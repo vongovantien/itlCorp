@@ -4,7 +4,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 import { AppForm } from '@app';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
@@ -34,7 +34,6 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     @ViewChild(ShareBusinessAddAttachmentPopupComponent) attachmentPopup: ShareBusinessAddAttachmentPopupComponent;
     @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
-    @ViewChild('formReportPDF', { static: true }) formRp: ElementRef;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
 
     srcReportPDF: any = `${environment.HOST.EXPORT_CRYSTAL}`;
@@ -876,7 +875,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                             this.dataReport = res;
                             if (res?.dataSource?.length > 0) {
                                 this.dataReport = res;
-                                this.renderAndShowReport();
+                                this.renderAndShowReport('AN');
                             } else {
                                 this._toastService.warning('There is no data to display preview');
                             }
@@ -894,7 +893,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         (res: Crystal) => {
                             if (res?.dataSource?.length > 0) {
                                 this.dataReport = res;
-                                this.renderAndShowReport();
+                                this.renderAndShowReport('AN');
                             } else {
                                 this._toastService.warning('There is no data to display preview');
                             }
@@ -916,7 +915,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     (res: Crystal) => {
                         this.dataReport = res;
                         if (res.dataSource.length > 0) {
-                            this.renderAndShowReport();
+                            this.renderAndShowReport('MNF');
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -933,7 +932,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     (res: Crystal) => {
                         this.dataReport = res;
                         if (res.dataSource.length > 0) {
-                            this.renderAndShowReport();
+                            this.renderAndShowReport('MNF');
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -956,7 +955,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     (res: Crystal) => {
                         this.dataReport = res;
                         if (res.dataSource.length > 0) {
-                            this.renderAndShowReport();
+                            this.renderAndShowReport('HBL');
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -976,7 +975,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport('HBL');
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -995,7 +994,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport('SI');
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -1014,7 +1013,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport('SI');
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -1033,7 +1032,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport('SI');
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -1052,7 +1051,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport('SI');
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -1069,7 +1068,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport('DO');
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -1085,7 +1084,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     if (!!res) {
                         this.dataReport = res;
                         if (this.dataReport.dataSource?.length > 0) {
-                            this.renderAndShowReport();
+                            this.renderAndShowReport('DO');
                         } else {
                             this._toastService.warning('There is no container data to display preview');
                         }
@@ -1104,7 +1103,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport('INV');
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -1119,7 +1118,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         if (res != null) {
                             if (res?.dataSource?.length > 0) {
                                 this.dataReport = res;
-                                this.renderAndShowReport();
+                                this.renderAndShowReport('INV');
                             } else {
                                 this._toastService.warning('There is no data to display preview');
                             }
@@ -1138,7 +1137,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport('CN');
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -1153,7 +1152,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport('CN');
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -1182,7 +1181,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 if (res !== false) {
                     if (res?.dataSource?.length > 0) {
                         this.dataReport = res;
-                        this.renderAndShowReport();
+                        this.renderAndShowReport('POD');
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -1322,7 +1321,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         this.componentRef.instance.show();
     }
 
-    renderAndShowReport() {
+    renderAndShowReport(templateCode?: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -1334,6 +1333,43 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 this.subscription.unsubscribe();
                 this.reportContainerRef.viewContainerRef.clear();
             });
+
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._export.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.jobId,
+                            hblId: SystemConstants.EMPTY_GUID,
+                            templateCode: templateCode || 'OTH',
+                            transactionType: this.serviceId
+                        };
+                        return this._systemfileManageRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 
     assignStageByEventType(jobId: string, hblId: string) {
