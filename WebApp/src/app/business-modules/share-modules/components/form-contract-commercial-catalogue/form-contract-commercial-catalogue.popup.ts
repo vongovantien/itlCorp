@@ -326,6 +326,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 },
             );
     }
+
     onSelectedDataFormInfo($event, type: string) {
         switch (type) {
             case 'salesman':
@@ -498,7 +499,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this._toastService.error('Contract no has been existed!');
                 return;
             }
-            this.asignValueToModel();
+            this.assignValueToModel();
             if (this.isCustomerRequest === true) {
                 if (!this.partnerIds.value) return;
                 this.selectedContract.partnerId = this.partnerIds.value;
@@ -514,6 +515,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                                     this.uploadFileContract(res.data);
                                 }
                                 this.onRequest.emit(true);
+                                this.formGroup.reset();
                                 this.hide();
                             } else {
                                 this._toastService.error(res.message);
@@ -612,7 +614,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.onRequest.emit(this.selectedContract);
-
+                        this.formGroup.reset();
                         this.hide();
                     } else {
                         this._toastService.error(res.message);
@@ -623,7 +625,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     onSubmitChangeAgreementType() {
         if (this.formGroup.valid) {
-            this.asignValueToModel();
+            this.assignValueToModel();
             const body = new Contract(this.selectedContract);
             body.isChangeAgrmentType = this.isChangeAgrmentType;
             this.confirmChangeAgreementTypePopup.hide();
@@ -726,7 +728,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
         this.formatAutoExtendDays();
     }
-    asignValueToModel() {
+    assignValueToModel() {
         if (this.isUpdate) {
             this.selectedContract.id = this.idContract;
         }
@@ -1048,6 +1050,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     close() {
         this.selectedSalesmanData = null;
+        this.formGroup.reset()
         this.hide();
     }
 
