@@ -599,25 +599,30 @@
                             <span> AR Confirmed </span>
                         </span>
                     </button>
-                    <ng-container
-                        *ngIf="(contractType.value !=='Cash' && contractType.value !== 'Guarantee' && contractType.value !== 'Prepaid') || selectedContract?.arconfirmed === true || currentUser?.userType === 'Super Admin'">
-                        <button (click)="activeInactiveContract(selectedContract.id)"
-                            *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
-                            class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
-                            <span>
-                                <i class="la la-check-square-o"></i>
-                                <span> Active </span>
-                            </span>
-                        </button>
-                        <button (click)="activeInactiveContract(selectedContract.id)"
-                            *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
-                            class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
-                            <span>
-                                <i class="la la-remove"></i>
-                                <span> Inactive </span>
-                            </span>
-                        </button>
+                    <ng-container *ngIf="!!contractType.value">
+                        <ng-container *ngIf="(contractType.value !=='Cash' && contractType.value !== 'Guarantee' && contractType.value !== 'Prepaid' && selectedContract?.arconfirmed === true)||
+                            (contractType.value === 'Cash' || contractType.value === 'Guarantee' || contractType.value === 'Prepaid')||
+                            currentUser?.userType === 'Super Admin'">
+                            <button (click)="activeInactiveContract(selectedContract.id)"
+                                *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
+                                class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
+                                <span>
+                                    <i class="la la-check-square-o"></i>
+                                    <span> Active </span>
+                                </span>
+                            </button>
+                            <button (click)="activeInactiveContract(selectedContract.id)"
+                                *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
+                                class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
+                                <span>
+                                    <i class="la la-remove"></i>
+                                    <span> Inactive </span>
+                                </span>
+                            </button>
+                        </ng-container>
                     </ng-container>
+
+
                     <button
                         *ngIf="( (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true || (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true   ) && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
                         type="button" class="btn btn-warning   m-btn--icon  m-btn--uppercase"
