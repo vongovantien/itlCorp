@@ -253,6 +253,18 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 contract.ShipmentType = "Freehand & Nominated";
             }
+            if (contract.ExpiredDate != null)
+            {
+                var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)contract.ExpiredDate).Date);
+                if (expiredCheck <= 0)
+                {
+                    contract.IsExpired = false;
+                }
+                else if (expiredCheck > 0)
+                {
+                    contract.IsExpired = true;
+                }
+            }
             var hs = DataContext.Add(contract, false);
             DataContext.SubmitChanges();
             if (hs.Success)
