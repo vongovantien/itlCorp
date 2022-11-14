@@ -13,6 +13,6 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public Guid? Hblid { get; set; }
         public decimal? UnpaidAmountVnd { get; set; }
         public decimal? UnpaidAmountUsd { get; set; }
-        public IQueryable<AgencyDebitCreditModel> Invoices { get; set; }
+        public List<AgencyDebitCreditModel> Invoices { get; set; }
     }
 }
