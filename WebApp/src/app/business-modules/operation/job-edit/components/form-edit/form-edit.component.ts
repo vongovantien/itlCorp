@@ -1,21 +1,23 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { OperationRepo } from '@repositories';
+import { takeUntil } from 'rxjs/operators';
 
 import { AppForm } from '@app';
-import { ShareBussinessContainerListPopupComponent, IShareBussinessState, GetContainerSuccessAction, getContainerSaveState } from '@share-bussiness';
-import { OpsTransaction, Customer, PortIndex, Warehouse, User, CommodityGroup, Unit, Container } from '@models';
-import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
-import { Store } from '@ngrx/store';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
-import { CommonEnum } from '@enums';
-import { FormValidators } from '@validators';
-import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
+import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { CommodityGroup, Container, CustomDeclaration, Customer, OpsTransaction, PortIndex, Unit, User, Warehouse } from '@models';
+import { Store } from '@ngrx/store';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
+import { getContainerSaveState, GetContainerSuccessAction, IShareBussinessState, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
+import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
+import { FormValidators } from '@validators';
 
-import { Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
+import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'job-mangement-form-edit',
@@ -104,9 +106,11 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
+        private _operationRepo: OperationRepo,
         protected _documentRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
         private _systemRepo: SystemRepo,
+        private _toastService: ToastrService,
         private _toaster: ToastrService) {
         super();
     }
@@ -141,7 +145,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.warehouses = this._store.select(getCatalogueWarehouseState);
         this.commodityGroups = this._store.select(getCatalogueCommodityGroupState);
         this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
-
         this.containers = this._store.select(getContainerSaveState);
         this.initForm();
     }
@@ -235,8 +238,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             shipmentType: [null, Validators.required],
             sumGrossWeight: [null],
             sumNetWeight: [null],
-            sumContainers: [null],
-            sumPackages: [null],
+            sumContainers: [null, Validators.max(5000000)],
+            sumPackages: [null, Validators.max(5000000)],
             sumCbm: [null],
             containerDescription: [null],
             packageTypeId: [null],
@@ -338,7 +341,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.salemansId.setValue(data.id);
                 this.salesmanName = data.username;
                 break;
-            case 'fieldOps':    
+            case 'fieldOps':
                 this.fieldOpsId.setValue(data.id);
                 break;
             case 'billingOps':
@@ -398,9 +401,9 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
         this.billingOpsId.setValue(this.userLogged.id);
     }
-    
-    getSalesmanList(data: any){
-        this.shipmentType.setValue(data); 
+
+    getSalesmanList(data: any) {
+        this.shipmentType.setValue(data);
         this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
             .subscribe(
                 (res: any) => {
@@ -422,9 +425,60 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                         this.salemansId.setValue(null);
                     }
                 }
-            );          
+            );
+    }
+
+    syncGoodInforToReplicateJob() {
+        this._documentRepo.syncGoodInforToReplicateJob({ jobNo: this.opsTransaction.jobNo }).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+        ).subscribe((res: any) => {
+            if (res.status) {
+                this._toastService.success(res.message);
+
+            } else {
+                this._toastService.error(res.message);
+            }
+        });
+    }
+
+    setGoodsInForValue(res: CustomDeclaration[]) {
+        if (!!res) {
+            let gw = 0;
+            let nw = 0;
+            let containerQty = 0;
+            let packagesQty = 0;
+            let sumCbm = 0;
+            res.forEach(s => {
+                sumCbm += s.cbm;
+                nw += s.netWeight;
+                containerQty += s.qtyCont;
+                gw += s.grossWeight;
+                packagesQty += s.pcs;
+            });
+            this.formEdit.patchValue({
+                sumCbm: sumCbm !== 0 ? sumCbm.toFixed(3) : null,
+                sumNetWeight: nw !== 0 ? nw.toFixed(3) : null,
+                sumContainers: containerQty !== 0 ? containerQty : null,
+                sumPackages: packagesQty !== 0 ? packagesQty : null,
+                sumGrossWeight: gw !== 0 ? gw.toFixed(3) : null,
+                packageTypeId: res[0].unitCodeId !== 0 ? res[0].unitCodeId : null,
+            });
+        }
+    }
+
+    getDataFromDeclaration() {
+        this._operationRepo.getListImportedInJob(this.opsTransaction.jobNo).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+        ).subscribe(
+            (res: CustomDeclaration[]) => {
+                this.setGoodsInForValue(res)
+            }
+        );
     }
 }
+
 export interface ILinkAirSeaInfoModel {
     hblId: string;
     jobId: string;

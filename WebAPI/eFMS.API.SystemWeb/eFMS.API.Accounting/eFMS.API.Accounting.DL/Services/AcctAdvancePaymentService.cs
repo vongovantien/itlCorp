@@ -1534,13 +1534,14 @@ namespace eFMS.API.Accounting.DL.Services
                     JobId = s.First() != null ? s.First().JobId : null,
                     Hbl = s.Key.Hbl,
                     Mbl = s.First() != null ? s.First().Mbl : null,
-                    CustomNo = s.First() != null ? s.First().CustomNo : null
+                    CustomNo = s.First() != null ? s.First().CustomNo : null,
+                    Hblid = s.First().Hblid
                 });
 
                 foreach (var request in groupJobByHbl)
                 {
                     //Lấy ra NW, CBM, PSC, Container Qty
-                    var ops = opsTransactionRepo.Get(x => x.JobNo == request.JobId).FirstOrDefault();
+                    var ops = opsTransactionRepo.Get(x => x.Hblid == request.Hblid).FirstOrDefault();
                     if (ops != null)
                     {
                         contQty += ops.SumContainers.HasValue ? ops.SumContainers.Value : 0;
@@ -1562,7 +1563,7 @@ namespace eFMS.API.Accounting.DL.Services
                             gw += job.GrossWeight ?? 0;
                         }
 
-                        var house = csTransactionDetailRepo.Get(x => x.Hwbno == request.Hbl).FirstOrDefault();
+                        var house = csTransactionDetailRepo.Get(x => x.Id == request.Hblid).FirstOrDefault();
                         string customerNameAbbr = catPartnerRepo.Get(x => x.Id == house.CustomerId).FirstOrDefault()?.ShortName;
                         customer += !string.IsNullOrEmpty(customerNameAbbr) && !customer.Contains(customerNameAbbr) ? customerNameAbbr + ", " : string.Empty;
                         string shipperNameAbbr = catPartnerRepo.Get(x => x.Id == house.ShipperId).FirstOrDefault()?.ShortName;

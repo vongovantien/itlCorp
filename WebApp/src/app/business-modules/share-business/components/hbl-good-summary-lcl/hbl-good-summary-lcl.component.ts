@@ -85,7 +85,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
                         this.packageQty = res.packageQty;
                         this.selectedPackage = res.packageType;
                         this.containerDescription = res.contSealNo;
-                        // this.containers = res.csMawbcontainers;
+                        this.containers = res.csMawbcontainers;
                     }
                 }
             );
@@ -123,13 +123,14 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (!!this.description && containers.length>0 ) {
+        if (!this.description && this.containers.length>0) {
             this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
+
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
-        console.log(!!this.commodities && containers.length>0)
-        if (!!this.commodities && containers.length>0) {
+
+        if (!this.commodities && this.containers.length>0) {
             this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
@@ -155,7 +156,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             }
         }
         // * Container
-        if (containers.length>0) {
+        if (this.containers.length>0) {
             this.containerDetail = '';
             this.containerDescription = '';
             if (this.type === 'export') {
@@ -204,7 +205,8 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     onRefresh() {
         this.confirmRefresh.hide();
-
+        this.containerDetail = '';
+        this.containerDescription = '';
         this.updateData(this.containers);
     }
 }

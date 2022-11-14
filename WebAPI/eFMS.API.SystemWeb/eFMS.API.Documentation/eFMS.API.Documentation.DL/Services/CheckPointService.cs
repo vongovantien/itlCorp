@@ -318,7 +318,7 @@ namespace eFMS.API.Documentation.DL.Services
             CatContract contract;
             int errorCode = -1;
 
-            if (partner.PartnerMode == "Internal")
+            if (partner.PartnerMode == "Internal" || partner.PartnerType == "Agent")
             {
                 return result;
             }
@@ -370,13 +370,18 @@ namespace eFMS.API.Documentation.DL.Services
                         return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
                     }
 
-                    if(contractCurrent.ContractType == "Prepaid") // check hợp đồng hiện tại trước khi đổi sales, đổi customer.
+                    if(contractCurrent.ContractType == "Prepaid") // check hợp đồng hiện tại trước khi đổi sales, đổi customer
                     {
-                        isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId, currentPartner, criteria.TransactionType);
-                        if (!isValid)
+                        if (currentPartner != criteria.PartnerId || currentSaleman != criteria.SalesmanId)
                         {
-                            return new HandleState((object)string.Format(@"Contract of {0} is Prepaid has issued debit/invoice. Cannot change to another customer or salesman",
-                            partner?.ShortName));
+                            // không cho đổi customer nếu đang là prepaid nếu đã issue debit/ inv
+                            isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId, currentPartner, criteria.TransactionType);
+                            if (!isValid)
+                            {
+                                return new HandleState((object)string.Format(@"Contract of {0} is Prepaid has issued debit/invoice. Cannot change to another customer or salesman",
+                                partner?.ShortName));
+                            }
+
                         }
                         currentSaleman = criteria.SalesmanId;
                         currentPartner = criteria.PartnerId;
@@ -513,7 +518,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else isValid = true;
                     break;
                 case "Prepaid":
-                    if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
+                    if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL || checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                     {
                         isValid = ValidateCheckPointPrepaidContractPartner(criteria.HblId, criteria.PartnerId, criteria.TransactionType);
                     } else

@@ -425,6 +425,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             _hblNo = _tranDeRepo.Get(y => y.Id == x.Hblid)?.FirstOrDefault()?.Hwbno;
                         }
                     }
+                    var jobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault().JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault().JobNo;
+                    var tra = GetDocumentType(transactionType,null);
                     var imagedetail = new SysImageDetailModel
                     {
                         BillingNo = null,
@@ -432,13 +434,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         DatetimeCreated = x.DatetimeCreated,
                         DatetimeModified = x.DatetimeModified,
                         DepartmentId = currentUser.DepartmentId,
-                        DocumentTypeId = GetDocumentType(transactionType,null),
+                        DocumentTypeId = tra,
                         ImageUrl = x.ImageUrl,
                         GroupId = currentUser.GroupId,
                         UserCreated = x.UserCreated,
                         UserModified = x.UserModified,
-                        SystemFileName = x.SystemFileName,//"OTH" + Path.GetFileNameWithoutExtension(clearPrefix(transactionType, x.UserFileName)),
-                        JobNo = transactionType != "CL" ? _cstranRepo.Get(y => y.Id == jobID).FirstOrDefault()?.JobNo : _opsTranRepo.Get(z => z.Id == jobID).FirstOrDefault()?.JobNo,
+                        SystemFileName = "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(x.UserFileName)),
+                        JobNo = jobNo,
                         UserFileName = x.UserFileName,
                         Id = x.Id,
                         TransactionType=transactionType,
@@ -814,21 +816,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 prefixs = _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType).Select(x => x.Code).OrderBy(x => x.Length).ToList(); prefixs = _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType).Select(x => x.Code).OrderBy(x => x.Length).ToList();
             }
             string code = null;
-            if (fileName.Contains("OTH"))
+            for(int i=0;i<prefixs.Count; i++)
             {
-                code = "OTH";
-            }
-            else
-            {
-                for (int i = 0; i < prefixs.Count; i++)
+                if (fileName.Contains(prefixs[i]))
                 {
-                    if (fileName.Contains(prefixs[i]))
-                    {
-                        code = prefixs[i];
-                    }
+                    code = prefixs[i];
                 }
             }
-         
             //prefixs.ForEach(x =>
             //{
             //    if (fileName.Contains(x))

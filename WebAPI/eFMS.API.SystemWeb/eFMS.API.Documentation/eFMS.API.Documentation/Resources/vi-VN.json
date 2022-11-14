@@ -69,5 +69,9 @@
   "MSG_INVOICE_NO_REQUIRED": "InvoiceNo không được để trống!",
   "MSG_CDNOTE_ISSUED_COMBINE": "CD Note đã làm combine billing {0}. Vui lòng xóa CD Note khỏi Combine trên để thực hiện thao tác.",
   "MSG_TOTAL_OVER_LIMIT": "Tổng tiền quá lớn với mã tiền tệ {0}",
-  "MSG_SHIPMENT_INVALID_NO_PROFIT": "{0} đã check No Profit đang có Profit > 0"
+  "MSG_SHIPMENT_INVALID_NO_PROFIT": "{0} đã check No Profit đang có Profit > 0",
+  "MSG_CLEARANCE_CONTRACT_NULL": "Khách hàng {0} không có bất kỳ thỏa thuận dịch vụ nào với văn phòng {1}!",
+  "MSG_CLEARANCE_IS_EXPIRED": "{0} - {1} {2} Thỏa thuận của {3} hết hạn, vui lòng kiểm tra lại!",
+  "MSG_CLEARANCE_IS_OVERDUE": "{0} - {1} {2} Thỏa thuận của {3} có công nợ quá hạn, vui lòng kiểm tra lại!",
+  "MSG_CLEARANCE_IS_OVERLIMIT": "{0} - {1} {2} Thỏa thuận của {3} vượt hạn mức tín dụng {4}% , vui lòng kiểm tra lại!"
 }

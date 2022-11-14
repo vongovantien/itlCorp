@@ -12,6 +12,7 @@ import { SearchListCustomerPayment } from '../../store/actions';
 import { customerPaymentReceipSearchState, ICustomerPaymentState } from '../../store/reducers';
 import { takeUntil } from 'rxjs/operators';
 import { isNull } from '@angular/compiler/src/output/output_ast';
+import { DataService } from '@services';
 
 @Component({
     selector: 'customer-payment-form-search',
@@ -32,6 +33,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     syncStatus: AbstractControl;
     status: AbstractControl;
     typeReceipt: AbstractControl;
+    class: AbstractControl;
 
     customerIDs: Observable<Customer[]>;
     creators: Observable<User[]>;
@@ -45,6 +47,13 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     statuss = AccountingConstants.STATUS;
     typesReceipt: string[] = ['Customer', 'Agent'];
     statusRecepit: string[] = ['Draft', 'Cancel', 'Done'];
+    classReceipts: string[] = [
+        AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT,
+        AccountingConstants.RECEIPT_CLASS.ADVANCE,
+        AccountingConstants.RECEIPT_CLASS.COLLECT_OBH,
+        AccountingConstants.RECEIPT_CLASS.COLLECT_OBH_OTHER,
+        AccountingConstants.RECEIPT_CLASS.PAY_OBH,
+        AccountingConstants.RECEIPT_CLASS.NET_OFF];
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -75,7 +84,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             currency: [],
             status: [],
             syncStatus: [],
-            typeReceipt: []
+            typeReceipt: [],
+            class: []
         });
         this.refNo = this.formSearch.controls['refNo'];
         this.paymentType = this.formSearch.controls['paymentType'];
@@ -86,6 +96,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.syncStatus = this.formSearch.controls['syncStatus'];
         this.typeReceipt = this.formSearch.controls['typeReceipt'];
         this.status = this.formSearch.controls['status'];
+        this.class = this.formSearch.controls['class'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -112,7 +123,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             currency: this.currency.value,
             syncStatus: this.syncStatus.value,
             status: this.status.value,
-            typeReceipt: this.typeReceipt.value
+            typeReceipt: this.typeReceipt.value,
+            class: this.class.value
         };
         //this._listReceipt.onSearchCPs(body);
         this._store.dispatch(SearchListCustomerPayment(body))
@@ -129,6 +141,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.currency.setValue(null);
         this.syncStatus.reset();
         this.status.reset();
+        this.class.reset();
 
         this._store.dispatch(SearchListCustomerPayment({}))
     }
@@ -150,7 +163,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
                             currency: data.currency ? data.currency : null,
                             status: data.status ? data.status : null,
                             syncStatus: data.syncStatus ? data.syncStatus : null,
-                            typeReceipt: data.typeReceipt ? data.typeReceipt : null
+                            typeReceipt: data.typeReceipt ? data.typeReceipt : null,
+                            class: data.class ? data.class : null
                         };
 
                         this.formSearch.patchValue(formData);
@@ -171,4 +185,5 @@ export interface IAcctReceiptCriteria {
     syncStatus: string;
     status: string;
     typeReceipt: string;
+    class: string;
 }

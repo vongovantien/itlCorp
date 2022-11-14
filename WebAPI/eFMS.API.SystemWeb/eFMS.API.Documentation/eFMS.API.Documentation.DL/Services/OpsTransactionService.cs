@@ -1,34 +1,33 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
-using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Common;
-using ITL.NetCore.Connection.BL;
-using ITL.NetCore.Connection.EF;
-using Microsoft.Extensions.Localization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
-using eFMS.API.Common.Models;
-using eFMS.API.Common;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using eFMS.API.Common.Helpers;
-using System.Data.Common;
-using eFMS.API.Documentation.Service.Contexts;
-using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
-using System.Linq.Expressions;
+using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
-using eFMS.API.Documentation.DL.Helpers;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using Microsoft.Extensions.Options;
 
@@ -890,15 +889,29 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                   && x.SaleService.Contains("CL")
-                   && x.Active == true
-                   && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                   && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                   )?.FirstOrDefault();
+                       && x.SaleService.Contains("CL")
+                       && x.Active == true
+                       && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
                     if (customerContract == null)
                     {
                         string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                        string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
+                        return new HandleState(errorContract);
+                    }
+                    string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
+                    if (customerContract.IsExpired == true)
+                    {
+                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                        return new HandleState(errorContract);
+                    }
+                    if (customerContract.IsOverDue == true)
+                    {
+                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                        return new HandleState(errorContract);
+                    }
+                    if (customerContract.IsOverLimit == true)
+                    {
+                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
                         return new HandleState(errorContract);
                     }
                 }
@@ -1005,7 +1018,7 @@ namespace eFMS.API.Documentation.DL.Services
                 UserCreated = currentUser.UserID, //currentUser.UserID;
                 DatetimeModified = DateTime.Now,
                 UserModified = currentUser.UserID,
-                ShipmentType = customerContract.ShipmentType== "Nominated" ? "Nominated" : "Freehand",
+                ShipmentType = customerContract.ShipmentType == "Nominated" ? "Nominated" : "Freehand",
             };
 
             CatPartner customer = new CatPartner();
@@ -1145,18 +1158,34 @@ namespace eFMS.API.Documentation.DL.Services
                         && x.SaleService.Contains("CL")
                         && x.Active == true
                         && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                    } else
+                    }
+                    else
                     {
                         customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
                        && x.SaleService.Contains("CL")
                        && x.Active == true
-                       && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                       && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                       )?.FirstOrDefault();
+                       && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                        
                         if (customerContract == null)
                         {
                             string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                            string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
+                            return new HandleState(errorContract);
+                        }
+                        string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
+                        if (customerContract.IsExpired == true)
+                        {
+                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                            return new HandleState(errorContract);
+                        }
+                        if (customerContract.IsOverDue == true)
+                        {
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                            return new HandleState(errorContract);
+                        }
+                        if (customerContract.IsOverLimit == true)
+                        {
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
                             return new HandleState(errorContract);
                         }
                     }
@@ -1284,7 +1313,7 @@ namespace eFMS.API.Documentation.DL.Services
                 result = new HandleState(ex.Message);
             }
             return result;
-        }
+         }
 
         private HandleState CreateJobAndClearanceReplicate(OpsTransaction opsTransaction, string productService, CustomsDeclarationModel cd,
             CatContract customerContract, out OpsTransaction opsTransactionReplicate, out CustomsDeclaration clearanceReplicate)
@@ -1353,6 +1382,10 @@ namespace eFMS.API.Documentation.DL.Services
                     Hblid = cd.Hblid,
                     Mblid = cd.Mblid,
                     NetWeight = cd.NetWeight,
+                    GrossWeight = cd.GrossWeight,
+                    Pcs = cd.Pcs,
+                    Cbm = cd.Cbm,
+                    UnitCode = cd.UnitCode,
                     Note = cd.Note,
                     AccountNo = cd.AccountNo,
                     PartnerTaxCode = cd.PartnerTaxCode,
@@ -2827,6 +2860,32 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
+        }
+
+        public async Task<HandleState> SyncGoodInforToReplicateJob(string jobNo)
+        {
+            var hs = new HandleState();
+
+            var job = await DataContext.Get(x => x.JobNo == jobNo && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+            if (job != null)
+            {
+                var repJob = await DataContext.Get(x => x.Id == job.ReplicatedId && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+                if (job != null && repJob != null)
+                {
+                    repJob.SumNetWeight = job.SumNetWeight;
+                    repJob.SumPackages = job.SumPackages;
+                    repJob.SumCbm = job.SumCbm;
+                    repJob.SumContainers = job.SumContainers;
+                    repJob.SumGrossWeight = job.SumGrossWeight;
+                    repJob.PackageTypeId = job.PackageTypeId;
+
+                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id);
+                    return hs;
+                }
+            }
+
+
+            return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_REPLICATE_NOT_EXISTS].Value);
         }
 
         private List<sp_GetOutsourcingRegcognising> GetOutsourcingRegcognising(string JobNos)

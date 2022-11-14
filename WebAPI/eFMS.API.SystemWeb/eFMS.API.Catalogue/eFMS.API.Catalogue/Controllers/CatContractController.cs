@@ -551,7 +551,7 @@ namespace eFMS.API.Catalogue.Controllers
                             dateToPaseExpired = DateTime.Parse(dateExpired, culture);
                         }
                     }
-
+                    string contractType = worksheet.Cells[row, 6].Value?.ToString().Trim();
 
                     var contract = new CatContractImportModel
                     {
@@ -561,12 +561,12 @@ namespace eFMS.API.Catalogue.Controllers
                         Company = worksheet.Cells[row, 3].Value?.ToString().Trim(),
                         Office = worksheet.Cells[row, 4].Value?.ToString().Trim(),
                         ContractNo = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                        ContractType = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        ContractType = contractType,
                         SaleService = worksheet.Cells[row, 7].Value?.ToString().Trim(),
                         EffectDate = !string.IsNullOrEmpty(dateEffect) ? dateToPase : (DateTime?)null,
                         ExpireDate = !string.IsNullOrEmpty(dateExpired) ? dateToPaseExpired : (DateTime?)null,
                         PaymentMethod = worksheet.Cells[row, 10].Value?.ToString().Trim(),
-                        CurrencyId = worksheet.Cells[row, 11].Value?.ToString().Trim(),
+                        CurrencyId = contractType != "Guarantee" ? worksheet.Cells[row, 11].Value?.ToString().Trim() : "VND",
                         Vas = worksheet.Cells[row, 12].Value?.ToString().Trim(),
                         PaymentTermTrialDay = worksheet.Cells[row, 13].Value?.ToString().Trim(),
                         BaseOn = worksheet.Cells[row, 14].Value?.ToString().Trim(),

@@ -15,6 +15,7 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public string Status { get; set; }
         public string TypeReceipt { get; set; }
         public string PaymentMethod { get; set; }
+        public string Class { get; set; }
     }
 
     public enum AcctReceiptPaymentTypeEnum

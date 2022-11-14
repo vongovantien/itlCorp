@@ -31,12 +31,12 @@ namespace eFMS.API.Catalogue.Controllers
     public class CatBankController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICatBankService CatBankService;
+        private readonly ICatBankService catBankService;
         private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="localizer">inject interface IStringLocalizer</param>
         /// <param name="service">inject interface ICatBankService</param>
@@ -46,7 +46,7 @@ namespace eFMS.API.Catalogue.Controllers
             ICurrentUser currUser, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
-            CatBankService = service;
+            catBankService = service;
             currentUser = currUser;
             _hostingEnvironment = hostingEnvironment;
         }
@@ -59,7 +59,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getAll")]
         public IActionResult Get()
         {
-            var data = CatBankService.GetAll()?.OrderBy(x => x.BankNameVn);
+            var data = catBankService.GetAll()?.OrderBy(x => x.BankNameVn);
             return Ok(data);
         }
 
@@ -69,10 +69,10 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="id">id of data that need to retrieve</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("getById/{id}")]
+        [Route("GetDetailById/{id}")]
         public IActionResult Get(Guid id)
         {
-            var data = CatBankService.GetDetail(id);
+            var data = catBankService.GetDetail(id);
             return Ok(data);
         }
 
@@ -87,7 +87,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("paging")]
         public IActionResult Get(CatBankCriteria criteria, int page, int size)
         {
-            var data = CatBankService.Paging(criteria, page, size, out int rowCount);
+            var data = catBankService.Paging(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
@@ -101,7 +101,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getAllByQuery")]
         public IActionResult Get(CatBankCriteria criteria)
         {
-            var data = CatBankService.Query(criteria);
+            var data = catBankService.Query(criteria);
             return Ok(data);
         }
 
@@ -116,12 +116,15 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatBankModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(string.Empty, model);
-            if (checkExistMessage.Length > 0)
+            if(model.PartnerId == null)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                var checkExistMessage = CheckExist(string.Empty, model);
+                if (checkExistMessage.Length > 0)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                }
             }
-            var hs = CatBankService.Add(model);
+            var hs = catBankService.Add(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -130,7 +133,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
-        
+
         /// <summary>
         /// update an existed item
         /// </summary>
@@ -142,12 +145,18 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Put(CatBankModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(model.Id.ToString(), model);
-            if (checkExistMessage.Length > 0)
+
+            if (model.PartnerId == null)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                var checkExistMessage = CheckExist(model.Id.ToString(), model);
+                if (checkExistMessage.Length > 0)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+                }
             }
-            var hs = CatBankService.Update(model);
+     
+           
+            var hs = catBankService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -166,7 +175,7 @@ namespace eFMS.API.Catalogue.Controllers
         //[Authorize]
         public IActionResult Delete(Guid id)
         {
-            var hs = CatBankService.Delete(id);
+            var hs = catBankService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -204,7 +213,7 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
-        /// read charge data from file excel 
+        /// read charge data from file excel
         /// </summary>
         /// <param name="uploadedFile">file to read data</param>
         /// <returns></returns>
@@ -226,7 +235,7 @@ namespace eFMS.API.Catalogue.Controllers
                     string status = worksheet.Cells[row, 4].Value?.ToString().Trim();
                     if (status.ToLower() != "active")
                         active = false;
-                    
+
                     var bank = new CatBankImportModel
                     {
                         IsValid = true,
@@ -238,7 +247,7 @@ namespace eFMS.API.Catalogue.Controllers
                     };
                     list.Add(bank);
                 }
-                var data = CatBankService.CheckValidImport(list);
+                var data = catBankService.CheckValidImport(list);
                 var totalValidRows = data.Count(x => x.IsValid == true);
                 var results = new { data, totalValidRows };
                 return Ok(results);
@@ -256,7 +265,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Import([FromBody] List<CatBankImportModel> data)
         {
-            var hs = CatBankService.Import(data);
+            var hs = catBankService.Import(data);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully!!!" };
             if (hs.Success)
                 return Ok(result);
@@ -264,25 +273,35 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = hs.Exception.Message });
         }
 
+
+        [HttpGet]
+        [Route("GetBankByPartnerId/{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetBankByPartnerId(Guid id)
+        {
+            var data = await catBankService.GetBankByPartnerId(id);
+            return Ok(data);
+        }
+
         private string CheckExist(string id, CatBankModel model)
         {
             string message = string.Empty;
             if (id == string.Empty)
             {
-                if (CatBankService.Any(x => x.Code.ToString().ToLower() == model.Code.ToString().ToLower()))
+                if (catBankService.Any(x => x.Code.ToString().ToLower() == model.Code.ToString().ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (CatBankService.Any(x => x.BankNameVn.ToLower() == model.BankNameVn.ToLower() && x.Id.ToString().ToLower() != id.ToLower()))
+                if (catBankService.Any(x => x.BankNameVn.ToLower() == model.BankNameVn.ToLower() && x.Id.ToString().ToLower() != id.ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_NAME_EXISTED].Value;
                 }
             }
             return message;
         }
-        
+
     }
 }

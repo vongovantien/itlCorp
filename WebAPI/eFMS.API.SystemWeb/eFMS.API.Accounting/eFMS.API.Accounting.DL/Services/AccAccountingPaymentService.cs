@@ -1715,7 +1715,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.BillingRefNoType
             }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno, z.CombineNo, z.Hblid }), payment = x.Select(z => new { z.payment?.Id, z.payment?.ReceiptId, z.payment?.PaymentType, z.PaymentRefNo, invoicePayment = z.payment?.InvoiceNo, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.payment?.PaymentAmountVnd, z.payment?.PaymentAmountUsd, z.payment?.UnpaidPaymentAmountVnd, z.payment?.UnpaidPaymentAmountUsd, z.Type }) });
             var results = new List<AccountingCustomerPaymentExport>();
-            var soaLst = soaRepository.Get().Select(x => new { x.Soano, x.UserCreated, x.SalemanId }).ToLookup(x => x.Soano);
+            var soaLst = soaRepository.Get().Select(x => new { x.Soano, x.UserCreated, x.SalemanId, x.Note }).ToLookup(x => x.Soano);
             var cdNoteLst = cdNoteRepository.Get().ToLookup(x => x.Code);
             var opsLookup = opsTransactionRepository.Get(x => x.CurrentStatus != "Canceled").Select(x => new { x.Id, x.JobNo, x.Hblid, x.SalemanId }).ToLookup(x => x.Id);
             //var userLst = userRepository.Get().Select(x => new { x.Id, x.EmployeeId }).ToLookup(x => x.Id);
@@ -1980,11 +1980,13 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             var creatorId = cdNoteDetail?.UserCreated;
                             payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
+                            payment.BillingNote = cdNoteDetail?.Note;
                         }
                         else // Billing là soa
                         {
                             var creatorId = soaDetail?.UserCreated;
                             payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
+                            payment.BillingNote = soaDetail?.Note;
                         }
 
                         results.Add(payment);
@@ -2311,11 +2313,13 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         var creatorId = cdNoteDetail?.UserCreated;
                         payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
+                        payment.BillingNote = cdNoteDetail?.Note;
                     }
                     else // Billing là soa
                     {
                         var creatorId = soaDetail?.UserCreated;
                         payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
+                        payment.BillingNote = soaDetail?.Note;
                     }
 
                     results.Add(payment);

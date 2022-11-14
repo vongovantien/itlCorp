@@ -7,7 +7,7 @@ import { Crystal, CsTransactionDetail } from '@models';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
-import { concatMap, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
+import { concatMap, mergeMap, catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { SystemConstants } from '@constants';
 import { HttpResponse } from '@angular/common/http';
 
@@ -222,15 +222,22 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                     if (res.status) {
                         return this._exportRepository.exportDangerousGoods(this.hblDetail.id);
                     }
-                    this._toastService.warning(res.message);
-                    return of(false);
-                })
+                    return of(res);
+                }),
+                catchError((res) => {
+                    return of(null);
+                }),
             ).subscribe(
                 (res: any) => {
-                    if (!!res) {
+                    if (!!res && res.status === 204) {
+                        this._toastService.error("Shipment has no container list, cannot preview Dangerous Goods template!");
+                        return;
+                    } else if ((res as HttpResponse<any>).status && !!res.message) {
+                        this._toastService.warning(res.message);
+                    } else {
                         this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                     }
-                },
+                }
             );
     }
 

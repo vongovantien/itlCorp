@@ -25,7 +25,8 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState DeleteTransactionDetail(Guid hbId, out List<ObjectReceivableModel> receivables);
         //CsTransactionDetailReport GetReportBy(Guid jobId);
         List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria);
-        
+        Task<IQueryable<CsTransactionDetailModel>> QueryData(CsTransactionDetailCriteria criteria);
+
         IQueryable<CsTransactionDetail> GetHouseBill(string transactionType, CsTransaction shipment = null);
 
         IQueryable<CsTransactionDetailModel> GetListHouseBillAscHBL(CsTransactionDetailCriteria criteria);

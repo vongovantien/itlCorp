@@ -775,6 +775,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("Salesman", item.Salesman);
                         listKeyData.Add("Creator", item.Creator);
                         listKeyData.Add("CombineNo", item.CombineNo);
+                        listKeyData.Add("BillingNote", item.BillingNote);
                     }
                     else
                     {
@@ -2247,15 +2248,15 @@ namespace eFMS.API.ReportData.FormatExcel
                         string vatAmount = "( " + itemCharge.VATAmount + " )";
 
 
-                        if (itemCharge.VATAmount < 0)
-                        {
-                            workSheet.Cells[i + addressStartContent, 14].Value = vatAmount;
-                            workSheet.Cells[i + addressStartContent, 17].Value = vatAmount;
-                        }
-                        else
-                        {
-                            workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
-                        }
+                        //if (itemCharge.VATAmount < 0)
+                        //{
+                        //    workSheet.Cells[i + addressStartContent, 14].Value = vatAmount;
+                        //    workSheet.Cells[i + addressStartContent, 17].Value = vatAmount;
+                        //}
+                        //else
+                        //{
+                        //    workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
+                        //}
 
 
                         if (itemCharge.Type.Contains("OBH"))
@@ -5599,6 +5600,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 int startRow = 6;
                 excel.StartDetailTable = startRow;
+                excel.IsWriteLnString = false; // Không xuống dòng cho description
                 int _length = result.Details.Count;
 
                 for (int i = 0; i < _length; i++)

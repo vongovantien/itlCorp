@@ -1,12 +1,12 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, AfterViewInit, ElementRef, ViewChild, QueryList, ViewChildren, ChangeDetectionStrategy, HostListener, forwardRef, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, forwardRef, HostListener, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 
-import cloneDeep from 'lodash/cloneDeep';
-import { ListKeyManager, FocusKeyManager } from '@angular/cdk/a11y';
-import { DOWN_ARROW, ENTER } from '@angular/cdk/keycodes';
-import { AppCombogridItemComponent } from './combogrid-item/combo-grid-item.component';
+import { FocusKeyManager, ListKeyManager } from '@angular/cdk/a11y';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { DOWN_ARROW, ENTER } from '@angular/cdk/keycodes';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import cloneDeep from 'lodash/cloneDeep';
 import { BsDropdownDirective } from 'ngx-bootstrap/dropdown';
-import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
+import { AppCombogridItemComponent } from './combogrid-item/combo-grid-item.component';
 
 @Component({
     selector: 'app-combo-grid-virtual-scroll',
@@ -46,6 +46,7 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
 
     @Output() itemSelected = new EventEmitter<any>();
     @Output() remove = new EventEmitter<any>();
+    @Output() showedDropdown = new EventEmitter<any>();
 
     @ViewChild('inputSearch') inputSearch: ElementRef;
     @ViewChild('clkSearch') inputPlaceholder: ElementRef;
@@ -276,6 +277,10 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
         if (this.inputSearch) {
             this.timeout = setTimeout(() => this.inputSearch.nativeElement.focus(), 0);
         }
+    }
+
+    onShowedDropDown() {
+        this.showedDropdown.emit();
     }
 
     onFocusInputPlaceholder(e) {

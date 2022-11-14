@@ -1,29 +1,29 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Operation.DL.Common;
 using eFMS.API.Operation.DL.IService;
 using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.DL.Models.Ecus;
+using eFMS.API.Operation.Service.Contexts;
+using eFMS.API.Operation.Service.Models;
+using eFMS.API.Operation.Service.ViewModels;
+using eFMS.API.Provider.Services.IService;
+using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
+using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using System.Data.Common;
-using eFMS.API.Operation.Service.Models;
-using ITL.NetCore.Connection.BL;
-using eFMS.API.Provider.Services.IService;
-using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Connection.EF;
-using ITL.NetCore.Common;
-using eFMS.API.Infrastructure.Extensions;
-using eFMS.API.Common.Globals;
-using eFMS.API.Common.Helpers;
-using eFMS.API.Operation.Service.ViewModels;
-using eFMS.API.Operation.Service.Contexts;
-using ITL.NetCore.Connection;
-using eFMS.API.Common.Models;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Operation.DL.Services
@@ -57,7 +57,7 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<SysUser> userRepo,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
-            IContextBase<CatPartner> customerRepo) : base(repository, mapper)
+        IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
             catPlaceApi = catPlace;
@@ -187,7 +187,7 @@ namespace eFMS.API.Operation.DL.Services
                 pattern.Replace(clearance.MA_DV, "");
             }
             string _accountNo = clearance.MA_DV;
-            var partner = customerRepository.Get(x => x.TaxCode.Trim() == clearance.MA_DV.Trim())?.FirstOrDefault();
+            var partner = customerRepository.Get(x => x.Active == true && x.TaxCode.Trim() == clearance.MA_DV.Trim())?.FirstOrDefault();
             if(partner != null)
             {
                 _accountNo = partner.AccountNo;
@@ -1320,10 +1320,10 @@ namespace eFMS.API.Operation.DL.Services
                 {
                     var hs = Delete(x => x.Id == item.Id, false);
 
-                    var hasReplicate = DataContext.Get(x => x.ClearanceNo == item.ClearanceNo && x.Id != item.Id 
+                    var hasReplicate = DataContext.Get(x => x.ClearanceNo == item.ClearanceNo && x.Id != item.Id
                     && x.Source == OperationConstants.FROM_REPLICATE
                     && x.ClearanceDate == item.ClearanceDate)?.FirstOrDefault(); // do đang check trùng clearance theo ngày
-                    if(hasReplicate != null)
+                    if (hasReplicate != null)
                     {
                         Delete(x => x.Id == hasReplicate.Id, false);
                     }
@@ -1356,16 +1356,17 @@ namespace eFMS.API.Operation.DL.Services
                         join ope in shipmentMerge on cus.JobNo equals ope.JobNo
                         select new { cus, ope };
             IQueryable<CustomsDeclarationModel> d = null;
-            if(query != null)
+            if (query != null)
             {
-                d = query.ToList().Select(x => {
+                d = query.ToList().Select(x =>
+                {
                     x.cus.Hblid = x.ope.Hblid.ToString();
                     return mapper.Map<CustomsDeclarationModel>(x.cus);
                 }).AsQueryable();
 
             }
 
-            if(d != null && d.Count() > 0)
+            if (d != null && d.Count() > 0)
             {
                 var data = d.ToArray().OrderBy(o => o.ClearanceDate).ToList();
                 return data;
@@ -1381,7 +1382,7 @@ namespace eFMS.API.Operation.DL.Services
                           (!string.IsNullOrEmpty(x.CreditNo)
                           || !string.IsNullOrEmpty(x.DebitNo)
                           || !string.IsNullOrEmpty(x.Soano)
-                          || !string.IsNullOrEmpty( x.PaymentRefNo)
+                          || !string.IsNullOrEmpty(x.PaymentRefNo)
                           || !string.IsNullOrEmpty(x.AdvanceNo)
                           || !string.IsNullOrEmpty(x.VoucherId)
                           || !string.IsNullOrEmpty(x.PaySoano)
@@ -1548,18 +1549,18 @@ namespace eFMS.API.Operation.DL.Services
                         throw new NullReferenceException();
                     }
 
-                    if(opsJob.ReplicatedId == null)
+                    if (opsJob.ReplicatedId == null)
                     {
                         return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
                     }
 
                     var opsJobReplicate = opsTransactionRepo.Get(x => x.Id == opsJob.ReplicatedId)?.FirstOrDefault();
-                    if(opsJobReplicate == null)
+                    if (opsJobReplicate == null)
                     {
                         return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
                     }
                     var existedClearance = DataContext.Any(x => x.ClearanceNo == cd.ClearanceNo && x.Id != cd.Id && opsJobReplicate.JobNo == x.JobNo);
-                    if(existedClearance)
+                    if (existedClearance)
                     {
                         return new HandleState((object)string.Format("Tờ khai {0} đã được thêm vào lô replicate", cd.ClearanceNo));
                     }
@@ -1599,7 +1600,7 @@ namespace eFMS.API.Operation.DL.Services
                     hs = await DataContext.AddAsync(replicateCd);
                 }
             }
-            catch (NullReferenceException ex)
+            catch (NullReferenceException)
             {
                 return new HandleState((object)"Không tìm thấy thông tin job trong tờ khai!");
             }

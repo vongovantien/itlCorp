@@ -1393,4 +1393,14 @@ export class CatalogueRepo {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetPartnerByTaxCode/${taxCode}`);
 
     }
+
+    getListBankByPartnerById(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/GetBankByPartnerId/${id}`);
+
+    }
+
+    getDetailBankById(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/GetDetailById/${id}`);
+
+    }
 }

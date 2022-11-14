@@ -17,6 +17,7 @@ namespace eFMS.API.Operation.DL.Models
         public Guid? jobId { get; set; }
         public Guid? hbl { get; set; }
         public string CustomerId { get; set; }
+        public int UnitCodeId { get; set; }
     }
 
 }

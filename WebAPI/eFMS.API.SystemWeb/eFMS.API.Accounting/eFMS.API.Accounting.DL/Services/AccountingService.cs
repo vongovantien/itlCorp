@@ -356,7 +356,7 @@ namespace eFMS.API.Accounting.DL.Services
                             // CustomerCode = partner != null ? partner.AccountNo : (!string.IsNullOrEmpty(employee.PersonalId) ? employee.PersonalId : employee.StaffCode),
                             item.CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode; //[06/01/2021]
                             item.PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod;
-                            item.CustomerMode = partner != null ? partner.PartnerMode : "External";
+                            item.CustomerMode = partner != null ? (partner.Public == true ? "External" : partner.PartnerMode) : "External";
                             item.LocalBranchCode = partner != null ? (partner.PartnerMode == "Internal" ? partner.InternalCode : null) : null; //Parnter mode là internal => Internal Code
                             item.Payee = settle.Payee;
                             item.CurrencyCode = settle.SettlementCurrency;
@@ -587,7 +587,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var cdNotePartner = partners.Where(x => x.Id == cdNote.PartnerId).FirstOrDefault();
                 sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
                 sync.CustomerName = cdNotePartner?.PartnerNameVn; //Partner Local Name
-                sync.CustomerMode = cdNotePartner?.PartnerMode;
+                sync.CustomerMode = cdNotePartner.Public == true ? "External" : cdNotePartner?.PartnerMode;
                 sync.LocalBranchCode = cdNotePartner?.PartnerMode == "Internal" ? cdNotePartner.InternalCode : null; //Parnter mode là internal => Internal Code
                 sync.CurrencyCode0 = cdNote.CurrencyId;
                 sync.ExchangeRate0 = cdNote.ExchangeRate ?? 1;
@@ -782,7 +782,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var cdNotePartner = partners.Where(x => x.Id == cdNote.PartnerId).FirstOrDefault();
                     sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
                     sync.CustomerName = cdNotePartner?.PartnerNameVn; //Partner Local Name
-                    sync.CustomerMode = cdNotePartner?.PartnerMode;
+                    sync.CustomerMode = (cdNotePartner.Public == true ? "External" : cdNotePartner?.PartnerMode);
                     sync.LocalBranchCode = cdNotePartner?.PartnerMode == "Internal" ? cdNotePartner?.InternalCode : null; //Parnter mode là internal => Internal Code
                     sync.CurrencyCode = cdNote.CurrencyId;
                     sync.ExchangeRate = cdNote.ExchangeRate ?? 1;
@@ -937,7 +937,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
                 sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
                 sync.CustomerName = soaPartner?.PartnerNameVn; //Partner Local Name
-                sync.CustomerMode = soaPartner?.PartnerMode;
+                sync.CustomerMode = soaPartner.Public == true ? "External" : soaPartner?.PartnerMode;
                 sync.LocalBranchCode = soaPartner?.PartnerMode == "Internal" ? soaPartner?.InternalCode : null; //Parnter mode là internal => Internal Code
                 sync.CurrencyCode0 = soa.Currency;
                 sync.ExchangeRate0 = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
@@ -1108,7 +1108,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
                     sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
                     sync.CustomerName = soaPartner?.PartnerNameVn; //Partner Local Name
-                    sync.CustomerMode = soaPartner?.PartnerMode;
+                    sync.CustomerMode = soaPartner?.Public == true ? "External" : soaPartner?.PartnerMode;
                     sync.LocalBranchCode = soaPartner?.PartnerMode == "Internal" ? soaPartner?.InternalCode : null; //Parnter mode là internal => Internal Code
                     sync.CurrencyCode = soa.Currency;
                     sync.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);

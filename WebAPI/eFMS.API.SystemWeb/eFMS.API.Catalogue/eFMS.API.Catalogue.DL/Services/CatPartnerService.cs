@@ -517,7 +517,7 @@ namespace eFMS.API.Catalogue.DL.Services
             // Body
             var body = new StringBuilder(emailTemplate.Body);
             string urlToSend = UrlClone.Replace("Catalogue", "");
-            body.Replace("{{dear}}", (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE) ? "Accountant Team" : "AR Team");
+            body.Replace("{{dear}}", (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID) ? "Accountant Team" : "AR Team");
             body.Replace("{{title}}", title);
             body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
             body.Replace("{{accountNo}}", partner.AccountNo);
@@ -532,7 +532,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             List<string> lstBCc = ListMailBCC();
             List<string> lstCc = new List<string>();
-            if (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE)
+            if (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID)
             {
                 lstTo = listEmailViewModel.ListAccountant;
                 if(listEmailViewModel.ListCCAccountant != null)

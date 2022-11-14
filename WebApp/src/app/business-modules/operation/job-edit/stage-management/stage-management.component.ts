@@ -1,16 +1,16 @@
 import { Component, ViewChild } from "@angular/core";
-import { OpsModuleStageManagementAddStagePopupComponent } from "./add/add-stage.popup.component";
-import { OpsModuleStageManagementDetailComponent } from "./detail/detail-stage-popup.component";
-import { OperationRepo, DocumentationRepo } from "src/app/shared/repositories";
 import { ActivatedRoute } from "@angular/router";
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { Stage } from "src/app/shared/models/operation/stage";
-import { SortService } from "src/app/shared/services";
-import { NgProgress } from "@ngx-progressbar/core";
-import { AssignStagePopupComponent } from "./assign-stage/assign-stage.popup";
-import { AppList } from "src/app/app.list";
 import { ConfirmPopupComponent } from "@common";
+import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { AppList } from "src/app/app.list";
+import { Stage } from "src/app/shared/models/operation/stage";
+import { DocumentationRepo, OperationRepo } from "src/app/shared/repositories";
+import { SortService } from "src/app/shared/services";
+import { OpsModuleStageManagementAddStagePopupComponent } from "./add/add-stage.popup.component";
+import { AssignStagePopupComponent } from "./assign-stage/assign-stage.popup";
+import { OpsModuleStageManagementDetailComponent } from "./detail/detail-stage-popup.component";
 
 @Component({
     selector: "app-ops-module-stage-management",
@@ -40,7 +40,7 @@ export class OpsModuleStageManagementComponent extends AppList {
         private _sortService: SortService,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
