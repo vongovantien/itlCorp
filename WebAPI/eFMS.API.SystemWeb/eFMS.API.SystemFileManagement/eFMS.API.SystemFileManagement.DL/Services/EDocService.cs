@@ -538,7 +538,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 //result.EDocs = lstEdoc.GroupBy(x => x.DocumentTypeId).ToList().Select(x => x.FirstOrDefault()).OrderBy(x => x.DatetimeCreated).ToList();
                 var lstEdocModel = new List<SysImageDetailModel>();
                 var edocLst = lstEdoc.OrderBy(x => x.DatetimeCreated).GroupBy(x=>x.SysImageId).ToList();
-                edocLst = edocLst;
                 edocLst.ForEach(x =>
                 {
                     var tottalItem = _sysImageDetailRepo.Get(z => z.SysImageId == x.FirstOrDefault().SysImageId).ToList();
@@ -626,7 +625,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserFileName = x.Name,
                         UserModified = x.UserModified,
                     };
-                    lstEdoc.Add(edoc);
+                    lstEdocOT.Add(edoc);
                 });
                 foreach (var x in advEDoc)
                 {
@@ -655,6 +654,30 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     };
                     lstEdoc.Add(edoc);
                 }
+                lstEdocOT.ForEach(x =>
+                {
+                    var edoc = new SysImageDetailModel()
+                    {
+                        JobNo = null,
+                        HBLNo = null,
+                        JobId = Guid.Empty,
+                        Hblid = Guid.Empty,
+                        SystemFileName = x.SystemFileName,
+                        UserFileName = x.UserFileName,
+                        DocumentTypeName = x.DocumentTypeName,
+                        DocumentTypeId = x.DocumentTypeId,
+                        TransactionType = x.TransactionType,
+                        ImageUrl = x.ImageUrl,
+                        SysImageId = x.SysImageId,
+                        UserCreated = x.UserCreated,
+                        Source = x.Source,
+                        AccountingType = x.AccountingType,
+                        DatetimeCreated = x.DatetimeCreated,
+                        Note = x.Note,
+                        Id = x.Id,
+                    };
+                    lstEdoc.Add(edoc);
+                });
                 result.EDocs = lstEdoc.OrderBy(x => x.DatetimeCreated).ToList();
             };
             return result;
