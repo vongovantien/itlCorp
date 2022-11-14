@@ -46,6 +46,7 @@ export class CustomDeclaration {
     companyId: string = null;
     userCreatedName: string = null;
     userModifieddName: string = null;
+    eta: any = null;
 
     // custom
     isReplicate: boolean = false;

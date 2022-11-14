@@ -44,7 +44,7 @@ export class CustomClearance {
     shipper: string;
     consignee: string;
     accountNo: string;
-    eta: any;
+    eta: any = null;
 
     permission: PermissionShipment = new PermissionShipment();
 
