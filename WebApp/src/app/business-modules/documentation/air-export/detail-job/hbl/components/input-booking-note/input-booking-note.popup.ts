@@ -177,7 +177,7 @@ export class InputBookingNotePopupComponent extends PopupBase implements ICrysta
                             folder: 'Shipment',
                             objectId: this.hblDetail.jobId,
                             hblId: this.hblId,
-                            templateCode: 'HAWB',
+                            templateCode: 'HBL',
                             transactionType: 'AE'
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
