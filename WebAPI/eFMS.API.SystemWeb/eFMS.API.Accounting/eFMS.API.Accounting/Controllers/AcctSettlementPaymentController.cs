@@ -37,6 +37,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IMapper mapper;
         private string typeApproval = "Settlement";
         private IAccAccountReceivableService accountReceivableService;
+        private readonly IEDocService _eDocService;
 
         /// <summary>
         /// Contructor
@@ -45,10 +46,11 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="service"></param>
         /// <param name="user"></param>
         public AcctSettlementPaymentController(
-            IStringLocalizer<LanguageSub> localizer, 
-            IAcctSettlementPaymentService service, 
+            IStringLocalizer<LanguageSub> localizer,
+            IAcctSettlementPaymentService service,
             ICurrentUser user, IMapper _mapper,
-            IAccAccountReceivableService accountReceivable
+            IAccAccountReceivableService accountReceivable,
+            IEDocService eDocService
             )
         {
             stringLocalizer = localizer;
@@ -56,6 +58,7 @@ namespace eFMS.API.Accounting.Controllers
             currentUser = user;
             mapper = _mapper;
             accountReceivableService = accountReceivable;
+            _eDocService = eDocService;
         }
 
         /// <summary>
@@ -508,6 +511,9 @@ namespace eFMS.API.Accounting.Controllers
                         await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
                     }
                 });
+                
+                // eDocService.RegenEDocSettle(model);
+
             }
             return Ok(result);
         }

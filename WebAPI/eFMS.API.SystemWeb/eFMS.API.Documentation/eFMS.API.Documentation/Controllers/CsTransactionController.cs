@@ -49,6 +49,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICheckPointService checkPointService;
         private readonly ICsStageAssignedService csStageAssignedService;
+        private readonly IEDocService _edocService;
 
         /// <summary>
         /// constructor
@@ -70,7 +71,8 @@ namespace eFMS.API.Documentation.Controllers
             IOptions<ApiServiceUrl> serviceUrl,
             ICheckPointService checkPoint,
             ISysImageService imageService,
-            ICsStageAssignedService stageAssignedService)
+             IEDocService edocService,
+        ICsStageAssignedService stageAssignedService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
@@ -81,6 +83,7 @@ namespace eFMS.API.Documentation.Controllers
             apiServiceUrl = serviceUrl;
             checkPointService = checkPoint;
             csStageAssignedService = stageAssignedService;
+            _edocService= edocService;
         }
 
         /// <summary>
@@ -487,6 +490,7 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
+                    await _edocService.DeleteEdocByJobId(id);
                 });
             }
             return Ok(result);
