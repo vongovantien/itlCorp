@@ -2217,6 +2217,7 @@ namespace eFMS.API.Documentation.DL.Services
                     item.PaySyncedFrom = null;
                     item.ReferenceNo = null;
                     item.ExchangeDate = DateTime.Now;
+                    item.AdvanceNoFor = null;
 
                     #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                     //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
