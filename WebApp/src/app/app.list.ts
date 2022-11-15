@@ -1,6 +1,4 @@
-import { AppPage } from './app.base';
-import { ContextMenuDirective } from '@directives';
-import { QueryList } from '@angular/core';
+import { AppPage } from "@app";
 
 export abstract class AppList extends AppPage {
 
@@ -84,14 +82,6 @@ export abstract class AppList extends AppPage {
         this.pageSize = e.pageSize;
         this.requestList(e.data);
     }
-
-    clearMenuContext(queryListMenuContext: QueryList<ContextMenuDirective>) {
-        const qContextMenuList = queryListMenuContext.toArray();
-        if (!!qContextMenuList.length) {
-            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
-        }
-    }
-
 }
 
 export interface IPermissionBase {
