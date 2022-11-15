@@ -615,8 +615,28 @@ namespace eFMS.API.Accounting.DL.Services
                 if (cdNotePartner != null)
                 {
                     var _partnerId = (cdNotePartner.Id == cdNotePartner.ParentId || string.IsNullOrEmpty(cdNotePartner.ParentId)) ? cdNotePartner.Id : cdNotePartner.ParentId;
-                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && servicesOfDebitNote.Any(z => x.SaleService.Contains(z)));
-                    var contractWithSaleman = contracts.Where(x => x.SaleManId == cdNote.SalemanId).FirstOrDefault();
+                    //var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && servicesOfDebitNote.Any(z => x.SaleService.Contains(z)));
+                    //if (contracts != null)
+                    //{
+                    //    // Ưu tiên Official >> Trial >> Cash (Default là 1)
+                    //    var contractsOffice = contracts.Where(x => x.ContractType == "Official").FirstOrDefault();
+                    //    if (contractsOffice != null)
+                    //    {
+                    //        _dueDate = contractsOffice.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                    //        _dueDateOBH = contractsOffice.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                    //    }
+                    //    else
+                    //    {
+                    //        var contractsTrial = contracts.Where(x => x.ContractType == "Trial").FirstOrDefault();
+                    //        if (contractsTrial != null)
+                    //        {
+                    //            _dueDate = contractsTrial.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                    //            _dueDateOBH = contractsTrial.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                    //        }
+                    //    }
+                    //}
+                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.SaleManId == cdNote.SalemanId && servicesOfDebitNote.Any(z => x.SaleService.Contains(z)));
+                    var contractWithSaleman = contracts.Where(x => x.Active == true).FirstOrDefault();
                     if (contractWithSaleman != null)
                     {
                         _dueDate = contractWithSaleman.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
@@ -624,24 +644,11 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        if (contracts != null)
+                        var contractInactive = contracts.Where(x => x.Active != true).FirstOrDefault(); // TH hđ inactive thì xem như no contract => payment term = 1
+                        if (contractInactive != null)
                         {
-                            // Ưu tiên Official >> Trial >> Cash (Default là 1)
-                            var contractsOffice = contracts.Where(x => x.ContractType == "Official").FirstOrDefault();
-                            if (contractsOffice != null)
-                            {
-                                _dueDate = contractsOffice.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
-                                _dueDateOBH = contractsOffice.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
-                            }
-                            else
-                            {
-                                var contractsTrial = contracts.Where(x => x.ContractType == "Trial").FirstOrDefault();
-                                if (contractsTrial != null)
-                                {
-                                    _dueDate = contractsTrial.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
-                                    _dueDateOBH = contractsTrial.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
-                                }
-                            }
+                            _dueDate = 1;
+                            _dueDateOBH = 1;
                         }
                     }
                 }
@@ -1001,8 +1008,28 @@ namespace eFMS.API.Accounting.DL.Services
                 if (soaPartner != null)
                 {
                     var _partnerId = (soaPartner.Id == soaPartner.ParentId || string.IsNullOrEmpty(soaPartner.ParentId)) ? soaPartner.Id : soaPartner.ParentId;
-                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && servicesOfSoaDebit.Any(z => x.SaleService.Contains(z)));
-                    var contractWithSaleman = contracts.Where(x => x.SaleManId == soa.SalemanId).FirstOrDefault();
+                    //var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.Active == true && servicesOfSoaDebit.Any(z => x.SaleService.Contains(z)));
+                    //if (contracts != null)
+                    //{
+                    //    // Ưu tiên Official >> Trial >> Cash (Default là 1)
+                    //    var contractsOffice = contracts.Where(x => x.ContractType == "Official").FirstOrDefault();
+                    //    if (contractsOffice != null)
+                    //    {
+                    //        _dueDate = contractsOffice.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                    //        _dueDateOBH = contractsOffice.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                    //    }
+                    //    else
+                    //    {
+                    //        var contractsTrial = contracts.Where(x => x.ContractType == "Trial").FirstOrDefault();
+                    //        if (contractsTrial != null)
+                    //        {
+                    //            _dueDate = contractsTrial.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
+                    //            _dueDateOBH = contractsTrial.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                    //        }
+                    //    }
+                    //}
+                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.SaleManId == soa.SalemanId && servicesOfSoaDebit.Any(z => x.SaleService.Contains(z)));
+                    var contractWithSaleman = contracts.Where(x => x.Active == true).FirstOrDefault();
                     if (contractWithSaleman != null)
                     {
                         _dueDate = contractWithSaleman.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
@@ -1010,24 +1037,11 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        if (contracts != null)
+                        var contractInactive = contracts.Where(x => x.Active != true).FirstOrDefault(); // TH hđ inactive thì xem như no contract => payment term = 1
+                        if (contractInactive != null)
                         {
-                            // Ưu tiên Official >> Trial >> Cash (Default là 1)
-                            var contractsOffice = contracts.Where(x => x.ContractType == "Official").FirstOrDefault();
-                            if (contractsOffice != null)
-                            {
-                                _dueDate = contractsOffice.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
-                                _dueDateOBH = contractsOffice.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
-                            }
-                            else
-                            {
-                                var contractsTrial = contracts.Where(x => x.ContractType == "Trial").FirstOrDefault();
-                                if (contractsTrial != null)
-                                {
-                                    _dueDate = contractsTrial.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
-                                    _dueDateOBH = contractsTrial.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
-                                }
-                            }
+                            _dueDate = 1;
+                            _dueDateOBH = 1;
                         }
                     }
                 }
