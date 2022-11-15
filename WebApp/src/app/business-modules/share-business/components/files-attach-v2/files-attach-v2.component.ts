@@ -267,9 +267,38 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.documentAttach.selectedtDocType = edoc.documentTypeId;
         this.clearMenuContext(this.queryListMenuContext);
     }
+    // downloadEdoc() {
+    //     this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
+    // }
+
     downloadEdoc() {
-        this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
+
+        const a: HTMLAnchorElement = document.createElement('a') as HTMLAnchorElement;
+
+        a.href = this.selectedEdoc.imageUrl;
+        a.download = 'AAA';
+        document.body.appendChild(a);
+        // a.click();
+        // setTimeout(function () {
+        //     document.body.removeChild(anchorElem);
+        //     window.URL.revokeObjectURL(url);
+        // }, 500);
     }
+
+    // downloadEdoc() {
+    //     const anchorElem = document.createElement("a");
+    //     anchorElem.id = "down";
+
+    //     // const el = document.getElementById('down');
+    //     const el = document.getElementById(anchorElem.id);
+
+    //     anchorElem.setAttribute('href', this.selectedEdoc.imageUrl);
+    //     anchorElem.setAttribute('download', "ABC");
+    //     anchorElem.style.display = 'none';
+    //     anchorElem.click();
+    // }
+
+
     editEdoc() {
         console.log(this.selectedEdoc);
         if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance') {
@@ -290,7 +319,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             id: this.selectedEdoc.id,
             docType: docType,
             note: this.selectedEdoc.note,
-            hwbNo: hwbNo,//hblNo 
+            hwbNo: hwbNo,//hblNo
             hblid: this.selectedEdoc.hblid,//hblNo
             jobNo: this.selectedEdoc.jobNo,
             jobId: this.selectedEdoc.jobId,
