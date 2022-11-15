@@ -438,13 +438,16 @@ namespace eFMS.API.Catalogue.DL.Services
             return ContractServicesName;
         }
 
-        public HandleState Update(CatContractModel model, out bool isChangeAgrmentType)
+        public HandleState Update(CatContractModel model)
         {
             var entity = mapper.Map<CatContract>(model);
             entity.UserModified = currentUser.UserID;
             entity.DatetimeModified = DateTime.Now;
             var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-            isChangeAgrmentType = (model.PaymentTerm != currentContract.PaymentTerm || model.PaymentTermObh != currentContract.PaymentTermObh);
+            // Get payment term change type
+            model.PaymentTermChanged = (model.PaymentTerm ?? 0) != (currentContract.PaymentTerm ?? 0) ? "DEBIT" : string.Empty;
+            model.PaymentTermChanged += (model.PaymentTermObh ?? 0) != (currentContract.PaymentTermObh ?? 0) ? ";OBH" : string.Empty;
+
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
 

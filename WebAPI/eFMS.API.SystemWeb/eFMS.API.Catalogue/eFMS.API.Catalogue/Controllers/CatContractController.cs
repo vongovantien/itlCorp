@@ -205,8 +205,7 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateSalesman, Data = new { errorCode = 403 } });
             }
 
-            var isChangeAgrmentType = false;
-            var hs = catContractService.Update(model, out isChangeAgrmentType);
+            var hs = catContractService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             DateTime localDate = DateTime.Now;
@@ -220,7 +219,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             else
             {
-                if (isChangeAgrmentType == true)
+                if (!string.IsNullOrEmpty(model.PaymentTermChanged))
                 {
                     Response.OnCompleted(async () =>
                     {

@@ -18,7 +18,7 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatContractViewModel> Query(CatContractCriteria criteria);
         List<CatContractViewModel> Paging(CatContractCriteria criteria, int page, int size, out int rowsCount);
         HandleState Delete(Guid id);
-        HandleState Update(CatContractModel model, out bool isChangeAgrmentType);
+        HandleState Update(CatContractModel model);
         HandleState CustomerRequest(CatContractModel model);
         List<CatContractModel> GetBy(string partnerId, bool? all);
         object GetContractIdByPartnerId(string partnerId, string jobId);

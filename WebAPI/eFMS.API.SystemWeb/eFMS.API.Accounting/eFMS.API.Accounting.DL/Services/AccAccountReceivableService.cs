@@ -1370,29 +1370,33 @@ namespace eFMS.API.Accounting.DL.Services
                 try
                 {
                     currentUser.Action = "UpdateDueDateAcctMngAfterChangePaymentTerm";
-                    var invoiceData = accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId &&
+                    var invoiceData = contractModel.PaymentTermChanged.Contains("DEBIT") ? accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId &&
                                              (!string.IsNullOrEmpty(x.ServiceType) && contractModel.SaleService.Contains(x.ServiceType.ToLower())) &&
                                             (x.OfficeId != null && contractModel.OfficeId.Contains(x.OfficeId.ToString().ToLower())) &&
-                                            x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).ToList();
-                    var acctOBH = accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId && contractModel.SaleService.Contains(x.ServiceType.ToLower()) &&
-                                             contractModel.OfficeId.ToLower().Contains(x.OfficeId.ToString().ToLower()) &&
-                                             x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
-                    if (acctOBH.Count() > 0)
+                                            x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).ToList()
+                                            : new List<AccAccountingManagement>();
+                    if (contractModel.PaymentTermChanged.Contains("OBH"))
                     {
-                        var surcharges = surchargeRepo.Get(x => x.AcctManagementId != null && x.PaymentObjectId == contractModel.PartnerId);
-                        var invOBHsurcharges = from acc in acctOBH
-                                               join surcharge in surcharges on acc.Id equals surcharge.AcctManagementId
-                                               select new
-                                               {
-                                                   acc,
-                                                   BillingNo = surcharge.SyncedFrom == "CDNOTE" ? surcharge.DebitNo : (surcharge.SyncedFrom == "SOA" ? surcharge.Soano : string.Empty)
-                                               };
-                        var invOBHGrp = invOBHsurcharges.GroupBy(x => x.BillingNo);
-                        foreach(var item in invOBHGrp)
+                        var acctOBH = accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId && contractModel.SaleService.Contains(x.ServiceType.ToLower()) &&
+                                                 contractModel.OfficeId.ToLower().Contains(x.OfficeId.ToString().ToLower()) &&
+                                                 x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
+                        if (acctOBH.Count() > 0)
                         {
-                            if(item.All(x=>x.acc.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
+                            var surcharges = surchargeRepo.Get(x => x.AcctManagementId != null && x.PaymentObjectId == contractModel.PartnerId);
+                            var invOBHsurcharges = from acc in acctOBH
+                                                   join surcharge in surcharges on acc.Id equals surcharge.AcctManagementId
+                                                   select new
+                                                   {
+                                                       acc,
+                                                       BillingNo = surcharge.SyncedFrom == "CDNOTE" ? surcharge.DebitNo : (surcharge.SyncedFrom == "SOA" ? surcharge.Soano : string.Empty)
+                                                   };
+                            var invOBHGrp = invOBHsurcharges.GroupBy(x => x.BillingNo);
+                            foreach (var item in invOBHGrp)
                             {
-                                invoiceData.AddRange(item.Select(x => x.acc));
+                                if (item.All(x => x.acc.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
+                                {
+                                    invoiceData.AddRange(item.Select(x => x.acc));
+                                }
                             }
                         }
                     }
