@@ -151,7 +151,7 @@
                                         <span></span>
                                     </label>
                                     <span>
-                                        <a class="pointer" (click)="previewDebitNote(debitNo.code)">{{debitNo.code}}</a>
+                                        <a class="pointer" (click)="previewDebitNote(debitNo)">{{debitNo.code}}</a>
                                     </span>
                                 </ng-container>
                             </ng-container>
@@ -184,7 +184,7 @@
                         </div>
                     </div>
                     <div class="form-group m-form__group"
-                        *ngIf="isPreAlert && (serviceId === 'AE' || serviceId === 'SFE' || serviceId === 'SLE')">
+                        *ngIf="isPreAlert && (serviceId === 'AE' || serviceId === 'SFE' || serviceId === 'SLE' || serviceId === 'SCE')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsManifest else NotManifest">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
@@ -236,8 +236,7 @@
                                         <span></span>
                                     </label>
                                     <span>
-                                        <a class="pointer"
-                                            (click)="previewCDNoteExport(debitNo.code)">{{debitNo.code}}</a>
+                                        <a class="pointer" (click)="previewCDNoteExport(debitNo)">{{debitNo.code}}</a>
                                     </span>
                                 </ng-container>
                             </ng-container>
@@ -252,7 +251,8 @@
                         </div>
                     </div>
 
-                    <div class="form-group m-form__group" *ngIf="isSI && (serviceId === 'SFE' || serviceId === 'SLE')">
+                    <div class="form-group m-form__group"
+                        *ngIf="isSI && (serviceId === 'SFE' || serviceId === 'SLE' || serviceId === 'SCE')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsSISummary else NotSISummary">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
@@ -356,7 +356,7 @@
 
                     <!-- Send HBL -->
                     <div class="form-group m-form__group"
-                        *ngIf="isSendHbl && (serviceId === 'SFE' || serviceId === 'SLE' || serviceId === 'AE')">
+                        *ngIf="isSendHbl && (serviceId === 'SFE' || serviceId === 'SLE' || serviceId === 'AE' || serviceId === 'SCE')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngFor="let hbl of hawbDetails">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px;">

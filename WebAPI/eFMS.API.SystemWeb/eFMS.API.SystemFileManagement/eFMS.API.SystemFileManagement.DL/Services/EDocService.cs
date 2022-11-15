@@ -1283,10 +1283,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             
                 string code = !isExsitedCode ? "OTH" : PreviewTemplateCodeMappingAttachTemplateCode[model.TemplateCode];
                 int? _docTypeId = -1;
-                var docTypeTemplate = _attachFileTemplateRepo.Get(x => x.Code == code && x.TransactionType == model.TransactionType)?.FirstOrDefault();
+                var docTypeTemplate = _attachFileTemplateRepo.Get(x => x.Code == code 
+                                                                && x.TransactionType == model.TransactionType 
+                                                                && x.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_GENERAL)?.FirstOrDefault();
                 if(docTypeTemplate == null)
                 {
-                    _docTypeId = _attachFileTemplateRepo.Get(x => x.Code == "OTH" && x.TransactionType == model.TransactionType)?.FirstOrDefault()?.Id;
+                    _docTypeId = _attachFileTemplateRepo.Get(x => x.Code == "OTH" 
+                                                        && x.TransactionType == model.TransactionType 
+                                                        && x.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_GENERAL)?.FirstOrDefault()?.Id;
                 } else
                 {
                     _docTypeId = docTypeTemplate.Id;

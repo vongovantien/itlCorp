@@ -7,6 +7,7 @@ using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
@@ -136,6 +137,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
         }
 
         [HttpPost("UploadPreviewTemplateToEDoc")]
+        [Authorize]
         public async Task<IActionResult> UploadPreviewTemplateToEDoc(List<EDocAttachPreviewTemplateUploadModel> models)
         {
             if (!ModelState.IsValid)
