@@ -17,6 +17,7 @@ import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/comm
 import { PopupBase } from 'src/app/popup.base';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
+import { AccountingConstants} from '@constants';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -24,7 +25,7 @@ import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.pop
 })
 
 export class FormContractCommercialPopupComponent extends PopupBase {
-
+   
     formGroup: FormGroup;
     partners: Observable<Customer[]>;
 
@@ -68,6 +69,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     paymentTermObh: AbstractControl;
     paymentTerm: AbstractControl;
     firstShipmentDate: AbstractControl;
+    creditLimitRate: AbstractControl;
+    
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -155,6 +158,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
+
     }
 
     ngOnInit() {
@@ -226,14 +230,21 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             trialEffectDate: [],
             trialExpiredDate: [],
             trialCreditLimit: [],
-            trialCreditDays: [],
-            paymentTerm: [null, Validators.compose([
+            trialCreditDays: [null, Validators.compose([
+                Validators.min(0),
+                Validators.max(365),
+                Validators.maxLength(3)
+            ])],
+            paymentTerm: [null,  Validators.compose([
                 Validators.min(0),
                 Validators.max(365)
             ])],
             baseOn: [null],
             creditLimit: [],
-            creditLimitRate: [],
+            creditLimitRate: [null,  Validators.compose([
+                Validators.min(0),
+                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+            ])],
             debitAmount: [],
             billingAmount: [],
             paidAmount: [],
@@ -253,7 +264,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             paymentTermObh: [null, Validators.compose([
                 Validators.min(0),
                 Validators.max(365)
-            ])]
+            ])],
         });
         this.companyId = this.formGroup.controls['companyId'];
         this.officeId = this.formGroup.controls['officeId'];
@@ -279,6 +290,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.firstShipmentDate = this.formGroup.controls['firstShipmentDate'];
         this.paymentTermObh = this.formGroup.controls['paymentTermObh'];
         this.paymentTerm = this.formGroup.controls['paymentTerm'];
+        this.creditLimitRate = this.formGroup.controls['creditLimitRate'];
     }
 
     initDataForm() {
