@@ -887,6 +887,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 break;
             case ChargeConstants.SFI_CODE:
             case ChargeConstants.SLI_CODE:
+            case ChargeConstants.SCI_CODE:
                 this._documentRepo.previewArrivalNotice({ hblId: this.hblId, currency: 'VND' })
                     .pipe(
                         catchError(this.catchError),
