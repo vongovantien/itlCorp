@@ -135,6 +135,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
         }
 
         [HttpPost("UploadPreviewTemplateToEDoc")]
+        [Authorize]
         public async Task<IActionResult> UploadPreviewTemplateToEDoc(List<EDocAttachPreviewTemplateUploadModel> models)
         {
             if (!ModelState.IsValid)
