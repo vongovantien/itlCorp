@@ -232,7 +232,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             trialExpiredDate: [],
             trialCreditLimit: [null, Validators.maxLength(20)],
             trialCreditDays: [null, Validators.compose([
-                Validators.min(1),
+                Validators.min(0),
                 Validators.max(AccountingConstants.MAX_NUMBER_INT)
             ])],
             paymentTerm: [null,  Validators.compose([

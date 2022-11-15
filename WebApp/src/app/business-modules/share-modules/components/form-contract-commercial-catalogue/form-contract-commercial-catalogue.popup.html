@@ -330,7 +330,7 @@
                                     [ngClass]="{'m-form__group has-danger':isSubmitted && !trialCreditDays.valid }">
                                         <label>Trial Credit Days
                                         </label>
-                                        <input integer type="number" (change)="onChageTrialCreditDays()"
+                                        <input type="number" (change)="onChageTrialCreditDays()"
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
                                             class="form-control" formControlName="trialCreditDays" maxlength="10">
                                     </div>
