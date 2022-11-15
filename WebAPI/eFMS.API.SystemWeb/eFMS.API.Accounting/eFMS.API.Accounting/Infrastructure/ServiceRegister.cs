@@ -47,6 +47,7 @@ namespace eFMS.API.Accounting.Infrastructure
             services.AddHostedService<eFMSQueueBackgroundService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddTransient<IAccountingPrePaidPaymentService, AccountingPrePaidPaymentService>();
+            services.AddTransient<IEDocService, EDocService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
