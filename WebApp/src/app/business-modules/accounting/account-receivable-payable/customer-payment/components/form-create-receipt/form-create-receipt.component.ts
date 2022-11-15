@@ -111,11 +111,10 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data) => {
+                    this.isRequireAgreement = false;
                     if (!!data) {
                         if (data.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE) || data.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL)) {
                             this.isRequireAgreement = true;
-                        } else {
-                            this.isRequireAgreement = false;
                         }
                     }
                 }
