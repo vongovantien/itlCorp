@@ -360,7 +360,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     UserCreated = x.UserCreated,
                     UserFileName = x.UserFileName,
                     UserModified = x.UserModified,
-                    ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault() != null ? _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url : null,
+                    ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault() != null ? GetAliasImageurl(_sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url,x.UserFileName,x.SystemFileName) : null,
                     HBLNo = _hblNo,
                     Note = x.Note,
                     TransactionType=transactionType
@@ -468,6 +468,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             result = resultGen.Concat(resultAcc).ToList();
             return result;
+        }
+
+        private string GetAliasImageurl(string imageUrl,string fileName,string aliasName)
+        {
+            if (aliasName.Contains("AD_"))
+            {
+                aliasName = aliasName+(Path.GetExtension(fileName));
+            }
+            return imageUrl.Replace("AWSS3/OpenFile", "EDoc/OpenEDocFile").Replace(fileName,aliasName).Replace("uat-api-efms.itlvn.com/file", "localhost:44329");
         }
         public EDocGroupByType GetEDocByAccountant(Guid billingId, string transactionType)
         {
@@ -1312,6 +1321,43 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 return new HandleState((object)ex.ToString());
             }
+        }
+
+        public async Task<HandleState> OpenEdocFile(string moduleName, string folder, Guid objId, string aliasName)
+        {
+            var edoc = new SysImageDetail();
+            if (moduleName == "Document" && folder == "Shipment")
+            {
+                edoc = _sysImageDetailRepo.Get(x => x.JobId == objId && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
+            }
+            else if(moduleName == "Accounting" && folder=="Advance")
+            {
+                var advNo=_advRepo.Get(x=>x.Id==objId).FirstOrDefault();
+                if (advNo != null)
+                {
+                    edoc = _sysImageDetailRepo.Get(x => x.BillingNo == advNo.AdvanceNo && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
+                }
+            }
+
+            if (edoc != null)
+            {
+                var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+                if (image != null)
+                {
+                    var key = moduleName + "/" + folder + "/" + objId + "/" + image.Name;
+
+                    var request = new GetObjectRequest()
+                    {
+                        BucketName = _bucketName,
+                        Key = key
+                    };
+
+                    GetObjectResponse response = await _client.GetObjectAsync(request);
+                    if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
+                    return new HandleState(true, response.ResponseStream);
+                }
+            }
+            return null;
         }
     }
 }
