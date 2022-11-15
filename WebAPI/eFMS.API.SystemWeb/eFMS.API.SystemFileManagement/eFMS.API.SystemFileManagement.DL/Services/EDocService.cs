@@ -523,7 +523,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = x.Id,
                         BillingNo = settle.SettlementNo,
                         SystemFileName = x.SystemFileName,
-                        ImageUrl = image == null ? null : image.Url,
+                        ImageUrl = image == null ? null : GetAliasImageurl(image.Url,x.UserFileName,x.SystemFileName),
                         DatetimeCreated = x.DatetimeCreated,
                         BillingType = transactionType,
                         DatetimeModified = x.DatetimeModified,
@@ -645,7 +645,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = x.FirstOrDefault().Id,
                         BillingNo = advance.AdvanceNo,
                         SystemFileName = x.FirstOrDefault().SystemFileName,
-                        ImageUrl = image.Url,
+                        ImageUrl = GetAliasImageurl(image.Url,x.FirstOrDefault().UserFileName,x.FirstOrDefault().SystemFileName),
                         DatetimeCreated = x.FirstOrDefault().DatetimeCreated,
                         BillingType = transactionType,
                         DatetimeModified = x.FirstOrDefault().DatetimeModified,
@@ -1336,6 +1336,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 if (advNo != null)
                 {
                     edoc = _sysImageDetailRepo.Get(x => x.BillingNo == advNo.AdvanceNo && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
+                }
+            }
+            else
+            {
+                var settle = _setleRepo.Get(x => x.Id == objId).FirstOrDefault();
+                if (settle != null)
+                {
+                    edoc = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
                 }
             }
 
