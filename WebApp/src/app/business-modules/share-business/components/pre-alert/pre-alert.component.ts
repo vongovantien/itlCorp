@@ -276,6 +276,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 }
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
+            case ChargeConstants.SCE_CODE: // Sea Consol Export
             case ChargeConstants.SLE_CODE: // Sea LCL Export
                 if (this.isPreAlert) {
                     this.checkExistManifestExport();
@@ -484,6 +485,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 }
                 break;
             case ChargeConstants.SFE_CODE:
+            case ChargeConstants.SCE_CODE:
             case ChargeConstants.SLE_CODE:
                 if (this.isPreAlert) {
                     if (this.isCheckedManifest) {
@@ -1166,6 +1168,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     previewSIDetailCont(serviceType) {
         switch (serviceType) {
             case ChargeConstants.SFE_CODE:
+            case ChargeConstants.SCE_CODE:
                 this.previewSIDetailContFCL();
                 break;
             case ChargeConstants.SLE_CODE:
