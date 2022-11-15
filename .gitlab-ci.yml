@@ -38,6 +38,7 @@ build_uat:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
       - WebApp/node_modules
+      - WebApp/package-lock.json
     policy: pull
   artifacts:
     name: "angular_build"
