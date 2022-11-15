@@ -512,7 +512,7 @@ namespace eFMS.API.Accounting.Controllers
                     }
                 });
                 
-                eDocService.RegenEDocSettle(model);
+                // eDocService.RegenEDocSettle(model);
 
             }
             return Ok(result);
