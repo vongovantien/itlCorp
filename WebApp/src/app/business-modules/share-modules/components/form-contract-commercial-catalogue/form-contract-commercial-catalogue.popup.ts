@@ -18,7 +18,7 @@ import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.pop
 import { ConfirmPopupComponent } from '@common';
 import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/commercial/components/popup/salesman-credit-limit.popup';
 import { CommonEnum } from '@enums';
-import { numberValidation} from 'src/app/business-modules/accounting/advance-payment/store/index';
+import { AccountingConstants} from '@constants';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -230,12 +230,21 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             vas: [],
             trialEffectDate: [],
             trialExpiredDate: [],
-            trialCreditLimit: [],
-            trialCreditDays: [null,  [numberValidation]],       
-            paymentTerm: [null, [numberValidation]],
+            trialCreditLimit: [null, Validators.maxLength(20)],
+            trialCreditDays: [null, Validators.compose([
+                Validators.min(1),
+                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+            ])],
+            paymentTerm: [null,  Validators.compose([
+                Validators.min(0),
+                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+            ])],
             baseOn: [null],
             creditLimit: [],
-            creditLimitRate: [null, [numberValidation]],
+            creditLimitRate: [null,  Validators.compose([
+                Validators.min(0),
+                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+            ])],
             debitAmount: [],
             billingAmount: [],
             paidAmount: [],
@@ -254,7 +263,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 Validators.pattern(SystemConstants.CPATTERN.EMAIL),
             ])],
             firstShipmentDate: [null],
-            paymentTermObh: [null, [numberValidation]],
+            paymentTermObh: [null, Validators.compose([
+                Validators.min(0),
+                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+            ])],
         });
         this.companyId = this.formGroup.controls['companyId'];
         this.officeId = this.formGroup.controls['officeId'];

@@ -1,8 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { numberValidation} from 'src/app/business-modules/accounting/advance-payment/store/index';
-
+import { AccountingConstants } from '@constants'
 @Component({
     selector: 'update-extend-day-popup',
     templateUrl: './update-extend-day.popup.html',
@@ -29,7 +28,12 @@ export class ARHistoryPaymentUpdateExtendDayPopupComponent extends PopupBase imp
 
     ngOnInit(): void {
         this.formUpdateExtenDate = this._fb.group({
-            numberDaysExtend: [null, Validators.required,[numberValidation]],                           
+            numberDaysExtend: [null, Validators.compose([
+                Validators.required,
+                Validators.min(0),
+                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+            ])],
+             
             note: []
         });
 

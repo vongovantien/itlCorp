@@ -16,7 +16,6 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':(checkError && (numberDaysExtend.value <= 0 || numberDaysExtend.value % 1 !== 0) )&& isSubmitted && !numberDaysExtend.valid }">
                                     <input type="number" class="form-control" formControlName="numberDaysExtend" />
-                                    <p class="text-danger invalid" *ngIf="numberDaysExtend.invalid">The number is too long!</p>
                                     <div class="m--font-danger" *ngIf="numberDaysExtend.value === 0 && checkError">
                                         Number Days Extend is required
                                     </div>
