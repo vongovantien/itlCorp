@@ -230,14 +230,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             vas: [],
             trialEffectDate: [],
             trialExpiredDate: [],
-            trialCreditLimit: [null, Validators.maxLength(20)],
+            trialCreditLimit: [],
             trialCreditDays: [null, Validators.compose([
                 Validators.min(0),
-                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+                Validators.max(365),
+                Validators.maxLength(3)
             ])],
             paymentTerm: [null,  Validators.compose([
                 Validators.min(0),
-                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+                Validators.max(365)
             ])],
             baseOn: [null],
             creditLimit: [],
@@ -265,7 +266,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             firstShipmentDate: [null],
             paymentTermObh: [null, Validators.compose([
                 Validators.min(0),
-                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+                Validators.max(365)
             ])],
         });
         this.companyId = this.formGroup.controls['companyId'];

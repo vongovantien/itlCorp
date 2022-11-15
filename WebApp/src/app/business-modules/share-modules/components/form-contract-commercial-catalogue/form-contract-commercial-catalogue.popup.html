@@ -332,7 +332,8 @@
                                         </label>
                                         <input type="number" (change)="onChageTrialCreditDays()"
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
-                                            class="form-control" formControlName="trialCreditDays" maxlength="10">
+                                            class="form-control" formControlName="trialCreditDays">
+                                            <p class="text-danger invalid" *ngIf="trialCreditDays.invalid">The value entered is not valid</p>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -386,7 +387,7 @@
                                         <label>Payment Term</label>
                                         <input type="number" numeric [decimals]="digitDecimal" [attr.disabled]="(menuSpecialPermission | async | specialPermission:
                                         'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
-                                            class="form-control" formControlName="paymentTerm" maxlength="10">
+                                            class="form-control" formControlName="paymentTerm" maxlength="3">
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -397,7 +398,7 @@
                                             <input type="number" numeric [decimals]="digitDecimal"
                                                 [attr.disabled]="(menuSpecialPermission | async | specialPermission:
                                             'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
-                                                class="form-control" formControlName="paymentTermObh" maxlength="10">
+                                                class="form-control" formControlName="paymentTermObh" maxlength="3">
                                         </div>
                                     </div>
                                 </div>
@@ -416,7 +417,7 @@
                                         <label>Credit Limited Rate</label>
                                         <input numeric [decimals]="digitDecimal"
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
-                                            type="text" class="form-control" formControlName="creditLimitRate" maxlength="10">
+                                            type="number" class="form-control" formControlName="creditLimitRate" maxlength="10" autoFormatCurrency>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
