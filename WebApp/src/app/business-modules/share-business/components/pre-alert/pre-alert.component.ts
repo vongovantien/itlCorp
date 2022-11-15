@@ -146,7 +146,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.name = params.name;
                     this.checkReportType();
 
-                    this.hblRptName = (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) ? "HBL" : "HAWB";
+                    this.hblRptName = (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE || this.serviceId === ChargeConstants.SCE_CODE) ? "HBL" : "HAWB";
 
                     this.getDetailHAWB();
                     // this.getContentMail(this.serviceId, this.hblId, this.jobId);
@@ -352,7 +352,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             .subscribe(
                 (res: any) => {
                     if (res) {
-                        if (this.serviceId === 'AE' || this.serviceId === 'SFE' || this.serviceId === 'SLE') {
+                        if (this.serviceId === 'AE' || this.serviceId === 'SFE' || this.serviceId === 'SLE' || this.serviceId === 'SCE') {
                             this.debitNos = res.map(v => ({ ...v, isCheckedDebitNote: false }));
                         } else {
                             this.debitNos = res.filter(x => lowerCase(x.type) !== 'credit').map(v => ({ ...v, isCheckedDebitNote: false }));
@@ -711,6 +711,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 }
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
+            case ChargeConstants.SCE_CODE:
                 if (this.isPreAlert) {
                     this.sendMailButtonName = "Send Pre Alert";
                     this.getInfoMailHBLPreAlertSeaExport(this.hawbDetails.map(x => x.id), jobId, serviceId);
@@ -904,7 +905,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     previewManifest() {
-        if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) {
+        if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE || this.serviceId === ChargeConstants.SCE_CODE) {
             this._progressRef.start();
             this._documentRepo.previewSeaExportManifestByJobId(this.jobId)
                 .pipe(
@@ -942,7 +943,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     previewHawb(hblId: string) {
-        if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE) {
+        if (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE || this.serviceId === ChargeConstants.SCE_CODE) {
             this.previewHBL(hblId);
         } else {
             this._progressRef.start();
@@ -1094,16 +1095,16 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         }
     }
 
-    previewDebitNote(code: string) {
+    previewDebitNote(debit: any) {
         if (this.serviceId === 'AI') {
-            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
+            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: debit?.code, currency: 'VND' })
                 .pipe(
             ).subscribe(
                 (res: any) => {
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport('INV');
+                            this.renderAndShowReport(debit?.type);
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -1111,7 +1112,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 },
             );
         } else {
-            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'VND' })
+            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: debit?.code, currency: 'VND' })
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: any) => {
@@ -1128,16 +1129,16 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         }
     }
 
-    previewCDNoteExport(code: string) {
+    previewCDNoteExport(debit: any) {
         if (this.serviceId === 'AE') {
-            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'ORIGIN' })
+            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: debit?.code, currency: 'ORIGIN' })
                 .pipe(
             ).subscribe(
                 (res: any) => {
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport('CN');
+                            this.renderAndShowReport(debit?.type);
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -1145,14 +1146,14 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 },
             );
         } else {
-            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: code, currency: 'ORIGIN' })
+            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: debit?.code, currency: 'ORIGIN' })
                 .pipe(
             ).subscribe(
                 (res: any) => {
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport('CN');
+                            this.renderAndShowReport(debit?.type);
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -1201,6 +1202,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedHawb);
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
+            case ChargeConstants.SCE_CODE: // Sea Consol Export
                 if (this.isPreAlert) {
                     this.UpdateAttachFileByPathGeneralReport(this.pathGeneralManifest, this.isCheckedManifest);
                     this.UpdateAttachFileByPathGeneralReport(this.pathGeneralMawb, this.isCheckedHawb);
@@ -1263,6 +1265,17 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.jobId}/si`]);
                     } else {
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}/${this.jobId}/hbl/${this.hblId}`]);
+                    }
+                }
+                break;
+            case ChargeConstants.SCE_CODE: // Sea FCL Export
+                if (this.hblId === SystemConstants.EMPTY_GUID) {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`]);
+                } else {
+                    if (this.isSI) {
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}/si`]);
+                    } else {
+                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}/hbl/${this.hblId}`]);
                     }
                 }
                 break;
