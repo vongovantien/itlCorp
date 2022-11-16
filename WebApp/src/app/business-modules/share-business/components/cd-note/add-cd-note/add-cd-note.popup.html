@@ -82,7 +82,8 @@
                                     <label class="form-control-label">
                                         Exc USD
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" formControlName="excRateUsdToLocal" formatDecimalFormControl format=".0-3" >
+                                    <input type="text" class="form-control m-input m-input--square" formControlName="excRateUsdToLocal" formatDecimalFormControl format=".0-3" 
+                                    min="1" numeric [decimals]="digitDecimal" autoFormatCurrency>
                                 </div>
                             </div>
                             <div class="col-lg-8">
