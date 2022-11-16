@@ -40,7 +40,7 @@ namespace eFMS.API.Documentation.DL.Services
                             .GetRequiredService<IScopedProcessingAlertATDService>();
                     await scopedProcessingService.AlertATD(stoppingToken);
                 }
-                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(12), stoppingToken);
             }
         }
 
