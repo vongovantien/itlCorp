@@ -6,6 +6,7 @@ using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.EF;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -19,53 +20,57 @@ namespace eFMS.API.Documentation.DL.Services
             csTransactionRepository = csTransaction;
         }
 
-        public Task AlertATD()
+        public Task AlertATD(CancellationToken stoppingToken)
         {
-            
-            var dtData = DC.GetViewData<vw_GetShipmentAlertATD>();
-            if(dtData.Count > 0)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                var emailTemplate = DC.SysEmailTemplate.Where(x => x.Code == "OPEX-ALERT-ATD").FirstOrDefault();
-                
-                var mailTo = new List<string> { };
-                var mailCC = new List<string> { };
-                List<string> emailBCCs = new List<string>();
-                var emailBcc = DC.ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
-                if (emailBcc != null)
+                var dtData = DC.GetViewData<vw_GetShipmentAlertATD>();
+                if (dtData.Count > 0)
                 {
-                    emailBCCs = emailBcc.ToString().Split(";").ToList();
-                }
-                string subject = emailTemplate.Subject;
-                string footer = emailTemplate.Footer;
+                    var emailTemplate = DC.SysEmailTemplate.Where(x => x.Code == "OPEX-ALERT-ATD").FirstOrDefault();
 
-                var grpPic = dtData.GroupBy(x => new { x.PIC }).ToList();
-                foreach (var grp in grpPic)
-                {
-                    string body = emailTemplate.Body;
-                    body = body.Replace("{{PIC}}", grp.FirstOrDefault().PIC);
-
-                    string tBody = string.Empty;
-
-                    var listData = grp.Select(x => x).ToList();
-                    int number = 0;
-                    foreach (var item in listData)
+                    var mailTo = new List<string> { };
+                    var mailCC = new List<string> { };
+                    List<string> emailBCCs = new List<string>();
+                    var emailBcc = DC.ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
+                    if (emailBcc != null)
                     {
-                        string tr = emailTemplate.Content;
-                        tr = tr.Replace("{{STT}}", (number + 1).ToString());
-                        tr = tr.Replace("{{JOBNO}}", item.JobNo);
-                        tr = tr.Replace("{{ETD}}", item.ETD.ToString("dd/MM/yyyy"));
-
-                        tBody += tr;
-                        number++;
+                        emailBCCs = emailBcc.ToString().Split(";").ToList();
                     }
-                    mailTo = new List<string> { grp.FirstOrDefault().Email };
-                    mailCC = grp.FirstOrDefault().EmailCC.Split(";").ToList();
-                    body = body.Replace("{{CONTENT}}", tBody);
+                    string subject = emailTemplate.Subject;
+                    string footer = emailTemplate.Footer;
 
-                    string email = body + footer;
-                    var s = SendMail.Send(emailTemplate.Subject, email, mailTo, null, mailCC, emailBCCs);
+                    var grpPic = dtData.GroupBy(x => new { x.PIC }).ToList();
+                    foreach (var grp in grpPic)
+                    {
+                        string body = emailTemplate.Body;
+                        body = body.Replace("{{PIC}}", grp.FirstOrDefault().PIC);
+
+                        string tBody = string.Empty;
+
+                        var listData = grp.Select(x => x).ToList();
+                        int number = 0;
+                        foreach (var item in listData)
+                        {
+                            string tr = emailTemplate.Content;
+                            tr = tr.Replace("{{STT}}", (number + 1).ToString());
+                            tr = tr.Replace("{{JOBNO}}", item.JobNo);
+                            tr = tr.Replace("{{ETD}}", item.ETD.ToString("dd/MM/yyyy"));
+
+                            tBody += tr;
+                            number++;
+                        }
+                        mailTo = new List<string> { "kenny.thuong@itlvn.com" };
+                        mailCC = grp.FirstOrDefault().EmailCC.Split(";").ToList();
+                        body = body.Replace("{{CONTENT}}", tBody);
+
+                        string email = body + footer;
+                        var s = SendMail.Send(emailTemplate.Subject, email, mailTo, null, null, null);
+                    }
                 }
+                return Task.CompletedTask;
             }
+
             return Task.CompletedTask;
         }
     }
