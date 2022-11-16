@@ -11,9 +11,9 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class ScopedAlertATDHostedService : BackgroundService
     {
-        public IServiceProvider services { get; }
+        public IServiceScopeFactory services { get; }
         private readonly ILogger<IScopedProcessingAlertATDService> logger;
-        public ScopedAlertATDHostedService(IServiceProvider _service, ILogger<IScopedProcessingAlertATDService> _log)
+        public ScopedAlertATDHostedService(IServiceScopeFactory _service, ILogger<IScopedProcessingAlertATDService> _log)
         {
             services = _service;
             logger = _log;
@@ -28,23 +28,19 @@ namespace eFMS.API.Documentation.DL.Services
 
         private async Task DoWork(CancellationToken stoppingToken)
         {
-            logger.LogInformation("Alert Service Hosted Service is working.");
-            new LogHelper("ScopedAlertATAHostedService", "WORKING\n");
             while (!stoppingToken.IsCancellationRequested)
             {
-                new LogHelper("ScopedAlertATAHostedService", "now is: " + DateTime.Now.Hour);
-                int hourCurrent = 25 - DateTime.Now.Hour;
-                int numerOfHours = hourCurrent;
-                new LogHelper("ScopedAlertATAHostedService", "hourCurrent: " + numerOfHours);
+                logger.LogInformation("Alert Service Hosted Service is running.");
                 using (var scope = services.CreateScope())
                 {
-                    new LogHelper("ScopedAlertATAHostedService", "Alert Service Hosted Service is excuted - {0}" + DateTime.Now);
+                    logger.LogInformation("Alert Service Hosted Service is excuted.");
+                    new LogHelper(string.Format("ScopedAlertATAHostedService", "Alert Service Hosted Service is excuted - {0}" + DateTime.Now));
                     var scopedProcessingService =
                         scope.ServiceProvider
                             .GetRequiredService<IScopedProcessingAlertATDService>();
-                    await scopedProcessingService.AlertATD();
+                    await scopedProcessingService.AlertATD(stoppingToken);
                 }
-                await Task.Delay(TimeSpan.FromHours(12), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
             }
         }
 
