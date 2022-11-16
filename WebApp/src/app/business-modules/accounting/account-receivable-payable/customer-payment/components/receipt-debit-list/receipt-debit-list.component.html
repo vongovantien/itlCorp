@@ -113,12 +113,13 @@
                                         {{item.totalPaidVnd | number:'1.0-2'}}
                                     </ng-container>
                                 </td>
-                                <td class="text-center"
-                                    *ngIf="item.paymentType === 'DEBIT' && (receiptType$ | async) !=='CUSTOMER'">
-                                    <app-switch size="sm" class="danger"
-                                        (toggleChange)="onToggleNetOfOnly($event, item)" [ngModel]="item.netOff"
-                                        [disabled]="isReadonly">
-                                    </app-switch>
+                                <td class="text-center" *ngIf="(receiptType$ | async) !=='CUSTOMER'">
+                                    <ng-container *ngIf="item.paymentType === 'DEBIT' && (receiptType$ | async) !=='CUSTOMER'">
+                                        <app-switch size="sm" class="danger"
+                                            (toggleChange)="onToggleNetOfOnly($event, item)" [ngModel]="item.netOff"
+                                            [disabled]="isReadonly">
+                                        </app-switch>
+                                    </ng-container>
                                 </td>
                                 <td ALIGN="right">
                                     <div *ngIf="item.paymentType !== 'OTHER'">
