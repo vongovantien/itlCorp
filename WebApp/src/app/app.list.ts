@@ -1,4 +1,4 @@
-import { AppPage } from "@app";
+import { AppPage } from "./app.base";
 
 export abstract class AppList extends AppPage {
 

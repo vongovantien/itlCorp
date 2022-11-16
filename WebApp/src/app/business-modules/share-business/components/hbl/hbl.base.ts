@@ -17,7 +17,7 @@ import isUUID from 'validator/lib/isUUID';
 import { delayTime } from "@decorators";
 import { combineLatest, of } from 'rxjs';
 import { RoutingConstants, SystemConstants } from '@constants';
-import { ShareBussinessMassUpdatePodComponent } from './mass-update-pod/mass-update-pod.component';
+import { ShareBussinessMassUpdatePodComponent } from '@share-bussiness';
 import { HttpResponse } from '@angular/common/http';
 import { InjectViewContainerRefDirective } from '@directives';
 

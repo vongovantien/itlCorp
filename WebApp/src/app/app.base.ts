@@ -151,7 +151,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     currentUser: any;
     currentUser$: Observable<Partial<SystemInterface.IClaimUser>>;
 
-    accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls,.docx,.msg,.html';
+    accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls,.docx,.msg,.html,.zip';
 
     ngOnInit(): void { }
 

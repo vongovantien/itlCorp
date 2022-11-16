@@ -6,7 +6,8 @@ import { CatalogueRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } fr
 import { SortService } from '@services';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { NgProgress } from '@ngx-progressbar/core';
-import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
+import { IShareBussinessState } from '@share-bussiness';
+import { AppShareHBLBase } from 'src/app/business-modules/share-business/components/hbl/hbl.base';
 
 
 @Component({
