@@ -445,7 +445,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = x.Id,
                         TransactionType=transactionType,
                         Note=x.Note,
-                        HBLNo= _hblNo
+                        HBLNo= _hblNo,
+                        Hblid = x.Hblid,
                     };
                     listOther.Add(imagedetail);
                 });
@@ -1366,6 +1367,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 }
             }
             return null;
+        
         }
     }
 }

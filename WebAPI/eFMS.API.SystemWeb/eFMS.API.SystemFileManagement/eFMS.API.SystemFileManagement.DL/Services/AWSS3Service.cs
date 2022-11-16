@@ -248,7 +248,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             HandleState result = new HandleState();
             try
             {
-                var lst = await _sysImageRepo.GetAsync(x => x.ObjectId == model.ObjectId && x.ChildId == model.ChillId);
+                var lst = new List<SysImage>();
+                if (model.ChillId == null)
+                {
+                    lst = await _sysImageRepo.GetAsync(x => x.ObjectId == model.ObjectId);
+                }
+                else
+                {
+                    lst = await _sysImageRepo.GetAsync(x => x.ObjectId == model.ObjectId && x.ChildId == model.ChillId);
+                }
+                
                 if (lst == null) { return new HandleState("Not found data"); }
                 var files = new List<InMemoryFile>();
                 foreach (var it in lst)

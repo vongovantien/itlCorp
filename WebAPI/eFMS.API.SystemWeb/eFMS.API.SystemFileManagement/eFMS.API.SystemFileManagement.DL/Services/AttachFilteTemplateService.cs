@@ -15,10 +15,20 @@ namespace eFMS.API.SystemFileManagement.DL.Services
     {
         private IContextBase<CsShipmentSurcharge> _surchargeRepo;
         private IContextBase<AcctSettlementPayment> _settleRepo;
-        public AttachFilteTemplateService(IContextBase<SysAttachFileTemplate> repository, IMapper mapper, IContextBase<CsShipmentSurcharge> surchargeRepo, IContextBase<AcctSettlementPayment> settleRepo) : base(repository, mapper)
+        private IContextBase<AcctSoa> _soaRepo;
+        private IContextBase<AcctAdvancePayment> _advRepo;
+        public AttachFilteTemplateService(
+            IContextBase<SysAttachFileTemplate> repository,
+            IMapper mapper, IContextBase<CsShipmentSurcharge> surchargeRepo,
+            IContextBase<AcctSettlementPayment> settleRepo,
+            IContextBase<AcctSoa> soaRepository,
+            IContextBase<AcctAdvancePayment> advRepository
+            ) : base(repository, mapper)
         {
             _surchargeRepo = surchargeRepo;
             _settleRepo = settleRepo;
+            _advRepo = advRepository;
+            _soaRepo = soaRepository;
         }
 
         public async Task<HandleState> Import(List<SysAttachFileTemplate> list)
@@ -44,7 +54,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = x.FirstOrDefault().Id,
                         Code = x.FirstOrDefault().Code,
                         NameEn = x.FirstOrDefault().NameEn,
-                        TransactionType="SOA"
+                        TransactionType="SOA",
                     }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 case "Settlement":
                     var settleNo = _settleRepo.Get(x => x.Id.ToString() == billingId).FirstOrDefault().SettlementNo;
@@ -55,7 +65,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = x.FirstOrDefault().Id,
                         Code = x.FirstOrDefault().Code,
                         NameEn = x.FirstOrDefault().NameEn,
-                        TransactionType=x.FirstOrDefault().TransactionType
+                        TransactionType=x.FirstOrDefault().TransactionType,
                     }).OrderBy(x => x.NameEn.Substring(0,1)).ToList();
                 case "Advance":
                     var advs = await DataContext.GetAsync(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
@@ -63,7 +73,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     {
                         Id = x.FirstOrDefault().Id,
                         Code = x.FirstOrDefault().Code,
-                        NameEn = x.FirstOrDefault().NameEn,
+                        NameEn = x.FirstOrDefault().NameEn
                     }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 default:
                     var jobs = await DataContext.GetAsync(x => x.Type != "Accountant" && x.TransactionType == transactionType);

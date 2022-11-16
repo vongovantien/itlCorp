@@ -27,6 +27,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
     @Input() typeFrom: string = 'Shipment';
     @Input() billingId: string = '';
+    @Input() billingNo: string = '';
+
     @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
@@ -47,6 +49,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     housebills: any[] = [];
     jobs: any[] = [];
     modifiedDocTypes: any;
+    jobNo: string = '';
 
     headerAttach: any[] = [
         { title: 'Alias Name', field: 'aliasName', width: 300 },
@@ -63,7 +66,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Job Ref', field: 'jobRef' },
         { title: 'Note', field: 'note' },
     ]
-    jobNo: string = '';
     private _readonly: boolean = false;
     constructor(
         private readonly _systemFileRepo: SystemFileManageRepo,
@@ -118,21 +120,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         }
                     );
             }
-        }
-        else if (this.typeFrom === 'Settlement') {
-
-            this.transactionType = this.typeFrom;
-            this.getJobList();
-            this.getDocumentType(this.typeFrom, this.billingId);
-            this.getEDoc(this.typeFrom);
-            this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
-            { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
-            //{ title: 'House Bill No', field: 'hblNo', sortable: true },
-            { title: 'Job No', field: 'jobNo' },
-            { title: 'Note', field: 'note' },
-            { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
-            { title: 'Attach Person', field: 'userCreated', sortable: true },
-            ];
         } else {
             this.transactionType = this.typeFrom;
             this.getJobList();
@@ -418,12 +405,13 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         // } else {
         //     fileName = this.fileNo + ".zip";
         // }
+        console.log(this.billingNo);
 
         let model = {
             folderName: this.typeFrom,
-            objectId: this.billingId,
+            objectId: this.typeFrom === 'Shipment' ? this.jobId : this.billingId,
             chillId: null,
-            fileName: 'eFMS_' + this.typeFrom
+            fileName: this.typeFrom === 'Shipment' ? this.jobNo : this.billingNo
         }
         this._systemFileRepo.dowloadallAttach(model)
             .subscribe(
