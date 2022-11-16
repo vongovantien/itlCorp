@@ -367,7 +367,12 @@ namespace eFMS.API.Documentation.DL.Services
 
                     if (contractCurrent == null)
                     {
-                        return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
+                        contractCurrent = GetContractByPartnerId(criteria.PartnerId, criteria.SalesmanId);
+                        partner = catPartnerRepository.First(x => x.Id == currentPartner);
+                        if(contractCurrent == null)
+                        {
+                            return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
+                        }
                     }
 
                     if(contractCurrent.ContractType == "Prepaid") // check hợp đồng hiện tại trước khi đổi sales, đổi customer
