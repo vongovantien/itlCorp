@@ -33,7 +33,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     detailDocId: number;
     formData: IEDocUploadFile;
     documentTypes: any[] = [];
-    accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
     isSubmitted: boolean = false;
     constructor(
         private _toastService: ToastrService,
