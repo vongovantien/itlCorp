@@ -53,6 +53,8 @@ export class AdvancePaymentDetailComponent
     statusApproval: string = "";
     isAdvCarrier: boolean = false;
 
+    advNo: string = '';
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -125,6 +127,7 @@ export class AdvancePaymentDetailComponent
                         this.back();
                         return;
                     }
+                    this.advNo = res.advanceNo;
                     this._store.dispatch(LoadAdvanceDetailSuccess(res));
                     this.advancePayment = new AdvancePayment(res);
                     switch (this.advancePayment.statusApproval) {
