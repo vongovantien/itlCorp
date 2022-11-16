@@ -31,7 +31,8 @@ export class ARHistoryPaymentUpdateExtendDayPopupComponent extends PopupBase imp
             numberDaysExtend: [null, Validators.compose([
                 Validators.required,
                 Validators.min(0),
-                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+                Validators.max(365), 
+                Validators.maxLength(3)
             ])],
              
             note: []
@@ -45,7 +46,7 @@ export class ARHistoryPaymentUpdateExtendDayPopupComponent extends PopupBase imp
 
     updateExtendDate() {
         // null , number <= 0 , float, double
-        if (!this.numberDaysExtend.value || this.numberDaysExtend.value <= 0 || this.numberDaysExtend.value % 1 !== 0) {
+        if (!this.numberDaysExtend.value || this.numberDaysExtend.value <= 0 || this.numberDaysExtend.value % 1 !== 0 || !this.numberDaysExtend.valid) {
             this.checkError = true;
             return;
         }
