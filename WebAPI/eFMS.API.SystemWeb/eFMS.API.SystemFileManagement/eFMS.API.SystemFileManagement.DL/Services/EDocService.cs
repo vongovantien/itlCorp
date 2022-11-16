@@ -476,7 +476,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 aliasName = aliasName+(Path.GetExtension(fileName));
             }
-            return imageUrl.Replace("AWSS3/OpenFile", "EDoc/OpenEDocFile").Replace(fileName,aliasName).Replace("uat-api-efms.itlvn.com/file", "localhost:44329");
+            return imageUrl.Replace("AWSS3/OpenFile", "EDoc/OpenEDocFile").Replace(fileName,aliasName);
         }
         public EDocGroupByType GetEDocByAccountant(Guid billingId, string transactionType)
         {
