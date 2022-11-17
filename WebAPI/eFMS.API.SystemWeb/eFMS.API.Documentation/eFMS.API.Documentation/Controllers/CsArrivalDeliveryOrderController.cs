@@ -1,8 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
-using eFMS.API.Catalogue.DL.Models;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.Common;
@@ -11,9 +7,10 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System;
+using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -141,6 +138,20 @@ namespace eFMS.API.Documentation.Controllers
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPut("UpdateMultipleProofOfDelivery")]
+        [Authorize]
+        public async Task<IActionResult> UpdateMultipleProofOfDelivery(ProofOfDeliveryModel model)
+        {
+            var handleStatus = await arrivalFreightChargeServices.UpdateMultipleProofOfDelivery(model);
+            var message = HandleError.GetMessage(handleStatus, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = handleStatus.Success, Message = stringLocalizer[message].Value };
+            if (!handleStatus.Success)
             {
                 return BadRequest(result);
             }

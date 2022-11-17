@@ -40,6 +40,10 @@ namespace eFMS.API.Documentation.DL.Services
         public async Task<HandleState> AddNewStageAssigned(CsStageAssignedModel model)
         {
             var stageAssigned = mapper.Map<OpsStageAssigned>(model);
+            stageAssigned.Id = Guid.NewGuid();
+            stageAssigned.Status = TermData.Done;
+            stageAssigned.DatetimeCreated = stageAssigned.DatetimeModified = stageAssigned.Deadline = DateTime.Now;
+            stageAssigned.MainPersonInCharge = stageAssigned.RealPersonInCharge = currentUser.UserID;
             var hs = await DataContext.AddAsync(stageAssigned);
             return hs;
         }
@@ -62,7 +66,7 @@ namespace eFMS.API.Documentation.DL.Services
             newItem.Hblno = hbl?.Hwbno;
             newItem.JobId = criteria.JobId;
             newItem.Type = DocumentConstants.FROM_SYSTEM;
-            newItem.DatetimeCreated = DateTime.Now;
+            newItem.DatetimeCreated = newItem.DatetimeModified = DateTime.Now;
             newItem.OrderNumberProcessed = orderNumber + 1;
 
             var result = await AddNewStageAssigned(newItem);
