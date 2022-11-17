@@ -148,6 +148,15 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
 
         // this.obhPartners = this._catalogueRepo.getListPartner(null, null, { active: true, partnerMode: 'Internal', notEqualInternalCode: this.currentUser });
         this.departments = this._systemRepo.getDepartment(null, null, { active: true, deptTypes: ['AR', 'ACCOUNTANT'] });
+        this._store.select(ReceiptTypeState)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
+            (partnerGroup) => {
+                if (!!partnerGroup) {
+                    this.receiptType = partnerGroup;
+                }
+            }
+        )
 
         this.initForm();
         this.listenCustomerInfoData();
@@ -229,15 +238,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 (data: string) => {
                     if (!!data) {
                         this.partnerId = data;
-                        this._store.select(ReceiptTypeState)
-                            .pipe(takeUntil(this.ngUnsubscribe))
-                            .subscribe(
-                                (partnerGroup) => {
-                                    if (!!partnerGroup) {
-                                        this.receiptType = partnerGroup;
-                                    }
-                                }
-                            )
+                        
                     }
                 }
             );
@@ -275,7 +276,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             description: [],
             finalPaidAmountVnd: [0],
             finalPaidAmountUsd: [0],
-            isAutoConvert: [true],
+            isAutoConvert: this.receiptType.toUpperCase() === 'CUSTOMER' ? [true] : [false],
             isAsPaidAmount: [false],
             obhpartnerId: [],
             notifyDepartment: [],
@@ -660,10 +661,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 const _advanceVnd: number = +((this.cusAdvanceAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
                 this.cusAdvanceAmountVnd.setValue(_advanceVnd);
 
-                if (this.receiptType.toUpperCase() === 'CUSTOMER') {
-                    const paidAmountVnd: number = +((this.paidAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
-                    this.paidAmountVnd.setValue(paidAmountVnd);
-                }
+                const paidAmountVnd: number = +((this.paidAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
+                this.paidAmountVnd.setValue(paidAmountVnd);
 
                 const creditAmountVnd: number = +((this.creditAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
                 this.creditAmountVnd.setValue(creditAmountVnd);
