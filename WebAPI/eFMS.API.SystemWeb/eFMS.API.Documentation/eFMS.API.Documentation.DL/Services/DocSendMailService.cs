@@ -1575,7 +1575,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var dtData = ((eFMSDataContext)DataContext.DC).GetViewData<vw_GetDataCustomerContractCashWithOutstandingDebit>();
                 var emailBcc = ((eFMSDataContext)DataContext.DC).ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
                 new LogHelper("SendMailContractCashWithOutstandingDebit", "Data : " + JsonConvert.SerializeObject(dtData, Formatting.Indented));
-                var dtGrp = dtData.Where(x => !string.IsNullOrEmpty(x.SaleManId)).GroupBy(x => new
+                var dtGrp = dtData.Where(x => !string.IsNullOrEmpty(x.SaleManId) && x.SalemanName  == "Kenny.Thương").GroupBy(x => new
                 {
                     x.SaleManId
                 });
