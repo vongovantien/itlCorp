@@ -45,7 +45,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IOptions<ApiUrl> apiUrl;
         private readonly IContextBase<SysImage> sysImageRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
-
+        private readonly IStageService stageService;
+        private readonly ICsStageAssignedService stageAssignedService;
         ICsTransactionDetailService houseBills;
 
         public CsArrivalFrieghtChargeService(IStringLocalizer<LanguageSub> localizer,
@@ -68,7 +69,9 @@ namespace eFMS.API.Documentation.DL.Services
             IOptions<WebUrl> url,
             IOptions<ApiUrl> aUrl,
             IContextBase<SysImage> sysImageRepo,
-            ICurrencyExchangeService currencyExchange
+            ICurrencyExchangeService currencyExchange,
+            IStageService stage,
+            ICsStageAssignedService stageAssigned
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -89,6 +92,8 @@ namespace eFMS.API.Documentation.DL.Services
             apiUrl = aUrl;
             sysImageRepository = sysImageRepo;
             currencyExchangeService = currencyExchange;
+            stageService = stage;
+            stageAssignedService = stageAssigned;
         }
 
         #region Arrival
@@ -259,10 +264,10 @@ namespace eFMS.API.Documentation.DL.Services
                 item.UserCreated = item.UserModified = currentUser.UserID;
 
                 // Nếu đang tạo hbl thì tỷ giá theo ngày tạo hbl.
-                if(item.CurrencyId != DocumentConstants.CURRENCY_LOCAL && !string.IsNullOrEmpty(model.HblId))
+                if (item.CurrencyId != DocumentConstants.CURRENCY_LOCAL && !string.IsNullOrEmpty(model.HblId))
                 {
                     CsTransactionDetail hbl = detailTransactionRepository.Get(x => x.Id.ToString() == model.HblId)?.FirstOrDefault();
-                    if(hbl != null)
+                    if (hbl != null)
                     {
                         item.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, hbl.DatetimeCreated, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                     }
@@ -377,8 +382,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                         charge.ShippingMarkImport = houserBill.ContSealNo;//Lấy value của field Container No/Container Type/Seal No
 
-                        charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
-                        charge.Description = houserBill.DesOfGoods;// Description of goods (Description)             
+                        charge.TotalPackages = houserBill.PackageContainer;// Detail container & package
+                        charge.Description = houserBill.DesOfGoods;// Description of goods (Description)
                         charge.NoPieces = nopieces;
                         charge.GrossWeight = houserBill.GrossWeight ?? 0; //GrossWeight of container
                         charge.CBM = houserBill.Cbm ?? 0; //CBM of container
@@ -440,7 +445,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                     charge.ShippingMarkImport = houserBill.ContSealNo;//Lấy value của field Container No/Container Type/Seal No
 
-                    charge.TotalPackages = houserBill.PackageContainer;// Detail container & package                    
+                    charge.TotalPackages = houserBill.PackageContainer;// Detail container & package
                     charge.Description = houserBill.DesOfGoods;// Description of goods (Description)
                     charge.NoPieces = nopieces;
                     charge.GrossWeight = houserBill.GrossWeight ?? 0; //GrossWeight of container
@@ -526,10 +531,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 var _polName = string.Empty;
                 var _podName = string.Empty;
-                if(string.IsNullOrEmpty(houseBill.PolDescription))
+                if (string.IsNullOrEmpty(houseBill.PolDescription))
                 {
                     _polName = placeRepository.Get(x => x.Id == houseBill.Pol).FirstOrDefault()?.NameEn;
-                } else
+                }
+                else
                 {
                     _polName = houseBill.PolDescription;
                 }
@@ -549,7 +555,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var _arrivalFooter = ReportUltity.ReplaceHtmlBaseForPreviewReport(arrival.ArrivalFooter);
 
                 string warehouseName = string.Empty;
-                if(houseBill.WarehouseId != Guid.Empty)
+                if (houseBill.WarehouseId != Guid.Empty)
                 {
                     warehouseName = placeRepository.Get(x => x.Id == houseBill.WarehouseId)?.FirstOrDefault()?.DisplayName;
                 }
@@ -566,7 +572,7 @@ namespace eFMS.API.Documentation.DL.Services
                         _sipperInfo = partnerRepositoty.Get(x => x.Id == houseBill.ShipperId).FirstOrDefault()?.PartnerNameEn;
                     }
                 }
-                
+
                 if (arrival.CsArrivalFrieghtCharges.Count > 0)
                 {
                     foreach (var frieght in arrival.CsArrivalFrieghtCharges)
@@ -663,7 +669,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Company Information
             var companyUser = companyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
             // Office Information
-            var officeUser = officeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();            
+            var officeUser = officeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();
             var parameter = new AirImptArrivalReportParams();
             parameter.No = string.Empty;
             parameter.MAWB = houseBill != null ? (houseBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
@@ -675,7 +681,7 @@ namespace eFMS.API.Documentation.DL.Services
             //[END]
 
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress1 = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? officeUser?.AddressVn : officeUser?.AddressEn; // Office Address En of user 
+            parameter.CompanyAddress1 = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? officeUser?.AddressVn : officeUser?.AddressEn; // Office Address En of user
             parameter.CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty); // Tel & Fax of Office user
             parameter.Website = companyUser?.Website; // Website Company of user
             parameter.AccountInfo = string.Empty;
@@ -836,6 +842,76 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
+        public async Task<HandleState> UpdateMultipleProofOfDelivery(ProofOfDeliveryModel model)
+        {
+            var listHBL = new List<CsTransactionDetail>();
+
+            foreach (var hblId in model.HouseBills)
+            {
+                var detailTransaction = detailTransactionRepository.First(x => x.Id == hblId);
+                if (detailTransaction == null) return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND].Value);
+                detailTransaction.ReferenceNoProof = model.ReferenceNo;
+                detailTransaction.DeliveryDate = model.DeliveryDate;
+                detailTransaction.DeliveryPerson = model.DeliveryPerson;
+                detailTransaction.DeliveryPerson = model.DeliveryPerson;
+                detailTransaction.Note = model.Note;
+                listHBL.Add(detailTransaction);
+            }
+
+            using (var trans = detailTransactionRepository.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    if (listHBL.Count() > 0)
+                    {
+                        List<CsStageAssignedModel> listStage = new List<CsStageAssignedModel>();
+                        var orderNumber = stageAssignedService.Get(x => x.JobId == listHBL.FirstOrDefault().JobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
+
+                        foreach (var item in listHBL)
+                        {
+                            var hs = detailTransactionRepository.Update(item, x => x.Id == item.Id, false);
+                            if (hs.Success)
+                            {
+                                var stage = await stageService.GetStageByType(DocumentConstants.UPDATE_POD);
+                                CsStageAssignedModel newItem = new CsStageAssignedModel();
+
+                                newItem.Id = Guid.NewGuid();
+                                newItem.StageId = stage.Id;
+                                newItem.Status = TermData.Done;
+                                newItem.Deadline = DateTime.Now;
+                                newItem.MainPersonInCharge = newItem.RealPersonInCharge = currentUser.UserID;
+                                newItem.Hblid = item?.Id;
+                                newItem.Hblno = item?.Hwbno;
+                                newItem.JobId = item.JobId;
+                                newItem.Type = DocumentConstants.FROM_SYSTEM;
+                                newItem.DatetimeCreated = newItem.DatetimeModified = DateTime.Now;
+                                newItem.OrderNumberProcessed = orderNumber + 1;
+
+                                listStage.Add(newItem);
+                                orderNumber++;
+                            }
+                        }
+                        var hS = await stageAssignedService.AddMutipleStageAssigned(listStage);
+                    }
+
+                    var result = detailTransactionRepository.SubmitChanges();
+                    trans.Commit();
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+
+
+        }
+
         //public SysImage GetFileProofOfDelivery(Guid hblId)
         //{
         //    var result = sysImageRepository.Get(x => x.ObjectId == hblId.ToString()).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();
@@ -946,8 +1022,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             //Group by Package Type [CR: 15147 - 18/12/2020]
-            var grpPkgsType = containers.GroupBy(g => new { g.PackageTypeId }).Select(s => new { PackageTypeId = s.Key.PackageTypeId,  PackageQuantitys = s.Select(se => (decimal?)se.PackageQuantity) });
-            foreach(var grp in grpPkgsType)
+            var grpPkgsType = containers.GroupBy(g => new { g.PackageTypeId }).Select(s => new { PackageTypeId = s.Key.PackageTypeId, PackageQuantitys = s.Select(se => (decimal?)se.PackageQuantity) });
+            foreach (var grp in grpPkgsType)
             {
                 var pkgsType = unitRepository.Get(x => x.Id == grp.PackageTypeId)?.FirstOrDefault()?.Code; //Unit Code
                 var pkgsQty = grp.PackageQuantitys.Sum();

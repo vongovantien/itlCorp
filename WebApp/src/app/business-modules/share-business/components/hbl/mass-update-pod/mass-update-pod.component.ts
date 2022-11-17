@@ -4,13 +4,13 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { HouseBill } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
+import { DocumentationRepo } from '@repositories';
+import { getHBLSState, IShareBussinessState } from '@share-bussiness';
 import { ToastrService } from 'ngx-toastr';
-import { forkJoin } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
 import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
-import { getHBLSState, IShareBussinessState } from '../../../store';
-import { DocumentationRepo } from './../../../../../shared/repositories/documentation.repo';
+
 
 @Component({
     selector: 'app-mass-update-pod',
@@ -25,7 +25,7 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
     deliveryDate: AbstractControl;
     deliveryPerson: AbstractControl;
     HAWBNo: AbstractControl;
-    housebillList: HouseBill[] = [];
+    houseBillList: HouseBill[] = [];
     constructor(
         private _fb: FormBuilder,
         private _toast: ToastrService,
@@ -56,14 +56,13 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
     }
 
     getHouseBills() {
-
         this._store.select(getHBLSState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (hbls: any[]) => {
                     if (hbls?.length >= 1) {
-                        this.housebillList = [new HouseBill({ id: 'All', hwbno: 'All' })];
-                        this.housebillList = this.housebillList.concat(hbls) || [];
+                        this.houseBillList = [new HouseBill({ id: 'All', hwbno: 'All' })];
+                        this.houseBillList = this.houseBillList.concat(hbls) || [];
                     }
                 }
             );
@@ -85,52 +84,36 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
 
     updatePOD() {
         this.isSubmitted = true;
-
-        console.log(this.HAWBNo);
-
         const deliveryDateInput = !!this.deliveryDate.value?.startDate ? formatDate(this.deliveryDate.value?.startDate, 'yyyy-MM-dd', 'en') : null;
         if (this.formGroup.invalid || deliveryDateInput === null) {
             return;
         }
-        const mapV: ProofOfDelivery[] = this.HAWBNo.value !== null ? (this.HAWBNo.value[0]?.id === 'All' ?
-            this.housebillList.filter(x => x.id != 'All').map((x: any) =>
-                new ProofOfDelivery({
-                    deliveryDate: deliveryDateInput,
-                    deliveryPerson: this.deliveryPerson.value,
-                    hblid: x.id,
-                }))
-            :
-            this.HAWBNo.value.map((x: any) =>
-                new ProofOfDelivery({
-                    deliveryDate: deliveryDateInput,
-                    deliveryPerson: this.deliveryPerson.value,
-                    hblid: x.id,
-                }))) : [];
-
-        const source = mapV.map((x: ProofOfDelivery) => this._documentRepo.updateProofOfDelivery(Object.assign({}, x)));
-        forkJoin(source)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: CommonInterface.IResult[]) => {
-                    if (!!res) {
-                        let errorIndex = res.findIndex(x => x.status === false);
-                        if (errorIndex === -1) {
-                            this._toast.success(res[0].message);
-                            this.isUpdated.emit(true);
-                            this.isSubmitted = false;
-                            this.formGroup.reset();
-                            this.hide();
-                        } else {
-                            this._toast.error(res[errorIndex].message);
-                        }
-                    }
+        const listHbl = !!this.HAWBNo.value && this.HAWBNo.value[0].id === 'All' ?
+            this.houseBillList.filter(x => x.id !== 'All').map((x: any) => x.id) :
+            this.HAWBNo.value.map((x: any) => x.id)
+        const body = {
+            deliveryDate: deliveryDateInput,
+            deliveryPerson: this.deliveryPerson.value,
+            houseBills: listHbl,
+        }
+        this._documentRepo.updateMultipleProofOfDelivery(body).pipe(catchError(this.catchError)).subscribe(
+            (res: CommonInterface.IResult) => {
+                if (res.status) {
+                    this._toast.success(res.message);
+                    this.isUpdated.emit(true);
+                    this.isSubmitted = false;
+                    this.formGroup.reset();
+                    this.hide();
+                } else {
+                    this._toast.error(res.message);
                 }
-            )
+            }
+
+        )
     }
 
     resetDeliveryDate() {
         this.deliveryDate.setValue(null);
-        console.log(this.deliveryDate);
     }
 
 }
