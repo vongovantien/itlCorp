@@ -58,7 +58,7 @@
                 <label required *ngIf="receiptType === 'CUSTOMER'">Collect Amount VND</label>
                 <label *ngIf="receiptType !== 'CUSTOMER'">Collect Amount VND</label>
                 <input type="number" class="form-control m-input m-input--square text-success font-15"
-                    formControlName="paidAmountVnd" autoFormatCurrency [attr.readOnly]="isReadonly || receiptType !== 'CUSTOMER'"
+                    formControlName="paidAmountVnd" autoFormatCurrency [attr.readOnly]="isReadonly"
                     (change)="onSelectDataFormInfo($event,'paid-amountVnd')">
             </div>
         </div>
@@ -93,7 +93,7 @@
                     <div class="form-group">
                         <label for="">Auto convert</label>
                         <app-switch size="sm" class="success" formControlName="isAutoConvert"
-                            (toggleChange)="onToggleAutoConvertPaid($event)" [disabled]="isReadonly || receiptType !== 'CUSTOMER'"></app-switch>
+                            (toggleChange)="onToggleAutoConvertPaid($event)" [disabled]="isReadonly"></app-switch>
                     </div>
                 </div>
             </div>

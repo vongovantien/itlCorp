@@ -181,10 +181,10 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                                         this.onSelectDataFormInfo(d[0], 'agreement');
 
                                         // * Check partner group của đối tượng đang chọn có # với đối tượng phiếu thu muốn tạo
-                                        if (data.partnerType === this.partnerTypeState) {
-                                            this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: this.partnerTypeState }));
-                                            return;
-                                        }
+                                        // if (data.partnerType === this.partnerTypeState) {
+                                        //     this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: this.partnerTypeState }));
+                                        //     return;
+                                        // }
                                         this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerType.toUpperCase() }));
 
                                     } else {
