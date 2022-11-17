@@ -336,7 +336,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             remark: data.remark,
             inWord: data.inWord,
             serviceType: data.serviceType,
-            receivedBillTime: data.receivedBillTime
+            receivedBillTime: data.receivedBillTime,
+            shipmentType: data.shipmentType
         });
     }
 
@@ -382,7 +383,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             incotermId: res.incotermId
         });
 
-        this._catalogueRepo.getListSalemanByPartner(res.customerId, this.type)
+        this._catalogueRepo.GetListSalemanByShipmentType(res.customerId, this.type, res.shipmentType)
             .subscribe((data) => {
                 this.saleMans = data || [];
             });
