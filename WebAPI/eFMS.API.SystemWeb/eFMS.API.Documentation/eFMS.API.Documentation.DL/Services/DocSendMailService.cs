@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -17,6 +18,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -1586,7 +1588,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 foreach (var saleman in dtGrp)
                 {
-                    var attachFile = GetAttachExportShipmentOutstandingDebit(saleman.Key.SaleManId).Result;
+                    var fileContent = GetAttachExportShipmentOutstandingDebit(saleman.Key.SaleManId).Result;
                     string body = emailTemplate.Body;
                     body = body.Replace("{{SalemanName}}", saleman.FirstOrDefault().SalemanName);
 
@@ -1615,12 +1617,13 @@ namespace eFMS.API.Documentation.DL.Services
                     var mailTo = new List<string> { saleman.FirstOrDefault().SalemanEmail };
                     var mailCC = saleman.FirstOrDefault().EmailCC.Split(";").ToList();
                     // Bcc
-                    if (saleman.Count() > 0 && attachFile.Status)
+                    if (saleman.Count() > 0)
                     {
                         string email = body + footer;
-
-                        List<string> pathFile = new List<string>() { attachFile.Data.ToString() };
-                        var s = SendMail.Send(subject, email, mailTo, pathFile, mailCC, emailBCCs);
+                        List<EmailAttachment> attachments = new List<EmailAttachment>();
+                        string fileName = string.Format(@"{0} - OustandingDebit-{1}.xlsx", saleman.FirstOrDefault().SalemanName, DateTime.Now.ToString("ddMMyy"));
+                        attachments.Add(new EmailAttachment { Stream = new MemoryStream(fileContent), FileName = fileName });
+                        var s = SendMail.SendFile(subject, email, mailTo, attachments, mailCC, emailBCCs);
 
                         #region --- Ghi Log Send Mail ---
                         var logSendMail = new SysSentEmailHistory
@@ -1664,13 +1667,12 @@ namespace eFMS.API.Documentation.DL.Services
             return data;
         }
 
-        private async Task<ResultHandle> GetAttachExportShipmentOutstandingDebit(string salemanId)
+        private async Task<byte[]> GetAttachExportShipmentOutstandingDebit(string salemanId)
         {
             Uri urlExport = new Uri(apiServiceUrl.Value.ApiUrlExport);
 
-            HttpResponseMessage resquest = await HttpClientService.GetApi(urlExport + "/api/v1/en-US/Documentation/ExportShipmentOutstandingDebit?salemanId=" + salemanId, null);
-            var response = await resquest.Content.ReadAsAsync<ResultHandle>();
-            return response;
+            var resquest = await HttpClientService.GetByteArrayFromFile(urlExport + "/api/v1/en-US/Documentation/ExportShipmentOutstandingDebit?salemanId=" + salemanId, null);
+            return resquest;
         }
     }
 }
