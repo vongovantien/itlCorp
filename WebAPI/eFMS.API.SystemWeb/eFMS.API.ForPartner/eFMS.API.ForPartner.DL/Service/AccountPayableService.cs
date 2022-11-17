@@ -431,7 +431,7 @@ namespace eFMS.API.ForPartner.DL.Service
             List<AccAccountPayable> payable = DataContext.Get(x => x.VoucherNo == model.VoucherNo
             && x.BillingNo == model.DocCode
             && x.BillingType == model.DocType
-            && x.OfficeId == office.Id).ToList();
+            && x.OfficeId == office.Id && !string.IsNullOrEmpty(x.ReferenceNo)).ToList();
             if (payable.Count > 0)
             {
                 IshasPayment = paymentRepository.Any(x => payable.Any(pa => pa.ReferenceNo == x.ReferenceNo && (pa.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_ADV ? pa.TransactionType == x.PaymentType : (x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF))));
