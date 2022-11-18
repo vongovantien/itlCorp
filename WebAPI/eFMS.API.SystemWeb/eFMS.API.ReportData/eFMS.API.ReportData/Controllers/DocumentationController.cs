@@ -803,10 +803,8 @@ namespace eFMS.API.ReportData.Controllers
             var stream = new DocumentationHelper().GenerateExportShipmentOutstandingDebit(dataObjects.Result, "Shipment-Oustanding-Debit-Template.xlsx", out salemanName);
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            var file = new FileHelper().ReturnFormFile("eFMS", stream, salemanName + "-OustandingDebit");
-            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + salemanId, accessToken);
-            var result = response.Content.ReadAsAsync<ResultHandle>().Result;
-            return Ok(result);
+            var file = new FileHelper().ExportExcel("eFMS", stream, salemanName + "-OustandingDebit");
+            return file;
         }
 
         /// <summary>
