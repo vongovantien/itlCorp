@@ -1,5 +1,5 @@
 <div class="modal fade" id="assign-modal" role="dialog" bsModal #popup="bs-modal">
-    <div class="modal-dialog c-modal-fullscreen" role="document">
+    <div class="modal-dialog modal-report" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 *ngIf="isAsignment === false" class="modal-title">OPS Assignment</h5>
@@ -11,7 +11,7 @@
             </div>
             <div class="modal-body">
                 <div class="row m-form m-form--state">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedStage.value}">
                             <label for="">Stage Content <span class="text-danger">(*)</span></label>
@@ -27,7 +27,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedUser.value}">
                             <label for="">Assign To <span class="text-danger">(*)</span></label>
@@ -42,20 +42,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-12">
                         <div class="form-group">
                             <label for="">House Bill</label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedHbl" [height]="150"
-                                (itemSelected)="onSelectData($event, 'hbl')" [dataSources]="configHbl.dataSource"
-                                [displayFields]="configHbl.displayFields"
-                                [selectedDisplayFields]="configHbl.selectedDisplayFields"
-                                (remove)="onRemoveData('hbl')">
-                            </app-combo-grid-virtual-scroll>
+                            <ng-select [multiple]="true" [items]="houseBillList" (remove)="onRemoveDataFormInfo($event)"
+                                [(ngModel)]="selectedHbl" (change)="onSelectDataFormInfo($event)" class="custom"
+                                bindLabel="hwbno" bindValue="id">
+                            </ng-select>
                         </div>
                     </div>
                     <div class="col-md-12">
                         <label for="">Description</label>
-                        <textarea cols="30" rows="10" class="form-control" [(ngModel)]="description"
+                        <textarea cols="20" rows="10" class="form-control" [(ngModel)]="description"
                             name=description></textarea>
                     </div>
                 </div>

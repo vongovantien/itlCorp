@@ -11,7 +11,6 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
@@ -235,7 +234,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (hs.Success)
                 {
-                    var handleStage = await csStageAssignedService.SetMutipleStageAssigned(currentHBL, null, model.JobId, model.Id, true);
+                    var handleStage = await csStageAssignedService.SetMultipleStageAssigned(currentHBL, null, model.JobId, model.Id, true);
                 }
 
             });

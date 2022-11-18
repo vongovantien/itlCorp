@@ -1,6 +1,8 @@
+import { X } from '@angular/cdk/keycodes';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { CsTransactionDetail } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, map } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
@@ -43,23 +45,13 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     selectedUser: Partial<CommonInterface.IComboGridData> = {};
     selectedUserData: any;
 
-    configHbl: CommonInterface.IComboGirdConfig = {
-        placeholder: 'Please select',
-        displayFields: [
-            { field: 'hwbno', label: 'HBL No' },
-            { field: 'customerName', label: 'Customer Name' },
-        ],
-        dataSource: [],
-        selectedDisplayFields: ['hwbno'],
-    };
-    selectedHbl: Partial<CommonInterface.IComboGridData> = {};
-    selectedHblData: any;
-
     users: User[] = [];
     description: string = '';
     isSubmitted: boolean = false;
     jobId: string = '';
     isAsignment: boolean = false;
+    houseBillList: CsTransactionDetail[];
+    selectedHbl: CsTransactionDetail[];
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -118,31 +110,33 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     }
 
     assignStage() {
-        this.isSubmitted = true;
-        if (!this.selectedUser.value || !this.selectedStage.value) {
-            return;
-        }
-        const body: IAssignStage = {
-            id: "00000000-0000-0000-0000-000000000000",
-            jobId: this.jobId,
-            hblId: !!this.selectedHbl.value ? this.selectedHblData.id : null,
-            stageId: this.selectedStageData.id,
-            mainPersonInCharge: this.selectedUserData.id,
-            description: this.description,
-            type: 'User'
-        };
-        this._operationRepo.assignStageOPS(body).pipe(catchError(this.catchError))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-                        this.onAssign.emit(this.selectedStageData.jobId);
-                        this.closePopup();
-                    } else {
-                        this._toastService.warning(res.message);
-                    }
-                },
-            );
+
+
+        // this.isSubmitted = true;
+        // if (!this.selectedUser.value || !this.selectedStage.value) {
+        //     return;
+        // }
+        // const body: IAssignStage = {
+        //     id: "00000000-0000-0000-0000-000000000000",
+        //     jobId: this.jobId,
+        //     hblId: null,
+        //     stageId: this.selectedStageData.id,
+        //     mainPersonInCharge: this.selectedUserData.id,
+        //     description: this.description,
+        //     type: 'User'
+        // };
+        // this._operationRepo.assignStageOPS(body).pipe(catchError(this.catchError))
+        //     .subscribe(
+        //         (res: CommonInterface.IResult) => {
+        //             if (res.status) {
+        //                 this._toastService.success(res.message);
+        //                 this.onAssign.emit(this.selectedStageData.jobId);
+        //                 this.closePopup();
+        //             } else {
+        //                 this._toastService.warning(res.message);
+        //             }
+        //         },
+        //     );
     }
 
     onRemoveData(type: string) {
@@ -152,9 +146,6 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
                 break;
             case "user":
                 this.selectedUser = {};
-                break;
-            case "hbl":
-                this.selectedHbl = {};
                 break;
             default:
                 break;
@@ -172,11 +163,6 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
                 this.selectedUserData = data;
                 this.selectedUser = { field: 'username', value: data.username };
                 break;
-            case "hbl":
-                this.selectedHblData = data;
-                this.selectedHbl = { field: 'hwbno', value: data.hwbno };
-            default:
-                break;
         }
     }
 
@@ -185,9 +171,12 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.configHbl.dataSource = res;
-                },
-                () => { }
+                    if (!!res) {
+                        this.houseBillList = [new CsTransactionDetail({ id: 'All', hwbno: 'All' })]
+                        this.houseBillList = this.houseBillList.concat(res);
+                        console.log(this.houseBillList)
+                    }
+                }
             );
     }
 
@@ -199,8 +188,24 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
         // this.selectedUser = null;
         this.selectedStage = {};
         this.selectedUser = {};
-        this.selectedHbl = {};
         this.isSubmitted = false;
+    }
+
+    onSelectDataFormInfo($event: CsTransactionDetail[]) {
+        if ($event.length > 0) {
+            if ($event[$event.length - 1].id === 'All') {
+                this.selectedHbl = this.houseBillList.filter(x => x.id !== 'All')
+                this.houseBillList = this.houseBillList.filter(x => x)
+            }
+            else {
+                this.houseBillList = this.houseBillList.concat($event);
+                console.log(this.houseBillList)
+            }
+        }
+    }
+
+    onRemoveDataFormInfo($event) {
+        console.log($event)
     }
 }
 
