@@ -22,6 +22,7 @@ import { DataService } from '@services';
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
 import { ToastrService } from 'ngx-toastr';
+import { getTransactionDetailCsTransactionState, getTransactionState } from './../../../../share-business/store';
 
 @Component({
     selector: 'app-form-create-hbl-sea-export',
@@ -76,7 +77,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     incotermId: AbstractControl;
 
     customers: Observable<Customer[]>;
-    saleMans: User[];
+    saleMans: any = [];
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
     countries: Observable<CountryModel[]>;
@@ -171,6 +172,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                             this.userCreated = res.userNameCreated;
                             this.userModified = res.userNameModified;
                             this.hblId = res.id;
+                            this.getShipmentType();
                             this.updateFormValue(res);
                         }
                     }
@@ -179,6 +181,17 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             this.getShipmentDetailAndUpdateDefault();
         }
 
+    }
+
+    getShipmentType(){
+        this._store.select(getTransactionDetailCsTransactionState)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
+            (res: any) => {
+                this.shipmentType = res.shipmentType;
+                console.log(this.shipmentType);
+            }
+        );
     }
 
     getShipmentDetailAndUpdateDefault() {
@@ -412,9 +425,9 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
 
-        this._catalogueRepo.getListSalemanByPartner(data.customerId, this.type)
+        this._catalogueRepo.GetListSalemanByShipmentType(data.customerId, this.type, this.shipmentType)
             .subscribe((salesmans: any) => {
-                this.saleMans = salesmans;
+                this.saleMans = salesmans || [];
             });
     }
 
@@ -469,6 +482,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             hbltype: data.hbltype,
             polDescription: data.polDescription,
             podDescription: data.podDescription,
+            shipmentType: data.shipmentType
         });
 
         this.ports.pipe(takeUntil(this.ngUnsubscribe)).subscribe(
