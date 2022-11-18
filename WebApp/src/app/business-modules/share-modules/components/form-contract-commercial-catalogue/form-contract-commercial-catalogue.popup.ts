@@ -1,23 +1,22 @@
-import { OAuthService } from 'angular-oauth2-oidc';
-import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef, Input } from '@angular/core';
-import { PopupBase } from 'src/app/popup.base';
-import { finalize, catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
-import { Office, Company, User, Customer } from '@models';
-import { Validators, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
-import { JobConstants, SystemConstants } from '@constants';
-import { SystemRepo, CatalogueRepo, SystemFileManageRepo } from '@repositories';
-import { Router, ActivatedRoute } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
-import { Store } from '@ngrx/store';
-import { IAppState, getMenuUserSpecialPermissionState, GetCatalogueCurrencyAction, getCatalogueCurrencyState, getCurrentUserState } from '@store';
-import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
-import { Observable } from 'rxjs';
 import { formatDate } from '@angular/common';
-import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
-import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/commercial/components/popup/salesman-credit-limit.popup';
+import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
+import { Company, Customer, Office, User } from '@models';
+import { Store } from '@ngrx/store';
+import { NgProgress } from '@ngx-progressbar/core';
+import { CatalogueRepo, SystemFileManageRepo, SystemRepo } from '@repositories';
+import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, getCurrentUserState, getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
+import { catchError, distinctUntilChanged, finalize, map, takeUntil } from 'rxjs/operators';
+import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/commercial/components/popup/salesman-credit-limit.popup';
+import { PopupBase } from 'src/app/popup.base';
+import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
+import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -329,6 +328,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 },
             );
     }
+
     onSelectedDataFormInfo($event, type: string) {
         switch (type) {
             case 'salesman':
@@ -502,7 +502,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this._toastService.error('Contract no has been existed!');
                 return;
             }
-            this.asignValueToModel();
+            this.assignValueToModel();
             if (this.isCustomerRequest === true) {
                 if (!this.partnerIds.value) return;
                 this.selectedContract.partnerId = this.partnerIds.value;
@@ -518,6 +518,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                                     this.uploadFileContract(res.data);
                                 }
                                 this.onRequest.emit(true);
+                                this.formGroup.reset();
                                 this.hide();
                             } else {
                                 this._toastService.error(res.message);
@@ -616,7 +617,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.onRequest.emit(this.selectedContract);
-
+                        this.formGroup.reset();
                         this.hide();
                     } else {
                         this._toastService.error(res.message);
@@ -627,7 +628,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     onSubmitChangeAgreementType() {
         if (this.formGroup.valid) {
-            this.asignValueToModel();
+            this.assignValueToModel();
             const body = new Contract(this.selectedContract);
             body.isChangeAgrmentType = this.isChangeAgrmentType;
             this.confirmChangeAgreementTypePopup.hide();
@@ -730,7 +731,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
         this.formatAutoExtendDays();
     }
-    asignValueToModel() {
+    assignValueToModel() {
         if (this.isUpdate) {
             this.selectedContract.id = this.idContract;
         }
@@ -1053,6 +1054,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     close() {
         this.selectedSalesmanData = null;
+        this.formGroup.reset()
         this.hide();
     }
 
