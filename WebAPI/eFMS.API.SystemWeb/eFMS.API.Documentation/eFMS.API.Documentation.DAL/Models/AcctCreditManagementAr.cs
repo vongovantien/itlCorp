@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -29,7 +28,5 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public string SurchargeId { get; set; }
         public bool? NetOff { get; set; }
-        public string ReferenceNo { get; set; }
-        public string Source { get; set; }
     }
 }
