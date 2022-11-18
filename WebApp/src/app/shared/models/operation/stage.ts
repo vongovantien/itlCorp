@@ -1,7 +1,7 @@
 
 export class Stage {
     comment: string = '';
-    createdDate: string = '';
+    datetimeCreated: string = '';
     deadline: string = '';
     departmentName: string = '';
     description: string = '';
