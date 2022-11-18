@@ -74,12 +74,7 @@
                                                             disabled>
                                                     </div>
                                                 </td>
-                                                <ng-container *ngIf="typeFrom!=='SOA'">
                                                     <td class="disabled" *ngIf="typeFrom!=='Shipment'">
-                                                        <!-- <div class="form-group " *ngIf="typeFrom!=='Settlement'">
-                                                            <input type="text" class="form-control "
-                                                                [ngModel]="file.jobNo" disabled>
-                                                        </div> -->
                                                         <select class="form-control" [(ngModel)]="file.job"
                                                             (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
                                                             <option *ngFor="let job of jobs" [ngValue]="job">
@@ -87,7 +82,7 @@
                                                             </option>
                                                         </select>
                                                     </td>
-                                                    <td class="" *ngIf="typeFrom!=='Settlement'&&typeFrom!=='Advance'">
+                                                    <td class="" *ngIf="typeFrom!=='Settlement'&&typeFrom!=='Advance'&&typeFrom!=='SOA'">
                                                         <div class="form-group ">
                                                             <select class="form-control" [(ngModel)]="file.hwbNo"
                                                                 (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
@@ -97,7 +92,6 @@
                                                             </select>
                                                         </div>
                                                     </td>
-                                                </ng-container>
                                                 <td class="">
                                                     <div class="form-group ">
                                                         <input type="text" class="form-control " placeholder="Note"

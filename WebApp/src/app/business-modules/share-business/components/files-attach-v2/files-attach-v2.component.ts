@@ -13,8 +13,9 @@ import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { getAdvanceDetailRequestState, getAdvanceDetailState } from 'src/app/business-modules/accounting/advance-payment/store';
+import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
 import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { getSOADetailState } from 'src/app/business-modules/accounting/statement-of-account/store/reducers';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../store';
 import { ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
@@ -22,6 +23,7 @@ import { ShareDocumentTypeAttachComponent } from '../document-type-attach/docume
     selector: 'files-attach-v2',
     templateUrl: './files-attach-v2.component.html'
 })
+
 export class ShareBussinessAttachFileV2Component extends AppList implements OnInit {
     @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
@@ -33,16 +35,27 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
-
-    @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
-
     get readonly(): boolean {
         return this._readonly;
     }
 
-    isDelete: boolean = false;
-    headersGen: CommonInterface.IHeaderTable[];
-    headersAcc: CommonInterface.IHeaderTable[];
+    @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
+
+    headersGen: CommonInterface.IHeaderTable[] = [
+        { title: 'Alias Name', field: 'systemFileName', sortable: true },
+        { title: 'Real File Name', field: 'userFileName', sortable: true },
+        { title: 'House Bill No', field: 'hblNo', sortable: true },
+        { title: 'Note', field: 'note' },
+        { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
+        { title: 'Attach Person', field: 'userCreated', sortable: true },
+    ];
+    headersAcc: CommonInterface.IHeaderTable[] = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
+    { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
+    { title: 'Job No', field: 'jobNo' },
+    { title: 'Note', field: 'note' },
+    { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
+    { title: 'Attach Person', field: 'userCreated', sortable: true },
+    ];;
     documentTypes: any[] = [];
     jobId: string = '';
     isOps: boolean = false;
@@ -128,13 +141,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             this.getJobList();
             this.getDocumentType(this.typeFrom, this.billingId);
             this.getEDoc(this.typeFrom);
-            this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
-            { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
-            { title: 'Job No', field: 'jobNo' },
-            { title: 'Note', field: 'note' },
-            { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
-            { title: 'Attach Person', field: 'userCreated', sortable: true },
-            ];
         }
         this.headers = [
             { title: 'Alias Name', field: 'systemFileName', sortable: true },
@@ -145,14 +151,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
             { title: 'Attach Person', field: 'userCreated', sortable: true },
         ];
-        this.headersGen = [
-            { title: 'Alias Name', field: 'systemFileName', sortable: true },
-            { title: 'Real File Name', field: 'userFileName', sortable: true },
-            { title: 'House Bill No', field: 'hblNo', sortable: true },
-            { title: 'Note', field: 'note' },
-            { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
-            { title: 'Attach Person', field: 'userCreated', sortable: true },
-        ]
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -160,35 +158,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     this.currentUser = res;
                 }
             )
-        if (this.typeFrom === 'SOA') {
-            this.headerAttach = [
-                { title: 'Alias Name', field: 'aliasName', width: 300 },
-                { title: 'Real File Name', field: 'realFilename', width: 300 },
-                { title: 'Document Type', field: 'docType', required: true },
-                { title: 'Note', field: 'note' }
-            ]
-            this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
-            { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
-            { title: 'Note', field: 'note' },
-            { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
-            { title: 'Attach Person', field: 'userCreated', sortable: true },
-            ];
-        }
         this.getHblList();
-
-        if ((this.typeFrom === 'Advance')) {
-            this._store.select(getAdvanceDetailState).pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-                .subscribe(
-                    (data) => {
-                        if (data.statusApproval === 'Done') {
-                            this.isDelete = false;
-                        } else {
-                            this.isDelete = true;
-                        }
-                    });
-        }
     }
 
     getJobList() {
@@ -223,6 +193,21 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         }
                     }
                 );
+        } else if (this.typeFrom === 'SOA') {
+            this._store.select(getSOADetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        if (!!data) {
+                            console.log(data);
+
+                            for (let element of data.groupShipments) {
+                                this.jobs.push({ jobNo: element.jobId, })
+                            }
+                        }
+                    }
+                );
         }
 
     }
@@ -244,11 +229,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.selectedEdoc = edoc;
         this.documentAttach.selectedtDocType = edoc.documentTypeId;
         this.clearMenuContext(this.queryListMenuContext);
+        console.log(edoc);
     }
 
     downloadEdoc() {
         const selectedEdoc = Object.assign({}, this.selectedEdoc);
-        this._systemFileRepo.getFileEdoc(selectedEdoc.id).subscribe(
+        this._systemFileRepo.getFileEdoc(selectedEdoc.sysImageId).subscribe(
             (data) => {
                 const exten = selectedEdoc.imageUrl.split('.').pop();
                 this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.systemFileName + '.' + exten);
@@ -257,7 +243,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     editEdoc() {
-        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance') {
+        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance' || this.typeFrom === 'SOA') {
             this.documentAttach.headers = this.headerSettleAttach;
 
         } else {
@@ -358,7 +344,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     showDocumentAttach() {
-        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance') {
+        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance' || this.typeFrom === 'SOA') {
             this.documentAttach.headers = this.headerSettleAttach;
         } else {
             this.documentAttach.headers = this.headerAttach;
@@ -371,10 +357,11 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         if (!this.selectedEdoc.imageUrl) {
             return;
         }
-        const extension = this.selectedEdoc.userFileName.split('.').pop();
-        if (['xlsx'].includes(extension)) {
+        const extension = this.selectedEdoc.imageUrl.split('.').pop();
+        if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
             this._exportRepo.previewExport(this.selectedEdoc.imageUrl);
-        } else {
+        }
+        else {
             this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
         }
     }
@@ -460,8 +447,4 @@ interface IEDocItem {
     userModified: string;
     documentTypeName: string;
     transactionType: string;
-}
-interface IEDoc {
-    documentType: any;
-    eDocs: IEDocItem[];
 }

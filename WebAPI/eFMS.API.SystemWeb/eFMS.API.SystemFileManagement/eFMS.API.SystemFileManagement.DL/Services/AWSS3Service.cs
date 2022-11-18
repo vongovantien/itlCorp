@@ -202,6 +202,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 };
                 GetObjectResponse response = await _client.GetObjectAsync(request);
                 if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
+                //else if (Path.GetExtension(fileName) == ".txt")
+                //{
+                //    var data = new StreamReader(response.ResponseStream, Encoding.UTF8);
+                //    var obj = new object();
+                //    obj = data.ReadToEnd();
+                //    return new HandleState(true, obj);
+                //}
                 return new HandleState(true, response.ResponseStream);
             }
             catch (Exception ex)

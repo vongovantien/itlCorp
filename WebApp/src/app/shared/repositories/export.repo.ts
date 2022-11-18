@@ -441,7 +441,6 @@ export class ExportRepo {
         window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${url}`, '_blank');
     }
 
-
     downloadExport(url: string) {
         window.open(`${url}`, '_blank');
     }

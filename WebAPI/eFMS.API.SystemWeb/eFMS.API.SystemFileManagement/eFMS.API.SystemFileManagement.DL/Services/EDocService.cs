@@ -19,7 +19,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
@@ -39,6 +38,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private IContextBase<CsTransaction> _cstranRepo;
         private IContextBase<AcctSettlementPayment> _setleRepo;
         private IContextBase<AcctAdvancePayment> _advRepo;
+        private IContextBase<AcctSoa> _soaRepo;
         private IContextBase<SysUser> _userRepo;
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)_sysImageDetailRepo.DC;
         private readonly Dictionary<string, string> PreviewTemplateCodeMappingAttachTemplateCode = new Dictionary<string, string>();
@@ -53,6 +53,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             IContextBase<AcctSettlementPayment> setleRepo,
             IContextBase<AcctAdvancePayment> advRepo,
             IContextBase<SysUser> userRepo,
+            IContextBase<AcctSoa> soaRepo,
         IContextBase<CsTransactionDetail> tranDeRepo)
         {
             this.currentUser = currentUser;
@@ -69,6 +70,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _setleRepo = setleRepo;
             _advRepo = advRepo;
             _userRepo = userRepo;
+            _soaRepo = soaRepo;
             PreviewTemplateCodeMappingAttachTemplateCode.Add("HBL", "HBL");
             PreviewTemplateCodeMappingAttachTemplateCode.Add("MBL", "MBL");
             PreviewTemplateCodeMappingAttachTemplateCode.Add("DEBIT", "INV");
@@ -362,7 +364,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     UserCreated = x.UserCreated,
                     UserFileName = x.UserFileName,
                     UserModified = x.UserModified,
-                    ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault() != null ? GetAliasImageurl(image.Url, image.Name, x.SystemFileName) : null,
+                    ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault() != null ? image.Url : null,
                     HBLNo = _hblNo,
                     Note = x.Note,
                     TransactionType = transactionType
@@ -473,24 +475,42 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return result;
         }
 
-        private string GetAliasImageurl(string imageUrl, string fileName, string aliasName)
-        {
-            return imageUrl + '/' + aliasName + Path.GetExtension(fileName);
-        }
         public EDocGroupByType GetEDocByAccountant(Guid billingId, string transactionType)
         {
             var result = new EDocGroupByType();
             var lstEdoc = new List<SysImageDetailModel>();
             var imageExist = _sysImageRepo.Get(x => x.Folder == transactionType && x.ObjectId == billingId.ToString()).ToList(); // file goc co tren SM
             var lstEdocOT = new List<SysImageDetailModel>();
+            var settle = new AcctSettlementPayment();
+            var advance = new AcctAdvancePayment();
+            var soa = new AcctSoa();
+            var attachTemplate = new SysAttachFileTemplate();
+            var attachTemplateIds = new List<int>();
+            var EdocIamgeIds = new List<Guid?>();
+            switch (transactionType)
+            {
+                case "Settlement":
+                    settle = _setleRepo.Get(z => z.Id == billingId).FirstOrDefault();
+                    attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).FirstOrDefault();
+                    attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).ToList().Select(x => x.Id).ToList();
+                    result.documentType = attachTemplate;
+                    EdocIamgeIds = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo).Select(x => x.SysImageId).ToList(); //ID file goc tren SM da dc generate detail.;
+                    break;
+                case "Advance":
+                    advance = _advRepo.Get(z => z.Id == billingId).FirstOrDefault();
+                    attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "AD" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_ADVANCE).FirstOrDefault();
+                    attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "AD" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_ADVANCE).ToList().Select(x => x.Id).ToList();
+                    result.documentType = attachTemplate;
+                    break;
+                case "SOA":
+                    soa = _soaRepo.Get(x => x.Id == billingId.ToString()).FirstOrDefault();
+                    attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "SOA" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_SOA).FirstOrDefault();
+                    attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "SOA" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_SOA).ToList().Select(x => x.Id).ToList();
+                    break;
+            }
             if (transactionType == "Settlement")
             {
-                var settle = _setleRepo.Get(z => z.Id == billingId).FirstOrDefault();
-                var attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).FirstOrDefault();
-                var attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).ToList().Select(x => x.Id);
-                result.documentType = attachTemplate;
-                var settleEdocIamgeIds = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo).Select(x => x.SysImageId).ToList(); //ID file goc tren SM da dc generate detail.
-                imageExist.Where(x => !settleEdocIamgeIds.Contains(x.Id)).ToList().ForEach(x =>
+                imageExist.Where(x => !EdocIamgeIds.Contains(x.Id)).ToList().ForEach(x =>
                 {
                     var edoc = new SysImageDetailModel()
                     {
@@ -522,7 +542,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = x.Id,
                         BillingNo = settle.SettlementNo,
                         SystemFileName = x.SystemFileName,
-                        ImageUrl = image == null ? null : GetAliasImageurl(image.Url, x.UserFileName, x.SystemFileName),
+                        ImageUrl = image == null ? null : image.Url,
                         DatetimeCreated = x.DatetimeCreated,
                         BillingType = transactionType,
                         DatetimeModified = x.DatetimeModified,
@@ -609,10 +629,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             else if (transactionType == "Advance")
             {
-                var advance = _advRepo.Get(z => z.Id == billingId).FirstOrDefault();
-                var attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "AD" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_ADVANCE).FirstOrDefault();
-                var attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "AD" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_ADVANCE).ToList().Select(x => x.Id);
-                result.documentType = attachTemplate;
                 var advEDoc = _sysImageDetailRepo.Get(x => attachTemplateIds.Contains((int)x.DocumentTypeId) && x.BillingNo == advance.AdvanceNo).GroupBy(x => x.SysImageId).ToList();
                 imageExist.Where(x => !advEDoc.Any(z => z.FirstOrDefault().SysImageId == x.Id)).ToList().ForEach(x =>
                 {
@@ -644,7 +660,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = x.FirstOrDefault().Id,
                         BillingNo = advance.AdvanceNo,
                         SystemFileName = x.FirstOrDefault().SystemFileName,
-                        ImageUrl = GetAliasImageurl(image.Url, x.FirstOrDefault().UserFileName, x.FirstOrDefault().SystemFileName),
+                        ImageUrl = image.Url,
                         DatetimeCreated = x.FirstOrDefault().DatetimeCreated,
                         BillingType = transactionType,
                         DatetimeModified = x.FirstOrDefault().DatetimeModified,
@@ -687,7 +703,84 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     lstEdoc.Add(edoc);
                 });
                 result.EDocs = lstEdoc.OrderBy(x => x.DatetimeCreated).ToList();
-            };
+            }
+            else if (transactionType == "SOA")
+            {
+                var soaEDoc = _sysImageDetailRepo.Get(x => attachTemplateIds.Contains((int)x.DocumentTypeId) && x.BillingNo == soa.Soano).GroupBy(x => x.SysImageId).ToList();
+                imageExist.Where(x => !soaEDoc.Any(z => z.FirstOrDefault().SysImageId == x.Id)).ToList().ForEach(x =>
+                {
+                    var edoc = new SysImageDetailModel()
+                    {
+                        Id = x.Id,
+                        BillingNo = advance.AdvanceNo,
+                        SystemFileName = "AD" + '_' + x.Name,
+                        ImageUrl = x.Url,
+                        DatetimeCreated = x.DateTimeCreated,
+                        BillingType = transactionType,
+                        DatetimeModified = x.DatetimeModified,
+                        DepartmentId = currentUser.DepartmentId,
+                        DocumentTypeId = attachTemplate.Id,
+                        Source = SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_ADVANCE,
+                        SysImageId = x.Id,
+                        UserCreated = x.UserCreated,
+                        UserFileName = x.Name,
+                        UserModified = x.UserModified,
+                    };
+                    lstEdocOT.Add(edoc);
+                });
+                foreach (var x in soaEDoc)
+                {
+                    var image = _sysImageRepo.Get(z => z.Id == x.FirstOrDefault().SysImageId).FirstOrDefault();
+                    var jobDetail = GetJobDetail(x.FirstOrDefault().JobId, x.FirstOrDefault().Hblid, x.FirstOrDefault().DocumentTypeId);
+                    var edoc = new SysImageDetailModel()
+                    {
+                        Id = x.FirstOrDefault().Id,
+                        BillingNo = advance.AdvanceNo,
+                        SystemFileName = x.FirstOrDefault().SystemFileName,
+                        ImageUrl = image.Url,
+                        DatetimeCreated = x.FirstOrDefault().DatetimeCreated,
+                        BillingType = transactionType,
+                        DatetimeModified = x.FirstOrDefault().DatetimeModified,
+                        DepartmentId = currentUser.DepartmentId,
+                        DocumentTypeId = attachTemplate.Id,
+                        DocumentTypeName = attachTemplate.NameEn,
+                        Source = SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_ADVANCE,
+                        SysImageId = image.Id,
+                        UserCreated = x.FirstOrDefault().UserCreated,
+                        UserFileName = x.FirstOrDefault().UserFileName,
+                        UserModified = x.FirstOrDefault().UserModified,
+                        Note = x.FirstOrDefault().Note,
+                        HBLNo = jobDetail != null ? jobDetail.HBLNo : null,
+                        JobNo = jobDetail != null ? jobDetail.JobNo : null,
+                    };
+                    lstEdoc.Add(edoc);
+                }
+                lstEdocOT.ForEach(x =>
+                {
+                    var edoc = new SysImageDetailModel()
+                    {
+                        JobNo = null,
+                        HBLNo = null,
+                        JobId = Guid.Empty,
+                        Hblid = Guid.Empty,
+                        SystemFileName = x.SystemFileName,
+                        UserFileName = x.UserFileName,
+                        DocumentTypeName = x.DocumentTypeName,
+                        DocumentTypeId = x.DocumentTypeId,
+                        TransactionType = x.TransactionType,
+                        ImageUrl = x.ImageUrl,
+                        SysImageId = x.SysImageId,
+                        UserCreated = x.UserCreated,
+                        Source = x.Source,
+                        AccountingType = x.AccountingType,
+                        DatetimeCreated = x.DatetimeCreated,
+                        Note = x.Note,
+                        Id = x.Id,
+                    };
+                    lstEdoc.Add(edoc);
+                });
+                result.EDocs = lstEdoc.OrderBy(x => x.DatetimeCreated).ToList();
+            }
             return result;
         }
 
@@ -1324,88 +1417,82 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
         }
 
-        public async Task<HandleState> OpenEdocFile(string moduleName, string folder, Guid objId, string aliasName)
-        {
-            var edoc = new SysImageDetail();
-            if (moduleName == "Document" && folder == "Shipment")
-            {
-                edoc = _sysImageDetailRepo.Get(x => x.JobId == objId && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
-            }
-            else if (moduleName == "Accounting" && folder == "Advance")
-            {
-                var advNo = _advRepo.Get(x => x.Id == objId).FirstOrDefault();
-                if (advNo != null)
-                {
-                    edoc = _sysImageDetailRepo.Get(x => x.BillingNo == advNo.AdvanceNo && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
-                }
-            }
-            else
-            {
-                var settle = _setleRepo.Get(x => x.Id == objId).FirstOrDefault();
-                if (settle != null)
-                {
-                    edoc = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
-                }
-            }
+        //public async Task<HandleState> OpenEdocFile(string moduleName, string folder, Guid objId, string aliasName)
+        //{
+        //    var edoc = new SysImageDetail();
+        //    if (moduleName == "Document" && folder == "Shipment")
+        //    {
+        //        edoc = _sysImageDetailRepo.Get(x => x.JobId == objId && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
+        //    }
+        //    else if (moduleName == "Accounting" && folder == "Advance")
+        //    {
+        //        var advNo = _advRepo.Get(x => x.Id == objId).FirstOrDefault();
+        //        if (advNo != null)
+        //        {
+        //            edoc = _sysImageDetailRepo.Get(x => x.BillingNo == advNo.AdvanceNo && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        var settle = _setleRepo.Get(x => x.Id == objId).FirstOrDefault();
+        //        if (settle != null)
+        //        {
+        //            edoc = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
+        //        }
+        //    }
 
-            if (edoc != null)
-            {
-                var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                if (image != null)
-                {
-                    var key = moduleName + "/" + folder + "/" + objId + "/" + image.Name;
+        //    if (edoc != null)
+        //    {
+        //        var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+        //        if (image != null)
+        //        {
+        //            var key = moduleName + "/" + folder + "/" + objId + "/" + image.Name;
 
-                    var request = new GetObjectRequest()
-                    {
-                        BucketName = _bucketName,
-                        Key = key
-                    };
+        //            var request = new GetObjectRequest()
+        //            {
+        //                BucketName = _bucketName,
+        //                Key = key
+        //            };
 
-                    GetObjectResponse response = await _client.GetObjectAsync(request);
-                    if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
-                    var imgeName = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                    if (Path.GetExtension(imgeName.Name) == ".txt")
-                    {
-                        var data = new StreamReader(response.ResponseStream, Encoding.UTF8);
-                        var obj = new object();
-                        obj = data.ReadToEnd();
-                        return new HandleState(true, obj);
-                    }
-                    return new HandleState(true, response.ResponseStream);
-                }
-            }
-            return null;
+        //            GetObjectResponse response = await _client.GetObjectAsync(request);
+        //            if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
+        //            var imgeName = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+        //            if (Path.GetExtension(imgeName.Name) == ".txt")
+        //            {
+        //                var data = new StreamReader(response.ResponseStream, Encoding.UTF8);
+        //                var obj = new object();
+        //                obj = data.ReadToEnd();
+        //                return new HandleState(true, obj);
+        //            }
+        //            return new HandleState(true, response.ResponseStream);
+        //        }
+        //    }
+        //    return null;
 
-        }
+        //}
 
         public async Task<HandleState> OpenFile(Guid Id)
         {
             try
             {
-                var imageDetail = await _sysImageDetailRepo.GetAsync(x => x.Id == Id);
-                if (imageDetail.Count > 0)
+                var image = await _sysImageRepo.GetAsync(x => x.Id == Id);
+                if (image == null)
                 {
-                    var image = await _sysImageRepo.GetAsync(x => x.Id == imageDetail.FirstOrDefault().SysImageId);
-                    if (image == null)
-                    {
-                        return new HandleState("Not found file");
-                    }
-                    string key = image.FirstOrDefault().KeyS3;
-                    if (string.IsNullOrEmpty(key))
-                    {
-                        return new HandleState("Not found key");
-                    }
-                    var request = new GetObjectRequest()
-                    {
-                        BucketName = _bucketName,
-                        Key = key
-                    };
-                    GetObjectResponse response = await _client.GetObjectAsync(request);
-                    if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
-                    return new HandleState(true, response.ResponseStream);
+                    return new HandleState("Not found file");
                 }
-
-                return new HandleState();
+                string key = image.FirstOrDefault().KeyS3;
+                if (string.IsNullOrEmpty(key))
+                {
+                    return new HandleState("Not found key");
+                }
+                var request = new GetObjectRequest()
+                {
+                    BucketName = _bucketName,
+                    Key = key
+                };
+                GetObjectResponse response = await _client.GetObjectAsync(request);
+                if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
+                return new HandleState(true, response.ResponseStream);
             }
             catch (Exception ex)
             {
