@@ -383,7 +383,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             incotermId: res.incotermId
         });
 
-        this._catalogueRepo.GetListSalemanByShipmentType(res.customerId, this.type, res.shipmentType)
+        this._catalogueRepo.GetListSalemanByShipmentType(res.customerId, this.type, this.shipmentType)
             .subscribe((data) => {
                 this.saleMans = data || [];
             });
