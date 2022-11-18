@@ -2,6 +2,7 @@ import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
+import { SystemConstants } from '@constants';
 import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
@@ -258,20 +259,29 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     downloadEdoc() {
-        let ext = this.selectedEdoc.imageUrl.split('.').pop().toLowerCase();
-        if (ext === "png" || ext === "jpg") {
-            return this.downloadImage(this.selectedEdoc.imageUrl, this.selectedEdoc.systemFileName + '.' + ext);
-        } else if (ext === "txt") {
-            this._systemFileRepo.downloadEdoc(this.selectedEdoc.imageUrl).subscribe(blob => {
-                const a = document.createElement('a')
-                const objectUrl = URL.createObjectURL(blob)
-                a.href = objectUrl
-                a.download = this.selectedEdoc.systemFileName + '.' + ext;
-                a.click();
-                URL.revokeObjectURL(objectUrl);
-            })
-        }
-        this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
+        const selectedEdoc = Object.assign({}, this.selectedEdoc);
+        console.log(selectedEdoc);
+        this._systemFileRepo.getFileEdoc(selectedEdoc.id).subscribe(
+            (data) => {
+                console.log(selectedEdoc);
+                const exten = selectedEdoc.imageUrl.split('.').pop();
+                this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.systemFileName + '.' + exten);
+            }
+        )
+        // let ext = this.selectedEdoc.imageUrl.split('.').pop().toLowerCase();
+        // if (ext === "png" || ext === "jpg") {
+        //     return this.downloadImage(this.selectedEdoc.imageUrl, this.selectedEdoc.systemFileName + '.' + ext);
+        // } else if (ext === "txt") {
+        //     this._systemFileRepo.downloadEdoc(this.selectedEdoc.imageUrl).subscribe(blob => {
+        //         const a = document.createElement('a')
+        //         const objectUrl = URL.createObjectURL(blob)
+        //         a.href = objectUrl
+        //         a.download = this.selectedEdoc.systemFileName + '.' + ext;
+        //         a.click();
+        //         URL.revokeObjectURL(objectUrl);
+        //     })
+        // }
+        // this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
     }
 
     downloadImage(imageUrl: string, fileName: string) {

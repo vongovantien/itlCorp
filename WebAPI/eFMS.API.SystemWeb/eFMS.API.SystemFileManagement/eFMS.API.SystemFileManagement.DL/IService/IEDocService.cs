@@ -20,5 +20,7 @@ namespace eFMS.API.SystemFileManagement.DL.IService
         Task<string> PostAttachFileTemplateToEDoc(FileUploadModel model);
         Task<HandleState> AttachPreviewTemplate(List<EDocAttachPreviewTemplateUploadModel> models);
         Task<HandleState> OpenEdocFile(string moduleName, string folder, Guid objId, string aliasName);
+        Task<HandleState> OpenFile(Guid Id);
+        
     }
 }

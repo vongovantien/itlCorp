@@ -1376,5 +1376,40 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return null;
         
         }
+
+        public async Task<HandleState> OpenFile(Guid Id)
+        {
+            try
+            {
+                var imageDetail = await _sysImageDetailRepo.GetAsync(x => x.Id == Id);
+                if (imageDetail.Count > 0)
+                {
+                    var image = await _sysImageRepo.GetAsync(x => x.Id == imageDetail.FirstOrDefault().SysImageId);
+                    if(image == null)
+                    {
+                        return new HandleState("Not found file");
+                    }
+                    string key = image.FirstOrDefault().KeyS3;
+                    if(string.IsNullOrEmpty(key))
+                    {
+                        return new HandleState("Not found key");
+                    }
+                    var request = new GetObjectRequest()
+                    {
+                        BucketName = _bucketName,
+                        Key = key
+                    };
+                    GetObjectResponse response = await _client.GetObjectAsync(request);
+                    if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
+                    return new HandleState(true, response.ResponseStream);
+                }
+
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
     }
 }

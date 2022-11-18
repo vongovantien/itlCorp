@@ -161,5 +161,14 @@ namespace eFMS.API.SystemFileManagement.Controllers
                 return Ok(hs.Message);
             return BadRequest(hs);
         }
+
+        [HttpGet("OpenFile/{Id}")]
+        public async Task<IActionResult> OpenFileAliasName(Guid Id)
+        {
+            HandleState hs = await _edocService.OpenFile(Id);
+            if (hs.Success)
+                return Ok(hs.Message);
+            return BadRequest(hs);
+        }
     }
 }
