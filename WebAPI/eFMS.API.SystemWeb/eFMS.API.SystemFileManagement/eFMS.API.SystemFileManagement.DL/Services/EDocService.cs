@@ -11,6 +11,7 @@ using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver.Linq;
 using System;
@@ -19,6 +20,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
@@ -340,6 +342,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         _hblNo = _tranDeRepo.Get(y => y.Id == x.Hblid)?.FirstOrDefault()?.Hwbno;
                     }
                 }
+                var image = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault();
                 var imageModel = new SysImageDetailModel()
                 {
                     BillingNo = x.BillingNo,
@@ -360,7 +363,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     UserCreated = x.UserCreated,
                     UserFileName = x.UserFileName,
                     UserModified = x.UserModified,
-                    ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault() != null ? GetAliasImageurl(_sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault().Url,x.UserFileName,x.SystemFileName) : null,
+                    ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault() != null ? GetAliasImageurl(image.Url, image.Name, x.SystemFileName) : null,
                     HBLNo = _hblNo,
                     Note = x.Note,
                     TransactionType=transactionType
@@ -439,7 +442,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         GroupId = currentUser.GroupId,
                         UserCreated = x.UserCreated,
                         UserModified = x.UserModified,
-                        SystemFileName = "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(null,x.UserFileName)),
+                        SystemFileName = x.SystemFileName.Contains("OTH")?x.SystemFileName:"OTH" + Path.GetFileNameWithoutExtension(clearPrefix(null,x.UserFileName)),
                         JobNo = jobNo,
                         UserFileName = x.UserFileName,
                         Id = x.Id,
@@ -473,11 +476,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         private string GetAliasImageurl(string imageUrl,string fileName,string aliasName)
         {
-            if (aliasName.Contains("AD_"))
-            {
-                aliasName = aliasName+(Path.GetExtension(fileName));
-            }
-            return imageUrl.Replace("AWSS3/OpenFile", "EDoc/OpenEDocFile").Replace(fileName,aliasName);
+            return imageUrl+'/'+aliasName+ Path.GetExtension(fileName);
         }
         public EDocGroupByType GetEDocByAccountant(Guid billingId, string transactionType)
         {
@@ -1363,6 +1362,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
                     GetObjectResponse response = await _client.GetObjectAsync(request);
                     if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
+                    var imgeName = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+                    if (Path.GetExtension(imgeName.Name)==".txt")
+                    {
+                        var data = new StreamReader(response.ResponseStream, Encoding.UTF8);
+                        var obj=new object();
+                        obj=data.ReadToEnd();
+                        return new HandleState(true, obj);
+                    }
                     return new HandleState(true, response.ResponseStream);
                 }
             }

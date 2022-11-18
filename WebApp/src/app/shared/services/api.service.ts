@@ -113,6 +113,12 @@ export class ApiService {
         }
     }
 
+    downloadEdocFile(url: string) {
+        return this._http.get(this.setUrl(url), {
+            responseType: 'blob'
+        });
+    }
+
     get(url: string = '', params?: any, headers: any = {}, isBaseHref: boolean = true) {
         return this._http.get(isBaseHref ? this.setUrl(url) : url, {
             params,

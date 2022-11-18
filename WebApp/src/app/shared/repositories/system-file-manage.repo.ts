@@ -100,4 +100,8 @@ export class SystemFileManageRepo {
     uploadPreviewTemplateEdoc(body) {
         return this._api.post(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/UploadPreviewTemplateToEDoc`, body);
     }
+
+    downloadEdoc(edocUrl: string) {
+        return this._api.downloadEdocFile(edocUrl);
+    }
 }
