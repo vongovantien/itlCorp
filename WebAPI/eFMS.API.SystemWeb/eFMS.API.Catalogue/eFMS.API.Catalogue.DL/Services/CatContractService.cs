@@ -459,6 +459,9 @@ namespace eFMS.API.Catalogue.DL.Services
                     entity.IsExpired = true;
                 }
             }
+            else{
+                entity.IsExpired = false;
+            }
 
             if (entity.ContractType == "Cash")
             {
