@@ -189,8 +189,9 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
                 description: form.value.description,
                 deadline: !!form.value.deadLineDate.startDate ? formatDate(form.value.deadLineDate.startDate, 'yyyy-MM-ddTHH:mm', 'en') : null,
                 status: form.value.status,
-                type: 'User',
-                userCreated: this.data.userCreated
+                type: this.data.type,
+                userCreated: this.data.userCreated,
+                datetimeCreated: this.data.datetimeCreated,
             };
             this._operationRepo.updateStageToJob(body).pipe(
                 takeUntil(this.ngUnsubscribe),
