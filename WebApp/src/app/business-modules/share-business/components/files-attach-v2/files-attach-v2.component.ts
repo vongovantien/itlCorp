@@ -10,6 +10,7 @@ import { SortService } from '@services';
 import { getCurrentUserState, IAppState } from '@store';
 import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
+import { Observable, Observer } from 'rxjs';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { getAdvanceDetailRequestState, getAdvanceDetailState } from 'src/app/business-modules/accounting/advance-payment/store';
@@ -50,6 +51,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     jobs: any[] = [];
     modifiedDocTypes: any;
     jobNo: string = '';
+    base64Image: any;
 
     headerAttach: any[] = [
         { title: 'Alias Name', field: 'aliasName', width: 300 },
@@ -256,7 +258,67 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     downloadEdoc() {
+        let ext = this.selectedEdoc.imageUrl.split('.').pop().toLowerCase();
+        if (ext === "png" || ext === "jpg") {
+            return this.downloadImage(this.selectedEdoc.imageUrl, this.selectedEdoc.systemFileName + '.' + ext);
+        } else if (ext === "txt") {
+            this._systemFileRepo.downloadEdoc(this.selectedEdoc.imageUrl).subscribe(blob => {
+                const a = document.createElement('a')
+                const objectUrl = URL.createObjectURL(blob)
+                a.href = objectUrl
+                a.download = this.selectedEdoc.systemFileName + '.' + ext;
+                a.click();
+                URL.revokeObjectURL(objectUrl);
+            })
+        }
         this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
+    }
+
+    downloadImage(imageUrl: string, fileName: string) {
+
+        this.getBase64ImageFromURL(imageUrl).subscribe(base64data => {
+            console.log(base64data);
+            this.base64Image = "data:image/jpg;base64," + base64data;
+            // save image to disk
+            var link = document.createElement("a");
+
+            document.body.appendChild(link); // for Firefox
+
+            link.setAttribute("href", this.base64Image);
+            link.setAttribute("download", fileName);
+            link.click();
+        });
+    }
+
+    getBase64ImageFromURL(url: string) {
+        return Observable.create((observer: Observer<string>) => {
+            const img: HTMLImageElement = new Image();
+            img.crossOrigin = "Anonymous";
+            img.src = url;
+            if (!img.complete) {
+                img.onload = () => {
+                    observer.next(this.getBase64Image(img));
+                    observer.complete();
+                };
+                img.onerror = err => {
+                    observer.error(err);
+                };
+            } else {
+                observer.next(this.getBase64Image(img));
+                observer.complete();
+            }
+        });
+    }
+
+    getBase64Image(img: HTMLImageElement) {
+        const canvas: HTMLCanvasElement = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx: CanvasRenderingContext2D = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+        const dataURL: string = canvas.toDataURL("image/png");
+
+        return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
     }
 
     editEdoc() {
@@ -375,7 +437,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         if (!this.selectedEdoc.imageUrl) {
             return;
         }
-        const extension = this.selectedEdoc.imageUrl.split('.').pop();
+        const extension = this.selectedEdoc.userFileName.split('.').pop();
         if (['xlsx'].includes(extension)) {
             this._exportRepo.previewExport(this.selectedEdoc.imageUrl);
         } else {
@@ -419,6 +481,36 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     this.downLoadFile(res, "application/zip", model.fileName);
                 }
             )
+    }
+
+    chooseFile(_$event: any) {
+        if (this._readonly) {
+            return;
+        }
+        const fileList = event.target['files'];
+        if (fileList.length > 0) {
+            let validSize: boolean = true;
+
+            for (let i = 0; i <= fileList.length - 1; i++) {
+                const fileSize: number = fileList[i].size / Math.pow(1024, 2); //TODO Verify BE
+                if (fileSize >= 100) {
+                    validSize = false;
+                    break;
+                }
+            }
+            if (!validSize) {
+                this._toast.warning("maximum file size < 100Mb");
+                return;
+            }
+            this._systemFileRepo.uploadAttachedFileEdoc('Accounting', null, null, null)
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toast.success("Upload file successfully!");
+                        }
+                    }
+                );
+        }
     }
 }
 interface IEDocItem {
