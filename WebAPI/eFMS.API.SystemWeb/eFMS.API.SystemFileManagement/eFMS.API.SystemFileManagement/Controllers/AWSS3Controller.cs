@@ -143,7 +143,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
         }
 
         [HttpGet("OpenFile/{moduleName}/{folder}/{objId}/{fileName}/{aliasName}")]
-        public async Task<IActionResult> OpenFile(string moduleName, string folder, Guid objId, string fileName,string aliasName)
+        public async Task<IActionResult> OpenFile(string moduleName, string folder, Guid objId, string fileName, string aliasName)
         {
             HandleState hs = await _aWSS3Service.OpenFile(moduleName, folder, objId, fileName);
             if (hs.Success)

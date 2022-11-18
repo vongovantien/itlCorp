@@ -70,7 +70,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     result = await _sysImageRepo.DeleteAsync(x => x.Id == id);
                 if (result.Success)
                 {
-                    var imageDetail= _sysImageDetailRepo.Delete(x=>x.SysImageId==id);
+                    var imageDetail = _sysImageDetailRepo.Delete(x => x.SysImageId == id);
                 }
                 return result;
             }
@@ -257,7 +257,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     lst = await _sysImageRepo.GetAsync(x => x.ObjectId == model.ObjectId && x.ChildId == model.ChillId);
                 }
-                
+
                 if (lst == null) { return new HandleState("Not found data"); }
                 var files = new List<InMemoryFile>();
                 foreach (var it in lst)

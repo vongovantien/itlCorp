@@ -12,7 +12,8 @@
                     </div>
                     <div class="c-button-actions" *ngIf="isLocked===false">
                         <div class="form-group float-right">
-                            <button type="button" class=" btn btn-primary  m-btn--icon m-btn--uppercase margin-right-10" (click)="downloadAllEdoc()">
+                            <button type="button" class=" btn btn-primary  m-btn--icon m-btn--uppercase margin-right-10"
+                                (click)="downloadAllEdoc()">
                                 <span>
                                     <i class="la la-download"></i>
                                     <span>
@@ -280,8 +281,8 @@
                 <span class="text-primary"><i class="la la-upload text-primary"></i>Upload
                 </span>
             </span>
-            <input type="file" [style]="'position: absolute;left:0;display:none;height'" multiple (change)="chooseFile($event)" [accept]="accepctFilesUpload"
-            title="Upload files" />
+            <input type="file" [style]="'position: absolute;left:0;display:none;height'" multiple
+                (change)="chooseFile($event)" [accept]="accepctFilesUpload" title="Upload files" />
         </div>
     </div>
     <ng-container *ngIf="selectedEdoc?.userCreated === currentUser.userName">

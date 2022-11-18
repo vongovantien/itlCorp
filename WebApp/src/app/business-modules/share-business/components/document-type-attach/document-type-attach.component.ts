@@ -86,32 +86,20 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     onSelectDataFormInfo(event: any, index: number, type: string) {
         switch (type) {
             case 'docType':
-                console.log(event);
                 this.listFile[index].Code = event.code;
                 this.listFile[index].DocumentId = event.id;
                 this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 this.selectedtDocType = event.id;
-                // this.listFile[index].aliasName = this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'));
                 break;
             case 'aliasName':
                 this.listFile[index].aliasName = event;
                 break;
             case 'houseBill':
-                // if (this.typeFrom === 'Shipment') {
-                //     this.listFile[index].hblid = event.id;
-                // } else {
-                //     this.listFile[index].jobNo = this.housebills.find(x => x.id === event.id).jobNo;
-                //     this.listFile[index].hblid = event.id;
-                //     this.listFile[index].jobId = this.housebills.find(x => x.id === event.id).jobId;
-                //     //this.listFile[index].billingNo = this.billingNo;
-                //}]
                 this.listFile[index].hblid = event.id;
                 break;
             case 'job':
                 this.listFile[index].jobNo = event.jobNo;
                 this.listFile[index].jobId = event.id;
-                console.log(event);
-
                 break;
             case 'note':
                 this.listFile[index].note = event;
@@ -130,8 +118,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.isSubmitted = true;
         this.listFile.forEach(x => {
             files.push(x);
-            console.log(x);
-
             edocFileList.push(({
                 JobId: this.typeFrom === 'Shipment' ? this.jobId : x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
                 Code: x.Code,
@@ -167,8 +153,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             }
 
             if (edocUploadModel.DocumentTypeId === undefined || edocUploadModel.SystemFileName === '') {
-                console.log(edocUploadModel.DocumentTypeId);
-
                 this._toastService.error("Please fill all field!");
                 return;
             }
@@ -186,8 +170,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     }
                 );
         } else {
-            console.log(edocFileList.find(x => x.DocumentId));
-
             if (edocFileList.find(x => x.DocumentId === undefined || x.AliasName === '')) {
 
                 this._toastService.error("Please fill all field!");

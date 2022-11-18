@@ -11,7 +11,6 @@ import { SortService } from '@services';
 import { getCurrentUserState, IAppState } from '@store';
 import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
-import { Observable, Observer } from 'rxjs';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { getAdvanceDetailRequestState, getAdvanceDetailState } from 'src/app/business-modules/accounting/advance-payment/store';
@@ -27,18 +26,21 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
+
     @Input() typeFrom: string = 'Shipment';
     @Input() billingId: string = '';
     @Input() billingNo: string = '';
-
-    @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
-    isDelete: boolean = false;
+
+    @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
+
     get readonly(): boolean {
         return this._readonly;
     }
+
+    isDelete: boolean = false;
     headersGen: CommonInterface.IHeaderTable[];
     headersAcc: CommonInterface.IHeaderTable[];
     documentTypes: any[] = [];
@@ -52,7 +54,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     jobs: any[] = [];
     modifiedDocTypes: any;
     jobNo: string = '';
-    base64Image: any;
+    private _readonly: boolean = false;
 
     headerAttach: any[] = [
         { title: 'Alias Name', field: 'aliasName', width: 300 },
@@ -62,6 +64,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'House Bill No', field: 'hbl' },
         { title: 'Note', field: 'note' },
     ]
+
     headerSettleAttach: any[] = [
         { title: 'Alias Name', field: 'aliasName', width: 300 },
         { title: 'Real File Name', field: 'realFilename', width: 300 },
@@ -69,7 +72,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Job Ref', field: 'jobRef' },
         { title: 'Note', field: 'note' },
     ]
-    private _readonly: boolean = false;
+
     constructor(
         private readonly _systemFileRepo: SystemFileManageRepo,
         private readonly _activedRoute: ActivatedRoute,
@@ -82,9 +85,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         super();
         this.requestSort = this.sortEdoc;
     }
-    ngOnInit() {
-        console.log(this.typeFrom);
 
+    ngOnInit() {
         if (this.typeFrom === 'Shipment') {
             this._activedRoute.params
                 .pipe(takeUntil(this.ngUnsubscribe))
@@ -118,8 +120,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                             this.getEDoc('CL');
                             this.jobNo = res.opstransaction.jobNo;
                             this.isLocked = res.opstransaction.isLocked;
-                            console.log(this.jobNo);
-
                         }
                     );
             }
@@ -130,7 +130,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             this.getEDoc(this.typeFrom);
             this.headersAcc = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
             { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
-            //{ title: 'House Bill No', field: 'hblNo', sortable: true },
             { title: 'Job No', field: 'jobNo' },
             { title: 'Note', field: 'note' },
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
@@ -150,7 +149,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             { title: 'Alias Name', field: 'systemFileName', sortable: true },
             { title: 'Real File Name', field: 'userFileName', sortable: true },
             { title: 'House Bill No', field: 'hblNo', sortable: true },
-            //{ title: 'Source', field: 'source', sortable: true },
             { title: 'Note', field: 'note' },
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
             { title: 'Attach Person', field: 'userCreated', sortable: true },
@@ -184,8 +182,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             )
                 .subscribe(
                     (data) => {
-                        console.log(data);
-
                         if (data.statusApproval === 'Done') {
                             this.isDelete = false;
                         } else {
@@ -194,6 +190,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     });
         }
     }
+
     getJobList() {
         if (this.typeFrom === 'Settlement') {
             this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
@@ -202,17 +199,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            console.log(_uniqBy(data, 'jobId'));
-                            console.log(this.jobs);
-                            //this.jobs = [];
                             _uniqBy(data, 'hbl').forEach(element => {
                                 let item = ({
                                     jobNo: element.jobId,
                                     id: element.shipmentId
                                 })
-
                                 this.jobs.push(item);
-                                console.log(this.jobs);
                             }
                             );
                         }
@@ -225,19 +217,16 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            console.log(_uniqBy(data, 'jobId'));
-                            console.log(data);
-                            //this.jobs = [];
                             for (let element of data) {
                                 this.jobs.push({ jobNo: element.jobId, })
                             }
-                            console.log(this.jobs);
                         }
                     }
                 );
         }
 
     }
+
     getHblList() {
         this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
             .pipe(
@@ -245,94 +234,29 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             ).subscribe(
                 (res: any) => {
                     if (!!res) {
-                        console.log(this.housebills);
                         this.housebills = res;
                     }
                 },
             );
     }
+
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
-        console.log(edoc);
         this.documentAttach.selectedtDocType = edoc.documentTypeId;
         this.clearMenuContext(this.queryListMenuContext);
     }
 
     downloadEdoc() {
         const selectedEdoc = Object.assign({}, this.selectedEdoc);
-        console.log(selectedEdoc);
         this._systemFileRepo.getFileEdoc(selectedEdoc.id).subscribe(
             (data) => {
-                console.log(selectedEdoc);
                 const exten = selectedEdoc.imageUrl.split('.').pop();
                 this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.systemFileName + '.' + exten);
             }
         )
-        // let ext = this.selectedEdoc.imageUrl.split('.').pop().toLowerCase();
-        // if (ext === "png" || ext === "jpg") {
-        //     return this.downloadImage(this.selectedEdoc.imageUrl, this.selectedEdoc.systemFileName + '.' + ext);
-        // } else if (ext === "txt") {
-        //     this._systemFileRepo.downloadEdoc(this.selectedEdoc.imageUrl).subscribe(blob => {
-        //         const a = document.createElement('a')
-        //         const objectUrl = URL.createObjectURL(blob)
-        //         a.href = objectUrl
-        //         a.download = this.selectedEdoc.systemFileName + '.' + ext;
-        //         a.click();
-        //         URL.revokeObjectURL(objectUrl);
-        //     })
-        // }
-        // this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
-    }
-
-    downloadImage(imageUrl: string, fileName: string) {
-
-        this.getBase64ImageFromURL(imageUrl).subscribe(base64data => {
-            console.log(base64data);
-            this.base64Image = "data:image/jpg;base64," + base64data;
-            // save image to disk
-            var link = document.createElement("a");
-
-            document.body.appendChild(link); // for Firefox
-
-            link.setAttribute("href", this.base64Image);
-            link.setAttribute("download", fileName);
-            link.click();
-        });
-    }
-
-    getBase64ImageFromURL(url: string) {
-        return Observable.create((observer: Observer<string>) => {
-            const img: HTMLImageElement = new Image();
-            img.crossOrigin = "Anonymous";
-            img.src = url;
-            if (!img.complete) {
-                img.onload = () => {
-                    observer.next(this.getBase64Image(img));
-                    observer.complete();
-                };
-                img.onerror = err => {
-                    observer.error(err);
-                };
-            } else {
-                observer.next(this.getBase64Image(img));
-                observer.complete();
-            }
-        });
-    }
-
-    getBase64Image(img: HTMLImageElement) {
-        const canvas: HTMLCanvasElement = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx: CanvasRenderingContext2D = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
-        const dataURL: string = canvas.toDataURL("image/png");
-
-        return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
     }
 
     editEdoc() {
-        console.log(this.selectedEdoc);
         if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance') {
             this.documentAttach.headers = this.headerSettleAttach;
 
@@ -359,13 +283,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             tranType: this.selectedEdoc.transactionType,
             AccountingType: this.typeFrom
         })
-        console.log(detailSeletedEdoc);
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.selectedtTrantype = this.selectedEdoc.transactionType;
         this.documentAttach.listFile.push(detailSeletedEdoc);
         this.documentAttach.show();
-        // this.getEDoc(this.transactionType);
     }
+
     confirmDelete() {
         let messageDelete = `Do you want to delete this Attach File ? `;
         let itemDelete = this.selectedEdoc.id;
@@ -378,6 +301,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             center: true
         }, () => this.deleteEdoc(itemDelete))
     }
+
     deleteEdoc(id: string = '') {
         this._systemFileRepo.deleteEdoc(id)
             .pipe(
@@ -392,6 +316,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 },
             );
     }
+
     getDocumentType(transactionType: string, billingId: string) {
         this._systemFileRepo.getDocumentType(transactionType, billingId)
             .pipe(
@@ -399,11 +324,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             )
             .subscribe(
                 (res: any[]) => {
-                    console.log(res);
-
                     this.documentTypes = res;
                     this.documentAttach.documentTypes = res;
-                    console.log(this.documentAttach.documentTypes);
                 },
             );
     }
@@ -434,6 +356,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 );
         }
     }
+
     showDocumentAttach() {
         if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance') {
             this.documentAttach.headers = this.headerSettleAttach;
@@ -443,6 +366,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.documentAttach.isUpdate = false;
         this.documentAttach.show();
     }
+
     viewFileEdoc() {
         if (!this.selectedEdoc.imageUrl) {
             return;
@@ -467,18 +391,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     downloadAllEdoc() {
-        console.log(this.edocByAcc);
-
-        // let fileName = "";
-
-        // if (this.fileNo.includes("/")) {
-        //     let arr = this.fileNo.split("/");
-        //     fileName = arr[0] + "_" + arr[1] + ".zip";
-        // } else {
-        //     fileName = this.fileNo + ".zip";
-        // }
-        console.log(this.billingNo);
-
         let model = {
             folderName: this.typeFrom,
             objectId: this.typeFrom === 'Shipment' ? this.jobId : this.billingId,
@@ -549,7 +461,6 @@ interface IEDocItem {
     documentTypeName: string;
     transactionType: string;
 }
-
 interface IEDoc {
     documentType: any;
     eDocs: IEDocItem[];
