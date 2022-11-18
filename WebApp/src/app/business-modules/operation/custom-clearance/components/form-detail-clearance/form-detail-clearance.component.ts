@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { AppForm } from 'src/app/app.form';
-import { CatalogueRepo } from '@repositories';
-import { Observable } from 'rxjs';
-import { Customer, PortIndex, CountryModel, Commodity, Unit } from '@models';
-import { CommonEnum } from '@enums';
-import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCountryAction, getCatalogueCountryState, GetCatalogueCommodityAction, getCatalogueCommodityState, GetCataloguePackageAction, getCataloguePackageState } from '@store';
-import { IShareBussinessState } from '@share-bussiness';
-import { Store } from '@ngrx/store';
-import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import { formatDate } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { JobConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { Commodity, CountryModel, Customer, PortIndex, Unit } from '@models';
+import { Store } from '@ngrx/store';
+import { CatalogueRepo } from '@repositories';
+import { IShareBussinessState } from '@share-bussiness';
+import { GetCatalogueCommodityAction, getCatalogueCommodityState, GetCatalogueCountryAction, getCatalogueCountryState, GetCataloguePortAction, getCataloguePortState } from '@store';
+import { Observable } from 'rxjs';
+import { AppForm } from 'src/app/app.form';
+import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 
 @Component({
     selector: 'custom-clearance-form-detail',
@@ -42,6 +42,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     shipper: AbstractControl;
     consignee: AbstractControl;
     note: AbstractControl;
+    eta: AbstractControl;
 
     customers: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
@@ -123,7 +124,8 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
             unit: [null],
             shipper: [null],
             consignee: [null],
-            note: [null]
+            note: [null],
+            eta: [null]
         });
 
         this.clearanceNo = this.formGroup.controls['clearanceNo'];
@@ -148,6 +150,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this.shipper = this.formGroup.controls['shipper'];
         this.consignee = this.formGroup.controls['consignee'];
         this.note = this.formGroup.controls['note'];
+        this.eta = this.formGroup.controls['eta'];
     }
 
     setFormValue() {
@@ -155,6 +158,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
             clearanceNo: this.customDeclaration.clearanceNo,
             partnerTaxCode: this.customDeclaration.accountNo,
             clearanceDate: !!this.customDeclaration.clearanceDate ? { startDate: new Date(this.customDeclaration.clearanceDate), endDate: new Date(this.customDeclaration.clearanceDate) } : null,
+            eta: !!this.customDeclaration.eta ? { startDate: new Date(this.customDeclaration.eta), endDate: new Date(this.customDeclaration.eta) } : null,
             hblid: this.customDeclaration.hblid,
             mblid: this.customDeclaration.mblid,
             gateway: this.customDeclaration.gateway,
@@ -246,6 +250,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this.customDeclaration.clearanceNo = !!form.clearanceNo ? form.clearanceNo.trim() : null;
         this.customDeclaration.partnerTaxCode = !!this.taxCode ? this.taxCode : this.customDeclaration.partnerTaxCode;
         this.customDeclaration.clearanceDate = !!form.clearanceDate && !!form.clearanceDate.startDate ? formatDate(form.clearanceDate.startDate, 'yyyy-MM-dd', 'en') : null;
+        this.customDeclaration.eta = !!form.clearanceDate && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null;
         this.customDeclaration.hblid = !!form.hblid ? form.hblid.trim() : null;
         this.customDeclaration.mblid = !!form.mblid ? form.mblid.trim() : null;
         this.customDeclaration.gateway = form.gateway;
