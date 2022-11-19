@@ -26,7 +26,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() typeFrom: string = 'Shipment';
 
     headers: CommonInterface.IHeaderTable[] = [];
-    isOps: boolean = false;
     EdocUploadFile: IEDocUploadFile;
     listFile: any[] = [];
     isUpdate: boolean = false;
@@ -51,7 +50,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     chooseFile(event: any) {
         const fileList = event.target['files'];
         const files: any[] = event.target['files'];
-        //this.listFile = files;
         let docType: any;
         if (this.documentTypes.length === 1) {
             docType = this.documentTypes[0];
