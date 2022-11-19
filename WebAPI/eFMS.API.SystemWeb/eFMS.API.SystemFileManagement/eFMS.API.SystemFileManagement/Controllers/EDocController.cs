@@ -2,7 +2,6 @@
 using eFMS.API.Common.Globals;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
-using eFMS.API.SystemFileManagement.DL.Services;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
@@ -153,10 +152,19 @@ namespace eFMS.API.SystemFileManagement.Controllers
             return BadRequest(new ResultHandle { Message = string.IsNullOrEmpty(hs.Message.ToString()) ? "Upload File fail" : hs.Message.ToString(), Status = false, Data = models });
         }
 
-        [HttpGet("OpenEDocFile/{moduleName}/{folder}/{objId}/{aliasName}")]
-        public async Task<IActionResult> OpenEdocFile(string moduleName, string folder, Guid objId, string aliasName)
+        //[HttpGet("OpenEDocFile/{moduleName}/{folder}/{objId}/{aliasName}")]
+        //public async Task<IActionResult> OpenEdocFile(string moduleName, string folder, Guid objId, string aliasName)
+        //{
+        //    HandleState hs = await _edocService.OpenEdocFile(moduleName, folder, objId, aliasName);
+        //    if (hs.Success)
+        //        return Ok(hs.Message);
+        //    return BadRequest(hs);
+        //}
+
+        [HttpGet("OpenFile/{Id}")]
+        public async Task<IActionResult> OpenFileAliasName(Guid Id)
         {
-            HandleState hs = await _edocService.OpenEdocFile(moduleName, folder, objId, aliasName);
+            HandleState hs = await _edocService.OpenFile(Id);
             if (hs.Success)
                 return Ok(hs.Message);
             return BadRequest(hs);
