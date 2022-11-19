@@ -108,4 +108,10 @@ export class SystemFileManageRepo {
     getFileEdoc(id: string) {
         return this._api.downloadEdocFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/OpenFile/${id}`)
     }
+
+    getFileEdocHtml(url: string) {
+        return this._api.getTextFile(url, null, null, 'response').pipe(
+            map((data: any) => data)
+        );
+    }
 }

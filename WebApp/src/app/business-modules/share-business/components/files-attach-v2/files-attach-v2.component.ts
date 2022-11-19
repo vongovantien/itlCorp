@@ -361,6 +361,15 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
             this._exportRepo.previewExport(this.selectedEdoc.imageUrl);
         }
+        else if (['html', 'htm'].includes(extension)) {
+            console.log();
+            this._systemFileRepo.getFileEdocHtml(this.selectedEdoc.imageUrl).subscribe(
+                (res: any) => {
+                    console.log(res.body);
+                    window.open('', '_blank').document.write(res.body);
+                }
+            )
+        }
         else {
             this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
         }

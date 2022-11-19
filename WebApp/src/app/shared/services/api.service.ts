@@ -113,6 +113,15 @@ export class ApiService {
         }
     }
 
+    getTextFile(url: string = '', params?: any, headers: any = {}, observe: 'body' | 'response' | any = 'body') {
+        return this._http.get(url, {
+            params,
+            headers: Object.assign({}, this._headers, headers),
+            responseType: 'text',
+            observe: observe
+        });
+    }
+
     downloadEdocFile(url: string) {
         return this._http.get(this.setUrl(url), {
             responseType: 'blob'
