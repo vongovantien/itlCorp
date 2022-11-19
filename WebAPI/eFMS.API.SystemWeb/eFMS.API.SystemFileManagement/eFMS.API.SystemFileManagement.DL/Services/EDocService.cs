@@ -19,7 +19,6 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
@@ -1418,59 +1417,59 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
         }
 
-        public async Task<HandleState> OpenEdocFile(string moduleName, string folder, Guid objId, string aliasName)
-        {
-            var edoc = new SysImageDetail();
-            if (moduleName == "Document" && folder == "Shipment")
-            {
-                edoc = _sysImageDetailRepo.Get(x => x.JobId == objId && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
-            }
-            else if (moduleName == "Accounting" && folder == "Advance")
-            {
-                var advNo = _advRepo.Get(x => x.Id == objId).FirstOrDefault();
-                if (advNo != null)
-                {
-                    edoc = _sysImageDetailRepo.Get(x => x.BillingNo == advNo.AdvanceNo && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
-                }
-            }
-            else
-            {
-                var settle = _setleRepo.Get(x => x.Id == objId).FirstOrDefault();
-                if (settle != null)
-                {
-                    edoc = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
-                }
-            }
+        //public async Task<HandleState> OpenEdocFile(string moduleName, string folder, Guid objId, string aliasName)
+        //{
+        //    var edoc = new SysImageDetail();
+        //    if (moduleName == "Document" && folder == "Shipment")
+        //    {
+        //        edoc = _sysImageDetailRepo.Get(x => x.JobId == objId && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
+        //    }
+        //    else if (moduleName == "Accounting" && folder == "Advance")
+        //    {
+        //        var advNo = _advRepo.Get(x => x.Id == objId).FirstOrDefault();
+        //        if (advNo != null)
+        //        {
+        //            edoc = _sysImageDetailRepo.Get(x => x.BillingNo == advNo.AdvanceNo && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        var settle = _setleRepo.Get(x => x.Id == objId).FirstOrDefault();
+        //        if (settle != null)
+        //        {
+        //            edoc = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo && x.SystemFileName == Path.GetFileNameWithoutExtension(aliasName)).FirstOrDefault();
+        //        }
+        //    }
 
-            if (edoc != null)
-            {
-                var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                if (image != null)
-                {
-                    var key = moduleName + "/" + folder + "/" + objId + "/" + image.Name;
+        //    if (edoc != null)
+        //    {
+        //        var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+        //        if (image != null)
+        //        {
+        //            var key = moduleName + "/" + folder + "/" + objId + "/" + image.Name;
 
-                    var request = new GetObjectRequest()
-                    {
-                        BucketName = _bucketName,
-                        Key = key
-                    };
+        //            var request = new GetObjectRequest()
+        //            {
+        //                BucketName = _bucketName,
+        //                Key = key
+        //            };
 
-                    GetObjectResponse response = await _client.GetObjectAsync(request);
-                    if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
-                    var imgeName = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                    if (Path.GetExtension(imgeName.Name) == ".txt")
-                    {
-                        var data = new StreamReader(response.ResponseStream, Encoding.UTF8);
-                        var obj = new object();
-                        obj = data.ReadToEnd();
-                        return new HandleState(true, obj);
-                    }
-                    return new HandleState(true, response.ResponseStream);
-                }
-            }
-            return null;
+        //            GetObjectResponse response = await _client.GetObjectAsync(request);
+        //            if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
+        //            var imgeName = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+        //            if (Path.GetExtension(imgeName.Name) == ".txt")
+        //            {
+        //                var data = new StreamReader(response.ResponseStream, Encoding.UTF8);
+        //                var obj = new object();
+        //                obj = data.ReadToEnd();
+        //                return new HandleState(true, obj);
+        //            }
+        //            return new HandleState(true, response.ResponseStream);
+        //        }
+        //    }
+        //    return null;
 
-        }
+        //}
 
         public async Task<HandleState> OpenFile(Guid Id)
         {
