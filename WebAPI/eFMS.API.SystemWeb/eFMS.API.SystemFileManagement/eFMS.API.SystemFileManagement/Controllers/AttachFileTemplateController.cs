@@ -76,6 +76,14 @@ namespace eFMS.API.SystemFileManagement.Controllers
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
+        [HttpGet]
+        public IActionResult Get()
+        {
+            var data = AttachFilteTemplateService.GetAttachTemplates();
+            return Ok(data);
+        }
+
+
         [HttpGet("GetDocumentType")]
         public async Task<IActionResult> GetDocumentTypeAsync(string transactionType, string billingId)
         {
