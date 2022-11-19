@@ -41,21 +41,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
     @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
 
-    headersGen: CommonInterface.IHeaderTable[] = [
-        { title: 'Alias Name', field: 'systemFileName', sortable: true },
-        { title: 'Real File Name', field: 'userFileName', sortable: true },
-        { title: 'House Bill No', field: 'hblNo', sortable: true },
-        { title: 'Note', field: 'note' },
-        { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
-        { title: 'Attach Person', field: 'userCreated', sortable: true },
-    ];
-    headersAcc: CommonInterface.IHeaderTable[] = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
-    { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
-    { title: 'Job No', field: 'jobNo' },
-    { title: 'Note', field: 'note' },
-    { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
-    { title: 'Attach Person', field: 'userCreated', sortable: true },
-    ];;
     documentTypes: any[] = [];
     jobId: string = '';
     isOps: boolean = false;
@@ -68,6 +53,24 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     modifiedDocTypes: any;
     jobNo: string = '';
     private _readonly: boolean = false;
+    isView: boolean = true;
+
+    headersGen: CommonInterface.IHeaderTable[] = [
+        { title: 'Alias Name', field: 'systemFileName', sortable: true },
+        { title: 'Real File Name', field: 'userFileName', sortable: true },
+        { title: 'House Bill No', field: 'hblNo', sortable: true },
+        { title: 'Note', field: 'note' },
+        { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
+        { title: 'Attach Person', field: 'userCreated', sortable: true },
+    ];
+
+    headersAcc: CommonInterface.IHeaderTable[] = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
+    { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
+    { title: 'Job No', field: 'jobNo' },
+    { title: 'Note', field: 'note' },
+    { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
+    { title: 'Attach Person', field: 'userCreated', sortable: true },
+    ];
 
     headerAttach: any[] = [
         { title: 'Alias Name', field: 'aliasName', width: 300 },
@@ -228,6 +231,11 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
         this.documentAttach.selectedtDocType = edoc.documentTypeId;
+        this.isView = true;
+        const extension = this.selectedEdoc.imageUrl.split('.').pop();
+        if (extension === 'zip') {
+            this.isView = false;
+        }
         this.clearMenuContext(this.queryListMenuContext);
         console.log(edoc);
     }

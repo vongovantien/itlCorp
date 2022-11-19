@@ -295,7 +295,7 @@
             <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
         </div>
     </ng-container>
-    <div class="menu-context__item" (click)="viewFileEdoc()">
+    <div class="menu-context__item" *ngIf="isView===true" (click)="viewFileEdoc()">
         <span><i class="la la-eye align-middle text-primary"></i>View</span>
     </div>
     <div class="menu-context__item" (click)="downloadEdoc()">
@@ -304,7 +304,7 @@
 </app-context-menu>
 
 <app-context-menu #edocAccountantShipmentTypeContext (clickOutside)="selectedEdoc = null">
-    <div class="menu-context__item" (click)="viewFileEdoc()">
+    <div class="menu-context__item" *ngIf="isView===true" (click)="viewFileEdoc()">
         <span><i class="la la-eye align-middle text-primary"></i>View</span>
     </div>
     <div class="menu-context__item" (click)="downloadEdoc()">
@@ -318,7 +318,7 @@
             <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
         </div>
     </ng-container>
-    <div class="menu-context__item" (click)="viewFileEdoc()">
+    <div class="menu-context__item" *ngIf="isView===true" (click)="viewFileEdoc()">
         <span><i class="la la-eye align-middle text-primary"></i>View</span>
     </div>
     <div class="menu-context__item" (click)="downloadEdoc()">
