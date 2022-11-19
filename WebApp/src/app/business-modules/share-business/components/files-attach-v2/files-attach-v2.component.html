@@ -10,7 +10,7 @@
                             General File
                         </h3>
                     </div>
-                    <div class="c-button-actions" *ngIf="isLocked===false">
+                    <div class="c-button-actions">
                         <div class="form-group float-right">
                             <button type="button" class=" btn btn-primary  m-btn--icon m-btn--uppercase margin-right-10"
                                 (click)="downloadAllEdoc()">
@@ -21,7 +21,7 @@
                                     </span>
                                 </span>
                             </button>
-                            <button type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
+                            <button *ngIf="isLocked===false" type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
                                 (click)="showDocumentAttach()">
                                 <span>
                                     <i class="la la-download"></i>
