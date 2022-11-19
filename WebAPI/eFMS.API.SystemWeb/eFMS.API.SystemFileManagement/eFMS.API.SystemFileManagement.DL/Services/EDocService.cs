@@ -367,7 +367,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     ImageUrl = _sysImageRepo.Get(z => z.Id == x.SysImageId).FirstOrDefault() != null ? image.Url : null,
                     HBLNo = _hblNo,
                     Note = x.Note,
-                    TransactionType = transactionType
+                    TransactionType = transactionType,
+                    DocumentCode=template.Code
                 };
                 lstImageMD.Add(imageModel);
             });
@@ -402,6 +403,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         HBLNo = null,
                         Note = null,
                         TransactionType = _attachFileTemplateRepo.Get(x => x.Id == GetDocumentType("Shipment", Guid.Parse(image.ObjectId))).FirstOrDefault()?.TransactionType,
+                        DocumentCode="OTH"
                     };
                     imageMap.Add(imageModel);
                 }
@@ -451,6 +453,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Note = x.Note,
                         HBLNo = _hblNo,
                         Hblid = x.Hblid,
+                        DocumentCode=x.DocumentCode
                     };
                     listOther.Add(imagedetail);
                 });

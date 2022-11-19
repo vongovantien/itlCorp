@@ -43,29 +43,4 @@
         }
     }
 
-    .list-files {
-        max-height: 60vh;
-        overflow: scroll;
-
-        .file__item {
-            cursor: pointer;
-
-            .file-item__name {
-                a {
-                    color: #595d6e;
-                    font-size: 1rem;
-                    font-weight: 500;
-                    padding-right: 1.25rem;
-                    transition: color 0.3s ease;
-                    -webkit-transition: color 0.3s ease;
-
-                    &:hover {
-                        color: #5d78ff;
-                        -webkit-transition: color 0.3s ease;
-                        transition: color 0.3s ease;
-                    }
-                }
-            }
-        }
-    }
 }

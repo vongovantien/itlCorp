@@ -276,13 +276,15 @@
 
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">
     <div class="menu-context__item" *ngIf="isLocked === false && !readonly && typeFrom === 'Shipment'">
-        <div [style]="'position:relative'">
-            <span>
-                <span class="text-primary"><i class="la la-upload text-primary"></i>Upload
-                </span>
-            </span>
-            <input type="file" [style]="'position: absolute;left:0;display:none;height'" multiple
-                (change)="chooseFile($event)" [accept]="accepctFilesUpload" title="Upload files" />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="uploadContext">
+                        <span><i class="la la-upload text-primary"></i>Upload
+                        </span>
+                    <input type="file" multiple (change)="chooseFile($event)" [accept]="accepctFilesUpload" class="inputUpload"
+                        title="Upload files" />
+                </div>
+            </div>
         </div>
     </div>
     <ng-container *ngIf="selectedEdoc?.userCreated === currentUser.userName">
