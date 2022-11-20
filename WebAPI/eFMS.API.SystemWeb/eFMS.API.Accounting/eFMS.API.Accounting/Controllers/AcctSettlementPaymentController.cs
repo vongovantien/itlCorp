@@ -487,8 +487,15 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
                 return BadRequest(_result);
             }
+
             var hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
             if (hs.Code == 403)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            var hsGenEdoc = _eDocService.GenerateEdoc(model);
+            if (hsGenEdoc.Result.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
@@ -511,9 +518,6 @@ namespace eFMS.API.Accounting.Controllers
                         await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
                     }
                 });
-                
-                _eDocService.GenerateEdoc(model);
-
             }
             return Ok(result);
         }

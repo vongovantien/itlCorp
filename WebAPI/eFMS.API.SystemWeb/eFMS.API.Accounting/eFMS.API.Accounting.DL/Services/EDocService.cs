@@ -3,10 +3,13 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common.Helpers;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Remotion.Linq.Clauses.ResultOperators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,50 +44,77 @@ namespace eFMS.API.Accounting.DL.Services
 
         public async Task<HandleState> GenerateEdoc(CreateUpdateSettlementModel model)
         {
-            var surcharge = await surchargetRepo.GetAsync(x => x.SettlementCode == model.Settlement.SettlementNo);
-            var jobCharge = new List<string>();
-            surcharge.ForEach(x =>
+            try
             {
-                if (x.TransactionType == "CL")
+                var surcharge = surchargetRepo.GetAsync(x => x.SettlementCode == model.Settlement.SettlementNo);
+                var jobCharge = new List<Guid?>();
+                surcharge.Result.ToList().ForEach(x =>
                 {
-                    jobCharge.Add(opsTranRepo.Get(z => z.JobNo == x.JobNo).FirstOrDefault().Id.ToString());
-                };
-                jobCharge.Add(csTranRepo.Get(z => z.JobNo == x.JobNo).FirstOrDefault().Id.ToString());
-            });
-            jobCharge.Distinct();
-            var jobModel  = model.ShipmentCharge.Select(x => x.JobId).Distinct().ToList();
-            var jobDel = jobCharge.Where(x => !jobModel.Contains(x)).Distinct().ToList();
-            var jobAdd = jobModel.Where(y => !jobCharge.Contains(y)).Distinct().ToList();
-            if (jobDel.Count()>0)
-            {
-                await DelEdocForJobDel(model.Settlement.SettlementNo, jobDel);
+                    if (x.TransactionType == "CL")
+                    {
+                        jobCharge.Add(opsTranRepo.Get(z => z.JobNo == x.JobNo).FirstOrDefault().Id);
+                    }
+                    else
+                    {
+                        jobCharge.Add(csTranRepo.Get(z => z.JobNo == x.JobNo).FirstOrDefault().Id);
+                    }
+
+                });
+                jobCharge.Distinct();
+                var jobModel = model.ShipmentCharge.Select(x => x.ShipmentId).Distinct().ToList();
+                var jobDel = jobCharge.Where(x => !jobModel.Contains((Guid)x)).Distinct().ToList();
+                var jobAddHBLs = model.ShipmentCharge.Where(x => x.Id == Guid.Empty).Select(x=>x.Hblid);
+                var jobIds = surchargetRepo.Get(x => jobAddHBLs.Contains(x.Hblid)).Select(x => new { x.JobNo,x.TransactionType }).GroupBy(x=>x.JobNo).ToList();
+                var jobAdd = new List<Guid>();
+                jobIds.ForEach(x =>
+                {
+                    if (x.FirstOrDefault()?.TransactionType == "CL")
+                    {
+                        jobAdd.Add(opsTranRepo.Get(z => z.JobNo == x.FirstOrDefault().JobNo).FirstOrDefault().Id);
+                    }
+                    else
+                    {
+                        jobAdd.Add(csTranRepo.Get(z => z.JobNo == x.FirstOrDefault().JobNo).FirstOrDefault().Id);
+                    }
+                });
+                if (jobDel.Count() > 0)
+                {
+                    await DelEdocForJobDel(model.Settlement.SettlementNo, jobDel);
+                }
+                if (jobAdd.Count() > 0)
+                {
+                    await AddEdocForJobDel(model.Settlement.SettlementNo, jobAdd);
+                }
+                return new HandleState();
             }
-            if (jobAdd.Count() > 0)
+            catch (Exception ex)
             {
-                await AddEdocForJobDel(model.Settlement.SettlementNo,jobAdd);
+                new LogHelper("eFMS_LOG_GenEdoc", ex.ToString());
+                return new HandleState(ex.Message);
             }
-            return new HandleState();
         }
 
 
-        private async Task DelEdocForJobDel(string BillingNo,List<string> JobIds)
+        private async Task DelEdocForJobDel(string BillingNo,List<Guid?> JobIds)
         {
-            await DataContext.DeleteAsync(x => x.BillingNo == BillingNo && JobIds.Contains(x.JobId.ToString()));
+            await DataContext.DeleteAsync(x => x.BillingNo == BillingNo && JobIds.Contains(x.JobId));
         }
-        private async Task AddEdocForJobDel(string BillingNo, List<string> JobIds)
+        private async Task AddEdocForJobDel(string BillingNo, List<Guid> JobIds)
         {
-            var EDocAdd = await DataContext.GetAsync(x => x.BillingNo == BillingNo && !JobIds.Contains(x.JobId.ToString()));
+            var EDocAdd = await DataContext.GetAsync(x => x.BillingNo == BillingNo);
             var EDocAdds = EDocAdd.GroupBy(x => x.SysImageId).Select(x => x.FirstOrDefault()).ToList();
             JobIds.ForEach(z =>
             {
                 EDocAdds.ForEach(x =>
                 {
                     var edoc = x;
-                    edoc.JobId = Guid.Parse(z);
+                    edoc.Id = Guid.NewGuid();
+                    edoc.JobId = z;
                     edoc.BillingNo = BillingNo;
-                    DataContext.AddAsync(edoc);
+                    DataContext.Add(edoc,false);
                 });
             });
+            DataContext.SubmitChanges();
         }
     }
 }
