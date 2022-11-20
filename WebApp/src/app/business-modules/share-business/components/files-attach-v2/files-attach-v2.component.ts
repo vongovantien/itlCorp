@@ -56,6 +56,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     jobNo: string = '';
     private _readonly: boolean = false;
     isView: boolean = true;
+    elementInput: HTMLElement = null
 
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
@@ -364,6 +365,17 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.documentAttach.show();
     }
 
+    setDocTypeSelected(docType: any) {
+        this.selectedEdoc1 = Object.assign({});
+        console.log(docType);
+
+        if (docType !== null) {
+            this.selectedEdoc1.documentTypeId = docType.id;
+            this.selectedEdoc1.documentCode = docType.code;
+        }
+    }
+
+
     viewFileEdoc() {
         if (!this.selectedEdoc.imageUrl) {
             return;
@@ -376,7 +388,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             console.log();
             this._systemFileRepo.getFileEdocHtml(this.selectedEdoc.imageUrl).subscribe(
                 (res: any) => {
-                    console.log(res.body);
                     window.open('', '_blank').document.write(res.body);
                 }
             )
