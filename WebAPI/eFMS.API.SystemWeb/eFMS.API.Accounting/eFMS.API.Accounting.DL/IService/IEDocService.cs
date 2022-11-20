@@ -11,6 +11,6 @@ namespace eFMS.API.Accounting.DL.IService
 {
     public interface IEDocService 
     {
-        HandleState RegenEDocSettle(CreateUpdateSettlementModel model);
+        Task<HandleState> GenerateEdoc(CreateUpdateSettlementModel model);
     }
 }
