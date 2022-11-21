@@ -206,10 +206,6 @@ namespace eFMS.API.Accounting.Controllers
                 result = new ResultHandle { Status = hs.Status, Message = hs.Message };
                 Response.OnCompleted(async () =>
                 {
-                    if (hs.Data != null)
-                    {
-                        acctSOAService.DeleteAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, soaNo, "Delete");
-                    }
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(soaNo, "SOA");
                     if (modelReceivableList.Count > 0)
                     {

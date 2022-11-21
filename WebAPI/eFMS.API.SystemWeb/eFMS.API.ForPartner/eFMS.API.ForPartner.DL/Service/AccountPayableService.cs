@@ -401,7 +401,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         hsUpdate = await creditManagementArRepository.AddAsync(acctCredit);
                         if (!hsUpdate.Success)
                         {
-                            new LogHelper("AddCreditMangagement_Fail", JsonConvert.SerializeObject(acctCredit));
+                            new LogHelper("AddCreditMangagement_Fail", hsUpdate.Message?.ToString() + JsonConvert.SerializeObject(acctCredit));
                         }
                         else
                         {
