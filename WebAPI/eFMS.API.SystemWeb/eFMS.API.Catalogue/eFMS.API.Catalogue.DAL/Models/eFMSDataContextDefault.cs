@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.Catalogue.Service.Models
 {
@@ -38,6 +40,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatPotential> CatPotential { get; set; }
         public virtual DbSet<CatServiceType> CatServiceType { get; set; }
         public virtual DbSet<CatStage> CatStage { get; set; }
+        public virtual DbSet<CatStandardCharge> CatStandardCharge { get; set; }
         public virtual DbSet<CatTransportationMode> CatTransportationMode { get; set; }
         public virtual DbSet<CatUnit> CatUnit { get; set; }
         public virtual DbSet<CsManifest> CsManifest { get; set; }
@@ -69,7 +72,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<CatArea>(entity =>
             {
@@ -1383,6 +1386,55 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatStandardCharge>(entity =>
+            {
+                entity.ToTable("catStandardCharge");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ChargeId).HasColumnName("ChargeID");
+
+                entity.Property(e => e.Currency).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Note).HasMaxLength(500);
+
+                entity.Property(e => e.Office).HasMaxLength(100);
+
+                entity.Property(e => e.Quantity).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.Service).HasMaxLength(50);
+
+                entity.Property(e => e.ServiceType).HasMaxLength(50);
+
+                entity.Property(e => e.TransactionType).HasMaxLength(10);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.VatRate).HasColumnType("decimal(18, 4)");
             });
 
             modelBuilder.Entity<CatTransportationMode>(entity =>

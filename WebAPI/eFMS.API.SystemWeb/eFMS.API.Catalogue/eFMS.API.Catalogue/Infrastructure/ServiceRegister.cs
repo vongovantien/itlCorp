@@ -89,6 +89,9 @@ namespace eFMS.API.Catalogue.Infrastructure
             new CacheServiceBase<CatContract>(x.GetRequiredService<IConnectionMultiplexer>()
             , Enum.GetName(typeof(CacheEntity), CacheEntity.CatContract)));
 
+            services.AddSingleton<ICacheServiceBase<CatStandardCharge>>(x =>
+            new CacheServiceBase<CatStandardCharge>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatStandardCharge)));
 
             services.AddSingleton<ICacheServiceBase<CatChartOfAccounts>>(x =>
             new CacheServiceBase<CatChartOfAccounts>(x.GetRequiredService<IConnectionMultiplexer>()
@@ -121,6 +124,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatPotentialService, CatPotentialService>();
             services.AddTransient<ICatPartnerEmailService, CatPartnerEmailService>();
             services.AddTransient<ICatBankService, CatBankService>();
+            services.AddTransient<ICatStandardChargeService, CatStandardChargeService>();
 
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
