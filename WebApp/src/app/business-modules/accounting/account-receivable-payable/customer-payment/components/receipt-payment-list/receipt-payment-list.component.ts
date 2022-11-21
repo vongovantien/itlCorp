@@ -371,7 +371,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     this.paidAmountUsd.enable();
                     this.creditAmountUsd.enable();
 
-                    if (this.isAutoConvert) {
+                    if (this.isAutoConvert.value) {
                         this.creditAmountVnd.disable();
                         this.cusAdvanceAmountVnd.disable();
                         this.paidAmountVnd.disable();
