@@ -44,7 +44,7 @@ namespace eFMS.API.SystemFileManagement
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             services.AddInfrastructure<LanguageSub>(Configuration);
-            ServiceRegister.Register(services);
+            ServiceRegister.Register(services, Configuration);
             services.AddCustomSwagger();
             DbHelper.DbHelper.AWSS3BucketName = Configuration.GetSection("AWSS3:BucketName")?.Value;
             DbHelper.DbHelper.AWSS3AccessKeyId = Configuration.GetSection("AWSS3:AccessKeyId")?.Value;

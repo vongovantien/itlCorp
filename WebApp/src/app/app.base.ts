@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from "@angular/common/http";
-import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ComponentFactory, ComponentFactoryResolver, ComponentRef, DoCheck, Injector, OnChanges, OnDestroy, OnInit, ViewContainerRef } from "@angular/core";
+import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ComponentFactory, ComponentFactoryResolver, ComponentRef, DoCheck, Injector, OnChanges, OnDestroy, OnInit, QueryList, ViewContainerRef } from "@angular/core";
 import { BehaviorSubject, Observable, Subject, Subscription, throwError } from "rxjs";
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 
@@ -13,6 +13,7 @@ import { ButtonType } from "./shared/enums/type-button.enum";
 import { PermissionHouseBill } from "./shared/models/document/permissionHouseBill";
 import { PermissionShipment } from "./shared/models/document/permissionShipment";
 import { ButtonModalSetting } from "./shared/models/layout/button-modal-setting.model";
+import { ContextMenuDirective } from "@directives";
 
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
@@ -149,6 +150,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
     currentUser: any;
     currentUser$: Observable<Partial<SystemInterface.IClaimUser>>;
+
+    accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls,.docx,.msg,.html,.zip';
 
     ngOnInit(): void { }
 
@@ -307,6 +310,13 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
                 }
             }
         )
+    }
+
+    clearMenuContext(queryListMenuContext: QueryList<ContextMenuDirective>) {
+        const qContextMenuList = queryListMenuContext.toArray();
+        if (!!qContextMenuList.length) {
+            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
+        }
     }
 
 }
