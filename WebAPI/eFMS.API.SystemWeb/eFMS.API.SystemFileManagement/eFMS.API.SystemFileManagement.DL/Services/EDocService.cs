@@ -445,7 +445,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         GroupId = currentUser.GroupId,
                         UserCreated = x.UserCreated,
                         UserModified = x.UserModified,
-                        SystemFileName = x.SystemFileName.Contains("OTH") ? x.SystemFileName : "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(null, x.UserFileName)),
+                        SystemFileName = x.SystemFileName.Contains("OTH") ? Path.GetFileNameWithoutExtension(x.SystemFileName) : "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(null, x.UserFileName)),
                         JobNo = jobNo,
                         UserFileName = x.UserFileName,
                         Id = x.Id,
@@ -453,7 +453,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Note = x.Note,
                         HBLNo = _hblNo,
                         Hblid = x.Hblid,
-                        DocumentCode=x.DocumentCode
+                        DocumentCode = x.DocumentCode,
+                        SysImageId = x.SysImageId
                     };
                     listOther.Add(imagedetail);
                 });

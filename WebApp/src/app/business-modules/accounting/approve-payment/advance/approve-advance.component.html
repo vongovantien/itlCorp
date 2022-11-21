@@ -14,11 +14,11 @@
 
                             <!-- ? Cho phép người có quyền approve chỉnh sửa -->
                             <div class="update-payment-term pos-rel">
-                                <ng-container *ngIf="(!!advancePayment 
-                                && advancePayment.statusApproval !== 'New' 
-                                && advancePayment.statusApproval !== 'Denied' 
-                                && advancePayment.statusApproval !== 'Done' 
-                                && advancePayment.isManager 
+                                <ng-container *ngIf="(!!advancePayment
+                                && advancePayment.statusApproval !== 'New'
+                                && advancePayment.statusApproval !== 'Denied'
+                                && advancePayment.statusApproval !== 'Done'
+                                && advancePayment.isManager
                                 && !advancePayment.isApproved);else paymentTermReadonly">
 
                                     <input type="number" integer class="form-control m-input m-input--square "
@@ -62,7 +62,7 @@
                             <span class="badge badge-success"
                                 *ngIf="attachFiles.eDocs?.length > 0">{{attachFiles.eDocs?.length}}</span>
                         </ng-template>
-                        <files-attach-v2 [typeFrom]="'Advance'" [billingId]="idAdvPayment"
+                        <files-attach-v2 [typeFrom]="'Advance'" [billingId]="idAdvPayment" [billingNo]="advNo"
                             (onChange)="attachFiles = $event" readOnly>
                         </files-attach-v2>
                     </tab>
