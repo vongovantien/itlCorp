@@ -57,7 +57,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     private _readonly: boolean = false;
     isView: boolean = true;
     elementInput: HTMLElement = null
-    soaSynced: boolean = false;
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
         { title: 'Real File Name', field: 'userFileName', sortable: true },
@@ -206,10 +205,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            console.log(data.syncStatus);
-                            if (data.syncStatus === 'Synced') {
-                                this.soaSynced = true;
-                            }
                             for (let element of data.groupShipments) {
                                 this.jobs.push({ jobNo: element.jobId, })
                             }
