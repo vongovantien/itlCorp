@@ -1,14 +1,15 @@
-import { PopupBase } from "src/app/popup.base";
-import { OnInit, Component, Output, EventEmitter, ViewChild, ViewChildren, QueryList } from "@angular/core";
-import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from "@repositories";
-import { ToastrService } from "ngx-toastr";
-import { NgProgress } from "@ngx-progressbar/core";
-import { IAppState } from "@store";
-import { Store } from "@ngrx/store";
-import { takeUntil, catchError, finalize } from "rxjs/operators";
-import { Params, ActivatedRoute } from "@angular/router";
+import { Component, EventEmitter, OnInit, Output, QueryList, ViewChildren } from "@angular/core";
+import { ActivatedRoute, Params } from "@angular/router";
 import { ConfirmPopupComponent } from "@common";
+import { SystemConstants } from "@constants";
 import { ContextMenuDirective } from "@directives";
+import { Store } from "@ngrx/store";
+import { NgProgress } from "@ngx-progressbar/core";
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from "@repositories";
+import { IAppState } from "@store";
+import { ToastrService } from "ngx-toastr";
+import { catchError, finalize, takeUntil } from "rxjs/operators";
+import { PopupBase } from "src/app/popup.base";
 
 
 @Component({
@@ -158,19 +159,54 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
     onSelectFileMenuContext(file: IShipmentAttachFile) {
         this.selectedFile = file;
         this.clearMenuContext(this.queryListMenuContext);
+        console.log(this.selectedFile);
+
+    }
+
+    // viewFile() {
+    //     const extension = this.selectedFile.url.split('.').pop();
+    //     if (['xlsx'].includes(extension)) {
+    //         this._exportRepo.previewExport(this.selectedFile.url);
+    //     } else {
+    //         this._exportRepo.downloadExport(this.selectedFile.url);
+    //     }
+    // }
+    viewEdocFromName(imageUrl: string) {
+        this.selectedFile = Object.assign({}, this.selectedFile);
+        this.selectedFile.url = imageUrl;
+        this.viewFile();
     }
 
     viewFile() {
+        if (!this.selectedFile.url) {
+            return;
+        }
         const extension = this.selectedFile.url.split('.').pop();
-        if (['xlsx'].includes(extension)) {
+        if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
             this._exportRepo.previewExport(this.selectedFile.url);
-        } else {
+        }
+        else if (['html', 'htm'].includes(extension)) {
+            console.log();
+            this._systemFileManagerRepo.getFileEdocHtml(this.selectedFile.url).subscribe(
+                (res: any) => {
+                    window.open('', '_blank').document.write(res.body);
+                }
+            )
+        }
+        else {
             this._exportRepo.downloadExport(this.selectedFile.url);
         }
     }
 
     download() {
-        this._exportRepo.downloadExport(this.selectedFile.url);
+        const selectedEdoc = Object.assign({}, this.selectedFile);
+        this._systemFileManagerRepo.getFileEdoc(selectedEdoc.id).subscribe(
+            (data) => {
+                const extention = selectedEdoc.url.split('.').pop();
+                this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.url + '.' + extention);
+            }
+        )
+        //this._exportRepo.downloadExport(this.selectedFile.url);
     }
 
     selectFile() {

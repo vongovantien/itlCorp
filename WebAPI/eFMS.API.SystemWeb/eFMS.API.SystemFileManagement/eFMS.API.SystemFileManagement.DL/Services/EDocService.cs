@@ -321,6 +321,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             var result = new List<EDocGroupByType>();
             lstTran.ForEach(x =>
             {
+                x.Code = x.Code.Replace(@",.;?", "").Trim();
                 var data = new EDocGroupByType()
                 {
                     documentType = x
@@ -497,6 +498,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     settle = _setleRepo.Get(z => z.Id == billingId).FirstOrDefault();
                     attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).FirstOrDefault();
                     attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "SM" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT || y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADV_SETTLE).ToList().Select(x => x.Id).ToList();
+                    attachTemplate.Code= attachTemplate.Code.Replace(@",.;?", "").Trim();
                     result.documentType = attachTemplate;
                     EdocIamgeIds = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo).Select(x => x.SysImageId).ToList(); //ID file goc tren SM da dc generate detail.;
                     break;
@@ -504,11 +506,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     advance = _advRepo.Get(z => z.Id == billingId).FirstOrDefault();
                     attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "AD" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_ADVANCE).FirstOrDefault();
                     attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "AD" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_ADVANCE).ToList().Select(x => x.Id).ToList();
+                    attachTemplate.Code = attachTemplate.Code.Replace(@",.;?", "").Trim();
                     result.documentType = attachTemplate;
                     break;
                 case "SOA":
                     soa = _soaRepo.Get(x => x.Id == billingId.ToString()).FirstOrDefault();
                     attachTemplate = _attachFileTemplateRepo.Get(y => y.Code == "SOA" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_SOA).FirstOrDefault();
+                    attachTemplate.Code = attachTemplate.Code.Replace(@",.;?", "").Trim();
                     attachTemplateIds = _attachFileTemplateRepo.Get(y => y.Code == "SOA" && y.AccountingType == SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_SOA).ToList().Select(x => x.Id).ToList();
                     break;
             }
