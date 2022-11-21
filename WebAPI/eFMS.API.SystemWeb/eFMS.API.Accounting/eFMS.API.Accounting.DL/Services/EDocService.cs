@@ -24,7 +24,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CsShipmentSurcharge> surchargetRepo;
         private readonly IContextBase<OpsTransaction> opsTranRepo;
         private readonly IContextBase<CsTransactionDetail> cstranDeRepo;
-        private readonly IContextBase<CsTransaction> csTranRepo;
+        private readonly IContextBase<CsTransaction> _csTranRepo;
         private readonly IContextBase<SysImage> sysImageRepo;
         public EDocService(
             IContextBase<SysImageDetail> repository,
@@ -33,6 +33,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<OpsTransaction> opsTranRepoitory,
             IContextBase<CsTransactionDetail> cstranDeRepository,
             IContextBase<SysImage> sysImageRepository,
+            IContextBase<CsTransaction> tranrepository,
             IMapper mapper) : base(repository, mapper)
         {
             acctApproveSettlementRepo = acctApproveSettlementRepository;
@@ -40,6 +41,7 @@ namespace eFMS.API.Accounting.DL.Services
             opsTranRepo = opsTranRepoitory;
             cstranDeRepo = cstranDeRepository;
             sysImageRepo = sysImageRepository;
+            _csTranRepo = tranrepository;
         }
 
         public async Task<HandleState> GenerateEdoc(CreateUpdateSettlementModel model)
@@ -56,7 +58,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        jobCharge.Add(csTranRepo.Get(z => z.JobNo == x.JobNo).FirstOrDefault().Id);
+                        jobCharge.Add(_csTranRepo.Get(z => z.JobNo == x.JobNo).FirstOrDefault().Id);
                     }
 
                 });
@@ -74,7 +76,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        jobAdd.Add(csTranRepo.Get(z => z.JobNo == x.FirstOrDefault().JobNo).FirstOrDefault().Id);
+                        jobAdd.Add(_csTranRepo.Get(z => z.JobNo == x.FirstOrDefault().JobNo).FirstOrDefault().Id);
                     }
                 });
                 if (jobDel.Count() > 0)

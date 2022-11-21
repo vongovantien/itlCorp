@@ -51,6 +51,8 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
     folderModuleName: string = 'Advance';
     isAdvCarrier: boolean = false;
 
+    advNo: string = '';
+
     constructor(
         private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
@@ -103,6 +105,7 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
             .subscribe(
                 (res: any) => {
                     if (!!res) {
+                        this.advNo = res.advanceNo;
                         this.advancePayment = new AdvancePayment(res);
                         console.log(this.advancePayment);
                         this._store.dispatch(LoadAdvanceDetailSuccess(res));

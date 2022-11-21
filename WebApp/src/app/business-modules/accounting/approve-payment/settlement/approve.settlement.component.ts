@@ -1,27 +1,27 @@
-import { Partner, SysImage } from '@models';
-import { Component, ViewChild, TemplateRef } from '@angular/core';
+import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { SysImage } from '@models';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { ToastrService } from 'ngx-toastr';
 
-import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
-import { AccountingRepo, CatalogueRepo, ExportRepo } from '@repositories';
-import { InjectViewContainerRefDirective } from '@directives';
-import { AppPage } from 'src/app/app.base';
-import { delayTime } from '@decorators';
+import { ConfirmPopupComponent, ReportPreviewComponent } from '@common';
 import { RoutingConstants } from '@constants';
+import { delayTime } from '@decorators';
+import { InjectViewContainerRefDirective } from '@directives';
+import { AccountingRepo, CatalogueRepo, ExportRepo } from '@repositories';
+import { AppPage } from 'src/app/app.base';
 
+import { SettlementFormCreateComponent } from '../../settlement-payment/components/form-create-settlement/form-create-settlement.component';
 import { SettlementListChargeComponent } from '../../settlement-payment/components/list-charge-settlement/list-charge-settlement.component';
 import { ISettlementPaymentData } from '../../settlement-payment/detail/detail-settlement-payment.component';
-import { SettlementFormCreateComponent } from '../../settlement-payment/components/form-create-settlement/form-create-settlement.component';
 import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
 
-import { finalize, catchError, takeUntil, switchMap, tap, pluck } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { getCurrentUserState } from '@store';
+import { Observable } from 'rxjs';
+import { catchError, finalize, pluck, switchMap, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { ISettlementPaymentState, LoadDetailSettlePayment, LoadDetailSettlePaymentSuccess } from '../../settlement-payment/components/store';
-import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { getCurrentUserState } from '@store';
 
 @Component({
     selector: 'app-approve-settlement',
@@ -94,7 +94,8 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                         return;
                     }
                     this.settlementPayment = res;
-
+                    console.log(res);
+                    this.settlementCode = res.settlement.settlementNo;
                     // * Update Store
                     this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementPayment));
 

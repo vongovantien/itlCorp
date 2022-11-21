@@ -244,12 +244,21 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         console.log(this.selectedEdoc);
     }
 
+    // downloadEdocFromName(doc: any) {
+    //     this.selectedEdoc = Object.assign({}, this.selectedEdoc);
+    //     this.selectedEdoc.sysImageId = doc.sysImageId;
+    //     this.selectedEdoc.imageUrl = doc.imageUrl;
+    //     this.selectedEdoc.systemFileName = doc.ssystemFileName;
+    //     console.log(doc);
+    //     this.downloadEdoc();
+    // }
+
     downloadEdoc() {
         const selectedEdoc = Object.assign({}, this.selectedEdoc);
         this._systemFileRepo.getFileEdoc(selectedEdoc.sysImageId).subscribe(
             (data) => {
-                const exten = selectedEdoc.imageUrl.split('.').pop();
-                this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.systemFileName + '.' + exten);
+                const extention = selectedEdoc.imageUrl.split('.').pop();
+                this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.systemFileName + '.' + extention);
             }
         )
     }
@@ -370,11 +379,16 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         console.log(docType);
 
         if (docType !== null) {
-            this.selectedEdoc1.documentTypeId = docType.id;
-            this.selectedEdoc1.documentCode = docType.code;
+            this.selectedEdoc1.documentTypeId = docType?.documentType.id;
+            this.selectedEdoc1.documentCode = docType?.documentType.code;
         }
     }
 
+    viewEdocFromName(imageUrl: string) {
+        this.selectedEdoc = Object.assign({}, this.selectedEdoc);
+        this.selectedEdoc.imageUrl = imageUrl;
+        this.viewFileEdoc();
+    }
 
     viewFileEdoc() {
         if (!this.selectedEdoc.imageUrl) {
