@@ -348,26 +348,27 @@ namespace eFMS.API.ForPartner.DL.Service
                     {
                         // Get detail to update Credit AR
                         var acctCredit = new AcctCreditManagementAr();
-                        var surcharges = surchargeRepository.Where(x => x.JobNo == item.Key.JobNo && x.Mblno == item.Key.MblNo && x.Hblno == item.Key.Hblno);
+                        var chargeIds = item.Select(x => x.ChargeId).ToList();
+                        var surcharges = surchargeRepository.Where(x => x.JobNo == item.Key.JobNo && x.Mblno == item.Key.MblNo && x.Hblno == item.Key.Hblno && chargeIds.Contains(x.Id));
                         var detailBilling = surcharges.FirstOrDefault();
                         //.Select(x => new { Code = string.IsNullOrEmpty(x.CreditNo) ? x.PaySoano : x.CreditNo, Type = string.IsNullOrEmpty(x.CreditNo) ? "CREDITSOA" : "CREDITNOTE", x.Hblid }).FirstOrDefault();
                         var syncFrom = string.Empty;
                         if (string.IsNullOrEmpty(_code))
                         {
-                            _type = detailBilling.Type == "OBH" ? (detailBilling.PaySyncedFrom.Contains("SOA") ? "CREDITSOA" : "CREDITNOTE") : (detailBilling.SyncedFrom.Contains("SOA") ? "CREDITSOA" : "CREDITNOTE");
-                            _code = _type == "CREDITSOA" ? detailBilling.PaySoano : detailBilling.CreditNo;
+                            if (detailBilling.Type == "OBH")
+                            {
+                                _type = detailBilling.PaySyncedFrom.Contains("SOA") ? "CREDITSOA" : (detailBilling.PaySyncedFrom.Contains("CDNOTE") ? "CREDITNOTE" : null);
+                            }
+                            else
+                            {
+                                _type = detailBilling.SyncedFrom.Contains("SOA") ? "CREDITSOA" : (detailBilling.SyncedFrom.Contains("CDNOTE") ? "CREDITNOTE" : null);
+                            }
+                            _code = _type == "CREDITSOA" ? detailBilling.PaySoano : (_type == "CREDITNOTE" ? detailBilling.CreditNo : null);
                         }
                         decimal totalVnd = 0, totalUsd = 0;
-                        if (_type == "CREDITSOA")
-                        {
-                            totalVnd = surcharges.Where(x => x.PaySoano == _code).Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-                            totalUsd = surcharges.Where(x => x.PaySoano == _code).Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
-                        }
-                        else if (_type == "CREDITNOTE")
-                        {
-                            totalVnd = surcharges.Where(x => x.CreditNo == _code).Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-                            totalUsd = surcharges.Where(x => x.CreditNo == _code).Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
-                        }
+                        totalVnd = surcharges.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                        totalUsd = surcharges.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
+
                         acctCredit.Id = Guid.NewGuid();
                         acctCredit.Code = _code;
                         acctCredit.Type = _type;
@@ -376,18 +377,19 @@ namespace eFMS.API.ForPartner.DL.Service
                         acctCredit.Mblno = item.Key.MblNo;
                         acctCredit.Hblno = item.Key.Hblno;
                         acctCredit.Hblid = detailBilling.Hblid;
-                        acctCredit.SurchargeId = string.Join(';', item.Select(x => x.ChargeId).Distinct());
+                        acctCredit.SurchargeId = string.Join(';', chargeIds);
                         acctCredit.Currency = item.FirstOrDefault().Currency;
                         acctCredit.ExchangeRate = item.FirstOrDefault().ExchangeRate;
                         acctCredit.ExchangeRateUsdToLocal = exchangeRateUsd;
-                        acctCredit.AmountVnd = acctCredit.RemainVnd = item.Sum(x => x.AmountVnd + x.VatAmountVnd);
-                        acctCredit.AmountUsd = acctCredit.RemainUsd = item.Sum(x => x.AmountUsd + x.VatAmountUsd);
+                        
                         if (acctCredit.Currency == ForPartnerConstants.CURRENCY_LOCAL)
                         {
+                            acctCredit.AmountVnd = acctCredit.RemainVnd = item.Sum(x => x.AmountVnd + x.VatAmountVnd);
                             acctCredit.AmountUsd = acctCredit.RemainUsd = totalUsd;
                         }
                         else
                         {
+                            acctCredit.AmountUsd = acctCredit.RemainUsd = item.Sum(x => x.AmountUsd + x.VatAmountUsd);
                             acctCredit.AmountVnd = acctCredit.RemainVnd = totalVnd;
                         }
                         acctCredit.CompanyId = currentUser.CompanyID;
@@ -986,32 +988,50 @@ namespace eFMS.API.ForPartner.DL.Service
                 .Select(x => new
                 {
                     x.Key.JobNo,
-                    x.Key.Hblid
-                ,
-                    Code = x.FirstOrDefault().Type == "OBH" ? (x.FirstOrDefault().PaySyncedFrom.Contains("SOA") ? x.FirstOrDefault().PaySoano : x.FirstOrDefault().CreditNo) :
-                (x.FirstOrDefault().SyncedFrom.Contains("SOA") ? x.FirstOrDefault().PaySoano : x.FirstOrDefault().CreditNo)
+                    x.Key.Hblid,
+                    TotalVnd = x.Sum(z=>z.AmountVnd + z.VatAmountVnd),
+                    TotalUsd = x.Sum(z => z.AmountUsd + z.VatAmountUsd)
                 });
             foreach (var payable in payables)
             {
-                var creditMng = creditManagementArRepository.Get(x => x.PartnerId == payable.PartnerId && x.ReferenceNo == payable.ReferenceNo && (x.RemainVnd > 0 || x.RemainUsd > 0));
+                var creditMng = await creditManagementArRepository.GetAsync(x => x.PartnerId == payable.PartnerId && x.ReferenceNo == payable.ReferenceNo && (x.RemainVnd > 0 || x.RemainUsd > 0));
                 var data = from cre in creditMng
-                           join shp in shipments on new { cre.JobNo, Hblid = (Guid)cre.Hblid, cre.Code } equals new { shp.JobNo, shp.Hblid, shp.Code }
-                           select cre;
+                           join shp in shipments on new { cre.JobNo, Hblid = (Guid)cre.Hblid } equals new { shp.JobNo, shp.Hblid }
+                           select new
+                           {
+                               cre,
+                               shp.TotalVnd,
+                               shp.TotalUsd
+                           };
                 foreach (var item in data)
                 {
-                    item.RemainVnd = item.RemainVnd == 0 ? item.RemainVnd : (item.RemainVnd - payable.PaymentAmountVnd);
-                    item.RemainUsd = item.RemainUsd == 0 ? item.RemainUsd : (item.RemainUsd - payable.PaymentAmountUsd);
+                    var creditDetail = item.cre;
+                    
                     if(payable.Currency == ForPartnerConstants.CURRENCY_LOCAL)
                     {
-                        if (item.RemainVnd == 0)
-                            item.RemainUsd = 0;
+                        creditDetail.RemainVnd = creditDetail.RemainVnd == 0 ? creditDetail.RemainVnd : (creditDetail.RemainVnd - payable.PaymentAmountVnd);
+                        if (creditDetail.RemainVnd == 0)
+                        {
+                            creditDetail.RemainUsd = 0;
+                        }
+                        else
+                        {
+                            creditDetail.RemainUsd = creditDetail.RemainUsd == 0 ? creditDetail.RemainUsd : (creditDetail.RemainUsd - item.TotalUsd);
+                        }
                     }
                     else
                     {
-                        if (item.RemainUsd == 0)
-                            item.RemainVnd = 0;
+                        creditDetail.RemainUsd = creditDetail.RemainUsd == 0 ? creditDetail.RemainUsd : (creditDetail.RemainUsd - payable.PaymentAmountUsd);
+                        if (creditDetail.RemainUsd == 0)
+                        {
+                            creditDetail.RemainVnd = 0;
+                        }
+                        else
+                        {
+                            creditDetail.RemainVnd = creditDetail.RemainVnd == 0 ? creditDetail.RemainVnd : (creditDetail.RemainVnd - item.TotalVnd);
+                        }
                     }
-                    await creditManagementArRepository.UpdateAsync(item, x => x.Id == item.Id, false);
+                    await creditManagementArRepository.UpdateAsync(creditDetail, x => x.Id == creditDetail.Id, false);
                 }
                 hs = creditManagementArRepository.SubmitChanges();
             }
@@ -1104,6 +1124,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         {
                             acct.RemainVnd = acct.AmountVnd;
                             acct.RemainUsd = acct.AmountUsd;
+                            acct.UserModified = currentUser.UserID;
                             acct.DatetimeModified = DateTime.Now;
                             creditManagementArRepository.Update(acct, x => x.Id == acct.Id, false);
                         }
@@ -1214,9 +1235,9 @@ namespace eFMS.API.ForPartner.DL.Service
                 try
                 {
                     var refNos = payables.Select(x => x.ReferenceNo).ToList();
-                    var billingNos = payables.Select(x => x.BillingNo).ToList();
+                    //var billingNos = payables.Select(x => x.BillingNo).ToList();
                     var partnerId = payables.FirstOrDefault().PartnerId;
-                    var creditMngIds = creditManagementArRepository.Get(x => x.PartnerId == partnerId && billingNos.Contains(x.Code) && refNos.Contains(x.ReferenceNo)).Select(x => x.Id).ToList();
+                    var creditMngIds = creditManagementArRepository.Get(x => x.PartnerId == partnerId && refNos.Contains(x.ReferenceNo)).Select(x => x.Id).ToList();
                     hsDeleteCredit = await creditManagementArRepository.DeleteAsync(x => creditMngIds.Contains(x.Id));
                     if (!hsDeleteCredit.Success)
                     {
