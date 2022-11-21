@@ -57,7 +57,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     private _readonly: boolean = false;
     isView: boolean = true;
     elementInput: HTMLElement = null
-
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
         { title: 'Real File Name', field: 'userFileName', sortable: true },
@@ -206,8 +205,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            console.log(data);
-
                             for (let element of data.groupShipments) {
                                 this.jobs.push({ jobNo: element.jobId, })
                             }
@@ -255,6 +252,14 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
     downloadEdoc() {
         const selectedEdoc = Object.assign({}, this.selectedEdoc);
+        if (selectedEdoc.id === selectedEdoc.sysImageId) {
+            this._systemFileRepo.getFileEdoc(selectedEdoc.sysImageId).subscribe(
+                (data) => {
+                    const extention = selectedEdoc.imageUrl.split('.').pop();
+                    this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.systemFileName + '.' + extention);
+                }
+            )
+        }
         this._systemFileRepo.getFileEdoc(selectedEdoc.sysImageId).subscribe(
             (data) => {
                 const extention = selectedEdoc.imageUrl.split('.').pop();

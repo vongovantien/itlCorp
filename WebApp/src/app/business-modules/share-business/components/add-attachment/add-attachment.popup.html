@@ -61,7 +61,11 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <a [href]="file.url" target="_blank" [title]="file.name" download>{{file.name}}
+                                        <!-- <a [href]="file.url" target="_blank" [title]="file.name" download>{{file.name}}
+                                                                                <icon-file [url]="file.url"></icon-file>
+                                                                            </a> -->
+                                        <a class="text-underline" style="cursor: pointer;" (click)="viewEdocFromName(file.url)"
+                                            download>{{file.name}}
                                             <icon-file [url]="file.url"></icon-file>
                                         </a>
                                     </td>

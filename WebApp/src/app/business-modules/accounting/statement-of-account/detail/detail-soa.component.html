@@ -202,7 +202,7 @@
                                 *ngIf="attachFiles.eDocs?.length > 0">{{attachFiles.eDocs?.length}}</span>
                         </ng-template>
                         <files-attach-v2 [typeFrom]="'SOA'" *ngIf="!!soa.id" [billingId]="soaId" [billingNo]="soaNO"
-                            (onChange)="attachFiles = $event" readOnly>
+                            (onChange)="attachFiles = $event" [readOnly]="soa.syncStatus==='Synced'">
                         </files-attach-v2>
                     </tab>
                 </tabset>

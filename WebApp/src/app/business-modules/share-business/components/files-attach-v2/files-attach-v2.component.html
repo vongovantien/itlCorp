@@ -74,14 +74,10 @@
                                                 <span>{{doc.systemFileName}} </span>
                                             </td>
                                             <td>
-                                                <a class="text-underline htmlLink" (click)="viewEdocFromName(doc.imageUrl)" *ngIf="doc.imageUrl.split('.').pop()==='html'"
+                                                <a class="text-underline htmlLink" (click)="viewEdocFromName(doc.imageUrl)"
                                                     download>{{doc.userFileName}}
                                                     <icon-file [url]="doc.imageUrl"></icon-file>
                                                 </a>
-                                                <a class="text-underline" [href]="doc.imageUrl" *ngIf="doc.imageUrl.split('.').pop()!=='html'"
-                                                download>{{doc.userFileName}}
-                                                <icon-file [url]="doc.imageUrl"></icon-file>
-                                            </a>
                                             </td>
                                             <td>
                                                 <span>{{doc.hblNo}}</span>
@@ -121,7 +117,7 @@
                         <i class="la la-minus m--margin-right-5"></i>
                         Accounting File
                     </h3>
-                    <div class="c-button-actions" *ngIf="(typeFrom !== 'Shipment' && !readonly)||typeFrom==='SOA'">
+                    <div class="c-button-actions" *ngIf="(typeFrom !== 'Shipment' && !readonly)">
                         <div class="form-group float-right">
                             <button type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
                                 (click)="showDocumentAttach()">
@@ -181,7 +177,6 @@
                                                         target="_blank">{{doc.userFileName}}
                                                         <icon-file [url]="doc.userFileName"></icon-file>
                                                     </a>
-
                                                 </td>
                                                 <td>
                                                     <span>{{doc.hblNo}}</span>
