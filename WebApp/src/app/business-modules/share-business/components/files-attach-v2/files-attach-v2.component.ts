@@ -18,10 +18,11 @@ import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modul
 import { getSOADetailState } from 'src/app/business-modules/accounting/statement-of-account/store/reducers';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../store';
-import { ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
+import { IEDocFile, IEDocUploadFile, ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
 @Component({
     selector: 'files-attach-v2',
-    templateUrl: './files-attach-v2.component.html'
+    templateUrl: './files-attach-v2.component.html',
+    styleUrls: ['./files-attach-v2.component.scss']
 })
 
 export class ShareBussinessAttachFileV2Component extends AppList implements OnInit {
@@ -41,6 +42,22 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
     @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
 
+    documentTypes: any[] = [];
+    jobId: string = '';
+    isOps: boolean = false;
+    edocByJob: any[] = [];
+    edocByAcc: any[] = [];
+    selectedEdoc: IEDocItem;
+    selectedEdoc1: IEDocItem;
+    transactionType: string = '';
+    housebills: any[] = [];
+    jobs: any[] = [];
+    modifiedDocTypes: any;
+    jobNo: string = '';
+    private _readonly: boolean = false;
+    isView: boolean = true;
+    elementInput: HTMLElement = null
+
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
         { title: 'Real File Name', field: 'userFileName', sortable: true },
@@ -49,25 +66,14 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
         { title: 'Attach Person', field: 'userCreated', sortable: true },
     ];
+
     headersAcc: CommonInterface.IHeaderTable[] = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
     { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
     { title: 'Job No', field: 'jobNo' },
     { title: 'Note', field: 'note' },
     { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
     { title: 'Attach Person', field: 'userCreated', sortable: true },
-    ];;
-    documentTypes: any[] = [];
-    jobId: string = '';
-    isOps: boolean = false;
-    edocByJob: any[] = [];
-    edocByAcc: any[] = [];
-    selectedEdoc: IEDocItem;
-    transactionType: string = '';
-    housebills: any[] = [];
-    jobs: any[] = [];
-    modifiedDocTypes: any;
-    jobNo: string = '';
-    private _readonly: boolean = false;
+    ];
 
     headerAttach: any[] = [
         { title: 'Alias Name', field: 'aliasName', width: 300 },
@@ -227,9 +233,15 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
+        this.selectedEdoc1 = edoc;
         this.documentAttach.selectedtDocType = edoc.documentTypeId;
+        this.isView = true;
+        const extension = this.selectedEdoc.imageUrl.split('.').pop();
+        if (extension === 'zip') {
+            this.isView = false;
+        }
         this.clearMenuContext(this.queryListMenuContext);
-        console.log(edoc);
+        console.log(this.selectedEdoc);
     }
 
     downloadEdoc() {
@@ -353,6 +365,17 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.documentAttach.show();
     }
 
+    setDocTypeSelected(docType: any) {
+        this.selectedEdoc1 = Object.assign({});
+        console.log(docType);
+
+        if (docType !== null) {
+            this.selectedEdoc1.documentTypeId = docType.id;
+            this.selectedEdoc1.documentCode = docType.code;
+        }
+    }
+
+
     viewFileEdoc() {
         if (!this.selectedEdoc.imageUrl) {
             return;
@@ -365,7 +388,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             console.log();
             this._systemFileRepo.getFileEdocHtml(this.selectedEdoc.imageUrl).subscribe(
                 (res: any) => {
-                    console.log(res.body);
                     window.open('', '_blank').document.write(res.body);
                 }
             )
@@ -401,15 +423,25 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             )
     }
 
-    chooseFile(_$event: any) {
-        if (this._readonly) {
-            return;
-        }
-        const fileList = event.target['files'];
-        if (fileList.length > 0) {
-            let validSize: boolean = true;
+    chooseFile(event: any) {
+        console.log(this.selectedEdoc1);
 
-            for (let i = 0; i <= fileList.length - 1; i++) {
+        const fileList = event.target['files'];
+        const files: any[] = event.target['files'];
+        let docType = this.selectedEdoc1?.documentTypeId;
+        let listFile: any[] = [];
+
+        for (let i = 0; i < files.length; i++) {
+            if (!!docType) {
+                files[i].DocumentId = docType;
+                files[i].DocumentCode = this.selectedEdoc1?.documentCode;
+            }
+            listFile.push(files[i]);
+            listFile[i].aliasName = this.selectedEdoc1?.documentCode + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
+        }
+        if (fileList?.length > 0) {
+            let validSize: boolean = true;
+            for (let i = 0; i <= fileList?.length - 1; i++) {
                 const fileSize: number = fileList[i].size / Math.pow(1024, 2); //TODO Verify BE
                 if (fileSize >= 100) {
                     validSize = false;
@@ -420,15 +452,48 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 this._toast.warning("maximum file size < 100Mb");
                 return;
             }
-            this._systemFileRepo.uploadAttachedFileEdoc('Accounting', null, null, null)
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            this._toast.success("Upload file successfully!");
-                        }
-                    }
-                );
         }
+        event.target.value = ''
+        this.uploadEDoc(listFile);
+    }
+
+    uploadEDoc(listFile: any[]) {
+        let edocFileList: IEDocFile[] = [];
+        let files: any[] = [];
+        listFile.forEach(x => {
+            files.push(x);
+            edocFileList.push(({
+                JobId: this.jobId,
+                Code: x.DocumentCode,
+                TransactionType: this.transactionType,
+                AliasName: x.aliasName,
+                BillingNo: '',
+                BillingType: this.typeFrom,
+                HBL: SystemConstants.EMPTY_GUID,
+                FileName: x.name,
+                Note: '',
+                BillingId: SystemConstants.EMPTY_GUID,
+                Id: SystemConstants.EMPTY_GUID,
+                DocumentId: x.DocumentId
+            }));
+        });
+        let EdocUploadFile: IEDocUploadFile;
+        EdocUploadFile = ({
+            ModuleName: 'Document',
+            FolderName: this.typeFrom,
+            Id: this.jobId,
+            EDocFiles: edocFileList,
+        })
+        this._systemFileRepo.uploadEDoc(EdocUploadFile, files, this.typeFrom)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toast.success("Upload file successfully!");
+                        this.getEDoc(this.transactionType);
+                    }
+                }
+            );
     }
 }
 interface IEDocItem {
@@ -456,4 +521,5 @@ interface IEDocItem {
     userModified: string;
     documentTypeName: string;
     transactionType: string;
+    documentCode: string;
 }

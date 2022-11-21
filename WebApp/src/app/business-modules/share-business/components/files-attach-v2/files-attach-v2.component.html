@@ -46,20 +46,33 @@
                                 </h4>
                             </div>
                         </div>
-                        <div class="text-right" *ngIf="docType.documentType.required">
-                            <button class="btn btn-sm m-btn--pill m-btn--icon m-btn--icon-only "
-                                [ngClass]="((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length)  ? 'btn-success': 'btn-danger'">
-                                <i
-                                    class="la la-{{((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length) ? 'check' : 'exclamation'}}"></i>
-                            </button>
+                        <div class="c-button-actions">
+                            <div class="form-group float-right">
+                                <button class="btn btn-sm m-btn--pill m-btn--icon m-btn--icon-only" *ngIf="docType.documentType.required"
+                                    [ngClass]="((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length)  ? 'btn-success': 'btn-danger'">
+                                    <i
+                                        class="la la-{{((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length) ? 'check' : 'exclamation'}}"></i>
+                                </button>
+                                <button class="btn btn-light m-btn--icon m-btn--uppercase margin-right-10" *ngIf="!(docType?.eDocs?.length>0)" (click)="setDocTypeSelected(docType.documentType)">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="uploadContext">
+                                                <span><i class="la la-upload"></i>Upload
+                                                </span>
+                                                <input id="elUpload" type="file" multiple (change)="chooseFile($event)" [accept]="accepctFilesUpload"
+                                                    class="inputUpload form-control m-input" title="Upload files" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="m-portlet__body p-0" id={{docType.documentType.code}}
                         [class]="!!(docType?.eDocs?.length) ? 'collapse show':'collapse'">
                         <div class="table-wrapper table-scrollable">
                             <table class="table table-hover table-editable dataTable-edit table-summary ">
-                                <thead app-table-header [headers]="headersGen"
-                                    (onClick)="sortEdoc('General',i, $event.sortField)">
+                                <thead app-table-header [headers]="headersGen" (onClick)="sortEdoc('General',i, $event.sortField)">
                                     <th class="first table-actions-col">
                                         Stt
                                     </th>
@@ -276,13 +289,15 @@
 
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">
     <div class="menu-context__item" *ngIf="isLocked === false && !readonly && typeFrom === 'Shipment'">
-        <div [style]="'position:relative'">
-            <span>
-                <span class="text-primary"><i class="la la-upload text-primary"></i>Upload
-                </span>
-            </span>
-            <input type="file" [style]="'position: absolute;left:0;display:none;height'" multiple
-                (change)="chooseFile($event)" [accept]="accepctFilesUpload" title="Upload files" />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="uploadContext">
+                    <span><i class="la la-upload"></i>Upload
+                    </span>
+                    <input id="elUpload" type="file" multiple (change)="chooseFile($event)" [accept]="accepctFilesUpload" class="inputUpload form-control m-input"
+                        title="Upload files" />
+                </div>
+            </div>
         </div>
     </div>
     <ng-container *ngIf="selectedEdoc?.userCreated === currentUser.userName">
@@ -295,7 +310,7 @@
             <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
         </div>
     </ng-container>
-    <div class="menu-context__item" (click)="viewFileEdoc()">
+    <div class="menu-context__item" *ngIf="isView===true" (click)="viewFileEdoc()">
         <span><i class="la la-eye align-middle text-primary"></i>View</span>
     </div>
     <div class="menu-context__item" (click)="downloadEdoc()">
@@ -304,7 +319,7 @@
 </app-context-menu>
 
 <app-context-menu #edocAccountantShipmentTypeContext (clickOutside)="selectedEdoc = null">
-    <div class="menu-context__item" (click)="viewFileEdoc()">
+    <div class="menu-context__item" *ngIf="isView===true" (click)="viewFileEdoc()">
         <span><i class="la la-eye align-middle text-primary"></i>View</span>
     </div>
     <div class="menu-context__item" (click)="downloadEdoc()">
@@ -318,7 +333,7 @@
             <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
         </div>
     </ng-container>
-    <div class="menu-context__item" (click)="viewFileEdoc()">
+    <div class="menu-context__item" *ngIf="isView===true" (click)="viewFileEdoc()">
         <span><i class="la la-eye align-middle text-primary"></i>View</span>
     </div>
     <div class="menu-context__item" (click)="downloadEdoc()">

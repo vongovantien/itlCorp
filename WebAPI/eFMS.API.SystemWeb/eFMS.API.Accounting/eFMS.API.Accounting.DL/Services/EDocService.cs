@@ -3,10 +3,13 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common.Helpers;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Remotion.Linq.Clauses.ResultOperators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +24,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CsShipmentSurcharge> surchargetRepo;
         private readonly IContextBase<OpsTransaction> opsTranRepo;
         private readonly IContextBase<CsTransactionDetail> cstranDeRepo;
+        private readonly IContextBase<CsTransaction> csTranRepo;
         private readonly IContextBase<SysImage> sysImageRepo;
         public EDocService(
             IContextBase<SysImageDetail> repository,
@@ -38,56 +42,79 @@ namespace eFMS.API.Accounting.DL.Services
             sysImageRepo = sysImageRepository;
         }
 
-        public HandleState RegenEDocSettle(CreateUpdateSettlementModel model)
+        public async Task<HandleState> GenerateEdoc(CreateUpdateSettlementModel model)
         {
-            var surcharge = surchargetRepo.Get(x => x.SettlementCode == model.Settlement.SettlementNo).ToList();
-            var edocExist = DataContext.Get(x => x.BillingNo == model.Settlement.SettlementNo).GroupBy(x=>x.JobId).ToList();
-            //var imageExist = await sysImageRepo.GetAsync(x => x.ObjectId == model.Settlement.Id.ToString() && x.Folder == "Settlement");
-            var jobOPSSMExist = opsTranRepo.Get(ops => surcharge.Select(x => x.Hblid).Contains(ops.Hblid)).ToList();
-            var jobCSSMExist = cstranDeRepo.Get(cs => surcharge.Select(x => x.Hblid).Contains(cs.Id)).ToList();
-            // get Job Don't have Edoc
-            var jobOPSNotEdoc = jobOPSSMExist.Where(x => !(edocExist.Select(y => (Guid)y.FirstOrDefault().JobId).Contains(x.Id))).Select(x=>x.Id).ToList();
-            var jobCsNotEdoc = jobCSSMExist.Where(x => !(edocExist.Select(y => (Guid)y.FirstOrDefault().JobId).Contains(x.Id))).Select(x => x.JobId).ToList();
-            // update Edoc OPS deon't have
-            jobOPSNotEdoc.ForEach(x =>
+            try
             {
-                edocExist.Where(y => y.FirstOrDefault().JobId != x).ToList().ForEach(z =>
+                var surcharge = surchargetRepo.GetAsync(x => x.SettlementCode == model.Settlement.SettlementNo);
+                var jobCharge = new List<Guid?>();
+                surcharge.Result.ToList().ForEach(x =>
                 {
-                    z.FirstOrDefault().JobId = x;
-                    DataContext.Add(z, false);
-                });
+                    if (x.TransactionType == "CL")
+                    {
+                        jobCharge.Add(opsTranRepo.Get(z => z.JobNo == x.JobNo).FirstOrDefault().Id);
+                    }
+                    else
+                    {
+                        jobCharge.Add(csTranRepo.Get(z => z.JobNo == x.JobNo).FirstOrDefault().Id);
+                    }
 
-            });
-            // update Edoc CS deon't have
-            jobCsNotEdoc.ForEach(x =>
-            {
-                edocExist.Where(y => y.FirstOrDefault().JobId != x).ToList().ForEach(z =>
+                });
+                jobCharge.Distinct();
+                var jobModel = model.ShipmentCharge.Select(x => x.ShipmentId).Distinct().ToList();
+                var jobDel = jobCharge.Where(x => !jobModel.Contains((Guid)x)).Distinct().ToList();
+                var jobAddHBLs = model.ShipmentCharge.Where(x => x.Id == Guid.Empty).Select(x=>x.Hblid);
+                var jobIds = surchargetRepo.Get(x => jobAddHBLs.Contains(x.Hblid)).Select(x => new { x.JobNo,x.TransactionType }).GroupBy(x=>x.JobNo).ToList();
+                var jobAdd = new List<Guid>();
+                jobIds.ForEach(x =>
                 {
-                    z.FirstOrDefault().JobId = x;
-                    DataContext.Add(z, false);
+                    if (x.FirstOrDefault()?.TransactionType == "CL")
+                    {
+                        jobAdd.Add(opsTranRepo.Get(z => z.JobNo == x.FirstOrDefault().JobNo).FirstOrDefault().Id);
+                    }
+                    else
+                    {
+                        jobAdd.Add(csTranRepo.Get(z => z.JobNo == x.FirstOrDefault().JobNo).FirstOrDefault().Id);
+                    }
                 });
-
-            });
-            //get Job Del Edoc
-            var jobOPSDelEdoc = edocExist.Where(x => !(jobOPSSMExist.Select(y=>y.Id).Contains((Guid)x.FirstOrDefault().JobId))).ToList();
-            var jobCsDelEdoc = edocExist.Where(x => !(jobCSSMExist.Select(y => y.JobId).Contains((Guid)x.FirstOrDefault().JobId))).ToList();
-            //delete edoc
-            //jobOPSDelEdoc.ForEach(x =>
-            //{
-            //        DataContext.Delete(z=>z.JobId==x.FirstOrDefault().Id, false);
-            //});
-            //jobCsDelEdoc.ForEach(x =>
-            //{
-            //    DataContext.Delete(z => z.JobId == x.FirstOrDefault().JobId, false);
-            //});
-
-            var result= DataContext.SubmitChanges();
-
-            if (result.Success)
-            {
-                return new HandleState("Can't Gen Edoc");
+                if (jobDel.Count() > 0)
+                {
+                    await DelEdocForJobDel(model.Settlement.SettlementNo, jobDel);
+                }
+                if (jobAdd.Count() > 0)
+                {
+                    await AddEdocForJobDel(model.Settlement.SettlementNo, jobAdd);
+                }
+                return new HandleState();
             }
-            return new HandleState();
+            catch (Exception ex)
+            {
+                new LogHelper("eFMS_LOG_GenEdoc", ex.ToString());
+                return new HandleState(ex.Message);
+            }
+        }
+
+
+        private async Task DelEdocForJobDel(string BillingNo,List<Guid?> JobIds)
+        {
+            await DataContext.DeleteAsync(x => x.BillingNo == BillingNo && JobIds.Contains(x.JobId));
+        }
+        private async Task AddEdocForJobDel(string BillingNo, List<Guid> JobIds)
+        {
+            var EDocAdd = await DataContext.GetAsync(x => x.BillingNo == BillingNo);
+            var EDocAdds = EDocAdd.GroupBy(x => x.SysImageId).Select(x => x.FirstOrDefault()).ToList();
+            JobIds.ForEach(z =>
+            {
+                EDocAdds.ForEach(x =>
+                {
+                    var edoc = x;
+                    edoc.Id = Guid.NewGuid();
+                    edoc.JobId = z;
+                    edoc.BillingNo = BillingNo;
+                    DataContext.Add(edoc,false);
+                });
+            });
+            DataContext.SubmitChanges();
         }
     }
 }
