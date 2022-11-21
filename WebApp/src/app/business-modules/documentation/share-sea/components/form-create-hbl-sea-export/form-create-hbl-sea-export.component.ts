@@ -35,7 +35,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
     @Input() isUpdate: boolean = false;
     @Input() set type(t: string) { this._type = t; }
-
+    @Input() jobId: string='';
     get type() { return this._type; }
 
     private _type: string = ChargeConstants.SFE_CODE; // SLE | SFE
@@ -159,6 +159,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         this.agents = this._store.select(getCatalogueAgentState);
         this.ports = this._store.select(getCataloguePortState);
         this.countries = this._store.select(getCatalogueCountryState);
+        // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
         if (this.isUpdate) {
             this._store.select(fromShareBussiness.getDetailHBlState)
@@ -189,7 +190,6 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         .subscribe(
             (res: any) => {
                 this.shipmentType = res.shipmentType;
-                console.log(this.shipmentType);
             }
         );
     }

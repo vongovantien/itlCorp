@@ -147,8 +147,19 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         if (!this.isUpdate) {
             this.getShipmentAndSetDefault();
         } else {
+            this.getShipmentType();
             this.getDetailHBLState();
         }
+    }
+
+    getShipmentType(){
+        this._store.select(getTransactionDetailCsTransactionState)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
+            (res: any) => {
+                this.shipmentType = res.shipmentType;
+            }
+        );
     }
 
     getShipmentAndSetDefault() {
@@ -162,6 +173,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                         this.jobId = shipment.id;
                         this.shipmentType = shipment.shipmentType;
+                        console.log(this.shipmentType);
                         this.formCreate.patchValue({
                             mawb: shipment.mawb,
                             pod: shipment.pod,
@@ -326,11 +338,11 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.incotermId = this.formCreate.controls['incotermId'];
         this.polDescription = this.formCreate.controls['polDescription'];
         this.podDescription = this.formCreate.controls['podDescription'];
-
+        this.getShipmentType();
     }
 
     onSelectDataFormInfo(data: any, type: string) {
-        console.log(data)
+        // console.log(data)
         switch (type) {
             case 'customer':
                 this._toaster.clear();
@@ -426,14 +438,14 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
             hbltype: data.hbltype,
             freightPayment: data.freightPayment,
-            packageType: data.packageType
+            packageType: data.packageType,
+            shipmentType: this?.shipmentType,
         };
 
         this.formCreate.patchValue(_merge(cloneDeep(data), formValue));
-
-        this._catalogueRepo.getListSalemanByPartner(data.customerId, ChargeConstants.AI_CODE)
+        this._catalogueRepo.GetListSalemanByShipmentType(data.customerId, ChargeConstants.AI_CODE, this.shipmentType)
             .subscribe((salesmans: any) => {
-                this.saleMans = salesmans;
+                this.saleMans = salesmans || [];
             })
     }
 }
