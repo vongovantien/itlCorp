@@ -22,6 +22,7 @@ export * from './combo-grid-virtual-scroll/combogrid-item/combo-grid-item.compon
 export * from './none-record-placeholder/none-record-placeholder.component';
 export { AppDropdownComponent, IDropdownPanel } from './dropdown/dropdown.component';
 export * from './context-menu/context-menu.component';
+export * from './file-icons/file-icon.component';
 
 export * from './popup/index';
 

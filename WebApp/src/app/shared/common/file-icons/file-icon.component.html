@@ -1,0 +1,43 @@
+<span class="m--margin-left-10">
+    <ng-container [ngSwitch]="url | extension">
+        <ng-container *ngSwitchCase="'pdf'">
+            <i class="fa fa-file-pdf-o fa-lg text-danger" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'doc'">
+            <i class="fa fa-file-word-o fa-lg text-primary" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'docx'">
+            <i class="fa fa-file-word-o fa-lg text-primary" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'xlsx'">
+            <i class="fa fa-file-excel-o fa-lg text-success" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'xls'">
+            <i class="fa fa-file-excel-o fa-lg text-success" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'txt'">
+            <i class="fa fa-file-text-o fa-lg text-info" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'jpg'">
+            <i class="fa fa-file-image-o fa-lg text-warning" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'png'">
+            <i class="fa fa-file-image-o fa-lg text-warning" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'html'">
+            <i class="fa fa-file-code-o fa-lg text-black" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'msg'">
+            <i class="fa fa-envelope-o fa-lg text-green" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'zip'">
+            <i class="fa fa-file-archive-o fa-lg text-black" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchCase="'rar'">
+            <i class="fa fa-file-archive-o fa-lg text-black" aria-hidden="true"></i>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+            <i class="fa fa-file fa-lg text-muted" aria-hidden="true"></i>
+        </ng-container>
+    </ng-container>
+</span>

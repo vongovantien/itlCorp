@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -858,9 +860,15 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ReferenceNo).HasMaxLength(100);
+
                 entity.Property(e => e.RemainUsd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.RemainVnd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.Source)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.SurchargeId).IsUnicode(false);
 

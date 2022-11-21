@@ -11,6 +11,7 @@ namespace eFMS.API.SystemFileManagement.Infrastructure
             // Map to entity model
             CreateMap<SysActionFuncLogModel, SysActionFuncLog>();
             CreateMap<SysImage, SysImageModel>().ReverseMap();
+            CreateMap<SysAttachFileTemplate, SysAttachFileTemplateModel>().ReverseMap();
             //CreateMap<AccAccountReceivable, ReceivableTable>();
         }
     }

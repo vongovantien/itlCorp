@@ -4,11 +4,12 @@ import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { CatalogueRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
-import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
+import { IShareBussinessState } from '@share-bussiness';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 import { takeUntil } from 'rxjs/operators';
 import { merge } from 'rxjs';
+import { AppShareHBLBase } from 'src/app/business-modules/share-business/components/hbl/hbl.base';
 
 @Component({
     selector: 'app-air-export-hbl',
