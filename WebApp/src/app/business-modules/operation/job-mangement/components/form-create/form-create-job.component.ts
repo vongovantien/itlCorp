@@ -1,18 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
-import { CommodityGroup, Customer, PortIndex, User, LinkAirSeaModel } from '@models';
-import { IShareBussinessState } from '@share-bussiness';
-import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueCarrierState, getCatalogueAgentState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState } from '@store';
-import { CommonEnum } from '@enums';
+import { AppForm } from '@app';
 import { ComboGridVirtualScrollComponent, InfoPopupComponent } from '@common';
 import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { CommodityGroup, Customer, LinkAirSeaModel, PortIndex, User } from '@models';
+import { Store } from '@ngrx/store';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
+import { IShareBussinessState } from '@share-bussiness';
+import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState } from '@store';
 import { FormValidators } from '@validators';
-import { AppForm } from '@app';
 
-import { Observable } from 'rxjs';
-import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 @Component({
@@ -42,6 +42,10 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     commodityGroupId: AbstractControl;
     shipmentType: AbstractControl;
     salemansId: AbstractControl;
+    eta: AbstractControl;
+    deliveryDate: AbstractControl;
+    suspendTime: AbstractControl;
+    clearanceDate: AbstractControl;
 
     productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
@@ -186,7 +190,13 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             billingOpsId: [this.userLogged.id, Validators.required],
             salemansId: [null, Validators.required],
             isReplicate: [false],
-            noProfit: [false]
+            noProfit: [false],
+            eta: [null],
+            deliveryDate: [null],
+            suspendTime: [null, Validators.compose([
+                Validators.maxLength(150),
+            ])],
+            clearanceDate: [null],
 
         }, { validator: FormValidators.comparePort });
 
@@ -205,7 +215,10 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.billingOpsId = this.formCreate.controls['billingOpsId'];
         this.shipmentType = this.formCreate.controls['shipmentType'];
         this.salemansId = this.formCreate.controls['salemansId'];
-
+        this.eta = this.formCreate.controls['eta'];
+        this.deliveryDate = this.formCreate.controls['deliveryDate'];
+        this.suspendTime = this.formCreate.controls['suspendTime'];
+        this.clearanceDate = this.formCreate.controls['clearanceDate'];
     }
 
     getASInfoToLink() {

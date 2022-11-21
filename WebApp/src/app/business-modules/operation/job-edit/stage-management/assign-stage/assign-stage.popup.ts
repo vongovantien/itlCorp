@@ -1,12 +1,11 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { PopupBase } from 'src/app/popup.base';
-import { CatalogueRepo, SystemRepo, OperationRepo } from 'src/app/shared/repositories';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 import { catchError, map } from 'rxjs/operators';
-import { User, OpsTransaction } from 'src/app/shared/models';
+import { PopupBase } from 'src/app/popup.base';
+import { OpsTransaction, User } from 'src/app/shared/models';
+import { CatalogueRepo, OperationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
-import { ToastrService } from 'ngx-toastr';
-import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'asign-stage-popup',
@@ -111,7 +110,6 @@ export class AssignStagePopupComponent extends PopupBase {
             mainPersonInCharge: this.selectedUserData.id,
             description: this.description,
             isUseReplicate: this.isAssignReplicateJob,
-            type: 'User'
         };
         this._operationRepo.assignStageOPS(body).pipe(catchError(this.catchError))
             .subscribe(
@@ -164,5 +162,4 @@ interface IAssignStage {
     mainPersonInCharge: string;
     description: string;
     isUseReplicate: boolean;
-    type: string;
 }

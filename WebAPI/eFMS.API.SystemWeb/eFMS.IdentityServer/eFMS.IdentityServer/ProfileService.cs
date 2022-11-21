@@ -75,6 +75,7 @@ namespace eFMS.IdentityServer
                     new Claim("officeCode", office.Code),
                     new Claim("signatureImage", employee.SignatureImage ?? ""),
                     new Claim("userType", user.UserType),
+                    new Claim("officeType", office.OfficeType ?? ""),
                     companyClaim,
                     officeClaim,
                     departmentclaim,

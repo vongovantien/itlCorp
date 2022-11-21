@@ -39,6 +39,26 @@ namespace eFMS.API.Common.Helpers
             }
         }
 
+        public FileContentResult ExportExcel(string refNo, Stream stream, string fileName)
+        {
+            var buffer = stream as MemoryStream;
+            var dateCurr = DateTime.Now.ToString("ddMMyy");
+            if (!string.IsNullOrEmpty(refNo))
+            {
+
+                return File(
+                            buffer.ToArray(),
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            fileName += "-" + dateCurr + "-" + refNo + ".xlsx"
+                        );
+            }
+            return File(
+                buffer.ToArray(),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileName += "-" + dateCurr + ".xlsx"
+            );
+        }
+
         public async Task<FileStreamResult> ExportExcel(string pathTeamplate, string fileName)
         {
             try

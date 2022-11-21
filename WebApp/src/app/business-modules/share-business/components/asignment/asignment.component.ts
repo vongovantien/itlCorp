@@ -1,5 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { ConfirmPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -7,7 +8,6 @@ import { getCurrentUserState, IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { Stage } from 'src/app/shared/models';
 import { DocumentationRepo, OperationRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
@@ -22,10 +22,9 @@ import { ShareBusinessStageManagementDetailComponent } from '../stage-management
 
 export class ShareBusinessAsignmentComponent extends AppList {
 
-    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(ShareBusinessStageManagementDetailComponent) popupDetail: ShareBusinessStageManagementDetailComponent;
     @ViewChild(ShareBusinessAssignStagePopupComponent) assignStagePopup: ShareBusinessAssignStagePopupComponent;
-    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(InjectViewContainerRefDirective) confirmContainerRef: InjectViewContainerRefDirective;
 
     data: any = null;
     jobId: string = '';
@@ -51,8 +50,8 @@ export class ShareBusinessAsignmentComponent extends AppList {
         super();
         this._progressRef = this._ngProgressService.ref();
         this.headers = [
-            { title: 'Action', field: 'status' },
-            { title: 'No', field: 'orderNumberProcessed' },
+            { title: 'Action', field: 'status', width: 10 },
+            { title: 'No', field: 'orderNumberProcessed', width: 20 },
             { title: 'Person Incharge', field: 'mainPersonInCharge', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
             { title: 'Code', field: 'stageCode', sortable: true },
@@ -142,14 +141,14 @@ export class ShareBusinessAsignmentComponent extends AppList {
         );
     }
 
-    showDeletePopup(data: any) {
-        this.confirmDeletePopup.show();
+    onDeleteStage(data: any) {
         this.selectedStage = data;
-    }
-
-    onDeleteStage() {
-        this.confirmDeletePopup.hide();
-        this.deleteStageAssigned(this.selectedStage.id);
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+            body: 'Do you want to delete this stage ?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.deleteStageAssigned(this.selectedStage.id);
+        })
     }
 
     deleteStageAssigned(id: string) {

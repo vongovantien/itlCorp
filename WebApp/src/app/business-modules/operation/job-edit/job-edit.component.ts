@@ -1,33 +1,33 @@
-import { getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
-import { finalize, mergeMap } from 'rxjs/operators';
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
-import { AbstractControl } from '@angular/forms';
-import { Store, ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AbstractControl } from '@angular/forms';
+import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
+import { getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
 
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
-import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
 import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent, SubHeaderComponent } from '@common';
-import { OpsTransaction, CsTransactionDetail, CsTransaction, Container, Crystal } from '@models';
 import { CommonEnum } from '@enums';
-import { OPSTransactionGetDetailSuccessAction } from '../store';
 import { InjectViewContainerRefDirective } from '@directives';
 import { RoutingConstants, JobConstants, SystemConstants } from '@constants';
 import { ICanComponentDeactivate } from '@core';
 import { AppForm } from '@app';
+import { Container, Crystal, CsTransaction, CsTransactionDetail, OpsTransaction } from '@models';
+import { ShareBussinessContainerListPopupComponent, ShareBussinessSellingChargeComponent } from '@share-bussiness';
+import { OPSTransactionGetDetailSuccessAction } from '../store';
 
-import { JobManagementFormEditComponent, ILinkAirSeaInfoModel } from './components/form-edit/form-edit.component';
+import { ILinkAirSeaInfoModel, JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 
-import { catchError, map, takeUntil, tap, switchMap, concatMap } from 'rxjs/operators';
 import { combineLatest, Observable, of } from 'rxjs';
+import { catchError, concatMap, map, switchMap, takeUntil, tap, mergeMap, finalize } from 'rxjs/operators';
 import * as fromShareBussiness from './../../share-business/store';
 
 
 import _groupBy from 'lodash/groupBy';
 import isUUID from 'validator/lib/isUUID';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http'; import { ICrystalReport } from '@interfaces';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 @Component({
     selector: 'app-ops-module-billing-job-edit',
@@ -327,6 +327,10 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.commodityGroupId = form.commodityGroupId;
         this.opsTransaction.shipmentType = form.shipmentType;
         this.opsTransaction.noProfit = form.noProfit;
+        this.opsTransaction.eta = !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null;
+        this.opsTransaction.deliveryDate = !!form.deliveryDate && !!form.deliveryDate.startDate ? formatDate(form.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null;
+        this.opsTransaction.clearanceDate = !!form.clearanceDate && !!form.clearanceDate.startDate ? formatDate(form.clearanceDate.startDate, 'yyyy-MM-dd', 'en') : null;
+        this.opsTransaction.suspendTime = form.suspendTime;
 
         if ((!!this.editForm.shipmentNo || !!this.opsTransaction.serviceNo) && form.shipmentMode === 'Internal'
             && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
@@ -489,7 +493,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             supplierName: this.opsTransaction.supplierName,
                             coloaderId: this.opsTransaction.supplierId,
                             mawb: this.opsTransaction.mblno,
-                            noProfit: this.opsTransaction.noProfit
+                            noProfit: this.opsTransaction.noProfit,
+                            eta: this.opsTransaction.eta,
+                            deliveryDate: this.opsTransaction.deliveryDate,
+                            suspendTime: this.opsTransaction.suspendTime,
+                            clearanceDate: this.opsTransaction.clearanceDate
                         }));
 
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(csTransation));
