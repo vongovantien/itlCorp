@@ -75,13 +75,13 @@ namespace eFMS.API.Accounting.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.0.120; Database=eFMS_20220617; User ID=eFMS-Admin; Password=eFMS@dm!n20");
+                optionsBuilder.UseSqlServer("Server=efms-db.itlvn.com; Database=eFMS; User ID=eFMS-Admin; Password=eFMS@dm!n20");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AccAccountPayable>(entity =>
             {
@@ -1908,6 +1908,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.DebitAmount).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.Description).HasColumnType("text");
+
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
 
                 entity.Property(e => e.EmailAddress)
@@ -1917,6 +1919,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
 
                 entity.Property(e => e.FirstShipmentDate).HasColumnType("datetime");
+
+                entity.Property(e => e.NoDue).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
@@ -3534,6 +3538,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.DocumentType)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
 
                 entity.Property(e => e.ExportCountryCode)
                     .HasMaxLength(50)
