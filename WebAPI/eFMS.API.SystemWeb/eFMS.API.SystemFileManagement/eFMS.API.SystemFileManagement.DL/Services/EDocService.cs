@@ -260,14 +260,23 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         else
                         {
                             string bilingNo = string.Empty;
-                            var models = GetTransactionTypeJobBillingModel(type, edoc.BillingId);
+                            var models = new List<TransctionTypeJobModel>();
+                            if (edoc.JobId != null && edoc.JobId != Guid.Empty)
+                            {
+                                models = GetTransactionTypeJobBillingModel(type, edoc.BillingId).Where(x => x.JobId == edoc.JobId).ToList();
+                            }
+                            else
+                            {
+                                models = GetTransactionTypeJobBillingModel(type, edoc.BillingId);
+                            }
+                            //var models = GetTransactionTypeJobBillingModel(type, edoc.BillingId);
 
                             if (models.Count > 0)
                             {
                                 foreach (var item in models)
                                 {
                                     var attachTemplate = _attachFileTemplateRepo.Get(x => x.TransactionType == item.TransactionType && x.Code == edoc.Code).FirstOrDefault();
-
+                                    
                                     var imageDetail = new SysImageDetail
                                     {
                                         SysImageId = imageID,
@@ -572,12 +581,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 var edocLst = lstEdoc.OrderBy(x => x.DatetimeCreated).GroupBy(x => x.SysImageId).ToList();
                 edocLst.ForEach(x =>
                 {
-                    var tottalItem = _sysImageDetailRepo.Get(z => z.SysImageId == x.FirstOrDefault().SysImageId).ToList();
-                    if (tottalItem.Count() == 1)
+                    if (x.Count() == 1)
                     {
                         lstEdocModel.Add(x.FirstOrDefault());
                     }
-                    else if (tottalItem.Count() > 1)
+                    else if (x.Count() > 1)
                     {
                         //var item = x.FirstOrDefault();
                         var edoc = new SysImageDetailModel()
@@ -597,7 +605,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             Source = x.FirstOrDefault()?.Source,
                             AccountingType = x.FirstOrDefault()?.AccountingType,
                             DatetimeCreated = x.FirstOrDefault()?.DatetimeCreated,
-                            Note = x.FirstOrDefault()?.Note,
+                            Note = x.Count() > 1 ? null : x.FirstOrDefault()?.Note,
                             Id = x.FirstOrDefault().Id,
                         };
                         lstEdocModel.Add(edoc);
@@ -676,9 +684,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserCreated = x.FirstOrDefault().UserCreated,
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
-                        Note = x.FirstOrDefault().Note,
-                        HBLNo = jobDetail != null ? jobDetail.HBLNo : null,
-                        JobNo = jobDetail != null ? jobDetail.JobNo : null,
+                        Note = x.Count() > 1 ? null:x.FirstOrDefault().Note,
+                        HBLNo = x.Count() > 1?null:jobDetail != null ? jobDetail.HBLNo : null,
+                        JobNo = x.Count() > 1?null:jobDetail != null ? jobDetail.JobNo : null,
                     };
                     lstEdoc.Add(edoc);
                 }
@@ -753,9 +761,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserCreated = x.FirstOrDefault().UserCreated,
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
-                        Note = x.FirstOrDefault().Note,
-                        HBLNo = jobDetail != null ? jobDetail.HBLNo : null,
-                        JobNo = jobDetail != null ? jobDetail.JobNo : null,
+                        Note = x.Count() > 1 ? null : x.FirstOrDefault().Note,
+                        HBLNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
+                        JobNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
                     };
                     lstEdoc.Add(edoc);
                 }
@@ -970,12 +978,21 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 prefixs = _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType).Select(x => x.Code).OrderBy(x => x.Length).ToList(); prefixs = _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType).Select(x => x.Code).OrderBy(x => x.Length).ToList();
             }
             string code = null;
-            for (int i = 0; i < prefixs.Count; i++)
+            if (fileName.Split('_').Count() > 0)
             {
-                if (!string.IsNullOrEmpty(prefixs[i]) && fileName.Contains(prefixs[i]))
+                var fileNameSplit = fileName.Split('_').ToList().Last();
+                var preFixFileName= fileName.Replace(fileNameSplit,"");
+                for (int i = 0; i < prefixs.Count; i++)
                 {
-                    code = prefixs[i];
+                    if (!string.IsNullOrEmpty(prefixs[i]) && preFixFileName.Contains(prefixs[i]))
+                    {
+                        code = prefixs[i];
+                    }
                 }
+            }
+            else
+            {
+                return '_' + fileName;
             }
             //prefixs.ForEach(x =>
             //{
