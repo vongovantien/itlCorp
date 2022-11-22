@@ -250,7 +250,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this.customDeclaration.clearanceNo = !!form.clearanceNo ? form.clearanceNo.trim() : null;
         this.customDeclaration.partnerTaxCode = !!this.taxCode ? this.taxCode : this.customDeclaration.partnerTaxCode;
         this.customDeclaration.clearanceDate = !!form.clearanceDate && !!form.clearanceDate.startDate ? formatDate(form.clearanceDate.startDate, 'yyyy-MM-dd', 'en') : null;
-        this.customDeclaration.eta = !!form.clearanceDate && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null;
+        this.customDeclaration.eta = !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null;
         this.customDeclaration.hblid = !!form.hblid ? form.hblid.trim() : null;
         this.customDeclaration.mblid = !!form.mblid ? form.mblid.trim() : null;
         this.customDeclaration.gateway = form.gateway;
