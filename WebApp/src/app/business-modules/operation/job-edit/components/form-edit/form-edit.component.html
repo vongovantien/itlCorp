@@ -567,10 +567,13 @@
                     <textarea formControlName="note" name="note" placeholder="Note" class="form-control"></textarea>
                 </div>
             </div>
-            <div class="col-4" *ngIf="opsTransaction">
-                <div class="text-right" *ngIf="!opsTransaction.isLocked">
-                    <div class="m--margin-bottom-15 m--margin-top-25" *ngIf="opsTransaction.permission.allowUpdate">
-                        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        &nbsp;
+                    </label>
+                    <div class="row justify-content-end">
+                        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
                             (click)="showListContainer()">
                             <span>
                                 <i class="la la-list"></i>

@@ -76,6 +76,7 @@ export class JobManagementCreateJobComponent extends AppForm {
 
         if (!this.checkValidateForm()) {
             this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: this.invalidFormText,
                 title: 'Cannot Create Job'
             });
             return;

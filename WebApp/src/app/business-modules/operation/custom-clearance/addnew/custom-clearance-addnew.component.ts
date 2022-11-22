@@ -9,6 +9,7 @@ import { CustomClearanceFormDetailComponent } from '../components/form-detail-cl
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { SystemConstants } from '@constants';
 import { getCurrentUserState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
 
@@ -26,7 +27,7 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
         private _store: Store<IAppState>,
         private _toastr: ToastrService) {
         super();
-        
+
     }
 
     ngOnInit() {

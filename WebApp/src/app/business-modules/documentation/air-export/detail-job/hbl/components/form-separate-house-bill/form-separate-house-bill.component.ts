@@ -38,7 +38,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _exportRepo: ExportRepo,
-        protected _fileMngtRepo: SystemFileManageRepo
+        protected _fileMngtRepo: SystemFileManageRepo,
     ) {
         super(
             _activedRoute,

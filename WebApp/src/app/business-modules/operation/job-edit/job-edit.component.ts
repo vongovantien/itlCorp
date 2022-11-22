@@ -1,28 +1,30 @@
-import { getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
-import { finalize, mergeMap } from 'rxjs/operators';
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { AbstractControl } from '@angular/forms';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
+import { getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
 
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
-import { ShareBussinessSellingChargeComponent, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
 import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent, SubHeaderComponent } from '@common';
-import { OpsTransaction, CsTransactionDetail, CsTransaction, Container, Crystal } from '@models';
 import { CommonEnum } from '@enums';
-import { OPSTransactionGetDetailSuccessAction } from '../store';
 import { InjectViewContainerRefDirective } from '@directives';
 import { RoutingConstants, JobConstants, SystemConstants } from '@constants';
 import { ICanComponentDeactivate } from '@core';
 import { AppForm } from '@app';
 
-import { JobManagementFormEditComponent, ILinkAirSeaInfoModel } from './components/form-edit/form-edit.component';
 
-import { catchError, map, takeUntil, tap, switchMap, concatMap } from 'rxjs/operators';
+import { Container, Crystal, CsTransaction, CsTransactionDetail, OpsTransaction } from '@models';
+import { ShareBussinessContainerListPopupComponent, ShareBussinessSellingChargeComponent } from '@share-bussiness';
+import { OPSTransactionGetDetailSuccessAction } from '../store';
+
+import { ILinkAirSeaInfoModel, JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
+
 import { combineLatest, Observable, of } from 'rxjs';
+import { catchError, concatMap, map, switchMap, takeUntil, tap, mergeMap, finalize } from 'rxjs/operators';
 import * as fromShareBussiness from './../../share-business/store';
+
 
 import _groupBy from 'lodash/groupBy';
 import isUUID from 'validator/lib/isUUID';
