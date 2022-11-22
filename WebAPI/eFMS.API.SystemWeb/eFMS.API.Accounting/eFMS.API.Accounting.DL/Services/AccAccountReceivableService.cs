@@ -1298,17 +1298,34 @@ namespace eFMS.API.Accounting.DL.Services
             DebitAmountDetail debitAmountDetail = new DebitAmountDetail();
             var contract = contractPartnerRepo.Get(x => x.Id == criteria.AgreementId).FirstOrDefault();
             var partner = partnerRepo.Get(x => x.Id == criteria.PartnerId.ToString()).FirstOrDefault();
-            debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
+            if (criteria.AgreementId != null)
             {
-                ContractNo = contract.ContractNo,
-                EffectiveDate = contract.EffectiveDate,
-                ContracType = contract.ContractType,
-                ExpiredDate = contract.ExpiredDate,
-                PartnerCode = partner.TaxCode,
-                PartnerName = partner.ShortName,
-                Currency = contract.CurrencyId
-            };
-            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId(criteria.AgreementId, criteria.PartnerId, criteria.AgreementSalesmanId).ToList();
+                debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
+                {
+                    ContractNo = contract.ContractNo,
+                    EffectiveDate = contract.EffectiveDate,
+                    ContracType = contract.ContractType,
+                    ExpiredDate = contract.ExpiredDate,
+                    PartnerCode = partner.TaxCode,
+                    PartnerName = partner.ShortName,
+                    Currency = contract.CurrencyId
+                };
+            }
+            else
+            {
+                criteria.AgreementId = Guid.Empty;
+                debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
+                {
+                    ContractNo = null,
+                    EffectiveDate = null,
+                    ContracType = null,
+                    ExpiredDate = null,
+                    PartnerCode = partner.TaxCode,
+                    PartnerName = partner.ShortName,
+                    Currency = null
+                };
+            }
+            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId((Guid)criteria.AgreementId, criteria.PartnerId, criteria.AgreementSalesmanId).ToList();
             //debitAmountDetail.DebitAmountDetails.ForEach(x =>
             //{
             //    if (!checkingPaidLoop2(x.AcctManagementID)) debitAmountDetail.DebitAmountDetails.Remove(x);
