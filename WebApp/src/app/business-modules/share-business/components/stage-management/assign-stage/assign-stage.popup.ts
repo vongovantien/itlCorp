@@ -1,4 +1,3 @@
-import { X } from '@angular/cdk/keycodes';
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -49,8 +48,9 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     description: string = '';
     isSubmitted: boolean = false;
     jobId: string = '';
-    isAsignment: boolean = false;
+    isAssignment: boolean = false;
     houseBillList: CsTransactionDetail[];
+    houseBills: CsTransactionDetail[];
     selectedHbl: CsTransactionDetail[];
 
     constructor(
@@ -110,33 +110,31 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     }
 
     assignStage() {
-
-
-        // this.isSubmitted = true;
-        // if (!this.selectedUser.value || !this.selectedStage.value) {
-        //     return;
-        // }
-        // const body: IAssignStage = {
-        //     id: "00000000-0000-0000-0000-000000000000",
-        //     jobId: this.jobId,
-        //     hblId: null,
-        //     stageId: this.selectedStageData.id,
-        //     mainPersonInCharge: this.selectedUserData.id,
-        //     description: this.description,
-        //     type: 'User'
-        // };
-        // this._operationRepo.assignStageOPS(body).pipe(catchError(this.catchError))
-        //     .subscribe(
-        //         (res: CommonInterface.IResult) => {
-        //             if (res.status) {
-        //                 this._toastService.success(res.message);
-        //                 this.onAssign.emit(this.selectedStageData.jobId);
-        //                 this.closePopup();
-        //             } else {
-        //                 this._toastService.warning(res.message);
-        //             }
-        //         },
-        //     );
+        this.isSubmitted = true;
+        if (!this.selectedUser.value || !this.selectedStage.value) {
+            return;
+        }
+        const body: IAssignStage = {
+            id: "00000000-0000-0000-0000-000000000000",
+            jobId: this.jobId,
+            hblId: null,
+            stageId: this.selectedStageData.id,
+            mainPersonInCharge: this.selectedUserData.id,
+            description: this.description,
+            type: 'User'
+        };
+        this._operationRepo.assignStageOPS(body).pipe(catchError(this.catchError))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.onAssign.emit(this.selectedStageData.jobId);
+                        this.closePopup();
+                    } else {
+                        this._toastService.warning(res.message);
+                    }
+                },
+            );
     }
 
     onRemoveData(type: string) {
@@ -174,6 +172,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
                     if (!!res) {
                         this.houseBillList = [new CsTransactionDetail({ id: 'All', hwbno: 'All' })]
                         this.houseBillList = this.houseBillList.concat(res);
+                        this.houseBills = this.houseBillList
                         console.log(this.houseBillList)
                     }
                 }
@@ -185,22 +184,22 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 
         // * Reset value
         this.description = '';
-        // this.selectedUser = null;
         this.selectedStage = {};
         this.selectedUser = {};
         this.isSubmitted = false;
     }
 
     onSelectDataFormInfo($event: CsTransactionDetail[]) {
+        console.log($event)
         if ($event.length > 0) {
             if ($event[$event.length - 1].id === 'All') {
-                this.selectedHbl = this.houseBillList.filter(x => x.id !== 'All')
-                this.houseBillList = this.houseBillList.filter(x => x)
+                this.houseBills = this.houseBillList.filter(x => x.id === 'All');
             }
             else {
-                this.houseBillList = this.houseBillList.concat($event);
-                console.log(this.houseBillList)
+                this.houseBills = this.houseBillList.filter(x => x.id !== 'All');
             }
+            console.log(this.houseBillList)
+            console.log(this.houseBills)
         }
     }
 
