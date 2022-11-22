@@ -602,15 +602,15 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                var contracts = contractRepository.Get(x => x.PartnerId == partnerId && x.Active == true);
-                if (contracts.Count() > 1)
-                {
-                    contract = contracts.FirstOrDefault(x => x.SaleManId == saleman);
-                }
-                else
-                {
-                    contract = contracts.FirstOrDefault();
-                }
+                var contracts = contractRepository.Get(x => x.PartnerId == partnerId && x.Active == true && x.SaleManId == saleman)?.FirstOrDefault();
+                //if (contracts.Count() > 1)
+                //{
+                //    contract = contracts.FirstOrDefault(x => x.SaleManId == saleman);
+                //}
+                //else
+                //{
+                //    contract = contracts.FirstOrDefault();
+                //}
             }
             return contract;
         }
