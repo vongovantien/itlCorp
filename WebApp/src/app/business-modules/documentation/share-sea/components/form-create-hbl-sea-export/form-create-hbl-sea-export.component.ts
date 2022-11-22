@@ -401,7 +401,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     updateFormValue(data: CsTransactionDetail) {
         this.customerName = data.customerName;
         this.shipperName = data.shipperName;
-
+        this.shipmentType = data.shipmentType;
         const formValue = {
             closingDate: !!data.closingDate ? { startDate: new Date(data.closingDate), endDate: new Date(data.closingDate) } : null,
             sailingDate: !!data.sailingDate ? { startDate: new Date(data.sailingDate), endDate: new Date(data.sailingDate) } : null,
