@@ -590,7 +590,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 else {
                     this.isCheckedActive = false;
                     this.formGroup.get('mawb').setValidators([
-                        Validators.required,
+                        FormValidators.required,
                         Validators.pattern(SystemConstants.CPATTERN.MAWB),
                         FormValidators.validateMAWB,
                         FormValidators.validateSpecialChar
