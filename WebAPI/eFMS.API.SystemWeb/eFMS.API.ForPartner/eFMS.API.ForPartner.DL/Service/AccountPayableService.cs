@@ -998,15 +998,15 @@ namespace eFMS.API.ForPartner.DL.Service
                     if (payable.Currency == ForPartnerConstants.CURRENCY_LOCAL)
                     {
                         creditDetail.RemainVnd = (creditDetail.RemainVnd ?? 0) == 0 ? (creditDetail.RemainVnd ?? 0) : ((creditDetail.RemainVnd ?? 0) - payable.PaymentAmountVnd);
-                        creditDetail.RemainUsd = ((creditDetail.RemainVnd ?? 0) == 0 || (creditDetail.RemainUsd ?? 0) == 0) ? (creditDetail.RemainUsd ?? 0) : ((creditDetail.RemainUsd ?? 0) - payable.PaymentAmountUsd);
+                        creditDetail.RemainVnd = creditDetail.RemainVnd < 0 ? 0 : creditDetail.RemainVnd;
+                        creditDetail.RemainUsd = ((creditDetail.RemainVnd ?? 0) == 0 || (creditDetail.RemainUsd ?? 0) == 0) ? 0 : ((creditDetail.RemainUsd ?? 0) - payable.PaymentAmountUsd);
                     }
                     else
                     {
                         creditDetail.RemainUsd = (creditDetail.RemainUsd ?? 0) == 0 ? (creditDetail.RemainUsd ?? 0) : ((creditDetail.RemainUsd ?? 0) - payable.PaymentAmountUsd);
-                        creditDetail.RemainVnd = ((creditDetail.RemainUsd ?? 0) == 0 || creditDetail.RemainVnd == 0) ? (creditDetail.RemainVnd ?? 0) : ((creditDetail.RemainVnd ?? 0) - payable.PaymentAmountVnd);
+                        creditDetail.RemainUsd = creditDetail.RemainUsd < 0 ? 0 : creditDetail.RemainUsd;
+                        creditDetail.RemainVnd = ((creditDetail.RemainUsd ?? 0) == 0 || creditDetail.RemainVnd == 0) ? 0 : ((creditDetail.RemainVnd ?? 0) - payable.PaymentAmountVnd);
                     }
-                    creditDetail.RemainVnd = creditDetail.RemainVnd < 0 ? 0 : creditDetail.RemainVnd;
-                    creditDetail.RemainUsd = creditDetail.RemainUsd < 0 ? 0 : creditDetail.RemainUsd;
 
                     payable.PaymentAmountVnd = remainPaymentVnd < 0 ? Math.Abs(remainPaymentVnd ?? 0) : 0;
                     payable.PaymentAmountUsd = remainPaymentUsd < 0 ? Math.Abs(remainPaymentUsd ?? 0) : 0;
