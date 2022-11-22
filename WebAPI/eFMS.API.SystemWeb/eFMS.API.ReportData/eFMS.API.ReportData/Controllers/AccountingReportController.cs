@@ -756,6 +756,10 @@ namespace eFMS.API.ReportData.Controllers
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             //var responseFromApi = await HttpServiceExtension.PostAPI(agreementId, aPis.AccountingAPI + Urls.Accounting.GetDetailARByArgeementIdUrl,accessToken);
+            if (criteria.ArSalesmanId != null)
+            {
+                criteria.AgreementSalesmanId = (Guid)criteria.ArSalesmanId;
+            }
             var responseFromApi = await HttpServiceExtension.PostAPI(criteria,aPis.AccountingAPI + Urls.Accounting.GetDetailARByArgeementIdUrl,accessToken);
             #region -- Ghi Log Report --
             var reportLogModel = new SysReportLogModel
