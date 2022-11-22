@@ -113,14 +113,14 @@
                                         {{item.totalPaidVnd | number:'1.0-2'}}
                                     </ng-container>
                                 </td>
-                                <td class="text-center" *ngIf="(receiptType$ | async) !=='CUSTOMER'">
+                                <!-- <td class="text-center" *ngIf="(receiptType$ | async) !=='CUSTOMER'">
                                     <ng-container *ngIf="item.paymentType === 'DEBIT' && (receiptType$ | async) !=='CUSTOMER'">
                                         <app-switch size="sm" class="danger"
                                             (toggleChange)="onToggleNetOfOnly($event, item)" [ngModel]="item.netOff"
                                             [disabled]="isReadonly">
                                         </app-switch>
                                     </ng-container>
-                                </td>
+                                </td> -->
                                 <td ALIGN="right">
                                     <div *ngIf="item.paymentType !== 'OTHER'">
                                         {{(item.unpaidAmountUsd - item.totalPaidUsd) | negativeNumber: '.2-2'}}
@@ -176,7 +176,7 @@
                             <td rowspan="4" ALIGN="center" class="text-right">
                                 {{sumTotalObj.totalPaidVnd | number: '1.0-2'}} VND
                             </td>
-                            <td *ngIf="(receiptType$ | async) !=='CUSTOMER'"></td>
+                            <!-- <td *ngIf="(receiptType$ | async) !=='CUSTOMER'"></td> -->
                             <td ALIGN="right">
                                 <ng-container *ngIf="sumTotalObj.totalRemainUsd > 0; else TplnegativeRemainUsd">
                                     {{sumTotalObj.totalRemainUsd | number:'.2-2'}} USD

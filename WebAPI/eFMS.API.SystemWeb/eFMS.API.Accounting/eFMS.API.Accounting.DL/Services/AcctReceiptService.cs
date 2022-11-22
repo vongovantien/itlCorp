@@ -1063,7 +1063,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu hđ tạm tiếp theo sau.
                                 remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu hđ tạm tiếp theo sau.
 
-                                if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF)
+                                if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF && receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE)
                                 {
                                     _paymentOBH.NetOffUsd = _paymentOBH.TotalPaidUsd;
                                     _paymentOBH.NetOffVnd = _paymentOBH.TotalPaidVnd;
@@ -1083,7 +1083,7 @@ namespace eFMS.API.Accounting.DL.Services
                             remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0;
                             remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0;
 
-                            if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF)
+                            if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF && receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE)
                             {
                                 _paymentOBH.NetOffUsd = _paymentOBH.TotalPaidUsd;
                                 _paymentOBH.NetOffVnd = _paymentOBH.TotalPaidVnd;
@@ -1108,7 +1108,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0;
                                 remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0;
 
-                                if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF)
+                                if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF && receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE)
                                 {
                                     _paymentOBH.NetOffUsd = _paymentOBH.TotalPaidUsd;
                                     _paymentOBH.NetOffVnd = _paymentOBH.TotalPaidVnd;
@@ -1126,7 +1126,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0;
                                 remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0;
 
-                                if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF)
+                                if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF && receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE)
                                 {
                                     _paymentOBH.NetOffUsd = _paymentOBH.TotalPaidUsd;
                                     _paymentOBH.NetOffVnd = _paymentOBH.TotalPaidVnd;
@@ -1146,7 +1146,7 @@ namespace eFMS.API.Accounting.DL.Services
                             remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0;
                             remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0;
 
-                            if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF)
+                            if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF && receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE)
                             {
                                 _paymentOBH.NetOffUsd = _paymentOBH.TotalPaidUsd;
                                 _paymentOBH.NetOffVnd = _paymentOBH.TotalPaidVnd;
@@ -1224,7 +1224,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.PartnerId = receipt.CustomerId;
                 _payment.PaymentType = payment.PaymentType;
                 _payment.NetOff = payment.NetOff;
-                if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF)
+                if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF && receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE)
                 {
                     _payment.NetOffUsd = payment.TotalPaidUsd;
                     _payment.NetOffVnd = payment.TotalPaidVnd;

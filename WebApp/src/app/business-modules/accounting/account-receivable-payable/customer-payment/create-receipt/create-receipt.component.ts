@@ -612,6 +612,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     onChangePaymentMethod(){
-        this.formCreate.getPaymentMethod();
+        this.formCreate.getRequireAgreementAgent();
     }
 }

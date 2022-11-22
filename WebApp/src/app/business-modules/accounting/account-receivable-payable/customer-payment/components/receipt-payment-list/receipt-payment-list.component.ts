@@ -316,6 +316,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     }
                 }
             });
+        this._store.dispatch(SelectReceiptPaymentMethod({ paymentMethod: this.paymentMethod.value }));
     }
 
     async generateExchangeRate(date: string, curreny: string = 'USD') {

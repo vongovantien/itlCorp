@@ -39,7 +39,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         { title: 'NetOff VND', field: '', width: 150, align: this.right },
         { title: 'Total Paid USD', field: '', width: 150, align: this.right },
         { title: 'Total Paid VND', field: '', width: 150, align: this.right },
-        { title: 'NetOff Only', field: '', width: 150 },
+        // { title: 'NetOff Only', field: '', width: 150 },
         { title: 'Remain USD', field: '', width: 150, align: this.right },
         { title: 'Remain VND', field: '', width: 150, align: this.right },
         { title: 'Note', field: '', width: 200 },
@@ -208,7 +208,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                 break;
 
             case 'netOffVnd':
-                if (!!this.isAutoConvert) {
+                if (!!this.isAutoConvert && !this.isTypeAgent) {
                     if (!!item.exchangeRateBilling) {
                         item.netOffUsd = +((+item.netOffVnd / item.exchangeRateBilling).toFixed(2));
                     } else {
@@ -222,7 +222,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
                 break;
             case 'netOffUsd':
-                if (!!this.isAutoConvert) {
+                if (!!this.isAutoConvert && !this.isTypeAgent) {
                     if (!!item.exchangeRateBilling) {
                         item.netOffVnd = +((+item.netOffUsd * item.exchangeRateBilling).toFixed(2));
                     } else {

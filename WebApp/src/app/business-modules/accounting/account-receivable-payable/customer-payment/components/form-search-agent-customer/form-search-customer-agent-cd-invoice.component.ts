@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { ChargeConstants, JobConstants } from '@constants';
+import { AccountingConstants, ChargeConstants, JobConstants } from '@constants';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { AppForm } from '@app';
@@ -8,11 +8,11 @@ import { Partner, Office } from '@models';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 
-import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState } from '../../store/reducers';
+import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState, ReceiptClassState, ReceiptPaymentMethodState } from '../../store/reducers';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { IReceiptState } from '../../store/reducers/customer-payment.reducer';
 
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { takeUntil, switchMap, tap, filter, startWith, map } from 'rxjs/operators';
 import { SelectPartnerReceipt } from '../../store/actions';
 import { getCurrentUserState } from '@store';
@@ -185,11 +185,41 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
 
                     } else {
                         this.partnerId.setValue(null);
-                        this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
+                        const isRequireAgreement: boolean = this.isRequireAgreementAgent();
+                        if(isRequireAgreement){
+                            this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
+                        }
                         return false;
                     }
                 }
             );
+    }
+
+    isRequireAgreementAgent() {
+        if(this.partnerTypeState.toUpperCase() === 'CUSTOMER'){
+            return true;
+        }
+        let result: boolean = false;
+        combineLatest([
+            this._store.select(ReceiptClassState),
+            this._store.select(ReceiptPaymentMethodState)
+        ])
+        .pipe(
+            map(([type, method]) => ({ type, method })),
+        ).subscribe(
+            (res: any) => {
+               console.log('class-method', res)
+               if (res.type && (res.type === AccountingConstants.RECEIPT_CLASS.ADVANCE || res.type === AccountingConstants.RECEIPT_CLASS.COLLECT_OBH)){
+                    result = true;
+               }
+                if (res.type === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT) {
+                    if (res.method.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE) || res.method.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL)) {
+                        result = true;
+                    }
+                }
+            }
+        );
+        return result;
     }
 
     onSelectMultipleValue(event: any, type: string) {
