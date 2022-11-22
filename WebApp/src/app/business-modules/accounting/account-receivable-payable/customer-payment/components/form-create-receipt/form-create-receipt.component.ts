@@ -84,7 +84,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                         if (this.partnerTypeState.toUpperCase() === 'CUSTOMER') {
                             this.isRequireAgreement = true;
                         }else{
-                            this.getPaymentMethod();
+                            this.getRequireAgreementAgent();
                         }
                     }
                 }
@@ -106,16 +106,23 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             );
     }
 
-    getPaymentMethod() {
+    getRequireAgreementAgent() {
+        if (this.class.value === AccountingConstants.RECEIPT_CLASS.ADVANCE || this.class.value === AccountingConstants.RECEIPT_CLASS.COLLECT_OBH) {
+            this.isRequireAgreement = true;
+            return;
+        }
+        this.isRequireAgreement = false;
         this._store.select(ReceiptPaymentMethodState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data) => {
-                    this.isRequireAgreement = false;
                     if (!!data) {
-                        if (data.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE) || data.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL)) {
-                            this.isRequireAgreement = true;
+                        if (this.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT) {
+                            if (data.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE) || data.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL)) {
+                                this.isRequireAgreement = true;
+                            }
                         }
+                        
                     }
                 }
             )
@@ -190,7 +197,9 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                                     } else {
                                         this.combogrid.displaySelectedStr = '';
                                         this.agreementId.setValue(null);
-                                        this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
+                                        if (this.isRequireAgreement) {
+                                            this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
+                                        }
 
                                     }
                                 }
@@ -234,6 +243,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     onChangeReceiptType(type: string) {
         this._store.dispatch(SelectReceiptClass({ class: type }));
+        this.getRequireAgreementAgent();
         if (type === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT || type === AccountingConstants.RECEIPT_CLASS.NET_OFF) {
             this.isShowGetDebit = true;
             return;
