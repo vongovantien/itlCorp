@@ -193,7 +193,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     (data) => {
                         if (!!data) {
                             for (let element of data) {
-                                this.jobs.push({ jobNo: element.jobId, })
+                                console.log(element);
+
+                                this.jobs.push({ jobNo: element.jobId, id: element.shipmentId })
                             }
                         }
                     }
@@ -206,7 +208,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     (data) => {
                         if (!!data) {
                             for (let element of data.groupShipments) {
-                                this.jobs.push({ jobNo: element.jobId, })
+                                console.log(element);
+                                this.jobs.push({ jobNo: element.jobId, id: element.shipmentId })
                             }
                         }
                     }

@@ -754,7 +754,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra danh sách Advance Request dựa vào Advance No và sắp xếp giảm dần theo DatetimeModified Advance Request
             var request = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).OrderByDescending(x => x.DatetimeModified).ToList();
-
             //Không tìm thấy Advance Request thì trả về null
             if (request == null) return null;
 
@@ -762,7 +761,10 @@ namespace eFMS.API.Accounting.DL.Services
             advanceModel = mapper.Map<AcctAdvancePaymentModel>(advance);
             //Mapper List<AcctAdvanceRequest> thành List<AcctAdvanceRequestModel>
             advanceModel.AdvanceRequests = mapper.Map<List<AcctAdvanceRequestModel>>(request);
-
+            advanceModel.AdvanceRequests.ForEach(x =>
+            {
+                x.ShipmentId = GetJobId(x.JobId);
+            });
             advanceModel.NumberOfRequests = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Count();
             advanceModel.UserNameCreated = sysUserRepo.Get(x => x.Id == advance.UserCreated).FirstOrDefault()?.Username;
             advanceModel.UserNameModified = sysUserRepo.Get(x => x.Id == advance.UserModified).FirstOrDefault()?.Username;
@@ -805,6 +807,16 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return advanceModel;
         }
+
+        private Guid GetJobId(string jobNo)
+        {
+            if (jobNo.Contains("LOG"))
+            {
+                return opsTransactionRepo.Get(x => x.JobNo == jobNo).FirstOrDefault().Id;
+            }
+            return csTransactionRepo.Get(x => x.JobNo == jobNo).FirstOrDefault().Id;
+        }
+
         #endregion --- DETAIL ---
 
         /// <summary>
