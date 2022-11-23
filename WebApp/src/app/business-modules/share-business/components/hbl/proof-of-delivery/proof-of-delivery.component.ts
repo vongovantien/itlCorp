@@ -1,16 +1,16 @@
-import { Component } from '@angular/core';
-import { AppForm } from '@app';
-import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
-import { ActivatedRoute, Params } from '@angular/router';
-import { takeUntil, map, switchMap, concatMap, catchError, finalize } from 'rxjs/operators';
-import { SystemConstants } from '@constants';
-import { of } from 'rxjs';
-import { DocumentationRepo } from '@repositories';
-import { ToastrService } from 'ngx-toastr';
-import { Store } from '@ngrx/store';
-import { IAppState } from '@store';
 import { formatDate } from '@angular/common';
+import { Component } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+import { AppForm } from '@app';
+import { SystemConstants } from '@constants';
+import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
+import { DocumentationRepo } from '@repositories';
+import { IAppState } from '@store';
+import { ToastrService } from 'ngx-toastr';
+import { of } from 'rxjs';
+import { catchError, concatMap, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
+import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
 import { SystemFileManageRepo } from 'src/app/shared/repositories/system-file-manage.repo';
 @Component({
     selector: 'hbl-proof-of-delivery',
@@ -114,7 +114,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
         //             }
         //         }
         //     );
-        this._systemFileManageRepo.uploadFile('Document', 'Shipment', hblId, this.fileList)
+        this._systemFileManageRepo.uploadAttachedFileEdoc('Document', 'Shipment', hblId, this.fileList)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {

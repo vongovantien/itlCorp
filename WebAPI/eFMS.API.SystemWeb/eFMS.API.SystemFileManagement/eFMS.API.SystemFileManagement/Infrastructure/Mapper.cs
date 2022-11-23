@@ -6,11 +6,12 @@ namespace eFMS.API.SystemFileManagement.Infrastructure
 {
     public class MappingProfile : Profile
     {
-        public  MappingProfile()
+        public MappingProfile()
         {
             // Map to entity model
             CreateMap<SysActionFuncLogModel, SysActionFuncLog>();
             CreateMap<SysImage, SysImageModel>().ReverseMap();
+            CreateMap<SysAttachFileTemplate, SysAttachFileTemplateModel>().ReverseMap();
             //CreateMap<AccAccountReceivable, ReceivableTable>();
         }
     }

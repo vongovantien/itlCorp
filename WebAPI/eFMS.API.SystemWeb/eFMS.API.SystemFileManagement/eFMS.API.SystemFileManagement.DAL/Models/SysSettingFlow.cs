@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -24,5 +23,9 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public string ApplyPartner { get; set; }
         public Guid? ReplicateOfficeId { get; set; }
         public string ReplicatePrefix { get; set; }
+        public bool? IsApplyContract { get; set; }
+        public bool? ApprovalAdvance { get; set; }
+        public bool? ApprovalSettlement { get; set; }
+        public bool? AlertAtd { get; set; }
     }
 }

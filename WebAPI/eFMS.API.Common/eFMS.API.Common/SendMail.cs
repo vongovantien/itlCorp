@@ -1,13 +1,14 @@
-﻿using System;
+﻿using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Net;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
-using System.Net.Mime;
-using eFMS.API.Common.Helpers;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Net.Mime;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace eFMS.API.Common
 {
@@ -84,23 +85,32 @@ namespace eFMS.API.Common
                 }
 
                 //now attached the file
+                //if (attachments != null)
+                //{
+                //    var webClient = new WebClient();
+                //    string fileName = string.Empty;
+                //    foreach (string attachment in attachments)
+                //    {
+                //        fileName = Path.GetFileName(attachment);
+                //        var folderDownload = AppDomain.CurrentDomain.BaseDirectory + "\\DownLoadedFiles";
+                //        if (!Directory.Exists(folderDownload))
+                //        {
+                //            Directory.CreateDirectory(folderDownload);
+                //        }
+                //        var fullFileName = folderDownload + "\\" + fileName;
+                //        webClient.DownloadFile(attachment, fullFileName);
+
+                //        Attachment attached = new Attachment(fullFileName, MediaTypeNames.Application.Octet);
+                //        message.Attachments.Add(attached);
+                //    }
+                //}
+
                 if (attachments != null)
                 {
-                    var webClient = new WebClient();
-                    string fileName = string.Empty;
-                    foreach (string attachment in attachments)
+                    foreach (string url in attachments)
                     {
-                        fileName = Path.GetFileName(attachment);
-                        var folderDownload = AppDomain.CurrentDomain.BaseDirectory + "\\DownLoadedFiles";
-                        if (!Directory.Exists(folderDownload))
-                        {
-                            Directory.CreateDirectory(folderDownload);
-                        }
-                        var fullFileName = folderDownload + "\\" + fileName;
-                        webClient.DownloadFile(attachment, fullFileName);
-
-                        Attachment attached = new Attachment(fullFileName, MediaTypeNames.Application.Octet);
-                        message.Attachments.Add(attached);
+                        byte[] filesArrayBuffer = FileHelper.DownloadFile(url).Result;
+                        message.Attachments.Add(new Attachment(new MemoryStream(filesArrayBuffer), Path.GetFileName(url)));
                     }
                 }
 
@@ -146,7 +156,7 @@ namespace eFMS.API.Common
             List<string> ToEmails = new List<string>() { ToEmail };
             emailBCC.Add("kenny.thuong@itlvn.com");
             return Send(Subject, Body, ToEmails, Attachments, EmailCCs, emailBCC);
-        }        
+        }
         public static bool IsValidEmail(string email)
         {
             try
@@ -190,6 +200,109 @@ namespace eFMS.API.Common
                 emailsReturn = emailsReturn.Distinct().ToList();
             }
             return emailsReturn;
+        }
+
+        public static bool SendFile(string subject, string body, List<string> toEmails, List<EmailAttachment> attachments, List<string> emailCCs, List<string> emailBCC = null)
+        {
+            string receivers = "";
+            string CCs = "";
+            string BCCs = "";
+
+            string description = "";
+            bool result = true;
+
+            MailAddress emailFrom = new MailAddress(_emailFrom);
+            MailMessage message = new MailMessage();
+
+            message.From = emailFrom;
+            ResetMailFrom(); // reset from email
+            try
+            {
+                if (toEmails != null && toEmails.Count() > 0)
+                {
+                    toEmails = GetListEmailValid(toEmails);
+                    foreach (string ToEmail in toEmails)
+                    {
+                        if (IsValidEmail(ToEmail))
+                        {
+                            MailAddress EmailTo = new MailAddress(ToEmail);
+                            receivers += EmailTo.Address + ", ";
+                            message.To.Add(EmailTo.Address);
+                        }
+                    }
+                }
+
+                message.IsBodyHtml = true;
+                message.Subject = subject;
+                message.Body = body;
+
+                // Add a carbon copy recipient.
+                if (emailCCs != null)
+                {
+                    emailCCs = GetListEmailValid(emailCCs);
+                    foreach (string EmailCC in emailCCs)
+                    {
+                        if (IsValidEmail(EmailCC))
+                        {
+                            MailAddress CC = new MailAddress(EmailCC);
+                            CCs += CC.Address + ", ";
+                            message.CC.Add(CC.Address);
+                        }
+                    }
+                }
+
+                // Add a carbon copy recipient.
+                if (emailBCC != null)
+                {
+                    emailBCC = GetListEmailValid(emailBCC);
+                    foreach (string EmailBCC in emailBCC)
+                    {
+                        if (IsValidEmail(EmailBCC))
+                        {
+                            MailAddress BCC = new MailAddress(EmailBCC);
+                            BCCs += BCC.Address + ", ";
+                            message.Bcc.Add(BCC.Address);
+                        }
+                    }
+                }
+
+                //now attached the file
+                if (attachments != null)
+                {
+                    foreach (EmailAttachment attachment in attachments)
+                    {
+                        Attachment item = new Attachment(attachment.Stream, attachment.FileName);
+                        message.Attachments.Add(item);
+                    }
+                }
+
+                SmtpClient client = new SmtpClient();
+                client.UseDefaultCredentials = false;
+
+                client.Host = _smtpHost;
+                client.Port = 587;
+                client.EnableSsl = true;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.Credentials =
+                    new System.Net.NetworkCredential(_smptUser,
+                        _smtpPassword);
+                client.Timeout = 300000;
+
+                ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
+                client.Send(message);
+                message.Attachments.Dispose();
+                client.Dispose();
+            }
+            catch (Exception ex)
+            {
+                result = false;
+                new LogHelper("LOG_SEND_MAIl", ex.ToString());
+                description = ex.Message;
+            }
+            finally
+            {
+            }
+            return result;
         }
     }
 }

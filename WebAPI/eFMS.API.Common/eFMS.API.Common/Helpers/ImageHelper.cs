@@ -1,8 +1,8 @@
-﻿using System;
-using System.Text;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Common.Helpers
@@ -105,7 +105,7 @@ namespace eFMS.API.Common.Helpers
             {
                 Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName + "\\files\\"));
             }
-            if(!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName + "\\files\\" + objectId)))
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName + "\\files\\" + objectId)))
             {
                 Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName + "\\files\\" + objectId));
             }
@@ -120,10 +120,10 @@ namespace eFMS.API.Common.Helpers
             }
         }
 
-        public static async Task<bool> DeleteFile(string fileName, string folderName, string option="files")
+        public static async Task<bool> DeleteFile(string fileName, string folderName, string option = "files")
         {
-          
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\"  + folderName + "\\" + option, fileName);
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + folderName + "\\" + option, fileName);
             if (!System.IO.File.Exists(path)) return false;
             try
             {

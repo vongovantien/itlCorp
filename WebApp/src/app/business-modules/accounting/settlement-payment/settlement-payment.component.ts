@@ -724,16 +724,16 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         let previewSoure$ = null;
         switch (key) {
             case 3:
-                previewSoure$ = this._exportRepo.exportSettlementPaymentDetail(settleId, 'VN')
+                previewSoure$ = this._exportRepo.exportSettlementPaymentDetail(settleId, 'VN', 'eDOC')
                 break;
             case 4:
-                previewSoure$ = this._exportRepo.exportSettlementPaymentDetail(settleId, 'EN')
+                previewSoure$ = this._exportRepo.exportSettlementPaymentDetail(settleId, 'EN', 'eDOC')
                 break;
             case 5:
-                previewSoure$ = this._exportRepo.exportGeneralSettlementPayment(settleId)
+                previewSoure$ = this._exportRepo.exportGeneralSettlementPayment(settleId, 'eDOC')
                 break;
             case 6:
-                previewSoure$ = this._exportRepo.exportSettlementPaymentDetailTemplate(settleId, 'VN')
+                previewSoure$ = this._exportRepo.exportSettlementPaymentDetailTemplate(settleId, 'VN', 'eDOC')
                 break;
             default:
                 break;

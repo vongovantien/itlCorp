@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace eFMS.API.Provider.Infrasture.API.System
+﻿namespace eFMS.API.Provider.Infrasture.API.System
 {
     public class CatDepartmentAPI
     {

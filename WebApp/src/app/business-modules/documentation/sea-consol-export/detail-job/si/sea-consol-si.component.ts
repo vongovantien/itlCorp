@@ -3,10 +3,10 @@ import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute } from '@angular/router';
 
-import { ReportPreviewComponent } from '@common';
-import { DocumentationRepo } from '@repositories';
+import { ConfirmPopupComponent, ReportPreviewComponent } from '@common';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SystemConstants } from '@constants';
-import { CsTransaction, CsShippingInstruction } from '@models';
+import { CsTransaction, CsShippingInstruction, Crystal } from '@models';
 
 import {
     ShareBussinessBillInstructionHousebillsSeaExportComponent,
@@ -16,24 +16,24 @@ import {
     TransactionGetDetailAction,
     getTransactionDetailCsTransactionState
 } from '@share-bussiness';
-import { AppList } from '@app';
+import { AppForm } from '@app';
 import { delayTime } from '@decorators';
 import { ICrystalReport } from '@interfaces';
 
 import { ShareSeaServiceFormSISeaExportComponent } from '../../../share-sea/components/form-si-sea-export/form-si-sea-export.component';
 
 import _groupBy from 'lodash/groupBy';
-import { catchError, finalize, takeUntil, take, pluck, concatMap } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
+import { catchError, finalize, takeUntil, take, pluck, concatMap, mergeMap } from 'rxjs/operators';
+import { forkJoin, of } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 
 
 @Component({
     selector: 'app-sea-consol-export-si',
     templateUrl: './sea-consol-si.component.html'
 })
-export class SeaConsolExportShippingInstructionComponent extends AppList implements ICrystalReport {
+export class SeaConsolExportShippingInstructionComponent extends AppForm implements ICrystalReport {
     @ViewChild(ShareBussinessBillInstructionHousebillsSeaExportComponent) billDetail: ShareBussinessBillInstructionHousebillsSeaExportComponent;
-    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(ShareSeaServiceFormSISeaExportComponent) billSIComponent: ShareSeaServiceFormSISeaExportComponent;
 
     jobId: string;
@@ -45,6 +45,8 @@ export class SeaConsolExportShippingInstructionComponent extends AppList impleme
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _activedRouter: ActivatedRoute,
+        private _exportRepo: ExportRepo,
+        private _fileMngtRepo: SystemFileManageRepo
     ) {
         super();
     }
@@ -311,7 +313,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList impleme
                     if (res != null) {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            this.showReport();
+                            this.renderAndShowReport();
                         } else {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
@@ -332,7 +334,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList impleme
                     if (res != null) {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            this.showReport();
+                            this.renderAndShowReport();
                         } else {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
@@ -353,7 +355,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList impleme
                     if (res != null) {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            this.showReport();
+                            this.renderAndShowReport();
                         } else {
                             this._toastService.warning('This shipment does not have any house bill ');
                         }
@@ -375,7 +377,7 @@ export class SeaConsolExportShippingInstructionComponent extends AppList impleme
                 (res: any) => {
                     this.dataReport = res;
                     if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.showReport();
+                        this.renderAndShowReport();
                     } else {
                         this._toastService.warning('This shipment does not have any house bill ');
                     }
@@ -383,10 +385,67 @@ export class SeaConsolExportShippingInstructionComponent extends AppList impleme
             );
     }
 
+    showRefreshPopup() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'All manually entered data will be refresh. Are you sure you want to perform this action?'
+        }, () => { this.refresh(); });
+    }
+
     @delayTime(1000)
     showReport(): void {
-        this.previewPopup.frm.nativeElement.submit();
-        this.previewPopup.show();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
+
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.jobId,
+                            hblId: SystemConstants.EMPTY_GUID,
+                            templateCode: 'SI',
+                            transactionType: 'SCE'
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 }
 

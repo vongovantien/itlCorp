@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -233,6 +234,14 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true,
                 IsLandscape = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "SeaCargoManifest" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+
+            result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -326,6 +335,15 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true,
                 IsLandscape = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = transaction.JobNo.Replace("/", "_") + "_" + "SeaImportCargoManifest" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(manifests);
             result.AddSubReport("ContainerDetail", containers);
             result.FormatType = ExportFormatType.PortableDocFormat;
@@ -418,6 +436,13 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true,
                 IsLandscape = true
             };
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = transaction.JobNo.Replace("/", "_") + "_" + "AirCargoManifest" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+
+            result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -509,10 +534,10 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var reportName = transaction.JobNo.Replace("/", "_") + "_" + "AirCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
-            result.PathReportGenerate = _pathReportGenerate;
 
+            result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -603,10 +628,10 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var reportName = transaction.JobNo.Replace("/","_") + "_" + "SeaCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
-            result.PathReportGenerate = _pathReportGenerate;
 
+            result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);

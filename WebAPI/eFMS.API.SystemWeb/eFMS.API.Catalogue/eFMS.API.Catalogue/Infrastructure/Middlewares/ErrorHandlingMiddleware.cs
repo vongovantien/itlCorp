@@ -1,11 +1,11 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Infrastructure.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.Infrastructure.Middlewares
 {
@@ -17,6 +17,7 @@ namespace eFMS.API.Catalogue.Infrastructure.Middlewares
         public ErrorHandlingMiddleware(RequestDelegate next, IOptions<MsWebHookUrl> _webHookUrl)
         {
             this.next = next;
+            webHookUrl = _webHookUrl;
         }
 
         public async Task Invoke(HttpContext context /* other scoped dependencies */, IOptions<MsWebHookUrl> _webHookUrl)

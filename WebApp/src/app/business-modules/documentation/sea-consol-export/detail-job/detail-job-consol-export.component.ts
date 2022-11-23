@@ -1,25 +1,21 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { Router, ActivatedRoute, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { ReportPreviewComponent, SubHeaderComponent } from 'src/app/shared/common';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 
 import { combineLatest, of, Observable } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap } from 'rxjs/operators';
+import { tap, map, switchMap, catchError, takeUntil, skip, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
-import { NgProgress } from '@ngx-progressbar/core';
 
 import isUUID from 'validator/lib/isUUID';
-import { CsTransaction } from '@models';
 import { SeaConsolExportCreateJobComponent } from '../create-job/create-job-consol-export.component';
 import { ICanComponentDeactivate } from '@core';
-import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
+import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
-import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'FILES' | 'HBL';
@@ -30,15 +26,10 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'FILES' | 'HBL';
 })
 
 export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
-    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
-    jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
-    ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
-    shipmentDetail: CsTransaction;
     confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, ETA, MBL, Vessel, Voy, POL, POD, Booking No to House Bill?<span>`;
 
     isCancelFormPopupSuccess: boolean = false;
@@ -48,18 +39,16 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     constructor(
 
         protected _toastService: ToastrService,
-        protected _documenRepo: DocumentationRepo,
+        protected _documentRepo: DocumentationRepo,
         protected _router: Router,
         protected _actionStoreSubject: ActionsSubject,
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
-        private _documentRepo: DocumentationRepo,
-        private _ngProgressService: NgProgress,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
+        protected _exportRepo: ExportRepo,
+        protected _fileMngt: SystemFileManageRepo
     ) {
-        super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd, _store);
-
-        this._progressRef = this._ngProgressService.ref();
+        super(_toastService, _documentRepo, _router, _actionStoreSubject, _cd, _store, _exportRepo, _fileMngt);
         this.requestCancel = this.handleCancelForm;
     }
 
@@ -158,7 +147,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     }
 
     duplicateJob(body: any) {
-        this._documenRepo.importCSTransaction(body)
+        this._documentRepo.importCSTransaction(body)
             .pipe(
                 catchError(this.catchError)
             )
@@ -186,11 +175,9 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     }
 
     saveJob(body: any) {
-        this._progressRef.start();
-        this._documenRepo.updateCSTransaction(body)
+        this._documentRepo.updateCSTransaction(body)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                catchError(this.catchError)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -270,47 +257,12 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
         }
     }
 
-    previewPLsheet(currency: string) {
-        const hblid = "00000000-0000-0000-0000-000000000000";
-        this._documenRepo.previewSIFPLsheet(this.jobId, hblid, currency)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
-
-    previewShipmentCoverPage() {
-        this._documenRepo.previewShipmentCoverPage(this.jobId)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
-
-    gotoList() {
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}`]);
-    }
-
     prepareDeleteJob() {
         this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
             .pipe(
                 concatMap((isAllowDelete: boolean) => {
                     if (isAllowDelete) {
-                        return this._documenRepo.checkMasterBillAllowToDelete(this.jobId);
+                        return this._documentRepo.checkMasterBillAllowToDelete(this.jobId);
                     }
                     return of(403);
                 }),
@@ -345,13 +297,9 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     }
 
     onDeleteJob() {
-        this._progressRef.start();
         this._documentRepo.deleteMasterBill(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
@@ -375,7 +323,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     }
 
     duplicateConfirm() {
-        this._documenRepo.getPartnerForCheckPointInShipment(this.jobId, 'SEC')
+        this._documentRepo.getPartnerForCheckPointInShipment(this.jobId, 'SEC')
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 switchMap((partnerIds: string[]) => {
@@ -413,13 +361,9 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     }
 
     onLockShipment() {
-        this._progressRef.start();
         this._documentRepo.LockCsTransaction(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             )
             .subscribe(
                 (r: CommonInterface.IResult) => {
@@ -468,13 +412,9 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
             podDescription: modelAdd.podDescription
         };
 
-        this._progressRef.start();
         this._documentRepo.syncHBL(this.jobId, bodySyncData)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (r: CommonInterface.IResult) => {
                     if (r.status) {
@@ -529,25 +469,5 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
             return;
         }
         return of(!isEdited);
-    }
-
-    @delayTime(1000)
-    showReport(): void {
-        this.componentRef.instance.frm.nativeElement.submit();
-        this.componentRef.instance.show();
-    }
-
-    renderAndShowReport() {
-        // * Render dynamic
-        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
-        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
-
-        this.showReport();
-
-        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
-            (v: any) => {
-                this.subscription.unsubscribe();
-                this.viewContainerRef.viewContainerRef.clear();
-            });
     }
 }

@@ -62,6 +62,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<SysSettingFlow> settingFlowRepository;
+        private readonly IContextBase<SysImageDetail> imageDetailRepository;
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
@@ -93,6 +94,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
             IContextBase<SysSettingFlow> settingFlowRepo,
+            IContextBase<SysImageDetail> imageDetailRepo,
             IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
         {
             currentUser = user;
@@ -124,6 +126,7 @@ namespace eFMS.API.Accounting.DL.Services
             acctApproveSettlementRepository = acctApproveSettlementRepo;
             sysEmployeeRepository = sysEmployeeRepo;
             settingFlowRepository = settingFlowRepo;
+            imageDetailRepository = imageDetailRepo;
         }
 
         #region -- Insert & Update SOA
@@ -223,7 +226,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soa.DebitAmount = _debitAmount;
                 soa.CreditAmount = _creditAmount;
                 soa.TotalCharge = _totalCharge;
-                soa.Soano = model.Soano = CreateSoaNo(currentOffice);
+                soa.Soano = model.Soano = CreateSoaNo(currentOffice, string.Empty);
                 soa.NetOff = false;
                 var hs = DataContext.Add(soa);
 
@@ -528,6 +531,7 @@ namespace eFMS.API.Accounting.DL.Services
             // Delete Credit AR
             if (soa.Type == "Credit" && hs.Success)
             {
+                imageDetailRepository.Delete(x => x.BillingNo == soa.Soano);
                 return new ResultHandle() { Status = true, Message = "Data delete success", Data = surcharges };
                 //UpdateAcctCreditManagement(surcharges, soa.Soano, soa.Currency, soa.ExcRateUsdToLocal, soa.Customer, "Delete");
             }
@@ -870,12 +874,13 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }*/
 
-        private string CreateSoaNo(string currOffice)
+        private string CreateSoaNo(string currOffice, string currentSoa)
         {
+            var soaNo = string.Empty;
             var prefix = (DateTime.Now.Year.ToString()).Substring(2, 2);
             string stt;
             //Lấy ra soa no mới nhất
-            var rowLast = DataContext.Get().OrderByDescending(o => o.DatetimeCreated).FirstOrDefault();
+            var rowLast = string.IsNullOrEmpty(currentSoa) ? DataContext.Get().OrderByDescending(o => o.DatetimeCreated).FirstOrDefault() : (new AcctSoa() { Soano = currentSoa });
             if (rowLast == null)
             {
                 stt = "00001";
@@ -883,7 +888,7 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 var soaCurrent = rowLast.Soano;
-                var prefixCurrent = soaCurrent.Substring(soaCurrent.Length-7, 2);
+                var prefixCurrent = soaCurrent.Substring(soaCurrent.Length - 7, 2);
                 //Reset về 1 khi qua năm mới
                 if (prefixCurrent != prefix)
                 {
@@ -891,12 +896,12 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    stt = (Convert.ToInt32(soaCurrent.Substring(soaCurrent.Length-5, 5)) + 1).ToString();
+                    stt = (Convert.ToInt32(soaCurrent.Substring(soaCurrent.Length - 5, 5)) + 1).ToString();
                     stt = stt.PadLeft(5, '0');
                 }
             }
 
-            if(currOffice== "ITLHAN")
+            if (currOffice == "ITLHAN")
             {
                 prefix = "H" + prefix;
             }
@@ -905,7 +910,12 @@ namespace eFMS.API.Accounting.DL.Services
                 prefix = "D" + prefix;
             }
 
-            return prefix + stt;
+            soaNo = prefix + stt;
+            if (DataContext.Get(x => x.Soano == soaNo).FirstOrDefault() != null)
+            {
+                return CreateSoaNo(currOffice, soaNo);
+            }
+            return soaNo;
         }
 
 

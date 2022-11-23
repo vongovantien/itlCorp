@@ -1,15 +1,15 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { AppForm } from 'src/app/app.form';
-import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
-import { DocumentationRepo, SystemFileManageRepo } from '@repositories';
-import { ToastrService } from 'ngx-toastr';
-import { Store } from '@ngrx/store';
-import { IAppState } from '@store';
-import { Params, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
-import { getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission } from '../../store';
 import { CsTransaction } from '@models';
+import { Store } from '@ngrx/store';
+import { DocumentationRepo, SystemFileManageRepo } from '@repositories';
+import { IAppState } from '@store';
+import { ToastrService } from 'ngx-toastr';
+import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
+import { AppForm } from 'src/app/app.form';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
+import { getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission } from '../../store';
 
 
 @Component({

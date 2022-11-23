@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -37,5 +36,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public string Photo { get; set; }
         public string PersonalId { get; set; }
         public string BankCode { get; set; }
+        public string SignatureImage { get; set; }
     }
 }

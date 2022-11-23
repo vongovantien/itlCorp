@@ -28,6 +28,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using eFMS.API.ForPartner.DL.Models.Receivable;
+using Microsoft.Extensions.Options;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -77,6 +79,9 @@ namespace eFMS.API.Documentation.DL.Services
         private IDatabaseUpdateService databaseUpdateService;
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IContextBase<AccAccountingManagement> accMngtRepo;
+        private readonly IOptions<ApiUrl> apiUrl;
+
+        private readonly ICsStageAssignedService csStageAssignedService;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository,
             IMapper mapper,
@@ -115,7 +120,9 @@ namespace eFMS.API.Documentation.DL.Services
             IDatabaseUpdateService _databaseUpdateService,
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<CsTransactionDetail> transactionDetail,
-            IContextBase<AccAccountingManagement> accMngt
+            IContextBase<AccAccountingManagement> accMngt,
+            IOptions<ApiUrl> aUrl,
+            ICsStageAssignedService csStageAssigned
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -158,6 +165,8 @@ namespace eFMS.API.Documentation.DL.Services
             surChargeRepository = surChargeRepo;
             transactionDetailRepository = transactionDetail;
             accMngtRepo = accMngt;
+            apiUrl = aUrl;
+            csStageAssignedService = csStageAssigned;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -271,7 +280,7 @@ namespace eFMS.API.Documentation.DL.Services
                 entityReplicate.GetType().GetProperty(item.Name).SetValue(entityReplicate, item.GetValue(originJob, null), null);
             }
 
-            entityReplicate.DatetimeCreated = originJob.DatetimeCreated;
+            entityReplicate.DatetimeCreated = DateTime.Now;
             entityReplicate.UserCreated = currentUser.UserID;
             entityReplicate.UserModified = currentUser.UserID;
             entityReplicate.DatetimeModified = DateTime.Now;
@@ -883,15 +892,29 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                   && x.SaleService.Contains("CL")
-                   && x.Active == true
-                   && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                   && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                   )?.FirstOrDefault();
+                       && x.SaleService.Contains("CL")
+                       && x.Active == true
+                       && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
                     if (customerContract == null)
                     {
                         string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                        string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
+                        return new HandleState(errorContract);
+                    }
+                    string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
+                    if (customerContract.IsExpired == true)
+                    {
+                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                        return new HandleState(errorContract);
+                    }
+                    if (customerContract.IsOverDue == true)
+                    {
+                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                        return new HandleState(errorContract);
+                    }
+                    if (customerContract.IsOverLimit == true)
+                    {
+                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
                         return new HandleState(errorContract);
                     }
                 }
@@ -989,6 +1012,8 @@ namespace eFMS.API.Documentation.DL.Services
                 SumCbm = model.Cbm,
                 Shipper = model.Shipper,
                 Consignee = model.Consignee,
+                Eta = model.Eta,
+                ClearanceDate = model.ClearanceDate,
                 BillingOpsId = currentUser.UserID,
                 GroupId = currentUser.GroupId,
                 DepartmentId = currentUser.DepartmentId,
@@ -1144,13 +1169,28 @@ namespace eFMS.API.Documentation.DL.Services
                         customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
                        && x.SaleService.Contains("CL")
                        && x.Active == true
-                       && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                       && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                       )?.FirstOrDefault();
+                       && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+                        
                         if (customerContract == null)
                         {
                             string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                            string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
+                            return new HandleState(errorContract);
+                        }
+                        string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
+                        if (customerContract.IsExpired == true)
+                        {
+                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                            return new HandleState(errorContract);
+                        }
+                        if (customerContract.IsOverDue == true)
+                        {
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                            return new HandleState(errorContract);
+                        }
+                        if (customerContract.IsOverLimit == true)
+                        {
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
                             return new HandleState(errorContract);
                         }
                     }
@@ -1278,7 +1318,7 @@ namespace eFMS.API.Documentation.DL.Services
                 result = new HandleState(ex.Message);
             }
             return result;
-        }
+         }
 
         private HandleState CreateJobAndClearanceReplicate(OpsTransaction opsTransaction, string productService, CustomsDeclarationModel cd,
             CatContract customerContract, out OpsTransaction opsTransactionReplicate, out CustomsDeclaration clearanceReplicate)
@@ -1641,6 +1681,14 @@ namespace eFMS.API.Documentation.DL.Services
                     dataSources.Add(surchargeRpt);
                 }
             }
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = shipment.JobNo.Replace("/", "_") + "_" + "FormPLsheet" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(dataSources);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -2171,6 +2219,7 @@ namespace eFMS.API.Documentation.DL.Services
                     item.PaySyncedFrom = null;
                     item.ReferenceNo = null;
                     item.ExchangeDate = DateTime.Now;
+                    item.AdvanceNoFor = null;
 
                     #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                     //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
@@ -2501,7 +2550,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         entityReplicate.GetType().GetProperty(item.Name).SetValue(entityReplicate, item.GetValue(job, null), null);
                     }
-                    entityReplicate.DatetimeCreated = job.DatetimeCreated;
+                    entityReplicate.DatetimeCreated = DateTime.Now;
                     entityReplicate.UserCreated = currentUser.UserID;
                     entityReplicate.UserModified = currentUser.UserID;
                     entityReplicate.DatetimeModified = DateTime.Now;
@@ -2560,25 +2609,30 @@ namespace eFMS.API.Documentation.DL.Services
                         }
 
                         // copy assignment
-                        var assign = opsStageAssignedRepository.Get(x => x.JobId == job.Id)?.FirstOrDefault();
-                        if (assign != null)
+                        var assign = opsStageAssignedRepository.Get(x => x.JobId == job.Id);
+                        if (assign?.Count() > 0)
                         {
-                            var opsAssignProp = assign.GetType().GetProperties();
-                            OpsStageAssigned newOpsAssigned = new OpsStageAssigned();
-
-                            foreach (var prop in opsAssignProp)
+                            var listStage = new List<CsStageAssignedModel>();
+                            foreach (var item in assign)
                             {
-                                newOpsAssigned.GetType().GetProperty(prop.Name).SetValue(newOpsAssigned, prop.GetValue(assign, null), null);
+                                var opsAssignProp = item.GetType().GetProperties();
+                                CsStageAssignedModel newOpsAssigned = new CsStageAssignedModel();
+                                foreach (var prop in opsAssignProp)
+                                {
+                                    newOpsAssigned.GetType().GetProperty(prop.Name).SetValue(newOpsAssigned, prop.GetValue(item, null), null);
+                                }
+
+                                newOpsAssigned.DatetimeCreated = DateTime.Now;
+                                newOpsAssigned.DatetimeModified = DateTime.Now;
+                                newOpsAssigned.UserCreated = currentUser.UserID;
+                                newOpsAssigned.UserModified = currentUser.UserID;
+                                newOpsAssigned.Id = Guid.NewGuid();
+                                newOpsAssigned.JobId = entityReplicate.Id;
+
+                                listStage.Add(newOpsAssigned);
                             }
+                            HandleState hsAssign = await csStageAssignedService.AddMutipleStageAssigned(listStage);
 
-                            newOpsAssigned.DatetimeCreated = DateTime.Now;
-                            newOpsAssigned.DatetimeModified = DateTime.Now;
-                            newOpsAssigned.UserCreated = currentUser.UserID;
-                            newOpsAssigned.UserModified = currentUser.UserID;
-                            newOpsAssigned.Id = Guid.NewGuid();
-                            newOpsAssigned.JobId = entityReplicate.Id;
-
-                            HandleState hsAssign = opsStageAssignedRepository.Add(newOpsAssigned);
                         }
                     }
                 };

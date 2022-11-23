@@ -26,8 +26,8 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<SysEmployee> employeeRepository;
         private readonly ICurrentUser currentUser;
 
-        public EcusConnectionService(IContextBase<SetEcusconnection> repository, 
-            ICacheServiceBase<SetEcusconnection> cacheService, 
+        public EcusConnectionService(IContextBase<SetEcusconnection> repository,
+            ICacheServiceBase<SetEcusconnection> cacheService,
             IMapper mapper,
             ICurrentUser user,
             IContextBase<SysUser> userRepo,
@@ -101,7 +101,7 @@ namespace eFMS.API.Operation.DL.Services
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingEcusConnection);
             var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
 
-            if(rangeSearch == PermissionRange.None)
+            if (rangeSearch == PermissionRange.None)
             {
                 totalItems = 0;
                 return null;
@@ -230,6 +230,7 @@ namespace eFMS.API.Operation.DL.Services
 	                              ,DTOKHAIMD_VNACCS2.[MA_HIEU_PTVC]
                                   ,DV_DT
                                   ,_Ten_DV_L1
+                                  ,[NGAYDEN]
                               FROM " + database + @".[dbo].[DTOKHAIMD]
                                     INNER JOIN " + database + @".[dbo].[DTOKHAIMD_VNACCS2]
                                     ON DTOKHAIMD._DToKhaiMDID = DTOKHAIMD_VNACCS2._DTOKHAIMDID
@@ -264,7 +265,7 @@ namespace eFMS.API.Operation.DL.Services
 	                                ,MA_DV
 	                                ,MA_CANGNN
 	                                ,H.SO_VAN_DON
-                                    ,H.TRLUONG 
+                                    ,H.TRLUONG
 	                                ,H.MA_DVT
                                     ,H.THE_TICH
                                     ,SO_CONTAINER

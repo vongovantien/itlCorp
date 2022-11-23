@@ -1,24 +1,21 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 import { SeaFCLExportCreateJobComponent } from '../create-job/create-job-fcl-export.component';
-import { CsTransaction } from '@models';
-import { DocumentationRepo } from '@repositories';
-import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 
 import { combineLatest, of, Observable } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap } from 'rxjs/operators';
+import { tap, map, switchMap, catchError, takeUntil, skip, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
-import { NgProgress } from '@ngx-progressbar/core';
 
 import isUUID from 'validator/lib/isUUID';
 import { ICanComponentDeactivate } from '@core';
 import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
-import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
@@ -29,15 +26,10 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 })
 
 export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
-    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
-    jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
-    ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
 
-    shipmentDetail: CsTransaction;
     confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, ETA, MBL, Vessel, Voy, POL, POD, Booking No to House Bill?<span>`;
 
     nextState: RouterStateSnapshot;
@@ -52,11 +44,11 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
-        private _ngProgressService: NgProgress
+        protected _exportRepo: ExportRepo,
+        protected _fileMngt: SystemFileManageRepo
     ) {
-        super(_toastService, _documenRepo, _store, _router, _actionStoreSubject, _cd);
+        super(_toastService, _documenRepo, _store, _router, _actionStoreSubject, _cd, _exportRepo, _fileMngt);
 
-        this._progressRef = this._ngProgressService.ref();
         this.requestCancel = this.handleCancelForm;
     }
 
@@ -184,11 +176,9 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     }
 
     saveJob(body: any) {
-        this._progressRef.start();
         this._documenRepo.updateCSTransaction(body)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                catchError(this.catchError)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -265,41 +255,6 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
         }
     }
 
-    previewPLsheet(currency: string) {
-        const hblid = "00000000-0000-0000-0000-000000000000";
-        this._documenRepo.previewSIFPLsheet(this.jobId, hblid, currency)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
-
-    previewShipmentCoverPage() {
-        this._documenRepo.previewShipmentCoverPage(this.jobId)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
-
-    gotoList() {
-        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_EXPORT}`]);
-    }
-
     prepareDeleteJob() {
         this._documentRepo.checkPermissionAllowDeleteShipment(this.jobId)
             .pipe(
@@ -340,13 +295,9 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     }
 
     onDeleteJob() {
-        this._progressRef.start();
         this._documentRepo.deleteMasterBill(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (response: CommonInterface.IResult) => {
                     if (response.status) {
@@ -408,13 +359,9 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     }
 
     onLockShipment() {
-        this._progressRef.start();
         this._documentRepo.LockCsTransaction(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             )
             .subscribe(
                 (r: CommonInterface.IResult) => {
@@ -462,13 +409,9 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
             podDescription: modelAdd.podDescription
         };
 
-        this._progressRef.start();
         this._documentRepo.syncHBL(this.jobId, bodySyncData)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (r: CommonInterface.IResult) => {
                     if (r.status) {
@@ -525,23 +468,4 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
         return of(!isEdited);
     }
 
-    @delayTime(1000)
-    showReport(): void {
-        this.componentRef.instance.frm.nativeElement.submit();
-        this.componentRef.instance.show();
-    }
-
-    renderAndShowReport() {
-        // * Render dynamic
-        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
-        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
-
-        this.showReport();
-
-        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
-            (v: any) => {
-                this.subscription.unsubscribe();
-                this.viewContainerRef.viewContainerRef.clear();
-            });
-    }
 }

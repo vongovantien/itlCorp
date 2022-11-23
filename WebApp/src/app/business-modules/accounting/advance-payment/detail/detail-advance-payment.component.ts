@@ -5,6 +5,7 @@ import {
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
+import { LoadAdvanceDetailSuccess } from './../store/actions/advance-payment.action';
 
 import { AppPage } from "@app";
 import { InfoPopupComponent, ReportPreviewComponent } from "@common";
@@ -52,6 +53,8 @@ export class AdvancePaymentDetailComponent
     statusApproval: string = "";
     isAdvCarrier: boolean = false;
 
+    advNo: string = '';
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -84,6 +87,8 @@ export class AdvancePaymentDetailComponent
                 }
             }
         );
+
+
     }
 
     @delayTime(1000)
@@ -116,11 +121,14 @@ export class AdvancePaymentDetailComponent
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
+                    console.log(res);
                     if (!res) {
                         this._toastService.warning("Advance Payment not found");
                         this.back();
                         return;
                     }
+                    this.advNo = res.advanceNo;
+                    this._store.dispatch(LoadAdvanceDetailSuccess(res));
                     this.advancePayment = new AdvancePayment(res);
                     switch (this.advancePayment.statusApproval) {
                         case "New":

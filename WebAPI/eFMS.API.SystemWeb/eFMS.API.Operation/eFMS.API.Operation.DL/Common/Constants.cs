@@ -9,6 +9,10 @@ namespace eFMS.API.Operation.DL.Common
     }
     public static class OperationConstants
     {
+        //Stage from constants
+        public const string FROM_USER = "User";
+        public const string FROM_SYSTEM = "System";
+
         public static readonly string InSchedule = "InSchedule";
         public static readonly string Processing = "Processing";
         public static readonly string Done = "Done";
@@ -23,7 +27,7 @@ namespace eFMS.API.Operation.DL.Common
         public const string Active = "Active";
         public const string FromEFMS = "eFMS";
         public const string FromEcus = "Ecus";
-        public const string FROM_REPLICATE= "Replicate";
+        public const string FROM_REPLICATE = "Replicate";
 
 
         public static readonly List<ConstantData> OperationStages = new List<ConstantData>
