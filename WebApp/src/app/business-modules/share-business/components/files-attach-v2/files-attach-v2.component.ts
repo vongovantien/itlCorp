@@ -335,19 +335,21 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
     getDocumentType(transactionType: string, billingId: string) {
-        this._systemFileRepo.getDocumentType(transactionType, billingId)
-            .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any[]) => {
-                    console.log(res);
+        if (!this.readonly) {
+            this._systemFileRepo.getDocumentType(transactionType, billingId)
+                .pipe(
+                    catchError(this.catchError),
+                )
+                .subscribe(
+                    (res: any[]) => {
+                        console.log(res);
 
-                    this.documentTypes = res;
-                    this.documentAttach.documentTypes = res;
-                    console.log(this.documentAttach.documentTypes);
-                },
-            );
+                        this.documentTypes = res;
+                        this.documentAttach.documentTypes = res;
+                        console.log(this.documentAttach.documentTypes);
+                    },
+                );
+        }
     }
 
     getEDoc(transactionType: string) {

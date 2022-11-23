@@ -629,6 +629,11 @@ namespace eFMS.API.Accounting.DL.Services
             settlementMap.IsApproved = CheckUserIsApproved(currentUser, settlement, settlementApprove);
             settlementMap.IsShowBtnDeny = CheckIsShowBtnDeny(currentUser, settlement, settlementApprove);
 
+            if(!string.IsNullOrEmpty(settlement.Payee))
+            {
+                settlementMap.PayeeName = catPartnerRepo.Get(x => x.Id == settlement.Payee)?.FirstOrDefault().ShortName;
+            }
+
             return settlementMap;
         }
 
@@ -5748,8 +5753,8 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 parameters = parameters.Concat(new[] { new SqlParameter("@ClearanceNo", clearanceNo) }).ToArray();
             }
-            List<sp_GetSurchargeDetailSettlement> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSettlement>(parameters);
-
+            // List<sp_GetSurchargeDetailSettlement> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSettlement>(parameters);
+            var listSurcharges = DbHelper.DbHelper.ExecuteProcedure<sp_GetSurchargeDetailSettlement>("sp_GetSurchargeDetailSettlement", parameters).Result;
             var data = mapper.Map<List<ShipmentChargeSettlement>>(listSurcharges);
             return data;
         }
