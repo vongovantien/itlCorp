@@ -30,10 +30,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private IContextBase<SysAttachFileTemplate> _attachFileTemplateRepo;
         private IEDocService edocService;
         private IS3Service _client;
+        private readonly IContextBase<AcctSoa> _soaRepo;
+        private readonly IContextBase<AcctSettlementPayment> _settleRepo;
+        private readonly IContextBase<AcctAdvancePayment> _advRepo;
 
         public AWSS3Service(IContextBase<SysImage> SysImageRepo,
             IContextBase<SysAttachFileTemplate> attachFileTemplateRepo,
             IContextBase<SysImageDetail> sysImageDetailRepo,
+            IContextBase<AcctSoa> soaRepo,
+            IContextBase<AcctSettlementPayment> settleRepo,
+            IContextBase<AcctAdvancePayment> advRepo,
             ICurrentUser currentUser,
             IOptions<ApiUrl> apiUrl,
             IS3Service s3,
@@ -48,6 +54,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _apiUrl = apiUrl;
             edocService = edoc;
             _sysImageDetailRepo = sysImageDetailRepo;
+            _settleRepo = settleRepo;
+            _advRepo = advRepo;
+            _soaRepo = soaRepo;
         }
 
         public async Task<HandleState> DeleteFile(string moduleName, string folder, Guid id)
@@ -257,7 +266,37 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             try
             {
                 var lst = new List<SysImage>();
-                if (model.ChillId == null)
+                if (model.FolderName.Contains("Edoc"))
+                {
+                    var edocs = new List<SysImageDetail>();
+                    if (model.FolderName == "EdocShipment")
+                    {
+                        edocs = await _sysImageDetailRepo.GetAsync(x => (x.JobId.ToString() == model.ObjectId));
+                    }
+                    else
+                    {
+                        string billingNo = null;
+                        switch (model.FolderName)
+                        {
+                            case "EdocSOA":
+                                var soa = await _soaRepo.GetAsync(x => x.Id == model.ObjectId);
+                                billingNo = soa.FirstOrDefault().Soano;
+                                break;
+                            case "EdocSettlement":
+                                var settle = await _settleRepo.GetAsync(x => x.Id.ToString() == model.ObjectId);
+                                billingNo = settle.FirstOrDefault().SettlementNo;
+                                break;
+                            case "EdocAdvance":
+                                var adv = await _advRepo.GetAsync(x => x.Id.ToString() == model.ObjectId);
+                                billingNo = adv.FirstOrDefault().AdvanceNo;
+                                break;
+                        }
+                        edocs = await _sysImageDetailRepo.GetAsync(x => (x.BillingNo == billingNo));
+                    }
+                    var imageExist = _sysImageRepo.Get(x => x.ObjectId == model.ObjectId && !edocs.Select(z => z.SysImageId).Contains(x.Id)).Select(x => x.Id).Distinct();
+                    lst = await _sysImageRepo.GetAsync(x => edocs.Select(y => y.SysImageId).Distinct().Contains(x.Id) || imageExist.Contains(x.Id));
+                }
+                else if (model.ChillId == null)
                 {
                     lst = await _sysImageRepo.GetAsync(x => x.ObjectId == model.ObjectId);
                 }
@@ -278,7 +317,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     GetObjectResponse response = await _client.GetObjectAsync(request);
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
-                        var f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = it.Name };
+                        var f = new InMemoryFile();
+                        if (model.FolderName.Contains("Edoc"))
+                        {
+                            f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = GetAliasName(it) };
+                        }
+                        else
+                        {
+                            f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = it.Name };
+                        }
                         files.Add(f);
                     }
                 }
@@ -290,6 +337,17 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
+
+        private string GetAliasName(SysImage image)
+        {
+            var name = _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).FirstOrDefault()?.SystemFileName;
+            if (name == null)
+            {
+                return "OT_"+ image.Name;
+            }
+            return _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).FirstOrDefault()?.SystemFileName + Path.GetExtension(image.Url);
+        }
+
         byte[] GetZipArchive(List<InMemoryFile> files)
         {
             byte[] archiveFile;

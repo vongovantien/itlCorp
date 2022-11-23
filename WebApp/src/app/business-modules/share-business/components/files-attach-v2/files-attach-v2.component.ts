@@ -56,7 +56,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     jobNo: string = '';
     private _readonly: boolean = false;
     isView: boolean = true;
-    elementInput: HTMLElement = null
+    elementInput: HTMLElement = null;
+
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
         { title: 'Real File Name', field: 'userFileName', sortable: true },
@@ -432,7 +433,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
     downloadAllEdoc() {
         let model = {
-            folderName: this.typeFrom,
+            folderName: 'Edoc' + this.typeFrom,
             objectId: this.typeFrom === 'Shipment' ? this.jobId : this.billingId,
             chillId: null,
             fileName: this.typeFrom === 'Shipment' ? this.jobNo : this.billingNo
