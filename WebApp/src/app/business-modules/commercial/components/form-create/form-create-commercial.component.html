@@ -51,6 +51,7 @@
                                 <label required>Tax Code</label>
                                 <input type="text" class="form-control" formControlName="taxCode"
                                     [attr.disabled]="active ? 'disabled' : null"
+                                    [attr.disabled]="!!this.parentId.value && this.isBranchSub ? 'disabled' : null"
                                     (blur)="getInforCompanyByTaxCode(this.taxCode.value)">
                                 <div class="form-control-feedback"
                                     *ngIf="(isSubmitted &&
