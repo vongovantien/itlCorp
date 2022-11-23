@@ -16,6 +16,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using static eFMS.API.Common.Helpers.FileHelper;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
 {
