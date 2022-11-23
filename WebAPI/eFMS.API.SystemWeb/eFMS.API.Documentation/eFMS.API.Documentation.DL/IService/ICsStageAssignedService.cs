@@ -12,7 +12,7 @@ namespace eFMS.API.Documentation.DL.IService
     {
         Task<HandleState> AddNewStageAssigned(CsStageAssignedModel model);
         Task<HandleState> AddNewStageAssignedByType(CsStageAssignedCriteria criteria);
-        Task<HandleState> AddMultipleStageAssigned(Guid jobID, List<CsStageAssignedModel> listStageAssigned);
+        Task<HandleState> AddMultipleStageAssigned(Guid jobId, List<CsStageAssignedModel> listStageAssigned);
         Task<HandleState> SetMultipleStageAssigned(CsTransactionDetailModel currentHbl, CsTransactionModel currentJob, Guid jobId, Guid hblId, bool isHbl = false);
 
 
