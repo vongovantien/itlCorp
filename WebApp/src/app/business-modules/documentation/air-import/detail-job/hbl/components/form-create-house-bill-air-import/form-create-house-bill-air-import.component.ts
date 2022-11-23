@@ -13,7 +13,7 @@ import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
 import { DataService } from '@services';
 import { InfoPopupComponent } from '@common';
 
-import { takeUntil, catchError, skip, tap, mergeMap, shareReplay } from 'rxjs/operators';
+import { takeUntil, catchError, skip, tap, mergeMap, shareReplay, withLatestFrom } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import cloneDeep from 'lodash/cloneDeep';
@@ -147,19 +147,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         if (!this.isUpdate) {
             this.getShipmentAndSetDefault();
         } else {
-            this.getShipmentType();
             this.getDetailHBLState();
         }
-    }
-
-    getShipmentType(){
-        this._store.select(getTransactionDetailCsTransactionState)
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (res: any) => {
-                this.shipmentType = res.shipmentType;
-            }
-        );
     }
 
     getShipmentAndSetDefault() {
@@ -173,7 +162,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                         this.jobId = shipment.id;
                         this.shipmentType = shipment.shipmentType;
-                        console.log(this.shipmentType);
                         this.formCreate.patchValue({
                             mawb: shipment.mawb,
                             pod: shipment.pod,
@@ -338,7 +326,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.incotermId = this.formCreate.controls['incotermId'];
         this.polDescription = this.formCreate.controls['polDescription'];
         this.podDescription = this.formCreate.controls['podDescription'];
-        this.getShipmentType();
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -441,7 +428,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             packageType: data.packageType,
             shipmentType: this?.shipmentType,
         };
-
+        // withLatestFrom()
         this.formCreate.patchValue(_merge(cloneDeep(data), formValue));
         this._catalogueRepo.GetListSalemanByShipmentType(data.customerId, ChargeConstants.AI_CODE, this.shipmentType)
             .subscribe((salesmans: any) => {
