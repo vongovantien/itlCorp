@@ -38,6 +38,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepository;
         private readonly IContextBase<AcctCreditManagementAr> creditManagementArRepository;
         private readonly IContextBase<AccAccountingManagement> accountingManagementRepository;
+        private readonly ICurrencyExchangeService currencyExchangeService;
         public AccountPayableService(IContextBase<AccAccountPayable> repository,
             IContextBase<CatPartner> partnerRepo,
             ICurrentUser cUser,
@@ -51,6 +52,7 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<CsShipmentSurcharge> surchargeRepo,
             IContextBase<AcctCreditManagementAr> creditManagementArRepo,
             IContextBase<AccAccountingManagement> accountingManagementRepo,
+            ICurrencyExchangeService currencyExchange,
             IMapper mapper) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -65,6 +67,7 @@ namespace eFMS.API.ForPartner.DL.Service
             surchargeRepository = surchargeRepo;
             creditManagementArRepository = creditManagementArRepo;
             accountingManagementRepository = accountingManagementRepo;
+            currencyExchangeService = currencyExchange;
         }
 
         private SysPartnerApi GetInfoPartnerByApiKey(string apiKey)
@@ -331,10 +334,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     var partner = partnerRepository.Get(x => x.AccountNo == model.CustomerCode).FirstOrDefault();
                     SysOffice office = officeRepository.Get(x => x.Code == model.OfficeCode).FirstOrDefault();
 
-                    //var creditManagements = creditManagementArRepository.Get(x => x.PartnerId == partner.Id && x.OfficeId == office.Id.ToString());
                     var shipments = detailBravoRefNos.GroupBy(x => new { x.JobNo, x.MblNo, x.Hblno, x.BravoRefNo });
-                    //var listChargeIds = model.Details.Select(x => x.ChargeId).ToList();
-                    //var surcharges = surchargeRepository.Get(x => listChargeIds.Contains(x.Id));
                     var _code = string.Empty;
                     var _type = string.Empty;
                     decimal? exchangeRateUsd = 0;
@@ -351,7 +351,6 @@ namespace eFMS.API.ForPartner.DL.Service
                         var chargeIds = item.Select(x => x.ChargeId).ToList();
                         var surcharges = surchargeRepository.Where(x => x.JobNo == item.Key.JobNo && x.Mblno == item.Key.MblNo && x.Hblno == item.Key.Hblno && chargeIds.Contains(x.Id));
                         var detailBilling = surcharges.FirstOrDefault();
-                        //.Select(x => new { Code = string.IsNullOrEmpty(x.CreditNo) ? x.PaySoano : x.CreditNo, Type = string.IsNullOrEmpty(x.CreditNo) ? "CREDITSOA" : "CREDITNOTE", x.Hblid }).FirstOrDefault();
                         var syncFrom = string.Empty;
                         if (string.IsNullOrEmpty(_code))
                         {
@@ -380,6 +379,10 @@ namespace eFMS.API.ForPartner.DL.Service
                         acctCredit.SurchargeId = string.Join(';', chargeIds);
                         acctCredit.Currency = item.FirstOrDefault().Currency;
                         acctCredit.ExchangeRate = item.FirstOrDefault().ExchangeRate;
+                        if(exchangeRateUsd == 0 && acctCredit.Currency == ForPartnerConstants.CURRENCY_USD)
+                        {
+                            exchangeRateUsd = currencyExchangeService.CurrencyExchangeRateConvert(null, detailBilling.ExchangeDate, ForPartnerConstants.CURRENCY_USD, ForPartnerConstants.CURRENCY_LOCAL);
+                        }
                         acctCredit.ExchangeRateUsdToLocal = exchangeRateUsd;
                         
                         if (acctCredit.Currency == ForPartnerConstants.CURRENCY_LOCAL)
@@ -998,15 +1001,15 @@ namespace eFMS.API.ForPartner.DL.Service
                     if (payable.Currency == ForPartnerConstants.CURRENCY_LOCAL)
                     {
                         creditDetail.RemainVnd = (creditDetail.RemainVnd ?? 0) == 0 ? (creditDetail.RemainVnd ?? 0) : ((creditDetail.RemainVnd ?? 0) - payable.PaymentAmountVnd);
-                        creditDetail.RemainUsd = ((creditDetail.RemainVnd ?? 0) == 0 || (creditDetail.RemainUsd ?? 0) == 0) ? (creditDetail.RemainUsd ?? 0) : ((creditDetail.RemainUsd ?? 0) - payable.PaymentAmountUsd);
+                        creditDetail.RemainVnd = creditDetail.RemainVnd < 0 ? 0 : creditDetail.RemainVnd;
+                        creditDetail.RemainUsd = ((creditDetail.RemainVnd ?? 0) == 0 || (creditDetail.RemainUsd ?? 0) == 0) ? 0 : ((creditDetail.RemainUsd ?? 0) - payable.PaymentAmountUsd);
                     }
                     else
                     {
                         creditDetail.RemainUsd = (creditDetail.RemainUsd ?? 0) == 0 ? (creditDetail.RemainUsd ?? 0) : ((creditDetail.RemainUsd ?? 0) - payable.PaymentAmountUsd);
-                        creditDetail.RemainVnd = ((creditDetail.RemainUsd ?? 0) == 0 || creditDetail.RemainVnd == 0) ? (creditDetail.RemainVnd ?? 0) : ((creditDetail.RemainVnd ?? 0) - payable.PaymentAmountVnd);
+                        creditDetail.RemainUsd = creditDetail.RemainUsd < 0 ? 0 : creditDetail.RemainUsd;
+                        creditDetail.RemainVnd = ((creditDetail.RemainUsd ?? 0) == 0 || creditDetail.RemainVnd == 0) ? 0 : ((creditDetail.RemainVnd ?? 0) - payable.PaymentAmountVnd);
                     }
-                    creditDetail.RemainVnd = creditDetail.RemainVnd < 0 ? 0 : creditDetail.RemainVnd;
-                    creditDetail.RemainUsd = creditDetail.RemainUsd < 0 ? 0 : creditDetail.RemainUsd;
 
                     payable.PaymentAmountVnd = remainPaymentVnd < 0 ? Math.Abs(remainPaymentVnd ?? 0) : 0;
                     payable.PaymentAmountUsd = remainPaymentUsd < 0 ? Math.Abs(remainPaymentUsd ?? 0) : 0;
