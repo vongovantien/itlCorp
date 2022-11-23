@@ -15,7 +15,8 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedStage.value}">
                             <label for="">Stage Content <span class="text-danger">(*)</span></label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedStage" [height]="150"
+                            <app-combo-grid-virtual-scroll placeholder="Please select"
+                                [currentActiveItemId]="selectedStage" [height]="150"
                                 (itemSelected)="onSelectData($event,'stage')" [dataSources]="configStage.dataSource"
                                 [displayFields]="configStage.displayFields"
                                 [selectedDisplayFields]="configStage.selectedDisplayFields"
@@ -31,7 +32,8 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedUser.value}">
                             <label for="">Assign To <span class="text-danger">(*)</span></label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedUser" [height]="150"
+                            <app-combo-grid-virtual-scroll placeholder="Please select"
+                                [currentActiveItemId]="selectedUser" [height]="150"
                                 (itemSelected)="onSelectData($event, 'user')" [dataSources]="configUser.dataSource"
                                 [displayFields]="configUser.displayFields"
                                 [selectedDisplayFields]="configUser.selectedDisplayFields"
@@ -45,21 +47,24 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="">House Bill</label>
-                            <ng-select [multiple]="true" [items]="houseBillList" (remove)="onRemoveDataFormInfo($event)"
-                                [(ngModel)]="selectedHbl" (change)="onSelectDataFormInfo($event)" class="custom"
-                                bindLabel="hwbno" bindValue="id">
+                            <ng-select [multiple]="true" [items]="houseBillList" [virtualScroll]="true"
+                                [clearable]="true" [(ngModel)]="selectedHbl" (change)="onSelectDataFormInfo($event)"
+                                placeholder="Please select" class="custom" bindLabel="hwbno" bindValue="id">
                             </ng-select>
                         </div>
                     </div>
                     <div class="col-md-12">
-                        <label for="">Description</label>
-                        <textarea cols="20" rows="10" class="form-control" [(ngModel)]="description"
-                            name=description></textarea>
+                        <div class="form-group">
+                            <label for="">Description</label>
+                            <textarea placeholder="Enter text" cols="20" rows="10" class="form-control"
+                                [(ngModel)]="description" name=description></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="assignStage()">
+                <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
+                    (click)="assignMultipleStage()">
                     <span>
                         <i class="la la-save"></i>
                         <span>

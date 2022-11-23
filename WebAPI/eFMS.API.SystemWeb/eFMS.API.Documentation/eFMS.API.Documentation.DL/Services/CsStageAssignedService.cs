@@ -77,11 +77,13 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var stage in listStageAssigned)
             {
                 orderNumber++;
+                var hbl = csTransDetailRepository.First(x => x.Id == stage.Hblid)?.Hwbno;
                 var assignedItem = mapper.Map<OpsStageAssigned>(stage);
                 assignedItem.Id = Guid.NewGuid();
+                assignedItem.Hblno = hbl;
                 assignedItem.DatetimeModified = assignedItem.DatetimeCreated = DateTime.Now;
-                assignedItem.UserCreated = assignedItem.UserModified = currentUser.UserID;
                 assignedItem.OrderNumberProcessed = orderNumber;
+
                 await DataContext.AddAsync(assignedItem, false);
             }
 

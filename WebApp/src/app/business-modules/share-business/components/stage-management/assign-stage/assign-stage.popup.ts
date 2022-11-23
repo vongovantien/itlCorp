@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { CsTransactionDetail } from '@models';
+import { CsTransactionDetail, Stage } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, map } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
 import { User } from 'src/app/shared/models';
-import { CatalogueRepo, DocumentationRepo, OperationRepo, SystemRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
 import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 
@@ -50,16 +50,14 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     jobId: string = '';
     isAssignment: boolean = false;
     houseBillList: CsTransactionDetail[];
-    houseBills: CsTransactionDetail[];
-    selectedHbl: CsTransactionDetail[];
+    selectedHbl: string[];
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _dataService: DataService,
         private _sysRepo: SystemRepo,
-        private _operationRepo: OperationRepo,
         private _toastService: ToastrService,
-        private _document: DocumentationRepo,
+        private _documentRepo: DocumentationRepo,
         private _activedRouter: ActivatedRoute
     ) {
         super();
@@ -109,21 +107,27 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
         }
     }
 
-    assignStage() {
+    assignMultipleStage() {
         this.isSubmitted = true;
         if (!this.selectedUser.value || !this.selectedStage.value) {
             return;
         }
-        const body: IAssignStage = {
-            id: "00000000-0000-0000-0000-000000000000",
-            jobId: this.jobId,
-            hblId: null,
-            stageId: this.selectedStageData.id,
-            mainPersonInCharge: this.selectedUserData.id,
-            description: this.description,
-            type: 'User'
-        };
-        this._operationRepo.assignStageOPS(body).pipe(catchError(this.catchError))
+        if (this.selectedHbl[0] === 'All') {
+            this.selectedHbl = this.houseBillList.filter(x => x.id !== 'All').map(x => x.id);
+        }
+
+        const body: any[] = this.selectedHbl.map((stage: any, index: number) => new Stage(stage));
+
+        for (const [index, value] of <any>body.entries()) {
+            value.id = "00000000-0000-0000-0000-000000000000";
+            value.jobId = this.jobId;
+            value.hblId = this.selectedHbl[index];
+            value.stageId = this.selectedStageData.id;
+            value.mainPersonInCharge = this.selectedUserData.id;
+            value.description = this.description;
+        }
+
+        this._documentRepo.addMultipleStageToJob(this.jobId, body).pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -131,7 +135,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
                         this.onAssign.emit(this.selectedStageData.jobId);
                         this.closePopup();
                     } else {
-                        this._toastService.warning(res.message);
+                        this._toastService.error(res.message);
                     }
                 },
             );
@@ -151,7 +155,6 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     }
 
     onSelectData(data: any, type: string) {
-
         switch (type) {
             case "stage":
                 this.selectedStageData = data;
@@ -165,15 +168,13 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     }
 
     getHblList(jobId: string) {
-        this._document.getHBLOfJob({ jobId: jobId })
+        this._documentRepo.getHBLOfJob({ jobId: jobId })
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    if (!!res) {
+                    if (!!res && res.length > 0) {
                         this.houseBillList = [new CsTransactionDetail({ id: 'All', hwbno: 'All' })]
                         this.houseBillList = this.houseBillList.concat(res);
-                        this.houseBills = this.houseBillList
-                        console.log(this.houseBillList)
                     }
                 }
             );
@@ -181,39 +182,23 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 
     closePopup() {
         this.hide();
-
         // * Reset value
         this.description = '';
         this.selectedStage = {};
         this.selectedUser = {};
+        this.selectedHbl = [];
         this.isSubmitted = false;
     }
 
-    onSelectDataFormInfo($event: CsTransactionDetail[]) {
-        console.log($event)
+    onSelectDataFormInfo($event: any) {
         if ($event.length > 0) {
             if ($event[$event.length - 1].id === 'All') {
-                this.houseBills = this.houseBillList.filter(x => x.id === 'All');
+                this.selectedHbl = []
+                this.selectedHbl.push(this.houseBillList[0].id);
             }
             else {
-                this.houseBills = this.houseBillList.filter(x => x.id !== 'All');
+                this.selectedHbl = this.selectedHbl.filter(x => x !== 'All');
             }
-            console.log(this.houseBillList)
-            console.log(this.houseBills)
         }
     }
-
-    onRemoveDataFormInfo($event) {
-        console.log($event)
-    }
-}
-
-interface IAssignStage {
-    id: string;
-    jobId: string;
-    hblId: string;
-    stageId: number;
-    mainPersonInCharge: string;
-    description: string;
-    type: string;
 }
