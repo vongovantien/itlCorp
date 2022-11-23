@@ -33,6 +33,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     formData: IEDocUploadFile;
     documentTypes: any[] = [];
     isSubmitted: boolean = false;
+
     constructor(
         private _toastService: ToastrService,
         private _store: Store<IAppState>,
@@ -62,7 +63,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             }
             this.listFile.push(files[i]);
-            this.listFile[i].aliasName = files[i].name.substring(0, files[i].name.lastIndexOf('.'));
+            //this.listFile[i].aliasName = files[i].name.substring(0, files[i].name.lastIndexOf('.'));
         }
         if (fileList?.length > 0) {
             let validSize: boolean = true;

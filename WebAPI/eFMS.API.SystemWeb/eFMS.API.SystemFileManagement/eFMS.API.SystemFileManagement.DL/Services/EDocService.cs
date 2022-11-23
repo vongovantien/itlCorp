@@ -276,7 +276,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 foreach (var item in models)
                                 {
                                     var attachTemplate = _attachFileTemplateRepo.Get(x => x.TransactionType == item.TransactionType && x.Code == edoc.Code).FirstOrDefault();
-                                    
+
                                     var imageDetail = new SysImageDetail
                                     {
                                         SysImageId = imageID,
@@ -684,9 +684,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserCreated = x.FirstOrDefault().UserCreated,
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
-                        Note = x.Count() > 1 ? null:x.FirstOrDefault().Note,
-                        HBLNo = x.Count() > 1?null:jobDetail != null ? jobDetail.HBLNo : null,
-                        JobNo = x.Count() > 1?null:jobDetail != null ? jobDetail.JobNo : null,
+                        Note = x.Count() > 1 ? null : x.FirstOrDefault().Note,
+                        HBLNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
+                        JobNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
                     };
                     lstEdoc.Add(edoc);
                 }
@@ -981,7 +981,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             if (fileName.Split('_').Count() > 0)
             {
                 var fileNameSplit = fileName.Split('_').ToList().Last();
-                var preFixFileName= fileName.Replace(fileNameSplit,"");
+                var preFixFileName = fileName.Replace(fileNameSplit, "");
                 for (int i = 0; i < prefixs.Count; i++)
                 {
                     if (!string.IsNullOrEmpty(prefixs[i]) && preFixFileName.Contains(prefixs[i]))
