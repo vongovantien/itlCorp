@@ -438,7 +438,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             chillId: null,
             fileName: this.typeFrom === 'Shipment' ? this.jobNo : this.billingNo
         }
-        this._systemFileRepo.dowloadallAttach(model)
+        this._systemFileRepo.dowloadallEDoc(model)
             .subscribe(
                 (res: any) => {
                     this.downLoadFile(res, "application/zip", model.fileName);

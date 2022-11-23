@@ -20,6 +20,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
+using static eFMS.API.Common.Helpers.FileHelper;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
 {
@@ -1519,6 +1520,76 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 return new HandleState(ex.ToString());
             }
+        }
+
+        public async Task<HandleState> CreateEDocZip(FileDowloadZipModel model)
+        {
+            HandleState result = new HandleState();
+            try
+            {
+                var lst = new List<SysImage>();
+
+                var edocs = new List<SysImageDetail>();
+                if (model.FolderName == "Shipment")
+                {
+                    edocs = await _sysImageDetailRepo.GetAsync(x => (x.JobId.ToString() == model.ObjectId));
+                }
+                else
+                {
+                    string billingNo = null;
+                    switch (model.FolderName)
+                    {
+                        case "SOA":
+                            var soa = await _soaRepo.GetAsync(x => x.Id == model.ObjectId);
+                            billingNo = soa.FirstOrDefault().Soano;
+                            break;
+                        case "Settlement":
+                            var settle = await _setleRepo.GetAsync(x => x.Id.ToString() == model.ObjectId);
+                            billingNo = settle.FirstOrDefault().SettlementNo;
+                            break;
+                        case "Advance":
+                            var adv = await _advRepo.GetAsync(x => x.Id.ToString() == model.ObjectId);
+                            billingNo = adv.FirstOrDefault().AdvanceNo;
+                            break;
+                    }
+                    edocs = await _sysImageDetailRepo.GetAsync(x => (x.BillingNo == billingNo));
+                }
+                var imageExist = _sysImageRepo.Get(x => x.ObjectId == model.ObjectId && !edocs.Select(z => z.SysImageId).Contains(x.Id)).Select(x => x.Id).Distinct();
+                lst = await _sysImageRepo.GetAsync(x => edocs.Select(y => y.SysImageId).Distinct().Contains(x.Id) || imageExist.Contains(x.Id));
+
+                if (lst == null) { return new HandleState("Not found data"); }
+                var files = new List<InMemoryFile>();
+                foreach (var it in lst)
+                {
+                    var request = new GetObjectRequest()
+                    {
+                        BucketName = _bucketName,
+                        Key = it.KeyS3
+                    };
+                    GetObjectResponse response = await _client.GetObjectAsync(request);
+                    if (response.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        var f = new InMemoryFile();
+                        f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = GetAliasName(it) };
+                        files.Add(f);
+                    }
+                }
+
+                return new HandleState(true, GetZipArchive(files));
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+        private string GetAliasName(SysImage image)
+        {
+            var name = _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).FirstOrDefault()?.SystemFileName;
+            if (name == null)
+            {
+                return "OT_" + image.Name;
+            }
+            return _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).FirstOrDefault()?.SystemFileName + Path.GetExtension(image.Url);
         }
     }
 }

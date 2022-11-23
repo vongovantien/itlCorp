@@ -317,15 +317,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     GetObjectResponse response = await _client.GetObjectAsync(request);
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
-                        var f = new InMemoryFile();
-                        if (model.FolderName.Contains("Edoc"))
-                        {
-                            f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = GetAliasName(it) };
-                        }
-                        else
-                        {
-                            f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = it.Name };
-                        }
+                        var f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = it.Name };
                         files.Add(f);
                     }
                 }
@@ -336,16 +328,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 return new HandleState(ex.ToString());
             }
-        }
-
-        private string GetAliasName(SysImage image)
-        {
-            var name = _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).FirstOrDefault()?.SystemFileName;
-            if (name == null)
-            {
-                return "OT_"+ image.Name;
-            }
-            return _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).FirstOrDefault()?.SystemFileName + Path.GetExtension(image.Url);
         }
 
         byte[] GetZipArchive(List<InMemoryFile> files)
