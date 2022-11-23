@@ -278,7 +278,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     GetObjectResponse response = await _client.GetObjectAsync(request);
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
-                        var f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = GetAliasName(it.Id)+Path.GetExtension(it.Url) };
+                        var f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = it.Name };
                         files.Add(f);
                     }
                 }
@@ -289,11 +289,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 return new HandleState(ex.ToString());
             }
-        }
-
-        private string GetAliasName(Guid imageId)
-        {
-            return _sysImageDetailRepo.Get(x=>x.SysImageId==imageId).FirstOrDefault()?.SystemFileName;
         }
 
         byte[] GetZipArchive(List<InMemoryFile> files)

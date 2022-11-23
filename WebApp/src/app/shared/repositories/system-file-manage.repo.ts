@@ -41,6 +41,13 @@ export class SystemFileManageRepo {
         );
     }
 
+    dowloadallEDoc(body: any) {
+        return this._api.downloadfile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/DowloadAllEDoc`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     uploadAttachedFiles(folder: string, id: string, files: FileList[], child?: string) {
         if (!!child) {
             return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Accounting/${folder}/${id}`, files, 'files', { child: child });
