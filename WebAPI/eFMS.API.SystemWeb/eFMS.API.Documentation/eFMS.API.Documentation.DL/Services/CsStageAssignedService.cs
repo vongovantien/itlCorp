@@ -73,7 +73,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public async Task<HandleState> AddMutipleStageAssigned(Guid jobId, List<CsStageAssignedModel> listStageAssigned)
+        public async Task<HandleState> AddMultipleStageAssigned(Guid jobId, List<CsStageAssignedModel> listStageAssigned)
         {
             var result = new HandleState();
             var orderNumber = DataContext.Where(x => x.JobId == jobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
@@ -102,7 +102,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public async Task<HandleState> SetMutipleStageAssigned(CsTransactionDetailModel currentHbl, CsTransactionModel currentJob, Guid jobId, Guid hblId, bool isHbl = false)
+        public async Task<HandleState> SetMultipleStageAssigned(CsTransactionDetailModel currentHbl, CsTransactionModel currentJob, Guid jobId, Guid hblId, bool isHbl = false)
         {
             var listStageAssigned = new List<CsStageAssignedModel>();
             var listStages = new List<CatStage>();
@@ -146,13 +146,13 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
-            listStageAssigned = await SetMutipleStageAssigned(listStages, jobId, hblId);
+            listStageAssigned = await SetMultipleStageAssigned(listStages, jobId, hblId);
 
-            hs = await AddMutipleStageAssigned(jobId, listStageAssigned);
+            hs = await AddMultipleStageAssigned(jobId, listStageAssigned);
             return hs;
         }
 
-        private async Task<List<CsStageAssignedModel>> SetMutipleStageAssigned(List<CatStage> listStages, Guid jobId, Guid hblId)
+        private async Task<List<CsStageAssignedModel>> SetMultipleStageAssigned(List<CatStage> listStages, Guid jobId, Guid hblId)
         {
             List<CsStageAssignedModel> listStageAssigned = new List<CsStageAssignedModel>();
 

@@ -889,7 +889,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 listStage.Add(newItem);
                             }
                         }
-                        var hS = await stageAssignedService.AddMutipleStageAssigned(jobId, listStage);
+                        var hS = await stageAssignedService.AddMultipleStageAssigned(jobId, listStage);
                     }
 
                     var result = detailTransactionRepository.SubmitChanges();
