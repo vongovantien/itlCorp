@@ -494,11 +494,11 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            var hsGenEdoc = _eDocService.GenerateEdoc(model);
-            if (hsGenEdoc.Result.Code == 403)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }
+            //var hsGenEdoc = _eDocService.GenerateEdoc(model);
+            //if (hsGenEdoc.Result.Code == 403)
+            //{
+            //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            //}
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
