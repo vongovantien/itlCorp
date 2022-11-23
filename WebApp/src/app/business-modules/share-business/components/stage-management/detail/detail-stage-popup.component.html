@@ -73,10 +73,11 @@
                                 <app-combo-grid-virtual-scroll *ngIf="!!data"
                                     [currentActiveItemId]="selectedMainPersonInCharge"
                                     (itemSelected)="onSelectMainPersonIncharge($event) "
-                                    [selectedDisplayFields]="configComboGrid.selectedDisplayFields " [dataSources]="configComboGrid.source
-                                        " [displayFields]="configComboGrid.displayFields ">
+                                    [selectedDisplayFields]="configComboGrid.selectedDisplayFields "
+                                    [dataSources]="configComboGrid.source" placeholder=" Please select"
+                                    [displayFields]=" configComboGrid.displayFields ">
                                 </app-combo-grid-virtual-scroll>
-                                <div class="form-control-feedback"
+                                <div class=" form-control-feedback"
                                     *ngIf="isSubmitted && !selectedMainPersonInCharge.value">
                                     Main person in charge is required!
                                 </div>
@@ -91,7 +92,7 @@
                                     (itemSelected)="onSelectRealPersonIncharge($event) "
                                     [selectedDisplayFields]="configComboGrid.selectedDisplayFields " [dataSources]="configComboGrid.source
                                         " [displayFields]="configComboGrid.displayFields"
-                                    [currentActiveItemId]="selectedRealPersonInCharge">
+                                    [currentActiveItemId]="selectedRealPersonInCharge" placeholder=" Please select">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -102,8 +103,9 @@
                                 <label class="form-control-label ">
                                     Description
                                 </label>
-                                <textarea class="form-control m-input m-input--square " rows="3 "
-                                    [formControl]="description" formControlName="description"></textarea>
+                                <textarea class="form-control m-input m-input--square " rows="3" placeholder=""
+                                    [formControl]="description" formControlName="description"
+                                    placeholder=" Enter text"></textarea>
                             </div>
                         </div>
                         <div class="col-lg-6 ">
@@ -113,7 +115,8 @@
                                     Comment
                                 </label>
                                 <textarea class="form-control m-input m-input--square " rows="3 "
-                                    [formControl]="comment" formControlName="comment"></textarea>
+                                    [formControl]="comment" formControlName="comment"
+                                    placeholder=" Enter text"></textarea>
                                 <div class="form-control-feedback"
                                     *ngIf="(status.value === 'Pending' || status.value === 'Deleted') && !comment.value">
                                     Comment is required!
@@ -138,7 +141,7 @@
                                 <app-combo-grid-virtual-scroll formControlName="hblno"
                                     [currentActiveItemId]="selectedHbl" [height]="150"
                                     (itemSelected)="onSelectHouseBill($event)" [dataSources]="configHbl.dataSource"
-                                    [displayFields]="configHbl.displayFields"
+                                    [displayFields]="configHbl.displayFields" placeholder="Please select"
                                     [selectedDisplayFields]="configHbl.selectedDisplayFields"
                                     (remove)="onRemoveData('hbl')">
                                 </app-combo-grid-virtual-scroll>

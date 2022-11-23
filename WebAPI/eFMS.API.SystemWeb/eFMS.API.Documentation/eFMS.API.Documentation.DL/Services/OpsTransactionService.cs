@@ -21,6 +21,7 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -1197,7 +1198,7 @@ namespace eFMS.API.Documentation.DL.Services
                        && x.SaleService.Contains("CL")
                        && x.Active == true
                        && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                        
+
                         if (customerContract == null)
                         {
                             string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
@@ -1345,7 +1346,7 @@ namespace eFMS.API.Documentation.DL.Services
                 result = new HandleState(ex.Message);
             }
             return result;
-         }
+        }
 
         private HandleState CreateJobAndClearanceReplicate(OpsTransaction opsTransaction, string productService, CustomsDeclarationModel cd,
             CatContract customerContract, out OpsTransaction opsTransactionReplicate, out CustomsDeclaration clearanceReplicate)
@@ -2658,7 +2659,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                                 listStage.Add(newOpsAssigned);
                             }
-                            HandleState hsAssign = await csStageAssignedService.AddMutipleStageAssigned(listStage);
+                            HandleState hsAssign = await csStageAssignedService.AddMultipleStageAssigned(job.Id, listStage);
 
                         }
                     }

@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { ApiService } from "../services";
-import { environment } from "src/environments/environment";
 import { throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
+import { environment } from "src/environments/environment";
+import { ApiService } from "../services";
 
 @Injectable({ providedIn: 'root' })
 export class OperationRepo {
@@ -115,7 +115,7 @@ export class OperationRepo {
             map((data: any) => data)
         );
     }
-    
+
     getClearanceType() {
         return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/GetClearanceTypes`)
             .pipe(

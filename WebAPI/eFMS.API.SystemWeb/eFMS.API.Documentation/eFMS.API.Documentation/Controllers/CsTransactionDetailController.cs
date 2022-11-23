@@ -234,7 +234,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (hs.Success)
                 {
-                    var handleStage = await csStageAssignedService.SetMutipleStageAssigned(currentHBL, null, model.JobId, model.Id, true);
+                    var handleStage = await csStageAssignedService.SetMultipleStageAssigned(currentHBL, null, model.JobId, model.Id, true);
                 }
 
             });
