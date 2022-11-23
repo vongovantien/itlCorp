@@ -8,6 +8,7 @@ namespace eFMS.API.Catalogue.DL.Models
 {
     public class CatStandardChargeModel : CatStandardCharge
     {
+        public string Code { get; set; }
         public PermissionAllowBase Permission { get; set; }
     }
 }

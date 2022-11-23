@@ -30,25 +30,17 @@ namespace eFMS.API.Catalogue.Controllers
     public class CatStandardChargeController : ControllerBase
     {
         
-         private readonly IStringLocalizer stringLocalizer;
          private readonly ICatStandardChargeService catStandardChargeService;
-
-         private readonly ICatChargeDefaultAccountService catChargeDefaultAccountService;
          private readonly IMapper mapper;
          private readonly ICurrentUser currentUser;
-         private readonly IHostingEnvironment _hostingEnvironment;
          public CatStandardChargeController(ICatStandardChargeService service,
-            ICatChargeDefaultAccountService catChargeDefaultAccount,
             IMapper imapper,
-            ICurrentUser user,
-            IHostingEnvironment hostingEnvironment
-         )
+            ICurrentUser user)
+         
          {
              catStandardChargeService = service;
-             catChargeDefaultAccountService = catChargeDefaultAccount;
              mapper = imapper;
              currentUser = user;
-             _hostingEnvironment = hostingEnvironment;
          }
 
         /// <summary>
@@ -62,7 +54,18 @@ namespace eFMS.API.Catalogue.Controllers
             var data = catStandardChargeService.Get();
             return Ok(data);
         }
-
+        /// <summary>
+        /// get standCharge by type and transactionType
+        /// </summary>
+        /// <param name="type">type=BUY/SELL/OBH</param>
+        /// <param name="transactionType">transactionType=AI/AE/SFE/SFI/SLE/SLI/SCE/SCI</param>
+        /// <returns></returns>
+        [HttpGet("GetBy")]
+        public IActionResult GetBy(string type, string transactionType)
+        {
+            var data = catStandardChargeService.GetBy(type, transactionType);
+            return Ok(data);
+        }
         /// <summary>
         /// read standard charge data from file excel 
         /// </summary>
@@ -78,18 +81,16 @@ namespace eFMS.API.Catalogue.Controllers
                 ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
                 int rowCount = worksheet.Dimension.Rows;
                 if (rowCount < 2) return BadRequest();
-
                 List<CatStandardChargeImportModel> list = new List<CatStandardChargeImportModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
                     var standardCharge = new CatStandardChargeImportModel
                     {
                         IsValid = true,
-                        Id = Guid.NewGuid(),
-                        ChargeId = Guid.Parse(worksheet.Cells[row, 1].Value?.ToString().Trim()),
+                        Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
                         Quantity = Convert.ToDecimal(worksheet.Cells[row, 2].Value?.ToString().Trim()),
                         UnitPrice = Convert.ToDecimal(worksheet.Cells[row, 3].Value?.ToString().Trim()),
-                        Currency = Convert.ToDecimal(worksheet.Cells[row, 4].Value?.ToString().Trim()),
+                        Currency = worksheet.Cells[row, 4].Value?.ToString().Trim(),
                         VatRate = Convert.ToDecimal(worksheet.Cells[row, 5].Value?.ToString().Trim()),
                         Type = worksheet.Cells[row, 6].Value?.ToString().Trim(),
                         TransactionType = worksheet.Cells[row, 7].Value?.ToString().Trim(),
@@ -97,36 +98,21 @@ namespace eFMS.API.Catalogue.Controllers
                         ServiceType = worksheet.Cells[row, 9].Value?.ToString().Trim(),
                         Office = worksheet.Cells[row, 10].Value?.ToString().Trim(),
                         Note = worksheet.Cells[row, 11].Value?.ToString().Trim()
-                    
+
                     };
                     list.Add(standardCharge);
                 }
-                return Ok();
+                var sc = catStandardChargeService.Import(list);
+                ResultHandle result = new ResultHandle { Status = sc.Success, Message = "Import successfully !!!" };
+                if (!sc.Success)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = sc.Message.ToString() });
+                }
+                return Ok(result); ;
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }
 
-        /// <summary>
-        /// import list standa charge into database
-        /// </summary>
-        /// <param name="data">list of data</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("import")]
-        [Authorize]
-        public IActionResult Import([FromBody] List<CatStandardChargeImportModel> data)
-        {
-            var hs = catStandardChargeService.Import(data);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully!!!" };
-            if (hs.Success)
-            {
-                return Ok(result);
-            }
-            else
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = hs.Exception.Message });
-            }
-        }
 
     }
 
