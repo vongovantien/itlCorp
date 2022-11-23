@@ -865,7 +865,7 @@ namespace eFMS.API.Documentation.DL.Services
                     if (listHBL.Count() > 0)
                     {
                         List<CsStageAssignedModel> listStage = new List<CsStageAssignedModel>();
-                        var orderNumber = stageAssignedService.Get(x => x.JobId == listHBL.FirstOrDefault().JobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
+                        var jobId = listHBL.FirstOrDefault().JobId;
 
                         foreach (var item in listHBL)
                         {
@@ -885,13 +885,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 newItem.JobId = item.JobId;
                                 newItem.Type = DocumentConstants.FROM_SYSTEM;
                                 newItem.DatetimeCreated = newItem.DatetimeModified = DateTime.Now;
-                                newItem.OrderNumberProcessed = orderNumber + 1;
 
                                 listStage.Add(newItem);
-                                orderNumber++;
                             }
                         }
-                        var hS = await stageAssignedService.AddMutipleStageAssigned(listStage);
+                        var hS = await stageAssignedService.AddMutipleStageAssigned(jobId, listStage);
                     }
 
                     var result = detailTransactionRepository.SubmitChanges();
