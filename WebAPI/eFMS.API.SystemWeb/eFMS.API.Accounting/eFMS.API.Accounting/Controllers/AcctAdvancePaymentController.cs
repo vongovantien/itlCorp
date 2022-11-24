@@ -392,7 +392,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut]
         [Route("Update")]
         [Authorize]
-        public async IActionResult Update(AcctAdvancePaymentModel model)
+        public IActionResult Update(AcctAdvancePaymentModel model)
         {
             currentUser.Action = "UpdateAdvancePayment";
 
