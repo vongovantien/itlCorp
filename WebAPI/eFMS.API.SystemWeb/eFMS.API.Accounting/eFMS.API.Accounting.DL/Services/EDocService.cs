@@ -7,13 +7,10 @@ using eFMS.API.Common.Helpers;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
-using Remotion.Linq.Clauses.ResultOperators;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
@@ -44,7 +41,7 @@ namespace eFMS.API.Accounting.DL.Services
             _csTranRepo = tranrepository;
         }
 
-        public async Task<HandleState> GenerateEdoc(CreateUpdateSettlementModel model)
+        public async Task<HandleState> GenerateEdocSettlement(CreateUpdateSettlementModel model)
         {
             try
             {
@@ -65,20 +62,20 @@ namespace eFMS.API.Accounting.DL.Services
                 jobCharge.Distinct();
                 var jobModel = model.ShipmentCharge.Select(x => x.ShipmentId).Distinct().ToList();
                 var jobDel = jobCharge.Where(x => !jobModel.Contains((Guid)x)).Distinct().ToList();
-                var jobAddHBLs = model.ShipmentCharge.Where(x => x.Id == Guid.Empty).Select(x=>x.Hblid);
-                var jobIds = surchargetRepo.Get(x => jobAddHBLs.Contains(x.Hblid)).Select(x => new { x.JobNo,x.TransactionType }).GroupBy(x=>x.JobNo).ToList();
+                var jobIds = model.ShipmentCharge.Where(x => x.Id == Guid.Empty).ToList();
                 var jobAdd = new List<Guid>();
                 jobIds.ForEach(x =>
                 {
-                    if (x.FirstOrDefault()?.TransactionType == "CL")
+                    if (x.JobId.Contains("LOG"))
                     {
-                        jobAdd.Add(opsTranRepo.Get(z => z.JobNo == x.FirstOrDefault().JobNo).FirstOrDefault().Id);
+                        jobAdd.Add(opsTranRepo.Get(z => z.JobNo == x.JobId).FirstOrDefault().Id);
                     }
                     else
                     {
-                        jobAdd.Add(_csTranRepo.Get(z => z.JobNo == x.FirstOrDefault().JobNo).FirstOrDefault().Id);
+                        jobAdd.Add(_csTranRepo.Get(z => z.JobNo == x.JobId).FirstOrDefault().Id);
                     }
                 });
+                var jobExist = new List<Guid>();
                 if (jobDel.Count() > 0)
                 {
                     await DelEdocForJobDel(model.Settlement.SettlementNo, jobDel);
@@ -96,8 +93,17 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
+        private async Task<bool> HaveEdoc(Guid imageId, Guid jobId)
+        {
+            var edocExist = await DataContext.GetAsync(x => x.JobId == jobId && x.SysImageId == imageId);
+            if (edocExist.FirstOrDefault() != null)
+            {
+                return true;
+            }
+            return false;
+        }
 
-        private async Task DelEdocForJobDel(string BillingNo,List<Guid?> JobIds)
+        private async Task DelEdocForJobDel(string BillingNo, List<Guid?> JobIds)
         {
             await DataContext.DeleteAsync(x => x.BillingNo == BillingNo && JobIds.Contains(x.JobId));
         }
@@ -113,10 +119,28 @@ namespace eFMS.API.Accounting.DL.Services
                     edoc.Id = Guid.NewGuid();
                     edoc.JobId = z;
                     edoc.BillingNo = BillingNo;
-                    DataContext.Add(edoc,false);
+                    if (!HaveEdoc((Guid)edoc.SysImageId, z).Result)
+                    {
+                        DataContext.Add(edoc, false);
+                    }
                 });
             });
             DataContext.SubmitChanges();
+        }
+
+        public async Task DeleteEdocByBillingNo(string billingNo)
+        {
+            await DataContext.DeleteAsync(x => x.BillingNo == billingNo);
+        }
+
+        public Task<HandleState> GenerateEdocSOA(AcctSoaModel model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<HandleState> GenerateEdocAdvance(AcctAdvancePaymentModel model)
+        {
+            throw new NotImplementedException();
         }
     }
 }
