@@ -5753,8 +5753,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 parameters = parameters.Concat(new[] { new SqlParameter("@ClearanceNo", clearanceNo) }).ToArray();
             }
-            // List<sp_GetSurchargeDetailSettlement> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSettlement>(parameters);
-            var listSurcharges = DbHelper.DbHelper.ExecuteProcedure<sp_GetSurchargeDetailSettlement>("sp_GetSurchargeDetailSettlement", parameters).Result;
+            List<sp_GetSurchargeDetailSettlement> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSettlement>(parameters);
             var data = mapper.Map<List<ShipmentChargeSettlement>>(listSurcharges);
             return data;
         }
