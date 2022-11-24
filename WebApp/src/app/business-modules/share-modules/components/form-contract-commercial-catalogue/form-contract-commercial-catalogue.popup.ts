@@ -515,7 +515,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                                     this.uploadFileContract(res.data);
                                 }
                                 this.onRequest.emit(true);
-                                this.formGroup.reset();
+                                // this.formGroup.reset();
                                 this.hide();
                             } else {
                                 this._toastService.error(res.message);
@@ -614,7 +614,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.onRequest.emit(this.selectedContract);
-                        this.formGroup.reset();
+                        // this.formGroup.reset();
                         this.hide();
                     } else {
                         this._toastService.error(res.message);
@@ -1050,7 +1050,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     close() {
         this.selectedSalesmanData = null;
-        this.formGroup.reset()
+        // this.formGroup.reset();
         this.hide();
     }
 
