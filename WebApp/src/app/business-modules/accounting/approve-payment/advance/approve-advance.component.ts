@@ -129,6 +129,7 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
 
                         this.formCreateComponent.formCreate.disable();
                         this.formCreateComponent.isDisabled = true;
+                        this.formCreateComponent.payeeName = this.advancePayment.payeeName;
                         if (!this.isAdvCarrier) {
                             this.listRequestAdvancePaymentComponent.isLoading = true;
                             this.listRequestAdvancePaymentComponent.listRequestAdvancePayment = this.advancePayment.advanceRequests;
