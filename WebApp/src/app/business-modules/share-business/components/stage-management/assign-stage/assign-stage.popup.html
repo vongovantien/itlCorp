@@ -45,12 +45,18 @@
                         </div>
                     </div>
                     <div class="col-md-12">
-                        <div class="form-group">
-                            <label for="">House Bill</label>
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && !this.selectedHbl && this.selectedStage.value === 'Make Advance/ Settlement'}">
+                            <label for="">House Bill <span *ngIf=" selectedStage.value==='Make Advance/ Settlement'"
+                                    class=" text-danger">(*)</span></label>
                             <ng-select [multiple]="true" [items]="houseBillList" [virtualScroll]="true"
                                 [clearable]="true" [(ngModel)]="selectedHbl" (change)="onSelectDataFormInfo($event)"
                                 placeholder="Please select" class="custom" bindLabel="hwbno" bindValue="id">
                             </ng-select>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && !this.selectedHbl && this.selectedStage.value === 'Make Advance/ Settlement'">
+                                House Bill is required!
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-12">
