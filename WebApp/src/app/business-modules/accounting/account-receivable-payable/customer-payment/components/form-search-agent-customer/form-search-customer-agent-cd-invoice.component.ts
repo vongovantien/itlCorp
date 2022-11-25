@@ -175,8 +175,8 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
             { partnerId: data.id, status: true })
             .subscribe(
                 (d: any[]) => {
+                    this.contractList = d;
                     if (!!d && !!d.length) {
-                        this.contractList = d;
                         this.partnerId.setValue(data.id);
 
                         //*  Check đối tượng đang search có khác với đối tượng bên ngoài receipt

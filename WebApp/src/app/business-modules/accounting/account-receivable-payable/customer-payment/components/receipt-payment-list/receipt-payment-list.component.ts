@@ -583,6 +583,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         this.debitList
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
+                x.forEach((item: ReceiptInvoiceModel) => {
+                    item.exchangeRateBilling = (!item.exchangeRateBilling || item.exchangeRateBilling === 0 ? this.exchangeRate.value : item.exchangeRateBilling);
+                } )
                 listInvoice = cloneDeep<ReceiptInvoiceModel[]>(x);
             });
         const body: IProcessClearInvoiceModel = {
