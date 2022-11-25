@@ -1,4 +1,4 @@
-import { LoadListSettlePayment } from './components/store/actions/settlement-payment.action';
+import { LoadListSettlePayment, LoadListSettlePaymentSuccess } from './components/store/actions/settlement-payment.action';
 import { takeUntil, withLatestFrom, concatMap, switchAll } from 'rxjs/operators';
 import { getSettlementPaymentListState, getSettlementPaymentSearchParamsState, getSettlementPaymentListPagingState, getSettlementPaymentListLoadingState } from './components/store/reducers/index';
 import { InjectViewContainerRefDirective } from './../../../shared/directives/inject-view-container-ref.directive';
@@ -137,8 +137,27 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
                     this.page = data.page;
                     this.pageSize = data.pageSize;
+                    //* Handle Cached.
+                    if (!!this.settlements.length && !!this.dataSearch?.referenceNos?.length) {
+                        let resultsCached = [];
 
-                    this.requestSettlePaymentList();
+                        resultsCached = this.settlements.filter(x => this.dataSearch.referenceNos.includes(x.settlementNo));
+
+                        if (resultsCached.length >= this.dataSearch?.referenceNos?.length) {
+                            const response: CommonInterface.IResponsePaging = {
+                                data: resultsCached,
+                                page: 1,
+                                size: this.pageSize,
+                                totalItems: resultsCached.length
+                            };
+                            this._store.dispatch(LoadListSettlePaymentSuccess(response));
+                            return;
+                        } else {
+                            this.requestSettlePaymentList();
+                        }
+                    } else {
+                        this.requestSettlePaymentList();
+                    }
                 }
             );
 
