@@ -2394,7 +2394,8 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     if (criteria.ReceiptType.ToLower() == "agent")
                     {
-                        invoice.PaidAmountVnd = NumberHelper.RoundNumber((invoice.PaidAmountUsd ?? 0) * (invoice.ExchangeRateBilling ?? 0), 2);
+                        invoice.PaidAmountVnd = NumberHelper.RoundNumber((invoice.PaidAmountUsd ?? 0) * (invoice.ExchangeRateBilling ?? 0), 0);
+                        invoice.TotalPaidVnd = NumberHelper.RoundNumber((invoice.TotalPaidUsd ?? 0) * (invoice.ExchangeRateBilling ?? 0), 0);
                     }
                 }
                 else
@@ -2409,7 +2410,7 @@ namespace eFMS.API.Accounting.DL.Services
             return new ProcessClearInvoiceModel
             {
                 Invoices = invoiceList,
-                CusAdvanceAmountVnd = NumberHelper.RoundNumber(paidVnd, 0),
+                CusAdvanceAmountVnd = (criteria.ReceiptType.ToLower() == "agent") ? NumberHelper.RoundNumber(paidUsd * criteria.FinalExchangeRate, 0) : NumberHelper.RoundNumber(paidVnd, 0),
                 CusAdvanceAmountUsd = NumberHelper.RoundNumber(paidUsd, 2),
             };
         }
