@@ -98,6 +98,16 @@ const routes: Routes = [
             checkMenu: MenuResolveGuard
         },
     },
+    {
+        path: 'upload-edoc', loadChildren: () => import('./upload-edoc/upload-edoc.module').then(m => m.UploadEdocModule),
+        data: {
+            name: "Upload eDoc",
+            title: "eFMS Upload eDOC"
+        },
+        resolve: {
+            checkMenu: MenuResolveGuard
+        },
+    }
 ];
 
 @NgModule({
