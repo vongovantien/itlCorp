@@ -37,9 +37,27 @@ namespace eFMS.API.Catalogue.DL.Services
         }        
         public IQueryable<CatStandardChargeModel> GetBy(string type, string transactionType)
         {
-            var data = DataContext.Get(x =>(x.Type == type && x.TransactionType == transactionType));
-            if (data == null) return null;
-            return data.ProjectTo<CatStandardChargeModel>(mapper.ConfigurationProvider);
+            IQueryable<CatStandardCharge> standCharge = DataContext.Get(x => (x.Type == type && x.TransactionType == transactionType));
+            if (standCharge == null) return null;
+            IQueryable<CatStandardChargeModel> result = (
+               from stcharge in standCharge
+               join charge in catChargeReposity.Get() on stcharge.ChargeId equals charge.Id
+               select new CatStandardChargeModel
+               {
+                   ChargeId = stcharge.ChargeId,
+                   Code = charge.Code,
+                   Quantity = stcharge.Quantity,
+                   UnitPrice = stcharge.UnitPrice,
+                   CurrencyId = stcharge.CurrencyId,
+                   Vatrate = stcharge.Vatrate,
+                   Type = stcharge.Type,
+                   TransactionType = stcharge.TransactionType,
+                   Service = stcharge.Service,
+                   ServiceType = stcharge.ServiceType,
+                   Office = stcharge.Office,
+                   Notes = stcharge.Notes
+               });
+            return result;
         }
         public HandleState Import(List<CatStandardChargeImportModel> data)
         {
@@ -53,14 +71,14 @@ namespace eFMS.API.Catalogue.DL.Services
                         ChargeId = catChargeReposity.Get(x => x.Code == item.Code).FirstOrDefault()?.Id,
                         Quantity = item.Quantity,
                         UnitPrice = item.UnitPrice,
-                        Currency = item.Currency,
-                        VatRate = item.VatRate,
+                        CurrencyId = item.CurrencyId,
+                        Vatrate = item.Vatrate,
                         Type = item.Type,
                         TransactionType = item.TransactionType,
                         Service = item.Service,
                         ServiceType = item.ServiceType,
                         Office = item.Office,
-                        Note = item.Note,
+                        Notes = item.Notes,
                         UserCreated = currentUser.UserID,
                         DatetimeCreated = DateTime.Now,
                         UserModified = currentUser.UserID,
@@ -77,6 +95,16 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return new HandleState(ex.Message);
             }
+        }
+        public HandleState DeleteStandard(Guid chargeId)
+        {
+                var hs = DataContext.Delete(x => (x.ChargeId == chargeId || x.ChargeId == null));
+                if (hs.Success == true)
+                {
+                    ClearCache();
+                    Get();
+                }
+                return hs;
         }
     }
 }

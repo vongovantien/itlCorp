@@ -1,6 +1,7 @@
 export class StandardCharge {
     id: string = '';
     chargeId: string = '';
+    code: string = '';
     quantity: number = 0;
     unitPrice: number = 0;
     currency: string = null;

@@ -1398,7 +1398,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.ChargeId).HasColumnName("ChargeID");
 
-                entity.Property(e => e.Currency)
+                entity.Property(e => e.CurrencyId)
                 .HasMaxLength(30)
                 .IsUnicode(false);;
 
@@ -1410,7 +1410,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
-                entity.Property(e => e.Note).HasMaxLength(500);
+                entity.Property(e => e.Notes).HasMaxLength(500);
 
                 entity.Property(e => e.Office).HasMaxLength(100);
 
@@ -1436,7 +1436,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.VatRate).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.Vatrate).HasColumnType("decimal(18, 4)");
             });
 
             modelBuilder.Entity<CatTransportationMode>(entity =>

@@ -1190,7 +1190,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     mapChargeToShipmentSurCharge(charges: StandardCharge[]): CsShipmentSurcharge[] {
         const newCsShipmentSurcharge: CsShipmentSurcharge[] = charges.map((c: StandardCharge) => new CsShipmentSurcharge(
             Object.assign({}, c, {
-                chargeCode: null,
+                chargeCode: c.code,
                 type: CommonEnum.SurchargeTypeEnum.BUYING_RATE,
                 chargeId: c.chargeId,
                 id: SystemConstants.EMPTY_GUID,

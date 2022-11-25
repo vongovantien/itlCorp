@@ -13,6 +13,7 @@ namespace eFMS.API.Catalogue.DL.IService
     {
         IQueryable<CatStandardChargeModel> GetBy(string type, string transactionType);
         HandleState Import(List<CatStandardChargeImportModel> data);
+        HandleState DeleteStandard(Guid chargeId);
     }
    
 }

@@ -6,6 +6,7 @@ using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -29,7 +30,7 @@ namespace eFMS.API.Catalogue.Controllers
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     public class CatStandardChargeController : ControllerBase
     {
-        
+         private readonly IStringLocalizer stringLocalizer;
          private readonly ICatStandardChargeService catStandardChargeService;
          private readonly IMapper mapper;
          private readonly ICurrentUser currentUser;
@@ -90,14 +91,14 @@ namespace eFMS.API.Catalogue.Controllers
                         Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
                         Quantity = Convert.ToDecimal(worksheet.Cells[row, 2].Value?.ToString().Trim()),
                         UnitPrice = Convert.ToDecimal(worksheet.Cells[row, 3].Value?.ToString().Trim()),
-                        Currency = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                        VatRate = Convert.ToDecimal(worksheet.Cells[row, 5].Value?.ToString().Trim()),
+                        CurrencyId = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                        Vatrate = Convert.ToDecimal(worksheet.Cells[row, 5].Value?.ToString().Trim()),
                         Type = worksheet.Cells[row, 6].Value?.ToString().Trim(),
                         TransactionType = worksheet.Cells[row, 7].Value?.ToString().Trim(),
                         Service = worksheet.Cells[row, 8].Value?.ToString().Trim(),
                         ServiceType = worksheet.Cells[row, 9].Value?.ToString().Trim(),
                         Office = worksheet.Cells[row, 10].Value?.ToString().Trim(),
-                        Note = worksheet.Cells[row, 11].Value?.ToString().Trim()
+                        Notes = worksheet.Cells[row, 11].Value?.ToString().Trim()
 
                     };
                     list.Add(standardCharge);
@@ -111,6 +112,26 @@ namespace eFMS.API.Catalogue.Controllers
                 return Ok(result); ;
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="chargeId">delete data</param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("delete/{chargeId}")]
+
+        public IActionResult Delete(Guid chargeId)
+        {
+
+            var hs = catStandardChargeService.DeleteStandard(chargeId);
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
 
