@@ -1062,7 +1062,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     close() {
         this.selectedSalesmanData = null;
-        this.formGroup.reset()
+        this.formGroup.reset();
         this.hide();
     }
 
