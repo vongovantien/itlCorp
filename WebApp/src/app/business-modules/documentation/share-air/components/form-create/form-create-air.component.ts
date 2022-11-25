@@ -251,7 +251,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             jobNo: [{ value: null, disabled: true }],
             notes: [],
             mawb: ['', Validators.compose([
-                Validators.required,
+                FormValidators.required,
                 Validators.pattern(SystemConstants.CPATTERN.MAWB),
                 FormValidators.validateMAWB,
                 FormValidators.validateSpecialChar
@@ -481,7 +481,6 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     }
 
     onBlurGetAirline(data: any) {
-
         const hawb: string = data.target.value.substring(0, 3);
         if (this.mawb.valid && !!hawb) {
             //
@@ -591,10 +590,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 else {
                     this.isCheckedActive = false;
                     this.formGroup.get('mawb').setValidators([
-                        // Validators.required,
-                        // Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                        // FormValidators.validateMAWB,
-                        // FormValidators.validateSpecialChar
+                        FormValidators.required,
+                        Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                        FormValidators.validateMAWB,
+                        FormValidators.validateSpecialChar
                     ]);
                 }
                 this.formGroup.get('mawb').updateValueAndValidity();
