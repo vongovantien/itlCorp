@@ -189,14 +189,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.type = result.type;
         });
 
-        this.formGroup.get("effectiveDate").valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                map((data: any) => data.startDate)
-            )
-            .subscribe((value: any) => {
-                this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
-            });
+        // this.formGroup.get("effectiveDate").valueChanges
+        //     .pipe(
+        //         distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+        //         map((data: any) => data.startDate)
+        //     )
+        //     .subscribe((value: any) => {
+        //         this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
+        //     });
+
         if (!!this.trialEffectDate.value) {
             this.formGroup.get("trialEffectDate").valueChanges
                 .pipe(
@@ -515,7 +516,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                                     this.uploadFileContract(res.data);
                                 }
                                 this.onRequest.emit(true);
-                                // this.formGroup.reset();
+                                this.formGroup.reset();
                                 this.hide();
                             } else {
                                 this._toastService.error(res.message);
@@ -614,7 +615,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.onRequest.emit(this.selectedContract);
-                        // this.formGroup.reset();
+                        this.formGroup.reset();
                         this.hide();
                     } else {
                         this._toastService.error(res.message);
@@ -727,6 +728,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.contractTypeDetail = this.selectedContract.contractType;
 
         this.formatAutoExtendDays();
+
+        this.expiredDate.setValue(this.formGroup.controls['expiredDate']);
     }
     assignValueToModel() {
         if (this.isUpdate) {
@@ -915,6 +918,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 30)),
             });
         }
+
+        this.minDateExpired.setValue(new Date(this.effectiveDate?.value?.startDate));
     }
 
     selectedService($event: any) {
@@ -1050,7 +1055,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     close() {
         this.selectedSalesmanData = null;
-        // this.formGroup.reset();
+        this.formGroup.reset();
         this.hide();
     }
 
