@@ -316,14 +316,15 @@ export class StatementOfAccountEditComponent extends AppList {
                     * and
         * startDate must <= soaFromDate
         */
-        if (!this.excRateUsdToLocal) {
+        if (this.excRateUsdToLocal) {
             if (this.excRateUsdToLocal <=0) {
                 this._toastService.warning(`Required to enter Excel USD greater than 0`);
                 return;
-            } else {
-                this._toastService.warning(`Required to enter Excel USD`);
-                return;
             }
+        }
+        else {
+            this._toastService.warning(`Exc USD is required!`);
+            return;
         }
         if ((new Date(this.selectedRange.startDate).getDate() > new Date(this.soa.soaformDate).getDate()) || new Date(this.selectedRange.endDate).getDate() < new Date(this.soa.soatoDate).getDate()) {
             this._toastService.warning(`Range date invalid `);

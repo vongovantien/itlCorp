@@ -271,7 +271,7 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
                     return;
                 }
             } else {
-                this._toastService.warning(`Required to enter Excel USD`);
+                this._toastService.warning(`Exc USD is required!`);
                 return;
             }
         }
