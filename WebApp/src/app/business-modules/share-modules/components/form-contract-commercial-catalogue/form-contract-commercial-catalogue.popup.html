@@ -333,12 +333,14 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !trialCreditDays.valid }">
                                         <label>Trial Credit Days
                                         </label>
-                                        <input type="number" min="0" (change)="onChageTrialCreditDays()"
+                                        <input type="number" (change)="onChageTrialCreditDays()"
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
                                             class="form-control" formControlName="trialCreditDays">
+                                            <p class="text-danger invalid" *ngIf="trialCreditDays.invalid">The value entered is not valid</p>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -388,11 +390,11 @@
                                 *ngIf=" isUpdate ||  (!isUpdate  && (contractType.value ==='Official' || contractType.value ==='Trial'))">
                                 <div class="col-lg-2">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger':isSubmitted  && !paymentTerm.valid }">
+                                        [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentTerm.valid }">
                                         <label>Payment Term</label>
-                                        <input type="number" min="0" numeric [decimals]="digitDecimal" [attr.disabled]="(menuSpecialPermission | async | specialPermission:
+                                        <input type="number" numeric [decimals]="digitDecimal" [attr.disabled]="(menuSpecialPermission | async | specialPermission:
                                         'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
-                                            class="form-control" formControlName="paymentTerm">
+                                            class="form-control" formControlName="paymentTerm" maxlength="3">
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -400,10 +402,10 @@
                                         [ngClass]="{'m-form__group has-danger':isSubmitted  && !paymentTermObh.valid }">
                                         <label>Payment Term OBH</label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                            <input type="number" min="0" numeric [decimals]="digitDecimal"
+                                            <input type="number" numeric [decimals]="digitDecimal"
                                                 [attr.disabled]="(menuSpecialPermission | async | specialPermission:
                                             'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
-                                                class="form-control" formControlName="paymentTermObh">
+                                                class="form-control" formControlName="paymentTermObh" maxlength="3">
                                         </div>
                                     </div>
                                 </div>
@@ -417,11 +419,12 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':isSubmitted  && !creditLimitRate?.valid }">
                                         <label>Credit Limited Rate</label>
-                                        <input min="0"
+                                        <input numeric [decimals]="digitDecimal"
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
-                                            type="number" class="form-control" formControlName="creditLimitRate">
+                                            type="number" class="form-control" formControlName="creditLimitRate" maxlength="10" autoFormatCurrency>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
