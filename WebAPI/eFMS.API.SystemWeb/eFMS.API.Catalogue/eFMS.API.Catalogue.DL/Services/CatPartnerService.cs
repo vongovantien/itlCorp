@@ -2264,11 +2264,14 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
                 query = criteria.Active != null ? query.And(x => x.Active == criteria.Active) : query;
-
+                if (!string.IsNullOrEmpty(criteria.PartnerType))
+                {
+                    query = query.And(x => x.PartnerType == criteria.PartnerType);
+                }
 
                 data = DataContext.Get(query);
                 Expression<Func<CatContract, bool>> queryContract = x => x.Active == true && (x.IsExpired == null || x.IsExpired == false);
-                if(!string.IsNullOrEmpty(criteria.Service))
+                if (!string.IsNullOrEmpty(criteria.Service))
                 {
                     queryContract = queryContract.And(x => IsMatchService(x.SaleService, criteria.Service));
                 }
@@ -2278,7 +2281,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     queryContract = queryContract.And(x => IsMatchOffice(x.OfficeId, criteria.Office));
                 }
 
-                if(criteria.SalemanId != null)
+                if (criteria.SalemanId != null)
                 {
                     queryContract = queryContract.And(x => x.SaleManId == criteria.SalemanId);
                 }
@@ -2293,8 +2296,14 @@ namespace eFMS.API.Catalogue.DL.Services
             else
             {
                 data = DataContext.Where(x => x.Active == criteria.Active || criteria.Active == null);
+                if (!string.IsNullOrEmpty(criteria.PartnerType))
+                {
+                    data = data.Where(x => x.PartnerType == criteria.PartnerType);
+                }
             }
             if (data == null) return null;
+
+            data = data.GroupBy(x => x.Id).Select(x => x.FirstOrDefault());
             var results = data.Select(x => new CatPartnerViewModel2
             {
                 Id = x.Id,

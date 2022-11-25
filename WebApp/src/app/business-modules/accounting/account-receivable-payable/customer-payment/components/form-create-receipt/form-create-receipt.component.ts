@@ -73,7 +73,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     }
     ngOnInit() {
         this.initForm();
-        this.getCustomerAgent();
 
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -87,6 +86,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                             this.getRequireAgreementAgent();
                         }
                     }
+                    this.getCustomerAgent();
                 }
             )
     }
@@ -98,7 +98,10 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             this.customers = customersFromService.data;
             return;
         }
-        this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER])
+        this._catalogueRepo.getPartnerGroupsWithCriteria({
+            partnerGroups: [CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]
+            , partnerType: this.partnerTypeState.toUpperCase() === 'CUSTOMER' ? 'Customer' : 'Agent'
+        })
             .subscribe(
                 (data) => {
                     this.customers = data;
