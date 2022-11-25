@@ -1,17 +1,17 @@
-import { PopupBase } from "src/app/popup.base";
+import { HttpResponse } from "@angular/common/http";
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild } from "@angular/core";
-import { FormGroup, AbstractControl, FormBuilder } from "@angular/forms";
-import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from "@repositories";
-import { catchError, finalize, switchMap, concatMap, mergeMap, takeUntil } from "rxjs/operators";
+import { AbstractControl, FormBuilder, FormGroup } from "@angular/forms";
+import { ReportPreviewComponent } from "@common";
+import { SystemConstants } from "@constants";
+import { delayTime } from "@decorators";
+import { InjectViewContainerRefDirective } from "@directives";
+import { ICrystalReport } from "@interfaces";
 import { Crystal, CsTransactionDetail } from "@models";
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from "@repositories";
 import { ToastrService } from "ngx-toastr";
 import { of } from "rxjs";
-import { ICrystalReport } from "@interfaces";
-import { ReportPreviewComponent } from "@common";
-import { InjectViewContainerRefDirective } from "@directives";
-import { delayTime } from "@decorators";
-import { HttpResponse } from "@angular/common/http";
-import { SystemConstants } from "@constants";
+import { catchError, concatMap, finalize, mergeMap, switchMap, takeUntil } from "rxjs/operators";
+import { PopupBase } from "src/app/popup.base";
 
 @Component({
     selector: 'input-booking-note-popup',
@@ -177,7 +177,7 @@ export class InputBookingNotePopupComponent extends PopupBase implements ICrysta
                             folder: 'Shipment',
                             objectId: this.hblDetail.jobId,
                             hblId: this.hblId,
-                            templateCode: 'HBL',
+                            templateCode: 'OTH',
                             transactionType: 'AE'
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
