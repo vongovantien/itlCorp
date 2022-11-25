@@ -265,6 +265,9 @@ namespace eFMS.API.Catalogue.DL.Services
                     contract.IsExpired = true;
                 }
             }
+            else{
+                contract.IsExpired = false;
+            }
             var hs = DataContext.Add(contract, false);
             DataContext.SubmitChanges();
             if (hs.Success)
