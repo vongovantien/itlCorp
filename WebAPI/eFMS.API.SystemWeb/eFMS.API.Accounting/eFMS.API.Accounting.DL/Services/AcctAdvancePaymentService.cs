@@ -1,28 +1,28 @@
 ﻿using AutoMapper;
+using eFMS.API.Accounting.DL.Common;
+using eFMS.API.Accounting.DL.IService;
+using eFMS.API.Accounting.DL.Models;
+using eFMS.API.Accounting.DL.Models.AdvancePayment;
+using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.ExportResults;
+using eFMS.API.Accounting.DL.Models.ReportResults;
+using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
+using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using eFMS.API.Common;
-using Microsoft.Extensions.Options;
-using eFMS.API.Accounting.Service.Models;
-using eFMS.API.Accounting.DL.Models;
-using eFMS.API.Accounting.DL.IService;
-using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Accounting.DL.Models.Criteria;
-using eFMS.API.Accounting.DL.Common;
-using eFMS.API.Accounting.DL.Models.ReportResults;
-using eFMS.API.Infrastructure.Extensions;
-using eFMS.API.Common.Models;
-using eFMS.API.Accounting.DL.Models.ExportResults;
-using Microsoft.Extensions.Localization;
 using System.Linq.Expressions;
-using eFMS.API.Common.Helpers;
 using System.Text;
-using eFMS.API.Accounting.DL.Models.AdvancePayment;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -329,7 +329,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return "settled";
             }
-            else if(settled == 0 && notsettled > 0)
+            else if (settled == 0 && notsettled > 0)
             {
                 return "notsettled";
             }
@@ -365,7 +365,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo).ToList();
                     foreach (var item in result)
                     {
-                        if (checkType(item.ToList())== "notsettled")
+                        if (checkType(item.ToList()) == "notsettled")
                         {
                             lstAdvanceRequests.AddRange(item.ToList());
                         }
@@ -659,7 +659,7 @@ namespace eFMS.API.Accounting.DL.Services
                 item.BankName = advancePayment.BankName;
                 item.RequestDate = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).RequestDate;
                 item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo && x.IsDeny == false).FirstOrDefault()?.BuheadAprDate;
-                
+
 
                 var surchargeAdvanceNo = surcharge.Where(x => x.AdvanceNo == item.AdvanceNo && x.SettlementCode != null)?.FirstOrDefault();
                 if (surchargeAdvanceNo?.SettlementCode == null)
@@ -670,7 +670,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     string _settleCode = surchargeAdvanceNo.SettlementCode;
                     var data = acctApproveSettlementRepo.Get(x => x.SettlementNo == _settleCode)?.FirstOrDefault();
-                    if (data != null && item.StatusPayment=="Settled")
+                    if (data != null && item.StatusPayment == "Settled")
                     {
                         item.SettleDate = data.RequesterAprDate;
                     }
@@ -770,7 +770,7 @@ namespace eFMS.API.Accounting.DL.Services
             advanceModel.UserNameModified = sysUserRepo.Get(x => x.Id == advance.UserModified).FirstOrDefault()?.Username;
             advanceModel.RequesterName = sysUserRepo.Get(x => x.Id == advance.Requester).FirstOrDefault()?.Username;
             advanceModel.PayeeName = catPartnerRepo.Get(x => x.Id == advance.Payee).FirstOrDefault()?.ShortName;
-            
+
             var advanceApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeny == false).FirstOrDefault();
 
             advanceModel.IsRequester = (currentUser.UserID == advance.Requester
@@ -1019,7 +1019,7 @@ namespace eFMS.API.Accounting.DL.Services
                             where adr.JobId == criteria.JobId
                             && adr.Hbl == criteria.HBL
                             && adr.Mbl == criteria.MBL
-                            select new { adr.AdvanceNo, adr.Amount, advgrp.RequestDate, u.Username, adr.Hblid,advgrp.AdvanceCurrency,advgrp.StatusApproval };
+                            select new { adr.AdvanceNo, adr.Amount, advgrp.RequestDate, u.Username, adr.Hblid, advgrp.AdvanceCurrency, advgrp.StatusApproval };
 
                 if (query != null && query.Count() > 0)
                 {
@@ -1037,9 +1037,9 @@ namespace eFMS.API.Accounting.DL.Services
                         HBL = x.Hblid,
                         x.AdvanceCurrency,
                         x.StatusApproval
-                    }).GroupBy(x => new { x.AdvanceNo, x.HBL, x.Requester, x.AdvanceCurrency,x.RequestDate, x.StatusApproval }).Select(x => new ShipmentExistedInAdvanceModel
+                    }).GroupBy(x => new { x.AdvanceNo, x.HBL, x.Requester, x.AdvanceCurrency, x.RequestDate, x.StatusApproval }).Select(x => new ShipmentExistedInAdvanceModel
                     {
-                        AdvanceNo =  x.Key.AdvanceNo,
+                        AdvanceNo = x.Key.AdvanceNo,
                         TotalAmount = x.Sum(i => i.Amount),
                         RequestDate = x.Key.RequestDate,
                         Requester = x.Key.Requester,
@@ -1152,7 +1152,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == advanceNo && string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.VoucherId) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.PaySoano)).Select(x => x.Id).ToList();
                                 var hsSur = csShipmentSurchargeRepo.Delete(x => surcharge.Any(z => z == x.Id), false);
                             }
-                            imagedetailRepository.Delete(x => x.BillingNo == advanceNo);
                             acctAdvanceRequestRepo.SubmitChanges();
                             acctApproveAdvanceRepo.SubmitChanges();
                             csShipmentSurchargeRepo.SubmitChanges();
@@ -1276,7 +1275,7 @@ namespace eFMS.API.Accounting.DL.Services
             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             var existAdvanceRequest = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == model.AdvanceNo);
             var surcharges = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == model.AdvanceNo);
-            if(surcharges?.Count() > 0)
+            if (surcharges?.Count() > 0)
             {
                 var idDelete = surcharges.Select(x => x.Id).ToList();
                 var hsSur = csShipmentSurchargeRepo.Delete(x => idDelete.Any(z => z == x.Id), false);
@@ -1312,7 +1311,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.UserCreated = surcharge.UserCreated;
                         charge.DatetimeCreated = surcharge.DatetimeCreated;
                         charge.ExchangeDate = surcharge.ExchangeDate;
-                        if(surcharge.CurrencyId != charge.CurrencyId || surcharge.ExchangeDate != charge.ExchangeDate)
+                        if (surcharge.CurrencyId != charge.CurrencyId || surcharge.ExchangeDate != charge.ExchangeDate)
                         {
                             charge.FinalExchangeRate = null;
                         }
@@ -2296,7 +2295,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
 
-                    
+
 
                     advancePayment.UserModified = approve.UserModified = userCurrent;
                     advancePayment.DatetimeModified = approve.DateModified = DateTime.Now;
@@ -2363,7 +2362,7 @@ namespace eFMS.API.Accounting.DL.Services
                 try
                 {
                     var advanceRequest = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advancePayment.AdvanceNo);
-                    foreach(var adv in advanceRequest)
+                    foreach (var adv in advanceRequest)
                     {
                         var surcharges = csShipmentSurchargeRepo.Get(x => x.JobNo == adv.JobId && x.Mblno == adv.Mbl && x.Hblid == adv.Hblid
                         && (!string.IsNullOrEmpty(x.ClearanceNo) ? (x.ClearanceNo == adv.CustomNo) : string.IsNullOrEmpty(adv.CustomNo)) && x.AdvanceNoFor == adv.AdvanceNo);
@@ -3848,7 +3847,7 @@ namespace eFMS.API.Accounting.DL.Services
                             RequesterName = user.Username
                         };
             }
-            
+
             //IQueryable<AcctAdvanceRequestModel> mergeAdvRequest = queryOps.Union(queryDoc);
             IQueryable<AcctAdvanceRequestModel> mergeAdvRequest = query;
 
@@ -3999,7 +3998,7 @@ namespace eFMS.API.Accounting.DL.Services
             var office = sysOfficeRepo.Get(x => x.Id == (currentUser.OfficeID)).FirstOrDefault();
             var officeName = office?.BranchNameEn?.ToUpper();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
-            var isCommonOffice = DataTypeEx.IsCommonOffice(office.Code); 
+            var isCommonOffice = DataTypeEx.IsCommonOffice(office.Code);
 
             var infoAdvance = new InfoAdvanceExport
             {
@@ -4041,7 +4040,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Hbl = s.First().Hbl,
                     Mbl = s.First().Mbl,
                     CustomNo = s.First().CustomNo,
-                    RequestNote= string.Join(";", s.Select(x => x.RequestNote)),
+                    RequestNote = string.Join(";", s.Select(x => x.RequestNote)),
                 });
             foreach (var request in groupJobByHbl)
             {
@@ -4105,7 +4104,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Pcs = _pcs,
                     Cbm = _cbm,
                     ServiceDate = serviceDate,
-                    RequestNote= request.RequestNote,
+                    RequestNote = request.RequestNote,
                     NormAmount = advancePayment.AdvanceRequests
                                             .Where(x => x.JobId == request.JobId
                                                     && x.Hbl == request.Hbl
@@ -4495,7 +4494,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                     var shipmentType = GetTransactionTypeOfChargeByHblId(charge.Key.Hblid);
-                    if(!catChargeRepository.First(x=>x.Id == charge.Key.ChargeId).ServiceTypeId.Contains(shipmentType))
+                    if (!catChargeRepository.First(x => x.Id == charge.Key.ChargeId).ServiceTypeId.Contains(shipmentType))
                     {
                         dataDuplicate = string.Format("Charge {0} with {1} not compatible service", charge.Key.ChargeCode, charge.Key.JobId);
                         return dataDuplicate;
@@ -4527,7 +4526,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private bool checkAdvSettingFlow()
         {
-            if (sysSettingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Type== "AccountPayable").FirstOrDefault()?.ApprovalAdvance == true)
+            if (sysSettingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Type == "AccountPayable").FirstOrDefault()?.ApprovalAdvance == true)
             {
                 return true;
             }
