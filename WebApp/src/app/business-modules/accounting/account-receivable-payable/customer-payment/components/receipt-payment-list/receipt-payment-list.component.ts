@@ -276,7 +276,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             description: [],
             finalPaidAmountVnd: [0],
             finalPaidAmountUsd: [0],
-            isAutoConvert: this.receiptType.toUpperCase() === 'CUSTOMER' ? [true] : [false],
+            isAutoConvert: [true],
             isAsPaidAmount: [false],
             obhpartnerId: [],
             notifyDepartment: [],
@@ -333,7 +333,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     onSelectDataFormInfo(data, type: string) {
         switch (type) {
             case 'paid-amountVnd':
-                if (this.isAutoConvert.value) {
+                if (this.isAutoConvert.value && this.receiptType.toUpperCase() === 'CUSTOMER') {
                     if (this.exchangeRateValue === 0) {
                         this.paidAmountUsd.setValue(0);
                     } else {
@@ -345,7 +345,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 this.calculateFinalPaidAmount();
                 break;
             case 'paid-amountUsd':
-                if (this.receiptType.toUpperCase() === 'CUSTOMER' && this.isAutoConvert.value) {
+                if (this.isAutoConvert.value && this.receiptType.toUpperCase() === 'CUSTOMER') {
                     this.paidAmountVnd.setValue(+(this.paidAmountUsd.value * this.exchangeRateValue).toFixed(0));
                 }
 
@@ -587,12 +587,13 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             });
         const body: IProcessClearInvoiceModel = {
             currency: this.currencyId.value,
-            finalExchangeRate: this.exchangeRate.value,
+            finalExchangeRate: this.receiptDebitList.receiptExchangeRate,
             paidAmountVnd: +this.finalPaidAmountVnd.value,
             paidAmountUsd: +this.finalPaidAmountUsd.value,
             list: listInvoice.filter(x => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT
                 || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH
-                || x.type === AccountingConstants.RECEIPT_ADVANCE_TYPE.ADVANCE)
+                || x.type === AccountingConstants.RECEIPT_ADVANCE_TYPE.ADVANCE),
+            receiptType: this.receiptType
         };
         if (!body.list.length || (this.receiptType.toUpperCase() === 'CUSTOMER' && body.currency === 'VND' && !body.paidAmountVnd) || (body.currency === 'USD' && !body.paidAmountUsd)) {
             this._toastService.warning('Missing data to process', 'Warning');
@@ -643,8 +644,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 const _advanceUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
                 this.cusAdvanceAmountUsd.setValue(_advanceUsd);
 
-                const paidAmountUsd: number = +((+this.paidAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
-                this.paidAmountUsd.setValue(paidAmountUsd)
+                if(this.receiptType.toUpperCase() === 'CUSTOMER'){
+                    const paidAmountUsd: number = +((+this.paidAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
+                    this.paidAmountUsd.setValue(paidAmountUsd)
+                }
 
                 const creditAmountUsd: number = +((+this.creditAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
                 this.creditAmountUsd.setValue(creditAmountUsd)
@@ -662,8 +665,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 const _advanceVnd: number = +((this.cusAdvanceAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
                 this.cusAdvanceAmountVnd.setValue(_advanceVnd);
 
-                const paidAmountVnd: number = +((this.paidAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
-                this.paidAmountVnd.setValue(paidAmountVnd);
+                if(this.receiptType.toUpperCase() === 'CUSTOMER'){
+                    const paidAmountVnd: number = +((this.paidAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
+                    this.paidAmountVnd.setValue(paidAmountVnd);
+                }
 
                 const creditAmountVnd: number = +((this.creditAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
                 this.creditAmountVnd.setValue(creditAmountVnd);
@@ -769,6 +774,7 @@ interface IProcessClearInvoiceModel {
     paidAmountUsd: number;
     list: ReceiptInvoiceModel[];
     finalExchangeRate: number;
+    receiptType: string;
 }
 
 interface IExchangeRate {

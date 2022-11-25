@@ -18,6 +18,7 @@ import { SelectPartnerReceipt } from '../../store/actions';
 import { getCurrentUserState } from '@store';
 import { CommonEnum } from '@enums';
 import { environment } from 'src/environments/environment';
+import { FormValidators } from '@validators';
 
 @Component({
     selector: 'form-search-customer-agent-cd-invoice',
@@ -57,6 +58,8 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     customerFromReceipt: string;
     partnerTypeState: string;
     offices: Office[];
+    isRequireAgreement: boolean = true;
+    contractList: any[] = [];
 
     selectedDefaultOffice = { id: 'All', shortName: "All" };
     currentUser;
@@ -77,11 +80,10 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
         // } else {
         //     this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
         // }
-        this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
+        // this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
 
         this.initSubmitClickSubscription(() => this.searchData());
         this.initForm();
-
         this._store.select(getCurrentUserState)
             .pipe(
                 filter(c => !!c.userName),
@@ -97,8 +99,12 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
             )
             .subscribe((offices: Office[]) => {
                 this.offices = offices;
-            })
+            });
 
+        this.customers = this._catalogueRepo.getPartnerGroupsWithCriteria({
+            partnerGroups: [CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]
+            , partnerType: this.partnerTypeState.toUpperCase() === 'CUSTOMER' ? 'Customer' : 'Agent'
+        });
     }
 
     initForm() {
@@ -164,11 +170,13 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     }
 
     onSelectDataFormInfo(data: any) {
+        this.isRequireAgreementAgent();
         this._catalogueRepo.getAgreement(
             { partnerId: data.id, status: true })
             .subscribe(
                 (d: any[]) => {
                     if (!!d && !!d.length) {
+                        this.contractList = d;
                         this.partnerId.setValue(data.id);
 
                         //*  Check đối tượng đang search có khác với đối tượng bên ngoài receipt
@@ -184,9 +192,8 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                         this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerType.toUpperCase() }));
 
                     } else {
-                        this.partnerId.setValue(null);
-                        const isRequireAgreement: boolean = this.isRequireAgreementAgent();
-                        if(isRequireAgreement){
+                        this.partnerId.setValue(data.id);
+                        if (this.isRequireAgreement) {
                             this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
                         }
                         return false;
@@ -197,7 +204,8 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
 
     isRequireAgreementAgent() {
         if(this.partnerTypeState.toUpperCase() === 'CUSTOMER'){
-            return true;
+            this.isRequireAgreement = true;
+            return;
         }
         let result: boolean = false;
         combineLatest([
@@ -219,7 +227,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                 }
             }
         );
-        return result;
+        this.isRequireAgreement = result;
     }
 
     onSelectMultipleValue(event: any, type: string) {
@@ -249,7 +257,8 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
 
     searchData() {
         this.isSubmitted = true;
-        if (this.formSearch.valid) {
+        this.isRequireAgreementAgent();
+        if (this.formSearch.valid && (this.contractList.length || !this.isRequireAgreement)) {
             const body: IAcctCustomerDebitCredit = {
                 partnerId: this.partnerId.value,
                 searchType: this.typeSearch.value,

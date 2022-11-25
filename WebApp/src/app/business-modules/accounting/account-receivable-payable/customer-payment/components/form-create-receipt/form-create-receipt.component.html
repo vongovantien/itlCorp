@@ -55,7 +55,7 @@
             </div>
         </div>
         <div class="col-lg-3">
-            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !agreementId.valid }">
+            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && isRequireAgreement && !agreementId.valid }">
                 <label class="form-control-label" required *ngIf="isRequireAgreement">Agreement
                 </label>
                 <label class="form-control-label" *ngIf="!isRequireAgreement">Agreement
