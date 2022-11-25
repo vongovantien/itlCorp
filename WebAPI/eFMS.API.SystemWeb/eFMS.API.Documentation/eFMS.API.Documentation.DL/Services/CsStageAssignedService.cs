@@ -40,6 +40,10 @@ namespace eFMS.API.Documentation.DL.Services
         public async Task<HandleState> AddNewStageAssigned(CsStageAssignedModel model)
         {
             var stageAssigned = mapper.Map<OpsStageAssigned>(model);
+            stageAssigned.Id = Guid.NewGuid();
+            stageAssigned.Status = TermData.Done;
+            stageAssigned.DatetimeCreated = stageAssigned.DatetimeModified = stageAssigned.Deadline = DateTime.Now;
+            stageAssigned.MainPersonInCharge = stageAssigned.RealPersonInCharge = currentUser.UserID;
             var hs = await DataContext.AddAsync(stageAssigned);
             return hs;
         }
@@ -62,20 +66,28 @@ namespace eFMS.API.Documentation.DL.Services
             newItem.Hblno = hbl?.Hwbno;
             newItem.JobId = criteria.JobId;
             newItem.Type = DocumentConstants.FROM_SYSTEM;
-            newItem.DatetimeCreated = DateTime.Now;
+            newItem.DatetimeCreated = newItem.DatetimeModified = DateTime.Now;
             newItem.OrderNumberProcessed = orderNumber + 1;
 
             var result = await AddNewStageAssigned(newItem);
             return result;
         }
 
-        public async Task<HandleState> AddMutipleStageAssigned(List<CsStageAssignedModel> listStageAssigned)
+        public async Task<HandleState> AddMultipleStageAssigned(Guid jobId, List<CsStageAssignedModel> listStageAssigned)
         {
             var result = new HandleState();
+            var orderNumber = DataContext.Where(x => x.JobId == jobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
 
             foreach (var stage in listStageAssigned)
             {
+                orderNumber++;
+                var hbl = csTransDetailRepository.First(x => x.Id == stage.Hblid)?.Hwbno;
                 var assignedItem = mapper.Map<OpsStageAssigned>(stage);
+                assignedItem.Id = Guid.NewGuid();
+                assignedItem.Hblno = hbl;
+                assignedItem.DatetimeModified = assignedItem.DatetimeCreated = DateTime.Now;
+                assignedItem.OrderNumberProcessed = orderNumber;
+
                 await DataContext.AddAsync(assignedItem, false);
             }
 
@@ -90,7 +102,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public async Task<HandleState> SetMutipleStageAssigned(CsTransactionDetailModel currentHbl, CsTransactionModel currentJob, Guid jobId, Guid hblId, bool isHbl = false)
+        public async Task<HandleState> SetMultipleStageAssigned(CsTransactionDetailModel currentHbl, CsTransactionModel currentJob, Guid jobId, Guid hblId, bool isHbl = false)
         {
             var listStageAssigned = new List<CsStageAssignedModel>();
             var listStages = new List<CatStage>();
@@ -134,13 +146,13 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
-            listStageAssigned = await SetMutipleStageAssigned(listStages, jobId, hblId);
+            listStageAssigned = await SetMultipleStageAssigned(listStages, jobId, hblId);
 
-            hs = await AddMutipleStageAssigned(listStageAssigned);
+            hs = await AddMultipleStageAssigned(jobId, listStageAssigned);
             return hs;
         }
 
-        private async Task<List<CsStageAssignedModel>> SetMutipleStageAssigned(List<CatStage> listStages, Guid jobId, Guid hblId)
+        private async Task<List<CsStageAssignedModel>> SetMultipleStageAssigned(List<CatStage> listStages, Guid jobId, Guid hblId)
         {
             List<CsStageAssignedModel> listStageAssigned = new List<CsStageAssignedModel>();
 

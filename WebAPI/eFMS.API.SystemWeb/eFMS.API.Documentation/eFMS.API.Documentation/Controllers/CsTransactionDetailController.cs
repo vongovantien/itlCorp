@@ -11,7 +11,6 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
@@ -200,7 +199,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPut]
         [Route("Update")]
         [Authorize]
-        public IActionResult Update(CsTransactionDetailModel model)
+        public async Task<IActionResult> Update(CsTransactionDetailModel model)
         {
             var currentHBL = csTransactionDetailService.First(x => x.Id == model.Id);
             currentUser.Action = "UpdateCSTransactionDetail";
@@ -223,7 +222,7 @@ namespace eFMS.API.Documentation.Controllers
             }
 
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = csTransactionDetailService.UpdateTransactionDetail(model);
+            var hs = await csTransactionDetailService.UpdateTransactionDetail(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -235,7 +234,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (hs.Success)
                 {
-                    var handleStage = await csStageAssignedService.SetMutipleStageAssigned(currentHBL, null, model.JobId, model.Id, true);
+                    var handleStage = await csStageAssignedService.SetMultipleStageAssigned(currentHBL, null, model.JobId, model.Id, true);
                 }
 
             });

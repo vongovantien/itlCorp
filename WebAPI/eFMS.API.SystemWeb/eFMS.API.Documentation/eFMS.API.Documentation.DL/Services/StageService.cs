@@ -6,9 +6,6 @@ using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -32,6 +29,9 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case DocumentConstants.UPDATE_INCOTERM:
                     stage = await DataContext.Get(x => x.Code == DocumentConstants.UPDATE_ICT_CODE).FirstOrDefaultAsync();
+                    break;
+                case DocumentConstants.UPDATE_POD:
+                    stage = await DataContext.Get(x => x.Code == DocumentConstants.UPDATE_POD_CODE).FirstOrDefaultAsync();
                     break;
                 case DocumentConstants.SEND_POD:
                     stage = await DataContext.Get(x => x.Code == DocumentConstants.SEND_POD_CODE).FirstOrDefaultAsync();
