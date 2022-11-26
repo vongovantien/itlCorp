@@ -1,0 +1,112 @@
+<div class="m-portlet m-animate-fade-in m--margin-50">
+    <div class="m-portlet__head alert-block__heading pointer">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <h3 class="m-portlet__head-text collapse-toggle">
+                    Attach File
+                </h3>
+            </div>
+        </div>
+    </div>
+    <div class="m-portlet__body">
+        <div class="row">
+            <div class="col-md-12 files-attach-wp">
+                <div class="dropzone">
+                    <div class="dropzone__message">
+                        <h3 class="dropzone__title">
+                            Click to upload
+                            <span>
+                                <i class="fa fa-upload" aria-hidden="true"></i>
+                            </span>
+                        </h3>
+                    </div>
+                    <input type="file" multiple (change)="chooseFile($event)" [accept]="accepctFilesUpload"
+                        title="Upload files" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 table-responsive table-horizontal">
+                <table class="table table-brand">
+                    <thead app-table-header [headers]="headers">
+                        <th class="first">Action</th>
+                    </thead>
+                    <ng-container>
+                        <tbody>
+                            <ng-container *ngIf="listFile.length>0">
+                                <ng-container *ngFor="let file of listFile; let i = index; trackBy: trackByFn">
+                                    <tr class="m-animate-fade-in">
+                                        <td>{{i + 1}}</td>
+                                        <td class="table-actions-col">
+                                            <button type="button" class="btn btn-danger m-btn--icon m-btn--icon-only"><i
+                                                    class="la la-trash la la-plus"></i>
+                                            </button>
+                                        </td>
+                                        <td class="">
+                                            <div class="form-group"
+                                                [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.aliasName) }">
+                                                <input class="form-control" placeholder="Aias name" type="text"
+                                                    (ngModelChange)="onSelectDataFormInfo($event,i,'aliasName')"
+                                                    [ngModel]="file.aliasName">
+                                            </div>
+                                        </td>
+                                        <td class="disabled">
+                                            <div class="form-group ">
+                                                <input type="text" class="form-control " [ngModel]="file.name" disabled>
+                                            </div>
+                                        </td>
+                                        <td class="">
+                                            <div class="form-group"
+                                                [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.docType) }">
+                                                <select class="form-control" [(ngModel)]="file.docType"
+                                                    (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
+                                                    <option *ngFor="let docType of documentTypes" [ngValue]="docType">
+                                                        {{docType.nameEn}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td class="disabled" *ngIf="typeFrom==='Shipment'">
+                                            <div class="form-group ">
+                                                <input type="text" class="form-control " [ngModel]="jobNo" disabled>
+                                            </div>
+                                        </td>
+                                        <td class="disabled" *ngIf="typeFrom!=='Shipment'">
+                                            <select class="form-control" [(ngModel)]="file.job"
+                                                (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
+                                                <option *ngFor="let job of jobs" [ngValue]="job">
+                                                    {{job.jobNo}}
+                                                </option>
+                                            </select>
+                                        </td>
+                                        <td class=""
+                                            *ngIf="typeFrom!=='Settlement'&&typeFrom!=='Advance'&&typeFrom!=='SOA'">
+                                            <div class="form-group ">
+                                                <select class="form-control" [(ngModel)]="file.hwbNo"
+                                                    (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
+                                                    <option *ngFor="let hbl of housebills" [ngValue]="hbl">
+                                                        {{hbl.hwbno}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td class="">
+                                            <div class="form-group ">
+                                                <input type="text" class="form-control " placeholder="Note"
+                                                    (ngModelChange)="onSelectDataFormInfo($event,i,'note')"
+                                                    [ngModel]="file.note">
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                </ng-container>
+                            </ng-container>
+                            <tr app-table-none-record [colspan]="headers?.length  + 1" *ngIf="!listFile.length">
+                            </tr>
+                        </tbody>
+                    </ng-container>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
