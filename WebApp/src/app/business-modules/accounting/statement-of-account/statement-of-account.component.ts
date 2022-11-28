@@ -12,11 +12,11 @@ import { ToastrService } from "ngx-toastr";
 import { SortService } from "src/app/shared/services";
 import { NgProgress } from "@ngx-progressbar/core";
 import { Router } from "@angular/router";
-import { RoutingConstants } from "@constants";
+import { RoutingConstants, SystemConstants } from "@constants";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserSpecialPermissionState } from "@store";
 import { getDataSearchSOAState, getSOAListState, getSOALoadingListState, getSOAPagingState } from "./store/reducers";
-import { LoadListSOA } from "./store/actions";
+import { LoadListSOA, LoadListSOASuccess } from "./store/actions";
 
 @Component({
     selector: "app-statement-of-account",
@@ -84,7 +84,35 @@ export class StatementOfAccountComponent extends AppList {
                     }
                     this.page = data.page;
                     this.pageSize = data.pageSize;
-                    this.requestSearchSOA();
+
+                    //* Handle Cached.
+                    if (!!this.SOAs.length && !!this.dataSearch?.strCodesForSearch?.length) {
+                        let resultsCached = [];
+
+                        const referenceNos = this.dataSearch.strCodesForSearch
+                            .replace(SystemConstants.CPATTERN.LINE, ',')
+                            .trim()
+                            .split(',')
+                            .filter(x => Boolean(x))
+                            .map((item: string) => item.trim());
+                        resultsCached = this.SOAs.filter(x => referenceNos.includes(x.soano));
+
+                        if (resultsCached.length >= referenceNos?.length) {
+                            const response: CommonInterface.IResponsePaging = {
+                                data: resultsCached,
+                                page: 1,
+                                size: this.pageSize,
+                                totalItems: resultsCached.length
+                            };
+                            this._store.dispatch(LoadListSOASuccess(response));
+                            return;
+                        } else {
+                            this.requestSearchSOA();
+                        }
+                    } else {
+                        this.requestSearchSOA();
+                    }
+
                 }
             );
 

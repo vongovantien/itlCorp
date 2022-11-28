@@ -147,18 +147,24 @@
                     [ngClass]="{'m-form__group has-danger': isSubmitted && isAdvCarrier && !payee.value }">
                     <label *ngIf="!isAdvCarrier">Payee:</label>
                     <label required *ngIf="isAdvCarrier">Payee:</label>
-                    <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:payee.value}"
-                        (itemSelected)="payee.setValue($event.id); onSelectPayee($event)"
-                        [dataSources]="customers | async" [displayFields]="[
+                    <ng-container *ngIf="!readonlyForm; else payeeTpl">
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:payee.value}"
+                            (itemSelected)="payee.setValue($event.id); onSelectPayee($event)"
+                            [dataSources]="customers | async" [displayFields]="[
                         { field: 'shortName', label: 'Name ABBR' },
                         { field: 'partnerNameEn', label: 'Name EN' },
                         { field: 'taxCode', label: 'Tax Code' }]" [selectedDisplayFields]="['shortName']"
-                        [disabled]="isDisabled" placeholder="Select payee"
-                        (remove)="resetFormControl(payee);selectedPayee = null">
-                    </app-combo-grid-virtual-scroll>
-                    <div class="form-control-feedback" *ngIf="isSubmitted && isAdvCarrier && !payee.value">
-                        Payee is required!
-                    </div>
+                            [disabled]="isDisabled" placeholder="Select payee"
+                            (remove)="resetFormControl(payee);selectedPayee = null">
+                        </app-combo-grid-virtual-scroll>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && isAdvCarrier && !payee.value">
+                            Payee is required!
+                        </div>
+                    </ng-container>
+                    <ng-template #payeeTpl>
+                        <input type="text" class="form-control" [value]="payeeName" readonly>
+                    </ng-template>
+
                 </div>
             </div>
             <div class="col-lg-4">
