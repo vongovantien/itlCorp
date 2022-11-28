@@ -266,7 +266,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                             objectId: this.idMasterBill,
                             hblId: SystemConstants.EMPTY_GUID,
                             templateCode: this.getCodeFromCD(),
-                            transactionType: this.transactionType
+                            transactionType: TransactionTypeEnum[this.transactionType]
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
                     }

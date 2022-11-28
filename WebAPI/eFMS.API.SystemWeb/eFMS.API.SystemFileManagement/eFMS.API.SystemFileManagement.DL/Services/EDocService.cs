@@ -1426,7 +1426,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     Source = SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_SHIPMENT,
                     SysImageId = image.Id,
                     UserFileName = Path.GetFileNameWithoutExtension(image.Name),
-                    SystemFileName = Path.GetFileNameWithoutExtension(image.Name),
+                    SystemFileName = docTypeTemplate.Code+'_'+ Path.GetFileNameWithoutExtension(image.Name),
                     DocumentTypeId = _docTypeId
                 };
                 result = await _sysImageDetailRepo.AddAsync(imageDetail);
