@@ -41,6 +41,5 @@ namespace eFMS.API.Accounting.Service.ViewModels
         public decimal AmountUSD { get; set; }
         public decimal VatAmountVND { get; set; }
         public decimal VatAmountUSD { get; set; }
-        public Guid ShipmentId { get; set; }
     }
 }

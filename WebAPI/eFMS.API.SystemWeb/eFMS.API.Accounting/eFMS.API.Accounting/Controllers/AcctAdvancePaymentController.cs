@@ -2,6 +2,8 @@
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.SettlementPayment;
+using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -323,10 +325,11 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
-            else
+
+            Response.OnCompleted(async () =>
             {
-                _edocService.DeleteEdocByBillingNo(advanceNo);
-            }
+                await _edocService.DeleteEdocByBillingNo(advanceNo);
+            });
 
             return Ok(result);
         }
