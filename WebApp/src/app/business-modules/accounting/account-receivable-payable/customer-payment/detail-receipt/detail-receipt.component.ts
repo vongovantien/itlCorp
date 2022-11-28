@@ -86,6 +86,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
     updateDetailForm(res: ReceiptModel) {
         this.receiptDetail = res;
+        this.type = res.type;
         this._store.dispatch(RegistTypeReceipt({ data: res.type.toUpperCase(), partnerId: res.customerId }));
         this._store.dispatch(SelectReceiptPaymentMethod({ paymentMethod: res.paymentMethod }));
 
