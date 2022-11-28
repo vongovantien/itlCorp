@@ -301,7 +301,7 @@ export class AdvancePaymentDetailComponent
                         if (!res.status) {
                             this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
                                 title: 'Warning',
-                                body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                                body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
                                 class: 'bg-danger'
                             });
                             return EMPTY;
@@ -415,7 +415,7 @@ export class AdvancePaymentDetailComponent
                     if (!res.status) {
                         this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
                             title: 'Warning',
-                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
                             class: 'bg-danger'
                         });
                     }
