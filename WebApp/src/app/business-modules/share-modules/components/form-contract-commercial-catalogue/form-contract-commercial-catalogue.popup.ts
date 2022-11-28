@@ -195,7 +195,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         //         map((data: any) => data.startDate)
         //     )
         //     .subscribe((value: any) => {
-        //         this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
+        //         // this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
+        //         console.log(value);
         //     });
 
         if (!!this.trialEffectDate.value) {
@@ -729,7 +730,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
         this.formatAutoExtendDays();
 
-        this.expiredDate.setValue(this.formGroup.controls['expiredDate']);
+        // this.expiredDate.setValue(this.formGroup.controls['expiredDate']?.value);
     }
     assignValueToModel() {
         if (this.isUpdate) {
@@ -818,6 +819,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.emailAddress = this.formGroup.controls['emailAddress'].value;
         this.selectedContract.firstShipmentDate = !!this.firstShipmentDate.value && this.firstShipmentDate.value.startDate ? formatDate(this.firstShipmentDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.paymentTermObh = this.formGroup.controls['paymentTermObh'].value;
+        
+        this.selectedContract.expiredDate= this.formGroup.controls['expiredDate']?.value?.startDate;
+        console.log(this.selectedContract.expiredDate);
     }
 
     onSubmitActiveContract() {
@@ -918,8 +922,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 30)),
             });
         }
-
-        this.minDateExpired.setValue(new Date(this.effectiveDate?.value?.startDate));
+        this.minDateExpired = this.createMoment(this.formGroup.get("effectiveDate")?.value?.startDate);
     }
 
     selectedService($event: any) {
