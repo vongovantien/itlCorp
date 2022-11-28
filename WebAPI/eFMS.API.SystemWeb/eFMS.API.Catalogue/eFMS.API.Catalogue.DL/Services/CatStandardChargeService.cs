@@ -64,30 +64,13 @@ namespace eFMS.API.Catalogue.DL.Services
         public CatStandardChargeImportModel CheckValidImport(CatStandardChargeImportModel charge)
         {
             CatStandardChargeImportModel sdCharge = new CatStandardChargeImportModel();
-            if (string.IsNullOrEmpty(charge.Code))
+            if (string.IsNullOrEmpty(charge.Code) || string.IsNullOrEmpty(charge.CurrencyId)
+                || string.IsNullOrEmpty(charge.Type) || string.IsNullOrEmpty(charge.TransactionType) 
+                || string.IsNullOrEmpty(charge.Service) || string.IsNullOrEmpty(charge.ServiceType))
             {
                 charge.IsValid = false;
             }
-            if (string.IsNullOrEmpty(charge.CurrencyId))
-            {
-                charge.IsValid = false;
-            }
-            if (string.IsNullOrEmpty(charge.Type))
-            {
-                charge.IsValid = false;
-            }
-            if (string.IsNullOrEmpty(charge.TransactionType))
-            {
-                charge.IsValid = false;
-            }
-            if (string.IsNullOrEmpty(charge.Service))
-            {
-                charge.IsValid = false;
-            }
-            if (string.IsNullOrEmpty(charge.ServiceType))
-            {
-                charge.IsValid = false;
-            }
+
             sdCharge = charge;
             return sdCharge;
         }
