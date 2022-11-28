@@ -729,7 +729,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.contractTypeDetail = this.selectedContract.contractType;
 
         this.formatAutoExtendDays();
-        if (this.trialEffectDate.value != null) {
+        console.log(this.effectiveDate.value)
+        if (this.effectiveDate.value != null) {
             this.minDateExpired = this.createMoment(this.formGroup.get("effectiveDate")?.value?.startDate);
         }
 
@@ -921,7 +922,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 30)),
             });
         }
-        if (this.trialEffectDate.value != null) {
+        if (!!value.startDate) {
             this.expiredDate.setValue(this.formGroup.controls['expiredDate']?.value);
         }
     }
