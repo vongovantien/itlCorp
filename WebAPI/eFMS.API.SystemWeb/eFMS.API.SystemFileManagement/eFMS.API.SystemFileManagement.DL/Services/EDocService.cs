@@ -1389,13 +1389,29 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
         }
 
+        private string convertTransactionType(string tranType)
+        {
+            string result = null;
+            CustomData.Services.ForEach(x =>
+            {
+                if (x.DisplayName.Replace(" ","") == tranType)
+                {
+                    result= x.Value.ToString();
+                }
+            });
+            return result;
+        }
+
         private async Task<HandleState> MappingPreviewTemplateToShipment(EDocAttachPreviewTemplateUploadModel model, SysImage image)
         {
             HandleState result = new HandleState();
             try
             {
                 bool isExsitedCode = PreviewTemplateCodeMappingAttachTemplateCode.ContainsKey(model.TemplateCode);
-
+                if (model.TransactionType.Length > 3)
+                {
+                    model.TransactionType = convertTransactionType(model.TransactionType);
+                }
                 string code = !isExsitedCode ? "OTH" : PreviewTemplateCodeMappingAttachTemplateCode[model.TemplateCode];
                 int? _docTypeId = -1;
                 var docTypeTemplate = _attachFileTemplateRepo.Get(x => x.Code == code
