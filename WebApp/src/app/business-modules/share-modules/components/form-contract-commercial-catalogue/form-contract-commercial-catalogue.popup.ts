@@ -244,7 +244,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             creditLimit: [],
             creditLimitRate: [null,  Validators.compose([
                 Validators.min(0),
-                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+                Validators.max(SystemConstants.MAX_NUMBER_INT)
             ])],
             debitAmount: [],
             billingAmount: [],

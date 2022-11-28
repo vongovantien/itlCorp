@@ -148,4 +148,6 @@ export class SystemConstants {
 
     public static ITL_BOD = "ITL.BOD";
 
+    public static MAX_NUMBER_INT: number = 2147483647;
+    public static MAX_NUMBER_DECIMAL: number = 99999999999999.9999;
 }
