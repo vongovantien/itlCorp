@@ -238,7 +238,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaCargoManifest" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var reportName = parameter.ManifestNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
 
             result.PathReportGenerate = _pathReportGenerate;
@@ -339,7 +339,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = transaction.JobNo.Replace("/", "_") + "_" + "SeaImportCargoManifest" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var reportName ="SeaImportCargoManifest_" + transaction.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
 
             result.PathReportGenerate = _pathReportGenerate;
@@ -439,7 +439,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = transaction.JobNo.Replace("/", "_") + "_" + "AirCargoManifest" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var reportName = "AirCargoManifest_" + transaction.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
 
             result.PathReportGenerate = _pathReportGenerate;
@@ -534,7 +534,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = transaction.JobNo.Replace("/", "_") + "_" + "AirCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var reportName = "AirCargoManifest_" + transaction.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
 
             result.PathReportGenerate = _pathReportGenerate;
@@ -628,7 +628,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = transaction.JobNo.Replace("/","_") + "_" + "SeaCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var reportName = "SeaCargoManifest" + transaction.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
 
             result.PathReportGenerate = _pathReportGenerate;

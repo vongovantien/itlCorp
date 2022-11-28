@@ -197,7 +197,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaShippingInstructionNew" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var reportName = "SeaShippingInstructionNew_" + jobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
 
             result.PathReportGenerate = _pathReportGenerate;
@@ -305,7 +305,7 @@ namespace eFMS.API.Documentation.DL.Services
                 // Get path link to report
                 CrystalEx._apiUrl = apiUrl.Value.Url;
                 string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-                var reportName = "SeaShippingInstructionCont" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+                var reportName = "SeaShippingInstructionCont_" + jobNo + ".pdf";
                 var _pathReportGenerate = folderDownloadReport + "/" + reportName;
                 result.PathReportGenerate = _pathReportGenerate;
 
@@ -414,7 +414,7 @@ namespace eFMS.API.Documentation.DL.Services
                 // Get path link to report
                 CrystalEx._apiUrl = apiUrl.Value.Url;
                 string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-                var reportName = "SeaShippingInstructionCont" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+                var reportName = "SeaShippingInstructionCont_" + jobNo + ".pdf";
                 var _pathReportGenerate = folderDownloadReport + "/" + reportName;
                 result.PathReportGenerate = _pathReportGenerate;
 
@@ -517,7 +517,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaOnboardContainerList" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var reportName = "SeaOnboardContainerList_" + opsTrans.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -629,7 +629,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaShippingInstruction" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var reportName = "SeaShippingInstruction_" + opsTrans.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -721,7 +721,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaShippingInstructionSummary" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var reportName = "SeaShippingInstructionSummary_" + jobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
 
             result.PathReportGenerate = _pathReportGenerate;
@@ -820,7 +820,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaShippingInstructionSummary" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var reportName = "SeaShippingInstructionSummary_" + jobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 

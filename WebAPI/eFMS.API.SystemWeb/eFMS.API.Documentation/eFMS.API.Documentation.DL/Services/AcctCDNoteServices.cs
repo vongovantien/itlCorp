@@ -1662,7 +1662,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = model.CDNote.Code + "_" + "LogisticsDebitNewDNTT" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var reportName = model.CDNote.Code + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -1870,7 +1870,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "LogisticCDNotePreviewNew" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(criteria.ExportFormatType);
+            var reportName = criteria.CreditDebitNo + CrystalEx.GetExtension(criteria.ExportFormatType);
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -2185,7 +2185,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaDebitAgentsNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(format);
+            var reportName = data.CDNote.Code+ CrystalEx.GetExtension(format);
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -2483,7 +2483,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirShipperDebitNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + CrystalEx.GetExtension(format);
+            var reportName = data.CDNote.Code+ CrystalEx.GetExtension(format);
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 

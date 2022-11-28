@@ -3125,7 +3125,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = shipment.JobNo.Replace("/", "_") + "_" + "PLSheet" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var reportName = "PLSheet_" + shipment.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -3526,7 +3526,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = dataShipment.JobNo.Replace("/", "_") + "_" + "ShipmentCoverPage" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
+            var reportName = "ShipmentCoverPage_" + dataShipment.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
 
             result.PathReportGenerate = _pathReportGenerate;
