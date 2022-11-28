@@ -460,8 +460,9 @@ namespace eFMS.API.Accounting.Controllers
                                 && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd))
                                 )
                 {
-                    List<ReceiptInvoiceModel> invalidPayments = payments.Where(x => x.Type == "DEBIT" && x.TotalPaidVnd > 0
-                    && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd)).ToList();
+                    List<ReceiptInvoiceModel> invalidPayments = model.Type.ToLower() == "customer" ?
+                        payments.Where(x => x.Type == "DEBIT" && x.TotalPaidVnd > 0 && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd)).ToList() :
+                        payments.Where(x => x.Type == "DEBIT" && x.TotalPaidUsd > 0 && x.TotalPaidUsd > x.UnpaidAmountUsd).ToList();
                     List<string> messages = new List<string>();
                     if (invalidPayments.Count > 0)
                     {

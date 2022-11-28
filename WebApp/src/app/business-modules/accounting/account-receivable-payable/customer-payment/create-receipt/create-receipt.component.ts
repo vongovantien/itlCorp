@@ -246,9 +246,12 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 this._toastService.warning('Please you do process clear firstly!');
                 return;
             }
-            const hasRowTotalInvalid: boolean = this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
+            const hasRowTotalInvalid: boolean = this.type === 'CUSTOMER' ? 
+                this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd)) :
+                this.paymentList.some(x => x.totalPaidUsd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidUsd > x.unpaidAmountUsd));
             if (hasRowTotalInvalid) {
-                const rowInvalid: ReceiptInvoiceModel[] = this.paymentList.filter(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
+                const rowInvalid: ReceiptInvoiceModel[] = this.type === 'CUSTOMER' ? this.paymentList.filter(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd)) :
+                this.paymentList.filter(x => x.totalPaidUsd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidUsd > x.unpaidAmountUsd));
                 rowInvalid.forEach(x => {
                     x.isValid = false;
                 })
