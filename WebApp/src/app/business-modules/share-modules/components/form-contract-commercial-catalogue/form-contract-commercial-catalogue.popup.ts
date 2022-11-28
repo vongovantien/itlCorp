@@ -193,14 +193,16 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.type = result.type;
         });
 
-        this.formGroup.get("effectiveDate").valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                map((data: any) => data.startDate)
-            )
-            .subscribe((value: any) => {
-                this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
-            });
+        // this.formGroup.get("effectiveDate").valueChanges
+        //     .pipe(
+        //         distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+        //         map((data: any) => data.startDate)
+        //     )
+        //     .subscribe((value: any) => {
+        //         // this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
+        //         console.log(value);
+        //     });
+
         if (!!this.trialEffectDate.value) {
             this.formGroup.get("trialEffectDate").valueChanges
                 .pipe(
@@ -739,6 +741,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.contractTypeDetail = this.selectedContract.contractType;
 
         this.formatAutoExtendDays();
+        if (this.trialEffectDate.value != null) {
+            this.minDateExpired = this.createMoment(this.formGroup.get("effectiveDate")?.value?.startDate);
+        }
+
     }
     assignValueToModel() {
         if (this.isUpdate) {
@@ -751,7 +757,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.index = this.indexDetailContract;
         this.selectedContract.contractNo = this.formGroup.controls['contractNo'].value;
         this.selectedContract.effectiveDate = this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null;
-        this.selectedContract.expiredDate = !!this.expiredDate.value && !!this.expiredDate.value.startDate ? formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
+        this.selectedContract.expiredDate = this.expiredDate.value ? (this.expiredDate.value.startDate !== null ? formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.selectedContract.contractType = !!this.contractType.value ? this.contractType.value : null;
         const services = this.saleService.value ? (this.saleService.value.length > 0 ? this.saleService.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
         this.selectedContract.saleService = services;
@@ -926,6 +932,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + 30)),
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 30)),
             });
+        }
+        if (this.trialEffectDate.value != null) {
+            this.expiredDate.setValue(this.formGroup.controls['expiredDate']?.value);
         }
     }
 
