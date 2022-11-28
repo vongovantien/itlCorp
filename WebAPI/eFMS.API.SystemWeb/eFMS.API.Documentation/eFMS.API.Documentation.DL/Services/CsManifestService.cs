@@ -628,7 +628,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaCargoManifest" + transaction.JobNo + ".pdf";
+            var reportName = "SeaCargoManifest_" + transaction.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
 
             result.PathReportGenerate = _pathReportGenerate;
