@@ -123,7 +123,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (hs.Success)
                 {
                     ClearCache();
-                    Get();
                 }
                 return hs;
             }
