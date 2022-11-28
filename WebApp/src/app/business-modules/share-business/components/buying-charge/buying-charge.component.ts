@@ -7,7 +7,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { CatPartnerCharge, Charge, ChargeGroup, Container, CsShipmentSurcharge, CsTransaction, CsTransactionDetail, Currency, HouseBill, OpsTransaction, Partner, Unit } from '@models';
+import { CatPartnerCharge, Charge, ChargeGroup, Container, CsShipmentSurcharge, CsTransaction, CsTransactionDetail, Currency, HouseBill, OpsTransaction, Partner, Unit, StandardCharge } from '@models';
 import { AccountingRepo, CatalogueRepo, DocumentationRepo } from '@repositories';
 import { SortService } from '@services';
 import { AppList } from 'src/app/app.list';
@@ -963,11 +963,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getStandardCharge(type: CommonEnum.SurchargeTypeEnum | string = CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
-        const chargeCodes: string[] = this.detectDefaultCode(this.serviceTypeId, type);
-
-        this._catalogueRepo.getChargeByCodes(chargeCodes)
+        // const chargeCodes: string[] = this.detectDefaultCode(this.serviceTypeId, type);
+        // this._catalogueRepo.getChargeByCodes(chargeCodes)
+        this._catalogueRepo.getStandChargeByType(type, this.serviceTypeId)
             .pipe(catchError(this.catchError))
-            .subscribe((charges: Charge[]) => {
+            .subscribe((charges: StandardCharge[]) => {
                 if (charges && !!charges.length) {
                     const csShipmentSurcharge: CsShipmentSurcharge[] = this.updateDefaultChargeCode(charges, this.serviceTypeId, type);
 
@@ -990,40 +990,40 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             });
     }
 
-    detectDefaultCode(serviceTypeId: string, type: CommonEnum.SurchargeTypeEnum | string = CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
-        if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
-            switch (serviceTypeId) {
-                case ChargeConstants.AE_CODE:
-                case ChargeConstants.AI_CODE:
-                    return ChargeConstants.DEFAULT_AIR;
-                case ChargeConstants.SFE_CODE:
-                    return ChargeConstants.BUYING_DEFAULT_FCL_EXPORT;
-                case ChargeConstants.SLE_CODE:
-                    return ChargeConstants.BUYING_DEFAULT_LCL_EXPORT;
-                case ChargeConstants.SFI_CODE:
-                    return ChargeConstants.BUYING_DEFAULT_FCL_IMPORT;
-                case ChargeConstants.SLI_CODE:
-                    return ChargeConstants.BUYING_DEFAULT_LCL_IMPORT;
-                default:
-                    return [];
-            }
-        } else {
-            switch (serviceTypeId) {
-                case ChargeConstants.SFE_CODE:
-                    return ChargeConstants.SELLING_DEFAULT_FCL_EXPORT;
-                case ChargeConstants.SLE_CODE:
-                    return ChargeConstants.SELLING_DEFAULT_LCL_EXPORT;
-                case ChargeConstants.SFI_CODE:
-                    return ChargeConstants.SELLING_DEFAULT_FCL_IMPORT;
-                case ChargeConstants.SLI_CODE:
-                    return ChargeConstants.SELLING_DEFAULT_LCL_IMPORT;
-                default:
-                    return [];
-            }
-        }
-    }
+    // detectDefaultCode(serviceTypeId: string, type: CommonEnum.SurchargeTypeEnum | string = CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+    //     if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+    //         switch (serviceTypeId) {
+    //             case ChargeConstants.AE_CODE:
+    //             case ChargeConstants.AI_CODE:
+    //                 return ChargeConstants.DEFAULT_AIR;
+    //             case ChargeConstants.SFE_CODE:
+    //                 return ChargeConstants.BUYING_DEFAULT_FCL_EXPORT;
+    //             case ChargeConstants.SLE_CODE:
+    //                 return ChargeConstants.BUYING_DEFAULT_LCL_EXPORT;
+    //             case ChargeConstants.SFI_CODE:
+    //                 return ChargeConstants.BUYING_DEFAULT_FCL_IMPORT;
+    //             case ChargeConstants.SLI_CODE:
+    //                 return ChargeConstants.BUYING_DEFAULT_LCL_IMPORT;
+    //             default:
+    //                 return [];
+    //         }
+    //     } else {
+    //         switch (serviceTypeId) {
+    //             case ChargeConstants.SFE_CODE:
+    //                 return ChargeConstants.SELLING_DEFAULT_FCL_EXPORT;
+    //             case ChargeConstants.SLE_CODE:
+    //                 return ChargeConstants.SELLING_DEFAULT_LCL_EXPORT;
+    //             case ChargeConstants.SFI_CODE:
+    //                 return ChargeConstants.SELLING_DEFAULT_FCL_IMPORT;
+    //             case ChargeConstants.SLI_CODE:
+    //                 return ChargeConstants.SELLING_DEFAULT_LCL_IMPORT;
+    //             default:
+    //                 return [];
+    //         }
+    //     }
+    // }
 
-    updateDefaultChargeCode(charges: Charge[], serviceTypeId: string, type: CommonEnum.SurchargeTypeEnum | string = CommonEnum.SurchargeTypeEnum.BUYING_RATE): CsShipmentSurcharge[] {
+    updateDefaultChargeCode(charges: StandardCharge[], serviceTypeId: string, type: CommonEnum.SurchargeTypeEnum | string = CommonEnum.SurchargeTypeEnum.BUYING_RATE): CsShipmentSurcharge[] {
         const shipmentSurcharges: CsShipmentSurcharge[] = this.mapChargeToShipmentSurCharge(charges);
 
         let coloaderPayer = null;
@@ -1187,12 +1187,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         return shipmentSurcharges;
     }
 
-    mapChargeToShipmentSurCharge(charges: Charge[]): CsShipmentSurcharge[] {
-        const newCsShipmentSurcharge: CsShipmentSurcharge[] = charges.map((c: Charge) => new CsShipmentSurcharge(
+    mapChargeToShipmentSurCharge(charges: StandardCharge[]): CsShipmentSurcharge[] {
+        const newCsShipmentSurcharge: CsShipmentSurcharge[] = charges.map((c: StandardCharge) => new CsShipmentSurcharge(
             Object.assign({}, c, {
                 chargeCode: c.code,
                 type: CommonEnum.SurchargeTypeEnum.BUYING_RATE,
-                chargeId: c.id,
+                chargeId: c.chargeId,
                 id: SystemConstants.EMPTY_GUID,
                 exchangeDate: { startDate: new Date, endDate: new Date() },
                 hblno: this.hbl.hwbno || null,
