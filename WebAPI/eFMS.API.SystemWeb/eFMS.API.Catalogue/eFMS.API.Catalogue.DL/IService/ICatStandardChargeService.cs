@@ -12,6 +12,7 @@ namespace eFMS.API.Catalogue.DL.IService
     public interface ICatStandardChargeService : IRepositoryBaseCache<CatStandardCharge, CatStandardChargeModel>
     {
         IQueryable<CatStandardChargeModel> GetBy(string type, string transactionType);
+        CatStandardChargeImportModel CheckValidImport(CatStandardChargeImportModel charge);
         HandleState Import(List<CatStandardChargeImportModel> data);
         HandleState DeleteStandard(Guid chargeId);
     }

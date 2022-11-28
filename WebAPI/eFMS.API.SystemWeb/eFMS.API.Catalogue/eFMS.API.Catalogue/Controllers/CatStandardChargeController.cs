@@ -101,7 +101,11 @@ namespace eFMS.API.Catalogue.Controllers
                         Notes = worksheet.Cells[row, 11].Value?.ToString().Trim()
 
                     };
-                    list.Add(standardCharge);
+                    var data = catStandardChargeService.CheckValidImport(standardCharge);
+                    if(data.IsValid == true)
+                    {
+                        list.Add(standardCharge);
+                    }    
                 }
                 var sc = catStandardChargeService.Import(list);
                 ResultHandle result = new ResultHandle { Status = sc.Success, Message = "Import successfully !!!" };
@@ -109,7 +113,7 @@ namespace eFMS.API.Catalogue.Controllers
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = sc.Message.ToString() });
                 }
-                return Ok(result); ;
+                return Ok(result); 
             }
             return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
         }

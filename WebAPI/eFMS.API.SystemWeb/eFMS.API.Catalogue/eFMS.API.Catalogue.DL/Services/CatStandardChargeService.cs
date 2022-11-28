@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.Service.Models;
@@ -22,6 +23,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly ICatChargeService catChargeService;
         private readonly IContextBase<CatCharge> catChargeReposity;
+        private readonly IStringLocalizer stringLocalizer;
         public CatStandardChargeService(IContextBase<CatStandardCharge> repository,
             ICacheServiceBase<CatStandardCharge> cacheService,
             IMapper mapper,
@@ -33,7 +35,7 @@ namespace eFMS.API.Catalogue.DL.Services
             currentUser = user;
             catChargeService = charService;
             catChargeReposity = catCharge;
-
+            stringLocalizer = localizer;
         }        
         public IQueryable<CatStandardChargeModel> GetBy(string type, string transactionType)
         {
@@ -59,10 +61,41 @@ namespace eFMS.API.Catalogue.DL.Services
                });
             return result;
         }
+        public CatStandardChargeImportModel CheckValidImport(CatStandardChargeImportModel charge)
+        {
+            CatStandardChargeImportModel sdCharge = new CatStandardChargeImportModel();
+            if (string.IsNullOrEmpty(charge.Code))
+            {
+                charge.IsValid = false;
+            }
+            if (string.IsNullOrEmpty(charge.CurrencyId))
+            {
+                charge.IsValid = false;
+            }
+            if (string.IsNullOrEmpty(charge.Type))
+            {
+                charge.IsValid = false;
+            }
+            if (string.IsNullOrEmpty(charge.TransactionType))
+            {
+                charge.IsValid = false;
+            }
+            if (string.IsNullOrEmpty(charge.Service))
+            {
+                charge.IsValid = false;
+            }
+            if (string.IsNullOrEmpty(charge.ServiceType))
+            {
+                charge.IsValid = false;
+            }
+            sdCharge = charge;
+            return sdCharge;
+        }
         public HandleState Import(List<CatStandardChargeImportModel> data)
         {
             try
             {
+                var listData = new List<CatStandardCharge>();
                 foreach (var item in data)
                 {
                     var standardCharge = new CatStandardCharge
@@ -84,12 +117,15 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserModified = currentUser.UserID,
                         DatetimeModified = DateTime.Now
                     };
-                    DataContext.Add(standardCharge, false);
+                    listData.Add(standardCharge);
                 }
-                DataContext.SubmitChanges();
-                ClearCache();
-                Get();
-                return new HandleState();
+                var hs = DataContext.Add(listData);
+                if (hs.Success)
+                {
+                    ClearCache();
+                    Get();
+                }
+                return hs;
             }
             catch (Exception ex)
             {
