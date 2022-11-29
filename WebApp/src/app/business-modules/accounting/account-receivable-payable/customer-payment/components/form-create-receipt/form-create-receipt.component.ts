@@ -202,6 +202,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                                         this.agreementId.setValue(null);
                                         if (this.isRequireAgreement) {
                                             this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
+                                        } else {
+                                            this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerType.toUpperCase() }));
                                         }
 
                                     }

@@ -2797,9 +2797,9 @@ namespace eFMS.API.Accounting.DL.Services
             var surcharges = surchargeRepository.Get(expQuerySurChg);
 
             var data = from acct in invoice
-                       join inv in debitsAr on acct.Id equals inv.AcctManagementId into debitGrp
-                       from inv in debitGrp.DefaultIfEmpty()
                        join sur in surcharges on acct.Id equals sur.AcctManagementId
+                       join inv in debitsAr on new { AcctManagementId = acct.Id, sur.Hblid } equals new { AcctManagementId = (inv.AcctManagementId ?? Guid.Empty), Hblid = (inv.Hblid ?? Guid.Empty) } into debitGrp
+                       from inv in debitGrp.DefaultIfEmpty()
                        select new
                        {
                            acct,
