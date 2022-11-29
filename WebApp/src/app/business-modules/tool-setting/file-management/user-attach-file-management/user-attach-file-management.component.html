@@ -29,25 +29,24 @@
             <div class="col-md-12 table-responsive table-horizontal">
                 <table class="table table-brand">
                     <thead app-table-header [headers]="headers">
-                        <th class="first">Action</th>
+                        <th class="first">No</th>
                     </thead>
                     <ng-container>
                         <tbody>
-                            <ng-container *ngIf="listFile.length>0">
+                            <ng-container *ngIf="listFile.length > 0">
                                 <ng-container *ngFor="let file of listFile; let i = index; trackBy: trackByFn">
                                     <tr class="m-animate-fade-in">
                                         <td>{{i + 1}}</td>
                                         <td class="table-actions-col">
-                                            <button type="button" class="btn btn-danger m-btn--icon m-btn--icon-only"><i
-                                                    class="la la-trash la la-plus"></i>
+                                            <button type="button" class="btn btn-danger m-btn--icon m-btn--icon-only"
+                                                (click)="removeFile(i)"><i class="la la-trash la la-plus"></i>
                                             </button>
                                         </td>
                                         <td class="">
                                             <div class="form-group"
                                                 [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.aliasName) }">
                                                 <input class="form-control" placeholder="Aias name" type="text"
-                                                    (ngModelChange)="onSelectDataFormInfo($event,i,'aliasName')"
-                                                    [ngModel]="file.aliasName">
+                                                    [(ngModel)]="file.aliasName">
                                             </div>
                                         </td>
                                         <td class="disabled">
@@ -60,32 +59,9 @@
                                                 [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.docType) }">
                                                 <select class="form-control" [(ngModel)]="file.docType"
                                                     (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
-                                                    <option *ngFor="let docType of documentTypes" [ngValue]="docType">
+                                                    <option *ngFor="let docType of documentTypes"
+                                                        [ngValue]="docType.id">
                                                         {{docType.nameEn}}
-                                                    </option>
-                                                </select>
-                                            </div>
-                                        </td>
-                                        <td class="disabled" *ngIf="typeFrom==='Shipment'">
-                                            <div class="form-group ">
-                                                <input type="text" class="form-control " [ngModel]="jobNo" disabled>
-                                            </div>
-                                        </td>
-                                        <td class="disabled" *ngIf="typeFrom!=='Shipment'">
-                                            <select class="form-control" [(ngModel)]="file.job"
-                                                (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
-                                                <option *ngFor="let job of jobs" [ngValue]="job">
-                                                    {{job.jobNo}}
-                                                </option>
-                                            </select>
-                                        </td>
-                                        <td class=""
-                                            *ngIf="typeFrom!=='Settlement'&&typeFrom!=='Advance'&&typeFrom!=='SOA'">
-                                            <div class="form-group ">
-                                                <select class="form-control" [(ngModel)]="file.hwbNo"
-                                                    (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
-                                                    <option *ngFor="let hbl of housebills" [ngValue]="hbl">
-                                                        {{hbl.hwbno}}
                                                     </option>
                                                 </select>
                                             </div>
@@ -93,8 +69,7 @@
                                         <td class="">
                                             <div class="form-group ">
                                                 <input type="text" class="form-control " placeholder="Note"
-                                                    (ngModelChange)="onSelectDataFormInfo($event,i,'note')"
-                                                    [ngModel]="file.note">
+                                                    [(ngModel)]="file.note">
                                             </div>
                                         </td>
 
@@ -108,5 +83,22 @@
                 </table>
             </div>
         </div>
+        <ng-container *ngIf="!!listFile.length">
+            <div class="row">
+                <div class="col-12">
+                    <div class="m--align-center m--margin-top-20">
+                        <div class="c-button-actions">
+                            <button type="button" class="btn btn-success m-btn--icon m-btn--uppercase"
+                                (click)="submitUpload()">
+                                <span>
+                                    <i class="la la-upload"></i>
+                                    <span> Upload </span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
     </div>
 </div>

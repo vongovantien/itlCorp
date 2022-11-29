@@ -26,7 +26,7 @@ const routing: Routes = [
         data: { name: 'System', title: 'System' }
     },
     {
-        path: 'attach-file', loadChildren: () => import('./attach-file-management/attach-file-management.module').then(m => m.AttachFileManagementModule),
+        path: 'user-attach-file', loadChildren: () => import('./user-attach-file-management/user-attach-file-management.module').then(m => m.UserAttachFileManagementModule),
         data: { name: 'Attach file', title: 'Attach file' }
     }
 ]
