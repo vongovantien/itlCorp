@@ -241,6 +241,10 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
         this.componentRef.instance.frm.nativeElement.submit();
         this.componentRef.instance.show();
     }
+    // closeReport(): void {
+    //     //this.componentRef.instance.clear();
+    //     this.componentRef.instance.hide();
+    // }
 
     renderAndShowReport() {
         // * Render dynamic
@@ -279,6 +283,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                     if (!res) return;
                     if (res.status) {
                         this._toastService.success(res.message);
+                        //this.closeReport();
                     } else {
                         this._toastService.success(res.message || "Upload fail");
                     }

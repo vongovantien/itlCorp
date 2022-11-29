@@ -455,7 +455,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         GroupId = currentUser.GroupId,
                         UserCreated = x.UserCreated,
                         UserModified = x.UserModified,
-                        SystemFileName = x.SystemFileName.Contains("OTH") ? Path.GetFileNameWithoutExtension(x.SystemFileName) : "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(null, x.UserFileName)),
+                        SystemFileName = x.SystemFileName.Contains("OTH") ? Path.GetFileNameWithoutExtension(x.SystemFileName) : "OTH" + Path.GetFileNameWithoutExtension(clearPrefix(null, x.SystemFileName)),
                         JobNo = jobNo,
                         UserFileName = x.UserFileName,
                         Id = x.Id,
@@ -1375,6 +1375,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         {
                             foreach (var image in imageList)
                             {
+                                model.TransactionType = convertTransactionType(model.TransactionType);
                                 result = await MappingPreviewTemplateToShipment(model, image);
                             }
                         }
@@ -1389,13 +1390,47 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
         }
 
+        private string convertTransactionType(string tranType)
+        {
+            string result = null;
+            if (tranType.Length > 3)
+            {
+                CustomData.Services.ForEach(x =>
+                {
+                    if (x.DisplayName.Replace(" ", "") == tranType)
+                    {
+                        result = x.Value.ToString();
+                    }
+                });
+            }
+            else
+            {
+                result = tranType;
+            }
+           
+            return result;
+        }
+
+        private string GetAliasNameForPreviewTemplate(string tranType,string name)
+        {
+            string type = null;
+            if (tranType.Length > 3)
+            {
+                type = convertTransactionType(tranType);
+            }
+            else
+            {
+                type = tranType;
+            }
+            return convertTransactionType(tranType)+'_'+Path.GetFileNameWithoutExtension(name).TrimEnd('_').Remove(name.LastIndexOf('_'));
+        }
+
         private async Task<HandleState> MappingPreviewTemplateToShipment(EDocAttachPreviewTemplateUploadModel model, SysImage image)
         {
             HandleState result = new HandleState();
             try
             {
                 bool isExsitedCode = PreviewTemplateCodeMappingAttachTemplateCode.ContainsKey(model.TemplateCode);
-
                 string code = !isExsitedCode ? "OTH" : PreviewTemplateCodeMappingAttachTemplateCode[model.TemplateCode];
                 int? _docTypeId = -1;
                 var docTypeTemplate = _attachFileTemplateRepo.Get(x => x.Code == code
@@ -1426,7 +1461,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     Source = SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_SHIPMENT,
                     SysImageId = image.Id,
                     UserFileName = Path.GetFileNameWithoutExtension(image.Name),
-                    SystemFileName = docTypeTemplate.Code+'_'+ Path.GetFileNameWithoutExtension(image.Name),
+                    SystemFileName = GetAliasNameForPreviewTemplate(model.TransactionType, image.Name),
                     DocumentTypeId = _docTypeId
                 };
                 result = await _sysImageDetailRepo.AddAsync(imageDetail);
