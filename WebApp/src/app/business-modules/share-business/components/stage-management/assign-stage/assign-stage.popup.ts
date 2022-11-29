@@ -83,8 +83,6 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
                         this.houseBillList = [new CsTransactionDetail({ id: 'All', hwbno: 'All' })]
                         this.houseBillList = this.houseBillList.concat(res);
                         this.houseBillList = this.houseBillList.filter(x => x.hwbno !== 'N/H').concat(this.houseBillList.find(x => x.hwbno === 'N/H') || []);
-
-                        console.log(this.houseBillList)
                     }
                 }
             );

@@ -45,15 +45,15 @@
                             </div>
                         </div>
                         <div class="col-lg-6">
-                            <div class="form-group form-control-date">
-                                <label class="form-control-label">
-                                    Deadline
-                                </label>
-                                <div class="m-input-icon m-input-icon--right down">
+                            <div class="form-group">
+                                <label class="form-control-label">Deadline</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         formControlName="deadLineDate" placeholder="Choose date"
                                         [singleDatePicker]="true" [timePicker]="true" [timePicker24Hour]="true"
-                                        [locale]="{format: 'DD/MM/YYYY'}">
+                                        [locale]="{format: 'DD/MM/YYYY'}"
+                                        [allowRemove]="!!deadLineDate.value && !!deadLineDate.value.startDate"
+                                        (remove)="onRemoveData('deadline')">
                                     <span class=" m-input-icon__icon m-input-icon__icon--right ">
                                         <span>
                                             <i class="la la-calendar "></i>
@@ -75,7 +75,7 @@
                                     (itemSelected)="onSelectMainPersonIncharge($event) "
                                     [selectedDisplayFields]="configComboGrid.selectedDisplayFields "
                                     [dataSources]="configComboGrid.source" placeholder=" Please select"
-                                    [displayFields]=" configComboGrid.displayFields ">
+                                    [displayFields]=" configComboGrid.displayFields " (remove)="onRemoveData('main')">
                                 </app-combo-grid-virtual-scroll>
                                 <div class=" form-control-feedback"
                                     *ngIf="isSubmitted && !selectedMainPersonInCharge.value">
@@ -92,7 +92,8 @@
                                     (itemSelected)="onSelectRealPersonIncharge($event) "
                                     [selectedDisplayFields]="configComboGrid.selectedDisplayFields " [dataSources]="configComboGrid.source
                                         " [displayFields]="configComboGrid.displayFields"
-                                    [currentActiveItemId]="selectedRealPersonInCharge" placeholder=" Please select">
+                                    [currentActiveItemId]="selectedRealPersonInCharge" placeholder=" Please select"
+                                    (remove)="onRemoveData('real')">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -131,13 +132,13 @@
                                     Status
                                 </label>
                                 <ng-select class="custom" [items]="statusStage" formControlName="status"
-                                    placeholder="Select status">
+                                    [clearable]="false" placeholder="Select status">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-6 ">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted && !this.selectedHbl.value && this.stageName.value !== 'Make Advance/ Settlement'}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && !this.selectedHbl && this.stageName.value !== 'Make Advance/ Settlement'}">
                                 <label for=""> House Bill <span *ngIf="stageName.value !== 'Make Advance/ Settlement'"
                                         class=" text-danger">(*)</span></label>
                                 <app-combo-grid-virtual-scroll formControlName="hblno"
@@ -148,7 +149,7 @@
                                     (remove)="onRemoveData('hbl')">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback"
-                                    *ngIf="isSubmitted && !this.selectedHbl.value && this.stageName.value !== 'Make Advance/ Settlement'">
+                                    *ngIf="isSubmitted && !this.selectedHbl && this.stageName.value !== 'Make Advance/ Settlement'">
                                     House Bill is required!
                                 </div>
                             </div>
