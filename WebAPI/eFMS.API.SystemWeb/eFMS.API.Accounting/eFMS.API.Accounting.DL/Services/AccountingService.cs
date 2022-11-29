@@ -3529,6 +3529,14 @@ namespace eFMS.API.Accounting.DL.Services
                     });
                 });
             }
+            string queryParamUrlAttachFile = string.Format(@"/en/#/home/tool/file-management/user-attach-file?module={0}&folder={1}&objectId={2}", "Accounting", folder, objectId);
+            results.Add(new BravoAttachDoc
+            {
+                AttachDocRowId = Guid.Empty.ToString(),
+                AttachDocName = "eFMS Attach Files eDoc",
+                AttachDocPath = webUrl.Value.Url.ToString() + queryParamUrlAttachFile,
+                AttachDocDate = DateTime.Now
+            });
 
             return results;
         }

@@ -35,7 +35,7 @@
                         <tbody>
                             <ng-container *ngIf="listFile.length > 0">
                                 <ng-container *ngFor="let file of listFile; let i = index; trackBy: trackByFn">
-                                    <tr class="m-animate-fade-in">
+                                    <tr class="m-animate-fade-in m-form m-form--state">
                                         <td>{{i + 1}}</td>
                                         <td class="table-actions-col">
                                             <button type="button" class="btn btn-danger m-btn--icon m-btn--icon-only"
@@ -57,7 +57,7 @@
                                         <td class="">
                                             <div class="form-group"
                                                 [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.docType) }">
-                                                <select class="form-control" [(ngModel)]="file.docType"
+                                                <select class="form-control" [ngModel]="file.docType"
                                                     (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
                                                     <option *ngFor="let docType of documentTypes"
                                                         [ngValue]="docType.id">
