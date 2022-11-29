@@ -44,7 +44,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //await Task.Delay(TimeSpan.FromHours(12), stoppingToken);
                 int hourSpan = 25 - DateTime.Now.Hour;
                 int numberOfhours = hourSpan;
-                if(hourSpan % 2 == 0)
+                if(hourSpan % 2 == 24)
                 {
                     using (var scope = services.CreateScope())
                     {
