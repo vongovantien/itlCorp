@@ -68,8 +68,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         TransactionType = "SOA",
                     }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 case "Settlement":
-                    var settleNo = _settleRepo.Get(x => x.Id.ToString() == billingId).FirstOrDefault().SettlementNo;
-                    var transType = _surchargeRepo.Get(x => x.SettlementCode == settleNo).Select(x => x.TransactionType).ToList();
                     var SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement"));
                     return SMCode.GroupBy(x => new { x.Code, x.AccountingType, x.NameEn }).Select(x => new DocumentTypeModel()
                     {
