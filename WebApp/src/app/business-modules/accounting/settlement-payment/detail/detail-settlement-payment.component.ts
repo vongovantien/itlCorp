@@ -218,6 +218,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
 
                     this.requestSurchargeListComponent.settlementCode = this.settlementPayment.settlement.settlementNo;
+                    this.settlementCode = this.settlementPayment.settlement.settlementNo;
+
                     this.requestSurchargeListComponent.requester = this.settlementPayment.settlement.requester;
 
                     // *SWITCH UI TO GROUP LIST SHIPMENT

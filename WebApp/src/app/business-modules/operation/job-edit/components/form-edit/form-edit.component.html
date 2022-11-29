@@ -11,7 +11,6 @@
                     </label>
                     <input type="text" class="form-control m-input m-input--square" placeholder="Job ID" name="jobNo"
                         disabled=true formControlName="jobNo">
-
                 </div>
             </div>
             <div class="col-lg-4">
@@ -54,6 +53,52 @@
                     <div class="form-control-feedback"
                         *ngIf="isSubmitted && finishDate.value.startDate && (serviceDate.value.startDate > finishDate.value.startDate)">
                         Finish Date must be greater or equal to Service Date
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label">
+                        ETA
+                    </label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                            [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                            [alwaysShowCalendars]="true" name="daterange" placeholder="DD/MM/YYYY" readonly
+                            formControlName="eta" (remove)="resetFormControl(eta)" calendar
+                            [allowRemove]="!!eta.value && !!eta.value.startDate" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Delivery Date
+                    </label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                            [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                            [alwaysShowCalendars]="true" name="daterange" readonly placeholder="DD/MM/YYYY"
+                            formControlName="deliveryDate" calendar
+                            [allowRemove]="!!deliveryDate.value && !!deliveryDate.value.startDate"
+                            (remove)="resetFormControl(deliveryDate)" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label" for="">
+                        Clearance Date
+                    </label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                            [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                            [alwaysShowCalendars]="true" name="daterange" readonly placeholder="DD/MM/YYYY"
+                            formControlName="clearanceDate" calendar
+                            [allowRemove]="!!clearanceDate.value && !!clearanceDate.value.startDate"
+                            (remove)="resetFormControl(clearanceDate)" />
                     </div>
                 </div>
             </div>
@@ -348,6 +393,21 @@
                         formControlName="consignee" placeholder="Enter text">
                 </div>
             </div>
+            <div class="col-lg-4">
+                <div class="form-group"
+                    [ngClass]="{ 'm-form__group has-danger': (suspendTime.dirty && !suspendTime.valid) || (isSubmitted && !suspendTime.valid) }">
+                    <label class="form-control-label" for="">
+                        Suspend Time
+                    </label>
+                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                        name="suspendTime" formControlName="suspendTime" placeholder="Enter text">
+                    <div class="form-control-feedback" *ngIf="suspendTime.errors | equalError: 'maxlength'">
+                        You cannot input more than 150 characters!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-lg-4">
                 <div class="row">
                     <div class="col-lg-8">

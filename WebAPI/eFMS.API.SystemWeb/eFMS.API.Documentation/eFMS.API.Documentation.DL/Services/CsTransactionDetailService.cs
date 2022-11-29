@@ -273,14 +273,21 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public HandleState UpdateTransactionDetail(CsTransactionDetailModel model)
+        public async Task<HandleState> UpdateTransactionDetail(CsTransactionDetailModel model)
         {
+            bool isCreateStage = false;
             var hb = DataContext.Where(x => x.Id == model.Id).FirstOrDefault();
             var changedSalesman = false;
             if (hb == null)
             {
                 return new HandleState("Housebill not found !");
             }
+            if (model.ReferenceNoProof != hb.ReferenceNoProof || model.Note != hb.Note || model.DeliveryPerson != hb.DeliveryPerson || model.DeliveryDate != hb.DeliveryDate)
+            {
+                isCreateStage = true;
+            }
+
+
             model.JobId = hb.JobId;
             model.GroupId = hb.GroupId;
             model.DepartmentId = hb.DepartmentId;
@@ -341,6 +348,21 @@ namespace eFMS.API.Documentation.DL.Services
                     var isUpdateDone = DataContext.Update(houseBill, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
                     {
+                        if (isCreateStage)
+                        {
+                            var stage = await catStageService.GetStageByType(DocumentConstants.UPDATE_POD);
+                            var orderNumber = csStageAssignedService.Get(x => x.JobId == hb.JobId).OrderByDescending(x => x.OrderNumberProcessed).FirstOrDefault()?.OrderNumberProcessed ?? 0;
+                            CsStageAssignedModel newStage = new CsStageAssignedModel();
+                            newStage.Id = Guid.NewGuid();
+                            newStage.StageId = stage.Id;
+                            newStage.Hblid = hb.Id;
+                            newStage.Hblno = hb.Hwbno;
+                            newStage.JobId = hb.JobId;
+                            newStage.Type = DocumentConstants.FROM_SYSTEM;
+                            newStage.OrderNumberProcessed = orderNumber + 1;
+
+                            var hs = csStageAssignedService.AddNewStageAssigned(newStage);
+                        }
 
                         if (model.CsMawbcontainers != null)
                         {
@@ -1687,7 +1709,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 housebill.TranShipmentTo = data.FinalDestinationPlace?.ToUpper(); //Final Destination
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription?.ToUpper(); //Good delivery
-                housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper() ?? string.Empty; //On board status  
+                housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper() ?? string.Empty; //On board status
                 var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
                 string hbConstainers = string.Empty;
                 string markNo = string.Empty;
@@ -1949,7 +1971,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.OrchW = data.OtherCharge?.ToUpper(); //Other Charge
                 housebill.OChrVal = string.Empty; //NOT USE
                 decimal _dueAgentPp = 0;
-                housebill.TTChgAgntPP = (decimal.TryParse(data.DueAgentPp, out _dueAgentPp)) ? (_dueAgentPp != 0 ? string.Format("{0:n}", _dueAgentPp) : string.Empty) : data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)                
+                housebill.TTChgAgntPP = (decimal.TryParse(data.DueAgentPp, out _dueAgentPp)) ? (_dueAgentPp != 0 ? string.Format("{0:n}", _dueAgentPp) : string.Empty) : data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)
                 decimal _dueAgentCll = 0;
                 housebill.TTChgAgntCC = (decimal.TryParse(data.DueAgentCll, out _dueAgentCll)) ? (_dueAgentCll != 0 ? string.Format("{0:n}", _dueAgentCll) : string.Empty) : data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
                 decimal _dueCarrierPp = 0;

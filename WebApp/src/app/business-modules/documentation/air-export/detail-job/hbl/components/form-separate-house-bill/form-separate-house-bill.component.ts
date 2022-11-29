@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import * as fromShareBussiness from '@share-bussiness';
@@ -12,6 +12,7 @@ import { AirExportDetailHBLComponent } from '../../detail/detail-house-bill.comp
 import { catchError } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
+import { CommonEnum } from '@enums';
 
 
 @Component({
@@ -37,7 +38,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
         protected _exportRepo: ExportRepo,
-        protected _fileMngtRepo: SystemFileManageRepo
+        protected _fileMngtRepo: SystemFileManageRepo,
     ) {
         super(
             _activedRoute,
@@ -81,8 +82,24 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             });
     }
 
+
     ngAfterViewInit() {
-        this.formCreateHBLComponent.isSeparate = true;
+        this._documentationRepo.getDetailTransaction(this.jobId)
+            .pipe(catchError(this.catchError))
+            .subscribe((data: any) => {
+                if (!!data) {
+                    if (!!data.isHawb) {
+                        this.formCreateHBLComponent.hwbnoSeparate = 'N/H';
+                    }
+                    else {
+                        this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
+                            .pipe(catchError(this.catchError))
+                            .subscribe(hawbNoGenerate => {
+                                this.formCreateHBLComponent.hwbno.setValue(hawbNoGenerate.hblNo);
+                            })
+                    }
+                }
+            })
     }
 
     onCancel() {
@@ -98,22 +115,26 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
             });
             return;
         }
-        const houseBill: HouseBill = this.getDataForm();
-        houseBill.jobId = this.jobId;
-        if (!this.hblSeparateId) {
-            houseBill.parentId = this.hblId;
-            this.createHbl(houseBill, this.hblId);
-        } else {
-            const modelUpdate = this.getDataForm();
-
-            modelUpdate.id = this.hblSeparateId;
-            modelUpdate.jobId = this.jobId;
-            modelUpdate.parentId = this.hblId;
-
-            for (const dim of modelUpdate.dimensionDetails) {
-                dim.hblid = this.hblSeparateId;
-            }
-            this.updateHbl(modelUpdate, true);
-        }
+        this._documentationRepo.checkExistedHawbNoAirExport(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res && res.length > 0) {
+                        let jobNo = '';
+                        res.forEach(element => {
+                            jobNo += element + '<br>';
+                        });
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: 'Cannot save HBL! Hawb no existed in the following job: ' + jobNo,
+                            class: 'bg-danger'
+                        });
+                    } else {
+                        const houseBill: HouseBill = this.getDataForm();
+                        this.setData(houseBill);
+                        this.createHbl(houseBill);
+                    }
+                }
+            );
     }
 }
+

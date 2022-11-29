@@ -324,11 +324,11 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         if (this.action !== "create") {
             if (this.excRateUsdToLocal.value) {
                 if (Number(this.excRateUsdToLocal.value) <= 0) {
-                    this._toastService.warning(`Required to enter Excel USD greater than 0`);
+                    this._toastService.warning(`Required to enter Exc USD greater than 0`);
                     return;
                 }
             } else {
-                this._toastService.warning(`Required to enter Excel USD`);
+                this._toastService.warning(`Exc USD is required!`);
                 return;
             }
         }

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
@@ -13,8 +6,6 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
-using eFMS.API.Documentation.DL.Services;
-using eFMS.API.Documentation.Service.Models;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
@@ -25,6 +16,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -49,6 +46,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICheckPointService checkPointService;
         private readonly ICsStageAssignedService csStageAssignedService;
+        private readonly IEDocService _edocService;
 
         /// <summary>
         /// constructor
@@ -70,7 +68,8 @@ namespace eFMS.API.Documentation.Controllers
             IOptions<ApiServiceUrl> serviceUrl,
             ICheckPointService checkPoint,
             ISysImageService imageService,
-            ICsStageAssignedService stageAssignedService)
+             IEDocService edocService,
+        ICsStageAssignedService stageAssignedService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
@@ -81,6 +80,7 @@ namespace eFMS.API.Documentation.Controllers
             apiServiceUrl = serviceUrl;
             checkPointService = checkPoint;
             csStageAssignedService = stageAssignedService;
+            _edocService= edocService;
         }
 
         /// <summary>
@@ -318,7 +318,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (hs.Success)
                 {
-                    var handleStage = await csStageAssignedService.SetMutipleStageAssigned(null, currentJob, model.Id, Guid.Empty);
+                    var handleStage = await csStageAssignedService.SetMultipleStageAssigned(null, currentJob, model.Id, Guid.Empty);
                 }
 
             });
@@ -487,6 +487,7 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
+                    await _edocService.DeleteEdocByJobId(id);
                 });
             }
             return Ok(result);
@@ -521,7 +522,7 @@ namespace eFMS.API.Documentation.Controllers
                 }
             }
 
-            string msgcheckShipmentTypeWithHBL = csTransactionService.CheckHasHBLUpdateNominatedtoFreehand(model,false);
+            string msgcheckShipmentTypeWithHBL = csTransactionService.CheckHasHBLUpdateNominatedtoFreehand(model, false);
             if (msgcheckShipmentTypeWithHBL.Length > 0)
             {
                 return Ok(new ResultHandle { Status = false, Message = msgcheckShipmentTypeWithHBL, Data = new { errorCode = 453 } });

@@ -188,7 +188,7 @@ namespace eFMS.API.Operation.DL.Services
             }
             string _accountNo = clearance.MA_DV;
             var partner = customerRepository.Get(x => x.Active == true && x.TaxCode.Trim() == clearance.MA_DV.Trim())?.FirstOrDefault();
-            if(partner != null)
+            if (partner != null)
             {
                 _accountNo = partner.AccountNo;
             }
@@ -222,7 +222,8 @@ namespace eFMS.API.Operation.DL.Services
                 DepartmentId = currentUser.DepartmentId,
                 OfficeId = currentUser.OfficeID,
                 CompanyId = currentUser.CompanyID,
-                AccountNo = _accountNo
+                AccountNo = _accountNo,
+                Eta = clearance.NGAYDEN
             };
             return newItem;
         }

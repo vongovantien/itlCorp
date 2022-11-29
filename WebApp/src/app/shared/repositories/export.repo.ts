@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from '../services';
-import { environment } from 'src/environments/environment';
-import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+import { ApiService } from '../services';
 
 @Injectable({ providedIn: 'root' })
 export class ExportRepo {
@@ -440,7 +440,6 @@ export class ExportRepo {
     previewExport(url: string) {
         window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${url}`, '_blank');
     }
-
 
     downloadExport(url: string) {
         window.open(`${url}`, '_blank');

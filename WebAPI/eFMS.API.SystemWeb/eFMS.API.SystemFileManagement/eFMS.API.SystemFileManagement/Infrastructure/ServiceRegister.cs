@@ -1,14 +1,19 @@
 ﻿using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Services;
+using eFMS.API.SystemFileManagement.Infrastructure.Common;
 using eFMS.API.SystemFileManagement.Infrastructure.Filters;
 using eFMS.API.SystemFileManagement.Service.Contexts;
+using eFMS.API.SystemFileManagement.Service.Models;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using LocalizationCultureCore.StringLocalizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
+using StackExchange.Redis;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
@@ -20,8 +25,14 @@ namespace eFMS.API.SystemFileManagement.Infrastructure
     public static class ServiceRegister
     {
 
-        public static void Register(IServiceCollection services)
+        public static void Register(IServiceCollection services, IConfiguration configuration)
         {
+            services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
+
+            services.AddSingleton<ICacheServiceBase<SysAttachFileTemplate>>(x =>
+            new CacheServiceBase<SysAttachFileTemplate>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.sysAttachFileTemplate)));
+
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();

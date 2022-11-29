@@ -57,14 +57,14 @@ const routing: Routes = [
                             },
                             {
                                 path: 'send-si', component: ShareBusinessReAlertComponent, data: {
-                                    name: "Send S.I", serviceId: ChargeConstants.SFE_CODE // Similar FCL Export
+                                    name: "Send S.I", serviceId: ChargeConstants.SCE_CODE // Similar FCL Export
                                 }
                             },
                         ]
                     },
                     {
                         path: 'prealert', component: ShareBusinessReAlertComponent,
-                        data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.SFE_CODE },
+                        data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.SCE_CODE },
                     },
                 ]
             },

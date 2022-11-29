@@ -1,7 +1,10 @@
 import { Component, ViewChild } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { ConfirmPopupComponent } from "@common";
+import { InjectViewContainerRefDirective } from '@directives';
+import { Store } from '@ngrx/store';
 import { NgProgress } from "@ngx-progressbar/core";
+import { getCurrentUserState, IAppState } from '@store';
 import { ToastrService } from "ngx-toastr";
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AppList } from "src/app/app.list";
@@ -22,13 +25,13 @@ export class OpsModuleStageManagementComponent extends AppList {
     @ViewChild(OpsModuleStageManagementAddStagePopupComponent) popupCreate: OpsModuleStageManagementAddStagePopupComponent;
     @ViewChild(OpsModuleStageManagementDetailComponent) popupDetail: OpsModuleStageManagementDetailComponent;
     @ViewChild(AssignStagePopupComponent) assignStagePopup: AssignStagePopupComponent;
-    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) confirmContainerRef: InjectViewContainerRefDirective;
 
     stages: Stage[] = [];
     stageAvailable: any[] = [];
     selectedStage: Stage = null;
     currentStages: Stage[] = [];
-
+    currentUser: any;
     jobId: string = '';
 
     timeOutSearch: any;
@@ -41,6 +44,7 @@ export class OpsModuleStageManagementComponent extends AppList {
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
         private _toastService: ToastrService,
+        private _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -70,6 +74,14 @@ export class OpsModuleStageManagementComponent extends AppList {
                 this.getListStageAvailable(this.jobId);
             }
         });
+
+        this._store.select(getCurrentUserState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((res) => {
+                this.currentUser = res
+            })
     }
 
     getShipmentDetails(id: any) {
@@ -186,14 +198,14 @@ export class OpsModuleStageManagementComponent extends AppList {
         this.stages = this._sortService.sort(this.stages, this.sort, this.order);
     }
 
-    showDeletePopup(data: any) {
-        this.confirmDeletePopup.show();
+    onDeleteStage(data: any) {
         this.selectedStage = data;
-    }
-
-    onDeleteStage() {
-        this.confirmDeletePopup.hide();
-        this.deleteStageAssigned(this.selectedStage.id);
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+            body: 'Do you want to delete this stage ?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.deleteStageAssigned(this.selectedStage.id);
+        })
     }
 
     deleteStageAssigned(id: string) {

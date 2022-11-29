@@ -28,7 +28,7 @@ import { AccountingSelectAttachFilePopupComponent } from '../components/select-a
 import {
     getAdvancePaymentListLoadingState,
     getAdvancePaymentListPagingState, getAdvancePaymentListState,
-    getAdvancePaymentSearchParamsState, LoadListAdvancePayment
+    getAdvancePaymentSearchParamsState, LoadListAdvancePayment, LoadListAdvancePaymentSuccess
 } from './store';
 
 @Component({
@@ -133,7 +133,27 @@ export class AdvancePaymentComponent extends AppList {
                     this.page = data.page;
                     this.pageSize = data.pageSize;
 
-                    this.requestLoadListAdvancePayment();
+                    //* Handle Cached.
+                    if (!!this.advancePayments.length && !!this.dataSearch?.referenceNos?.length) {
+                        let resultsCached = [];
+
+                        resultsCached = this.advancePayments.filter(x => this.dataSearch.referenceNos.includes(x.advanceNo));
+
+                        if (resultsCached.length >= this.dataSearch?.referenceNos?.length) {
+                            const response: CommonInterface.IResponsePaging = {
+                                data: resultsCached,
+                                page: 1,
+                                size: this.pageSize,
+                                totalItems: resultsCached.length
+                            };
+                            this._store.dispatch(LoadListAdvancePaymentSuccess(response));
+                            return;
+                        } else {
+                            this.requestLoadListAdvancePayment();
+                        }
+                    } else {
+                        this.requestLoadListAdvancePayment();
+                    }
                 }
             );
 

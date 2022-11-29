@@ -66,6 +66,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     shipmentType: AbstractControl;
     note: AbstractControl;
     noProfit: AbstractControl;
+    eta: AbstractControl;
+    deliveryDate: AbstractControl;
+    suspendTime: AbstractControl;
+    clearanceDate: AbstractControl;
 
     productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
@@ -184,8 +188,14 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             packageTypeId: this.opsTransaction.packageTypeId,
             shipmentType: this.opsTransaction.shipmentType,
             note: this.opsTransaction.note,
-            noProfit: this.opsTransaction.noProfit
+            noProfit: this.opsTransaction.noProfit,
+            eta: !!this.opsTransaction.eta ? { startDate: new Date(this.opsTransaction.eta), endDate: new Date(this.opsTransaction.eta) } : null,
+            deliveryDate: !!this.opsTransaction.deliveryDate ? { startDate: new Date(this.opsTransaction.deliveryDate), endDate: new Date(this.opsTransaction.deliveryDate) } : null,
+            clearanceDate: !!this.opsTransaction.clearanceDate ? { startDate: new Date(this.opsTransaction.clearanceDate), endDate: new Date(this.opsTransaction.clearanceDate) } : null,
+            suspendTime: this.opsTransaction.suspendTime,
         });
+
+        console.log(this.opsTransaction)
 
         this.customerName = this.opsTransaction.customerName;
         this.shipmentInfo = this.opsTransaction.serviceNo;
@@ -244,7 +254,13 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             containerDescription: [null],
             packageTypeId: [null],
             note: [null],
-            noProfit: [false]
+            noProfit: [false],
+            eta: [null],
+            deliveryDate: [null],
+            suspendTime: [null, Validators.compose([
+                Validators.maxLength(150),
+            ])],
+            clearanceDate: [null],
         }, { validator: FormValidators.comparePort });
 
         this.jobNo = this.formEdit.controls['jobNo'];
@@ -281,6 +297,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.shipmentType = this.formEdit.controls['shipmentType'];
         this.note = this.formEdit.controls['note'];
         this.noProfit = this.formEdit.controls['noProfit'];
+        this.eta = this.formEdit.controls['eta'];
+        this.deliveryDate = this.formEdit.controls['deliveryDate'];
+        this.suspendTime = this.formEdit.controls['suspendTime'];
+        this.clearanceDate = this.formEdit.controls['clearanceDate'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {

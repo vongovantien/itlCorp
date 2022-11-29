@@ -18,6 +18,7 @@ import { SOA, SysImage } from 'src/app/shared/models';
 import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { StatementOfAccountPaymentMethodComponent } from '../components/poup/payment-method/soa-payment-method.popup';
+import { LoadSOADetailSuccess } from '../store/actions';
 
 @Component({
     selector: 'app-statement-of-account-detail',
@@ -28,7 +29,6 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
     @ViewChild(ShareModulesReasonRejectPopupComponent) reasonRejectPopupComponent: ShareModulesReasonRejectPopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
     @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
-
     soaNO: string = '';
 
     soa: SOA = new SOA();
@@ -123,10 +123,11 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
             .subscribe(
                 (res: any) => {
                     this.soa = new SOA(res);
-                    console.log(res);
                     this.soaId = res.id;
+                    console.log(this.soaId);
                     this.totalItems = this.soa.chargeShipments.length;
                     this.initGroup = this.soa.groupShipments;
+                    this._store.dispatch(LoadSOADetailSuccess(res));
                 },
             );
     }

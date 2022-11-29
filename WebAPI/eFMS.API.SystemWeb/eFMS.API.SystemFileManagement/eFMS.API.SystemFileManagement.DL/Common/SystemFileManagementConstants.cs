@@ -10,7 +10,7 @@
         public const string ATTACH_TEMPLATE_ACCOUNTING_TYPE_SOA = "SOA";
         public const string ATTACH_TEMPLATE_SOURCE_SHIPMENT = "Shipment";
         public const string ATTACH_TEMPLATE_SOURCE_ADVANCE = "Advance";
-        public const string ATTACH_TEMPLATE_SOURCE_SOA = "Advance";
+        public const string ATTACH_TEMPLATE_SOURCE_SOA = "SOA";
         public const string ATTACH_TEMPLATE_SOURCE_SETTLEMENT = "Settlement";
     }
 }

@@ -519,6 +519,13 @@ export class DocumentationRepo {
         );
     }
 
+    updateMultipleProofOfDelivery(body: any = {}) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/updateMultipleProofOfDelivery`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     // uploadFileProofOfDelivery(hblId: string, body: any) {
     //     return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/uploadFileProofOfDelivery/${hblId}`, body, 'files').pipe(
     //         map((data: any) => data)

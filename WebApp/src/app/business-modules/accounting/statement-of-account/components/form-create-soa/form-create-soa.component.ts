@@ -116,7 +116,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
     getUserLevel() {
         this._store.select(getMenuUserPermissionState)
-            .pipe(takeUntil(this.ngUnsubscribe), skip(1)) //* skip(1) - tránh case load 2 lần */
+            .pipe(takeUntil(this.ngUnsubscribe)) //* skip(1) - tránh case load 2 lần */
             .subscribe((menuPermission: SystemInterface.IUserPermission) => {
                 if (menuPermission !== null && menuPermission !== undefined && Object.keys(menuPermission).length !== 0) {
                     console.log(menuPermission);

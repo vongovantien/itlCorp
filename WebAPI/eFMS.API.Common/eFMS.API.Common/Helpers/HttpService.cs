@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace eFMS.API.Common.Helpers
 {
@@ -98,6 +100,50 @@ namespace eFMS.API.Common.Helpers
 
                 HttpResponseMessage response = await client.PutAsync(url, content);
                 return response;
+            }
+            catch (Exception e)
+            {
+                new LogHelper("eFMS_HttpService_Log", e.ToString());
+            }
+            return null;
+        }
+
+        public async static Task<byte[]> GetByteArrayFromFile(string url, string token)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    token = token.Split()[1]; // remove bearer
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+                var response = await client.GetByteArrayAsync(url);
+                return response;
+            }
+            catch (Exception e)
+            {
+                new LogHelper("eFMS_HttpService_Log", e.ToString());
+            }
+            return null;
+        }
+
+        public async static Task<Stream> GetFileContentResult(string url, string token)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    token = token.Split()[1]; // remove bearer
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+                var s = await client.GetStreamAsync(url);
+                return s;
             }
             catch (Exception e)
             {

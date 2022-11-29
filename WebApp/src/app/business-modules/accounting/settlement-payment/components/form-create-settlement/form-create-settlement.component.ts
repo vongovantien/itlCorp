@@ -72,6 +72,7 @@ export class SettlementFormCreateComponent extends AppForm {
 
     customers: any;
     banks: Observable<any[]>;
+    payeeName: string = '';
 
     constructor(
         private _fb: FormBuilder,

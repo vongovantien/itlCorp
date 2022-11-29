@@ -1,0 +1,26 @@
+.uploadContext {
+    cursor: pointer;
+    &.disabled {
+        pointer-events: none;
+        cursor: not-allowed;
+        color: #999999;
+        &:hover {
+            color: #999999;
+        }
+        i {
+            color: #999999 !important;
+        }
+    }
+    .inputUpload {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        height: 100%;
+        width: 100%;
+    }
+}
+
+.htmlLink{
+    cursor: pointer
+}

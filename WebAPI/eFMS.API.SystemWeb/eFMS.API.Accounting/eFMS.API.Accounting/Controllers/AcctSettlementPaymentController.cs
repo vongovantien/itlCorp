@@ -37,6 +37,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IMapper mapper;
         private string typeApproval = "Settlement";
         private IAccAccountReceivableService accountReceivableService;
+        private readonly IEDocService _eDocService;
 
         /// <summary>
         /// Contructor
@@ -45,10 +46,11 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="service"></param>
         /// <param name="user"></param>
         public AcctSettlementPaymentController(
-            IStringLocalizer<LanguageSub> localizer, 
-            IAcctSettlementPaymentService service, 
+            IStringLocalizer<LanguageSub> localizer,
+            IAcctSettlementPaymentService service,
             ICurrentUser user, IMapper _mapper,
-            IAccAccountReceivableService accountReceivable
+            IAccAccountReceivableService accountReceivable,
+            IEDocService eDocService
             )
         {
             stringLocalizer = localizer;
@@ -56,6 +58,7 @@ namespace eFMS.API.Accounting.Controllers
             currentUser = user;
             mapper = _mapper;
             accountReceivableService = accountReceivable;
+            _eDocService = eDocService;
         }
 
         /// <summary>
@@ -484,11 +487,18 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
                 return BadRequest(_result);
             }
+
             var hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
+
+            //var hsGenEdoc = _eDocService.GenerateEdoc(model);
+            //if (hsGenEdoc.Result.Code == 403)
+            //{
+            //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            //}
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };

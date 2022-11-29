@@ -44,7 +44,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICsShipmentSurchargeService surchargeService;
         private readonly ICheckPointService checkPointService;
-
+        private readonly IEDocService _edocService;
         /// <summary>
         /// 
         /// </summary>
@@ -62,6 +62,7 @@ namespace eFMS.API.Documentation.Controllers
             IOptions<ApiServiceUrl> serviceUrl,
             ICsShipmentSurchargeService surchargeshipment,
             ICheckPointService checkPoint,
+            IEDocService edocService,
             Menu menu = Menu.opsJobManagement) : base(curUser, menu)
         {
             stringLocalizer = localizer;
@@ -72,6 +73,7 @@ namespace eFMS.API.Documentation.Controllers
             apiServiceUrl = serviceUrl;
             surchargeService = surchargeshipment;
             checkPointService = checkPoint;
+            _edocService = edocService;
         }
 
         /// <summary>
@@ -329,6 +331,7 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
+                    await _edocService.DeleteEdocByJobId(id);
                 });
             }
             return Ok(result);

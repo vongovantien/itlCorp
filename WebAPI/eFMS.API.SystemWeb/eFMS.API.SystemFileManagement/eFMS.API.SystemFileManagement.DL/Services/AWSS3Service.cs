@@ -14,6 +14,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
@@ -70,7 +71,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     result = await _sysImageRepo.DeleteAsync(x => x.Id == id);
                 if (result.Success)
                 {
-                    var imageDetail= _sysImageDetailRepo.Delete(x=>x.SysImageId==id);
+                    var imageDetail = _sysImageDetailRepo.Delete(x => x.SysImageId == id);
                 }
                 return result;
             }
@@ -202,6 +203,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 };
                 GetObjectResponse response = await _client.GetObjectAsync(request);
                 if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
+                else if (Path.GetExtension(fileName) == ".txt")
+                {
+                    var data = new StreamReader(response.ResponseStream, Encoding.UTF8);
+                    var obj = new object();
+                    obj = data.ReadToEnd();
+                    return new HandleState(true, obj);
+                }
                 return new HandleState(true, response.ResponseStream);
             }
             catch (Exception ex)
@@ -248,7 +256,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             HandleState result = new HandleState();
             try
             {
-                var lst = await _sysImageRepo.GetAsync(x => x.ObjectId == model.ObjectId && x.ChildId == model.ChillId);
+                var lst = new List<SysImage>();
+                if (model.ChillId == null)
+                {
+                    lst = await _sysImageRepo.GetAsync(x => x.ObjectId == model.ObjectId);
+                }
+                else
+                {
+                    lst = await _sysImageRepo.GetAsync(x => x.ObjectId == model.ObjectId && x.ChildId == model.ChillId);
+                }
+
                 if (lst == null) { return new HandleState("Not found data"); }
                 var files = new List<InMemoryFile>();
                 foreach (var it in lst)

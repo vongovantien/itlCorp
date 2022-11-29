@@ -128,7 +128,7 @@ export class StatementOfAccountEditComponent extends AppList {
                     // * update range Date
                     this.selectedRange = { startDate: new Date(this.soa.soaformDate), endDate: new Date(this.soa.soatoDate) };
 
-                    this.excRateUsdToLocal = !!this.soa.excRateUsdToLocal?this.formatNumberDecimal(this.soa.excRateUsdToLocal):0;
+                    this.excRateUsdToLocal = !!this.soa.excRateUsdToLocal ? this.formatNumberDecimal(this.soa.excRateUsdToLocal) : 0;
 
                     // * Update dataSearch for Add More Charge.
                     const datSearchMoreCharge: SOASearchCharge = {
@@ -156,7 +156,7 @@ export class StatementOfAccountEditComponent extends AppList {
                         salemanId: ''
                     };
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
-                    if(!!this.soa){
+                    if (!!this.soa) {
                         this.creatorShipment = this.soa.creatorShipment;
                         this.staffTypeName = this.staffTypes.filter(item => item.value === this.soa.staffType)[0].title;
                         this.getUserLevel();
@@ -250,7 +250,7 @@ export class StatementOfAccountEditComponent extends AppList {
             this.selectedUser = this.users.filter(i => this.creatorShipment.includes(i.id)).map(x => x.id);
         }
     }
-    
+
     onSelectDataFormInfo(data: { id: any; }, type: string) {
         switch (type) {
             case 'staffInfo':
@@ -316,14 +316,15 @@ export class StatementOfAccountEditComponent extends AppList {
                     * and
         * startDate must <= soaFromDate
         */
-        if (!this.excRateUsdToLocal) {
-            if (this.excRateUsdToLocal <=0) {
-                this._toastService.warning(`Required to enter Excel USD greater than 0`);
-                return;
-            } else {
-                this._toastService.warning(`Required to enter Excel USD`);
+        if (this.excRateUsdToLocal) {
+            if (this.excRateUsdToLocal <= 0) {
+                this._toastService.warning(`Required to enter Exc USD greater than 0`);
                 return;
             }
+        }
+        else {
+            this._toastService.warning(`Exc USD is required!`);
+            return;
         }
         if ((new Date(this.selectedRange.startDate).getDate() > new Date(this.soa.soaformDate).getDate()) || new Date(this.selectedRange.endDate).getDate() < new Date(this.soa.soatoDate).getDate()) {
             this._toastService.warning(`Range date invalid `);
@@ -357,7 +358,7 @@ export class StatementOfAccountEditComponent extends AppList {
                 customer: this.soa.customer,
                 commodityGroupId: this.soa.commodityGroupId,
                 staffType: this.soa.staffType,
-                excRateUsdToLocal:this.excRateUsdToLocal
+                excRateUsdToLocal: this.excRateUsdToLocal
             };
             this._progressRef.start();
             this._accoutingRepo.updateSOA(body)

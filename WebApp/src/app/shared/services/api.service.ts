@@ -113,6 +113,21 @@ export class ApiService {
         }
     }
 
+    getTextFile(url: string = '', params?: any, headers: any = {}, observe: 'body' | 'response' | any = 'body') {
+        return this._http.get(url, {
+            params,
+            headers: Object.assign({}, this._headers, headers),
+            responseType: 'text',
+            observe: observe
+        });
+    }
+
+    downloadEdocFile(url: string) {
+        return this._http.get(this.setUrl(url), {
+            responseType: 'blob'
+        });
+    }
+
     get(url: string = '', params?: any, headers: any = {}, isBaseHref: boolean = true) {
         return this._http.get(isBaseHref ? this.setUrl(url) : url, {
             params,
@@ -140,7 +155,6 @@ export class ApiService {
                 BillingType: edoc.EDocFiles[i].BillingType,
                 Code: edoc.EDocFiles[i].Code,
                 DocumentId: edoc.EDocFiles[i].DocumentId,
-                //FileInput: edoc.EDocFiles[i].FileInput,
                 HBL: edoc.EDocFiles[i].HBL,
                 JobId: edoc.EDocFiles[i].JobId,
                 TransactionType: edoc.EDocFiles[i].TransactionType,
@@ -158,7 +172,6 @@ export class ApiService {
             formData.append(`edocUploadModel.EDocFiles[${i}][BillingType]`, edocFile[i].BillingType);
             formData.append(`edocUploadModel.EDocFiles[${i}][Code]`, edocFile[i].Code);
             formData.append(`edocUploadModel.EDocFiles[${i}][DocumentId]`, edocFile[i].DocumentId);
-            //formData.append(`edocUploadModel.EDocFiles[${i}].[File]`, edocFile[i].FileInput);
             formData.append(`edocUploadModel.EDocFiles[${i}][HBL]`, edocFile[i].HBL);
             formData.append(`edocUploadModel.EDocFiles[${i}][JobId]`, edocFile[i].JobId);
             formData.append(`edocUploadModel.EDocFiles[${i}][TransactionType]`, edocFile[i].TransactionType);
