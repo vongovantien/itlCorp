@@ -18,6 +18,7 @@ export class StandardCharge {
     datetimeModified: string = '';
     unitId: number = null;
     quantityType: any = null;
+    chargeGroup: string = null;
 
     constructor(data?: any) {
         const self = this;

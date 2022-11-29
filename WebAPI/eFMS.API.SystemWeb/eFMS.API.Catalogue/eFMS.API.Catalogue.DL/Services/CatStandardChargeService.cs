@@ -59,7 +59,8 @@ namespace eFMS.API.Catalogue.DL.Services
                    Office = stcharge.Office,
                    Notes = stcharge.Notes,
                    UnitId = stcharge.UnitId,
-                   QuantityType = stcharge.QuantityType
+                   QuantityType = stcharge.QuantityType,
+                   ChargeGroup = charge.ChargeGroup
                });
             return result;
         }
