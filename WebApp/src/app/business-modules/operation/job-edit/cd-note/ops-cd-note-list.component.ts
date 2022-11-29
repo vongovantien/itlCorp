@@ -1,25 +1,29 @@
-import { Component, Input, ViewChild } from '@angular/core';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { catchError, finalize, map } from 'rxjs/operators';
-import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { SortService } from 'src/app/shared/services';
-import { ActivatedRoute } from '@angular/router';
-import { NgProgress } from '@ngx-progressbar/core';
-import { AppList } from 'src/app/app.list';
-import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
-import { OpsCdNoteDetailPopupComponent } from '../components/popup/ops-cd-note-detail/ops-cd-note-detail.popup';
-import { ToastrService } from 'ngx-toastr';
-import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/ops-cd-note-add.popup';
-import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
-import _uniq from 'lodash/uniq';
-import { ReportPreviewComponent } from '@common';
-import { Crystal } from '@models';
-import { InjectViewContainerRefDirective } from '@directives';
-import { delayTime } from '@decorators';
-import { combineLatest } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
+import { Component, Input, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ReportPreviewComponent } from '@common';
 import { SystemConstants } from '@constants';
+import { delayTime } from '@decorators';
+import { InjectViewContainerRefDirective } from '@directives';
+import { Crystal } from '@models';
+import { Store } from '@ngrx/store';
+import { SystemFileManageRepo } from '@repositories';
+import _uniq from 'lodash/uniq';
+import { ToastrService } from 'ngx-toastr';
+import { combineLatest, of } from 'rxjs';
+import { catchError, concatMap, finalize, map, mergeMap, takeUntil } from 'rxjs/operators';
+import { AppList } from 'src/app/app.list';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
+import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
+import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
+import { SortService } from 'src/app/shared/services';
+import { getOperationTransationDetail } from '../../store';
+import { ICustomDeclarationState } from '../../store/reducers/custom-clearance.reducer';
+import { IOPSTransactionState } from '../../store/reducers/operation.reducer';
+import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/ops-cd-note-add.popup';
+import { OpsCdNoteDetailPopupComponent } from '../components/popup/ops-cd-note-detail/ops-cd-note-detail.popup';
 
 @Component({
     selector: 'ops-cd-note-list',
@@ -40,7 +44,7 @@ export class OpsCDNoteComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
-
+    shipment: any;
     isDesc = true;
     sortKey: string = '';
 
@@ -50,6 +54,8 @@ export class OpsCDNoteComponent extends AppList {
         private _sortService: SortService,
         private _activedRouter: ActivatedRoute,
         private _toastService: ToastrService,
+        private _fileMngtRepo: SystemFileManageRepo,
+        private _store: Store<IOperationState>,
     ) {
         super();
     }
@@ -87,6 +93,8 @@ export class OpsCDNoteComponent extends AppList {
             { title: 'Sync Status', field: 'syncStatus', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
         ];
+
+        this.getCurrentJob();
     }
 
     getListCdNote(id: string) {
@@ -107,6 +115,24 @@ export class OpsCDNoteComponent extends AppList {
                         });
                     });
                 },
+            );
+    }
+
+    getCurrentJob() {
+        this._store.select(getOperationTransationDetail)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe(
+                (res: CommonInterface.IResponsePaging | any) => {
+                    if (!!res) {
+                        this.shipment = res || [];
+                        this.totalItems = res.totalItems;
+                    } else {
+                        this.shipment = null;
+                        this.totalItems = 0;
+                    }
+                }
             );
     }
 
@@ -277,6 +303,8 @@ export class OpsCDNoteComponent extends AppList {
     }
 
     renderAndShowReport() {
+        console.log(this.shipment);
+
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -288,6 +316,43 @@ export class OpsCDNoteComponent extends AppList {
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
             });
+
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.shipment.id,
+                            hblId: this.shipment.hblid,
+                            templateCode: 'PLSheet',
+                            transactionType: 'CL'
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 
     preview(isOrigin: boolean) {
@@ -330,4 +395,9 @@ export class OpsCDNoteComponent extends AppList {
                 },
             );
     }
+}
+
+interface IOperationState {
+    transaction: IOPSTransactionState;
+    clearance: ICustomDeclarationState;
 }

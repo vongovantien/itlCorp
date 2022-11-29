@@ -1393,7 +1393,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private string convertTransactionType(string tranType)
         {
             string result = null;
-            if (tranType.Length > 3)
+            if (CustomData.Services.Any(x => x.DisplayName.Replace(" ", "") == tranType))
             {
                 CustomData.Services.ForEach(x =>
                 {
@@ -1407,22 +1407,18 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 result = tranType;
             }
-           
+
             return result;
         }
 
-        private string GetAliasNameForPreviewTemplate(string tranType,string name)
+        private string GetAliasNameForPreviewTemplate(string name)
         {
-            string type = null;
-            if (tranType.Length > 3)
-            {
-                type = convertTransactionType(tranType);
-            }
-            else
-            {
-                type = tranType;
-            }
-            return convertTransactionType(tranType)+'_'+Path.GetFileNameWithoutExtension(name).TrimEnd('_').Remove(name.LastIndexOf('_'));
+            //if (tranType == "CL")
+            //{
+            //    return Path.GetFileNameWithoutExtension(name).TrimEnd('_').Remove(name.LastIndexOf('_'));
+            //}
+            //return convertTransactionType(tranType)+'_'+Path.GetFileNameWithoutExtension(name).TrimEnd('_').Remove(name.LastIndexOf('_'));
+            return Path.GetFileNameWithoutExtension(name).TrimEnd('_').Remove(name.LastIndexOf('_'));
         }
 
         private async Task<HandleState> MappingPreviewTemplateToShipment(EDocAttachPreviewTemplateUploadModel model, SysImage image)
@@ -1461,7 +1457,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     Source = SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_SHIPMENT,
                     SysImageId = image.Id,
                     UserFileName = Path.GetFileNameWithoutExtension(image.Name),
-                    SystemFileName = GetAliasNameForPreviewTemplate(model.TransactionType, image.Name),
+                    SystemFileName = _attachFileTemplateRepo.Get(x=>x.Id==_docTypeId).FirstOrDefault()?.Code +"_"+  GetAliasNameForPreviewTemplate(image.Name),
                     DocumentTypeId = _docTypeId
                 };
                 result = await _sysImageDetailRepo.AddAsync(imageDetail);
