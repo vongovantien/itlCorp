@@ -4,7 +4,7 @@ export class StandardCharge {
     code: string = '';
     quantity: number = 0;
     unitPrice: number = 0;
-    currency: string = null;
+    currencyId: string = null;
     vatrate: number = 0;
     type: string = '';
     transactionType: string = '';
@@ -16,6 +16,9 @@ export class StandardCharge {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
+    unitId: number = null;
+    quantityType: any = null;
+    chargeGroup: string = null;
 
     constructor(data?: any) {
         const self = this;

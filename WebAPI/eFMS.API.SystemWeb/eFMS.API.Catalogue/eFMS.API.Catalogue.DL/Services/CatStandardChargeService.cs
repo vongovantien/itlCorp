@@ -57,7 +57,10 @@ namespace eFMS.API.Catalogue.DL.Services
                    Service = stcharge.Service,
                    ServiceType = stcharge.ServiceType,
                    Office = stcharge.Office,
-                   Notes = stcharge.Notes
+                   Notes = stcharge.Notes,
+                   UnitId = stcharge.UnitId,
+                   QuantityType = stcharge.QuantityType,
+                   ChargeGroup = charge.ChargeGroup
                });
             return result;
         }
@@ -98,7 +101,9 @@ namespace eFMS.API.Catalogue.DL.Services
                         UserCreated = currentUser.UserID,
                         DatetimeCreated = DateTime.Now,
                         UserModified = currentUser.UserID,
-                        DatetimeModified = DateTime.Now
+                        DatetimeModified = DateTime.Now,
+                        UnitId = item.UnitId,
+                        QuantityType = item.QuantityType
                     };
                     listData.Add(standardCharge);
                 }
