@@ -73,5 +73,11 @@ namespace eFMS.API.Documentation.DL.Services
 
             return Task.CompletedTask;
         }
+
+        public List<vw_GetShipmentAlertATD> GetAlertATDData()
+        {
+            var dtData = DC.GetViewData<vw_GetShipmentAlertATD>();
+            return dtData;
+        }
     }
 }
