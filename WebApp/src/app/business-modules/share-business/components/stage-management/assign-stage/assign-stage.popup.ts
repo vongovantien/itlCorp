@@ -50,7 +50,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     jobId: string = '';
     isAssignment: boolean = false;
     houseBillList: CsTransactionDetail[];
-    selectedHbl: any[] = null;
+    selectedHbl: any[];
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -82,6 +82,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
                     if (!!res && res.length > 0) {
                         this.houseBillList = [new CsTransactionDetail({ id: 'All', hwbno: 'All' })]
                         this.houseBillList = this.houseBillList.concat(res);
+                        this.houseBillList = this.houseBillList.filter(x => x.hwbno !== 'N/H').concat(this.houseBillList.find(x => x.hwbno === 'N/H'));
                     }
                 }
             );
@@ -122,13 +123,13 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 
     assignMultipleStage() {
         this.isSubmitted = true;
-        if (!this.selectedUser.value || !this.selectedStage.value || (!this.selectedHbl && this.selectedStage.value === 'Make Advance/ Settlement')) {
+        if (!this.selectedUser.value || !this.selectedStage.value || ((!this.selectedHbl || this.selectedHbl?.length <= 0) && this.selectedStage.value !== 'Make Advance/ Settlement')) {
             return;
         }
 
         let listItemTemp = [];
         if (!!this.selectedHbl && this.selectedHbl[0] === 'All') {
-            listItemTemp = this.houseBillList.filter(x => x.id !== 'All').map(x => x.id);
+            listItemTemp = this.houseBillList.filter(x => x.id !== 'All').map(x => x.id)
         }
         else if (!!this.selectedHbl && this.selectedHbl[0] !== 'All') {
             listItemTemp = this.selectedHbl
