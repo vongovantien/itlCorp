@@ -71,7 +71,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
         const files: any[] = event.target['files'];
         let docType: any;
         if (this.documentTypes.length === 1) {
-            docType = this.documentTypes[0];
+            docType = this.documentTypes[0].id;
         }
         for (let i = 0; i < files.length; i++) {
             if (!!docType) {
@@ -79,10 +79,13 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                 files[i].DocumentId = docType.id;
                 files[i].docType = docType;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
+            } else {
+                files[i].docType = null;
             }
             this.listFile.push(files[i]);
             this.listFile[i].aliasName = files[i].name.substring(0, files[i].name.lastIndexOf('.'));
         }
+        console.log(this.listFile);
         if (fileList?.length > 0) {
             let validSize: boolean = true;
             for (let i = 0; i <= fileList?.length - 1; i++) {
@@ -127,7 +130,6 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
     }
 
     uploadEDoc() {
-        this.isSubmitted = false;
         let edocFileList: any[] = [];
         let files: any[] = [];
 
@@ -170,6 +172,10 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                         return;
                     }
                     this._toastService.error(res.message);
+                },
+                (error) => { },
+                () => {
+                    this.isSubmitted = false;
                 }
             );
 
