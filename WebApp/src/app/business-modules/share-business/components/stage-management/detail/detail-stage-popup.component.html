@@ -136,8 +136,10 @@
                             </div>
                         </div>
                         <div class="col-lg-6 ">
-                            <div class="form-group">
-                                <label for="">House Bill</label>
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && !this.selectedHbl.value && this.stageName.value !== 'Make Advance/ Settlement'}">
+                                <label for=""> House Bill <span *ngIf="stageName.value !== 'Make Advance/ Settlement'"
+                                        class=" text-danger">(*)</span></label>
                                 <app-combo-grid-virtual-scroll formControlName="hblno"
                                     [currentActiveItemId]="selectedHbl" [height]="150"
                                     (itemSelected)="onSelectHouseBill($event)" [dataSources]="configHbl.dataSource"
@@ -145,6 +147,10 @@
                                     [selectedDisplayFields]="configHbl.selectedDisplayFields"
                                     (remove)="onRemoveData('hbl')">
                                 </app-combo-grid-virtual-scroll>
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && !this.selectedHbl.value && this.stageName.value !== 'Make Advance/ Settlement'">
+                                    House Bill is required!
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -148,7 +148,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
     }
 
     onSelectHouseBill($event: CsTransactionDetail) {
-        this.selectedHbl.value = $event.hwbno;
+        this.selectedHbl.value = $event.id;
         this.hblno.setValue($event.hwbno);
     }
 
@@ -172,7 +172,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         if ((form.value.status === 'Pending' || form.value.status === "Deleted") && !form.value.comment) {
             return;
         }
-        if (!this.selectedMainPersonInCharge.value) {
+        if (!this.selectedMainPersonInCharge.value || (!this.selectedHbl.value && this.stageName.value !== 'Make Advance/ Settlement')) {
             return;
         } else {
             const body = {
@@ -253,7 +253,6 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         this.selectedHbl = {}
         this.hblno.setValue(null);
     }
-
 
     onRemoveData(type: string) {
         switch (type) {

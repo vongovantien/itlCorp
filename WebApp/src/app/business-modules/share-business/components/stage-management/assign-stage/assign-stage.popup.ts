@@ -50,7 +50,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
     jobId: string = '';
     isAssignment: boolean = false;
     houseBillList: CsTransactionDetail[];
-    selectedHbl: string[];
+    selectedHbl: any[];
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -72,6 +72,20 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
                 this.jobId = res.jobId;
             }
         });
+    }
+
+    getHblList(jobId: string) {
+        this._documentRepo.getHBLOfJob({ jobId: jobId })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (!!res && res.length > 0) {
+                        this.houseBillList = [new CsTransactionDetail({ id: 'All', hwbno: 'All' })]
+                        this.houseBillList = this.houseBillList.concat(res);
+                        this.houseBillList = this.houseBillList.filter(x => x.hwbno !== 'N/H').concat(this.houseBillList.find(x => x.hwbno === 'N/H'));
+                    }
+                }
+            );
     }
 
     getStage() {
@@ -109,22 +123,28 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
 
     assignMultipleStage() {
         this.isSubmitted = true;
-        if (!this.selectedUser.value || !this.selectedStage.value) {
+        if (!this.selectedUser.value || !this.selectedStage.value || ((!this.selectedHbl || this.selectedHbl?.length <= 0) && this.selectedStage.value !== 'Make Advance/ Settlement')) {
             return;
         }
-        if (this.selectedHbl[0] === 'All') {
-            this.selectedHbl = this.houseBillList.filter(x => x.id !== 'All').map(x => x.id);
+
+        let listItemTemp = [];
+        if (!!this.selectedHbl && this.selectedHbl[0] === 'All') {
+            listItemTemp = this.houseBillList.filter(x => x.id !== 'All').map(x => x.id)
+        }
+        else if (!!this.selectedHbl && this.selectedHbl[0] !== 'All') {
+            listItemTemp = this.selectedHbl
+        } else {
+            listItemTemp.push(new Stage().id)
         }
 
-        const body: any[] = this.selectedHbl.map((stage: any, index: number) => new Stage(stage));
+        const body: any[] = listItemTemp.map((stage: any, index: number) => new Stage(stage));
 
         for (const [index, value] of <any>body.entries()) {
             value.id = "00000000-0000-0000-0000-000000000000";
             value.jobId = this.jobId;
-            value.hblId = this.selectedHbl[index];
+            value.hblId = listItemTemp[index];
             value.stageId = this.selectedStageData.id;
             value.mainPersonInCharge = this.selectedUserData.id;
-            value.description = this.description;
         }
 
         this._documentRepo.addMultipleStageToJob(this.jobId, body).pipe(catchError(this.catchError))
@@ -167,26 +187,13 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
         }
     }
 
-    getHblList(jobId: string) {
-        this._documentRepo.getHBLOfJob({ jobId: jobId })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    if (!!res && res.length > 0) {
-                        this.houseBillList = [new CsTransactionDetail({ id: 'All', hwbno: 'All' })]
-                        this.houseBillList = this.houseBillList.concat(res);
-                    }
-                }
-            );
-    }
-
     closePopup() {
         this.hide();
         // * Reset value
         this.description = '';
         this.selectedStage = {};
         this.selectedUser = {};
-        this.selectedHbl = [];
+        this.selectedHbl = null;
         this.isSubmitted = false;
     }
 
