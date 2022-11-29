@@ -1375,6 +1375,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         {
                             foreach (var image in imageList)
                             {
+                                model.TransactionType = convertTransactionType(model.TransactionType);
                                 result = await MappingPreviewTemplateToShipment(model, image);
                             }
                         }
