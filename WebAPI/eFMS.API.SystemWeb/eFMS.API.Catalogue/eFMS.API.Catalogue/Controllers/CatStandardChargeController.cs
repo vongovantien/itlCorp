@@ -98,7 +98,10 @@ namespace eFMS.API.Catalogue.Controllers
                         Service = worksheet.Cells[row, 8].Value?.ToString().Trim(),
                         ServiceType = worksheet.Cells[row, 9].Value?.ToString().Trim(),
                         Office = worksheet.Cells[row, 10].Value?.ToString().Trim(),
-                        Notes = worksheet.Cells[row, 11].Value?.ToString().Trim()
+                        Notes = worksheet.Cells[row, 11].Value?.ToString().Trim(),
+                        UnitId = short.Parse(worksheet.Cells[row, 12].Value?.ToString().Trim()),
+                        QuantityType = worksheet.Cells[row, 13].Value?.ToString().Trim()
+
 
                     };
                     var data = catStandardChargeService.CheckValidImport(standardCharge);

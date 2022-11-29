@@ -1437,6 +1437,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Vatrate).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.UnitId).HasColumnName("UnitID");
+                entity.Property(e => e.QuantityType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<CatTransportationMode>(entity =>
