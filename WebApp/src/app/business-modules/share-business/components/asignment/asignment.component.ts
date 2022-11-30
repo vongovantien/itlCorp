@@ -51,8 +51,8 @@ export class ShareBusinessAsignmentComponent extends AppList {
         super();
         this._progressRef = this._ngProgressService.ref();
         this.headers = [
-            { title: 'Action', field: 'status' },
-            { title: 'No', field: 'orderNumberProcessed' },
+            { title: 'Action', field: 'status', width: 10 },
+            { title: 'No', field: 'orderNumberProcessed', width: 20 },
             { title: 'Person Incharge', field: 'mainPersonInCharge', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
             { title: 'Code', field: 'stageCode', sortable: true },
