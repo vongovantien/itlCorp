@@ -1,8 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AppList } from '@app';
 import { SystemConstants } from '@constants';
-import { SystemFileManageRepo } from '@repositories';
+import { ContextMenuDirective } from '@directives';
+import { ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 
@@ -11,21 +12,29 @@ import { takeUntil } from 'rxjs/operators';
     templateUrl: './user-attach-file-management.component.html',
 })
 export class UserAttachFileManagementComponent extends AppList implements OnInit {
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
+
     @Input() type: string = 'Accountant';
     listFile: any[] = [];
     documentTypes: any[] = [];
+    edocs: any[] = [];
 
     paramsAvailable = ['Advance', 'Settlement', 'SOA'];
 
     module: string;
     folder: string;
     objectId: string;
+    billingNo: string = '';
+
     isSubmitted: boolean;
+
+    selectedFile: any;
 
     constructor(
         private readonly _toastService: ToastrService,
         private readonly _systemFileRepo: SystemFileManageRepo,
-        private readonly _activedRoute: ActivatedRoute
+        private readonly _activedRoute: ActivatedRoute,
+        private readonly _exportRepo: ExportRepo
     ) {
         super();
     }
@@ -48,8 +57,10 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                         this.module = param.module;
                         this.folder = param.folder;
                         this.objectId = param.objectId;
+                        this.billingNo = param.billingNo;
 
                         this.getDocumentType(param.folder, null);
+                        this.getEdoc(this.objectId, this.folder);
                     } else {
                         this._toastService.warning("Params invalid");
                     }
@@ -62,6 +73,16 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
             .subscribe(
                 (res: any[]) => {
                     this.documentTypes = res;
+                },
+            );
+    }
+
+    getEdoc(billingId: string, transactionType: string) {
+        this._systemFileRepo.getEDocByAccountant(billingId, transactionType)
+            .subscribe(
+                (res: any) => {
+                    this.edocs = res.eDocs || [];
+                    console.log(res);
                 },
             );
     }
@@ -108,13 +129,13 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
     }
 
     onSelectDataFormInfo(event, index: number, type: string) {
-        console.log(event);
         switch (type) {
             case 'docType':
                 const selectedDocType = this.documentTypes.find(x => x.id == event);
                 if (!selectedDocType) { return; }
                 this.listFile[index].Code = selectedDocType.code;
                 this.listFile[index].DocumentId = selectedDocType.id;
+                this.listFile[index].docType = selectedDocType.id;
                 this.listFile[index].aliasName = selectedDocType.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 break;
         }
@@ -134,6 +155,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
         let files: any[] = [];
 
         this.listFile.forEach(x => {
+            console.log(x);
             files.push(x);
             edocFileList.push(({
                 JobId: SystemConstants.EMPTY_GUID,
@@ -167,7 +189,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                     if (res.status) {
                         this._toastService.success(`Uploaded ${this.listFile.length} files successfully`);
                         this.listFile = [];
-
+                        this.getEdoc(this.objectId, this.folder);
                         this.isSubmitted = false;
                         return;
                     }
@@ -178,7 +200,54 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                     this.isSubmitted = false;
                 }
             );
+    }
 
+    selectFileItem(file: any) {
+        this.selectedFile = file;
+    }
 
+    onSelectFileMenuContext(file: any) {
+        this.selectedFile = file;
+        this.clearMenuContext(this.queryListMenuContext);
+
+    }
+
+    viewEdocFromName(imageUrl: string) {
+        this.selectedFile = Object.assign({}, this.selectedFile);
+        this.selectedFile.imageUrl = imageUrl;
+        this.viewFile();
+    }
+
+    viewFile() {
+        if (!this.selectedFile.imageUrl) {
+            return;
+        }
+        const extension = this.selectedFile.imageUrl.split('.').pop();
+        if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
+            this._exportRepo.previewExport(this.selectedFile.imageUrl);
+        }
+        else if (['html', 'htm'].includes(extension)) {
+            console.log();
+            this._systemFileRepo.getFileEdocHtml(this.selectedFile.imageUrl).subscribe(
+                (res: any) => {
+                    window.open('', '_blank').document.write(res.body);
+                }
+            )
+        }
+        else {
+            this._exportRepo.downloadExport(this.selectedFile.imageUrl);
+        }
+    }
+
+    download() {
+        const selectedEdoc = Object.assign({}, this.selectedFile);
+        console.log(selectedEdoc);
+        this._systemFileRepo.getFileEdoc(selectedEdoc.sysImageId)
+            .subscribe(
+                (data) => {
+                    const extention = selectedEdoc.imageUrl.split('.').pop();
+                    this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.systemFileName + '.' + extention);
+                }
+            )
     }
 }
