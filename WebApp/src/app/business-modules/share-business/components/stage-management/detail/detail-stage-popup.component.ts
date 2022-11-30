@@ -171,7 +171,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         if ((form.value.status === 'Pending' || form.value.status === "Deleted") && !form.value.comment) {
             return;
         }
-        if (!this.selectedMainPersonInCharge.value || (!this.selectedHbl && this.stageName.value !== 'Make Advance/ Settlement')) {
+        if (!this.selectedMainPersonInCharge.value || !this.hblno.value && this.stageName.value !== 'Make Advance/ Settlement') {
             return;
         } else {
             const body = {

@@ -138,7 +138,7 @@
                         </div>
                         <div class="col-lg-6 ">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted && !this.selectedHbl && this.stageName.value !== 'Make Advance/ Settlement'}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted &&  !this.hblno.value && this.stageName.value !== 'Make Advance/ Settlement'}">
                                 <label for=""> House Bill <span *ngIf="stageName.value !== 'Make Advance/ Settlement'"
                                         class=" text-danger">(*)</span></label>
                                 <app-combo-grid-virtual-scroll formControlName="hblno"
@@ -149,7 +149,7 @@
                                     (remove)="onRemoveData('hbl')">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback"
-                                    *ngIf="isSubmitted && !this.selectedHbl && this.stageName.value !== 'Make Advance/ Settlement'">
+                                    *ngIf="isSubmitted && !this.hblno.value && this.stageName.value !== 'Make Advance/ Settlement'">
                                     House Bill is required!
                                 </div>
                             </div>
