@@ -301,7 +301,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                             folder: 'Shipment',
                             objectId: this.idMasterBill,
                             hblId: SystemConstants.EMPTY_GUID,
-                            templateCode: null,
+                            templateCode: this.cdNotePrint[0].type,
                             transactionType: TransactionTypeEnum[this.transactionType]
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);

@@ -282,7 +282,7 @@ export class OpsCDNoteComponent extends AppList {
     }
 
     renderAndShowReport() {
-        console.log(this.idMasterBill);
+        console.log(this.cdNotePrint);
 
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
@@ -307,7 +307,7 @@ export class OpsCDNoteComponent extends AppList {
                             folder: 'Shipment',
                             objectId: this.idMasterBill,
                             hblId: SystemConstants.EMPTY_GUID,
-                            templateCode: 'PLSheet',
+                            templateCode: this.cdNotePrint[0].type,
                             transactionType: 'CL'
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);

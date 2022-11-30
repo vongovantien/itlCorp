@@ -1438,9 +1438,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                                 && x.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_GENERAL)?.FirstOrDefault();
                 if (docTypeTemplate == null)
                 {
-                    _docTypeId = _attachFileTemplateRepo.Get(x => x.Code == "OTH"
+                    docTypeTemplate = _attachFileTemplateRepo.Get(x => x.Code == "OTH"
                                                         && x.TransactionType == model.TransactionType
-                                                        && x.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_GENERAL)?.FirstOrDefault()?.Id;
+                                                        && x.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_GENERAL)?.FirstOrDefault();
+                    _docTypeId = docTypeTemplate.Id;
                 }
                 else
                 {
@@ -1461,7 +1462,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     Source = SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_SHIPMENT,
                     SysImageId = image.Id,
                     UserFileName = Path.GetFileNameWithoutExtension(image.Name),
-                    SystemFileName = _attachFileTemplateRepo.Get(x=>x.Id==_docTypeId).FirstOrDefault()?.Code +"_"+  GetAliasNameForPreviewTemplate(image.Name),
+                    SystemFileName = docTypeTemplate.Code +"_"+  GetAliasNameForPreviewTemplate(image.Name),
                     DocumentTypeId = _docTypeId
                 };
                 result = await _sysImageDetailRepo.AddAsync(imageDetail);
