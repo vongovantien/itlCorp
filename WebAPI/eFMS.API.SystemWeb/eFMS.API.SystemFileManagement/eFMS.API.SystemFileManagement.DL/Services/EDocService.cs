@@ -1429,6 +1429,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 bool isExsitedCode = PreviewTemplateCodeMappingAttachTemplateCode.ContainsKey(model.TemplateCode);
                 string code = !isExsitedCode ? "OTH" : PreviewTemplateCodeMappingAttachTemplateCode[model.TemplateCode];
                 int? _docTypeId = -1;
+                if (model.TransactionType == null)
+                {
+                    model.TransactionType = _cstranRepo.Get(x => x.Id == model.ObjectId).FirstOrDefault()?.TransactionType;
+                }
                 var docTypeTemplate = _attachFileTemplateRepo.Get(x => x.Code == code
                                                                 && x.TransactionType == model.TransactionType
                                                                 && x.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_GENERAL)?.FirstOrDefault();

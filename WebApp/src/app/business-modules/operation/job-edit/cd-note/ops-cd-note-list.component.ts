@@ -19,7 +19,6 @@ import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
 import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
-import { getOperationTransationDetail } from '../../store';
 import { ICustomDeclarationState } from '../../store/reducers/custom-clearance.reducer';
 import { IOPSTransactionState } from '../../store/reducers/operation.reducer';
 import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/ops-cd-note-add.popup';
@@ -44,7 +43,6 @@ export class OpsCDNoteComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
-    shipment: any;
     isDesc = true;
     sortKey: string = '';
 
@@ -94,7 +92,6 @@ export class OpsCDNoteComponent extends AppList {
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
         ];
 
-        this.getCurrentJob();
     }
 
     getListCdNote(id: string) {
@@ -115,24 +112,6 @@ export class OpsCDNoteComponent extends AppList {
                         });
                     });
                 },
-            );
-    }
-
-    getCurrentJob() {
-        this._store.select(getOperationTransationDetail)
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-            )
-            .subscribe(
-                (res: CommonInterface.IResponsePaging | any) => {
-                    if (!!res) {
-                        this.shipment = res || [];
-                        this.totalItems = res.totalItems;
-                    } else {
-                        this.shipment = null;
-                        this.totalItems = 0;
-                    }
-                }
             );
     }
 
@@ -303,7 +282,7 @@ export class OpsCDNoteComponent extends AppList {
     }
 
     renderAndShowReport() {
-        console.log(this.shipment);
+        console.log(this.idMasterBill);
 
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
@@ -326,8 +305,8 @@ export class OpsCDNoteComponent extends AppList {
                             url: (this.dataReport as Crystal).pathReportGenerate || null,
                             module: 'Document',
                             folder: 'Shipment',
-                            objectId: this.shipment.id,
-                            hblId: this.shipment.hblid,
+                            objectId: this.idMasterBill,
+                            hblId: SystemConstants.EMPTY_GUID,
                             templateCode: 'PLSheet',
                             transactionType: 'CL'
                         };

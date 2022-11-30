@@ -301,7 +301,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                             folder: 'Shipment',
                             objectId: this.idMasterBill,
                             hblId: SystemConstants.EMPTY_GUID,
-                            templateCode: this.getCodeFromCD(),
+                            templateCode: null,
                             transactionType: TransactionTypeEnum[this.transactionType]
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
@@ -352,16 +352,6 @@ export class ShareBussinessCdNoteListComponent extends AppList {
             return false;
         }
         return true;
-    }
-
-    getCodeFromCD() {
-        console.log('running');
-        for (const element of this.cdNoteGroups) {
-            const item = element.listCDNote.filter(cdNote => cdNote.isSelected === true);
-            if (item.length > 0) {
-                return item[0].type;
-            }
-        }
     }
 
     previewCdNote(data: string) {
