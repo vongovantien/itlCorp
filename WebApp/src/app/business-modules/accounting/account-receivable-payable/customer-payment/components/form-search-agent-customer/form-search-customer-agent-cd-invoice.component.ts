@@ -195,6 +195,8 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                         this.partnerId.setValue(data.id);
                         if (this.isRequireAgreement) {
                             this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
+                        } else {
+                            this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerType.toUpperCase() }));
                         }
                         return false;
                     }
