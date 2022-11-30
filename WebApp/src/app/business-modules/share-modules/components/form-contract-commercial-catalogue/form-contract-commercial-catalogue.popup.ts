@@ -1,3 +1,4 @@
+import { C } from '@angular/cdk/keycodes';
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -729,7 +730,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.contractTypeDetail = this.selectedContract.contractType;
 
         this.formatAutoExtendDays();
-        // this.minDateExpired = this.createMoment(this.formGroup.get("effectiveDate")?.value?.startDate);
+        this.minDateExpired = this.createMoment(this.selectedContract?.effectiveDate);
     }
     assignValueToModel() {
         if (this.isUpdate) {
