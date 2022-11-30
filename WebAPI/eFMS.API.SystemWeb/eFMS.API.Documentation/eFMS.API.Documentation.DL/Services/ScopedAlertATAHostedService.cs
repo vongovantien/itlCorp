@@ -44,8 +44,9 @@ namespace eFMS.API.Documentation.DL.Services
                 //await Task.Delay(TimeSpan.FromHours(12), stoppingToken);
                 int hourSpan = 25 - DateTime.Now.Hour;
                 int numberOfhours = hourSpan;
-                if(hourSpan % 2 == 24)
+                if(hourSpan == 24)
                 {
+                    new LogHelper(string.Format("ScopedAlertATAHostedService", "Alert Service Hosted Service is excuted " + DateTime.Now));
                     using (var scope = services.CreateScope())
                     {
                         var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IScopedProcessingAlertATDService>();
