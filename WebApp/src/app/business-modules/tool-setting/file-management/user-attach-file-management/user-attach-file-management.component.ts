@@ -92,13 +92,13 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
         const files: any[] = event.target['files'];
         let docType: any;
         if (this.documentTypes.length === 1) {
-            docType = this.documentTypes[0].id;
+            docType = this.documentTypes[0];
         }
         for (let i = 0; i < files.length; i++) {
             if (!!docType) {
                 files[i].Code = docType.code;
                 files[i].DocumentId = docType.id;
-                files[i].docType = docType;
+                files[i].docType = docType.id;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             } else {
                 files[i].docType = null;

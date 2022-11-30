@@ -31,6 +31,7 @@
             <div class="col-md-12">
                 <table class="table table-striped table-hover" id="Extension1">
                     <thead>
+                        <th class="text-left">No</th>
                         <th class="text-left">File Name</th>
                         <th class="text-left">Document Name</th>
                         <th class="text-left">Note</th>
@@ -41,6 +42,7 @@
                             <tr class="paginate-show" *ngFor="let item of edocs; let i = index; trackBy: trackByFn"
                                 [contextMenu]="menuContext" (onTouch)="onSelectFileMenuContext(item)"
                                 [class.touch-row]="selectedFile?.id === item.id" (click)="selectFileItem(item)">
+                                <td>{{ i + 1 }}</td>
                                 <td>
                                     <a class="text-underline" style="cursor: pointer;"
                                         (click)="viewEdocFromName(item.imageUrl)" download>{{item?.systemFileName}}
@@ -48,7 +50,7 @@
                                     </a>
                                 </td>
                                 <td class="text-left">{{item.documentTypeName}}</td>
-                                <td class="text-success">{{item.note}}</td>
+                                <td>{{item.note}}</td>
                                 <td class="text-success">{{item.userCreated}}</td>
                             </tr>
                         </ng-container>

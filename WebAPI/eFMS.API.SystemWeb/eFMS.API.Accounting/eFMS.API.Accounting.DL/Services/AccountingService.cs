@@ -227,7 +227,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (advRGrps.Count > 0)
                     {
                         item.Details = advRGrps;
-                        item.AtchDocInfo = GetAtchDocInfo("Advance", item.Stt.ToString());
+                        item.AtchDocInfo = GetAtchDocInfo("Advance", item.Stt.ToString(), item.ReferenceNo);
                     }
                 }
                 result = data;
@@ -431,7 +431,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (querySettlementReq.Count() > 0)
                             {
                                 item.Details = querySettlementReq.ToList();
-                                item.AtchDocInfo = GetAtchDocInfo("Settlement", item.Stt.ToString());
+                                item.AtchDocInfo = GetAtchDocInfo("Settlement", item.Stt.ToString(), item.ReferenceNo);
 
                                 // Trong phiếu thanh toán có tồn tại lô nào có hoàn ứng hay không?
                                 bool hasAdvancePayment = item.Details.Any(x => !string.IsNullOrEmpty(x.AdvanceNo));
@@ -1126,7 +1126,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charges.Add(charge);
                 }
                 sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList(); // Sắp xếp theo số job giảm dần
-                sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt);
+                sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt, sync.ReferenceNo);
                 data.Add(sync);
             }
             return data;
@@ -1267,7 +1267,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charges.Add(charge);
                     }
                     sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList();  // Sắp xếp theo số job giảm dần
-                    sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt);
+                    sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt, sync.ReferenceNo);
                     data.Add(sync);
                 }
             }
@@ -3543,7 +3543,7 @@ namespace eFMS.API.Accounting.DL.Services
             return false;
         }
 
-        private List<BravoAttachDoc> GetAtchDocInfo(string folder, string objectId)
+        private List<BravoAttachDoc> GetAtchDocInfo(string folder, string objectId, string billingNo)
         {
             List<BravoAttachDoc> results = new List<BravoAttachDoc>();
 
@@ -3560,10 +3560,10 @@ namespace eFMS.API.Accounting.DL.Services
                     });
                 });
             }
-            string queryParamUrlAttachFile = string.Format(@"/en/#/home/tool/file-management/user-attach-file?module={0}&folder={1}&objectId={2}", "Accounting", folder, objectId);
+            string queryParamUrlAttachFile = string.Format(@"/en/#/home/tool/file-management/user-attach-file?module={0}&folder={1}&objectId={2}&billingNo={3}", "Accounting", folder, objectId, billingNo);
             results.Add(new BravoAttachDoc
             {
-                AttachDocRowId = Guid.Empty.ToString(),
+                AttachDocRowId = Guid.NewGuid().ToString(),
                 AttachDocName = "eFMS Attach Files eDoc",
                 AttachDocPath = webUrl.Value.Url.ToString() + queryParamUrlAttachFile,
                 AttachDocDate = DateTime.Now
