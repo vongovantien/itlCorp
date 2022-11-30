@@ -8,7 +8,7 @@ import { Partner, Office } from '@models';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 
-import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState, ReceiptClassState, ReceiptPaymentMethodState } from '../../store/reducers';
+import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState, ReceiptClassState, ReceiptPaymentMethodState, ReceiptAgreementState } from '../../store/reducers';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { IReceiptState } from '../../store/reducers/customer-payment.reducer';
 
@@ -135,6 +135,16 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                     if (!!partnerId) {
                         this.partnerId.setValue(partnerId);
                         this.customerFromReceipt = partnerId;
+                    }
+                }
+            )
+        this._store.select(ReceiptAgreementState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (contract) => {
+                    this.contractList = [];
+                    if (!!contract) {
+                        this.contractList.push(contract);
                     }
                 }
             )
