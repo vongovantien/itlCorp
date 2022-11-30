@@ -145,6 +145,7 @@ export class ShareBusinessAssignStagePopupComponent extends PopupBase {
             value.hblId = listItemTemp[index];
             value.stageId = this.selectedStageData.id;
             value.mainPersonInCharge = this.selectedUserData.id;
+            value.description = this.description;
         }
 
         this._documentRepo.addMultipleStageToJob(this.jobId, body).pipe(catchError(this.catchError))
