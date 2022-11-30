@@ -558,7 +558,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     })
 
         }
-        newInvoiceWithAdv.paidAmountVnd = this.paidAmountVnd.value ?? 0;
+        newInvoiceWithAdv.paidAmountVnd = this.receiptType.toUpperCase() === 'CUSTOMER' ? (this.paidAmountVnd.value ?? 0) : Math.round((this.paidAmountUsd.value ?? 0) * (this.exchangeRate.value ?? 0));
         newInvoiceWithAdv.paidAmountUsd = this.paidAmountUsd.value ?? 0;
 
         newInvoiceWithAdv.totalPaidUsd = 0;
