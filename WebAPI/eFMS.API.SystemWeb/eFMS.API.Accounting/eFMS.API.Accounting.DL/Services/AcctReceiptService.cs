@@ -843,16 +843,33 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         foreach (var item in debitPaidAprt)
                         {
-                            AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == item.RefIds.FirstOrDefault())?.FirstOrDefault();
-                            item.BalanceVnd = invoice.UnpaidAmountVnd;
-                            item.BalanceUsd = invoice.UnpaidAmountUsd;
-                            if (item.RefCurrency == AccountingConstants.CURRENCY_LOCAL)
+                            if (receipt.Type == "Customer")
                             {
-                                item.Balance = item.BalanceVnd;
+                                AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == item.RefIds.FirstOrDefault())?.FirstOrDefault();
+                                item.BalanceVnd = invoice.UnpaidAmountVnd;
+                                item.BalanceUsd = invoice.UnpaidAmountUsd;
+                                if (item.RefCurrency == AccountingConstants.CURRENCY_LOCAL)
+                                {
+                                    item.Balance = item.BalanceVnd;
+                                }
+                                else
+                                {
+                                    item.Balance = item.BalanceUsd;
+                                }
                             }
                             else
                             {
-                                item.Balance = item.BalanceUsd;
+                                var debitInvoice = debitMngtArRepository.Get(x => item.RefIds.Contains(x.AcctManagementId.ToString()) && x.Hblid == item.Hblid).FirstOrDefault();
+                                item.BalanceVnd = debitInvoice.UnpaidAmountVnd;
+                                item.BalanceUsd = debitInvoice.UnpaidAmountUsd;
+                                if (item.RefCurrency == AccountingConstants.CURRENCY_LOCAL)
+                                {
+                                    item.Balance = item.BalanceVnd;
+                                }
+                                else
+                                {
+                                    item.Balance = item.BalanceUsd;
+                                }
                             }
                         }
                     }
@@ -1867,14 +1884,14 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             HandleState hsPayment = AddPayments(receiptModel.Payments, receipt);
                             // Cập nhật cấn trừ debit
-                            if (receiptModel.Type == "Agent")
-                            {
-                                var hsDebit = UpdateAccountingDebitAR(receiptModel.Payments, SaveAction.SAVEDRAFT_ADD);
-                                if (!hsDebit.Success)
-                                {
-                                    new LogHelper("eFMS_SaveReceipt_UpdateDebitAR_LOG", hsDebit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
-                                }
-                            }
+                            //if (receiptModel.Type == "Agent")
+                            //{
+                            //    var hsDebit = UpdateAccountingDebitAR(receiptModel.Payments, SaveAction.SAVEDRAFT_ADD);
+                            //    if (!hsDebit.Success)
+                            //    {
+                            //        new LogHelper("eFMS_SaveReceipt_UpdateDebitAR_LOG", hsDebit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
+                            //    }
+                            //}
                             DataContext.SubmitChanges();
                             trans.Commit();
                         }
@@ -1940,14 +1957,14 @@ namespace eFMS.API.Accounting.DL.Services
                             HandleState hsPaymentDelete = DeletePayments(paymentsOldDelete);
 
                             // Cập nhật cấn trừ debit
-                            if (receiptModel.Type == "Agent")
-                            {
-                                var hsDebit = UpdateAccountingDebitAR(receiptModel.Payments, SaveAction.SAVEDRAFT_UPDATE);
-                                if (!hsDebit.Success)
-                                {
-                                    new LogHelper("eFMS_SaveReceipt_UpdateDebitAR_LOG", hsDebit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
-                                }
-                            }
+                            //if (receiptModel.Type == "Agent")
+                            //{
+                            //    var hsDebit = UpdateAccountingDebitAR(receiptModel.Payments, SaveAction.SAVEDRAFT_UPDATE);
+                            //    if (!hsDebit.Success)
+                            //    {
+                            //        new LogHelper("eFMS_SaveReceipt_UpdateDebitAR_LOG", hsDebit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
+                            //    }
+                            //}
 
                             DataContext.SubmitChanges();
                             trans.Commit();
@@ -4178,20 +4195,20 @@ namespace eFMS.API.Accounting.DL.Services
                 invoiceDebitAr.UnpaidAmountUsd = invoiceDebitAr.TotalAmountUsd;
                 invoiceDebitAr.UnpaidAmountVnd = invoiceDebitAr.TotalAmountVnd;
 
-                if (saveAction == SaveAction.SAVEDONE)
-                {
-                    var invoice = accountingMng.Where(x => payment.RefIds.Contains(x.Id.ToString())).FirstOrDefault();
-                    invoiceDebitAr.PaidAmountUsd = (invoiceDebitAr.PaidAmountUsd ?? 0) + invoice.PaidAmountUsd;
-                    invoiceDebitAr.PaidAmountVnd = (invoiceDebitAr.PaidAmountVnd ?? 0) + invoice.PaidAmountVnd;
-                }
-                else
+                //if (saveAction == SaveAction.SAVEDONE)
+                //{
+                //    var invoice = accountingMng.Where(x => payment.RefIds.Contains(x.Id.ToString())).FirstOrDefault();
+                //    invoiceDebitAr.PaidAmountUsd = (invoiceDebitAr.PaidAmountUsd ?? 0) + invoice.PaidAmountUsd;
+                //    invoiceDebitAr.PaidAmountVnd = (invoiceDebitAr.PaidAmountVnd ?? 0) + invoice.PaidAmountVnd;
+                //}
+                //else
                 {
                     var paymentInvs = acctPaymentRepository.Get(x => payment.RefIds.Contains(x.RefId) && x.Hblid == payment.Hblid && x.Negative != true);
                     var receiptIds = paymentInvs.Select(x => x.ReceiptId).ToList();
-                    if(receiptIds.Count > 0)
+                    if (receiptIds.Count > 0)
                     {
-                        var receiptCancel = DataContext.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_CANCEL && receiptIds.Contains(x.Id)).Select(x => x.Id).ToList();
-                        paymentInvs = paymentInvs.Where(x => !receiptCancel.Contains(x.ReceiptId ?? Guid.Empty));
+                        var receiptDone = DataContext.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE && receiptIds.Contains(x.Id)).Select(x => x.Id).ToList();
+                        paymentInvs = paymentInvs.Where(x => receiptDone.Contains(x.ReceiptId ?? Guid.Empty));
                     }
                     invoiceDebitAr.PaidAmountUsd = (invoiceDebitAr.PaidAmountUsd ?? 0) + paymentInvs.Sum(z => z.PaymentAmountUsd ?? 0);
                     invoiceDebitAr.PaidAmountVnd = (invoiceDebitAr.PaidAmountVnd ?? 0) + paymentInvs.Sum(z => z.PaymentAmountVnd ?? 0);
