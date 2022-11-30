@@ -82,7 +82,6 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
             .subscribe(
                 (res: any) => {
                     this.edocs = res.eDocs || [];
-                    console.log(res);
                 },
             );
     }
@@ -100,13 +99,9 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                 files[i].DocumentId = docType.id;
                 files[i].docType = docType.id;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
-            } else {
-                files[i].docType = null;
             }
             this.listFile.push(files[i]);
-            this.listFile[i].aliasName = files[i].name.substring(0, files[i].name.lastIndexOf('.'));
         }
-        console.log(this.listFile);
         if (fileList?.length > 0) {
             let validSize: boolean = true;
             for (let i = 0; i <= fileList?.length - 1; i++) {
@@ -146,7 +141,6 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
         if (!this.listFile.length || !this.module || !this.folder || !this.objectId) {
             return;
         }
-        console.log(this.listFile);
         this.uploadEDoc();
     }
 
@@ -155,7 +149,6 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
         let files: any[] = [];
 
         this.listFile.forEach(x => {
-            console.log(x);
             files.push(x);
             edocFileList.push(({
                 JobId: SystemConstants.EMPTY_GUID,
@@ -227,7 +220,6 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
             this._exportRepo.previewExport(this.selectedFile.imageUrl);
         }
         else if (['html', 'htm'].includes(extension)) {
-            console.log();
             this._systemFileRepo.getFileEdocHtml(this.selectedFile.imageUrl).subscribe(
                 (res: any) => {
                     window.open('', '_blank').document.write(res.body);
@@ -241,7 +233,6 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
 
     download() {
         const selectedEdoc = Object.assign({}, this.selectedFile);
-        console.log(selectedEdoc);
         this._systemFileRepo.getFileEdoc(selectedEdoc.sysImageId)
             .subscribe(
                 (data) => {
