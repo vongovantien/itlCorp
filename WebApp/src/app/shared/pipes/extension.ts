@@ -9,6 +9,6 @@ export class ExtensionPipe implements PipeTransform {
         if (!fileName) {
             return '';
         }
-        return (fileName || '').split("/").pop().split('.').pop();
+        return (fileName.toLowerCase() || '').split("/").pop().split('.').pop();
     }
 }

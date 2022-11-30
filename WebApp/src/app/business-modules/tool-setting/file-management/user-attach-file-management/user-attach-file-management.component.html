@@ -4,6 +4,8 @@
             <div class="m-portlet__head-title">
                 <h3 class="m-portlet__head-text collapse-toggle">
                     Attach File
+                    <ng-container *ngIf="!!billingNo"></ng-container>
+                    <span class="font-weight-bold">{{billingNo}}</span>
                 </h3>
             </div>
         </div>
@@ -25,7 +27,38 @@
                 </div>
             </div>
         </div>
-        <div class="row">
+        <div class="row m--margin-top-20">
+            <div class="col-md-12">
+                <table class="table table-striped table-hover" id="Extension1">
+                    <thead>
+                        <th class="text-left">File Name</th>
+                        <th class="text-left">Document Name</th>
+                        <th class="text-left">Note</th>
+                        <th class="text-left">UserCreated</th>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="!!edocs.length">
+                            <tr class="paginate-show" *ngFor="let item of edocs; let i = index; trackBy: trackByFn"
+                                [contextMenu]="menuContext" (onTouch)="onSelectFileMenuContext(item)"
+                                [class.touch-row]="selectedFile?.id === item.id" (click)="selectFileItem(item)">
+                                <td>
+                                    <a class="text-underline" style="cursor: pointer;"
+                                        (click)="viewEdocFromName(item.imageUrl)" download>{{item?.systemFileName}}
+                                        <icon-file [url]="item.imageUrl"></icon-file>
+                                    </a>
+                                </td>
+                                <td class="text-left">{{item.documentTypeName}}</td>
+                                <td class="text-success">{{item.note}}</td>
+                                <td class="text-success">{{item.userCreated}}</td>
+                            </tr>
+                        </ng-container>
+                        <tr app-table-none-record *ngIf="!edocs.length">
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row m--margin-top-20">
             <div class="col-md-12 table-responsive table-horizontal">
                 <table class="table table-brand">
                     <thead app-table-header [headers]="headers">
@@ -102,3 +135,12 @@
         </ng-container>
     </div>
 </div>
+
+<app-context-menu #menuContext (clickOutside)="selectedFile = null">
+    <div class="menu-context__item" (click)="viewFile()">
+        <span><i class="la la-eye align-middle text-primary"></i>View</span>
+    </div>
+    <div class="menu-context__item" (click)="download()">
+        <span><i class="la la-download align-middle text-primary"></i>Download</span>
+    </div>
+</app-context-menu>
