@@ -741,7 +741,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.contractTypeDetail = this.selectedContract.contractType;
 
         this.formatAutoExtendDays();
-        // this.minDateExpired = this.createMoment(this.formGroup.get("effectiveDate")?.value?.startDate);
+        this.minDateExpired = this.createMoment(this.selectedContract?.effectiveDate);
     }
     assignValueToModel() {
         if (this.isUpdate) {
