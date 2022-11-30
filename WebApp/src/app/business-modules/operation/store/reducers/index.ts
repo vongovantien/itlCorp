@@ -1,6 +1,6 @@
-import { createFeatureSelector, createSelector, ActionReducerMap } from "@ngrx/store";
+import { ActionReducerMap, createFeatureSelector, createSelector } from "@ngrx/store";
 import { clearanceReducer, ICustomDeclarationState } from "./custom-clearance.reducer";
-import { opsReducer, IOPSTransactionState } from "./operation.reducer";
+import { IOPSTransactionState, opsReducer } from "./operation.reducer";
 
 export interface IOperationState {
     transaction: IOPSTransactionState;
@@ -12,6 +12,7 @@ export const OperationState = createFeatureSelector<IOperationState>('operations
 export const getOperationState = createSelector(OperationState, (state: IOperationState) => state);
 export const getOperationTransationState = createSelector(OperationState, (state: IOperationState) => state && state.transaction);
 export const getOperationTransationListShipment = createSelector(OperationState, (state: IOperationState) => state && state.transaction?.opsTransations);
+export const getOperationTransationDetail = createSelector(OperationState, (state: IOperationState) => state && state.transaction?.opstransaction);
 export const getOperationTransationDataSearch = createSelector(OperationState, (state: IOperationState) => state && state.transaction?.dataSearch);
 export const getOperationTransationLoadingState = createSelector(OperationState, (state: IOperationState) => state && state.transaction?.isLoading);
 export const getOperationTransationPagingState = createSelector(OperationState, (state: IOperationState) => state && state.transaction?.pagingData);

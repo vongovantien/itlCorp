@@ -1398,7 +1398,7 @@ namespace eFMS.API.Documentation.DL.Services
             var firstAcctCDNote = acctCdNoteList.FirstOrDefault();
             var cdNoteDetail = DataContext.Get(x => x.Id == firstAcctCDNote.Id);
             model.CDNote = mapper.Map<AcctCdnote>(firstAcctCDNote);
-            model.CDNote.Code = string.Join(";", acctCdNoteList.Select(x => x.Code));
+            model.CDNote.Code = string.Join("-", acctCdNoteList.Select(x => x.Code));
             var opsTransaction = opstransRepository.Get(x => x.Id == firstAcctCDNote.JobId).FirstOrDefault();
             if (opsTransaction == null)
             {

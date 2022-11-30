@@ -1393,7 +1393,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private string convertTransactionType(string tranType)
         {
             string result = null;
-            if (tranType.Length > 3)
+            if (CustomData.Services.Any(x => x.DisplayName.Replace(" ", "") == tranType))
             {
                 CustomData.Services.ForEach(x =>
                 {
@@ -1407,22 +1407,18 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 result = tranType;
             }
-           
+
             return result;
         }
 
-        private string GetAliasNameForPreviewTemplate(string tranType,string name)
+        private string GetAliasNameForPreviewTemplate(string name)
         {
-            string type = null;
-            if (tranType.Length > 3)
-            {
-                type = convertTransactionType(tranType);
-            }
-            else
-            {
-                type = tranType;
-            }
-            return convertTransactionType(tranType)+'_'+Path.GetFileNameWithoutExtension(name).TrimEnd('_').Remove(name.LastIndexOf('_'));
+            //if (tranType == "CL")
+            //{
+            //    return Path.GetFileNameWithoutExtension(name).TrimEnd('_').Remove(name.LastIndexOf('_'));
+            //}
+            //return convertTransactionType(tranType)+'_'+Path.GetFileNameWithoutExtension(name).TrimEnd('_').Remove(name.LastIndexOf('_'));
+            return Path.GetFileNameWithoutExtension(name).TrimEnd('_').Remove(name.LastIndexOf('_'));
         }
 
         private async Task<HandleState> MappingPreviewTemplateToShipment(EDocAttachPreviewTemplateUploadModel model, SysImage image)
@@ -1433,14 +1429,19 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 bool isExsitedCode = PreviewTemplateCodeMappingAttachTemplateCode.ContainsKey(model.TemplateCode);
                 string code = !isExsitedCode ? "OTH" : PreviewTemplateCodeMappingAttachTemplateCode[model.TemplateCode];
                 int? _docTypeId = -1;
+                if (model.TransactionType == null)
+                {
+                    model.TransactionType = _cstranRepo.Get(x => x.Id == model.ObjectId).FirstOrDefault()?.TransactionType;
+                }
                 var docTypeTemplate = _attachFileTemplateRepo.Get(x => x.Code == code
                                                                 && x.TransactionType == model.TransactionType
                                                                 && x.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_GENERAL)?.FirstOrDefault();
                 if (docTypeTemplate == null)
                 {
-                    _docTypeId = _attachFileTemplateRepo.Get(x => x.Code == "OTH"
+                    docTypeTemplate = _attachFileTemplateRepo.Get(x => x.Code == "OTH"
                                                         && x.TransactionType == model.TransactionType
-                                                        && x.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_GENERAL)?.FirstOrDefault()?.Id;
+                                                        && x.Type == SystemFileManagementConstants.ATTACH_TEMPLATE_TYPE_GENERAL)?.FirstOrDefault();
+                    _docTypeId = docTypeTemplate.Id;
                 }
                 else
                 {
@@ -1461,7 +1462,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     Source = SystemFileManagementConstants.ATTACH_TEMPLATE_SOURCE_SHIPMENT,
                     SysImageId = image.Id,
                     UserFileName = Path.GetFileNameWithoutExtension(image.Name),
-                    SystemFileName = GetAliasNameForPreviewTemplate(model.TransactionType, image.Name),
+                    SystemFileName = docTypeTemplate.Code +"_"+  GetAliasNameForPreviewTemplate(image.Name),
                     DocumentTypeId = _docTypeId
                 };
                 result = await _sysImageDetailRepo.AddAsync(imageDetail);
