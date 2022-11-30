@@ -69,10 +69,10 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public async Task<HandleState> AddMultipleStageAssigned(Guid jobID, List<CsStageAssignedModel> listStageAssigned)
+        public async Task<HandleState> AddMultipleStageAssigned(Guid jobId, List<CsStageAssignedModel> listStageAssigned)
         {
             var result = new HandleState();
-            var orderNumber = DataContext.Where(x => x.JobId == jobID).Select(x => x.OrderNumberProcessed).Max() ?? 0;
+            var orderNumber = DataContext.Where(x => x.JobId == jobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
 
             foreach (var stage in listStageAssigned)
             {
