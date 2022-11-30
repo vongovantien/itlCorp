@@ -53,7 +53,7 @@ namespace eFMS.API.Accounting.Service.Models
         public virtual DbSet<CustomsDeclaration> CustomsDeclaration { get; set; }
         public virtual DbSet<OpsStageAssigned> OpsStageAssigned { get; set; }
         public virtual DbSet<OpsTransaction> OpsTransaction { get; set; }
-        public virtual DbSet<SysActionFuncLog> SysActionFuncLog { get; set; }
+        public virtual DbSet<SysAttachFileTemplate> SysAttachFileTemplate { get; set; }
         public virtual DbSet<SysAuthorizedApproval> SysAuthorizedApproval { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
         public virtual DbSet<SysEmailSetting> SysEmailSetting { get; set; }
@@ -3528,7 +3528,6 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.DocumentType)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
                 entity.Property(e => e.ExportCountryCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -3838,6 +3837,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.SuspendTime).HasMaxLength(150);
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -3853,43 +3854,61 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
 
-            modelBuilder.Entity<SysActionFuncLog>(entity =>
+            modelBuilder.Entity<SysAttachFileTemplate>(entity =>
             {
-                entity.ToTable("sysActionFuncLog");
+                entity.ToTable("sysAttachFileTemplate");
 
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.AccountingType).HasMaxLength(50);
+
+                entity.Property(e => e.Code).HasMaxLength(150);
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
-                entity.Property(e => e.EndDateProgress).HasColumnType("datetime");
+                entity.Property(e => e.NameEn)
+                    .HasColumnName("NameEN")
+                    .HasMaxLength(250);
 
-                entity.Property(e => e.FuncLocal)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
+                entity.Property(e => e.NameVn)
+                    .HasColumnName("NameVN")
+                    .HasMaxLength(250);
 
-                entity.Property(e => e.FuncPartner)
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
+                entity.Property(e => e.PartnerType).HasMaxLength(50);
 
-                entity.Property(e => e.Major).HasMaxLength(100);
+                entity.Property(e => e.PreFix).HasMaxLength(150);
 
-                entity.Property(e => e.ObjectRequest).HasColumnType("ntext");
-
-                entity.Property(e => e.ObjectResponse).HasColumnType("ntext");
-
-                entity.Property(e => e.StartDateProgress).HasColumnType("datetime");
-
-                entity.Property(e => e.UserCreated)
+                entity.Property(e => e.Service)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.UserModified)
+                entity.Property(e => e.ServiceType)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.StorageFollowing)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StorageRule)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StorageType)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SubFix).HasMaxLength(150);
+
+                entity.Property(e => e.Tag).HasMaxLength(150);
+
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Type).HasMaxLength(10);
             });
 
             modelBuilder.Entity<SysAuthorizedApproval>(entity =>
