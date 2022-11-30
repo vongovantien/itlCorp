@@ -148,6 +148,11 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
 
+        if(this.formCreate.isRequireAgreement && !this.formCreate.agreementId.value){
+            this._toastService.warning(`Partner does not have any agreement, Please check it again!`);
+            return;
+        }
+
         const receiptModel: ReceiptModel = this.getDataForm();
 
         this.paymentList = [];
@@ -280,7 +285,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     checkValidateForm() {
         let valid: boolean = true;
         this.removeValidators(this.listInvoice.paymentMethod);
-        if (!this.formCreate.formSearchInvoice.valid
+        if (!this.formCreate.customerId.valid 
+            || (this.formCreate.isRequireAgreement && !this.formCreate.agreementId.value)
             || !this.listInvoice.form.valid
             || this.listInvoice.paidAmountVnd.value === null
             || this.listInvoice.paidAmountUsd.value === null
