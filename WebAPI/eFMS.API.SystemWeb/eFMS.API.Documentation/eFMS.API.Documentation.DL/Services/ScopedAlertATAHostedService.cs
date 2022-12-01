@@ -22,29 +22,13 @@ namespace eFMS.API.Documentation.DL.Services
       
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            new LogHelper("ScopedAlertATAHostedService", "RUNNING\n");
-            logger.LogInformation("Alert Service Hosted Service is running.");
-            await DoWork(stoppingToken);
-        }
-
-        private async Task DoWork(CancellationToken stoppingToken)
-        {
-            while (!stoppingToken.IsCancellationRequested)
+            do
             {
-                //logger.LogInformation("Alert Service Hosted Service is running.");
-                //using (var scope = services.CreateScope())
-                //{
-                //    logger.LogInformation("Alert Service Hosted Service is excuted.");
-                //    new LogHelper(string.Format("ScopedAlertATAHostedService", "Alert Service Hosted Service is excuted - {0}" + DateTime.Now));
-                //    var scopedProcessingService =
-                //        scope.ServiceProvider
-                //            .GetRequiredService<IScopedProcessingAlertATDService>();
-                //    await scopedProcessingService.AlertATD(stoppingToken);
-                //}
-                //await Task.Delay(TimeSpan.FromHours(12), stoppingToken);
-                int hourSpan = 25 - DateTime.Now.Hour;
-                int numberOfhours = hourSpan;
-                if(hourSpan % 2 == 0)
+                int hourSpan = 24 - DateTime.Now.Hour;
+                new LogHelper(string.Format("ScopedAlertATAHostedService"), hourSpan.ToString() + "\n");
+                int numberOfHours = hourSpan;
+
+                if (hourSpan == 24)
                 {
                     new LogHelper(string.Format("ScopedAlertATAHostedService", "Alert Service Hosted Service is excuted " + DateTime.Now));
                     using (var scope = services.CreateScope())
@@ -53,9 +37,34 @@ namespace eFMS.API.Documentation.DL.Services
                         var data = scopedProcessingService.GetAlertATDData();
                         new LogHelper("ScopedAlertATAHostedService" + hourSpan, JsonConvert.SerializeObject(data));
                     }
-                    numberOfhours = 1;
+                    numberOfHours = 24;
                 }
-                await Task.Delay(TimeSpan.FromHours(numberOfhours));
+                new LogHelper(string.Format("ScopedAlertATAHostedService"), "Delay" + hourSpan.ToString() + "\n");
+                await Task.Delay(TimeSpan.FromHours(numberOfHours), stoppingToken);
+            }
+            while (!stoppingToken.IsCancellationRequested);
+        }
+
+        private async Task DoWork(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                int hourSpan = 24 - DateTime.Now.Hour;
+                int numberOfHours = hourSpan;
+
+                if (hourSpan == 24)
+                {
+                    new LogHelper(string.Format("ScopedAlertATAHostedService", "Alert Service Hosted Service is excuted " + DateTime.Now));
+                    using (var scope = services.CreateScope())
+                    {
+                        var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IScopedProcessingAlertATDService>();
+                        var data = scopedProcessingService.GetAlertATDData();
+                        new LogHelper("ScopedAlertATAHostedService" + hourSpan, JsonConvert.SerializeObject(data));
+                    }
+                    numberOfHours = 24;
+                }
+
+                await Task.Delay(TimeSpan.FromHours(numberOfHours), stoppingToken);
             }
         }
 
