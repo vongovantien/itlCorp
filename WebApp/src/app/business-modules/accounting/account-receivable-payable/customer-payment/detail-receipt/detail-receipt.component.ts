@@ -12,7 +12,7 @@ import { of } from 'rxjs';
 import { pluck, switchMap, tap, concatMap, takeUntil, filter } from 'rxjs/operators';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
-import { GetInvoiceListSuccess, ResetInvoiceList, RegistTypeReceipt, SelectReceiptClass, SelectReceiptPaymentMethod } from '../store/actions';
+import { GetInvoiceListSuccess, ResetInvoiceList, RegistTypeReceipt, SelectReceiptClass, SelectReceiptPaymentMethod, UpdateReceiptExchangeRate } from '../store/actions';
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
@@ -89,6 +89,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.type = res.type;
         this._store.dispatch(RegistTypeReceipt({ data: res.type.toUpperCase(), partnerId: res.customerId }));
         this._store.dispatch(SelectReceiptPaymentMethod({ paymentMethod: res.paymentMethod }));
+        this._store.dispatch(UpdateReceiptExchangeRate({ exchangeRate: res.exchangeRate }));
 
         this.updateFormCreate(this.receiptDetail);
         this.updateListInvoice(this.receiptDetail);

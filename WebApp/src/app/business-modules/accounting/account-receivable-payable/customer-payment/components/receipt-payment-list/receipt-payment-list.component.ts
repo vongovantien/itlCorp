@@ -417,6 +417,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             case 'exchangeRate':
                 if (!data.target.value.length) {
                     this.exchangeRate.setValue(0);
+                } else {
+                    if (this.receiptType.toUpperCase() !== 'CUSTOMER') {
+                        this._store.dispatch(UpdateReceiptExchangeRate({ exchangeRate: this.exchangeRate.value }));
+                    }
                 }
                 break;
             case 'cusAdvanceAmountVnd':
