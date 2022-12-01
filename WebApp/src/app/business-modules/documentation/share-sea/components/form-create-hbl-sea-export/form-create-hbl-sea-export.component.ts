@@ -16,7 +16,7 @@ import { AppForm } from 'src/app/app.form';
 import * as fromShareBussiness from './../../../../share-business/store';
 
 import { Observable, of } from 'rxjs';
-import { catchError, takeUntil, skip, finalize, tap, concatMap, startWith } from 'rxjs/operators';
+import { catchError, takeUntil, skip, finalize, tap, concatMap, startWith, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { DataService } from '@services';
 
 import _merge from 'lodash/merge';
@@ -185,13 +185,14 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     }
 
     getShipmentType(){
-        this._store.select(getTransactionDetailCsTransactionState)
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (res: any) => {
+        this._store.select(fromShareBussiness.getDetailHBlState)
+            .pipe(catchError(this.catchError),
+                distinctUntilChanged(),
+                switchMap((shipment: any) => this._store.select(getTransactionDetailCsTransactionState))
+            ).subscribe((res: any) => {
                 this.shipmentType = res.shipmentType;
-            }
-        );
+                console.log('switch map', this.shipmentType);
+            });
     }
 
     getShipmentDetailAndUpdateDefault() {

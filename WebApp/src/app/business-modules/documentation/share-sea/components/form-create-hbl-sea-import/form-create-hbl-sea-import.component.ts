@@ -14,10 +14,11 @@ import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAc
 import * as fromShareBussiness from './../../../../share-business/store';
 
 import { Observable } from 'rxjs';
-import { takeUntil, shareReplay } from 'rxjs/operators';
+import { takeUntil, shareReplay, catchError, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { FormValidators } from '@validators';
 import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
+import { getTransactionDetailCsTransactionState } from './../../../../share-business/store';
 
 @Component({
     selector: 'app-form-create-hbl-sea-import',
@@ -126,7 +127,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
 
         this.getMasterData();
         this.getConfigComboGrid();
-
+        
+        this.getShipmentType();
         this.initForm();
 
         this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.type] });
@@ -158,13 +160,23 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                             etd: !!this.shipmentDetail.etd ? { startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) } : null,
                             arrivalVessel: this.shipmentDetail.flightVesselName,
                             arrivalVoyage: this.shipmentDetail.voyNo,
-                            incotermId: this.shipmentDetail.incotermId
-
+                            incotermId: this.shipmentDetail.incotermId,
                         };
                         this.formGroup.patchValue(formData);
                     }
                 }
             );
+    }
+
+    getShipmentType(){
+        this._store.select(fromShareBussiness.getDetailHBlState)
+            .pipe(catchError(this.catchError),
+                distinctUntilChanged(),
+                switchMap((shipment: any) => this._store.select(getTransactionDetailCsTransactionState))
+            ).subscribe((res: any) => {
+                this.shipmentType = res.shipmentType;
+                console.log('switch map', this.shipmentType);
+            });
     }
 
     getConfigComboGrid() {
@@ -382,7 +394,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             hbOfladingType: res.hbltype,
             incotermId: res.incotermId
         });
-
+        console.log(this.shipmentType);
         this._catalogueRepo.GetListSalemanByShipmentType(res.customerId, this.type, this.shipmentType)
             .subscribe((data) => {
                 this.saleMans = data || [];
@@ -402,7 +414,6 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                     this.consignee.setValue(data.id);
                     this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
-
                 this._catalogueRepo.GetListSalemanByShipmentType(data.id, this.type, this.shipmentType)
                     .subscribe((res: any) => {
                         if (!!res) {
