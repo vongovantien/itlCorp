@@ -2025,8 +2025,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                             AcctReceipt receiptData = mapper.Map<AcctReceipt>(receiptModel);
                             var listInvoice = receiptModel.Payments
-                                .Where(x => (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                                .Select(x => x.InvoiceNo).ToList();
+                                .Where(x => (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)).ToList();
+                                //.Select(x => x.InvoiceNo).ToList();
                             // Check payment hien tai
                             IQueryable<AccAccountingPayment> hasPayments = GetPaymentStepOrderReceipt(receiptData, listInvoice);
 
@@ -4120,25 +4120,36 @@ namespace eFMS.API.Accounting.DL.Services
             return valid;
         }
 
-        private IQueryable<AccAccountingPayment> GetPaymentStepOrderReceipt(AcctReceipt receiptCurrent, List<string> invoice = null)
+        private IQueryable<AccAccountingPayment> GetPaymentStepOrderReceipt(AcctReceipt receiptCurrent, List<ReceiptInvoiceModel> invoice = null)
         {
-            List<string> receiptCurrentPaymentInvoiceList = new List<string>();
+            //List<string> receiptCurrentPaymentInvoiceList = new List<string>();
             if (invoice != null)
             {
-                receiptCurrentPaymentInvoiceList = invoice;
-            } else
-            {
-                receiptCurrentPaymentInvoiceList = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id
-                && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)).Select(x => x.InvoiceNo).ToList();
-            }
-           
-            IQueryable<AccAccountingPayment> hasPayments = acctPaymentRepository.Get(x => x.ReceiptId != receiptCurrent.Id
+                //receiptCurrentPaymentInvoiceList.AddRange(invoice.Select(x => x.InvoiceNo));
+                IQueryable<AccAccountingPayment> hasPayments = acctPaymentRepository.Get(x => x.ReceiptId != receiptCurrent.Id
                               && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
                               && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) < 0
-                              && receiptCurrentPaymentInvoiceList.Any(inv => inv == x.InvoiceNo)
+                              //&& receiptCurrentPaymentInvoiceList.Any(inv => inv == x.InvoiceNo)
+                              && invoice.Any(z => z.InvoiceNo == x.InvoiceNo && (receiptCurrent.Type == "Customer" ? true : z.Hblid == x.Hblid))
                               );
+                return hasPayments;
+            } else
+            {
+                var receiptCurrentPaymentInvoiceList = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id
+                && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)).ToList();
+                IQueryable<AccAccountingPayment> hasPayments = acctPaymentRepository.Get(x => x.ReceiptId != receiptCurrent.Id
+                              && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                              && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) < 0
+                              && receiptCurrentPaymentInvoiceList.Any(inv => inv.InvoiceNo == x.InvoiceNo && (receiptCurrent.Type == "Customer" ? true : inv.Hblid == x.Hblid)));
+                return hasPayments;
+            }
+            //IQueryable<AccAccountingPayment> hasPayments = acctPaymentRepository.Get(x => x.ReceiptId != receiptCurrent.Id
+            //                   && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
+            //                   && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) < 0
+            //                   && receiptCurrentPaymentInvoiceList.Any(inv => inv == x.InvoiceNo)
+            //                   );
 
-            return hasPayments;
+            //return hasPayments;
         }
 
         public async Task<HandleState> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model)
