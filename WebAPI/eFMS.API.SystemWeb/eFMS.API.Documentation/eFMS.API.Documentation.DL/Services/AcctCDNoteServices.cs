@@ -1662,8 +1662,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = model.CDNote.Code.Replace("/","") + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = model.CDNote.Code + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listSOA);
@@ -1870,8 +1870,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = criteria.CreditDebitNo.Replace("/", "") + CrystalEx.GetExtension(criteria.ExportFormatType);
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = criteria.CreditDebitNo + CrystalEx.GetExtension(criteria.ExportFormatType);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
@@ -2185,8 +2185,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.CDNote.Code.Replace("/","")+ CrystalEx.GetExtension(format);
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = data.CDNote.Code+ CrystalEx.GetExtension(format);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
@@ -2483,8 +2483,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.CDNote.Code.Replace("/", "") + CrystalEx.GetExtension(format);
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = data.CDNote.Code + CrystalEx.GetExtension(format);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);

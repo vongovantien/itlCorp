@@ -1713,8 +1713,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "FormPLsheet_" + shipment.JobNo.Replace("/", "") + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = "FormPLsheet_" + shipment.JobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(dataSources);
