@@ -20,8 +20,19 @@
                             <a class="dropdown-item pointer" (click)="preview(true)">Preview with Original</a>
                             <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
                             <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
-                            <a class="dropdown-item pointer" (click)="exportCDNote()">Export Excel Template</a>
+                            <!-- <a class="dropdown-item pointer" (click)="exportCDNote()">Export Excel Template</a> -->
+                            <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
+                                <div class="d-flex justify-content-between ">
+                                    <div>
+                                        <a class="dropdown-item pointer">Download</a>
+                                    </div>
+                                    <div class="d-flex align-items-center m--margin-top-5">
+                                        <i class="la la-caret-right font-13"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        <!--  -->
                     </div>
                 </div>
             </div>
@@ -305,7 +316,17 @@
         </div>
     </div>
 </div>
-
+<app-dropdown #exportTpl>
+    <span class="dropdown-item pointer" (click)="">
+        PDF
+    </span>
+    <span class="dropdown-item pointer" (click)="">
+        EXCEL
+    </span>
+    <span class="dropdown-item pointer" (click)="">
+        WORD
+    </span>
+</app-dropdown>
 <ops-cd-note-add-popup (onUpdate)="onUpdateCdNote($event)"></ops-cd-note-add-popup>
 
 <ng-template inject></ng-template>

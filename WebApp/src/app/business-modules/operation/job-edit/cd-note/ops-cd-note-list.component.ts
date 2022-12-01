@@ -1,6 +1,6 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, concatMap, finalize, map, switchMap } from 'rxjs/operators';
 import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { SortService } from 'src/app/shared/services';
@@ -40,6 +40,7 @@ export class OpsCDNoteComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
+    selectedCdNote: AcctCDNote = null;
 
     isDesc = true;
     sortKey: string = '';
@@ -328,6 +329,64 @@ export class OpsCDNoteComponent extends AppList {
                         this._toastService.warning('No data found');
                     }
                 },
+            );
+    }
+    previewItem(jobId: string, cdNote:string, currency: string = 'VND') {
+        this._documentRepo.getDetailsCDNote(jobId, cdNote)
+            .pipe(
+                switchMap(() => {
+                    return this._documentRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency });            
+                }),
+            ).subscribe(
+                (res: any) => {
+                    if (res != null && res?.dataSource.length > 0) {
+                        this.dataReport = res;
+                        this.renderAndShowReport();
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+    onSelectCdNote(cd: AcctCDNote) {
+        this.selectedCdNote = cd;
+    }
+    exportItem(jobId: string, cdNote:string, format: string) {
+        let url: string;
+        let _format = 0;
+        switch (format) {
+            case 'PDF':
+                _format = 5;
+                break;
+            case 'WORD':
+                _format = 3;
+                break;
+            case 'EXCEL':
+                _format = 4;
+                break;
+            default:
+                _format = 5;
+                break;
+        }
+        this._documentRepo.getDetailsCDNote(jobId, cdNote)
+            .pipe(
+                switchMap((detail) => {
+                    return this._documentRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                }),
+                concatMap((x) => {
+                    url = x.pathReportGenerate;
+                    return this._exportRepo.exportCrystalReportPDF(x);
+                })
+            ).subscribe(
+                (res: any) => {
+
+                },
+                (error) => {
+                    this._exportRepo.downloadExport(url);
+                },
+                () => {
+                    console.log(url);
+                }
             );
     }
 }
