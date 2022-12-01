@@ -177,49 +177,7 @@ namespace eFMS.API.Accounting.DL.Services
                 decimal _debitAmount = 0;
                 decimal _creditAmount = 0;
                 int _totalCharge = 0;
-                if (surcharges != null)
-                {
-                    _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
-                    _totalCharge = surcharges.Count();
-                    #region delete
-                    //decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-
-                    //foreach (var surcharge in surcharges)
-                    //{
-                    //    surcharge.UserModified = userCurrent;
-                    //    surcharge.DatetimeModified = soa.DatetimeCreated;
-                    //    if (string.IsNullOrEmpty(surcharge.CreditNo) && string.IsNullOrEmpty(surcharge.DebitNo))
-                    //    {
-                    //        //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
-                    //        surcharge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
-                    //        //FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
-                    //        surcharge.FinalExchangeRate = null;
-
-                    //        #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                    //        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
-                    //        surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                    //        surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                    //        surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                    //        surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                    //        surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                    //        surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                    //        surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                    //        #endregion -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                    //    }
-
-                    //    _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, soa.Currency);
-                    //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                    //    {
-                    //        _debitAmount += _amount;
-                    //    }
-                    //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                    //    {
-                    //        _creditAmount += _amount;
-                    //    }
-                    //    surchargesSoa.Add(surcharge);
-                    //}
-                    #endregion
-                }
+               
                 #endregion
                 var currentOffice = officeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault().Code;
                 soa.TotalShipment = _totalShipment;
@@ -329,67 +287,6 @@ namespace eFMS.API.Accounting.DL.Services
                 //decimal _debitAmount = 0;
                 //decimal _creditAmount = 0;
                 int _totalCharge = 0;
-                if (surcharges != null)
-                {
-                    _totalShipment = surcharges.Where(x => x.Hblno != null).GroupBy(x => x.JobNo + "_" + x.Hblno).Count();
-                    _totalCharge = surcharges.Count();
-                    //decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-                    #region delete
-                    //foreach (var surcharge in surcharges)
-                    //{
-                    //    surcharge.UserModified = userCurrent;
-                    //    surcharge.DatetimeModified = model.DatetimeCreated;
-                    //    if (string.IsNullOrEmpty(surcharge.CreditNo) && string.IsNullOrEmpty(surcharge.DebitNo))
-                    //    {
-                    //        //Cập nhật ExchangeDate của phí theo ngày Created Date SOA & phí chưa có tạo CDNote
-                    //        surcharge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
-
-                    //        if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
-                    //        {
-                    //            //surcharge.FinalExchangeRate = soaCurrent.ExcRateUsdToLocal;
-                    //            surcharge.FinalExchangeRate = soa.ExcRateUsdToLocal;
-                    //        }
-                    //        else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
-                    //        {
-                    //            surcharge.FinalExchangeRate = 1;
-                    //        }
-                    //        else
-                    //        {
-                    //            surcharge.FinalExchangeRate = null;
-                    //        }
-
-                    //        #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                    //        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
-                    //        surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                    //        surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                    //        surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                    //        surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                    //        surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                    //        surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                    //        surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                    //        #endregion -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                    //    }
-
-                    //    _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, soa.Currency);
-                    //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                    //    {
-                    //        _debitAmount += _amount;
-                    //    }
-                    //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == model.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                    //    {
-                    //        _creditAmount += _amount;
-                    //    }
-                    //    // Update combine no for old charges
-                    //    var oldCharge = surchargesUpdateSoa.Where(x => x.Hblid == surcharge.Hblid && (!string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo))).FirstOrDefault();
-                    //    if(oldCharge != null)
-                    //    {
-                    //        surcharge.CombineBillingNo = oldCharge.CombineBillingNo;
-                    //        surcharge.ObhcombineBillingNo = oldCharge.ObhcombineBillingNo;
-                    //    }
-                    //    surchargesSoa.Add(surcharge);
-                    //}
-                    #endregion
-                }
 
                 soa.TotalShipment = _totalShipment;
                 //soa.DebitAmount = _debitAmount;
@@ -561,7 +458,8 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             //List charge of SOA
-            var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Any(s => s.surchargeId == x.Id));
+            var ids = model.Surcharges.Select(x => x.surchargeId);
+            var surcharges = csShipmentSurchargeRepo.Get(x => ids.Contains(x.Id));
 
             decimal _amount = 0;
             decimal _debitAmount = 0;
@@ -569,7 +467,10 @@ namespace eFMS.API.Accounting.DL.Services
             if (surcharges != null)
             {
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-
+                if(model.IsUseCommissionExRate)
+                {
+                    kickBackExcRate = model.ExcRateUsdToLocal ?? 20000;
+                }
                 foreach (var surcharge in surcharges)
                 {
                     surcharge.UserModified = currentUser.UserID;
