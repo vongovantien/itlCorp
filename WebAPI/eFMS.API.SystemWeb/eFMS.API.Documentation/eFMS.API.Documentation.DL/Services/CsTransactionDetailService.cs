@@ -194,7 +194,6 @@ namespace eFMS.API.Documentation.DL.Services
             model.Id = Guid.NewGuid();
             model.DatetimeModified = model.DatetimeCreated = DateTime.Now;
             model.Active = true;
-
             string contSealNo = string.Empty;
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -296,6 +295,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.CompanyId = hb.CompanyId;
             model.UserCreated = hb.UserCreated;
             model.UserModified = currentUser.UserID;
+            // model.ShipmentType = hb.ShipmentType;
             if (model.SaleManId != hb.SaleManId)
             {
                 changedSalesman = true;
@@ -612,6 +612,7 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
                     detail.ShipmentPIC = shipment.PersonIncharge;
                     detail.JobStatus = shipment.CurrentStatus;
+                    detail.ShipmentType = shipment.ShipmentType;
                     //detail.DeliveryPlace = detail.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
                     detail.DeptSign = catDepartmentRepository.Get(x => x.Id == shipment.DepartmentId)?.FirstOrDefault()?.SignPath;
                     detail.Department = catDepartmentRepository.Get(x => x.Id == detail.DepartmentId)?.FirstOrDefault()?.DeptNameAbbr;

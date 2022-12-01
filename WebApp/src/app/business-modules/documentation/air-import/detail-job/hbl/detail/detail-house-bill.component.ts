@@ -36,7 +36,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     hblId: string;
     hblDetail: any;
-
+    shipmentType: string;
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
     checkPointPreview;
