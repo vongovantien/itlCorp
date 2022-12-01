@@ -15,7 +15,8 @@ import {
     ReceiptPartnerCurrentState,
     ReceiptClassState,
     ReceiptAgreementState,
-    ReceiptTypeState
+    ReceiptTypeState,
+    ReceiptExchangeRate
 } from '../../store/reducers';
 import {
     InsertAdvance,
@@ -44,7 +45,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     @ViewChild(ARCustomerPaymentReceiptDebitListComponent) receiptDebitList: ARCustomerPaymentReceiptDebitListComponent;
     @ViewChild(ARCustomerPaymentReceiptCreditListComponent) receiptCreditList: ARCustomerPaymentReceiptCreditListComponent;
 
-    @Input() syncInfoTemplate?: TemplateRef<any>
+    @Input() syncInfoTemplate?: TemplateRef<any>;
+    @Input() isUpdate: boolean = false;
     @Output() onChangePaymentMethod: EventEmitter<any> = new EventEmitter<any>();
     
     creditList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptCreditListState);
@@ -165,14 +167,26 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         this.generateExchangeRate(formatDate(this.paymentDate.value?.startDate, 'yyyy-MM-dd', 'en'))
             .then(
                 (exchangeRate: IExchangeRate) => {
-                    if (!!exchangeRate) {
-                        this.exchangeRateValue = exchangeRate.rate;
+                    if (!this.isUpdate) {
+                        if (!!exchangeRate) {
+                            this.exchangeRateValue = exchangeRate.rate;
+                        } else {
+                            this.exchangeRateValue = 0;
+                        }
+
+                        this._store.dispatch(UpdateReceiptExchangeRate({ exchangeRate: this.exchangeRateValue }));
                     } else {
-                        this.exchangeRateValue = 0;
+                        this._store.select(ReceiptExchangeRate)
+                            .pipe(takeUntil(this.ngUnsubscribe))
+                            .subscribe((data) => {
+                                if (!!data) {
+                                    this.exchangeRateValue = data;
+                                } else {
+                                    this.exchangeRateValue = 0;
+                                }
+                            }
+                            )
                     }
-
-                    this._store.dispatch(UpdateReceiptExchangeRate({ exchangeRate: this.exchangeRateValue }));
-
                     const currencySelected = new Currency({ id: this.currencyId.value, currencyName: this.currencyId.value });
                     this.onSelectDataFormInfo(currencySelected, 'currency');
                 }
