@@ -1553,7 +1553,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirImpProofofDelivery_" + data.Hwbno + ".pdf";
+            var reportName = "AirImpProofofDelivery_" + data.Hwbno+"_"+data.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -1616,7 +1616,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirImptDocumentRelease_" + data.Hwbno + ".pdf";
+            var reportName = "AirImptDocumentRelease_" + data.Hwbno+"_"+data.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -2126,7 +2126,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirImptAuthorisedLetter_" + data.Hwbno + ".pdf";
+            var reportName = data.DeliveryOrderNo!=null? data.DeliveryOrderNo+".pdf":"AirImptAuthorisedLetter_" + data.DeliveryOrderNo.ToUpper() +"_"+ data.Hwbno + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
