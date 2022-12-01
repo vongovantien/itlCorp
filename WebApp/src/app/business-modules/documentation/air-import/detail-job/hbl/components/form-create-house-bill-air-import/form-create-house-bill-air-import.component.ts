@@ -160,7 +160,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                 switchMap((shipment: any) => this._store.select(getTransactionDetailCsTransactionState))
             ).subscribe((res: any) => {
                 this.shipmentType = res.shipmentType;
-                console.log("useswitch map:", this.shipmentType);
+                // console.log("useswitch map:", this.shipmentType);
             }
             );
             this.getDetailHBLState();
@@ -431,7 +431,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     updateFormValue(data: HouseBill) {
-        console.log('Shipment type:', this.shipmentType);
+        // console.log('Shipment type:', this.shipmentType);
         const formValue = {
             issueHBLDate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,

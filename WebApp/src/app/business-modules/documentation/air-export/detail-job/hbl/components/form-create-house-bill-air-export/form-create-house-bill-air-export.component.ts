@@ -819,7 +819,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     getSalesmanList(selectedShipmentType: any) {
-        console.log(this.shipmenttype.value);
+        // console.log(this.shipmenttype.value);
         this.shipmenttype.setValue(selectedShipmentType);
         if (!!this.customerId.value) {
             this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.AE_CODE, this.shipmenttype.value)

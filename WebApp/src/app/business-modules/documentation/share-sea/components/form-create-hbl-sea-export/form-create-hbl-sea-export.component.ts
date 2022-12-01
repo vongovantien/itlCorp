@@ -191,7 +191,6 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                 switchMap((shipment: any) => this._store.select(getTransactionDetailCsTransactionState))
             ).subscribe((res: any) => {
                 this.shipmentType = res.shipmentType;
-                console.log('switch map', this.shipmentType);
             });
     }
 
