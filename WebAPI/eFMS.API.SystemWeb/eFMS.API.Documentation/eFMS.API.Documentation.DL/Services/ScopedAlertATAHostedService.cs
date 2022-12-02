@@ -25,21 +25,22 @@ namespace eFMS.API.Documentation.DL.Services
             do
             {
                 int hourSpan = 24 - DateTime.Now.Hour;
-                new LogHelper(string.Format("ScopedAlertATAHostedService"), hourSpan.ToString() + "\n");
+                new LogHelper(string.Format("ScopedAlertATAHostedService"), DateTime.Now + "\n");
                 int numberOfHours = hourSpan;
 
-                if (hourSpan == 24)
+                if (hourSpan == 12)
                 {
                     new LogHelper(string.Format("ScopedAlertATAHostedService", "Alert Service Hosted Service is excuted " + DateTime.Now));
                     using (var scope = services.CreateScope())
                     {
                         var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IScopedProcessingAlertATDService>();
                         var data = scopedProcessingService.GetAlertATDData();
+                        scopedProcessingService.AlertATD();
                         new LogHelper("ScopedAlertATAHostedService" + hourSpan, JsonConvert.SerializeObject(data));
                     }
-                    numberOfHours = 24;
+                    numberOfHours = 12;
                 }
-                new LogHelper(string.Format("ScopedAlertATAHostedService"), "Delay" + hourSpan.ToString() + "\n");
+                new LogHelper(string.Format("ScopedAlertATAHostedService"), "Delay " + hourSpan.ToString() + "\n");
                 await Task.Delay(TimeSpan.FromHours(numberOfHours), stoppingToken);
             }
             while (!stoppingToken.IsCancellationRequested);
