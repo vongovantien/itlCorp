@@ -1,13 +1,13 @@
 ﻿using eFMS.API.Documentation.Service.ViewModels;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
 {
-    public interface IScopedProcessingAlertATDService 
+    public interface IScopedProcessingAlertService 
     {
         void AlertATD();
+        void AlertATA();
         List<vw_GetShipmentAlertATD> GetAlertATDData();
+        List<vw_GetShipmentAlertATA> GetAlertATAData();
     }
 }
