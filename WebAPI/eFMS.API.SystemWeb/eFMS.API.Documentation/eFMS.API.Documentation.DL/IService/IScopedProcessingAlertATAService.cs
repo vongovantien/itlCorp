@@ -7,7 +7,7 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface IScopedProcessingAlertATDService 
     {
-        Task AlertATD(CancellationToken stoppingToken);
+        void AlertATD();
         List<vw_GetShipmentAlertATD> GetAlertATDData();
     }
 }
