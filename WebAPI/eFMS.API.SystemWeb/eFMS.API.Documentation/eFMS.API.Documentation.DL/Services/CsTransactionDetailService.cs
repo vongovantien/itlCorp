@@ -194,7 +194,6 @@ namespace eFMS.API.Documentation.DL.Services
             model.Id = Guid.NewGuid();
             model.DatetimeModified = model.DatetimeCreated = DateTime.Now;
             model.Active = true;
-
             string contSealNo = string.Empty;
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -1549,11 +1548,11 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-
+            var jobNo = csTransactionRepo.Get(x => x.Id == data.JobId)?.FirstOrDefault();
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirImpProofofDelivery_" + data.Hwbno+"_"+data.JobNo + ".pdf";
+            var reportName = jobNo!=null? "AirImpProofofDelivery_" + data.Hwbno + "_" + jobNo.JobNo + ".pdf":"AirImpProofofDelivery_" + data.Hwbno+"_"+".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -1614,9 +1613,10 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true
             };
             // Get path link to report
+            var jobNo = csTransactionRepo.Get(x => x.Id == data.JobId)?.FirstOrDefault();
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirImptDocumentRelease_" + data.Hwbno+"_"+data.JobNo + ".pdf";
+            var reportName = jobNo!=null ? "AirImptDocumentRelease_" + data.Hwbno + "_" + jobNo.JobNo + ".pdf": "AirImptDocumentRelease_" + data.Hwbno + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -1686,7 +1686,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 housebill.TranShipmentTo = data.FinalDestinationPlace?.ToUpper(); //Final Destination
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription?.ToUpper(); //Good delivery
-                housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper() ?? string.Empty; //On board status  
+                housebill.CleanOnBoard = data.OnBoardStatus?.ToUpper() ?? string.Empty; //On board status
                 var conts = csMawbcontainerRepo.Get(x => x.Hblid == data.Id);
                 string hbConstainers = string.Empty;
                 string markNo = string.Empty;
@@ -1948,7 +1948,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.OrchW = data.OtherCharge?.ToUpper(); //Other Charge
                 housebill.OChrVal = string.Empty; //NOT USE
                 decimal _dueAgentPp = 0;
-                housebill.TTChgAgntPP = (decimal.TryParse(data.DueAgentPp, out _dueAgentPp)) ? (_dueAgentPp != 0 ? string.Format("{0:n}", _dueAgentPp) : string.Empty) : data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)                
+                housebill.TTChgAgntPP = (decimal.TryParse(data.DueAgentPp, out _dueAgentPp)) ? (_dueAgentPp != 0 ? string.Format("{0:n}", _dueAgentPp) : string.Empty) : data.DueAgentPp?.ToUpper(); //Due to agent (prepaid)
                 decimal _dueAgentCll = 0;
                 housebill.TTChgAgntCC = (decimal.TryParse(data.DueAgentCll, out _dueAgentCll)) ? (_dueAgentCll != 0 ? string.Format("{0:n}", _dueAgentCll) : string.Empty) : data.DueAgentCll?.ToUpper(); //Due to agent (Collect)
                 decimal _dueCarrierPp = 0;
@@ -2123,10 +2123,25 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+            string doNo = null;
+            authorizeLetters.ForEach(x =>
+            {
+                if (x.DONo != null)
+                {
+                    if (doNo == null)
+                    {
+                        doNo = x.DONo;
+                    }
+                    else
+                    {
+                        doNo = doNo + "-" + x.DONo.Replace("/", "");
+                    }
+                }
+            });
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.DeliveryOrderNo!=null? data.DeliveryOrderNo+".pdf":"AirImptAuthorisedLetter_" + data.DeliveryOrderNo.ToUpper() +"_"+ data.Hwbno + ".pdf";
+            var reportName = doNo!=null?doNo+".pdf": "AirImptAuthorisedLetter_" + data.Hwbno + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -2194,11 +2209,25 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-
+            string doNo = null;
+            authorizeLetters.ForEach(x =>
+            {
+                if (x.DONo != null)
+                {
+                    if (doNo == null)
+                    {
+                        doNo = x.DONo;
+                    }
+                    else
+                    {
+                        doNo = doNo + "-" + x.DONo.Replace("/", "");
+                    }
+                }
+            });
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirImptAuthorisedLetter_Consign_" + data.Hwbno + ".pdf";
+            var reportName = doNo!=null?doNo+".pdf":"AirImptAuthorisedLetter_Consign_" + data.Hwbno + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
