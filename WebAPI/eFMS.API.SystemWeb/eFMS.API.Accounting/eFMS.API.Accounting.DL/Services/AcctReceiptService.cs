@@ -2867,17 +2867,7 @@ namespace eFMS.API.Accounting.DL.Services
                        from inv in debitGrp.DefaultIfEmpty()
                        select new
                        {
-                           //acct,
-                           acct.inv.PartnerId,
-                           acct.inv.Id,
-                           acct.inv.InvoiceNoReal,
-                           acct.inv.Date,
-                           acct.inv.Currency,
-                           acct.inv.TotalAmount,
-                           acct.inv.PaymentTerm,
-                           acct.inv.PaymentDueDate,
-                           acct.inv.OfficeId,
-                           acct.inv.CompanyId,
+                           acct,
                            RefNo = inv == null ? (acct.sur.SyncedFrom.Contains("SOA") ? acct.sur.Soano : acct.sur.DebitNo) : inv.RefNo,
                            Type = AccountingConstants.ACCOUNTANT_TYPE_DEBIT,
                            //PartnerId = acct.PartnerId,
@@ -2904,13 +2894,13 @@ namespace eFMS.API.Accounting.DL.Services
 
                        };
             data = data.Where(x => x.DebitStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
-            var groupData = data.OrderBy(x => x.RefNo).GroupBy(x => new { x.RefNo, x.Type, x.PartnerId, x.Hblid });
+            var groupData = data.OrderBy(x => x.RefNo).GroupBy(x => new { x.RefNo, x.Type, x.acct.inv.PartnerId, x.Hblid });
             var result = groupData.Select(inv => new AgencyDebitCreditModel
             {
                 RefNo = inv.Key.RefNo,
                 Type = inv.Key.Type,
                 PartnerId = inv.Key.PartnerId,
-                RefIds = new List<string> { inv.FirstOrDefault().Id.ToString() },
+                RefIds = new List<string> { inv.FirstOrDefault().acct.inv.Id.ToString() },
                 Hblid = inv.Key.Hblid,
                 JobNo = inv.FirstOrDefault().JobNo,
                 Mbl = inv.FirstOrDefault().Mbl,
@@ -2919,14 +2909,14 @@ namespace eFMS.API.Accounting.DL.Services
                 UnpaidAmountUsd = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().UnpaidAmountUsd : inv.Sum(x => x.UnpaidAmountUsd),
                 UnpaidAmountVnd = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().UnpaidAmountVnd : inv.Sum(x => x.UnpaidAmountVnd),
                 PaymentStatus = inv.FirstOrDefault().PaymentStatus,
-                InvoiceNo = inv.FirstOrDefault().InvoiceNoReal,
-                InvoiceDate = inv.FirstOrDefault().Date,
-                CurrencyId = inv.FirstOrDefault().Currency,
-                Amount = inv.FirstOrDefault().TotalAmount,
-                PaymentTerm = inv.FirstOrDefault().PaymentTerm,
-                DueDate = inv.FirstOrDefault().PaymentDueDate,
-                OfficeId = inv.FirstOrDefault().OfficeId,
-                CompanyId = inv.FirstOrDefault().CompanyId,
+                InvoiceNo = inv.FirstOrDefault().acct.inv.InvoiceNoReal,
+                InvoiceDate = inv.FirstOrDefault().acct.inv.Date,
+                CurrencyId = inv.FirstOrDefault().acct.inv.Currency,
+                Amount = inv.FirstOrDefault().acct.inv.TotalAmount,
+                PaymentTerm = inv.FirstOrDefault().acct.inv.PaymentTerm,
+                DueDate = inv.FirstOrDefault().acct.inv.PaymentDueDate,
+                OfficeId = inv.FirstOrDefault().acct.inv.OfficeId,
+                CompanyId = inv.FirstOrDefault().acct.inv.CompanyId,
                 ExchangeRateBilling = inv.FirstOrDefault().ExchangeRateBilling
             });
             var partners = catPartnerRepository.Get();
@@ -4165,7 +4155,7 @@ namespace eFMS.API.Accounting.DL.Services
             var hblIds = payments.Select(x => x.Hblid).ToList();
             var invoiceDebitArs = debitMngtArRepository.Get(x => hblIds.Contains(x.Hblid));
             var accountingMng = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
-            //payments = payments.Where(x => x.Type == "DEBIT").ToList();
+            payments = payments.Where(x => x.Type == "DEBIT" || x.Type == "OBH").ToList();
             //foreach (var payment in payments)
             //{
             //    var invoiceDebitAr = invoiceDebitArs.Where(x => payment.RefIds.Contains(x.AcctManagementId.ToString()) && x.Hblid == payment.Hblid).FirstOrDefault();
