@@ -1000,7 +1000,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = item.ArrivalNote!=null? item.ArrivalNote+ ".pdf": "SeaDeliveryCommand_"+ transactionRepository.Get(x => x.Id == detail.JobId).Select(x => x.JobNo).FirstOrDefault()+".pdf" ;
+            var reportName = detail.DeliveryOrderNo != null? detail.DeliveryOrderNo + ".pdf": "SeaDeliveryCommand_"+ transactionRepository.Get(x => x.Id == detail.JobId).Select(x => x.JobNo).FirstOrDefault()+".pdf" ;
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
