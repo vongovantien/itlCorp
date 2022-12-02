@@ -32,7 +32,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!--  -->
                     </div>
                 </div>
             </div>
@@ -317,13 +316,13 @@
     </div>
 </div>
 <app-dropdown #exportTpl>
-    <span class="dropdown-item pointer" (click)="">
+    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'PDF')">
         PDF
     </span>
-    <span class="dropdown-item pointer" (click)="">
+    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'EXCEL')">
         EXCEL
     </span>
-    <span class="dropdown-item pointer" (click)="">
+    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'WORD')">
         WORD
     </span>
 </app-dropdown>

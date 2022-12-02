@@ -17,7 +17,7 @@ import { ReportPreviewComponent } from '@common';
 import { Crystal } from '@models';
 import { InjectViewContainerRefDirective } from '@directives';
 import { delayTime } from '@decorators';
-import { combineLatest } from 'rxjs';
+import { combineLatest, of } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { SystemConstants } from '@constants';
 
@@ -40,7 +40,7 @@ export class OpsCDNoteComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
-    selectedCdNote: AcctCDNote = null;
+    selectedCdNote: any = null;
 
     isDesc = true;
     sortKey: string = '';
@@ -332,12 +332,28 @@ export class OpsCDNoteComponent extends AppList {
             );
     }
     previewItem(jobId: string, cdNote:string, currency: string = 'VND') {
-        this._documentRepo.getDetailsCDNote(jobId, cdNote)
-            .pipe(
-                switchMap(() => {
+        let sourcePreview$;
+        if (this.selectedCdNote.type === "DEBIT") {
+            sourcePreview$ = this._documentRepo.validateCheckPointContractPartner({
+                partnerId: this.selectedCdNote.partnerId,
+                // hblId: this.selectedCdNote.hblid,
+                transactionType: 'CL',
+                type: 3
+            }).pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
                     return this._documentRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency });            
-                }),
-            ).subscribe(
+                }
+                this._toastService.warning(res.message);
+                return of(false);
+            })
+        )
+        }
+        else {
+            sourcePreview$ = this._documentRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency });
+        }
+        sourcePreview$
+            .subscribe(
                 (res: any) => {
                     if (res != null && res?.dataSource.length > 0) {
                         this.dataReport = res;

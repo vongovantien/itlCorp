@@ -125,7 +125,8 @@
                                                 class="table table-striped table-brand table-collapse-group dataTable">
                                                 <tbody>
                                                     <tr
-                                                        *ngFor="let cdNote of cdNoteGroup.listCDNote; let j = index; trackBy: trackByFn">
+                                                        *ngFor="let cdNote of cdNoteGroup.listCDNote; let j = index; trackBy: trackByFn"
+                                                        [contextMenu]="CdContextMenu" (onTouch)="onSelectCdNote(cdNote)">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions">
                                                                 <label class="m-checkbox" style="display: inline;">
@@ -227,6 +228,45 @@
         </div>
     </div>
 </div>
+<app-context-menu #CdContextMenu (clickOutside)="selectedCdNote = null">
+    <div class="menu-context__item" [dpToggle]="previewTpl" position="rightTop" trigger="hover" ClickStopPropagation>
+        <div class="d-flex justify-content-between ">
+            <div>
+                <i class="la la-print text-primary"></i>
+                <span> Preview </span>
+                <span class="font-weight-bold">{{selectedCdNote?.code}}</span>
+            </div>
+            <div class="d-flex align-items-center m--margin-top-5">
+                <i class="la la-caret-right font-13"></i>
+            </div>
+        </div>
+        
+    </div>
+    <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
+        <div class="d-flex justify-content-between ">
+            <div>
+                <i class="la la-download text-primary"></i>
+                <span> Export </span>
+                <span class="font-weight-bold">{{selectedCdNote?.code}}</span>
+            </div>
+            <div class="d-flex align-items-center m--margin-top-5">
+                <i class="la la-caret-right font-13"></i>
+            </div>
+        </div>
+    </div>
+</app-context-menu>
+
+<app-dropdown #exportTpl>
+    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'PDF')">
+        PDF
+    </span>
+    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'EXCEL')">
+        EXCEL
+    </span>
+    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'WORD')">
+        WORD
+    </span>
+</app-dropdown>
 <cd-note-detail-popup (onDeleted)="onDeletedCdNote()"></cd-note-detail-popup>
 
 <cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"></cd-note-add-popup>
