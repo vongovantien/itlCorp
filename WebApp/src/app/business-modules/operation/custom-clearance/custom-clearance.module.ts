@@ -7,6 +7,7 @@ import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { SharedOperationModule } from '../shared-operation.module';
 import { CustomClearanceAddnewComponent } from './addnew/custom-clearance-addnew.component';
 import { CustomClearanceFormDetailComponent } from './components/form-detail-clearance/form-detail-clearance.component';
 import { CustomClearanceFormSearchComponent } from './components/form-search-custom-clearance/form-search-custom-clearance.component';
@@ -39,16 +40,16 @@ const LIB = [
     imports: [
         SharedModule,
         RouterModule.forChild(routing),
-        ...LIB
+        ...LIB,
+        SharedOperationModule
     ],
-    exports: [CustomClearanceFormDetailComponent],
+    exports: [],
     declarations: [
         CustomClearanceComponent,
         CustomClearanceAddnewComponent,
         CustomClearanceImportComponent,
         CustomClearanceEditComponent,
         CustomClearanceFormSearchComponent,
-        CustomClearanceFormDetailComponent
     ],
     providers: [],
 })

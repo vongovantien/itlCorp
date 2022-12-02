@@ -15,7 +15,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
-import { SharedOperationModule } from '../shared-operation.module';
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 import { JobEditLazyLoadComponentModule } from './job-edit-lazy-load-component.module';
 import { OpsModuleBillingJobEditComponent } from './job-edit.component';
@@ -57,7 +56,6 @@ const customCurrencyMaskConfig = {
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         JobEditLazyLoadComponentModule, // ? Lazy loading module with 3 tab component (CD, Credit/Debit, Stage),
         ShareBussinessModule,
-        SharedOperationModule,
         ...LIB,
 
     ],

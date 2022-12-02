@@ -1,13 +1,16 @@
 import { NgModule } from '@angular/core';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { CustomClearanceModule } from './custom-clearance/custom-clearance.module';
+import { CustomClearanceFormDetailComponent } from './custom-clearance/components/form-detail-clearance/form-detail-clearance.component';
 
 @NgModule({
-    declarations: [],
+    declarations: [CustomClearanceFormDetailComponent],
     imports: [
         SharedModule,
-        CustomClearanceModule
+        NgxDaterangepickerMd,
+        NgSelectModule
     ],
-    exports: [CustomClearanceModule]
+    exports: [CustomClearanceFormDetailComponent]
 })
 export class SharedOperationModule { }
