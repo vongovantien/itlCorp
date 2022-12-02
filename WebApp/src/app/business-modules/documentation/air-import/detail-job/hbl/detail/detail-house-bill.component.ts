@@ -1,24 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, Params } from '@angular/router';
-import { Store, ActionsSubject } from '@ngrx/store';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo, CatalogueRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent } from '@common';
-import { Crystal, CsTransactionDetail, HouseBill } from '@models';
 import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
-import { DataService } from '@services';
-import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
+import { ICrystalReport } from '@interfaces';
+import { Crystal, CsTransactionDetail, HouseBill } from '@models';
+import { CatalogueRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
+import { DataService } from '@services';
 
-import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
+import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { skip, catchError, takeUntil, switchMap, concatMap, mergeMap } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
-import { of, throwError } from 'rxjs';
 import { formatDate } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { of, throwError } from 'rxjs';
+import { catchError, concatMap, mergeMap, skip, switchMap, takeUntil } from 'rxjs/operators';
+import isUUID from 'validator/lib/isUUID';
 
 
 enum HBL_TAB {
@@ -126,7 +126,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 this.saveHBL();
                 break;
 
-            // * Update Arrival Note.    
+            // * Update Arrival Note.
             case HBL_TAB.ARRIVAL: {
                 this.arrivalNoteComponent.isSubmitted = true;
                 if (!this.arrivalNoteComponent.checkValidate()) {

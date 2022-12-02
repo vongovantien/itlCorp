@@ -519,7 +519,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = csTransactionRepo.Get(x => x.Id == jobId).FirstOrDefault()?.Mawb!=null? csTransactionRepo.Get(x => x.Id == jobId).FirstOrDefault()?.Mawb+".pdf":"MAWBITL_" + csTransactionRepo.Get(x=>x.Id==jobId).FirstOrDefault()?.JobNo + ".pdf";
+            var reportName = csTransactionRepo.Get(x => x.Id == jobId).FirstOrDefault()?.JobNo!=null? csTransactionRepo.Get(x => x.Id == jobId).FirstOrDefault()?.JobNo + ".pdf":"MAWBITL_" + csTransactionRepo.Get(x=>x.Id==jobId).FirstOrDefault()?.JobNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 

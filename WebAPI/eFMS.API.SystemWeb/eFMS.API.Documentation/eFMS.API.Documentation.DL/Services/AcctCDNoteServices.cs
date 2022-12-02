@@ -1227,7 +1227,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if (string.IsNullOrEmpty(cdNo))
             {
-                cdNoteDetails.CDNote.Code = string.Join(';', cdNoList);
+                cdNoteDetails.CDNote.Code = string.Join('-', cdNoList);
             }
             cdNoteDetails.ProductService = opsTransaction?.ProductService;
             cdNoteDetails.ServiceMode = opsTransaction?.ServiceMode;
