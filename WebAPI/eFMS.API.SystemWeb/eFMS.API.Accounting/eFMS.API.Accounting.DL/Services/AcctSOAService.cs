@@ -166,29 +166,13 @@ namespace eFMS.API.Accounting.DL.Services
 
                 var soa = mapper.Map<AcctSoa>(model);
 
-                var surchargesSoa = new List<CsShipmentSurcharge>();
-
-                //List charge of SOA
-                #region
-                var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Any(s => s.surchargeId == x.Id));
-
-                var _totalShipment = 0;
-                decimal _amount = 0;
-                decimal _debitAmount = 0;
-                decimal _creditAmount = 0;
-                int _totalCharge = 0;
-               
-                #endregion
                 var currentOffice = officeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault().Code;
-                soa.TotalShipment = _totalShipment;
-                soa.DebitAmount = _debitAmount;
-                soa.CreditAmount = _creditAmount;
-                soa.TotalCharge = _totalCharge;
+     
                 soa.Soano = model.Soano = CreateSoaNo(currentOffice, string.Empty);
                 soa.NetOff = false;
                 var hs = DataContext.Add(soa);
 
-                if (hs.Success && surchargesSoa != null)
+                if (hs.Success)
                 {
                     var surchargeSoa = new List<CsShipmentSurcharge>();
                     var hsCharges = UpdateSoaCharge(model, "Add", out surchargeSoa);
@@ -250,6 +234,8 @@ namespace eFMS.API.Accounting.DL.Services
                 soa.ReasonReject = soaCurrent.ReasonReject;
                 soa.ExcRateUsdToLocal = soa.ExcRateUsdToLocal != null ? soa.ExcRateUsdToLocal : soaCurrent.ExcRateUsdToLocal;
                 soa.NetOff = soaCurrent.NetOff;
+                soa.CombineBillingNo = soaCurrent.CombineBillingNo;
+
                 if (string.IsNullOrEmpty(model.CreatorShipment))
                 {
                     soa.CreatorShipment = model.CreatorShipment;
@@ -276,27 +262,10 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     soa.PaymentStatus = (soa.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID) ? null : soa.PaymentStatus;
                 }
-
-                var surchargesSoa = new List<CsShipmentSurcharge>();
-
-                //List charge of SOA
-                var surcharges = csShipmentSurchargeRepo.Get(x => model.Surcharges.Any(s => s.surchargeId == x.Id));
-
-                var _totalShipment = 0;
-                //decimal _amount = 0;
-                //decimal _debitAmount = 0;
-                //decimal _creditAmount = 0;
-                int _totalCharge = 0;
-
-                soa.TotalShipment = _totalShipment;
-                //soa.DebitAmount = _debitAmount;
-                //soa.CreditAmount = _creditAmount;
-                soa.TotalCharge = _totalCharge;
-                soa.CombineBillingNo = soaCurrent.CombineBillingNo;
-
+               
                 var hs = DataContext.Update(soa, x => x.Id == soa.Id);
 
-                if (hs.Success && surchargesSoa != null)
+                if (hs.Success)
                 {
                     var surchargeSoa = new List<CsShipmentSurcharge>();
                     var hsCharges = UpdateSoaCharge(model, "Update", out surchargeSoa);
@@ -464,6 +433,9 @@ namespace eFMS.API.Accounting.DL.Services
             decimal _amount = 0;
             decimal _debitAmount = 0;
             decimal _creditAmount = 0;
+            var _totalShipment = surcharges.GroupBy(x => x.JobNo).Count();
+            int _totalCharge = 0;
+
             if (surcharges != null)
             {
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
@@ -565,6 +537,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     soaUpd.DebitAmount = _debitAmount;
                     soaUpd.CreditAmount = _creditAmount;
+                    soaUpd.TotalShipment = _totalShipment;
+                    soaUpd.TotalCharge = _totalCharge;
                     var updSoa = DataContext.Update(soaUpd, x => x.Id == soaUpd.Id);
                 }
 
