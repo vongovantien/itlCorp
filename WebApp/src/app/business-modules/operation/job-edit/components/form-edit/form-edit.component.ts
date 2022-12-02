@@ -194,9 +194,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             clearanceDate: !!this.opsTransaction.clearanceDate ? { startDate: new Date(this.opsTransaction.clearanceDate), endDate: new Date(this.opsTransaction.clearanceDate) } : null,
             suspendTime: this.opsTransaction.suspendTime,
         });
-
-        console.log(this.opsTransaction)
-
         this.customerName = this.opsTransaction.customerName;
         this.shipmentInfo = this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.

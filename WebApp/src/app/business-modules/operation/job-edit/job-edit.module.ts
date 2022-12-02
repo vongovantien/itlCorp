@@ -1,23 +1,24 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
 
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { NgxCurrencyModule } from 'ngx-currency';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 
 
-import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 
-import { OpsModuleBillingJobEditComponent } from './job-edit.component';
-import { SharedModule } from 'src/app/shared/shared.module';
-import { JobEditLazyLoadComponentModule } from './job-edit-lazy-load-component.module';
-import { ShareBussinessModule } from '../../share-business/share-bussines.module';
-import { ChargeConstants } from 'src/constants/charge.const';
-import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 import { DeactivateGuardService } from '@core';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { ChargeConstants } from 'src/constants/charge.const';
+import { ShareBussinessModule } from '../../share-business/share-bussines.module';
+import { SharedOperationModule } from '../shared-operation.module';
+import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
+import { JobEditLazyLoadComponentModule } from './job-edit-lazy-load-component.module';
+import { OpsModuleBillingJobEditComponent } from './job-edit.component';
 
 const routing: Routes = [
     {
@@ -56,6 +57,7 @@ const customCurrencyMaskConfig = {
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         JobEditLazyLoadComponentModule, // ? Lazy loading module with 3 tab component (CD, Credit/Debit, Stage),
         ShareBussinessModule,
+        SharedOperationModule,
         ...LIB,
 
     ],
