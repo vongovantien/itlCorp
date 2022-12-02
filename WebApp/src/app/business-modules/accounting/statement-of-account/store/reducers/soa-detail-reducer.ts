@@ -18,8 +18,9 @@ export const initialState: SOADetailState = {
 const SOADetailReducer = createReducer(
     initialState,
     on(
-        Types.LoadSOADetailSuccess, (state: SOADetailState, payload: SOA) => {
-            return { ...state, data: payload, isLoading: false, isLoaded: true };
+        Types.LoadSOADetailSuccess, (state: SOADetailState, payload: { detail: SOA }) => {
+            console.log(payload);
+            return { ...state, data: payload.detail, isLoading: false, isLoaded: true };
         }
     )
 );

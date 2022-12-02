@@ -153,12 +153,11 @@ export class StatementOfAccountEditComponent extends AppList {
                         console.log("data in store redux", data);
                         return of(data?.detail);
                     }
-                    return this._accoutingRepo.getDetaiLSOAUpdateExUsd(this.soaNO, this.currencyLocal)
+                    return this._accoutingRepo.getDetaiLSOAUpdateExUsd(this.soaNO, this.currencyLocal);
                 }),
                 takeUntil(this.ngUnsubscribe),
             )
             .subscribe((dataSoa: any) => {
-                console.log("data final subscribe", dataSoa);
                 this.soa = new SOA(dataSoa);
                 this.soa.shipment = Object.keys(groupBy(this.soa.groupShipments, 'jobId')).length || 0;
 
