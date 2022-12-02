@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using eFMS.API.Common.Helpers;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -268,13 +269,13 @@ namespace eFMS.API.Accounting.Controllers
                     result = new ResultHandle { Status = false, Message = "Save Receipt fail" };
                     break;
             }
-            
+
             if (!hs.Success)
             {
                 return BadRequest(result);
             }
-            else if(saveAction == SaveAction.SAVECANCEL || saveAction == SaveAction.SAVEDONE)
-            {                
+            else if (saveAction == SaveAction.SAVECANCEL || saveAction == SaveAction.SAVEDONE)
+            {
                 Response.OnCompleted(async () =>
                 {
                     await acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
@@ -285,6 +286,18 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     await CalculateOverDueAsync(new List<string>() { receiptModel.CustomerId });
                 });
+            }
+            if (saveAction == SaveAction.SAVEDRAFT_ADD || saveAction == SaveAction.SAVEDRAFT_UPDATE || saveAction == SaveAction.SAVEDONE)
+            {
+                // Cập nhật cấn trừ debit
+                if (receiptModel.Type == "Agent")
+                {
+                    var hsDebit = acctReceiptService.UpdateAccountingDebitAR(receiptModel.Payments, saveAction);
+                    if (!hsDebit.Success)
+                    {
+                        new LogHelper("eFMS_SaveReceipt_UpdateDebitAR_LOG", hsDebit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
+                    }
+                }
             }
             return Ok(result);
         }
