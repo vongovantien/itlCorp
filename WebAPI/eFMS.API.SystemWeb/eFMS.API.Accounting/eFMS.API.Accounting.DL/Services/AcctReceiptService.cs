@@ -689,7 +689,8 @@ namespace eFMS.API.Accounting.DL.Services
                     Mbl = GetHBLInfo(s.FirstOrDefault().Hblid).MBL,
                     Hbl = GetHBLInfo(s.FirstOrDefault().Hblid).HBLNo,
                     JobNo = GetHBLInfo(s.FirstOrDefault().Hblid).JobNo,
-                    PaymentStatus = GetPaymentStatus(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList()),
+                    PaymentStatus = receipt.Type == "Customer" ? GetPaymentStatus(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList()) :
+                                    GetPaymentStatusAgent(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList(), s.FirstOrDefault().Hblid),
                     ExchangeRateBilling = s.FirstOrDefault().ExchangeRateBilling,
                     PartnerId = s.FirstOrDefault()?.PartnerId?.ToString(),
                     Negative = s.FirstOrDefault()?.Negative,
@@ -712,13 +713,20 @@ namespace eFMS.API.Accounting.DL.Services
 
                     if (acctPayment.Hblid != null && acctPayment.Hblid != Guid.Empty)
                     {
-                        CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id == acctPayment.Hblid)?.FirstOrDefault();
-                        if (hbl != null)
+                        //CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id == acctPayment.Hblid)?.FirstOrDefault();
+                        //if (hbl != null)
+                        //{
+                        //    CsTransaction job = csTransactionRepository.Get(x => x.Id == hbl.JobId)?.FirstOrDefault();
+                        //    _Hbl = hbl.Hwbno;
+                        //    _Mbl = hbl.Mawb;
+                        //    _jobNo = job?.JobNo;
+                        //}
+                        var surcharge = surchargeRepository.Get(x => x.Hblid == acctPayment.Hblid).FirstOrDefault();
+                        if (surcharge != null)
                         {
-                            CsTransaction job = csTransactionRepository.Get(x => x.Id == hbl.JobId)?.FirstOrDefault();
-                            _Hbl = hbl.Hwbno;
-                            _Mbl = hbl.Mawb;
-                            _jobNo = job?.JobNo;
+                            _Hbl = surcharge.Hblno;
+                            _Mbl = surcharge.Mblno;
+                            _jobNo = surcharge?.JobNo;
                         }
                     }
 
@@ -757,7 +765,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.DepartmentName = dept?.DeptNameAbbr;
                     payment.OfficeName = office?.ShortName;
                     payment.RefIds = string.IsNullOrEmpty(acctPayment.RefId) ? null : acctPayment.RefId.Split(',').ToList();
-                    payment.PaymentStatus = acctPayment.Type == "DEBIT" ? (receipt.Type == "Customer" ? GetPaymentStatus(new List<string> { acctPayment.RefId }) : GetPaymentStatusAgent(new List<AccAccountingPayment> { acctPayment })) : null;
+                    payment.PaymentStatus = acctPayment.Type == "DEBIT" ? (receipt.Type == "Customer" ? GetPaymentStatus(new List<string> { acctPayment.RefId }) : GetPaymentStatusAgent(new List<string> { acctPayment.RefId }, acctPayment.Hblid)) : null;
                     payment.JobNo = _jobNo;
                     payment.Mbl = _Mbl;
                     payment.Hbl = _Hbl;
@@ -909,13 +917,20 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return result;
             }
-            CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id == hblId)?.FirstOrDefault();
-            if (hbl != null)
+            //CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id == hblId)?.FirstOrDefault();
+            //if (hbl != null)
+            //{
+            //    CsTransaction job = csTransactionRepository.Get(x => x.Id == hbl.JobId)?.FirstOrDefault();
+            //    result.HBLNo = hbl.Hwbno;
+            //    result.MBL = hbl.Mawb;
+            //    result.JobNo = job?.JobNo;
+            //}
+            var surcharge = surchargeRepository.Get(x => x.Hblid == hblId).FirstOrDefault();
+            if (surcharge != null)
             {
-                CsTransaction job = csTransactionRepository.Get(x => x.Id == hbl.JobId)?.FirstOrDefault();
-                result.HBLNo = hbl.Hwbno;
-                result.MBL = hbl.Mawb;
-                result.JobNo = job?.JobNo;
+                result.HBLNo = surcharge.Hblno;
+                result.MBL = surcharge.Mblno;
+                result.JobNo = surcharge?.JobNo;
             }
             return result;
         }
@@ -968,32 +983,34 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
-        /// 
+        /// Get payment status type obh for agency
         /// </summary>
-        /// <param name="payments"></param>
+        /// <param name="invoices"></param>
         /// <returns></returns>
-        private string GetPaymentStatusAgent(List<AccAccountingPayment> payments)
+        private string GetPaymentStatusAgent(List<string> invoiceIds, Guid? hblId)
         {
             string _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
-            if(payments.Count == 1)
+            if (invoiceIds.Count > 0)
             {
-                var debitAR = debitMngtArRepository.Get(x => x.Hblid == payments.FirstOrDefault().Hblid && x.AcctManagementId.ToString() == payments.FirstOrDefault().RefId).FirstOrDefault();
-                if(debitAR != null)
+                //
+                var debitAR = debitMngtArRepository.Get(x => x.Hblid == hblId && invoiceIds.Contains(x.AcctManagementId.ToString()));
+                if(debitAR.Count() > 0)
                 {
-                    return debitAR.PaymentStatus;
-                }
-                else
-                {
-                    var surcharges = surchargeRepository.Get(x => x.Hblid == payments.FirstOrDefault().Hblid && x.AcctManagementId != null && x.AcctManagementId.ToString() == payments.FirstOrDefault().RefId);
-                    var total = payments.FirstOrDefault().CurrencyId == AccountingConstants.CURRENCY_USD ? surcharges.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0)) : surcharges.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-                    if(total == payments.FirstOrDefault().PaymentAmount)
+                    bool isPaid = debitAR.All(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+                    if (isPaid == true)
                     {
                         _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
                     }
-                    else
+                    else if (debitAR.Any(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART)
+                        || debitAR.Any(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
                     {
                         _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
                     }
+                }
+                else
+                {
+                    var invoices = acctMngtRepository.Get(x => invoiceIds.Contains(x.Id.ToString())).ToList();
+                    _paymentStatus = GetPaymentStatusInvoice(invoices);
                 }
             }
             return _paymentStatus;
@@ -3015,9 +3032,38 @@ namespace eFMS.API.Accounting.DL.Services
                         break;
                 }
             }
+            List<string> childPartnerIds = catPartnerRepository.Get(x => x.ParentId == criteria.PartnerId)
+                        .Select(x => x.Id)
+                        .ToList();
+            var debitsAr = debitMngtArRepository.Get(q => q.PartnerId == criteria.PartnerId || childPartnerIds.Contains(q.PartnerId));
+            if (query.FirstOrDefault() == null)
+                return null;
 
-            var grpInvoiceCharge = query.GroupBy(g => new { g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)), g.sur.JobNo, g.sur.Mblno, g.sur.Hblno, g.sur.Hblid })
-                .Select(s => new { s.Key.PartnerId, s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(se => se.sur), Job = s.Key });
+            var dataOBH = from acct in query
+                          join inv in debitsAr on new { AcctManagementId = acct.inv.Id, acct.sur.Hblid } equals new { AcctManagementId = (inv.AcctManagementId ?? Guid.Empty), Hblid = (inv.Hblid ?? Guid.Empty) } into debitGrp
+                          from inv in debitGrp.DefaultIfEmpty()
+                          select new
+                          {
+                              acct,
+                              RefNo = inv == null ? (acct.sur.SyncedFrom.Contains("SOA") ? acct.sur.Soano : acct.sur.DebitNo) : inv.RefNo,
+                              Type = AccountingConstants.ACCOUNTANT_TYPE_DEBIT,
+                              Hblid = acct.sur.Hblid,
+                              JobNo = acct.sur.JobNo,
+                              Mbl = acct.sur.Mblno,
+                              Hbl = acct.sur.Hblno,
+                              UnpaidAmount = inv != null ? inv.UnpaidAmount : (acct.inv.Currency == AccountingConstants.CURRENCY_LOCAL ? (acct.sur.AmountVnd + acct.sur.VatAmountVnd) : (acct.sur.AmountUsd + acct.sur.VatAmountUsd)),
+                              UnpaidAmountUsd = inv != null ? inv.UnpaidAmountUsd : (acct.sur.AmountUsd + acct.sur.VatAmountUsd),
+                              UnpaidAmountVnd = inv != null ? inv.UnpaidAmountVnd : (acct.sur.AmountVnd + acct.sur.VatAmountVnd),
+                              PaymentStatus = inv != null ? inv.PaymentStatus : acct.inv.PaymentStatus,
+                              OBHStatus = inv != null ? inv.PaymentStatus : AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID,
+                              ExchangeRateBilling = GetExchangeRateDebitBilling(acct.sur.Soano, acct.sur.DebitNo),
+                              isExistDebitAR = inv != null ? true : false
+
+                          };
+            dataOBH = dataOBH.Where(x => x.OBHStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+            //(g.acct.sur.SyncedFrom == "CDNOTE" ? g.acct.sur.DebitNo : (g.acct.sur.SyncedFrom == "SOA" ? g.acct.sur.Soano : null))
+            var grpInvoiceCharge = dataOBH.OrderBy(x => x.RefNo).GroupBy(g => new { g.acct.inv.PartnerId, RefNo = g.RefNo, g.acct.sur.JobNo, g.acct.sur.Mblno, g.acct.sur.Hblno, g.acct.sur.Hblid })
+                .Select(s => new { s.Key.PartnerId, s.Key.RefNo, Invoice = s.Select(se => se.acct.inv), Surcharge = s.Select(se => se.acct.sur), Job = s.Key, s.FirstOrDefault().isExistDebitAR });
             var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
             {
                 RefNo = se.RefNo,
