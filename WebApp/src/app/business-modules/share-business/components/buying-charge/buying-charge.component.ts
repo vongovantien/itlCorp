@@ -1050,16 +1050,16 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
                     c = this.updatePayer(c, coloaderPayer);
 
-                    // if (c.chargeCode === ChargeConstants.DEFAULT_AIR[0]) {
-                    //     c = this.updateUnitSurcharge(c, 'KGS');
-                    //     c.quantityType = CommonEnum.QUANTITY_TYPE.CW;
-                    //     c.quantity = this.shipment.chargeWeight;
-                    // }
-                    // if (c.chargeCode === ChargeConstants.DEFAULT_AIR[1]) {
-                    //     c = this.updateUnitSurcharge(c, 'KGS');
-                    //     c.quantityType = CommonEnum.QUANTITY_TYPE.GW;
-                    //     c.quantity = this.shipment.grossWeight;
-                    // }
+                    if (c.chargeCode === ChargeConstants.DEFAULT_AIR[0]) {
+                        // c = this.updateUnitSurcharge(c, 'KGS');
+                        // c.quantityType = CommonEnum.QUANTITY_TYPE.CW;
+                        c.quantity = this.shipment.chargeWeight;
+                    }
+                    if (c.chargeCode === ChargeConstants.DEFAULT_AIR[1]) {
+                        // c = this.updateUnitSurcharge(c, 'KGS');
+                        // c.quantityType = CommonEnum.QUANTITY_TYPE.GW;
+                        c.quantity = this.shipment.grossWeight;
+                    }
                     // if (c.chargeCode === ChargeConstants.DEFAULT_AIR[2]) {
                     //     c = this.updateUnitSurcharge(c, 'SET');
                     //     c.quantity = 1;
