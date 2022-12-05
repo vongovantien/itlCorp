@@ -183,8 +183,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             paymentTerm: partner.paymentTerm,
             currency: partner.currency
         })
-        console.log("Here I am!",  this.formCommercialComponent.partnerId);
-        console.log('Parent:', partner.parentId)
     }
 
     getListContract(partneId: string) {
