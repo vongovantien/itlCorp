@@ -254,7 +254,7 @@
 </app-context-menu>
 
 <app-dropdown #previewTpl>
-    <span class="dropdown-item pointer" (click)="preview(true)">
+    <span class="dropdown-item pointer" (click)="previewItemOrigin(selectedCdNote?.jobId, selectedCdNote?.code, true)">
         Original
     </span>
     <span class="dropdown-item pointer" (click)="previewItem(selectedCdNote?.jobId, selectedCdNote?.code, 'VND')">
@@ -266,7 +266,6 @@
 </app-dropdown>
 
 <app-dropdown #exportTpl>
-    <!--  -->
     <span class="dropdown-item pointer" (click)="exportItem(selectedCdNote?.jobId, selectedCdNote?.code,'PDF')">
         PDF
     </span>

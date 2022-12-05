@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
+import { catchError, concatMap, filter, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -11,7 +11,7 @@ import { ShareBussinessCdNoteAddPopupComponent } from '../add-cd-note/add-cd-not
 import { ShareBussinessCdNoteDetailPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
 import { Store } from '@ngrx/store';
 import { TransactionActions } from '../../../store';
-import { combineLatest } from 'rxjs';
+import { combineLatest, of } from 'rxjs';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
 import { ActivatedRoute } from '@angular/router';
 import { ReportPreviewComponent } from '@common';
@@ -19,7 +19,8 @@ import { InjectViewContainerRefDirective } from '@directives';
 import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 import { delayTime } from '@decorators';
 import { Crystal } from '@models';
-import { ChargeConstants } from '@constants';
+import { ChargeConstants, SystemConstants } from '@constants';
+import { getCurrentUserState } from '@store';
 
 @Component({
     selector: 'cd-note-list',
@@ -42,7 +43,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
-
+    selectedCdNote: AcctCDNote = null;
     isDesc = true;
     sortKey: string = '';
 
@@ -52,7 +53,8 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         private _progressService: NgProgress,
         private _sortService: SortService,
         private _store: Store<TransactionActions>,
-        private _activedRouter: ActivatedRoute
+        private _activedRouter: ActivatedRoute,
+        private _exportRepo: ExportRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -337,5 +339,63 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                     }
                 },
             );
+    }
+    previewItem(jobId: string, cdNote:string , currency: string = 'VND') {
+        //test
+        this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: Crystal) => {
+                    this.dataReport = res;
+                    if (res.dataSource.length > 0) {
+                        this.renderAndShowReport();
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+    onSelectCdNote(cd: AcctCDNote) {
+        this.selectedCdNote = cd;
+        
+    }
+    exportItem(jobId: string, cdNote:string, format: string) {
+        let url: string;
+        let _format = 0;
+        switch (format) {
+            case 'PDF':
+                _format = 5;
+                break;
+            case 'WORD':
+                _format = 3;
+                break;
+            case 'EXCEL':
+                _format = 4;
+                break;
+            default:
+                _format = 5;
+                break;
+        }
+        this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+        .pipe(
+            switchMap((detail) => {
+                return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+            }),
+            concatMap((x) => {
+                url = x.pathReportGenerate;
+                return this._exportRepo.exportCrystalReportPDF(x);
+            })
+        ).subscribe(
+            (res: any) => {
+
+            },
+            (error) => {
+                this._exportRepo.downloadExport(url);
+            },
+            () => {
+                console.log(url);
+            }
+        );
+  
     }
 }

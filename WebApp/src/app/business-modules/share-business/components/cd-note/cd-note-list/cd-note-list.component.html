@@ -255,15 +255,25 @@
         </div>
     </div>
 </app-context-menu>
-
+<app-dropdown #previewTpl>
+    <span class="dropdown-item pointer" (click)="previewItemOrigin(selectedCdNote, true)">
+        Original
+    </span>
+    <span class="dropdown-item pointer" (click)="previewItem(selectedCdNote?.jobId, selectedCdNote?.code, 'VND')">
+        VND
+    </span>
+    <span class="dropdown-item pointer" (click)="previewItem(selectedCdNote?.jobId, selectedCdNote?.code, 'USD')">
+        USD
+    </span>
+</app-dropdown>
 <app-dropdown #exportTpl>
-    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'PDF')">
+    <span class="dropdown-item pointer" (click)="exportItem(selectedCdNote?.jobId, selectedCdNote?.code,'PDF')">
         PDF
     </span>
-    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'EXCEL')">
+    <span class="dropdown-item pointer" (click)="exportItem(selectedCdNote?.jobId, selectedCdNote?.code,'EXCEL')">
         EXCEL
     </span>
-    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'WORD')">
+    <span class="dropdown-item pointer" (click)="exportItem(selectedCdNote?.jobId, selectedCdNote?.code,'WORD')">
         WORD
     </span>
 </app-dropdown>
