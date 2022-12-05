@@ -129,7 +129,7 @@
                                     Status
                                 </label>
                                 <ng-select class="custom" [items]="statusStage" placeholder="Select status"
-                                    formControlName="status">
+                                    [clearable]="false" formControlName="status">
                                 </ng-select>
                             </div>
                         </div>
