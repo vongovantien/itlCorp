@@ -45,7 +45,7 @@ namespace eFMS.API.Documentation.DL.Services
                     numberOfHours = 24;
                 }
 
-                await Task.Delay(TimeSpan.FromHours(12), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(numberOfHours), stoppingToken);
             }
             while (!stoppingToken.IsCancellationRequested);
         }
