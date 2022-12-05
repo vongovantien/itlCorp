@@ -3,17 +3,18 @@ using eFMS.API.Documentation.DL.IService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-    public class ScopedAlertATDHostedService : BackgroundService
+    public class ScopedAlertHostedService : BackgroundService
     {
-        public IServiceProvider services { get; }
-        private readonly ILogger<IScopedProcessingAlertATDService> logger;
-        public ScopedAlertATDHostedService(IServiceProvider _service, ILogger<IScopedProcessingAlertATDService> _log)
+        public IServiceScopeFactory services { get; }
+        private readonly ILogger<IScopedProcessingAlertService> logger;
+        public ScopedAlertHostedService(IServiceScopeFactory _service, ILogger<IScopedProcessingAlertService> _log)
         {
             services = _service;
             logger = _log;
@@ -21,37 +22,38 @@ namespace eFMS.API.Documentation.DL.Services
       
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            new LogHelper("ScopedAlertATAHostedService", "RUNNING\n");
-            logger.LogInformation("Alert Service Hosted Service is running.");
-            await DoWork(stoppingToken);
-        }
-
-        private async Task DoWork(CancellationToken stoppingToken)
-        {
-            logger.LogInformation("Alert Service Hosted Service is working.");
-            new LogHelper("ScopedAlertATAHostedService", "WORKING\n");
-            while (!stoppingToken.IsCancellationRequested)
+            do
             {
-                new LogHelper("ScopedAlertATAHostedService", "now is: " + DateTime.Now.Hour);
-                int hourCurrent = 25 - DateTime.Now.Hour;
-                int numerOfHours = hourCurrent;
-                new LogHelper("ScopedAlertATAHostedService", "hourCurrent: " + numerOfHours);
-                using (var scope = services.CreateScope())
+                int hourSpan = 25 - DateTime.Now.Hour;
+                new LogHelper(string.Format("ScopedAlerHostedService"), DateTime.Now + "\n" + "hourSpan " + hourSpan);
+                int numberOfHours = hourSpan;
+
+                if (hourSpan == 24)
                 {
-                    new LogHelper("ScopedAlertATAHostedService", "Alert Service Hosted Service is excuted - {0}" + DateTime.Now);
-                    var scopedProcessingService =
-                        scope.ServiceProvider
-                            .GetRequiredService<IScopedProcessingAlertATDService>();
-                    await scopedProcessingService.AlertATD();
+                    using (var scope = services.CreateScope())
+                    {
+                        var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IScopedProcessingAlertService>();
+                        var dataAtd = scopedProcessingService.GetAlertATDData();
+                        var dataAta = scopedProcessingService.GetAlertATAData();
+
+                        scopedProcessingService.AlertATD();
+                        scopedProcessingService.AlertATA();
+                        new LogHelper("ScopedAlertATDHostedService Atd " + hourSpan, JsonConvert.SerializeObject(dataAtd));
+                        new LogHelper("ScopedAlertATAHostedService Ata " + hourSpan, JsonConvert.SerializeObject(dataAta));
+                    }
+                    new LogHelper(string.Format("ScopedAlertHostedService"), "Delay " + hourSpan.ToString() + " To " + DateTime.Now.AddHours(hourSpan) + "\n");
+                    numberOfHours = 24;
                 }
-                await Task.Delay(TimeSpan.FromHours(12), stoppingToken);
+
+                await Task.Delay(TimeSpan.FromHours(numberOfHours), stoppingToken);
             }
+            while (!stoppingToken.IsCancellationRequested);
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)
         {
             logger.LogInformation("Alert Service Hosted Service is stopping.");
-            new LogHelper("ScopedAlertATDHostedService", "STOPPED\n");
+            new LogHelper("ScopedAlertHostedService", "STOPPED\n");
             await base.StopAsync(stoppingToken);
         }
     }
