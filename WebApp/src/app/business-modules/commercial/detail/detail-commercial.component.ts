@@ -176,7 +176,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             this.formCommercialComponent.isDisabled = false;
         }
         else {
-            console.log(this.formCommercialComponent.isDisabled);
+            this.formCommercialComponent.isDisabled = true;
         }
         this.contractList.partnerLocation = partner.partnerLocation;
         this.payableComponent.payableForm.patchValue({
