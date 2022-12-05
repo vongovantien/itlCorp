@@ -24,11 +24,11 @@ namespace eFMS.API.Documentation.DL.Services
         {
             do
             {
-                int hourSpan = 24 - DateTime.Now.Hour;
-                new LogHelper(string.Format("ScopedAlerHostedService"), DateTime.Now + "\n");
+                int hourSpan = 25 - DateTime.Now.Hour;
+                new LogHelper(string.Format("ScopedAlerHostedService"), DateTime.Now + "\n" + "hourSpan " + hourSpan);
                 int numberOfHours = hourSpan;
 
-                if (hourSpan == 12)
+                if (hourSpan == 24)
                 {
                     using (var scope = services.CreateScope())
                     {
@@ -42,7 +42,7 @@ namespace eFMS.API.Documentation.DL.Services
                         new LogHelper("ScopedAlertATAHostedService Ata " + hourSpan, JsonConvert.SerializeObject(dataAta));
                     }
                     new LogHelper(string.Format("ScopedAlertHostedService"), "Delay " + hourSpan.ToString() + " To " + DateTime.Now.AddHours(hourSpan) + "\n");
-                    numberOfHours = 12;
+                    numberOfHours = 24;
                 }
 
                 await Task.Delay(TimeSpan.FromHours(12), stoppingToken);
