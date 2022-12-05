@@ -23,7 +23,7 @@ import { AppComboGridComponent } from '@common';
 export class SettlementExistingChargePopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
-    
+
     headers: CommonInterface.IHeaderTable[];
     headerPartner: CommonInterface.IHeaderTable[] = [];
     formSearch: FormGroup;
@@ -36,6 +36,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     invoiceNoAll: string = null;
     invoiceDateAll: AbstractControl;
     confirmInvoice = false;
+    seriesNoAll: string = null;
 
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -248,7 +249,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                 (data: CommonInterface.IValueDisplay[]) => {
                     this.initService = data;
                     this.services = (data || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
-                    // sort A -> Z theo text services 
+                    // sort A -> Z theo text services
                     this.sortIncreaseServices('text', true);
                     this.selectedServices = this.services;
                 }
@@ -408,7 +409,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             this._toastService.warning(`None of charges are selected, Please recheck again! `);
             return;
         } else {
-            
+
             this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
                 shipment.chargeSettlements.filter((charge: Surcharge) => charge.isSelected)
                     .map((charge: Surcharge) => {
@@ -480,17 +481,21 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
     onChangeAllInvoice() {
         this.confirmInvoice = true;
-        let validInvNo = false, validInvDate = false;
+        let validInvNo = false, validInvDate = false, validSeriesNo = false;
+        if (!!this.seriesNoAll) {
+            validSeriesNo = true;
+        }
         if (!!this.invoiceNoAll) {
             validInvNo = true;
         }
         if (!!this.invoiceDateAll.value && !!this.invoiceDateAll.value.startDate) {
             validInvDate = true;
         }
-        if (validInvNo && validInvDate) {
+        if (validInvNo && validInvDate && validSeriesNo) {
             this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
                 shipment.chargeSettlements.forEach((charge: Surcharge) => {
                     if (charge.isSelected) {
+                        charge.seriesNo = !validSeriesNo ? charge.seriesNo : this.seriesNoAll;
                         charge.invoiceNo = !validInvNo ? charge.invoiceNo : this.invoiceNoAll;
                         charge.invoiceDate = validInvDate ? formatDate(new Date(this.invoiceDateAll.value.startDate), 'dd/MM/yyyy', 'en') : charge.invoiceDate;
                         if (validInvNo) {
@@ -743,7 +748,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                 .map((surcharge: Surcharge) => this.selectedCharge.push(new Surcharge(surcharge)))
         );
         console.log('Shipment',this.shipments);
-        
+
 
         // if(this.shipments.every(x=>x.jobId.includes('LOG'))){
         //     for (const charge of this.selectedCharge) {
@@ -798,6 +803,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.resetFormShipmentInput();
         this.confirmInvoice = false;
         this.invoiceNoAll = null;
+        this.seriesNoAll = null;
         this.resetInvoiceDateAll();
     }
 
@@ -825,12 +831,14 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     onResetInvoice(){
         this.confirmInvoice = false;
         this.invoiceNoAll = null;
+        this.seriesNoAll = null;
         this.resetInvoiceDateAll();
         this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
             shipment.chargeSettlements.forEach((charge: Surcharge) => {
                 if (charge.isSelected) {
-                    charge.invoiceNo =  this.invoiceNoAll;
+                    charge.invoiceNo = this.invoiceNoAll;
                     charge.invoiceDate = null;
+                    charge.seriesNo = this.seriesNoAll;
                     this.onChangeInvoiceNo(charge, charge.invoiceNo);
                 }
             })
