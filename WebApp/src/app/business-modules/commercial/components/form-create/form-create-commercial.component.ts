@@ -166,7 +166,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         this.addressEn = this.formGroup.controls["addressEn"];
         this.addressVn = this.formGroup.controls["addressVn"];
         this.partnerLocation = this.formGroup.controls["partnerLocation"];
-        this.isDisabled = this.parentId.value != null && !this.isUpdate ? true : false;
+        this.isDisabled = this.parentId != null && !this.isUpdate ? true : false;
     }
 
     onRemove() {

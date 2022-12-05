@@ -176,13 +176,15 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             this.formCommercialComponent.isDisabled = false;
         }
         else {
-            this.formCommercialComponent.isDisabled = true;
+            console.log(this.formCommercialComponent.isDisabled);
         }
         this.contractList.partnerLocation = partner.partnerLocation;
         this.payableComponent.payableForm.patchValue({
             paymentTerm: partner.paymentTerm,
             currency: partner.currency
         })
+        console.log("Here I am!",  this.formCommercialComponent.partnerId);
+        console.log('Parent:', partner.parentId)
     }
 
     getListContract(partneId: string) {

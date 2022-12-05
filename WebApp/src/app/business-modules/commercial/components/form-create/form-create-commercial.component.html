@@ -11,7 +11,7 @@
                 <div class="col-lg-8">
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger':(isSubmitted || partnerNameEn.dirty) && !partnerNameEn.valid }">
-                        <label required>English Name</label><a>{{isActive}}</a>
+                        <label required>English Name</label>
                         <input type="text" class="form-control" formControlName="partnerNameEn"
                             [attr.disabled]="this.isActive === true ? 'disabled' : null">
                     </div>
@@ -50,8 +50,7 @@
                                 [ngClass]="{'m-form__group has-danger':(isSubmitted || taxCode.dirty) && !taxCode.valid }">
                                 <label required>Tax Code</label>
                                 <input type="text" class="form-control" formControlName="taxCode"
-                                    [attr.disabled]="active ? 'disabled' : null"
-                                    [attr.disabled]="!!this.parentId.value && this.isBranchSub ? 'disabled' : null"
+                                    [attr.disabled]="!!parentName && parentName!=partnerNameEn.value ? 'disabeld' : null"
                                     (blur)="getInforCompanyByTaxCode(this.taxCode.value)">
                                 <div class="form-control-feedback"
                                     *ngIf="(isSubmitted &&
