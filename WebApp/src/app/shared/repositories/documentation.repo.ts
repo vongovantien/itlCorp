@@ -1288,4 +1288,11 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    addMultipleStageToJob(jobId: string, body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsStageAssigned/AddMultipleStage`, body, { jobId: jobId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
