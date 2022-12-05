@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Accounting.DL.Models
 {
@@ -9,7 +10,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string MBL { get; set; }
         public string TotalDebit { get; set; }
         public string TotalCredit { get; set; }
-        public string ShipmentId { get; set; }
+        public Guid ShipmentId { get; set; }
         public string PIC { get; set; }
         public List<ChargeShipmentModel> ChargeShipments { get; set; }
     }

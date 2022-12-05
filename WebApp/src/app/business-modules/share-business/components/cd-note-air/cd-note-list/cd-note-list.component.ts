@@ -1,23 +1,25 @@
+import { HttpResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map, take, takeUntil } from 'rxjs/operators';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
-import { SortService } from 'src/app/shared/services';
-import { combineLatest } from 'rxjs';
-import _uniq from 'lodash/uniq';
-import { TransactionTypeEnum } from 'src/app/shared/enums';
-import { ShareBussinessCdNoteAddAirPopupComponent } from '../add-cd-note/add-cd-note.popup';
-import { ShareBussinessCdNoteDetailAirPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
 import { ActivatedRoute } from '@angular/router';
-import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
-import { delayTime } from '@decorators';
 import { ReportPreviewComponent } from '@common';
+import { ChargeConstants, SystemConstants } from '@constants';
+import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { Crystal } from '@models';
-import { ChargeConstants } from '@constants';
+import { NgProgress } from '@ngx-progressbar/core';
+import { SystemFileManageRepo } from '@repositories';
+import _uniq from 'lodash/uniq';
+import { ToastrService } from 'ngx-toastr';
+import { combineLatest, of } from 'rxjs';
+import { catchError, concatMap, finalize, map, mergeMap, takeUntil } from 'rxjs/operators';
+import { AppList } from 'src/app/app.list';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { TransactionTypeEnum } from 'src/app/shared/enums';
+import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
+import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
+import { SortService } from 'src/app/shared/services';
+import { ShareBussinessCdNoteAddAirPopupComponent } from '../add-cd-note/add-cd-note.popup';
+import { ShareBussinessCdNoteDetailAirPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
 
 @Component({
     selector: 'cd-note-list-air',
@@ -42,13 +44,16 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
 
     isDesc = true;
     sortKey: string = '';
+    comfirmEdoc = false;
 
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
         private _sortService: SortService,
-        private _activedRoute: ActivatedRoute
+        private _activedRoute: ActivatedRoute,
+        private _exportRepo: ExportRepo,
+        private _fileMngtRepo: SystemFileManageRepo
 
     ) {
         super();
@@ -235,6 +240,10 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
         this.componentRef.instance.frm.nativeElement.submit();
         this.componentRef.instance.show();
     }
+    // closeReport(): void {
+    //     //this.componentRef.instance.clear();
+    //     this.componentRef.instance.hide();
+    // }
 
     renderAndShowReport() {
         // * Render dynamic
@@ -248,6 +257,43 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                 this.subscription.unsubscribe();
                 this.reportContainerRef.viewContainerRef.clear();
             });
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.idMasterBill,
+                            hblId: SystemConstants.EMPTY_GUID,
+                            templateCode: this.cdNotePrint[0].type,
+                            transactionType: TransactionTypeEnum[this.transactionType]
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        //this.closeReport();
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 
     checkValidCDNote() {
@@ -309,6 +355,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                 },
             );
     }
+
 
     previewCdNote(data: string) {
         if (!this.checkValidCDNote()) {

@@ -1227,7 +1227,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if (string.IsNullOrEmpty(cdNo))
             {
-                cdNoteDetails.CDNote.Code = string.Join(';', cdNoList);
+                cdNoteDetails.CDNote.Code = string.Join('-', cdNoList);
             }
             cdNoteDetails.ProductService = opsTransaction?.ProductService;
             cdNoteDetails.ServiceMode = opsTransaction?.ServiceMode;
@@ -1398,7 +1398,7 @@ namespace eFMS.API.Documentation.DL.Services
             var firstAcctCDNote = acctCdNoteList.FirstOrDefault();
             var cdNoteDetail = DataContext.Get(x => x.Id == firstAcctCDNote.Id);
             model.CDNote = mapper.Map<AcctCdnote>(firstAcctCDNote);
-            model.CDNote.Code = string.Join(";", acctCdNoteList.Select(x => x.Code));
+            model.CDNote.Code = string.Join("-", acctCdNoteList.Select(x => x.Code));
             var opsTransaction = opstransRepository.Get(x => x.Id == firstAcctCDNote.JobId).FirstOrDefault();
             if (opsTransaction == null)
             {
@@ -1662,8 +1662,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = model.CDNote.Code + "_" + "LogisticsDebitNewDNTT" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = model.CDNote.Code + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listSOA);
@@ -1870,8 +1870,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "LogisticCDNotePreviewNew" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(criteria.ExportFormatType);
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = criteria.CreditDebitNo + CrystalEx.GetExtension(criteria.ExportFormatType);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
@@ -2185,8 +2185,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaDebitAgentsNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(format);
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = data.CDNote.Code+ CrystalEx.GetExtension(format);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
@@ -2483,8 +2483,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirShipperDebitNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + CrystalEx.GetExtension(format);
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = data.CDNote.Code + CrystalEx.GetExtension(format);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);

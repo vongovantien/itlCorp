@@ -194,7 +194,6 @@ namespace eFMS.API.Documentation.DL.Services
             model.Id = Guid.NewGuid();
             model.DatetimeModified = model.DatetimeCreated = DateTime.Now;
             model.Active = true;
-
             string contSealNo = string.Empty;
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -1504,8 +1503,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.Hwbno.Replace("/","") + "_" + "SeaImpProofofDelivery" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = "SeaImpProofofDelivery_" + data.Hwbno + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listProof);
@@ -1571,12 +1570,12 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-
+            var jobNo = csTransactionRepo.Get(x => x.Id == data.JobId)?.FirstOrDefault();
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.Hwbno.Replace("/", "") + "_" + "AirImpProofofDelivery" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = jobNo!=null? "AirImpProofofDelivery_" + data.Hwbno + "_" + jobNo.JobNo + ".pdf":"AirImpProofofDelivery_" + data.Hwbno+"_"+".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listProof);
@@ -1636,10 +1635,11 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true
             };
             // Get path link to report
+            var jobNo = csTransactionRepo.Get(x => x.Id == data.JobId)?.FirstOrDefault();
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.Hwbno.Replace("/", "") + "_" + "AirImptDocumentRelease" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = jobNo!=null ? "AirImptDocumentRelease_" + data.Hwbno + "_" + jobNo.JobNo + ".pdf": "AirImptDocumentRelease_" + data.Hwbno + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listDocument);
@@ -1880,8 +1880,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.Hwbno.Replace("/", "") + "_" + "HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = "HouseBillOfLadingITL_" + data.Hwbno+ ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             return result;
@@ -2043,8 +2043,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.Hwbno.Replace("/", "") + "_" + "HouseAirwayBillLastestITL" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = "HouseAirwayBillLastestITL_" + data.Hwbno + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(housebills);
@@ -2078,8 +2078,8 @@ namespace eFMS.API.Documentation.DL.Services
             };
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.Hwbno.Replace("/", "") + "_" + "AirAttachedList" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = "AirAttachedList_"+data.Hwbno + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(housebills);
             result.FormatType = ExportFormatType.PortableDocFormat;
@@ -2145,11 +2145,26 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+            string doNo = null;
+            authorizeLetters.ForEach(x =>
+            {
+                if (x.DONo != null)
+                {
+                    if (doNo == null)
+                    {
+                        doNo = x.DONo;
+                    }
+                    else
+                    {
+                        doNo = doNo + "-" + x.DONo.Replace("/", "");
+                    }
+                }
+            });
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.Hwbno.Replace("/", "") + "_" + "AirImptAuthorisedLetter" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = doNo!=null?doNo+".pdf": "AirImptAuthorisedLetter_" + data.Hwbno + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(authorizeLetters);
@@ -2216,12 +2231,26 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-
+            string doNo = null;
+            authorizeLetters.ForEach(x =>
+            {
+                if (x.DONo != null)
+                {
+                    if (doNo == null)
+                    {
+                        doNo = x.DONo;
+                    }
+                    else
+                    {
+                        doNo = doNo + "-" + x.DONo.Replace("/", "");
+                    }
+                }
+            });
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.Hwbno.Replace("/", "") + "_" + "AirImptAuthorisedLetter_Consign" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = doNo!=null?doNo+".pdf":"AirImptAuthorisedLetter_Consign_" + data.Hwbno + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(authorizeLetters);
@@ -2277,8 +2306,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.Hwbno.Replace("/", "") + "_" + "BookingNoteAir" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = "BookingNoteAir"+"_"+bookingNotes.FirstOrDefault().HawbNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(bookingNotes);

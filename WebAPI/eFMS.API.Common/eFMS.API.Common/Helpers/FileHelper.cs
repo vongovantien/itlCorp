@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -116,14 +118,14 @@ namespace eFMS.API.Common.Helpers
         }
         public static string RenameFileS3(string fileName)
         {
-            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#+:'*?<>|%@$-]+", "") + "_" + StringHelper.RandomString(5);
+            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#+:'*?<>|%@$]+", "") + "_" + StringHelper.RandomString(5);
         }
         public static async Task<byte[]> DownloadFile(string url)
         {
             using (var client = new HttpClient())
             {
                 using (var result = await client.GetAsync(url))
-                {
+                { 
                     if (result.IsSuccessStatusCode)
                     {
                         return await result.Content.ReadAsByteArrayAsync();
@@ -131,6 +133,45 @@ namespace eFMS.API.Common.Helpers
                 }
             }
             return null;
+        }
+
+
+        public static byte[] GetZipArchive(List<InMemoryFile> files)
+        {
+            byte[] archiveFile;
+            using (var archiveStream = new MemoryStream())
+            {
+                using (var archive = new ZipArchive(archiveStream, ZipArchiveMode.Create, true))
+                {
+                    foreach (var file in files)
+                    {
+                        var zipArchiveEntry = archive.CreateEntry(file.FileName, System.IO.Compression.CompressionLevel.Fastest);
+
+                        using (var zipStream = zipArchiveEntry.Open())
+                        {
+                            zipStream.Write(file.Content, 0, file.Content.Length);
+                        }
+                    }
+                }
+
+                archiveFile = archiveStream.ToArray();
+            }
+
+            return archiveFile;
+        }
+
+        public class InMemoryFile
+        {
+            public string FileName { get; set; }
+
+            public byte[] Content { get; set; }
+        }
+
+        public static byte[] streamToByteArray(Stream input)
+        {
+            MemoryStream ms = new MemoryStream();
+            input.CopyTo(ms);
+            return ms.ToArray();
         }
     }
 }

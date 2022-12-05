@@ -177,10 +177,14 @@
                                                     <span>{{doc.systemFileName}} </span>
                                                 </td>
                                                 <td>
-                                                    <a class="text-underline" [href]="doc.imageUrl"
+                                                    <!-- <a class="text-underline" [href]="doc.imageUrl"
                                                         target="_blank">{{doc.userFileName}}
                                                         <icon-file [url]="doc.userFileName"></icon-file>
-                                                    </a>
+                                                    </a> -->
+                                                    <a class="text-underline htmlLink" (click)="viewEdocFromName(doc.imageUrl)"
+                                                    download>{{doc.userFileName}}
+                                                    <icon-file [url]="doc.imageUrl"></icon-file>
+                                                </a>
                                                 </td>
                                                 <td>
                                                     <span>{{doc.hblNo}}</span>
@@ -236,10 +240,14 @@
                                         [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
                                         <td>{{i + 1}}</td>
                                         <td>
-                                            <a class="text-underline" [href]="doc.imageUrl" target="_blank"
+                                            <!-- <a class="text-underline" [href]="doc.imageUrl" target="_blank"
                                                 download>{{doc.systemFileName}}
                                                 <icon-file [url]="doc.userFileName"></icon-file>
-                                            </a>
+                                            </a> -->
+                                            <a class="text-underline htmlLink" (click)="viewEdocFromName(doc.imageUrl)"
+                                            download>{{doc.systemFileName}}
+                                            <icon-file [url]="doc.imageUrl"></icon-file>
+                                        </a>
                                         </td>
                                         <td>
                                             <span>{{doc.documentTypeName}}</span>

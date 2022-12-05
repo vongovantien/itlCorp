@@ -56,7 +56,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     jobNo: string = '';
     private _readonly: boolean = false;
     isView: boolean = true;
-    elementInput: HTMLElement = null
+    elementInput: HTMLElement = null;
+
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
         { title: 'Real File Name', field: 'userFileName', sortable: true },
@@ -193,7 +194,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     (data) => {
                         if (!!data) {
                             for (let element of data) {
-                                this.jobs.push({ jobNo: element.jobId, })
+                                console.log(element);
+
+                                this.jobs.push({ jobNo: element.jobId, id: element.shipmentId })
                             }
                         }
                     }
@@ -206,7 +209,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     (data) => {
                         if (!!data) {
                             for (let element of data.groupShipments) {
-                                this.jobs.push({ jobNo: element.jobId, })
+                                console.log(element);
+                                this.jobs.push({ jobNo: element.jobId, id: element.shipmentId })
                             }
                         }
                     }
@@ -434,7 +438,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             chillId: null,
             fileName: this.typeFrom === 'Shipment' ? this.jobNo : this.billingNo
         }
-        this._systemFileRepo.dowloadallAttach(model)
+        this._systemFileRepo.dowloadallEDoc(model)
             .subscribe(
                 (res: any) => {
                     this.downLoadFile(res, "application/zip", model.fileName);

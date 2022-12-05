@@ -169,5 +169,14 @@ namespace eFMS.API.SystemFileManagement.Controllers
                 return Ok(hs.Message);
             return BadRequest(hs);
         }
+
+        [HttpPost("DowloadAllEDoc")]
+        public async Task<IActionResult> DowloadAllEDoc(FileDowloadZipModel m)
+        {
+            HandleState hs = await _edocService.CreateEDocZip(m);
+            if (hs.Success)
+                return File((byte[])hs.Message, "application/zip", m.FileName);
+            return BadRequest(hs);
+        }
     }
 }

@@ -45,5 +45,6 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal FinalExchangeRate { get; set; }
         public decimal AdjustedVND { get; set; }
         public decimal AdjustedUSD { get; set; }
+        public Guid ShipmentId { get; set; }
     }
 }

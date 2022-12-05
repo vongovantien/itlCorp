@@ -2330,7 +2330,7 @@ namespace eFMS.API.Accounting.DL.Services
             var chargeShipments = GetChargesForDetailSoa(soaNo);
 
             var _groupShipments = new List<GroupShipmentModel>();
-            _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL, g.PIC })
+            _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL, g.PIC, g.ShipmentId })
             .Select(s => new GroupShipmentModel
             {
                 PIC = s.Key.PIC,
@@ -2339,7 +2339,8 @@ namespace eFMS.API.Accounting.DL.Services
                 MBL = s.Key.MBL,
                 TotalCredit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Credit)) + " " + se.Key.Currency).ToList()),
                 TotalDebit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Debit)) + " " + se.Key.Currency).ToList()),
-                ChargeShipments = s.ToList()
+                ChargeShipments = s.ToList(),
+                ShipmentId=s.Key.ShipmentId,
             }).ToList();
             data = soaDetail;
             data.TotalCharge = chargeShipments.Count;

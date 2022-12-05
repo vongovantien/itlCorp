@@ -80,7 +80,7 @@ namespace eFMS.API.Setting.DL.Services
                                        )
                                        select new SysImageViewModel
                                        {
-                                           FolderName = soa.Soano,
+                                           FolderName = "SOA"+soa.Soano,
                                            DateTimeCreated = d.DateTimeCreated,
                                            UserCreated = d.UserCreated,
                                            ObjectId = d.ObjectId

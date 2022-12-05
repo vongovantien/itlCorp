@@ -1,25 +1,26 @@
+import { HttpResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { ToastrService } from 'ngx-toastr';
+import { ActivatedRoute } from '@angular/router';
+import { ChargeConstants, SystemConstants } from '@constants';
+import { delayTime } from '@decorators';
+import { InjectViewContainerRefDirective } from '@directives';
+import { Crystal } from '@models';
+import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
-import { SortService } from 'src/app/shared/services';
 import _uniq from 'lodash/uniq';
+import { ToastrService } from 'ngx-toastr';
+import { combineLatest, of } from 'rxjs';
+import { catchError, concatMap, finalize, map, mergeMap, takeUntil } from 'rxjs/operators';
+import { AppList } from 'src/app/app.list';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { ReportPreviewComponent } from 'src/app/shared/common/report-preview/report-preview.component';
+import { TransactionTypeEnum } from 'src/app/shared/enums';
+import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from 'src/app/shared/repositories';
+import { SortService } from 'src/app/shared/services';
+import { TransactionActions } from '../../../store';
 import { ShareBussinessCdNoteAddPopupComponent } from '../add-cd-note/add-cd-note.popup';
 import { ShareBussinessCdNoteDetailPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
-import { Store } from '@ngrx/store';
-import { TransactionActions } from '../../../store';
-import { combineLatest } from 'rxjs';
-import { TransactionTypeEnum } from 'src/app/shared/enums';
-import { ActivatedRoute } from '@angular/router';
-import { ReportPreviewComponent } from '@common';
-import { InjectViewContainerRefDirective } from '@directives';
-import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
-import { delayTime } from '@decorators';
-import { Crystal } from '@models';
-import { ChargeConstants } from '@constants';
 
 @Component({
     selector: 'cd-note-list',
@@ -52,7 +53,9 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         private _progressService: NgProgress,
         private _sortService: SortService,
         private _store: Store<TransactionActions>,
-        private _activedRouter: ActivatedRoute
+        private _activedRouter: ActivatedRoute,
+        private _exportRepo: ExportRepo,
+        private _fileMngtRepo: SystemFileManageRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -286,6 +289,44 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 this.subscription.unsubscribe();
                 this.reportContainerRef.viewContainerRef.clear();
             });
+
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.idMasterBill,
+                            hblId: SystemConstants.EMPTY_GUID,
+                            templateCode: this.cdNotePrint[0].type,
+                            transactionType: TransactionTypeEnum[this.transactionType]
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        //this.closeReport();
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 
     checkValidCDNote() {
