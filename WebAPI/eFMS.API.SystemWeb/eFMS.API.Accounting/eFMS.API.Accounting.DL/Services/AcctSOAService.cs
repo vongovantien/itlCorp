@@ -292,6 +292,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soa.ReasonReject = soaCurrent.ReasonReject;
                 soa.ExcRateUsdToLocal = soa.ExcRateUsdToLocal != null ? soa.ExcRateUsdToLocal : soaCurrent.ExcRateUsdToLocal;
                 soa.NetOff = soaCurrent.NetOff;
+                soa.SalemanId = soaCurrent.SalemanId;
                 if (string.IsNullOrEmpty(model.CreatorShipment))
                 {
                     soa.CreatorShipment = model.CreatorShipment;
