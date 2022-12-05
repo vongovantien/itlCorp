@@ -195,24 +195,36 @@
                                                 [(ngModel)]="invoiceNoAll">
                                         </div>
                                     </div>
-                            
+                                    <div class="col-lg-3">
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger': confirmInvoice && !this.seriesNoAll}">
+                                            <label>Series No</label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                autocomplete="nope" placeholder="Series No" [(ngModel)]="seriesNoAll">
+                                        </div>
+                                    </div>
                                     <div class="col-lg-5" [formGroup]="formSearch">
                                         <div class="form-group" [ngClass]="{'m-form__group has-danger': confirmInvoice && (!this.invoiceDateAll.value || !this.invoiceDateAll.value.startDate)}">
                                             <label>Invoice Date</label>
                                             <div class="row">
-                                                <div class="col-lg-8"
-                                                >
+                                                <div class="col-lg-8">
                                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                                            [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                                            [alwaysShowCalendars]="true" name="daterange" placeholder="Select Service Date" readonly
-                                                            formControlName="invoiceDateAll" (remove)="resetInvoiceDateAll()" calendar
-                                                            [allowRemove]="!!invoiceDateAll.value && !!invoiceDateAll.value.startDate" />
+                                                        <input type="text" class="form-control m-input m-input--square"
+                                                            ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}"
+                                                            [autoApply]="true" [singleDatePicker]="true"
+                                                            [alwaysShowCalendars]="true" name="daterange"
+                                                            placeholder="Select Service Date" readonly
+                                                            formControlName="invoiceDateAll" calendar />
+                                                        <span class="m-input-icon_clear" (click)="resetInvoiceDateAll()"
+                                                            *ngIf="!!invoiceDateAll.value && !!invoiceDateAll.value.startDate">
+                                                            <i class="la la-times"></i>
+                                                        </span>
                                                     </div>
                                                 </div>
+
                                                 <div class="col-lg-4">
                                                     <button class="btn btn-success btn-sm m-btn--pill m-btn--icon m-btn--icon-only"
-                                                        title="Apply inoice no/date" (click)="onChangeAllInvoice()">
+                                                        title="Apply invoice no/date, series No" (click)="onChangeAllInvoice()">
                                                         <i class="la la-arrow-circle-down"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-default m-btn--pill m-btn--icon m-btn--icon-only"
@@ -220,7 +232,7 @@
                                                         <i class="la la-close"></i>
                                                     </button>
                                                 </div>
-                            
+
                                             </div>
                                         </div>
                                     </div>
@@ -268,7 +280,7 @@
                                     </label>
                                 </th>
                             </thead>
-                            <tbody class="tbody-group">                                
+                            <tbody class="tbody-group">
                                     <tr class="child"
                                         *ngFor="let charge of shipment.chargeSettlements; let i = index; trackBy:trackByFn">
                                         <td class="table-actions-col">
@@ -322,7 +334,7 @@
                                         <td>
                                             <div class="form-group col-md-12 dropdown-partner" dropdown>
                                                 <input type="text" class="dropdown-toggle form-control" dropdownToggle
-                                                    readonly placeholder="Vat Partner" [(ngModel)]="charge.vatPartnerShortName" 
+                                                    readonly placeholder="Vat Partner" [(ngModel)]="charge.vatPartnerShortName"
                                                     (click)="loadDynamicComoGrid(charge,i)">
                                                     <ng-container>
                                                         <div class="d-flex justify-content-end dropdown-partner__header">
