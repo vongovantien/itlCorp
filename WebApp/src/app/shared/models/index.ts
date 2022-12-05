@@ -26,6 +26,7 @@ export * from './catalogue/catContract.model';
 export { ChargeGroup, Charge } from './catalogue/catCharge.model';
 export * from './catalogue/district.model';
 export * from './catalogue/catBank.model';
+export * from './catalogue/catStandardCharge.model';
 
 export { SoaCharge, SOA } from './accouting/soa.model';
 export * from './accouting/soa-search-charge';

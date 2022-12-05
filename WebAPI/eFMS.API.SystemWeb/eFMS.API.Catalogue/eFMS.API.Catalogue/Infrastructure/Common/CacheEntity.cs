@@ -19,6 +19,7 @@
         CatUnit,
         CatContract,
         catChartOfAccounts,
-        CatBank
+        CatBank,
+        CatStandardCharge
     }
 }
