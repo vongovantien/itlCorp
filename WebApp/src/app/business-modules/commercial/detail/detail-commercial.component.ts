@@ -146,10 +146,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         this.formCreate.countryIdName = partner.countryName;
         this.formCreate.formGroup.patchValue({
             accountNo: this.isAddSubPartner ? null : partner.accountNo,
-            partnerNameEn: partner.partnerNameEn,
-            partnerNameVn: partner.partnerNameVn,
-            shortName: partner.shortName,
-            taxCode: this.isAddSubPartner ? null : partner.taxCode,
+            partnerNameEn: this.isAddSubPartner ? null : partner.partnerNameEn,
+            partnerNameVn: this.isAddSubPartner ? null : partner.partnerNameVn,
+            shortName: this.isAddSubPartner ? null : partner.shortName,
+            taxCode: partner.taxCode,
             internalReferenceNo: partner.internalReferenceNo,
             addressShippingEn: partner.addressShippingEn,
             addressShippingVn: partner.addressShippingVn,
@@ -176,7 +176,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             this.formCommercialComponent.isDisabled = false;
         }
         else {
-            this.formCommercialComponent.isDisabled = true;
+            console.log(this.formCommercialComponent.isDisabled);
         }
         this.contractList.partnerLocation = partner.partnerLocation;
         this.payableComponent.payableForm.patchValue({

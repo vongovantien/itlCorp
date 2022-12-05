@@ -50,7 +50,7 @@
                                 [ngClass]="{'m-form__group has-danger':(isSubmitted || taxCode.dirty) && !taxCode.valid }">
                                 <label required>Tax Code</label>
                                 <input type="text" class="form-control" formControlName="taxCode"
-                                    [attr.disabled]="active ? 'disabled' : null"
+                                    [attr.disabled]="!!parentName && parentName!=partnerNameEn.value ? 'disabeld' : null"
                                     (blur)="getInforCompanyByTaxCode(this.taxCode.value)">
                                 <div class="form-control-feedback"
                                     *ngIf="(isSubmitted &&
@@ -73,8 +73,7 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger':(isSubmitted || internalReferenceNo.dirty) && !internalReferenceNo.valid}">
                                 <label>Internal Reference</label>
-                                <input [attr.disabled]="isDisabled === true ? 'disabeld' : null" #focusInput type="text"
-                                    class="form-control" formControlName="internalReferenceNo">
+                                <input #focusInput type="text" class="form-control" formControlName="internalReferenceNo">
                                 <div class="form-control-feedback" *ngIf="isSubmitted &&
                                 ((internalReferenceNo.errors | equalError: 'maxlength' )|| (internalReferenceNo.errors | equalError: 'minlength'))
                                 ">
