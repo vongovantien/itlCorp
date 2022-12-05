@@ -11,4 +11,4 @@ export enum SOAActionTypes {
 export const SearchListSOA = createAction(SOAActionTypes.SEARCH_LIST, props<Partial<any>>());
 export const LoadListSOA = createAction(SOAActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());
 export const LoadListSOASuccess = createAction(SOAActionTypes.LOAD_LIST_SUCCESS, props<CommonInterface.IResponsePaging>());
-export const LoadSOADetailSuccess = createAction(SOAActionTypes.LOAD_SOA_DETAIL_SUCCESS, props<{ detai: SOA }>());
+export const LoadSOADetailSuccess = createAction(SOAActionTypes.LOAD_SOA_DETAIL_SUCCESS, props<{ detail: SOA }>());

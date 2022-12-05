@@ -19,7 +19,7 @@ import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { StatementOfAccountPaymentMethodComponent } from '../components/poup/payment-method/soa-payment-method.popup';
 import { LoadSOADetailSuccess } from '../store/actions';
-
+import groupBy from 'lodash/groupBy'
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -124,10 +124,10 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
                 (res: any) => {
                     this.soa = new SOA(res);
                     this.soaId = res.id;
-                    console.log(this.soaId);
                     this.totalItems = this.soa.chargeShipments.length;
                     this.initGroup = this.soa.groupShipments;
-                    this._store.dispatch(LoadSOADetailSuccess(res));
+                    this.soa.shipment = Object.keys(groupBy(this.initGroup, 'jobId')).length || 0;
+                    this._store.dispatch(LoadSOADetailSuccess({ detail: res }));
                 },
             );
     }
