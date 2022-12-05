@@ -206,7 +206,7 @@ namespace eFMS.API.Accounting.Controllers
                     if (modelReceivableList.Count > 0)
                     {
                         await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
-                        //await _eDocService.DeleteEdocByBillingNo(settlementNo);
+                        await _eDocService.DeleteEdocByBillingNo(settlementNo);
                     }
                 });
             }
@@ -496,11 +496,11 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            var hsGenEdoc = _eDocService.GenerateEdocSettlement(model);
-            if (hsGenEdoc.Result.Code == 403)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }
+            //var hsGenEdoc = _eDocService.GenerateEdocSettlement(model);
+            //if (hsGenEdoc.Result.Code == 403)
+            //{
+            //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            //}
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
