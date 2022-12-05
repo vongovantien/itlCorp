@@ -1,19 +1,19 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { NgSelectModule } from '@ng-select/ng-select';
-import { NgProgressModule } from '@ngx-progressbar/core';
-import { ModalModule } from 'ngx-bootstrap/modal';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { TabsModule } from 'ngx-bootstrap/tabs';
-import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
-import { SharedModule } from 'src/app/shared/shared.module';
-import { SharedOperationModule } from '../shared-operation.module';
-import { CustomClearanceAddnewComponent } from './addnew/custom-clearance-addnew.component';
-import { CustomClearanceFormDetailComponent } from './components/form-detail-clearance/form-detail-clearance.component';
-import { CustomClearanceFormSearchComponent } from './components/form-search-custom-clearance/form-search-custom-clearance.component';
 import { CustomClearanceComponent } from './custom-clearance.component';
+import { Routes, RouterModule } from '@angular/router';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { TabsModule } from 'ngx-bootstrap/tabs';
+import { NgProgressModule } from '@ngx-progressbar/core';
+import { CustomClearanceFormSearchComponent } from './components/form-search-custom-clearance/form-search-custom-clearance.component';
+import { CustomClearanceAddnewComponent } from './addnew/custom-clearance-addnew.component';
 import { CustomClearanceEditComponent } from './detail/custom-clearance-edit.component';
 import { CustomClearanceImportComponent } from './import/custom-clearance-import.component';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { SharedOperationModule } from '../shared-operation.module';
+
 
 const routing: Routes = [
     {

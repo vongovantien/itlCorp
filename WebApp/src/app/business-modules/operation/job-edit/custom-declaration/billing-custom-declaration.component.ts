@@ -1,17 +1,17 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ConfirmPopupComponent } from '@common';
-import { InjectViewContainerRefDirective } from '@directives';
-import { CustomDeclaration } from '@models';
-import { NgProgress } from '@ngx-progressbar/core';
-import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize, takeUntil, tap } from 'rxjs/operators';
-import { AppList } from 'src/app/app.list';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { CatalogueRepo, DocumentationRepo, OperationRepo } from 'src/app/shared/repositories';
 import { PagingService } from 'src/app/shared/services/paging-service';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { AddMoreModalComponent } from './add-more-modal/add-more-modal.component';
+import { OperationRepo, DocumentationRepo, CatalogueRepo } from 'src/app/shared/repositories';
+import { catchError, finalize, takeUntil, tap } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
+import { NgProgress } from '@ngx-progressbar/core';
+import { AppList } from 'src/app/app.list';
+import { CustomDeclaration } from '@models';
+import { InjectViewContainerRefDirective } from '@directives';
+import { ConfirmPopupComponent } from '@common';
+import { ToastrService } from 'ngx-toastr';
 import { AddNewModalComponent } from './add-new-modal/add-new-modal.component';
 
 @Component({
