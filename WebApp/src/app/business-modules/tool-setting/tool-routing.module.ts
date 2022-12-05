@@ -97,7 +97,7 @@ const routes: Routes = [
         resolve: {
             checkMenu: MenuResolveGuard
         },
-    },
+    }
 ];
 
 @NgModule({
