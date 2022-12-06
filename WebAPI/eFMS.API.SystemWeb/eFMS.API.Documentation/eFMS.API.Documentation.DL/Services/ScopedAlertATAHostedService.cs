@@ -1,4 +1,5 @@
-﻿using eFMS.API.Common.Helpers;
+﻿using Cronos;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.IService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,32 +23,33 @@ namespace eFMS.API.Documentation.DL.Services
       
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            do
+            while (!stoppingToken.IsCancellationRequested)
             {
-                int hourSpan = 25 - DateTime.Now.Hour;
-                new LogHelper(string.Format("ScopedAlerHostedService"), DateTime.Now + "\n" + "hourSpan " + hourSpan);
-                int numberOfHours = hourSpan;
-
-                if (hourSpan == 24)
+                await WaitForNextSchedule("0 8 * * 1-5"); // At 8:00am on Monday to Friday
+                using (var scope = services.CreateScope())
                 {
-                    using (var scope = services.CreateScope())
-                    {
-                        var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IScopedProcessingAlertService>();
-                        var dataAtd = scopedProcessingService.GetAlertATDData();
-                        var dataAta = scopedProcessingService.GetAlertATAData();
+                    var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IScopedProcessingAlertService>();
+                    var dataAtd = scopedProcessingService.GetAlertATDData();
+                    var dataAta = scopedProcessingService.GetAlertATAData();
 
-                        scopedProcessingService.AlertATD();
-                        scopedProcessingService.AlertATA();
-                        new LogHelper("ScopedAlertATDHostedService Atd " + hourSpan, JsonConvert.SerializeObject(dataAtd));
-                        new LogHelper("ScopedAlertATAHostedService Ata " + hourSpan, JsonConvert.SerializeObject(dataAta));
-                    }
-                    new LogHelper(string.Format("ScopedAlertHostedService"), "Delay " + hourSpan.ToString() + " To " + DateTime.Now.AddHours(hourSpan) + "\n");
-                    numberOfHours = 24;
+                    scopedProcessingService.AlertATD();
+                    scopedProcessingService.AlertATA();
+                    new LogHelper("ScopedAlertATDHostedService Atd ", JsonConvert.SerializeObject(dataAtd));
+                    new LogHelper("ScopedAlertATAHostedService Ata ", JsonConvert.SerializeObject(dataAta));
                 }
-
-                await Task.Delay(TimeSpan.FromHours(numberOfHours), stoppingToken);
             }
-            while (!stoppingToken.IsCancellationRequested);
+        }
+
+        private async Task WaitForNextSchedule(string cronExpression)
+        {
+            var parsedExp = CronExpression.Parse(cronExpression);
+            var currentUtcTime = DateTimeOffset.UtcNow.UtcDateTime;
+            var occurenceTime = parsedExp.GetNextOccurrence(currentUtcTime);
+
+            var delay = occurenceTime.GetValueOrDefault() - currentUtcTime;
+            new LogHelper(string.Format("ScopedAlertHostedService"), "Delay " + delay + "\n");
+
+            await Task.Delay(delay);
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)
