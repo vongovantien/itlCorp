@@ -201,7 +201,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
         this.openPopupDetail($event.jobId, $event.code);
     }
 
-    onDeletedCisOrigindNote() {
+    onDeletedCdNote() {
         this.getListCdNote(this.idMasterBill);
     }
 
