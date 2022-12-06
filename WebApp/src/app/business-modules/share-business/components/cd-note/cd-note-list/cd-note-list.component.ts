@@ -10,7 +10,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import _uniq from 'lodash/uniq';
 import { ToastrService } from 'ngx-toastr';
 import { combineLatest, of } from 'rxjs';
-import { catchError, concatMap, finalize, map, mergeMap, takeUntil } from 'rxjs/operators';
+import { catchError, concatMap, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common/report-preview/report-preview.component';
@@ -43,7 +43,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
-
+    selectedCdNote: AcctCDNote = null;
     isDesc = true;
     sortKey: string = '';
 
@@ -378,5 +378,88 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                     }
                 },
             );
+    }
+    previewItem(jobId: string, cdNote:string , currency: string = 'VND') {
+        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
+            this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
+                .pipe(
+            ).subscribe(
+                (res: any) => {
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
+                },
+            );
+        } else {
+            this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: any) => {
+                        if (res != null) {
+                            if (res?.dataSource?.length > 0) {
+                                this.dataReport = res;
+                                this.renderAndShowReport();
+                            } else {
+                                this._toastService.warning('There is no data to display preview');
+                            }
+                        }
+                    },
+                );
+        }
+    }
+
+    onSelectCdNote(cd: AcctCDNote) {
+        this.selectedCdNote = cd;
+        
+    }
+    exportItem(jobId: string, cdNote:string, format: string) {
+        let url: string;
+        let _format = 0;
+        switch (format) {
+            case 'PDF':
+                _format = 5;
+                break;
+            case 'WORD':
+                _format = 3;
+                break;
+            case 'EXCEL':
+                _format = 4;
+                break;
+            default:
+                _format = 5;
+                break;
+        }
+        this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+        .pipe(
+            switchMap((detail) => {
+                if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport)
+                {
+                    return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                }
+                else{
+                    return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format })
+                }
+            }),
+            concatMap((x) => {
+                url = x.pathReportGenerate;
+                return this._exportRepo.exportCrystalReportPDF(x);
+            })
+        ).subscribe(
+            (res: any) => {
+
+            },
+            (error) => {
+                this._exportRepo.downloadExport(url);
+            },
+            () => {
+                console.log(url);
+            }
+        );
+  
     }
 }

@@ -11,7 +11,7 @@ import { SystemFileManageRepo } from '@repositories';
 import _uniq from 'lodash/uniq';
 import { ToastrService } from 'ngx-toastr';
 import { combineLatest, of } from 'rxjs';
-import { catchError, concatMap, finalize, map, mergeMap, takeUntil } from 'rxjs/operators';
+import { catchError, concatMap, filter, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
@@ -23,6 +23,7 @@ import { ICustomDeclarationState } from '../../store/reducers/custom-clearance.r
 import { IOPSTransactionState } from '../../store/reducers/operation.reducer';
 import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/ops-cd-note-add.popup';
 import { OpsCdNoteDetailPopupComponent } from '../components/popup/ops-cd-note-detail/ops-cd-note-detail.popup';
+import { getCurrentUserState, IAppState } from '@store';
 
 @Component({
     selector: 'ops-cd-note-list',
@@ -43,6 +44,8 @@ export class OpsCDNoteComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
+    selectedCdNote: AcctCDNote = null;
+
     isDesc = true;
     sortKey: string = '';
 
@@ -373,6 +376,117 @@ export class OpsCDNoteComponent extends AppList {
                     }
                 },
             );
+    }
+    previewItem(jobId: string, cdNote:string, currency: string = 'VND') {
+        let sourcePreview$;
+        if (this.selectedCdNote.type === "DEBIT") {
+            sourcePreview$ = this._documentRepo.validateCheckPointContractPartner({
+                partnerId: this.selectedCdNote.partnerId,
+                hblId: this.selectedCdNote.hblid,
+                transactionType: 'CL',
+                type: 3
+            }).pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                    return this._documentRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency });            
+                }
+                this._toastService.warning(res.message);
+                return of(false);
+            })
+        )
+        }
+        else {
+            sourcePreview$ = this._documentRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency });
+        }
+        sourcePreview$
+            .subscribe(
+                (res: any) => {
+                    if (res != null && res?.dataSource.length > 0) {
+                        this.dataReport = res;
+                        this.renderAndShowReport();
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+    onSelectCdNote(cd: AcctCDNote) {
+        this.selectedCdNote = cd;
+        
+    }
+    exportItem(jobId: string, cdNote:string, format: string) {
+        let url: string;
+        let _format = 0;
+        switch (format) {
+            case 'PDF':
+                _format = 5;
+                break;
+            case 'WORD':
+                _format = 3;
+                break;
+            case 'EXCEL':
+                _format = 4;
+                break;
+            default:
+                _format = 5;
+                break;
+        }
+        let sourcePreview$;
+        if (this.selectedCdNote.type === "DEBIT") {
+            sourcePreview$ = this._documentRepo.validateCheckPointContractPartner({
+                partnerId: this.selectedCdNote.partnerId,
+                hblId: this.selectedCdNote.hblid,
+                transactionType: 'CL',
+                type: 3
+            }).pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._store.select(getCurrentUserState)
+                            .pipe(
+                                filter((c: any) => !!c.userName),
+                                switchMap((currentUser: SystemInterface.IClaimUser) => {
+                                    if (!!currentUser.userName) {
+                                        return this._exportRepo.exportCDNote(jobId, cdNote, currentUser.officeId)
+                                    }
+                                }),
+                                takeUntil(this.ngUnsubscribe),
+                            );
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+            )
+        } else {
+            this._documentRepo.getDetailsCDNote(jobId, cdNote)
+            .pipe(
+                switchMap((detail) => {
+                    return this._documentRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                }),
+                concatMap((x) => {
+                    url = x.pathReportGenerate;
+                    return this._exportRepo.exportCrystalReportPDF(x);
+                })
+            ).subscribe(
+                (res: any) => {
+
+                },
+                (error) => {
+                    this._exportRepo.downloadExport(url);
+                },
+                () => {
+                    console.log(url);
+                }
+            );
+        }
+        sourcePreview$.subscribe(
+            (response: any) => {
+                if (response != null) {
+                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
+                } else {
+                    this._toastService.warning('No data found');
+                }
+            },
+        );   
     }
 }
 

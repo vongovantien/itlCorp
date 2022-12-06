@@ -12,6 +12,7 @@ namespace eFMS.API.Documentation.DL.Models
         public int total_charge { get; set; }
         public string soaNo { get; set; }
         public object balanceCdNote { get; set; }
+        public Guid Hblid { get; set; }
     }
 
     public class RejectCreditNoteModel
