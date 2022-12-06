@@ -47,7 +47,7 @@ namespace eFMS.API.Documentation.DL.Services
                 //}
 
                 //await Task.Delay(TimeSpan.FromHours(numberOfHours), stoppingToken);
-                await WaitForNextSchedule("0 * * * *");
+                await WaitForNextSchedule("*/10 * * * *");
                 using (var scope = services.CreateScope())
                 {
                     var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IScopedProcessingAlertService>();
