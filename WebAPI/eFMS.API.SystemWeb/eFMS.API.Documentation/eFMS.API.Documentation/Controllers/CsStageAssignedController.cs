@@ -54,7 +54,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 item.Status = TermData.InSchedule;
                 item.Type = DocumentConstants.FROM_USER;
-                item.MainPersonInCharge = item.RealPersonInCharge = currentUser.UserID;
+                item.RealPersonInCharge = item.MainPersonInCharge;
                 item.UserCreated = item.UserModified = currentUser.UserID;
             }
             var hs = await csStageAssignedService.AddMultipleStageAssigned(jobID, listItem);
