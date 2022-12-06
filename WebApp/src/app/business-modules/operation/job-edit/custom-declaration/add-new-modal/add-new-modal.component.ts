@@ -72,8 +72,10 @@ export class AddNewModalComponent extends PopupBase implements OnInit, AfterView
         if (this.detailComponent.formGroup.invalid || (!!this.detailComponent.clearanceDate.value && !this.detailComponent.clearanceDate.value.startDate)) {
             return;
         }
+        if (!this.detailComponent.customDeclaration.mblid) {
+            this.detailComponent.customDeclaration.mblid = this.detailComponent.customDeclaration.hblid;
+        }
         this.detailComponent.customDeclaration.jobNo = this.currentJob.jobNo;
-
         this._operationRepo.addCustomDeclaration(this.detailComponent.customDeclaration)
             .subscribe((res: CommonInterface.IResult) => {
                 if (!!res && res.status) {
