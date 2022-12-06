@@ -40,6 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
+  <PackageReference Include="Cronos" Version="0.7.1" />
   <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" PrivateAssets="All" />   
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="EPPlus.Core" Version="1.5.4" />
