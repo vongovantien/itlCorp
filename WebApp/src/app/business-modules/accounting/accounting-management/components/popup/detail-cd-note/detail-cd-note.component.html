@@ -349,13 +349,13 @@
     </div>
 </div>
 <app-dropdown #exportTpl>
-    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'PDF')">
+    <span class="dropdown-item pointer" (click)="exportItem(cdnoteDetail?.cdNote.jobId, cdnoteDetail?.cdNote.code,'PDF')">
         PDF
     </span>
-    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'EXCEL')">
+    <span class="dropdown-item pointer" (click)="exportItem(cdnoteDetail?.cdNote.jobId, cdnoteDetail?.cdNote.code,'EXCEL')">
         EXCEL
     </span>
-    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'WORD')">
+    <span class="dropdown-item pointer" (click)="exportItem(cdnoteDetail?.cdNote.jobId, cdnoteDetail?.cdNote.code,'WORD')">
         WORD
     </span>
 </app-dropdown>

@@ -1,16 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { DocumentationRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { DocumentationRepo, ExportRepo } from '@repositories';
+import { catchError, concatMap, filter, finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { Crystal } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from '@services';
 import { Store } from '@ngrx/store';
-import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { IAppState, getMenuUserSpecialPermissionState, getCurrentUserState } from '@store';
 import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup';
+import { of } from 'rxjs';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'accounting-detail-cd-note',
@@ -97,7 +99,8 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         private _toastService: ToastrService,
         private _sortService: SortService,
         private _store: Store<IAppState>,
-        private _spinner: NgxSpinnerService,) {
+        private _spinner: NgxSpinnerService,
+        private _exportRepo: ExportRepo) {
         super();
         this.requestSort = this.sortChargeCdNote;
     }
@@ -311,5 +314,48 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
     }
     onSaveAdjustDebit() {
         this.getDetailCdNote(this.jobId, this.cdNote);
+    }
+    exportItem(jobId: string, cdNote:string, format: string) {
+        let url: string;
+        let _format = 0;
+        switch (format) {
+            case 'PDF':
+                _format = 5;
+                break;
+            case 'WORD':
+                _format = 3;
+                break;
+            case 'EXCEL':
+                _format = 4;
+                break;
+            default:
+                _format = 5;
+                break;
+        }
+        this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+        .pipe(
+            switchMap((detail) => {
+                if (this.cdNote.includes('CL')) {
+                    return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                } else if(this.cdNote.includes('AE') || this.cdNote.includes('AI')) {
+                    return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                }
+                return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+            }),
+            concatMap((x) => {
+                url = x.pathReportGenerate;
+                return this._exportRepo.exportCrystalReportPDF(x);
+            })
+        ).subscribe(
+            (res: any) => {
+
+            },
+            (error) => {
+                this._exportRepo.downloadExport(url);
+            },
+            () => {
+                console.log(url);
+            }
+        );  
     }
 }
