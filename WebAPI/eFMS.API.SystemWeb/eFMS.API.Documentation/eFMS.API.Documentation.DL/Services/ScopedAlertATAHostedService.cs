@@ -23,11 +23,27 @@ namespace eFMS.API.Documentation.DL.Services
       
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            do
+            while (!stoppingToken.IsCancellationRequested)
             {
-                int hourSpan = 25 - DateTime.Now.Hour;
-                new LogHelper(string.Format("ScopedAlerHostedService"), DateTime.Now + "\n" + "hourSpan " + hourSpan);
-                int numberOfHours = hourSpan;
+                // Schedule the job every minute.
+                await WaitForNextSchedule("0 * * * *");
+                using (var scope = services.CreateScope())
+                {
+                    var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IScopedProcessingAlertService>();
+                    var dataAtd = scopedProcessingService.GetAlertATDData();
+                    var dataAta = scopedProcessingService.GetAlertATAData();
+
+                    scopedProcessingService.AlertATD();
+                    scopedProcessingService.AlertATA();
+                    new LogHelper("ScopedAlertATDHostedService Atd ", JsonConvert.SerializeObject(dataAtd));
+                    new LogHelper("ScopedAlertATAHostedService Ata ", JsonConvert.SerializeObject(dataAta));
+                }
+            }
+            //do
+            //{
+                //int hourSpan = 25 - DateTime.Now.Hour;
+                //new LogHelper(string.Format("ScopedAlerHostedService"), DateTime.Now + "\n" + "hourSpan " + hourSpan);
+                //int numberOfHours = hourSpan;
 
                 //if (hourSpan == 24)
                 //{
@@ -47,20 +63,9 @@ namespace eFMS.API.Documentation.DL.Services
                 //}
 
                 //await Task.Delay(TimeSpan.FromHours(numberOfHours), stoppingToken);
-                await WaitForNextSchedule("*/10 * * * *");
-                using (var scope = services.CreateScope())
-                {
-                    var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IScopedProcessingAlertService>();
-                    var dataAtd = scopedProcessingService.GetAlertATDData();
-                    var dataAta = scopedProcessingService.GetAlertATAData();
-
-                    scopedProcessingService.AlertATD();
-                    scopedProcessingService.AlertATA();
-                    new LogHelper("ScopedAlertATDHostedService Atd " + hourSpan, JsonConvert.SerializeObject(dataAtd));
-                    new LogHelper("ScopedAlertATAHostedService Ata " + hourSpan, JsonConvert.SerializeObject(dataAta));
-                }
-            }
-            while (!stoppingToken.IsCancellationRequested);
+                
+            //}
+            //while (!stoppingToken.IsCancellationRequested);
         }
 
         private async Task WaitForNextSchedule(string cronExpression)
