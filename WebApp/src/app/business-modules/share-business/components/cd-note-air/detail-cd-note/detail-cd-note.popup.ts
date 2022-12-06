@@ -396,7 +396,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends DetailCDNoteBas
             sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
                 partnerId: this.CdNoteDetail.partnerId,
                 hblId: this.CdNoteDetail.listSurcharges[0].hblid,
-                transactionType: 'CL',
+                transactionType: 'DOC',
                 type: 3
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {

@@ -258,7 +258,7 @@
 </app-context-menu>
 
 <app-dropdown #previewTpl>
-    <span class="dropdown-item pointer" (click)="previewItemOrigin(selectedCdNote?.jobId, selectedCdNote?.code, true)">
+    <span class="dropdown-item pointer" (click)="previewCdNoteItem(selectedCdNote?.jobId, selectedCdNote?.code, 'ORIGIN')">
         Original
     </span>
     <span class="dropdown-item pointer" (click)="previewCdNoteItem(selectedCdNote?.jobId, selectedCdNote?.code, 'VND')">

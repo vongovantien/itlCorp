@@ -341,20 +341,39 @@ export class ShareBussinessCdNoteListComponent extends AppList {
             );
     }
     previewItem(jobId: string, cdNote:string , currency: string = 'VND') {
-        //test
-        this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: Crystal) => {
-                    this.dataReport = res;
-                    if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
+        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
+            this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
+                .pipe(
+            ).subscribe(
+                (res: any) => {
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport();
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
                     }
                 },
             );
+        } else {
+            this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: any) => {
+                        if (res != null) {
+                            if (res?.dataSource?.length > 0) {
+                                this.dataReport = res;
+                                this.renderAndShowReport();
+                            } else {
+                                this._toastService.warning('There is no data to display preview');
+                            }
+                        }
+                    },
+                );
+        }
     }
+
     onSelectCdNote(cd: AcctCDNote) {
         this.selectedCdNote = cd;
         
@@ -379,7 +398,13 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         this._documentationRepo.getDetailsCDNote(jobId, cdNote)
         .pipe(
             switchMap((detail) => {
-                return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport)
+                {
+                    return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                }
+                else{
+                    return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format })
+                }
             }),
             concatMap((x) => {
                 url = x.pathReportGenerate;

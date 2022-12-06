@@ -41,7 +41,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
-    selectedCdNote: AcctCDNote = null;
+    selectedCdNote: any = null;
     isDesc = true;
     sortKey: string = '';
 
@@ -350,8 +350,8 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
         if (this.selectedCdNote.type === "DEBIT") {
             this.cdNoteDetailPopupComponent.getDetailCdNote(jobId, cdNote);
             sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
-                partnerId: this.cdNoteDetailPopupComponent.CdNoteDetail.partnerId,
-                hblId: this.cdNoteDetailPopupComponent.CdNoteDetail.listSurcharges[0].hblid,
+                partnerId: this.selectedCdNote.partnerId,
+                hblId: this.selectedCdNote.hblid,
                 transactionType: 'DOC',
                 type: 3
             }).pipe(
@@ -403,10 +403,9 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
         }
         let sourcePreview$;
         if (this.selectedCdNote.type === "DEBIT") {
-            this.cdNoteDetailPopupComponent.getDetailCdNote(jobId, cdNote);
             sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
-                partnerId: this.cdNoteDetailPopupComponent.CdNoteDetail.partnerId,
-                hblId: this.cdNoteDetailPopupComponent.CdNoteDetail.listSurcharges[0].hblid,
+                partnerId: this.selectedCdNote.partnerId,
+                hblId: this.selectedCdNote.hblid,
                 transactionType: 'DOC',
                 type: 3
             }).pipe(
@@ -458,44 +457,6 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                 }
             },
         );
-    }
-    previewItemOrigin(jobId: string, cdNote:string, isOrigin: boolean) {
-        this.cdNoteDetailPopupComponent.getDetailCdNote(jobId, cdNote);
-        this.cdNoteDetailPopupComponent.CdNoteDetail.totalCredit = this.cdNoteDetailPopupComponent.CdNoteDetail.listSurcharges.reduce((credit, charge) => credit + charge.credit, 0);
-        this.cdNoteDetailPopupComponent.CdNoteDetail.totalDebit = this.cdNoteDetailPopupComponent.CdNoteDetail.listSurcharges.reduce((debit, charge) => debit + charge.debit, 0);
-        let sourcePreview$;
-        if (this.cdNoteDetailPopupComponent.CdNoteDetail.cdNote.type === "DEBIT") {
-            sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
-                partnerId: this.cdNoteDetailPopupComponent.CdNoteDetail.partnerId,
-                hblId: this.cdNoteDetailPopupComponent.CdNoteDetail.listSurcharges[0].hblid,
-                transactionType: 'DOC',
-                type: 3
-            }).pipe(
-                switchMap((res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        return this._documentationRepo.previewCDNote(this.cdNoteDetailPopupComponent.CdNoteDetail, isOrigin);
-                    }
-                    this._toastService.warning(res.message);
-                    return of(false);
-                })
-
-            )
-        } else {
-            sourcePreview$ = this._documentationRepo.previewCDNote(this.cdNoteDetailPopupComponent.CdNoteDetail, isOrigin);
-        }
-        sourcePreview$
-            .subscribe(
-                (res: any) => {
-                    if (res !== false) {
-                        if (res != null && res?.dataSource?.length > 0) {
-                            this.dataReport = res;
-                            this.renderAndShowReport();
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
-                    }
-                },
-            );
     }
 
 }
