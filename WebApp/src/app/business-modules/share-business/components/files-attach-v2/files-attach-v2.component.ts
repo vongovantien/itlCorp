@@ -433,7 +433,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
     downloadAllEdoc() {
         let model = {
-            folderName: 'Edoc' + this.typeFrom,
+            folderName: this.typeFrom,
             objectId: this.typeFrom === 'Shipment' ? this.jobId : this.billingId,
             chillId: null,
             fileName: this.typeFrom === 'Shipment' ? this.jobNo : this.billingNo
