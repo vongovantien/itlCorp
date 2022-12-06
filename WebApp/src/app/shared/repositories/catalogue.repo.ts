@@ -172,7 +172,7 @@ export class CatalogueRepo {
             }, null, { "hideSpinner": "true" });
     }
 
-    getPartnerGroupsWithCriteria(data: any){
+    getPartnerGroupsWithCriteria(data: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`, data, null, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
@@ -1424,7 +1424,7 @@ export class CatalogueRepo {
         )
     }
 
-    getStandChargeByType(type: string, transactionType: string){
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStandardCharge/GetBy`, { type: type, transactionType: transactionType});
+    getStandChargeByType(type: string, transactionType: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStandardCharge/GetBy`, { type: type, transactionType: transactionType });
     }
 }

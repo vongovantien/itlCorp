@@ -17,7 +17,7 @@ import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/comm
 import { PopupBase } from 'src/app/popup.base';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
-import { AccountingConstants} from '@constants';
+import { AccountingConstants } from '@constants';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -25,7 +25,7 @@ import { AccountingConstants} from '@constants';
 })
 
 export class FormContractCommercialPopupComponent extends PopupBase {
-   
+
     formGroup: FormGroup;
     partners: Observable<Customer[]>;
 
@@ -70,7 +70,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     paymentTerm: AbstractControl;
     firstShipmentDate: AbstractControl;
     creditLimitRate: AbstractControl;
-    
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -237,15 +236,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 Validators.max(365),
                 Validators.maxLength(3)
             ])],
-            paymentTerm: [null,  Validators.compose([
+            paymentTerm: [null, Validators.compose([
                 Validators.min(0),
                 Validators.max(365)
             ])],
             baseOn: [null],
             creditLimit: [],
-            creditLimitRate: [null,  Validators.compose([
+            creditLimitRate: [null, Validators.compose([
                 Validators.min(0),
-                Validators.max(AccountingConstants.MAX_NUMBER_INT)
+                Validators.max(SystemConstants.MAX_NUMBER_INT)
             ])],
             debitAmount: [],
             billingAmount: [],
@@ -932,7 +931,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.minDateExpired = this.createMoment(new Date(value.startDate));
         }
 
-        if (this.effectiveDate.value.startDate != new Date(this.selectedContract.effectiveDate) && value.startDate!=null) {
+        if (this.effectiveDate.value.startDate != new Date(this.selectedContract.effectiveDate) && value.startDate != null) {
             this.minDateExpired = this.createMoment(this.formGroup.get("effectiveDate")?.value?.startDate);
         }
     }
