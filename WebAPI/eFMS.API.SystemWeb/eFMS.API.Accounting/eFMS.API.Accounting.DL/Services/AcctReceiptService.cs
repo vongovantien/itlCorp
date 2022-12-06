@@ -2479,8 +2479,15 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     if (criteria.ReceiptType.ToLower() == "agent")
                     {
-                        invoice.PaidAmountVnd = NumberHelper.RoundNumber((invoice.PaidAmountUsd ?? 0) * (invoice.ExchangeRateBilling ?? 0), 0);
-                        invoice.TotalPaidVnd = NumberHelper.RoundNumber((invoice.TotalPaidUsd ?? 0) * (invoice.ExchangeRateBilling ?? 0), 0);
+                        if (invoice.UnpaidAmountUsd == invoice.PaidAmountUsd)
+                        {
+                            invoice.PaidAmountVnd = invoice.TotalPaidVnd = invoice.UnpaidAmountVnd;
+                        }
+                        else
+                        {
+                            invoice.PaidAmountVnd = NumberHelper.RoundNumber((invoice.PaidAmountUsd ?? 0) * (invoice.ExchangeRateBilling ?? 0), 0);
+                            invoice.TotalPaidVnd = NumberHelper.RoundNumber((invoice.TotalPaidUsd ?? 0) * (invoice.ExchangeRateBilling ?? 0), 0);
+                        }
                     }
                 }
                 else
@@ -2906,7 +2913,7 @@ namespace eFMS.API.Accounting.DL.Services
                            //DueDate = acct.PaymentDueDate,
                            //OfficeId = acct.OfficeId,
                            //CompanyId = acct.CompanyId,
-                           ExchangeRateBilling = GetExchangeRateDebitBilling(acct.sur.Soano, acct.sur.DebitNo),
+                           ExchangeRateBilling = acct.inv.Currency != AccountingConstants.CURRENCY_LOCAL ? acct.sur.FinalExchangeRate : GetExchangeRateDebitBilling(acct.sur.Soano, acct.sur.DebitNo),
                            isExistDebitAR = inv != null ? true : false
 
                        };

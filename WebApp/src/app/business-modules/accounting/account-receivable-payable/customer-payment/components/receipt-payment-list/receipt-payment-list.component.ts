@@ -787,6 +787,14 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         
 
     }
+
+    updateTotalAmount(data: any) {
+        // receipt type agent, khi thay đổi amount vnd trên detail thì update lai final paid amount vnd
+        if (data) {
+            const totalPaidAmountVnd = this.receiptDebitList.sumTotalObj.totalPaidAmountVnd;
+            this.finalPaidAmountVnd.setValue(totalPaidAmountVnd);
+        }
+    }
 }
 
 interface IProcessClearInvoiceModel {

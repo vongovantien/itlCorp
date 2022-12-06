@@ -1,4 +1,4 @@
-import { OnInit, Component, ChangeDetectionStrategy, Input, ViewChild } from "@angular/core";
+import { OnInit, Component, ChangeDetectionStrategy, Input, ViewChild, Output, EventEmitter } from "@angular/core";
 import { AppList } from "@app";
 import { Store } from "@ngrx/store";
 import { ReceiptInvoiceModel } from "@models";
@@ -23,6 +23,7 @@ import { I } from "@angular/cdk/keycodes";
 export class ARCustomerPaymentReceiptDebitListComponent extends AppList implements OnInit {
     @ViewChild(InjectViewContainerRefDirective) viewContainerInject: InjectViewContainerRefDirective;
     @Input() isReadonly: boolean = false;
+    @Output() onChangeDetailDebit: EventEmitter<any> = new EventEmitter<boolean>();
     
     debitList$ = this._store.select(ReceiptDebitListState);
     creditList$: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptCreditListState);
@@ -238,6 +239,9 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                 break;
         }
         this.calculateSumTotalDebit();
+        if (this.isTypeAgent) {
+            this.onChangeDetailDebit.emit(true);
+        }
     }
 
     calculateSumTotalDebit() {
