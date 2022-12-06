@@ -25,8 +25,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                // Schedule the job every minute.
-                await WaitForNextSchedule("0 * * * *");
+                await WaitForNextSchedule("0 8 * * 1-5"); // At 8:00am on Monday to Friday
                 using (var scope = services.CreateScope())
                 {
                     var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IScopedProcessingAlertService>();
@@ -39,33 +38,6 @@ namespace eFMS.API.Documentation.DL.Services
                     new LogHelper("ScopedAlertATAHostedService Ata ", JsonConvert.SerializeObject(dataAta));
                 }
             }
-            //do
-            //{
-                //int hourSpan = 25 - DateTime.Now.Hour;
-                //new LogHelper(string.Format("ScopedAlerHostedService"), DateTime.Now + "\n" + "hourSpan " + hourSpan);
-                //int numberOfHours = hourSpan;
-
-                //if (hourSpan == 24)
-                //{
-                //    using (var scope = services.CreateScope())
-                //    {
-                //        var scopedProcessingService = scope.ServiceProvider.GetRequiredService<IScopedProcessingAlertService>();
-                //        var dataAtd = scopedProcessingService.GetAlertATDData();
-                //        var dataAta = scopedProcessingService.GetAlertATAData();
-
-                //        scopedProcessingService.AlertATD();
-                //        scopedProcessingService.AlertATA();
-                //        new LogHelper("ScopedAlertATDHostedService Atd " + hourSpan, JsonConvert.SerializeObject(dataAtd));
-                //        new LogHelper("ScopedAlertATAHostedService Ata " + hourSpan, JsonConvert.SerializeObject(dataAta));
-                //    }
-                //    new LogHelper(string.Format("ScopedAlertHostedService"), "Delay " + hourSpan.ToString() + " To " + DateTime.Now.AddHours(hourSpan) + "\n");
-                //    numberOfHours = 24;
-                //}
-
-                //await Task.Delay(TimeSpan.FromHours(numberOfHours), stoppingToken);
-                
-            //}
-            //while (!stoppingToken.IsCancellationRequested);
         }
 
         private async Task WaitForNextSchedule(string cronExpression)
