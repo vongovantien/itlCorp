@@ -24,7 +24,7 @@ import _cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
 import { ToastrService } from 'ngx-toastr';
 import { forkJoin, Observable } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map, mergeMap, shareReplay, skip, startWith, takeUntil, tap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, map, mergeMap, shareReplay, skip, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 
 @Component({
@@ -130,6 +130,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     userCreated: string;
     userModified: string;
     hwbnoSeparate: string;
+    shipmentType: string;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -151,6 +152,13 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.loadMasterData();
         this.incoterms = this._catalogueRepo.getIncoterm({ service: ['AE'] });
         if (this.isUpdate) {
+            this._store.select(getDetailHBlState)
+            .pipe(catchError(this.catchError),
+                distinctUntilChanged(),
+                switchMap((shipment: any) => this._store.select(getTransactionDetailCsTransactionState))
+            ).subscribe((res: any) => {
+                this.shipmentType = res.shipmentType;
+            });
             this.getDetailHBLState();
             this.getDimensionState();
         } else {
@@ -824,6 +832,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     getSalesmanList(selectedShipmentType: any) {
+        // console.log(this.shipmenttype.value);
         this.shipmenttype.setValue(selectedShipmentType);
         if (this.shipmentTypeFromStore=="Nominated" &&  this.shipmenttype.value=="Freehand"){
             this.isNotMatchShipmentType = true;

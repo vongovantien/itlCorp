@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo, CatalogueRepo } from '@repositories';
 import { Container } from '@models';
-import { ShareBussinessShipmentGoodSummaryComponent } from '@share-bussiness';
+import { getTransactionState, ITransactionState, ShareBussinessShipmentGoodSummaryComponent } from '@share-bussiness';
 import { ChargeConstants, RoutingConstants } from '@constants';
 import { DataService } from '@services';
 
@@ -41,6 +41,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
 
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
+    shipmentType: string;
 
     constructor(
         protected _documentationRepo: DocumentationRepo,
@@ -159,7 +160,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
         modelUpdate.userCreated = this.hblDetail.userCreated;
-
+        modelUpdate.shipmentType = this.hblDetail.shipmentType;
         this.updateHbl(modelUpdate);
 
     }
