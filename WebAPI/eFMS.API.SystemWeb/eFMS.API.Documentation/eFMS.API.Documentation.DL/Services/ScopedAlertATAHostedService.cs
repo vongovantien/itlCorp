@@ -43,10 +43,10 @@ namespace eFMS.API.Documentation.DL.Services
         private async Task WaitForNextSchedule(string cronExpression)
         {
             var parsedExp = CronExpression.Parse(cronExpression);
-            var currentUtcTime = DateTimeOffset.UtcNow.UtcDateTime;
-            var occurenceTime = parsedExp.GetNextOccurrence(currentUtcTime);
+            var currentTime = DateTimeOffset.Now.DateTime;
+            var occurenceTime = parsedExp.GetNextOccurrence(DateTimeOffset.Now, TimeZoneInfo.Local);
 
-            var delay = occurenceTime.GetValueOrDefault() - currentUtcTime;
+            var delay = occurenceTime.GetValueOrDefault() - currentTime;
             new LogHelper(string.Format("ScopedAlertHostedService"), "Delay " + delay + "\n");
 
             await Task.Delay(delay);
