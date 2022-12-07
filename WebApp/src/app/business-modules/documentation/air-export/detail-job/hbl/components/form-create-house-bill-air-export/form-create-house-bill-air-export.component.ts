@@ -528,8 +528,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         }
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
         this.totalHeightWeight = data.hw;
-        console.log(this.shipmentTypeFromStore);
-        console.log(formValue.shipmenttype);
+
         this._catalogueRepo.GetListSalemanByShipmentType(data.customerId, ChargeConstants.AE_CODE, this.shipmenttype.value)
             .subscribe((salesmans: any) => {
                 this.saleMans = salesmans;
@@ -831,8 +830,17 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.otherCharges = data.charges;
     }
 
+    checkShipmentTypeSelected(selectedShipmentType: any) {
+        this.shipmenttype.setValue(selectedShipmentType);
+        if (this.shipmentTypeFromStore=="Nominated" &&  this.shipmenttype.value=="Freehand"){
+            this.isNotMatchShipmentType = true;
+        }
+        else{
+            this.isNotMatchShipmentType = false;
+        }
+    }
+
     getSalesmanList(selectedShipmentType: any) {
-        // console.log(this.shipmenttype.value);
         this.shipmenttype.setValue(selectedShipmentType);
         if (this.shipmentTypeFromStore=="Nominated" &&  this.shipmenttype.value=="Freehand"){
             this.isNotMatchShipmentType = true;

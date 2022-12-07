@@ -325,10 +325,13 @@ namespace eFMS.API.Documentation.DL.Services
                 model.SalesOfficeId = hb.SalesOfficeId;
                 model.SalesCompanyId = hb.SalesCompanyId;
             }
+            CatPartner customer = new CatPartner();
             var detailJob = DataContext.Where(x => x.JobId == model.JobId).FirstOrDefault();
-            if (detailJob != null && detailJob.ShipmentType=="Nominated" && model.ShipmentType=="Freehand")
+            customer = catPartnerRepo.Get(x => x.Id == model.CustomerId)?.FirstOrDefault();
+            string SalesmanName = sysUserRepo.Get(x => x.Id.ToString() == customer.SalePersonId)?.FirstOrDefault()?.Username;
+            if (detailJob != null && detailJob.ShipmentType =="Nominated" && model.ShipmentType=="Freehand")
             {
-                string errorContract = String.Format("Contract of {0} - {1} - {2} is Cash-Nominated. Shipment type is not match. Please, check it again!", model.CustomerId, model.CustomerName, model.SaleManName);
+                string errorContract = String.Format("Contract of {0} - {1} - {2} is Cash-Nominated. Shipment type is not match. Please, check it again!", customer.AccountNo, customer.PartnerNameEn, SalesmanName);
                 return new HandleState(errorContract);
             }
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
