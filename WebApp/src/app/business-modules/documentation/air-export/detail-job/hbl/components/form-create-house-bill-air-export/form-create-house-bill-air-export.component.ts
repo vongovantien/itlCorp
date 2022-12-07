@@ -842,9 +842,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     getSalesmanList(selectedShipmentType: any) {
         this.shipmenttype.setValue(selectedShipmentType);
-        if (this.shipmentTypeFromStore=="Nominated" &&  this.shipmenttype.value=="Freehand"){
-            this.isNotMatchShipmentType = true;
-        }
         if (!!this.customerId.value) {
             this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.AE_CODE, this.shipmenttype.value)
                 .subscribe(

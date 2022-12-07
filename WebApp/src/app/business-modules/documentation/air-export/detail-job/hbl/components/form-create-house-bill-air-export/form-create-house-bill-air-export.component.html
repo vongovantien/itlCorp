@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !saleManId.value || isNotMatchShipmentType}">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !saleManId.value}">
                         <label required>Salesman In Charge</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'sale')"
                             [currentActiveItemId]="{ field: 'id', value: saleManId.value}"
@@ -95,7 +95,7 @@
                             <div class="form-group" [ngClass]="{'m-form__group has-danger': isNotMatchShipmentType}">
                                 <label>Shipment Type</label>
                                 <ng-select class="custom" [items]="shipmentTypes" placeholder="Please select"
-                                    formControlName="shipmenttype" (change)="checkShipmentTypeSelected($event)" ></ng-select>
+                                    formControlName="shipmenttype" ></ng-select>
                             </div>
                         </div>
                         <div class="col-md-6 pl-0">

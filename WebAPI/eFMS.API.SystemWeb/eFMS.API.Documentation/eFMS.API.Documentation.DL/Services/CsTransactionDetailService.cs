@@ -294,7 +294,8 @@ namespace eFMS.API.Documentation.DL.Services
             model.CompanyId = hb.CompanyId;
             model.UserCreated = hb.UserCreated;
             model.UserModified = currentUser.UserID;
-            // model.ShipmentType = hb.ShipmentType;
+            var detailJob = DataContext.Where(x => x.JobId == model.JobId).FirstOrDefault();
+            model.ShipmentType = detailJob.ShipmentType;
             if (model.SaleManId != hb.SaleManId)
             {
                 changedSalesman = true;
@@ -324,15 +325,6 @@ namespace eFMS.API.Documentation.DL.Services
                 model.SalesDepartmentId = hb.SalesDepartmentId;
                 model.SalesOfficeId = hb.SalesOfficeId;
                 model.SalesCompanyId = hb.SalesCompanyId;
-            }
-            CatPartner customer = new CatPartner();
-            var detailJob = DataContext.Where(x => x.JobId == model.JobId).FirstOrDefault();
-            customer = catPartnerRepo.Get(x => x.Id == model.CustomerId)?.FirstOrDefault();
-            string SalesmanName = sysUserRepo.Get(x => x.Id.ToString() == customer.SalePersonId)?.FirstOrDefault()?.Username;
-            if (detailJob != null && detailJob.ShipmentType =="Nominated" && model.ShipmentType=="Freehand")
-            {
-                string errorContract = String.Format("Contract of {0} - {1} - {2} is Cash-Nominated. Shipment type is not match. Please, check it again!", customer.AccountNo, customer.PartnerNameEn, SalesmanName);
-                return new HandleState(errorContract);
             }
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
