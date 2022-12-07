@@ -658,7 +658,11 @@ namespace eFMS.API.Documentation.DL.Services
             if (detail == null) return null;
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(detail.TransactionType, currentUser);
 
-
+            if(detail.ShipmentType == null)
+            {
+                var detailJob = DataContext.Where(x => x.JobId == detail.JobId).FirstOrDefault();
+                detail.ShipmentType = detailJob.ShipmentType;
+            }
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
 
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
