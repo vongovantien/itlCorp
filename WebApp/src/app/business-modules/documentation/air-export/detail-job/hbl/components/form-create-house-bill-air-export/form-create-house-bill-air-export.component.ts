@@ -112,8 +112,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     shipmentDetail: CsTransaction;
     customerName: string;
-    shipmentTypeFromStore: string;
-    isNotMatchShipmentType: boolean = false;
     AA: string = 'As Arranged';
 
     dims: DIM[] = []; // * Dimension details.
@@ -145,7 +143,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     ngOnInit(): void {
-        this.getShipmentTypeFromDetailShipment();
         this._store.dispatch(new GetCatalogueWarehouseAction());
 
         this.initForm();
@@ -164,16 +161,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         } else {
             this.getDetailShipmentAndSetDefault();
         }
-    }
-
-    getShipmentTypeFromDetailShipment(){
-        this._store.select(getTransactionDetailCsTransactionState)
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (res: any) => {
-                this.shipmentTypeFromStore = res.shipmentType;
-            }
-        );
     }
 
     getDetailShipmentAndSetDefault() {
@@ -828,16 +815,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
         this.formCreate.controls["otherCharge"].setValue(text);
         this.otherCharges = data.charges;
-    }
-
-    checkShipmentTypeSelected(selectedShipmentType: any) {
-        this.shipmenttype.setValue(selectedShipmentType);
-        if (this.shipmentTypeFromStore=="Nominated" &&  this.shipmenttype.value=="Freehand"){
-            this.isNotMatchShipmentType = true;
-        }
-        else{
-            this.isNotMatchShipmentType = false;
-        }
     }
 
     getSalesmanList(selectedShipmentType: any) {
