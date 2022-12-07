@@ -288,7 +288,6 @@ namespace eFMS.API.Documentation.DL.Services
                 isCreateStage = true;
             }
 
-
             model.JobId = hb.JobId;
             model.GroupId = hb.GroupId;
             model.DepartmentId = hb.DepartmentId;
@@ -326,7 +325,12 @@ namespace eFMS.API.Documentation.DL.Services
                 model.SalesOfficeId = hb.SalesOfficeId;
                 model.SalesCompanyId = hb.SalesCompanyId;
             }
-
+            var detailJob = DataContext.Where(x => x.JobId == model.JobId).FirstOrDefault();
+            if (detailJob != null && detailJob.ShipmentType=="Nominated" && model.ShipmentType=="Freehand")
+            {
+                string errorContract = String.Format("Contract of {0} - {1} - {2} is Cash-Nominated. Shipment type is not match. Please, check it again!", model.CustomerId, model.CustomerName, model.SaleManName);
+                return new HandleState(errorContract);
+            }
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             int code = checkOwnerPermission(model) ? 200 : GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);

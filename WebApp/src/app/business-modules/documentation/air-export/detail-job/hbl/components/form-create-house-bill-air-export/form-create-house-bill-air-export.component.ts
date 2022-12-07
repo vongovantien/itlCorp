@@ -112,7 +112,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     shipmentDetail: CsTransaction;
     customerName: string;
-
+    shipmentTypeFromStore: string;
+    isNotMatchShipmentType: boolean = false;
     AA: string = 'As Arranged';
 
     dims: DIM[] = []; // * Dimension details.
@@ -143,6 +144,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     ngOnInit(): void {
+        this.getShipmentTypeFromDetailShipment();
         this._store.dispatch(new GetCatalogueWarehouseAction());
 
         this.initForm();
@@ -154,6 +156,16 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         } else {
             this.getDetailShipmentAndSetDefault();
         }
+    }
+
+    getShipmentTypeFromDetailShipment(){
+        this._store.select(getTransactionDetailCsTransactionState)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
+            (res: any) => {
+                this.shipmentTypeFromStore = res.shipmentType;
+            }
+        );
     }
 
     getDetailShipmentAndSetDefault() {
@@ -508,7 +520,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         }
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
         this.totalHeightWeight = data.hw;
-
+        console.log(this.shipmentTypeFromStore);
+        console.log(formValue.shipmenttype);
         this._catalogueRepo.GetListSalemanByShipmentType(data.customerId, ChargeConstants.AE_CODE, this.shipmenttype.value)
             .subscribe((salesmans: any) => {
                 this.saleMans = salesmans;
@@ -812,6 +825,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     getSalesmanList(selectedShipmentType: any) {
         this.shipmenttype.setValue(selectedShipmentType);
+        if (this.shipmentTypeFromStore=="Nominated" &&  this.shipmenttype.value=="Freehand"){
+            this.isNotMatchShipmentType = true;
+        }
         if (!!this.customerId.value) {
             this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.AE_CODE, this.shipmenttype.value)
                 .subscribe(
