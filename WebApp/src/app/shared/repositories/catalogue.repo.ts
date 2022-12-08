@@ -614,8 +614,8 @@ export class CatalogueRepo {
         );
     }
 
-    checkExistedContractActive(id: string, partnerId: string) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/CheckExistedContract`, { id: id, partnerId: partnerId }).pipe(
+    checkExistedContractActive(id: string,salemanId, partnerId: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/CheckExistedContract`, { id: id, salemanId: salemanId, partnerId: partnerId }).pipe(
             map((data: any) => data)
         );
     }

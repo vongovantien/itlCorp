@@ -2,7 +2,7 @@ import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Company, Customer, Office, User } from '@models';
@@ -33,8 +33,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     @ViewChild(SalesmanCreditLimitPopupComponent) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
     @ViewChild(PartnerRejectPopupComponent) popupRejectPartner: PartnerRejectPopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmChangeAgreementTypePopup: ConfirmPopupComponent;
-    @ViewChild('confirmActive') confirmActiveContractPopup: ConfirmPopupComponent;
-    @ViewChild('confirmDelete') confirmDeletePopup: ConfirmPopupComponent;
 
     openOnPartner: boolean = false;
 
@@ -576,7 +574,29 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 if (this.selectedContract.active === false) {
                     this.isChangeAgrmentType = null;
                 }
-                this.updateContract(body);
+                if (this.selectedContract.active === true) {
+                    console.log(this.selectedContract.saleManId)
+                    this._catalogueRepo.checkExistedContractActive(this.selectedContract.id, this.selectedContract.saleManId, this.partnerId).pipe(
+                        catchError(this.catchError)
+                    ).subscribe(
+                        (res: boolean) => {
+                            if (res === true) {
+                                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                    body: 'The contract already exists on the system, please edit the information on that contract or select the salesman/agreement type again.',
+                                    label: 'OK'
+                                }, () => {
+                                    return;
+                                })
+                            }
+                            else {
+                                this.updateContract(body);
+                            }
+                        }
+                    );
+                }
+                else {
+                    this.updateContract(body);
+                }
             } else {
                 this.selectedContract.username = this.users.find(x => x.userId === this.selectedContract.saleManId).userName;
                 if (this.selectedContract.officeId.includes(';')) {
@@ -739,6 +759,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
         this.formatAutoExtendDays();
     }
+
     assignValueToModel() {
         if (this.isUpdate) {
             this.selectedContract.id = this.idContract;
@@ -828,12 +849,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.paymentTermObh = this.formGroup.controls['paymentTermObh'].value;
     }
 
-    onSubmitActiveContract() {
-        this.confirmActiveContractPopup.hide();
-        this.processActiveInActiveContract(this.selectedContract.id);
-
-    }
-
     activeInactiveContract(id: string) {
         if (this.contractType.value === 'Guaranteed'
             && ((this.formGroup.controls['creditLimit'].value <= 0
@@ -843,12 +858,17 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             return;
         }
         if (this.selectedContract.active === false) {
-            this._catalogueRepo.checkExistedContractActive(id, this.partnerId).pipe(
+            this._catalogueRepo.checkExistedContractActive(id, this.selectedContract.saleManId, this.partnerId).pipe(
                 catchError(this.catchError)
             ).subscribe(
                 (res: boolean) => {
                     if (res === true) {
-                        this.confirmActiveContractPopup.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: 'There are Other Agreement that same service, If Agreement is actived, Those Agreement will be Inactive. Are You Sure Active this agreement ?',
+                            label: 'OK'
+                        }, () => {
+                            this.processActiveInActiveContract(id);
+                        });
                     }
                     else {
                         this.processActiveInActiveContract(id);
@@ -1078,11 +1098,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         if (!!file) {
             this.selectedFile = file;
         }
-        this.confirmDeletePopup.show();
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Are you sure to delete this file ?',
+            label: 'OK'
+        }, () => {
+            this.onDeleteFile();
+        })
     }
 
     onDeleteFile() {
-        this.confirmDeletePopup.hide();
         this._systemFileManageRepo.deleteFile('Catalogue', 'CatContract', this.selectedContract.id, this.selectedFile.name)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
