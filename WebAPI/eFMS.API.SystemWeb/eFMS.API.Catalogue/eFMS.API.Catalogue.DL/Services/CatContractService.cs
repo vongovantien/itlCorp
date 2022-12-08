@@ -438,6 +438,26 @@ namespace eFMS.API.Catalogue.DL.Services
 
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
+            if (entity.ExpiredDate != null)
+            {
+                if (entity.Active == true)
+                {
+                    var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate).Date);
+                    if (expiredCheck <= 0)
+                    {
+                        entity.IsExpired = false;
+                    }
+                    else if (expiredCheck > 0)
+                    {
+                        entity.IsExpired = true;
+                    }
+                }
+            }
+            else
+            {
+                entity.IsExpired = false;
+            }
+
             if (entity.ContractType == "Cash")
             {
                 entity.ShipmentType = "Nominated";
@@ -447,6 +467,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.ShipmentType = "Freehand & Nominated";
 
             }
+            
             var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
             if (hs.Success)
             {
@@ -674,6 +695,25 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 objUpdate.DatetimeModified = DateTime.Now;
                 objUpdate.UserModified = currentUser.UserID;
+                DateTime localDate = DateTime.Now;
+                if (objUpdate.ExpiredDate != null)
+                {
+                    var expiredCheck = DateTime.Compare(localDate, (DateTime)objUpdate.ExpiredDate);
+
+                    if (expiredCheck <= 0)
+                    {
+                        objUpdate.IsExpired = false;
+                    }
+                    else if (expiredCheck > 0)
+                    {
+                        objUpdate.IsExpired = true;
+                    }
+                }
+                else
+                {
+                    objUpdate.IsExpired = false;
+                }
+
                 isUpdateDone = DataContext.Update(objUpdate, x => x.Id == objUpdate.Id, false);
             }
             if (isUpdateDone.Success)
