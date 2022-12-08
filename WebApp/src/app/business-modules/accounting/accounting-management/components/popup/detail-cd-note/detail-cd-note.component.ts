@@ -315,7 +315,7 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
     onSaveAdjustDebit() {
         this.getDetailCdNote(this.jobId, this.cdNote);
     }
-    exportItem(jobId: string, cdNote:string, format: string) {
+    exportItem(jobId: string, code:string, format: string) {
         let url: string;
         let _format = 0;
         switch (format) {
@@ -332,13 +332,16 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
                 _format = 5;
                 break;
         }
-        this._store.select(getCurrentUserState)
+        this._documentationRepo.getDetailsCDNote(jobId, code) 
         .pipe(
-            switchMap((detail) => {
-                if (this.cdNote.includes('AE') || this.cdNote.includes('AI')) {
-                    return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+            switchMap(() => {
+                if (this.cdNote.includes('CL')) {
+                    return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: code, currency: 'VND', exportFormatType: _format });
                 }
-                return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                else if (this.cdNote.includes('AE') || this.cdNote.includes('AI')) {
+                    return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: code, currency: 'VND', exportFormatType: _format });
+                }
+                return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: code, currency: 'VND', exportFormatType: _format });
             }),
             concatMap((x) => {
                 url = x.pathReportGenerate;
