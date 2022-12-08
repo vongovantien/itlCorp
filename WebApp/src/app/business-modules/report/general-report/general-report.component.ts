@@ -3,7 +3,7 @@ import { Component, ViewChild } from "@angular/core";
 import { SortService } from "@services";
 import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
-import { ExportRepo, ReportManagementRepo } from "@repositories";
+import { ReportManagementRepo } from "@repositories";
 import { catchError, finalize, map } from "rxjs/operators";
 import { LoadingPopupComponent } from "@common";
 import { NgxSpinnerService } from "ngx-spinner";
@@ -26,7 +26,6 @@ export class GeneralReportComponent extends AppList {
         private _sortService: SortService,
         private _progressService: NgProgress,
         private _toastService: ToastrService,
-        private _exportRepo: ExportRepo,
         private _spinner: NgxSpinnerService,
         private _report: ReportManagementRepo
 
@@ -114,7 +113,7 @@ export class GeneralReportComponent extends AppList {
             this.isClickSubMenu = false;
             this._spinner.hide();
             this.loadingPopupComponent.show();
-            this._exportRepo.exportShipmentOverview(this.dataSearch)
+            this._report.exportShipmentOverview(this.dataSearch)
                 .pipe(
                     catchError(() => of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
@@ -135,7 +134,7 @@ export class GeneralReportComponent extends AppList {
             this.isClickSubMenu = false;
             this._spinner.hide();
             this.loadingPopupComponent.show();
-            this._exportRepo.exportShipmentOverviewWithType(this.dataSearch, reportType)
+            this._report.exportShipmentOverviewWithType(this.dataSearch, reportType)
                 .pipe(
                     catchError(() => of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
@@ -156,7 +155,7 @@ export class GeneralReportComponent extends AppList {
             this.isClickSubMenu = false;
             this._spinner.hide();
             this.loadingPopupComponent.show();
-            this._exportRepo.exportStandardGeneralReport(this.dataSearch)
+            this._report.exportStandardGeneralReport(this.dataSearch)
                 .pipe(
                     catchError(() => of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())

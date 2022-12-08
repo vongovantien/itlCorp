@@ -4,6 +4,10 @@ namespace eFMS.API.Report.DL.Models
 {
     public class GeneralReportCriteria
     {
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
         public DateTime? ServiceDateFrom { get; set; }
         public DateTime? ServiceDateTo { get; set; }
         public DateTime? CreatedDateFrom { get; set; }
