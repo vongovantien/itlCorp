@@ -672,10 +672,10 @@ namespace eFMS.API.Catalogue.DL.Services
             active = false;
             var isUpdateDone = new HandleState();
             var objUpdate = DataContext.First(x => x.Id == id);
-            var DataCheckExisted = CheckExistedContractActive(id, partnerId);
-            if (DataCheckExisted != null && DataCheckExisted.Count() > 0 && objUpdate.Active == false)
+            var dataCheckExisted = CheckExistedContractActive(id, objUpdate.SaleManId, partnerId);
+            if (dataCheckExisted != null && dataCheckExisted.Count() > 0 && objUpdate.Active == false)
             {
-                foreach (var item in DataCheckExisted)
+                foreach (var item in dataCheckExisted)
                 {
                     item.UserModified = currentUser.UserID;
                     item.DatetimeModified = DateTime.Now;
@@ -740,19 +740,19 @@ namespace eFMS.API.Catalogue.DL.Services
             return isUpdateDone;
         }
 
-        public IQueryable<CatContract> CheckExistedContractActive(Guid id, string partnerId)
+        public IQueryable<CatContract> CheckExistedContractActive(Guid id, string salemanId, string partnerId)
         {
             var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            var ContractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId && x.SaleManId == contract.SaleManId);
-            if (ContractActive.Count() == 0)
+            var contractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId && x.SaleManId == salemanId);
+            if (contractActive.Count() == 0)
             {
                 return null;
             }
-            var IsExisted = ContractActive
-                .Any(x => x.SaleManId == contract.SaleManId && x.OfficeId.Intersect(contract.OfficeId).Any() && x.SaleService.Intersect(contract.SaleService).Any());
+            var IsExisted = contractActive
+                .Any(x => x.SaleManId == salemanId && x.OfficeId.Intersect(contract.OfficeId).Any() && x.SaleService.Intersect(contract.SaleService).Any());
             if (IsExisted)
             {
-                return ContractActive;
+                return contractActive;
             }
             return null;
         }

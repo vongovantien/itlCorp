@@ -409,9 +409,9 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         [HttpGet("CheckExistedContract")]
-        public IActionResult CheckExistedContract(Guid id, string partnerId)
+        public IActionResult CheckExistedContract(Guid id, string salemanId, string partnerId)
         {
-            var result = catContractService.CheckExistedContractActive(id, partnerId);
+            var result = catContractService.CheckExistedContractActive(id, salemanId, partnerId);
             bool IsExisted = result != null && result.Count() > 0 ? true : false;
             return Ok(IsExisted);
         }
