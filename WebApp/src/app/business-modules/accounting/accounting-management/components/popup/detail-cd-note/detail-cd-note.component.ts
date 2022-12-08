@@ -332,12 +332,10 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
                 _format = 5;
                 break;
         }
-        this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+        this._store.select(getCurrentUserState)
         .pipe(
             switchMap((detail) => {
-                if (this.cdNote.includes('CL')) {
-                    return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
-                } else if(this.cdNote.includes('AE') || this.cdNote.includes('AI')) {
+                if (this.cdNote.includes('AE') || this.cdNote.includes('AI')) {
                     return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
                 }
                 return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
