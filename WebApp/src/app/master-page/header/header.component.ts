@@ -126,7 +126,7 @@ export class HeaderComponent implements OnInit, AfterViewInit {
 
                 this.subscriptions.push(toastrSub);
             }
-            this.getListNotification();
+            // this.getListNotification();
         });
 
         this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {
