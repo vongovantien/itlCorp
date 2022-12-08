@@ -36,6 +36,7 @@ namespace eFMS.API.Report.Infrastructure
             services.AddTransient<IUserBaseService, UserBaseService>();
             services.AddTransient<IGeneralReportService, GeneralReportService>();
             services.AddTransient<ICurrencyExchangeService, CurrencyExchangeService>();
+            services.AddTransient<IAccountingReportService, AccountingReportService>();
 
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)

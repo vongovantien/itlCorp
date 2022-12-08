@@ -435,7 +435,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportAccountingPlSheet(GeneralReportCriteria criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataAccountingPLSheetUrl, accessToken);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.ReportAPI + Urls.Report.GetDataAccountingPLSheetUrl, accessToken);
 
             #region -- Ghi Log Report --
             var reportLogModel = new SysReportLogModel
@@ -474,7 +474,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportJobProfitAnalysis(GeneralReportCriteria criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataJobProfitAnalysisUrl, accessToken);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.ReportAPI + Urls.Report.GetDataJobProfitAnalysisUrl, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<JobProfitAnalysisExport>>();
 
             #region -- Ghi Log Report --
@@ -510,7 +510,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportSummaryOfCostsIncurred(GeneralReportCriteria criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfCostsIncurredUrl, accessToken);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Report.GetDataSummaryOfCostsIncurredUrl, accessToken);
 
             #region -- Ghi Log Report --
             var reportLogModel = new SysReportLogModel
@@ -548,7 +548,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportSummaryOfRevenueIncurred(GeneralReportCriteria criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfRevenueIncurredUrl, accessToken);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Report.GetDataSummaryOfRevenueIncurredUrl, accessToken);
 
             #region -- Ghi Log Report --
             var reportLogModel = new SysReportLogModel
@@ -586,7 +586,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportSummaryOfCostsPartner(GeneralReportCriteria criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataSummaryOfCostsPartnerUrl, accessToken);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Report.GetDataSummaryOfCostsPartnerUrl, accessToken);
 
             #region -- Ghi Log Report --
             var reportLogModel = new SysReportLogModel
