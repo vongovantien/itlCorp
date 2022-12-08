@@ -1402,18 +1402,21 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     if (invoiceData.Count > 0)
                     {
+                        int paymentTerm = 1, paymentTermOBH = 1;
+                        paymentTerm = contractModel.PaymentTerm ?? 1;
+                        paymentTermOBH = contractModel.PaymentTermObh ?? paymentTerm;
                         foreach (var invoice in invoiceData)
                         {
                             //Nếu Base On là Invoice Date: Due Date = Invoice Date + Payment Term
                             if (contractModel.BaseOn == "Invoice Date")
                             {
-                                invoice.PaymentTerm = invoice.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? contractModel.PaymentTerm : contractModel.PaymentTermObh;
+                                invoice.PaymentTerm = invoice.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? paymentTerm : paymentTermOBH;
                                 invoice.PaymentDueDate = invoice.Date.HasValue ? invoice.Date.Value.AddDays((double)(invoice.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
                             }
                             //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
                             if (contractModel.BaseOn == "Confirmed Billing")
                             {
-                                invoice.PaymentTerm = invoice.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? contractModel.PaymentTerm : contractModel.PaymentTermObh;
+                                invoice.PaymentTerm = invoice.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? paymentTerm : paymentTermOBH;
                                 invoice.PaymentDueDate = invoice.ConfirmBillingDate.HasValue ? invoice.ConfirmBillingDate.Value.AddDays((double)(invoice.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
                             }
                             var hsPaymentMgn = accountingManagementRepo.Update(invoice, x => x.Id == invoice.Id, false);
