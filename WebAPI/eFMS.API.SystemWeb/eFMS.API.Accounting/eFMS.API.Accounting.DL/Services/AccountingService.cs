@@ -619,8 +619,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var contractWithSaleman = contracts.Where(x => x.Active == true && x.ContractType != "Cash").FirstOrDefault();
                     if (contractWithSaleman != null)
                     {
-                        _dueDate = contractWithSaleman.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
-                        _dueDateOBH = contractWithSaleman.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                        _dueDate = contractWithSaleman.PaymentTerm ?? 1; //PaymentTerm không có value sẽ default là 1[CR 081222=> null => default 1]
+                        _dueDateOBH = contractWithSaleman.PaymentTermObh ?? _dueDate; //PaymentTermOBH không có value sẽ default là PaymentTerm
                     }
                     else // Các trường hợp khác lấy payment term = 1
                     {
@@ -992,8 +992,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var contractWithSaleman = contracts.Where(x => x.Active == true && x.ContractType != "Cash").FirstOrDefault();
                     if (contractWithSaleman != null)
                     {
-                        _dueDate = contractWithSaleman.PaymentTerm ?? 30; //PaymentTerm không có value sẽ default là 30
-                        _dueDateOBH = contractWithSaleman.PaymentTermObh ?? 30; //PaymentTermOBH không có value sẽ default là 30
+                        _dueDate = contractWithSaleman.PaymentTerm ?? 1; //PaymentTerm không có value sẽ default là 1[CR 081222=> null => default 1]
+                        _dueDateOBH = contractWithSaleman.PaymentTermObh ?? _dueDate; //PaymentTermOBH không có value sẽ default là PaymentTerm
                     }
                     else // Các trường hợp khác lấy payment term = 1
                     {
