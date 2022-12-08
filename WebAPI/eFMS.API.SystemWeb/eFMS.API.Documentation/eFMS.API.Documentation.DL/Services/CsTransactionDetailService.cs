@@ -287,7 +287,6 @@ namespace eFMS.API.Documentation.DL.Services
                 isCreateStage = true;
             }
 
-
             model.JobId = hb.JobId;
             model.GroupId = hb.GroupId;
             model.DepartmentId = hb.DepartmentId;
@@ -295,7 +294,8 @@ namespace eFMS.API.Documentation.DL.Services
             model.CompanyId = hb.CompanyId;
             model.UserCreated = hb.UserCreated;
             model.UserModified = currentUser.UserID;
-            // model.ShipmentType = hb.ShipmentType;
+            var detailJob = DataContext.Where(x => x.JobId == model.JobId).FirstOrDefault();
+            model.ShipmentType = detailJob.ShipmentType;
             if (model.SaleManId != hb.SaleManId)
             {
                 changedSalesman = true;
@@ -326,7 +326,6 @@ namespace eFMS.API.Documentation.DL.Services
                 model.SalesOfficeId = hb.SalesOfficeId;
                 model.SalesCompanyId = hb.SalesCompanyId;
             }
-
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             int code = checkOwnerPermission(model) ? 200 : GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
@@ -659,7 +658,11 @@ namespace eFMS.API.Documentation.DL.Services
             if (detail == null) return null;
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(detail.TransactionType, currentUser);
 
-
+            if(detail.ShipmentType == null)
+            {
+                var detailJob = DataContext.Where(x => x.JobId == detail.JobId).FirstOrDefault();
+                detail.ShipmentType = detailJob.ShipmentType;
+            }
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
 
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
