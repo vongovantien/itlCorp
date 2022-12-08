@@ -149,13 +149,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.loadMasterData();
         this.incoterms = this._catalogueRepo.getIncoterm({ service: ['AE'] });
         if (this.isUpdate) {
-            this._store.select(getDetailHBlState)
-            .pipe(catchError(this.catchError),
-                distinctUntilChanged(),
-                switchMap((shipment: any) => this._store.select(getTransactionDetailCsTransactionState))
-            ).subscribe((res: any) => {
-                this.shipmentType = res.shipmentType;
-            });
             this.getDetailHBLState();
             this.getDimensionState();
         } else {
@@ -196,8 +189,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 polDescription: shipment.polDescription,
                                 podDescription: shipment.podDescription,
                                 shipmenttype: shipment.shipmentType,
+                                shipmentType: shipment.shipmentType
                             });
-
                             // *  CR 14501
                             if (shipment.isHawb) {
                                 const valueDefaultFromShipment = {
@@ -447,6 +440,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.incotermId = this.formCreate.controls["incotermId"];
         this.polDescription = this.formCreate.controls["polDescription"];
         this.podDescription = this.formCreate.controls["podDescription"];
+        this.shipmentType = this.shipmenttype.value;
 
         // this.formCreate.get('dimensionDetails')
         //     .valueChanges
@@ -533,13 +527,14 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
+                console.log(this.shipmentType);
                 this._toast.clear();
                 this.customerId.setValue(data.id);
                 if (!this.shipperId.value) {
                     this.shipperId.setValue(data.id);
                     this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 }
-                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.AE_CODE, this.shipmenttype.value)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.AE_CODE, this.shipmentType)
                     .subscribe((res: any) => {
                         if (!!res) {
                             this.saleMans = res || [];
