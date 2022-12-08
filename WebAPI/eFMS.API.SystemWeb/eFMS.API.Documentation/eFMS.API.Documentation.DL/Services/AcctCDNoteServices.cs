@@ -213,26 +213,22 @@ namespace eFMS.API.Documentation.DL.Services
                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                     && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
                                                     .OrderByDescending(x => x.DatetimeCreated);
-            if (office != null)
+            switch (office.Code)
             {
-                if (office.Code == "ITLHAN")
-                {
+                case "ITLHAN":
                     currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault(); //CR: HAN -> H [15202]
-                }
-                else if (office.Code == "ITLDAD")
-                {
+                    break;
+                case "ITLDAD":
                     currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")).FirstOrDefault(); //CR: DAD -> D [15202]
-                }
-                else
-                {
+                    break;
+                case "ITLCAM":
+                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("C") && !x.Code.StartsWith("CAM-")).FirstOrDefault(); //CR: DAD -> D [15202]
+                    break;
+                default:
                     currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")
-                                                           && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault();
-                }
-            }
-            else
-            {
-                currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")
-                                                       && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault();
+                                                           && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")
+                                                           && !x.Code.StartsWith("C") && !x.Code.StartsWith("CAM-")).FirstOrDefault();
+                    break;
             }
             return currentCdNote;
         }
@@ -240,16 +236,19 @@ namespace eFMS.API.Documentation.DL.Services
         private string SetPrefixJobIdByOfficeCode(string officeCode)
         {
             string prefixCode = string.Empty;
-            if (!string.IsNullOrEmpty(officeCode))
+            switch (officeCode)
             {
-                if (officeCode == "ITLHAN")
-                {
+                case "ITLHAN":
                     prefixCode = "H"; //HAN- >> H
-                }
-                else if (officeCode == "ITLDAD")
-                {
-                    prefixCode = "D"; //DAD- >> D
-                }
+                    break;
+                case "ITLDAD":
+                    prefixCode = "D"; //HAN- >> H
+                    break;
+                case "ITLCAM":
+                    prefixCode = "C"; //HAN- >> H
+                    break;
+                default:
+                    break;
             }
             return prefixCode;
         }
