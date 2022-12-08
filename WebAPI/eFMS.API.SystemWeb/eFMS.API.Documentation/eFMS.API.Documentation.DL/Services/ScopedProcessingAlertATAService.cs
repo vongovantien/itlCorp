@@ -4,6 +4,7 @@ using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.EF;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -63,7 +64,20 @@ namespace eFMS.API.Documentation.DL.Services
                     body = body.Replace("{{CONTENT}}", tBody);
 
                     string email = body + footer;
-                    var s = SendMail.Send(emailTemplate.Subject, email, mailTo, null, null, null);
+                    var sendMailResult = SendMail.Send(emailTemplate.Subject, email, mailTo, null, mailCC, emailBCCs);
+                    #region --- Ghi Log Send Mail ---
+                    var logSendMail = new SysSentEmailHistory
+                    {
+                        SentUser = SendMail._emailFrom,
+                        Receivers = string.Join("; ", mailTo),
+                        Ccs = string.Join("; ", mailCC),
+                        Subject = emailTemplate.Subject,
+                        Sent = sendMailResult,
+                        SentDateTime = DateTime.Now,
+                        Body = email
+                    };
+                    var hsLogSendMail = DC.SysSentEmailHistory.Add(logSendMail);
+                    #endregion --- Ghi Log Send Mail ---
                 }
             }
         }
@@ -117,7 +131,20 @@ namespace eFMS.API.Documentation.DL.Services
                     body = body.Replace("{{CONTENT}}", tBody);
 
                     string email = body + footer;
-                    var s = SendMail.Send(emailTemplate.Subject, email, mailTo, null, null, null);
+                    var sendMailResult = SendMail.Send(emailTemplate.Subject, email, mailTo, null, mailCC, emailBCCs);
+                    #region --- Ghi Log Send Mail ---
+                    var logSendMail = new SysSentEmailHistory
+                    {
+                        SentUser = SendMail._emailFrom,
+                        Receivers = string.Join("; ", mailTo),
+                        Ccs = string.Join("; ", mailCC),
+                        Subject = emailTemplate.Subject,
+                        Sent = sendMailResult,
+                        SentDateTime = DateTime.Now,
+                        Body = email
+                    };
+                    var hsLogSendMail = DC.SysSentEmailHistory.Add(logSendMail);
+                    #endregion --- Ghi Log Send Mail ---
                 }
             }
         }
