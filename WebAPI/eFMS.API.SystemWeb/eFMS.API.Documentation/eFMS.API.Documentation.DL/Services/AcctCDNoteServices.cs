@@ -196,7 +196,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
             }
             int count = 0;
-            var cdCode = GetCdNoteToGenerateCode(office, code)?.Code;
+            var cdCode = GetCdNoteToGenerateCode(office, code, typeCDNote)?.Code;
             if (cdCode != null)
             {
                 cdCode = cdCode.Substring(code.Length + 4, 5);
@@ -206,10 +206,12 @@ namespace eFMS.API.Documentation.DL.Services
             return code;
         }
 
-        private AcctCdnote GetCdNoteToGenerateCode(SysOffice office, string code)
+        private AcctCdnote GetCdNoteToGenerateCode(SysOffice office, string code, string type)
         {
             AcctCdnote currentCdNote = null;
             var currentCdNotes = DataContext.Get(x => x.Code.StartsWith(code)
+                                                    && x.Type == type
+                                                    && x.OfficeId == office.Id
                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                     && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
                                                     .OrderByDescending(x => x.DatetimeCreated);
@@ -226,8 +228,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 default:
                     currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")
-                                                           && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")
-                                                           && !x.Code.StartsWith("C") && !x.Code.StartsWith("CAM-")).FirstOrDefault();
+                                                           && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault();
                     break;
             }
             return currentCdNote;

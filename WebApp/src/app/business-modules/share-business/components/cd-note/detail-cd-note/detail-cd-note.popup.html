@@ -20,7 +20,10 @@
                             <a class="dropdown-item pointer" (click)="previewCdNote('ORIGIN')">Preview with Original</a>
                             <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
                             <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
-                            <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
+                            <a *ngIf="CdNoteDetail?.cdNote?.type === 'DEBIT'" class="dropdown-item pointer"
+                                (click)="previewCdNote('USD')">WP Template Debit</a>
+                            <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover"
+                                ClickStopPropagation>
                                 <div class="d-flex justify-content-between ">
                                     <div>
                                         <a class="dropdown-item pointer">Download</a>
@@ -30,6 +33,7 @@
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -414,13 +418,16 @@
 </div> -->
 
 <app-dropdown #exportTpl>
-    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'PDF')">
+    <span class="dropdown-item pointer"
+        (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'PDF')">
         PDF
     </span>
-    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'EXCEL')">
+    <span class="dropdown-item pointer"
+        (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'EXCEL')">
         EXCEL
     </span>
-    <span class="dropdown-item pointer" (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'WORD')">
+    <span class="dropdown-item pointer"
+        (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'WORD')">
         WORD
     </span>
 </app-dropdown>
