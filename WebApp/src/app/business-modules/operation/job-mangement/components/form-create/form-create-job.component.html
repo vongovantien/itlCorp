@@ -322,7 +322,7 @@
                                     </div>
                                     <div class="col-lg-3">
                                         <div class="form-group">
-                                            <label class="form-control-label">
+                                            <label class="form-control-label"*ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                                                 No Profit
                                             </label>
                                             <app-switch size="md" formControlName="noProfit"></app-switch>

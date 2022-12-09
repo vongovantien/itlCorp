@@ -424,7 +424,7 @@
                     </div>
                     <div class="col-lg-4 app-switch-custom">
                         <div class="form-group">
-                            <label class="form-control-label">
+                            <label class="form-control-label" *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                                 No Profit
                             </label>
                             <app-switch size="md" formControlName="noProfit" class="success switch-noProfit">
