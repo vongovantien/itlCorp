@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Threading.Tasks;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Report.DL.Common;
@@ -10,7 +7,6 @@ using eFMS.API.Report.DL.Models;
 using eFMS.API.Report.Helpers;
 using eFMS.API.Report.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -20,7 +16,7 @@ namespace eFMS.API.Report.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class GeneralReportController : ControllerBase
+    public class GeneralReportController : Controller
     {
         private IGeneralReportService generalReportService;
         public GeneralReportController(IGeneralReportService generalReport)
@@ -84,15 +80,15 @@ namespace eFMS.API.Report.Controllers
             var data = generalReportService.GetDataGeneralExportShipmentOverview(criteria);
             if (data == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
 
             var stream = new ReportHelper().GenerateShipmentOverviewExcel(data, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Shipment Overview");
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, "Shipment Overview");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -117,7 +113,7 @@ namespace eFMS.API.Report.Controllers
                 var data = generalReportService.GetDataGeneralExportShipmentOverviewFCL(criteria);
                 if (data == null)
                 {
-                    return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                    return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
                 }
 
                 stream = new ReportHelper().GenerateShipmentOverviewFCLExcell(data, criteria);
@@ -127,18 +123,18 @@ namespace eFMS.API.Report.Controllers
                 var data = generalReportService.GetDataGeneralExportShipmentOverviewLCL(criteria);
                 if (data == null)
                 {
-                    return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                    return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
                 }
                 stream = new ReportHelper().BidingGeneralLCLExport(data, criteria, "ShipmentOverviewLCL");
             }
 
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
 
             var downloadName = reportType == "FCL" ? "Shipment Overview FCL" : "Shipment Overview-LCL";
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, downloadName);
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, downloadName);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -160,15 +156,15 @@ namespace eFMS.API.Report.Controllers
             var data = generalReportService.QueryDataGeneralReport(criteria);
             if (data == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
 
             var stream = new ReportHelper().GenerateStandardGeneralReportExcel(data, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Standard Report" + criteria.Currency);
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, "Standard Report" + criteria.Currency);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }

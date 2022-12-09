@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Report.Controllers
@@ -81,15 +82,17 @@ namespace eFMS.API.Report.Controllers
             var data = accountingReport.GetDataAccountingPLSheet(criteria);
             if (data == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
-
+            new LogHelper("ExportAccountingPlSheet", "" + data.Count().ToString());
             var stream = new ReportHelper().GenerateAccountingPLSheetExcel(data, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                new LogHelper("Stream null");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Accounting PL Sheet" + criteria.Currency);
+            new LogHelper("Stream not null");
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, "Accounting PL Sheet" + criteria.Currency);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }        
@@ -111,15 +114,15 @@ namespace eFMS.API.Report.Controllers
             var data = accountingReport.GetDataJobProfitAnalysis(criteria);
             if (data == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
 
             var stream = new ReportHelper().GenerateJobProfitAnalysisExportExcel(data, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Job Profit Analysis");
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, "Job Profit Analysis");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -141,15 +144,15 @@ namespace eFMS.API.Report.Controllers
             var data = accountingReport.GetDataSummaryOfCostsIncurred(criteria);
             if (data == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
 
             var stream = new ReportHelper().GenerateSummaryOfCostsIncurredExcel(data, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Summary of Cossts incurred");
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, "Summary of Cossts incurred");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -171,15 +174,15 @@ namespace eFMS.API.Report.Controllers
             var data = accountingReport.GetDataSummaryOfRevenueIncurred(criteria);
             if (data == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
 
             var stream = new ReportHelper().GenerateSummaryOfRevenueExcel(data, criteria, null);
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Summary of Revenue incurred");
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, "Summary of Revenue incurred");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
@@ -200,16 +203,16 @@ namespace eFMS.API.Report.Controllers
             var data = accountingReport.GetDataCostsByPartner(criteria);
             if (data == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
 
             var stream = new ReportHelper().GenerateSummaryOfRevenueExcel(data, criteria, null);
 
             if (stream == null)
             {
-                return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Costs By Partner");
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, "Costs By Partner");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
