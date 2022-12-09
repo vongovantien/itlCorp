@@ -295,7 +295,13 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
             this.CDNote.transactionTypeEnum = TransactionTypeEnum.CustomLogistic;
             this.CDNote.note = this.note.value;
             this.CDNote.excRateUsdToLocal = this.excRateUsdToLocal.value;
-            this.CDNote.hblid =  this.listChargePartner[0].listCharges[0].hblid;
+            for(const itemCharges of this.listChargePartner )
+            {
+                if(itemCharges.listCharges.length > 0)
+                  {
+                    this.CDNote.hblid = itemCharges.listCharges[0].hblid;
+                  }
+            }
             const arrayCharges = [];
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges) {
