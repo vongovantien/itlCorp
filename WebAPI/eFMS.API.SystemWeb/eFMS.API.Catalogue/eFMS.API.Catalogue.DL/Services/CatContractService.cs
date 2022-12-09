@@ -440,7 +440,6 @@ namespace eFMS.API.Catalogue.DL.Services
 
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
-
             if (entity.ExpiredDate != null)
             {
                 if (entity.Active == true)
@@ -697,7 +696,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 objUpdate.DatetimeModified = DateTime.Now;
                 objUpdate.UserModified = currentUser.UserID;
-
                 DateTime localDate = DateTime.Now;
                 if (objUpdate.ExpiredDate != null)
                 {
@@ -712,7 +710,8 @@ namespace eFMS.API.Catalogue.DL.Services
                         objUpdate.IsExpired = true;
                     }
                 }
-                else { 
+                else
+                {
                     objUpdate.IsExpired = false;
                 }
 

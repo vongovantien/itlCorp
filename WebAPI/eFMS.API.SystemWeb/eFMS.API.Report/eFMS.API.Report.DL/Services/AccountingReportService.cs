@@ -124,7 +124,7 @@ namespace eFMS.API.Report.DL.Services
             var lstCharge = catChargeRepo.Get();
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
-            var dataCustom = customsDeclarationRepo.Get().ToList();
+            var dataCustom = customsDeclarationRepo.Get();
             var LookupUser = sysUserRepo.Get().ToLookup(x => x.Id);
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
             foreach (var charge in dataExportAccountants)
