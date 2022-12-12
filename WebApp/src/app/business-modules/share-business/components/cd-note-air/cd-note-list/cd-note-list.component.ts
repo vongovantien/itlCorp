@@ -411,25 +411,37 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
-                        return this._store.select(getCurrentUserState)
-                            .pipe(
-                                filter((c: any) => !!c.userName),
-                                switchMap((currentUser: SystemInterface.IClaimUser) => {
-                                    if (!!currentUser.userName) {
-                                        return this._exportRepo.exportCDNote(jobId, cdNote, currentUser.officeId)
-                                    }
-                                }),
-                                takeUntil(this.ngUnsubscribe),
-                            );
+                         return this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+                                .pipe(
+                                    switchMap(() => {
+                                        return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                                    }),
+                                    concatMap((x) => {
+                                        url = x.pathReportGenerate;
+                                        return this._exportRepo.exportCrystalReportPDF(x);
+                                    }), takeUntil(this.ngUnsubscribe)
+                                )
                     }
                     this._toastService.warning(res.message);
                     return of(false);
                 })
-            )
+            ).subscribe(
+                (res: any) => {
+                    if (!res) {
+                        this._toastService.warning('No data found');
+                    }
+                },
+                (error) => {
+                    this._exportRepo.downloadExport(url);
+                },
+                () => {
+                    console.log(url);
+                }
+            );
         } else {
             this._documentationRepo.getDetailsCDNote(jobId, cdNote)
             .pipe(
-                switchMap((detail) => {
+                switchMap(() => {
                     return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
                 }),
                 concatMap((x) => {
@@ -448,15 +460,6 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                 }
             );
         }
-        sourcePreview$.subscribe(
-            (response: any) => {
-                if (response != null) {
-                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
-                } else {
-                    this._toastService.warning('No data found');
-                }
-            },
-        );
     }
 
 }
