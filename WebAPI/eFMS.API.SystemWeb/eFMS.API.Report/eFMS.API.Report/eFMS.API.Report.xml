@@ -128,5 +128,10 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.Report.Helpers.FileHelper">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
     </members>
 </doc>

@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Report.DL.Common;
 using eFMS.API.Report.DL.Models;
 using eFMS.API.Report.FormatExcel;
@@ -39,7 +40,7 @@ namespace eFMS.API.Report.Helpers
             }
             catch (Exception ex)
             {
-
+                new LogHelper("ExportAccountingPlSheet", "" + ex.ToString());
             }
             return null;
         }
