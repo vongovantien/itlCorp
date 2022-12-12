@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from '../services';
-import { environment } from 'src/environments/environment';
-import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
+import { ApiService } from '../services';
 
 @Injectable({ providedIn: 'root' })
 export class SettingRepo {
@@ -214,6 +214,15 @@ export class SettingRepo {
             map((data: any) => data)
         );;
     }
+
+    getEdocManagement(body: any) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/GetEdocManagement`, body
+        ).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
 }
 
 

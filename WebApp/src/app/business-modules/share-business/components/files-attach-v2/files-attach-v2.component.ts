@@ -9,6 +9,7 @@ import { Store } from '@ngrx/store';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { getCurrentUserState, IAppState } from '@store';
+import _some from 'lodash/some';
 import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
@@ -432,6 +433,17 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     downloadAllEdoc() {
+        let countEdocJob = _some(this.edocByJob, x => (x.eDocs !== null && x.eDocs.length > 0));
+        let countEdocAcc = _some(this.edocByAcc, x => (x !== null && x.eDocs !== null && x.eDocs.length > 0));
+        if (this.typeFrom === 'Shipment') {
+            if (!countEdocJob && !countEdocAcc) {
+                return this._toast.warning("No data to Export");
+            }
+        } else {
+            if (!countEdocAcc) {
+                return this._toast.warning("No data to Export");
+            }
+        }
         let model = {
             folderName: this.typeFrom,
             objectId: this.typeFrom === 'Shipment' ? this.jobId : this.billingId,

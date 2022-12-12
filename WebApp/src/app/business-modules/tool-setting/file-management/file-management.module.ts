@@ -1,44 +1,52 @@
-import { NgModule } from '@angular/core'
-import { Router, RouterModule, Routes } from '@angular/router';
-import { SharedModule } from 'src/app/shared/shared.module';
-import { FileManagementComponent } from './file-management.component';
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { TabsModule } from 'ngx-bootstrap/tabs';
-import { ShareFileManagementModule } from './share-file-management.module';
+import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { AccountantFileManagementComponent } from './accountant-file-management/accountant-file-management.component';
+import { FormSearchFileManagementComponent } from './components/form-search-file-management/form-search-file-management.component';
+import { ListFileManagementComponent } from './components/list-file-management/list-file-management.component';
+import { GeneralFileManagementComponent } from './general-file-management/general-file-management.component';
 
 const routing: Routes = [
+
     {
-        path: '', loadChildren: () => import('./accounting-file-management/accounting-file-management.module').then(m => m.AccountingFileManagementModule),
-        data: { name: 'Accounting', title: 'Accounting' }
+        path: "",
+        data: { name: "General", title: 'General File Management' }, redirectTo: 'general-file-management',
     },
     {
-        path:'accounting', redirectTo : '' , pathMatch : 'full'
+        path: 'general-file-management', component: GeneralFileManagementComponent,
+        data: { name: "General", title: 'General File Management' },
     },
     {
-        path: 'document', loadChildren: () => import('./document-file-management/document-file-management.module').then(m => m.DocumentFileManagementModule),
-        data: { name: 'Document', title: 'Document' }
-    },
-    {
-        path: 'catalogue', loadChildren: () => import('./catalogue-file-management/catalogue-file-management.module').then(m => m.CatalogueFileManagementModule),
-        data: { name: 'Catalogue', title: 'Catalogue' }
-    },
-    {
-        path: 'system', loadChildren: () => import('./system-file-management/system-file-management.module').then(m => m.SystemFileManagementModule),
-        data: { name: 'System', title: 'System' }
+        path: 'accountant-file-management', component: AccountantFileManagementComponent,
+        data: { name: "Accountant", title: 'Accountant File Management' },
     }
 ]
 
 @NgModule({
     declarations: [
-        FileManagementComponent,
+        ListFileManagementComponent,
+        FormSearchFileManagementComponent,
+        GeneralFileManagementComponent,
+        AccountantFileManagementComponent
     ],
-
+    exports: [],
     imports: [
-        TabsModule.forRoot(),
         RouterModule.forChild(routing),
+        TabsModule.forRoot(),
+        PaginationModule.forRoot(),
+        NgxDaterangepickerMd.forRoot(),
+        CollapseModule.forRoot(),
         SharedModule,
-        ShareFileManagementModule
+        //ShareFileManagementModule,
+        NgSelectModule,
     ],
-    exports: [RouterModule]
+    providers: [
 
+    ]
 })
-export class FilesManagementModule { }
+export class FilesManagementModule { static routing = routing; }

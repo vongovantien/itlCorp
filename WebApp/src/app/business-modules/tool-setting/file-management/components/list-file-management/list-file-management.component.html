@@ -1,0 +1,52 @@
+<div class="m-portlet">
+    <div class="m-form">
+        <div class="m-portlet__body">
+            <div class="table-wrapper table-scrollable">
+                <table class="table table-hover table-brand dataTable">
+                    <thead app-table-header [headers]="headers"
+                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                        <th class="first table-actions-col">Action</th>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="!!listEdocFile?.length">
+                            <tr class="collapse-toggle-row"
+                                *ngFor="let edocFile of listEdocFile ;let i = index; trackBy: trackByFn">
+
+                                <td class="table-actions-col">
+                                    <div class="table-actions" style="width: 70px">
+                                        <app-permission-button (onClick)="onDeleteEdoc(edocFile.id)" type="delete"
+                                         >
+                                        </app-permission-button>
+                                        <app-permission-button (onClick)="downloadEdoc(edocFile)" type="download"
+                                         >
+                                        </app-permission-button>
+                                    </div>
+                                </td>
+
+                                <td>{{edocFile.systemFileName}}</td>
+                                <td>{{edocFile.documentType}}</td>
+                                <td>{{edocFile.jobRef}}</td>
+                                <td>{{edocFile.hblNo}}</td>
+                                <td>{{edocFile.billingNo}}</td>
+                                <td>{{edocFile.source}}</td>
+                                <td>{{edocFile.type}}</td>
+                                <td>{{edocFile.userFileName}}</td>
+                                <td>{{edocFile.datetimeCreated| date: 'dd/MM/yyyy'}}</td>
+                                <td>{{edocFile.userCreated}}</td>
+
+                            </tr>
+                        </ng-container>
+                        <tr app-table-none-record *ngIf="!isLoading && !listEdocFile?.length"
+                            [colspan]="headers1?.length + 1">
+                        </tr>
+                        <tr app-table-row-loading *ngIf="isLoading"></tr>
+                    </tbody>
+                </table>
+            </div>
+            <app-pagination (onChange)="updatePagingData($event)" [total]="totalItems" [pageNum]="page"
+                [itemPerPage]="pageSize"></app-pagination>
+        </div>
+    </div>
+</div>
+
+<confirm-popup body="Do you want to delete?" (onSubmit)="deleteEdoc()"></confirm-popup>
