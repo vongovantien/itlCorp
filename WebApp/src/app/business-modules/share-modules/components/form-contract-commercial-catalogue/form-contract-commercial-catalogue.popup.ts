@@ -40,6 +40,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     isCreateNewCommercial: boolean = false;
     isDuplicateContract: boolean = false;
     statusContract: boolean = false;
+    isChangeSaleMan: boolean = false;
 
     // salesmanId: AbstractControl;
     companyId: AbstractControl;
@@ -344,6 +345,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     this.selectedSalesman = { field: 'userId', value: data.userId };
                 } else {
                     this.selectedSalesman = { field: 'id', value: data.userId + '-' + data.userGroupId + '-' + data.userDeparmentId };
+                    if (!!data.userId && data.userId !== this.selectedContract.saleManId) {
+                        this.isChangeSaleMan = true;
+                    }
                 }
                 this.selectedSalesmanData = data;
                 break;
@@ -574,8 +578,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 if (this.selectedContract.active === false) {
                     this.isChangeAgrmentType = null;
                 }
-                if (this.selectedContract.active === true) {
-                    console.log(this.selectedContract.saleManId)
+                if (this.selectedContract.active && this.isChangeSaleMan) {
                     this._catalogueRepo.checkExistedContractActive(this.selectedContract.id, this.selectedContract.saleManId, this.partnerId).pipe(
                         catchError(this.catchError)
                     ).subscribe(
@@ -585,17 +588,20 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                                     body: 'The contract already exists on the system, please edit the information on that contract or select the salesman/agreement type again.',
                                     label: 'OK'
                                 }, () => {
+                                    this.isChangeSaleMan = true;
                                     return;
                                 })
                             }
                             else {
-                                this.updateContract(body);
+                                this.updateContract(body)
+                                this.isChangeSaleMan = false;
                             }
                         }
-                    );
+                    )
                 }
                 else {
-                    this.updateContract(body);
+                    this.updateContract(body)
+                    this.isChangeSaleMan = false;
                 }
             } else {
                 this.selectedContract.username = this.users.find(x => x.userId === this.selectedContract.saleManId).userName;
@@ -1081,6 +1087,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     close() {
         this.selectedSalesmanData = null;
+        this.isChangeSaleMan = null;
         this.formGroup.reset()
         this.hide();
     }
