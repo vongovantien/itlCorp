@@ -22,7 +22,8 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <app-list-file-management [listEdocFile]="edocFiles" [headers]="headers" (reGetEdoc)="ReloadEDoc($event)">
+                            <app-list-file-management [listEdocFile]="edocFiles" [headers]="headers" (reGetEdoc)="ReloadEDoc($event)" (changePage)="RepageEDoc($event)"
+                            >
                             </app-list-file-management>
                         </div>
                     </div>

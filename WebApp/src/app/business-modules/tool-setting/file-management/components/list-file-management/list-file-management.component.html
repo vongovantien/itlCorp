@@ -8,21 +8,18 @@
                         <th class="first table-actions-col">Action</th>
                     </thead>
                     <tbody>
-                        <ng-container *ngIf="!!listEdocFile?.length">
+                        <ng-container *ngIf="!!listEdocFile?.data?.length">
                             <tr class="collapse-toggle-row"
-                                *ngFor="let edocFile of listEdocFile ;let i = index; trackBy: trackByFn">
+                                *ngFor="let edocFile of listEdocFile?.data ;let i = index; trackBy: trackByFn">
 
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <app-permission-button (onClick)="onDeleteEdoc(edocFile.id)" type="delete"
-                                         >
+                                        <app-permission-button (onClick)="onDeleteEdoc(edocFile.id)" type="delete">
                                         </app-permission-button>
-                                        <app-permission-button (onClick)="downloadEdoc(edocFile)" type="download"
-                                         >
+                                        <app-permission-button (onClick)="downloadEdoc(edocFile)" type="download">
                                         </app-permission-button>
                                     </div>
                                 </td>
-
                                 <td>{{edocFile.systemFileName}}</td>
                                 <td>{{edocFile.documentType}}</td>
                                 <td>{{edocFile.jobRef}}</td>
@@ -33,18 +30,17 @@
                                 <td>{{edocFile.userFileName}}</td>
                                 <td>{{edocFile.datetimeCreated| date: 'dd/MM/yyyy'}}</td>
                                 <td>{{edocFile.userCreated}}</td>
-
                             </tr>
                         </ng-container>
-                        <tr app-table-none-record *ngIf="!isLoading && !listEdocFile?.length"
-                            [colspan]="headers1?.length + 1">
+                        <tr app-table-none-record *ngIf="!listEdocFile?.data?.length">
                         </tr>
-                        <tr app-table-row-loading *ngIf="isLoading"></tr>
                     </tbody>
                 </table>
             </div>
-            <app-pagination (onChange)="updatePagingData($event)" [total]="totalItems" [pageNum]="page"
-                [itemPerPage]="pageSize"></app-pagination>
+            <!-- <app-pagination (onChange)="updatePagingData($event)" [total]="listEdocFile.totalItems" [pageNum]="listEdocFile.page"
+                [itemPerPage]="listEdocFile.pageSize"></app-pagination> -->
+            <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                (onChange)="updatePagingEdocFile($event)"></app-pagination>
         </div>
     </div>
 </div>

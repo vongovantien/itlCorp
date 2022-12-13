@@ -5,6 +5,7 @@ import { SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { catchError } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
+import { fileManagePaging } from '../../general-file-management/general-file-management.component';
 
 @Component({
     selector: 'app-list-file-management',
@@ -12,11 +13,12 @@ import { AppList } from 'src/app/app.list';
 })
 export class ListFileManagementComponent extends AppList implements OnInit {
 
-    @Input() listEdocFile: any[] = [];
+    @Input() listEdocFile: fileManagePaging;
     @Input() headers: CommonInterface.IHeaderTable[];
     edocId: string = '';
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @Output() reGetEdoc: EventEmitter<boolean> = new EventEmitter<false>();
+    @Output() changePage: EventEmitter<any> = new EventEmitter<any>();
 
     constructor(
         private _systemFileRepo: SystemFileManageRepo,
@@ -59,6 +61,14 @@ export class ListFileManagementComponent extends AppList implements OnInit {
                     }
                 },
             );
+    }
+
+    updatePagingEdocFile(e: { page: number, pageSize: number, data: any }) {
+        let pageData: any = {
+            page: e.page,
+            pageSize: e.pageSize
+        };
+        this.changePage.emit(pageData);
     }
 
     downloadEdoc(edoc: any) {

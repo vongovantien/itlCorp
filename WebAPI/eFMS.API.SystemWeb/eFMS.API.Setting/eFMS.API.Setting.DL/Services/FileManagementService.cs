@@ -19,6 +19,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using eFMS.API.Common.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -36,8 +38,9 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<AccAccountingManagement> accManageRepo;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
         private readonly IContextBase<SysAttachFileTemplate> docTypeRepo;
+        private readonly IContextBase<AccAccountPayable> accPayableRepo;
 
-        public FileManagementService(IStringLocalizer<LanguageSub> localizer, IContextBase<SysAttachFileTemplate> docTypeRepository, IContextBase<CsShipmentSurcharge> surchargeRepository, IContextBase<AccAccountingManagement> accManageRepository, IContextBase<CsTransactionDetail> csTranDetailRepoitory, IContextBase<OpsTransaction> opsTranRepository, IContextBase<SysImage> repository, IContextBase<CsTransaction> csTran, IContextBase<AcctSoa> acctSOA, IContextBase<SysImageDetail> EDoc, IContextBase<AcctSettlementPayment> accSettle, IContextBase<AcctAdvancePayment> acctAdvance, IMapper mapper, ICurrentUser user) : base(repository, mapper)
+        public FileManagementService(IStringLocalizer<LanguageSub> localizer, IContextBase<AccAccountPayable> accPayableRepository, IContextBase<SysAttachFileTemplate> docTypeRepository, IContextBase<CsShipmentSurcharge> surchargeRepository, IContextBase<AccAccountingManagement> accManageRepository, IContextBase<CsTransactionDetail> csTranDetailRepoitory, IContextBase<OpsTransaction> opsTranRepository, IContextBase<SysImage> repository, IContextBase<CsTransaction> csTran, IContextBase<AcctSoa> acctSOA, IContextBase<SysImageDetail> EDoc, IContextBase<AcctSettlementPayment> accSettle, IContextBase<AcctAdvancePayment> acctAdvance, IMapper mapper, ICurrentUser user) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -51,6 +54,7 @@ namespace eFMS.API.Setting.DL.Services
             accManageRepo = accManageRepository;
             surchargeRepo = surchargeRepository;
             docTypeRepo = docTypeRepository;
+            accPayableRepo = accPayableRepository;
         }
 
         public IQueryable<SysImageViewModel> Get(FileManagementCriteria criteria, int page, int size, out int rowsCount)
@@ -158,7 +162,7 @@ namespace eFMS.API.Setting.DL.Services
             return result;
         }
 
-        public async Task<List<EDocFile>> GetEdocManagement(EDocManagementCriterial criterial)
+        public async Task<ResponsePagingModel<EDocFile>> GetEdocManagement(EDocManagementCriterial criterial)
         {
             var data = await edocRepo.WhereAsync(await ExpressionQuery(criterial));
             List<EDocFile> eDocFiles = new List<EDocFile>();
@@ -167,13 +171,23 @@ namespace eFMS.API.Setting.DL.Services
                 var edocFile = MappingEDocFile(x);
                 eDocFiles.Add(edocFile.Result);
             });
-            var result = eDocFiles.Take(criterial.Size).Skip(criterial.Page * criterial.Size).ToList();
-            return result;
+            var result = eDocFiles.AsQueryable().Skip((criterial.Page - 1) * criterial.Size).Take(criterial.Size);
+            return new ResponsePagingModel<EDocFile>()
+            {
+                Data = result,
+                Page = criterial.Page,
+                Size = criterial.Size,
+                TotalItems = data.Count()
+            };
         }
 
-        private string getFileNameWithWxtention(Guid? sysImageId)
+        private string getFileNameWithWxtention(Guid? sysImageId,bool isOTH)
         {
-            return "OTH" + DataContext.Get(x => x.Id == sysImageId).FirstOrDefault().Name;
+            if (isOTH)
+            {
+                return "OTH" + DataContext.Get(x => x.Id == sysImageId).FirstOrDefault().Name;
+            }
+            return DataContext.Get(x => x.Id == sysImageId).FirstOrDefault().Name;
         }
 
         private async Task<EDocFile> MappingEDocFile(SysImageDetail imageDetail)
@@ -189,7 +203,11 @@ namespace eFMS.API.Setting.DL.Services
                 edocFile.Type = docType.FirstOrDefault().Type;
                 if (imageDetail.SystemFileName.Substring(0, 3) == "OTH")
                 {
-                    edocFile.UserFileName = getFileNameWithWxtention(edocFile.SysImageId);
+                    edocFile.UserFileName = getFileNameWithWxtention(edocFile.SysImageId,true);
+                }
+                else
+                {
+                    edocFile.UserFileName = getFileNameWithWxtention(edocFile.SysImageId, false);
                 }
             }
             else
@@ -201,7 +219,11 @@ namespace eFMS.API.Setting.DL.Services
                 edocFile.Type = docType.FirstOrDefault().Type;
                 if (imageDetail.SystemFileName.Substring(0, 3) == "OTH")
                 {
-                    edocFile.UserFileName = getFileNameWithWxtention(edocFile.SysImageId);
+                    edocFile.UserFileName = getFileNameWithWxtention(edocFile.SysImageId,true);
+                }
+                else
+                {
+                    edocFile.UserFileName = getFileNameWithWxtention(edocFile.SysImageId, false);
                 }
             }
 
@@ -226,7 +248,7 @@ namespace eFMS.API.Setting.DL.Services
             var lstId2 = new List<Guid>();
             if (criteria.isAcc)
             {
-                query = query.And(x => x.Source != "Shipment");
+                query = query.And(x => x.BillingNo != null);
             }
             switch (criteria.ReferenceType)
             {
@@ -302,17 +324,19 @@ namespace eFMS.API.Setting.DL.Services
                 case ReferenceType.AccountantNo:
                     if (!isRefNo)
                     {
-                        accManages = await accManageRepo.GetAsync(x => x.DatetimeCreated>=criteria.FromDate && x.DatetimeCreated<=criteria.ToDate);
-                        surCharges = await surchargeRepo.GetAsync(x => x.AcctManagementId == accManages.FirstOrDefault().Id);
-                        lstId1 = surCharges.Select(x => x.Hblid).ToList();
+                        var accPayable = await accPayableRepo.GetAsync(x => x.DatetimeCreated>=criteria.FromDate && x.DatetimeCreated<=criteria.ToDate);
+                        var accPayableNo = accPayable.Select(x => x.BillingNo);
+                        var edocs = await edocRepo.GetAsync(x => accPayableNo.Contains(x.BillingNo));
+                        lstId1=edocs.Select(x => x.Id).ToList();
                     }
                     else
                     {
-                        accManages = await accManageRepo.GetAsync(x => lstRefNo.Contains(x.VoucherId));
-                        surCharges = await surchargeRepo.GetAsync(x => x.AcctManagementId == accManages.FirstOrDefault().Id);
-                        lstId1 = surCharges.Select(x => x.Hblid).ToList();
+                        var accPayable = await accPayableRepo.GetAsync(x => lstRefNo.Contains(x.VoucherNo));
+                        var accPayableNo = accPayable.Select(x => x.BillingNo);
+                        var edocs = await edocRepo.GetAsync(x => accPayableNo.Contains(x.BillingNo));
+                        lstId1 = edocs.Select(x => x.Id).ToList();
                     }
-                    query = query.And(x => lstId1.Contains((Guid)x.Hblid));
+                    query = query.And(x => lstId1.Contains((Guid)x.Id));
                     break;
             }
             

@@ -1,4 +1,5 @@
-﻿using eFMS.API.Setting.DL.Models;
+﻿using eFMS.API.Common.Models;
+using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Service.Models;
 using ITL.NetCore.Common;
@@ -15,6 +16,6 @@ namespace eFMS.API.Setting.DL.IService
     {
         IQueryable<SysImageViewModel> Get(FileManagementCriteria criteria, int page, int size, out int rowsCount);
         List<SysImageViewModel> GetDetail(string folderName, string objectId);
-        Task<List<EDocFile>> GetEdocManagement(EDocManagementCriterial criterial);
+        Task<ResponsePagingModel<EDocFile>> GetEdocManagement(EDocManagementCriterial criterial);
     }
 }

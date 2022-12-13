@@ -4,7 +4,6 @@ import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { DataService } from '@services';
 import { AppForm } from 'src/app/app.form';
-import { RuleLinkFee } from 'src/app/shared/models/tool-setting/rule-link-fee';
 
 @Component({
     selector: 'form-search-file-management',
@@ -15,7 +14,9 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
 
     @Output() onSearch: EventEmitter<Partial<IFileManageSearch> | any> = new EventEmitter<Partial<IFileManageSearch> | any>();
     referenceTypes: CommonInterface.ICommonTitleValue[] = [
-        { title: 'Job ID', value: 0 }
+        { title: 'Job ID', value: 0 },
+        { title: 'House Bill', value: 1 },
+        { title: 'Mater Bill', value: 2 },
     ];
     referenceNo: AbstractControl;
     searchType: AbstractControl;
@@ -33,9 +34,9 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         { title: 'Purchasing Note', value: 4 },
         { title: 'Other Entry', value: 5 },
     ]
-    @Output() onSearchF: EventEmitter<Partial<IFileManageSearch> | any> = new EventEmitter<Partial<IFileManageSearch> | any>(); formSearchFileManagement: FormGroup;
+    @Output() onSearchF: EventEmitter<Partial<IFileManageSearch> | any> = new EventEmitter<Partial<IFileManageSearch> | any>();
+    formSearchFileManagement: FormGroup;
     @Input() tabType: string = '';
-    rule: RuleLinkFee = new RuleLinkFee();
     isAcc: boolean = false;
     ruleName: AbstractControl;
     serviceBuying: AbstractControl;
@@ -62,9 +63,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
 
         if (this.tabType === 'fileAccManage') {
             this.referenceTypes = [
-                { title: 'House Bill', value: 0 },
-                { title: 'Mater Bill', value: 1 },
-                { title: 'Accountant No', value: 2 },
+                { title: 'Accountant No', value: 3 },
             ]
             this.isAcc = true;
             //this.submitSearch(this.formSearchFileManagement?.value);
@@ -100,15 +99,26 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     }
 
     submitReset() {
-        this.formSearchFileManagement.reset();
+        //this.formSearchFileManagement.reset();
         const bodySearch: Partial<IFileManageSearch> = {
+            referenceNo: null,
+            referenceType: this.referenceTypes[0].value,
+            fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+            dateMode: this.accountantTypes[0].value,
+            accountantType: this.isAcc ? this.accountantTypes[0].value : null
         };
-        console.log(bodySearch);
+        this.referenceNo.setValue(null)
+        this.date.setValue({
+            startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+        });
+        this.searchType.setValue(this.referenceTypes[0].value);
+        this.dateMode.setValue(this.dateModes[0].value);
+        if (this.isAcc) {
+            this.accountantType.setValue(this.accountantTypes[0].value);
+        }
         this.onSearch.emit(bodySearch);
-    }
-
-    resetDate() {
-        this.date.setValue(null);
     }
 
     // ngOnChanges(changes: any): void {
@@ -128,8 +138,8 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
 interface IFileManageSearch {
     referenceType: string,
     referenceNo: string,
-    fromDate: string,
-    toDate: string,
+    fromDate: any,
+    toDate: any,
     dateMode: string,
     accountantType: number[],
 }

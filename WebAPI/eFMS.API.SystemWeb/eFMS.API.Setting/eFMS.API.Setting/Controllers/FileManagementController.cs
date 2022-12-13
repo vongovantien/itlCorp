@@ -12,9 +12,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Setting.Controllers
@@ -70,12 +73,12 @@ namespace eFMS.API.Setting.Controllers
         [Authorize]
         public IActionResult GetEdocManagement(EDocManagementCriterial criteria)
         {
-            var data = fileManagementService.GetEdocManagement(criteria).Result;
-            if (data == null)
+            var result = fileManagementService.GetEdocManagement(criteria).Result;
+            if (result == null)
             {
                 return BadRequest();
             }
-            return Ok(data);
+            return Ok(result);
         }
     }
 }
