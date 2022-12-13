@@ -21,8 +21,8 @@ namespace eFMSWindowService.Helpers
                 {
                     sw.WriteLine(Message);
 
-                    if (ConfigurationManager.AppSettings["MonitorFileLogs"] =="1")
-                        WriteLogs(logName, Message);
+                    //if (ConfigurationManager.AppSettings["MonitorFileLogs"] =="1")
+                    //    WriteLogs(logName, Message);
                 }
             }
             else
@@ -30,8 +30,8 @@ namespace eFMSWindowService.Helpers
                 using (StreamWriter sw = File.AppendText(filepath))
                 {
                     sw.WriteLine(Message);
-                    if (ConfigurationManager.AppSettings["MonitorFileLogs"] == "1")
-                        WriteLogs(logName, Message);
+                    //if (ConfigurationManager.AppSettings["MonitorFileLogs"] == "1")
+                    //    WriteLogs(logName, Message);
                 }
             }
         }
