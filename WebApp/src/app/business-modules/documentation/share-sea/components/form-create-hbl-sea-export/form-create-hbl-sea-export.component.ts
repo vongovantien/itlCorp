@@ -172,6 +172,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                             this.dateTimeModified = res.datetimeModified;
                             this.userCreated = res.userNameCreated;
                             this.userModified = res.userNameModified;
+                            this.type = res.transactionType;
                             this.hblId = res.id;
                             this.getShipmentType();
                             this.updateFormValue(res);
@@ -578,7 +579,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             case 'finalPod':
                 this.finalPod.setValue(data.id);
                 this.finalDestinationPlace.setValue((data as PortIndex).nameEn);
-                break;    
+                break;
             default:
                 break;
         }

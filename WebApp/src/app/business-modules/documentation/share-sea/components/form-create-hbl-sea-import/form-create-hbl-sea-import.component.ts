@@ -144,6 +144,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                     this.userCreated = res.userNameCreated;
                     this.userModified = res.userNameModified;
                     this.shipmentType = res.shipmentType;
+                    this.type = res.transactionType;
                     if (!this.isUpdate) {
                         const formData = {
                             masterBill: this.shipmentDetail.mawb,
