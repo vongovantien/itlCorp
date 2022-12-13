@@ -200,6 +200,8 @@
 
 <app-dropdown #dropdownMenuDuplicate>
     <a class="dropdown-item pointer" (click)="confirmDuplicate()" title="Duplicate with current job">Current Job</a>
-    <a class="dropdown-item pointer" (click)="confirmDuplicate(true)" title="Duplicate with job replicate">With Job
-        Replicate</a>
+    <ng-container *ngIf="(currentUser$ | async)?.officeType === 'Head'">
+        <a class="dropdown-item pointer" (click)="confirmDuplicate(true)" title="Duplicate with job replicate">With Job
+            Replicate</a>
+    </ng-container>
 </app-dropdown>

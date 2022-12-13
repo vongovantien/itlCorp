@@ -265,8 +265,8 @@ export class UtilityHelper {
 
     getChargeType(type: string) {
         return new Map([
-            ['BUY', [CommonEnum.CHARGE_TYPE.DEBIT]],
-            ['SELL', [CommonEnum.CHARGE_TYPE.CREDIT]],
+            ['BUY', [CommonEnum.CHARGE_TYPE.CREDIT]],
+            ['SELL', [CommonEnum.CHARGE_TYPE.DEBIT]],
             ['OBH', [CommonEnum.CHARGE_TYPE.OBH]],
         ]).get(type)[0];
     }
