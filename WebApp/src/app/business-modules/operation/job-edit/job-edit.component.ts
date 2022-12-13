@@ -280,7 +280,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         [this.editForm.commodityGroupId,
         this.editForm.packageTypeId,
         ].forEach((control: AbstractControl) => this.setError(control));
-        console.log(this.editForm);
         let valid: boolean = true;
         if (!this.editForm.formEdit.valid
             || (!!this.editForm.serviceDate.value && !this.editForm.serviceDate.value.startDate)
@@ -295,7 +294,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     onSubmitData() {
         const form: any = this.editForm.formEdit.getRawValue();
-
         this.opsTransaction.serviceDate = !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null;
         this.opsTransaction.finishDate = !!form.finishDate && !!form.finishDate.startDate ? formatDate(form.finishDate.startDate, 'yyyy-MM-dd', 'en') : null;
 
@@ -335,6 +333,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.deliveryDate = !!form.deliveryDate && !!form.deliveryDate.startDate ? formatDate(form.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null;
         this.opsTransaction.clearanceDate = !!form.clearanceDate && !!form.clearanceDate.startDate ? formatDate(form.clearanceDate.startDate, 'yyyy-MM-dd', 'en') : null;
         this.opsTransaction.suspendTime = form.suspendTime;
+        this.opsTransaction.serviceNo = this.editForm.shipmentInfo;
 
         if ((!!this.editForm.shipmentNo || !!this.opsTransaction.serviceNo) && form.shipmentMode === 'Internal'
             && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
@@ -343,6 +342,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             // this.opsTransaction.serviceNo = null;
             // this.opsTransaction.serviceHblId = null;
         }
+
     }
 
     updateShipment() {
@@ -360,6 +360,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             this.opsTransaction.serviceHblId = null;
                             this.opsTransaction.isLinkJob = false;
                         }
+                        this.isSaveLink = false;
                         return this._documentRepo.updateShipment(this.opsTransaction);
                     })
                 ).subscribe(
