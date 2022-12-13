@@ -501,51 +501,46 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
-                        return this._store.select(getCurrentUserState)
-                            .pipe(
-                                filter((c: any) => !!c.userName),
-                                switchMap((currentUser: SystemInterface.IClaimUser) => {
-                                    if (!!currentUser.userName) {
-                                        return this._exportRepo.exportCDNote(this.CdNoteDetail.jobId, this.CdNoteDetail.cdNote.code, currentUser.officeId)
-                                    }
-                                }),
-                                takeUntil(this.ngUnsubscribe),
-                            );
+                        return this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+                                .pipe(
+                                    switchMap(() => {
+                                        return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                                    }),
+                                    concatMap((x) => {
+                                        url = x.pathReportGenerate;
+                                        return this._exportRepo.exportCrystalReportPDF(x);
+                                    }), takeUntil(this.ngUnsubscribe)
+                                )
                     }
                     this._toastService.warning(res.message);
                     return of(false);
                 })
             )
         } else {
-            this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+            sourcePreview$ = this._documentationRepo.getDetailsCDNote(jobId, cdNote)
             .pipe(
-                switchMap((detail) => {
+                switchMap(() => {
                     return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
                 }),
                 concatMap((x) => {
                     url = x.pathReportGenerate;
                     return this._exportRepo.exportCrystalReportPDF(x);
-                })
-            ).subscribe(
-                (res: any) => {
-
-                },
-                (error) => {
-                    this._exportRepo.downloadExport(url);
-                },
-                () => {
-                    console.log(url);
-                }
-            );
+                }), takeUntil(this.ngUnsubscribe))
+                
         }
         sourcePreview$.subscribe(
-            (response: any) => {
-                if (response != null) {
-                    this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
-                } else {
-                    this._toastService.warning('No data found');
+            (res: any) => {
+
+            },
+            (error) => {
+                if(error.status === 200)
+                {
+                    this._exportRepo.downloadExport(url);
                 }
             },
-        );    
+            () => {
+                console.log(url);
+            }
+        );  
     }
 }

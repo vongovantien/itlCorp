@@ -417,25 +417,54 @@ export class ShareBussinessCdNoteDetailPopupComponent extends DetailCDNoteBase i
                 _format = 5;
                 break;
         }
-        this._documentationRepo.getDetailsCDNote(jobId, cdNote)
-        .pipe(
-            switchMap((detail) => {
-                return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
-            }),
-            concatMap((x) => {
-                url = x.pathReportGenerate;
-                return this._exportRepo.exportCrystalReportPDF(x);
-            })
-        ).subscribe(
-            (res: any) => {
-
-            },
-            (error) => {
-                this._exportRepo.downloadExport(url);
-            },
-            () => {
-                console.log(url);
+        let sourcePreview$;
+        if (this.CdNoteDetail.cdNote.type === "DEBIT") {
+            sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
+                partnerId: this.CdNoteDetail.partnerId,
+                hblId: this.CdNoteDetail.listSurcharges[0].hblid,
+                transactionType: 'DOC',
+                type: 3
+            }).pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                         return this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+                                .pipe(
+                                    switchMap(() => {
+                                        return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                                    }),
+                                    concatMap((x) => {
+                                        url = x.pathReportGenerate;
+                                        return this._exportRepo.exportCrystalReportPDF(x);
+                                    }), takeUntil(this.ngUnsubscribe)
+                                )
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                }))
+        } else {
+            sourcePreview$ = this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+            .pipe(
+                switchMap(() => {
+                    return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                }),
+                concatMap((x) => {
+                    url = x.pathReportGenerate;
+                    return this._exportRepo.exportCrystalReportPDF(x);
+                }), takeUntil(this.ngUnsubscribe))
             }
-        );
+            sourcePreview$.subscribe(
+                (res:  any) => {
+
+                },
+                (error) => {
+                    if(error.status === 200)
+                    {
+                        this._exportRepo.downloadExport(url);
+                    }
+                },
+                () => {
+                    console.log(url);
+                }
+            );
     }
 }

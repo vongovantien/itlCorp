@@ -16,10 +16,18 @@
                             <i class="la la-download"></i>Export<span class="caret"></span>
                         </button>
                         <div class="dropdown-menu" role="menu" aria-labelledby="button-nested">
-                            <a class="dropdown-item pointer" (click)="preview(false)">Preview with USD/VND</a>
-                            <a class="dropdown-item pointer" (click)="preview(true)">Preview with Original</a>
-                            <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
-                            <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="preview(false)">Preview with USD/VND</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="preview(true)">Preview with Original</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
+                            </div>
                             <!-- <a class="dropdown-item pointer" (click)="exportCDNote()">Export Excel Template</a> -->
                             <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
                                 <div class="d-flex justify-content-between ">

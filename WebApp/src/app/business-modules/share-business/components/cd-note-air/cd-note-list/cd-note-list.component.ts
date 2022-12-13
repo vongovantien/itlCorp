@@ -424,22 +424,9 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                     }
                     this._toastService.warning(res.message);
                     return of(false);
-                })
-            ).subscribe(
-                (res: any) => {
-                    if (!res) {
-                        this._toastService.warning('No data found');
-                    }
-                },
-                (error) => {
-                    this._exportRepo.downloadExport(url);
-                },
-                () => {
-                    console.log(url);
-                }
-            );
+                }))
         } else {
-            this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+            sourcePreview$ = this._documentationRepo.getDetailsCDNote(jobId, cdNote)
             .pipe(
                 switchMap(() => {
                     return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
@@ -447,19 +434,23 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                 concatMap((x) => {
                     url = x.pathReportGenerate;
                     return this._exportRepo.exportCrystalReportPDF(x);
-                })
-            ).subscribe(
-                (res: any) => {
+                }), takeUntil(this.ngUnsubscribe))
+            }
+            sourcePreview$.subscribe(
+                (res:  any) => {
 
                 },
                 (error) => {
-                    this._exportRepo.downloadExport(url);
+                    if(error.status === 200)
+                    {
+                        this._exportRepo.downloadExport(url);
+                    }
                 },
                 () => {
                     console.log(url);
                 }
             );
-        }
+        
     }
 
 }
