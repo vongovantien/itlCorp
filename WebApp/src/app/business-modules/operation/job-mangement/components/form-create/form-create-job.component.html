@@ -312,14 +312,16 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="row">
-                                    <div class="col-lg-3">
-                                        <div class="form-group">
-                                            <label class="form-control-label">
-                                                Replicate
-                                            </label>
-                                            <app-switch size="md" formControlName="isReplicate"></app-switch>
+                                    <ng-container *ngIf="userLogged?.officeType === 'Head'">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label class="form-control-label">
+                                                    Replicate
+                                                </label>
+                                                <app-switch size="md" formControlName="isReplicate"></app-switch>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </ng-container>
                                     <div class="col-lg-3">
                                         <div class="form-group"*ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                                             <label class="form-control-label">

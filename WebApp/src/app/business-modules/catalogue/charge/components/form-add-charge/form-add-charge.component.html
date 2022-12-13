@@ -130,13 +130,12 @@
                                 <label class="form-control-label">
                                     Buying Mapping
                                 </label>
-                                <app-combo-grid-virtual-scroll
-                                (itemSelected)="creditCharge.setValue($event.id); "
-                                [currentActiveItemId]="{ field: 'id', value: creditCharge.value}"
-                                [selectedDisplayFields]="['chargeNameEn']" [dataSources]="creditCharges | async"
-                                [displayFields]="[{ field: 'chargeNameEn', label: 'Name' }, { field: 'code', label: 'Code' }]"
-                                placeholder="Select charge"
-                                (remove)="resetFormControl(creditCharge); generateSelling.setValue(false) ">
+                                <app-combo-grid-virtual-scroll (itemSelected)="creditCharge.setValue($event.id); "
+                                    [currentActiveItemId]="{ field: 'id', value: creditCharge.value}"
+                                    [selectedDisplayFields]="['chargeNameEn']" [dataSources]="creditCharges | async"
+                                    [displayFields]="[{ field: 'chargeNameEn', label: 'Name' }, { field: 'code', label: 'Code' }]"
+                                    placeholder="Select charge"
+                                    (remove)="resetFormControl(creditCharge); generateSelling.setValue(false) ">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -204,7 +203,17 @@
                                 </ng-select>
                             </div>
                         </div>
-
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="form-control-label">
+                                    Offices
+                                </label>
+                                <ng-select [items]="listOffices | async" class="custom" placeholder="All"
+                                    formControlName="offices" [multiple]="true" class="custom" bindLabel="code"
+                                    bindValue="id">
+                                </ng-select>
+                            </div>
+                        </div>
 
                     </div>
                 </div>

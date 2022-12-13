@@ -7,6 +7,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public Guid Id { get; set; }
         public Guid JobId { get; set; }
         public Guid? Hblid { get; set; }
+        public string Hblno { get; set; }
         public int StageId { get; set; }
         public string Name { get; set; }
         public int? OrderNumberProcessed { get; set; }

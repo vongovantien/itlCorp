@@ -367,42 +367,38 @@ namespace eFMS.API.Documentation.DL.Services
         private OpsTransaction GetOpsTransactionToGenerateJobNo(SysOffice office)
         {
             OpsTransaction currentShipment = null;
-            if (office != null)
+            switch (office.Code)
             {
-                if (office.Code == "ITLHAN")
-                {
+                case "ITLHAN":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                          && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                          && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: HAN -> H [15202]
-                }
-                else if (office.Code == "ITLDAD")
-                {
+                    break;
+                case "ITLDAD":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
-                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
-                }
-                else
-                {
+                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                        && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
+                                                        .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
+                    break;
+                case "ITLCAM":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
-                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
-                                                         && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
-                }
-            }
-            else
-            {
-                currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
+                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                        && x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-"))
+                                                        .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                    break;
+                default:
+                    currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                      && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                      && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                     && !x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-")
                                                      && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                      .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                    break;
             }
             return currentShipment;
         }
@@ -410,16 +406,19 @@ namespace eFMS.API.Documentation.DL.Services
         private string SetPrefixJobIdByOfficeCode(string officeCode)
         {
             string prefixCode = string.Empty;
-            if (!string.IsNullOrEmpty(officeCode))
+            switch (officeCode)
             {
-                if (officeCode == "ITLHAN")
-                {
-                    prefixCode = "H"; //HAN- >> H
-                }
-                else if (officeCode == "ITLDAD")
-                {
-                    prefixCode = "D"; //DAD- >> D
-                }
+                case "ITLHAN":
+                    prefixCode = "H";
+                    break;
+                case "ITLDAD":
+                    prefixCode = "D";
+                    break;
+                case "ITLCAM":
+                    prefixCode = "C";
+                    break;
+                default:
+                    break;
             }
             return prefixCode;
         }

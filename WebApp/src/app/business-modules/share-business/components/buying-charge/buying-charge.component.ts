@@ -14,7 +14,7 @@ import { AppList } from 'src/app/app.list';
 import { GetBuyingSurchargeAction, GetOBHSurchargeAction, GetSellingSurchargeAction } from './../../store';
 
 import { Observable } from 'rxjs';
-import { catchError, finalize, map, shareReplay, skip, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, shareReplay, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 
@@ -170,7 +170,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         this.getCurrency();
         this.getDetailHBL();
         this.getPartner();
-        this.getCharge();
         this.getShipmentContainer();
         this.getHBLContainer();
         this.getShipmentDetail();
@@ -268,10 +267,25 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     getShipmentDetail() {
         this._store.select(fromStore.getTransactionDetailCsTransactionState)
-            .pipe(catchError(this.catchError), takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (shipment: CsTransaction | OpsTransaction) => {
+            .pipe(
+                tap((shipment: CsTransaction | OpsTransaction) => {
                     this.shipment = shipment;
+                }),
+                switchMap((shipment) => {
+                    return this._catalogueRepo.getCharges({
+                        active: true,
+                        serviceTypeId: this.serviceTypeId,
+                        type: this.utility.getChargeType(this.TYPE),
+                        officeId: shipment?.officeId
+                    });
+                }),
+                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (charges) => {
+                    console.log(charges);
+                    this.listCharges = charges;
                 }
             );
     }
@@ -284,15 +298,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     this.hbl = hbl;
                 }
             );
-    }
-
-    getCharge() {
-        this.listCharges$ = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.CREDIT })
-        // .subscribe(
-        //     (charges: Charge[]) => {
-        //         this.listCharges = charges;
-        //     }
-        // );
     }
 
     sortSurcharge() {
@@ -324,7 +329,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
                 // * Unit, Unit Price had value
                 if (!chargeItem.unitId || chargeItem.unitPrice == null) {
-                    chargeItem.unitId = this.listUnits.find((u: Unit) => u.id === data.unitId).id;
+                    chargeItem.unitId = this.listUnits.find((u: Unit) => u.id === data.unitId)?.id || null;
                     chargeItem.unitPrice = data.unitPrice;
                     this.onChangeDataUpdateTotal(chargeItem);
                 }

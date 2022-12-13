@@ -170,9 +170,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var charge = DataContext.Get(x => x.Id == id).FirstOrDefault();
             var listChargeDefault = chargeDefaultRepository.Get(x => x.ChargeId == id).ToList();
             returnCharge.Charge = charge;
-
-            // Update permission
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+           // Update permission
+           ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
 
             BaseUpdateModel baseModel = new BaseUpdateModel
@@ -511,9 +510,11 @@ namespace eFMS.API.Catalogue.DL.Services
                                    || (x.ServiceTypeId ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase))
                                    && (x.Active == criteria.Active || criteria.Active == null);
             }
+            if(!string.IsNullOrEmpty(criteria.OfficeId))
+            {
+                query = query.And(x => !string.IsNullOrEmpty(x.Offices) && x.Offices.ToLower().Contains(criteria.OfficeId.ToLower()));
+            } 
             var list = DataContext.Get(query);
-            var currencies = currencyService.Get();
-            var units = catUnitService.Get();
             var catChargeLst = (from charge in list select new CatChargeModel
                                 {
                                     Id = charge.Id,
