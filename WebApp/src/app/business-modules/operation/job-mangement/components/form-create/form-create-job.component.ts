@@ -119,6 +119,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             )
         this.initForm();
     }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'supplier':

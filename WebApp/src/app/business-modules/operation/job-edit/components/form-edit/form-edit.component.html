@@ -151,7 +151,7 @@
                         </div>
                     </div>
                     <ng-select class="custom" [clearable]="false" [items]="shipmentModes" placeholder="Please select"
-                        formControlName="shipmentMode">
+                        formControlName="shipmentMode" (change)="onSelectDataFormInfo($event, 'shipmentMode')">
                     </ng-select>
                     <div class="form-control-feedback"
                         *ngIf="(shipmentMode.dirty && !shipmentMode.valid) || (isSubmitted && !shipmentMode.valid)">
