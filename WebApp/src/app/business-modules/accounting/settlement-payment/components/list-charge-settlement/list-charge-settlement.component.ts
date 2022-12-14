@@ -567,7 +567,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     }
                     this.tableListChargePopup.getMasterCharges(shipment.officeId, shipment.service);
 
-                    const selectedCD = this.tableListChargePopup.cds.find(x => x.clearanceNo === surcharges[0].clearanceNo);
+                    const selectedCD = (this.tableListChargePopup.cds || []).find(x => x.clearanceNo === surcharges[0].clearanceNo);
                     if (!!selectedCD) {
                         this.tableListChargePopup.selectedCD = selectedCD;
                     }
