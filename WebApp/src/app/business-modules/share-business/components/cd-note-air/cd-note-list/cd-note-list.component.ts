@@ -248,7 +248,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
     //     this.componentRef.instance.hide();
     // }
 
-    renderAndShowReport() {
+    renderAndShowReport(templateCode: string, jobId: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -269,10 +269,10 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                             url: (this.dataReport as Crystal).pathReportGenerate || null,
                             module: 'Document',
                             folder: 'Shipment',
-                            objectId: this.idMasterBill,
+                            objectId: jobId,
                             hblId: SystemConstants.EMPTY_GUID,
-                            templateCode: this.cdNotePrint[0].type,
-                            transactionType: TransactionTypeEnum[this.transactionType]
+                            templateCode: templateCode,
+                            transactionType: this.utility.getTransationTypeByEnum(this.transactionType)
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
                     }
@@ -296,7 +296,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                 () => {
                     sub.unsubscribe();
                 }
-            );
+            ); 
     }
 
     checkValidCDNote() {
@@ -378,7 +378,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport(this.cdNotePrint[0].type, this.cdNotePrint[0].jobId);
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -392,12 +392,14 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
     }
 
     previewAirCdNote(jobId: string, cdNote:string, data: string) {
+        let typeCdNote = this.selectedCdNote.type;
+        let hblidCdNote = this.selectedCdNote.hblid;
         let sourcePreview$;
         if (this.selectedCdNote.type === "DEBIT") {
             this.cdNoteDetailPopupComponent.getDetailCdNote(jobId, cdNote);
             sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
                 partnerId: this.selectedCdNote.partnerId,
-                hblId: this.selectedCdNote.hblid,
+                hblId: hblidCdNote,
                 transactionType: 'DOC',
                 type: 3
             }).pipe(
@@ -419,7 +421,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                     if (res !== false) {
                         if (res != null && res.dataSource.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport(typeCdNote, jobId);
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }

@@ -284,9 +284,7 @@ export class OpsCDNoteComponent extends AppList {
         this.componentRef.instance.show();
     }
 
-    renderAndShowReport() {
-        console.log(this.cdNotePrint);
-
+    renderAndShowReport(templateCode: string, jobId: string, hblid: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -308,9 +306,9 @@ export class OpsCDNoteComponent extends AppList {
                             url: (this.dataReport as Crystal).pathReportGenerate || null,
                             module: 'Document',
                             folder: 'Shipment',
-                            objectId: this.idMasterBill,
-                            hblId: SystemConstants.EMPTY_GUID,
-                            templateCode: this.cdNotePrint[0].type,
+                            objectId: jobId,
+                            hblId: hblid,
+                            templateCode: templateCode,
                             transactionType: 'CL'
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
@@ -334,7 +332,7 @@ export class OpsCDNoteComponent extends AppList {
                 () => {
                     sub.unsubscribe();
                 }
-            );
+            );        
     }
 
     preview(isOrigin: boolean) {
@@ -351,7 +349,7 @@ export class OpsCDNoteComponent extends AppList {
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport(this.cdNotePrint[0].type, this.cdNotePrint[0].jobId, this.cdNotePrint[0].hblid);
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -378,11 +376,13 @@ export class OpsCDNoteComponent extends AppList {
             );
     }
     previewItem(jobId: string, cdNote:string, currency: string = 'VND') {
+        let typeCdNote = this.selectedCdNote.type;
+        let hblidCdNote = this.selectedCdNote.hblid;
         let sourcePreview$;
-        if (this.selectedCdNote.type === "DEBIT") {
+        if (typeCdNote === "DEBIT") {
             sourcePreview$ = this._documentRepo.validateCheckPointContractPartner({
                 partnerId: this.selectedCdNote.partnerId,
-                hblId: this.selectedCdNote.hblid,
+                hblId: hblidCdNote,
                 transactionType: 'CL',
                 type: 3
             }).pipe(
@@ -403,7 +403,7 @@ export class OpsCDNoteComponent extends AppList {
                 (res: any) => {
                     if (res != null && res?.dataSource.length > 0) {
                         this.dataReport = res;
-                        this.renderAndShowReport();
+                        this.renderAndShowReport(typeCdNote, jobId, hblidCdNote);
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }

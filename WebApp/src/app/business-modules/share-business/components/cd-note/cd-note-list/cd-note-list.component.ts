@@ -277,7 +277,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         this.componentRef.instance.show();
     }
 
-    renderAndShowReport() {
+    renderAndShowReport(templateCode: string, jobId: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -289,7 +289,6 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 this.subscription.unsubscribe();
                 this.reportContainerRef.viewContainerRef.clear();
             });
-
         let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
             .pipe(
                 concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
@@ -299,10 +298,10 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                             url: (this.dataReport as Crystal).pathReportGenerate || null,
                             module: 'Document',
                             folder: 'Shipment',
-                            objectId: this.idMasterBill,
+                            objectId: jobId,
                             hblId: SystemConstants.EMPTY_GUID,
-                            templateCode: this.cdNotePrint[0].type,
-                            transactionType: TransactionTypeEnum[this.transactionType]
+                            templateCode: templateCode,
+                            transactionType: this.utility.getTransationTypeByEnum(this.transactionType)
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
                     }
@@ -372,7 +371,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport(this.cdNotePrint[0].type, this.cdNotePrint[0].jobId);
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -380,6 +379,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
             );
     }
     previewItem(jobId: string, cdNote:string , currency: string = 'VND') {
+        let typeCdNote = this.selectedCdNote.type;
         if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
             this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
                 .pipe(
@@ -388,7 +388,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport(typeCdNote, jobId);
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -403,7 +403,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                         if (res != null) {
                             if (res?.dataSource?.length > 0) {
                                 this.dataReport = res;
-                                this.renderAndShowReport();
+                                this.renderAndShowReport(typeCdNote, jobId);
                             } else {
                                 this._toastService.warning('There is no data to display preview');
                             }
