@@ -163,6 +163,9 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             case 'salesman':
                 this.salemansId.setValue(data.id);
                 break;
+            case 'billingOps':
+                this.billingOpsId.setValue(data.id);
+                break;
             default:
                 break;
         }
