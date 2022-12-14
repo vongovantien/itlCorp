@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { catchError, concatMap, filter, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
-import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
+import { catchError, concatMap, filter, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { SortService } from 'src/app/shared/services';
 import { ActivatedRoute } from '@angular/router';
@@ -53,7 +53,8 @@ export class OpsCDNoteComponent extends AppList {
         private _sortService: SortService,
         private _activedRouter: ActivatedRoute,
         private _toastService: ToastrService,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
+        private _fileMngtRepo: SystemFileManageRepo
     ) {
         super();
     }
@@ -280,7 +281,7 @@ export class OpsCDNoteComponent extends AppList {
         this.componentRef.instance.show();
     }
 
-    renderAndShowReport() {
+    renderAndShowReport(templateCode: string, jobId: string, hblid: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -292,6 +293,42 @@ export class OpsCDNoteComponent extends AppList {
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
             });
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: jobId,
+                            hblId: hblid,
+                            templateCode: templateCode,
+                            transactionType: 'CL'
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );        
     }
 
     preview(isOrigin: boolean) {
@@ -308,7 +345,7 @@ export class OpsCDNoteComponent extends AppList {
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport(this.cdNotePrint[0].type, this.cdNotePrint[0].jobId, this.cdNotePrint[0].hblid);
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -335,11 +372,13 @@ export class OpsCDNoteComponent extends AppList {
             );
     }
     previewItem(jobId: string, cdNote:string, currency: string = 'VND') {
+        let typeCdNote = this.selectedCdNote.type;
+        let hblidCdNote = this.selectedCdNote.hblid;
         let sourcePreview$;
-        if (this.selectedCdNote.type === "DEBIT") {
+        if (typeCdNote === "DEBIT") {
             sourcePreview$ = this._documentRepo.validateCheckPointContractPartner({
                 partnerId: this.selectedCdNote.partnerId,
-                hblId: this.selectedCdNote.hblid,
+                hblId: hblidCdNote,
                 transactionType: 'CL',
                 type: 3
             }).pipe(
@@ -360,7 +399,7 @@ export class OpsCDNoteComponent extends AppList {
                 (res: any) => {
                     if (res != null && res?.dataSource.length > 0) {
                         this.dataReport = res;
-                        this.renderAndShowReport();
+                        this.renderAndShowReport(typeCdNote, jobId, hblidCdNote);
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }

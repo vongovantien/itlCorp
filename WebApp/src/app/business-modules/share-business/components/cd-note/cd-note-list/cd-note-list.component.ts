@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
-import { catchError, concatMap, filter, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from 'src/app/shared/repositories';
+import { catchError, concatMap, filter, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -21,6 +21,7 @@ import { delayTime } from '@decorators';
 import { Crystal } from '@models';
 import { ChargeConstants, SystemConstants } from '@constants';
 import { getCurrentUserState } from '@store';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'cd-note-list',
@@ -54,7 +55,8 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         private _sortService: SortService,
         private _store: Store<TransactionActions>,
         private _activedRouter: ActivatedRoute,
-        private _exportRepo: ExportRepo
+        private _exportRepo: ExportRepo,
+        private _fileMngtRepo: SystemFileManageRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -276,7 +278,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         this.componentRef.instance.show();
     }
 
-    renderAndShowReport() {
+    renderAndShowReport(templateCode: string, jobId: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -288,6 +290,42 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 this.subscription.unsubscribe();
                 this.reportContainerRef.viewContainerRef.clear();
             });
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: jobId,
+                            hblId: SystemConstants.EMPTY_GUID,
+                            templateCode: templateCode,
+                            transactionType: this.utility.getTransationTypeByEnum(this.transactionType)
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 
     checkValidCDNote() {
@@ -333,7 +371,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport(this.cdNotePrint[0].type, this.cdNotePrint[0].jobId);
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -341,6 +379,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
             );
     }
     previewItem(jobId: string, cdNote:string , currency: string = 'VND') {
+        let typeCdNote = this.selectedCdNote.type;
         if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
             this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
                 .pipe(
@@ -349,7 +388,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport(typeCdNote, jobId);
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -364,7 +403,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                         if (res != null) {
                             if (res?.dataSource?.length > 0) {
                                 this.dataReport = res;
-                                this.renderAndShowReport();
+                                this.renderAndShowReport(typeCdNote, jobId);
                             } else {
                                 this._toastService.warning('There is no data to display preview');
                             }
