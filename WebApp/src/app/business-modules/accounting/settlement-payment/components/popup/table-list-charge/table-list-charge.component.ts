@@ -284,7 +284,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected && !chg.hadIssued); // Update shipment for selected charges without issued
         let notSelectedCharges = this.charges.filter((chg: Surcharge) => selectedCharges.filter(x => x.id === chg.id).length === 0);
         if (!!selectedCharges.length) {
-            if (this.utility.getServiceType(selectedCharges[0].jobId) !== this.utility.getServiceType(data.jobId)) {
+            if (selectedCharges[0].typeService !== this.utility.getServiceType(data.jobId)) {
                 this.getMasterCharges(this.selectedShipment.officeId, this.serviceTypeId, true);
             }
             if (selectedCharges[0].hblid !== data.hblid) {
@@ -329,7 +329,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected && !chg.hadIssued); // Update clearance no for selected charges without issued
             let notSelectedCharges = this.charges.filter((chg: Surcharge) => selectedCharges.filter(x => x.id === chg.id).length === 0);
             if (!!selectedCharges.length) {
-                if (this.utility.getServiceType(selectedCharges[0].jobId) !== this.utility.getServiceType((data as CustomDeclaration).jobNo)) {
+                if (selectedCharges[0].typeService !== this.utility.getServiceType((data as CustomDeclaration).jobNo)) {
                     this.getMasterCharges(this.selectedCD.officeId, this.serviceTypeId, true);
                 }
                 if (selectedCharges[0].hblid !== data.hblid) {
