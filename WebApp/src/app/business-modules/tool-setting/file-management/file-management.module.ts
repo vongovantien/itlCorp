@@ -15,14 +15,14 @@ const routing: Routes = [
 
     {
         path: "",
-        data: { name: "General", title: 'General File Management' }, redirectTo: 'general-file-management',
+        data: { name: "General", title: 'General File Management' }, redirectTo: 'general',
     },
     {
-        path: 'general-file-management', component: GeneralFileManagementComponent,
+        path: 'general', component: GeneralFileManagementComponent,
         data: { name: "General", title: 'General File Management' },
     },
     {
-        path: 'accountant-file-management', component: AccountantFileManagementComponent,
+        path: 'accountant', component: AccountantFileManagementComponent,
         data: { name: "Accountant", title: 'Accountant File Management' },
     }
 ]

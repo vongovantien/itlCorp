@@ -166,12 +166,13 @@ namespace eFMS.API.Setting.DL.Services
         {
             var data = await edocRepo.WhereAsync(await ExpressionQuery(criterial));
             List<EDocFile> eDocFiles = new List<EDocFile>();
-            data.ForEach(x =>
+           
+            var result = eDocFiles.AsQueryable().Skip((criterial.Page - 1) * criterial.Size).Take(criterial.Size);
+            result.ToList().ForEach(x =>
             {
                 var edocFile = MappingEDocFile(x);
                 eDocFiles.Add(edocFile.Result);
             });
-            var result = eDocFiles.AsQueryable().Skip((criterial.Page - 1) * criterial.Size).Take(criterial.Size);
             return new ResponsePagingModel<EDocFile>()
             {
                 Data = result,

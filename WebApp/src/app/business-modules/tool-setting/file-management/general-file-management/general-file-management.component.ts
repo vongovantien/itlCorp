@@ -58,7 +58,7 @@ export class GeneralFileManagementComponent extends AppList implements OnInit {
     onSelectTab(tabName: string) {
         switch (tabName) {
             case 'Acc':
-                this._router.navigate([`${RoutingConstants.TOOL.FILE_MANAGMENT}/accountant-file-management`]);
+                this._router.navigate([`${RoutingConstants.TOOL.FILE_MANAGMENT}/accountant`]);
                 break;
             default:
                 break;

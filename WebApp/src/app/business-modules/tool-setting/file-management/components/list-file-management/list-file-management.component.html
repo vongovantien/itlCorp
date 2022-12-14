@@ -5,21 +5,21 @@
                 <table class="table table-hover table-brand dataTable">
                     <thead app-table-header [headers]="headers"
                         (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                        <th class="first table-actions-col">Action</th>
+                        <!-- <th class="first table-actions-col">Action</th> -->
                     </thead>
                     <tbody>
                         <ng-container *ngIf="!!listEdocFile?.data?.length">
-                            <tr class="collapse-toggle-row"
+                            <tr class="collapse-toggle-row" [contextMenu]="fileManageContext" (onTouch)="onSelectFile(edocFile)"
                                 *ngFor="let edocFile of listEdocFile?.data ;let i = index; trackBy: trackByFn">
 
-                                <td class="table-actions-col">
+                                <!-- <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <!-- <app-permission-button (onClick)="onDeleteEdoc(edocFile.id)" type="delete">
-                                        </app-permission-button> -->
+                                        <app-permission-button (onClick)="onDeleteEdoc(edocFile.id)" type="delete">
+                                        </app-permission-button>
                                         <app-permission-button (onClick)="downloadEdoc(edocFile)" type="download">
                                         </app-permission-button>
                                     </div>
-                                </td>
+                                </td> -->
                                 <td>{{edocFile.systemFileName}}</td>
                                 <td>{{edocFile.documentType}}</td>
                                 <td>{{edocFile.jobRef}}</td>
@@ -46,3 +46,17 @@
 </div>
 
 <confirm-popup body="Do you want to delete?" (onSubmit)="deleteEdoc()"></confirm-popup>
+
+<app-context-menu #fileManageContext (clickOutside)="selectedFile = null">
+    <ng-container>
+        <div class="menu-context__item" (click)="downloadEdoc()">
+            <span><i class="la la-download align-middle text-primary"></i><span>Download</span></span>
+        </div>
+        <!-- <div class="menu-context__item {{(selectedFile?.userCreated === currentUser.userName && !readonly) === false ? 'disabled':''}}"
+        (click)="confirmDelete()">
+        <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
+    </div>-->
+    </ng-container>
+</app-context-menu>
+
+<ng-template inject></ng-template>

@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ConfirmPopupComponent } from '@common';
 import { SystemConstants } from '@constants';
+import { InjectViewContainerRefDirective } from '@directives';
 import { SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { catchError } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { fileManagePaging } from '../../general-file-management/general-file-management.component';
 
@@ -19,6 +19,8 @@ export class ListFileManagementComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @Output() reGetEdoc: EventEmitter<boolean> = new EventEmitter<false>();
     @Output() changePage: EventEmitter<any> = new EventEmitter<any>();
+    selectedFile: any = null;
+    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
 
     constructor(
         private _systemFileRepo: SystemFileManageRepo,
@@ -42,26 +44,39 @@ export class ListFileManagementComponent extends AppList implements OnInit {
         ]
     }
 
-    onDeleteEdoc(id: string = '') {
-        this.edocId = id;
-        this.confirmDeletePopup.show();
-    }
+    // onDeleteEdoc(id: string = '') {
+    //     this.edocId = id;
+    //     this.confirmDeletePopup.show();
+    // }
 
-    deleteEdoc() {
-        this._systemFileRepo.deleteEdoc(this.edocId)
-            .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res.status) {
-                        this._toast.success("Delete Sucess");
-                        this.confirmDeletePopup.close();
-                        this.reGetEdoc.emit(true);
-                    }
-                },
-            );
-    }
+    // deleteEdoc() {
+    //     this._systemFileRepo.deleteEdoc(this.edocId)
+    //         .pipe(
+    //             catchError(this.catchError),
+    //         )
+    //         .subscribe(
+    //             (res: any) => {
+    //                 if (res.status) {
+    //                     this._toast.success("Delete Sucess");
+    //                     this.confirmDeletePopup.close();
+    //                     this.reGetEdoc.emit(true);
+    //                 }
+    //             },
+    //         );
+    // }
+
+    // confirmDelete() {
+    //     let messageDelete = `Do you want to delete this Attach File ? `;
+    //     this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+    //         title: 'Delete Attach File',
+    //         body: messageDelete,
+    //         labelConfirm: 'Yes',
+    //         classConfirmButton: 'btn-danger',
+    //         iconConfirm: 'la la-trash',
+    //         center: true
+    //     }, () => this.deleteEdoc())
+    // }
+
 
     updatePagingEdocFile(e: { page: number, pageSize: number, data: any }) {
         let pageData: any = {
@@ -71,10 +86,13 @@ export class ListFileManagementComponent extends AppList implements OnInit {
         this.changePage.emit(pageData);
     }
 
-    downloadEdoc(edoc: any) {
-        console.log(edoc);
+    onSelectFile(edoc: any) {
+        this.selectedFile = edoc;
+    }
 
-        const selectedEdoc = Object.assign({}, edoc);
+    downloadEdoc() {
+
+        const selectedEdoc = Object.assign({}, this.selectedFile);
         if (selectedEdoc.id === selectedEdoc.sysImageId) {
             this._systemFileRepo.getFileEdoc(selectedEdoc.sysImageId).subscribe(
                 (data) => {

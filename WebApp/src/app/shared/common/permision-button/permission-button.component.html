@@ -48,17 +48,6 @@
             </ng-container>
         </ng-container>
     </ng-container>
-    <ng-container *ngSwitchCase="'download'">
-        <ng-container *ngIf="(menuPermission | async)?.detail !== 'None'">
-            <ng-container *ngIf="!!user && (menuPermission | async)?.detail=== 'Owner';else downloadTpl">
-                <button type="button" NoDbClick
-                    class="btn btn-{{class ? class : 'success'}}  m-btn--icon m-btn--icon-only"
-                    (click)="onClicked($event)" *hasOwnerPermission="user">
-                    <i class="la la-download"></i>
-                </button>
-            </ng-container>
-        </ng-container>
-    </ng-container>
     <ng-container *ngSwitchCase="'copy'">
         <ng-container *ngIf="(menuPermission | async)?.detail !== 'None'">
             <ng-container *ngIf="!!user && (menuPermission | async)?.detail=== 'Owner';else copyTpl">
