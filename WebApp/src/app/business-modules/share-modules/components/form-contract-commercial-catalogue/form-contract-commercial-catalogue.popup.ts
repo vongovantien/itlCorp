@@ -1023,6 +1023,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.formGroup.controls['currencyId'].setValue("VND");
                 break;
             case 'Cash':
+                this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
                 break;
             default:
