@@ -9,7 +9,7 @@
     <tabset class="custom-class-tab">
         <tab [active]="true">
             <ng-template tabHeading>
-                <a routerLink="/home/tool/file-management" class="dropdown-item" href="javascript:void(0)">General</a>
+                <a routerLink="/home/tool/file-management/general" class="dropdown-item" href="javascript:void(0)">General</a>
             </ng-template>
             <div class="m-portlet">
                 <div class="m-portlet__body">
@@ -32,7 +32,7 @@
         </tab>
         <tab (selectTab)="onSelectTab('Acc')">
             <ng-template tabHeading>
-                <a routerLink="/home/tool/file-management/accountant-file-management" style="color:#6f727d">
+                <a routerLink="/home/tool/file-management/accountant" style="color:#6f727d">
                     Accountant
                 </a>
             </ng-template>
