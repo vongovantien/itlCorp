@@ -166,8 +166,7 @@ namespace eFMS.API.Setting.DL.Services
         {
             var data = await edocRepo.WhereAsync(await ExpressionQuery(criterial));
             List<EDocFile> eDocFiles = new List<EDocFile>();
-           
-            var result = eDocFiles.AsQueryable().Skip((criterial.Page - 1) * criterial.Size).Take(criterial.Size);
+            var result = data.AsQueryable().Skip((criterial.Page - 1) * criterial.Size).Take(criterial.Size);
             result.ToList().ForEach(x =>
             {
                 var edocFile = MappingEDocFile(x);
@@ -175,7 +174,7 @@ namespace eFMS.API.Setting.DL.Services
             });
             return new ResponsePagingModel<EDocFile>()
             {
-                Data = result,
+                Data = eDocFiles.AsQueryable(),
                 Page = criterial.Page,
                 Size = criterial.Size,
                 TotalItems = data.Count()
