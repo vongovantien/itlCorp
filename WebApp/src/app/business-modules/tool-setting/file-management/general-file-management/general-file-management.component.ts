@@ -9,7 +9,7 @@ import { ListFileManagementComponent } from '../components/list-file-management/
 
 @Component({
     selector: 'app-general-file-management',
-    templateUrl: './general-file-management.component.html',
+    templateUrl: './general-file-management.component.html'
 })
 export class GeneralFileManagementComponent extends AppList implements OnInit {
 
