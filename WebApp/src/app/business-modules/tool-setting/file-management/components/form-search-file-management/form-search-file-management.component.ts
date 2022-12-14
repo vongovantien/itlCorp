@@ -21,8 +21,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     referenceNo: AbstractControl;
     searchType: AbstractControl;
     dateModes: CommonInterface.ICommonTitleValue[] = [
-        { title: 'Create Date', value: 0 },
-        { title: 'Accounting Date', value: 1 },]
+        { title: 'Create Date', value: 0 },]
     dateMode: AbstractControl;
     date: AbstractControl;
     accountantType: AbstractControl;
@@ -66,6 +65,9 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
                 { title: 'Accountant No', value: 3 },
             ]
             this.isAcc = true;
+            this.dateModes = [
+                { title: 'Create Date', value: 0 },
+                { title: 'Accounting Date', value: 1 },]
             //this.submitSearch(this.formSearchFileManagement?.value);
         }
         this.formSearchFileManagement = this._fb.group({
@@ -86,27 +88,28 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     }
 
     submitSearch(formSearch: any) {
+        console.log(formSearch.accountantType);
+
         const bodySearch: Partial<IFileManageSearch> = {
             referenceNo: formSearch.referenceNo,
             referenceType: formSearch.searchType,
             fromDate: !!formSearch.date?.startDate ? formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en') : null,
             toDate: !!formSearch.date?.endDate ? formatDate(formSearch.date.endDate, "yyyy-MM-dd", 'en') : null,
             dateMode: formSearch.dateMode,
-            accountantType: this.isAcc ? formSearch.accountantType : null
+            accountantTypes: this.isAcc ? formSearch.accountantType == 0 ? [0] : formSearch.accountantType : null
         };
         console.log(bodySearch);
         this.onSearch.emit(bodySearch);
     }
 
     submitReset() {
-        //this.formSearchFileManagement.reset();
         const bodySearch: Partial<IFileManageSearch> = {
             referenceNo: null,
             referenceType: this.referenceTypes[0].value,
             fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
             toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
             dateMode: this.accountantTypes[0].value,
-            accountantType: this.isAcc ? this.accountantTypes[0].value : null
+            accountantTypes: this.isAcc ? [0] : null
         };
         this.referenceNo.setValue(null)
         this.date.setValue({
@@ -141,5 +144,5 @@ interface IFileManageSearch {
     fromDate: any,
     toDate: any,
     dateMode: string,
-    accountantType: number[],
+    accountantTypes: number[],
 }

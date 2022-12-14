@@ -229,6 +229,64 @@ namespace eFMS.API.Setting.DL.Services
 
             return edocFile;
         }
+        private async Task<Expression<Func<SysImageDetail, bool>>> QueryAccType(List<AccountantType> accTypes, List<AccAccountingManagement> accManage,
+        List<AccAccountPayable> accPayable)
+        {
+            Expression<Func<SysImageDetail, bool>> query1 = q => true;
+            var Acctype = new List<Guid>();
+            bool haveQuery = false;
+            for (int i = 0; i < accTypes.Count; i++)
+            {
+                switch (accTypes[i])
+                {
+                    case AccountantType.OtherEntry:
+                        var voucherOTId = accManage.Where(x => x.VoucherType.Replace(" ", "").ToUpper() == "OTHERENTRY").Select(x => x.VoucherId);
+                        var accOTPayables = accPayable.Where(x => voucherOTId.Contains(x.VoucherNo));
+                        var accOTPayableNo = accOTPayables.Select(x => x.BillingNo);
+                        var edocOTs = edocRepo.Get(x => accOTPayableNo.Contains(x.BillingNo));
+                        Acctype = edocOTs.Select(x => x.Id).ToList();
+                        break;
+                    case AccountantType.CashPayment:
+                        var voucherCPId = accManage.Where(x => x.VoucherType.Replace(" ", "").ToUpper() == "CASHPAYMENT").Select(x => x.VoucherId);
+                        var accCPPayables = accPayable.Where(x => voucherCPId.Contains(x.VoucherNo));
+                        var accCPPayableNo = accCPPayables.Select(x => x.BillingNo);
+                        var edocCPs = edocRepo.Get(x => accCPPayableNo.Contains(x.BillingNo));
+                        Acctype = edocCPs.Select(x => x.Id).ToList();
+                        break;
+                    case AccountantType.PurchasingNote:
+                        var voucherPNId = accManage.Where(x => x.VoucherType.Replace(" ", "").ToUpper() == "PURCHASINGNOTE").Select(x => x.VoucherId);
+                        var accPNPayables = accPayable.Where(x => voucherPNId.Contains(x.VoucherNo));
+                        var accPNPayableNo = accPNPayables.Select(x => x.BillingNo);
+                        var edocPNs = edocRepo.Get(x => accPNPayableNo.Contains(x.BillingNo));
+                        Acctype = edocPNs.Select(x => x.Id).ToList();
+                        break;
+                    case AccountantType.CreditSlip:
+                        var voucherCLId = accManage.Where(x => x.VoucherType.Replace(" ", "").ToUpper() == "CREDITSLIP").Select(x => x.VoucherId);
+                        var accCLPayables = accPayable.Where(x => voucherCLId.Contains(x.VoucherNo));
+                        var accCLPayableNo = accCLPayables.Select(x => x.BillingNo);
+                        var edocCLs = edocRepo.Get(x => accCLPayableNo.Contains(x.BillingNo));
+                        Acctype = edocCLs.Select(x => x.Id).ToList();
+                        break;
+                    case AccountantType.CashReceipt:
+                        var voucherRCId = accManage.Where(x => x.VoucherType.Replace(" ", "").ToUpper() == "CASHRECEIPT").Select(x => x.VoucherId);
+                        var accRCPayables = accPayable.Where(x => voucherRCId.Contains(x.VoucherNo));
+                        var accRCPayableNo = accRCPayables.Select(x => x.BillingNo);
+                        var edocRCs = edocRepo.Get(x => accRCPayableNo.Contains(x.BillingNo));
+                        Acctype = edocRCs.Select(x => x.Id).ToList();
+                        break;
+                }
+                if (Acctype.Count() > 0)
+                {
+                    query1 = query1.And(x => Acctype.Contains((Guid)x.Id));
+                    haveQuery = true;
+                }
+            };
+            if (haveQuery)
+            {
+                return query1;
+            }
+            return query1.And(x => x.Id == null);
+        }
         private async Task<Expression<Func<SysImageDetail, bool>>> ExpressionQuery(EDocManagementCriterial criteria)
         {
             Expression<Func<SysImageDetail, bool>> query = q => true;
@@ -246,6 +304,7 @@ namespace eFMS.API.Setting.DL.Services
             var accManages = new List<AccAccountingManagement>();
             var lstId1 = new List<Guid>();
             var lstId2 = new List<Guid>();
+
             if (criteria.isAcc)
             {
                 query = query.And(x => x.BillingNo != null);
@@ -354,38 +413,26 @@ namespace eFMS.API.Setting.DL.Services
                         break;
                 }
             }
-            if (criteria.AccountantTypes != null&&criteria.AccountantTypes.Count()>0)
+            if (criteria.AccountantTypes != null && criteria.AccountantTypes.Count() > 0)
             {
-                var accManage = await accManageRepo.GetAsync(x => lstRefNo.Contains(x.VoucherId));
-                //var accType = accManage.Select(x => x.VoucherType);
-                criteria.AccountantTypes.ForEach(z =>
+                var accManage = new List<AccAccountingManagement>();
+                var accPayable = new List<AccAccountPayable>();
+                if (!isRefNo)
                 {
-                    switch (z)
-                    {
-                        case AccountantType.OtherEntry:
-                            var accOEId = accManage.Where(x => x.VoucherType.Trim().ToUpper() == "OTHERENTRY").Select(x => x.Id);
-                            query = query.And(x => accOEId.Contains((Guid)x.JobId));
-                            break;
-                        case AccountantType.CashPayment:
-                            var accCPId = accManage.Where(x => x.VoucherType.Trim().ToUpper() == "CASHPAYMENT").Select(x => x.Id);
-                            query = query.And(x => accCPId.Contains((Guid)x.JobId));
-                            break;
-                        case AccountantType.PurchasingNote:
-                            var accPNId = accManage.Where(x => x.VoucherType.Trim().ToUpper() == "PURCHASINGNOTE").Select(x => x.Id);
-                            query = query.And(x => accPNId.Contains((Guid)x.JobId));
-                            break;
-                        case AccountantType.CreditSlip:
-                            var accCLId = accManage.Where(x => x.VoucherType.Trim().ToUpper() == "CREDITSLIP").Select(x => x.Id);
-                            query = query.And(x => accCLId.Contains((Guid)x.JobId));
-                            break;
-                        case AccountantType.CashReceipt:
-                            var accRCId = accManage.Where(x => x.VoucherType.Trim().ToUpper() == "CASHRECEIPT").Select(x => x.Id);
-                            query = query.And(x => accRCId.Contains((Guid)x.JobId));
-                            break;
-                    }
-                });
+                    accPayable = await accPayableRepo.GetAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated <= criteria.ToDate);
+                    var accManageNo = accPayable.Select(x => x.VoucherNo);
+                    accManage = await accManageRepo.GetAsync(x => accManageNo.Contains(x.VoucherId));
+                }
+                else
+                {
+                    accPayable = await accPayableRepo.GetAsync(x => lstRefNo.Contains(x.VoucherNo));
+                    var accManageNo = accPayable.Select(x => x.VoucherNo);
+                    accManage = await accManageRepo.GetAsync(x => accManageNo.Contains(x.VoucherId));
+                }
+                var query1 = QueryAccType(criteria.AccountantTypes, accManage, accPayable).Result;
+                query = query.And(query1);
             }
-          
+
             return query;
         }
     }

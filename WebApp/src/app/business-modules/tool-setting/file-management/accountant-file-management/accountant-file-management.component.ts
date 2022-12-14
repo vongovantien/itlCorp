@@ -34,6 +34,8 @@ export class AccountantFileManagementComponent extends AppList implements OnInit
     }
 
     onSearchFile(body: any) {
+        console.log(body);
+
         body.Size = this.pageSize;
         body.Page = this.page;
         this.dataSearch = body;
@@ -50,6 +52,8 @@ export class AccountantFileManagementComponent extends AppList implements OnInit
                 }
             );
     }
+
+
     onSelectTab(tabName: string) {
         switch (tabName) {
 
