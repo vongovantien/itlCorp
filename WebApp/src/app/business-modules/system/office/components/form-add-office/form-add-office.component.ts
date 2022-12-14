@@ -66,7 +66,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     officeType: AbstractControl;
     partnerMapping: AbstractControl;
     SelectedOffice: any = {};
-    
+
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
         { title: 'Inactive', value: false },
@@ -90,7 +90,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
 
     ngOnInit(): void {
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
-        
+
         this.initForm();
         this.getDataComboBox();
 
@@ -160,7 +160,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
 
     }
 
-    resetPartnerMapping(data: any){
+    resetPartnerMapping(data: any) {
         this.partnerMapping.setValue(SystemConstants.EMPTY_GUID);
     }
 
@@ -212,7 +212,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             officeType: ['Branch', Validators.compose([
                 Validators.required
             ])],
-            internalCode: [],
+            internalCode: [null, Validators.maxLength(20)],
             partnerMapping: [],
         });
 
