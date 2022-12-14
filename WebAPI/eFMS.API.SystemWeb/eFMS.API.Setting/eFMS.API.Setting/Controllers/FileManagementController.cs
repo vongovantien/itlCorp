@@ -1,4 +1,5 @@
-﻿using eFMS.API.Common.Globals;
+﻿using eFMS.API.Common;
+using eFMS.API.Common.Globals;
 using eFMS.API.Common.Models;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
@@ -6,12 +7,18 @@ using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Infrastructure.Middlewares;
 using eFMS.API.Setting.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Setting.Controllers
 {
@@ -59,6 +66,19 @@ namespace eFMS.API.Setting.Controllers
                 return BadRequest();
             }
             return Ok(data);
+        }
+
+        [HttpPost]
+        [Route("GetEdocManagement")]
+        [Authorize]
+        public IActionResult GetEdocManagement(EDocManagementCriterial criteria)
+        {
+            var result = fileManagementService.GetEdocManagement(criteria).Result;
+            if (result == null)
+            {
+                return BadRequest();
+            }
+            return Ok(result);
         }
     }
 }

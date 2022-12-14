@@ -28,6 +28,11 @@ namespace eFMS.API.Setting.Infrastructure
             CreateMap<SetUnlockRequestApprove, SetUnlockRequestApproveModel>();
             CreateMap<RuleLinkFeeModel, CsRuleLinkFee>();
             CreateMap<SysImageModel, SysImage>();
+
+            CreateMap<SysImageDetail, EDocFile>().ForMember(dest => dest.DocumentType, o => o.Ignore())
+                .ForMember(dest => dest.JobRef, o => o.Ignore())
+                .ForMember(dest => dest.HBLNo, o => o.Ignore())
+                .ReverseMap();
         }
     }
 }

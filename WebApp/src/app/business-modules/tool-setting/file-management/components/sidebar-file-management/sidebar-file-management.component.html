@@ -24,42 +24,26 @@
     </div>
     <ul class="m-menu__nav navbar-nav pt-3 menu-sidebar-file-management">
 
-        <li class="m-menu__link p-3" [ngClass]="{'active-side-file' : this.title === 'Accounting'}">
+        <li class="m-menu__link p-3" [ngClass]="{'active-side-file' : this.title === 'Accountant'}">
             <a href="javascript:;" class="m-menu__link ng-star-inserted text-dark d-flex align-items-center"
-                (click)="navigateFileMngt('accounting')">
+                (click)="redirectTo('Accountant')">
                 <i class="icon-calculator m__link-icon"></i>
                 <span class="m-menu__link-text ml-3">
-                    Accounting
+                    Accountant
                 </span>
             </a>
         </li>
-        <li class="m-menu__item p-3" [ngClass]="{'active-side-file' : this.title === 'Document'}">
+        <li class="m-menu__item p-3" [ngClass]="{'active-side-file' : this.title === 'General'}">
             <a href="javascript:;" class="m-menu__link ng-star-inserted text-dark d-flex align-items-center "
-                (click)="navigateFileMngt('document')">
+                (click)="redirectTo('General')">
                 <i class="icon-file-text2 m-menu__link-icon"></i>
                 <span class="m-menu__link-text ml-3">
-                    Document
-                </span>
-            </a>
-        </li>
-        <li class="m-menu__item p-3">
-            <a href="javascript:;" class="m-menu__link ng-star-inserted text-dark d-flex align-items-center">
-                <i class="icon-books m-menu__link-icon"></i>
-                <span class="m-menu__link-text ml-3">
-                    Catalogue
-                </span>
-            </a>
-        </li>
-        <li class="m-menu__item p-3">
-            <a href="javascript:;" class="m-menu__link ng-star-inserted text-dark d-flex align-items-center">
-                <i class="icon-database m-menu__link-icon"></i>
-                <span class="m-menu__link-text ml-3">
-                    System
+                    General
                 </span>
             </a>
         </li>
     </ul>
-    <div *ngIf="isActiveSearch === true" class="ml-2 mt-3">
+    <!-- <div *ngIf="isActiveSearch === true" class="ml-2 mt-3">
         <form class="row" [formGroup]="formSearch">
             <div class="col-lg-11">
                 <div class="form-group">
@@ -77,5 +61,5 @@
                 </div>
             </div>
         </form>
-    </div>
+    </div> -->
 </div>

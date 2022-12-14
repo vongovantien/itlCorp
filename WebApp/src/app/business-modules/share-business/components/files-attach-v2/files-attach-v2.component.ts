@@ -57,6 +57,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     private _readonly: boolean = false;
     isView: boolean = true;
     elementInput: HTMLElement = null;
+    isEdocByJob: boolean = false;
+    isEdocByAcc: boolean = false;
 
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
@@ -367,6 +369,10 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 .subscribe(
                     (res: any) => {
                         this.edocByAcc = res;
+                        console.log(res);
+                        if (res.eDocs.length > 0) {
+                            this.isEdocByAcc = true
+                        }
                         this.onChange.emit(res);
                     },
                 );
@@ -432,6 +438,19 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     downloadAllEdoc() {
+        // let countEdocJob = _some(this.edocByJob, x => (x.eDocs !== null && x.eDocs?.length > 0));
+        // let countEdocAcc = _some(this.edocByAcc, x => (x.eDocs !== null && x.eDocs?.length > 0));
+        console.log(this.edocByAcc);
+
+        if (this.typeFrom === 'Shipment') {
+            if (this.edocByJob?.some(x => x.eDocs?.length > 0) || this.isEdocByAcc) {
+                return this._toast.warning("No data to Export");
+            }
+        } else {
+            if (!this.isEdocByAcc) {
+                return this._toast.warning("No data to Export");
+            }
+        }
         let model = {
             folderName: this.typeFrom,
             objectId: this.typeFrom === 'Shipment' ? this.jobId : this.billingId,
@@ -454,7 +473,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         let docType = this.selectedEdoc1?.documentTypeId;
         let listFile: any[] = [];
 
-        for (let i = 0; i < files.length; i++) {
+        for (let i = 0; i < files?.length; i++) {
             if (!!docType) {
                 files[i].DocumentId = docType;
                 files[i].DocumentCode = this.selectedEdoc1?.documentCode;
