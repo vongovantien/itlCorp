@@ -291,6 +291,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 selectedCharges.forEach((charge: Surcharge) => {
                     charge.isChangeShipment = true;
                     charge.id = null;
+                    if (charge.chargeId === SystemConstants.EMPTY_GUID) {
+                        charge.chargeId = null;
+                    }
                 });
             }
             for (const charge of selectedCharges) {
@@ -302,6 +305,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 charge.hbl = this.selectedShipment.hbl;
                 charge.hblid = this.selectedShipment.hblid;
                 charge.advanceNo = charge.originAdvanceNo = this.advanceNo.value;
+                if (charge.chargeId === SystemConstants.EMPTY_GUID) {
+                    charge.chargeId = null;
+                }
             }
             this.charges = [...selectedCharges, ...notSelectedCharges];
         } else {
