@@ -139,7 +139,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
         this._store.dispatch(new GetCatalogueUnitAction());
 
-        this.getMasterCharges();
+        // this.getMasterCharges();
         this.getShipmentCommonData();
         this.getCustomDecleration();
         this.initForm();
@@ -249,7 +249,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 if (isChangeService) {
                     this.charges.forEach((charge: Surcharge) => {
                         if (charge.chargeId) {
-                            charge.chargeId = SystemConstants.EMPTY_GUID;
+                            charge.chargeId = null;
                             charge.id = SystemConstants.EMPTY_GUID;
                             charge.chargeName = null;
                             charge.isChangeShipment = true;
@@ -290,7 +290,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             if (selectedCharges[0].hblid !== data.hblid) {
                 selectedCharges.forEach((charge: Surcharge) => {
                     charge.isChangeShipment = true;
-                    charge.id = SystemConstants.EMPTY_GUID;
+                    charge.id = null;
                 });
             }
             for (const charge of selectedCharges) {
@@ -368,7 +368,18 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 if (this.charges.length > 0) {
                     let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected); // Update selected charges
                     let notSelectedCharges = this.charges.filter((chg: Surcharge) => !chg.isSelected);
-                    selectedCharges.forEach((chg: Surcharge) => chg.invoiceDate = null);
+                    selectedCharges.forEach((chg: Surcharge) => {
+                        chg.invoiceDate = null;
+                        if (!chg.chargeId) {
+                            chg.chargeId = SystemConstants.EMPTY_GUID;
+                        }
+                        if (chg.unitId === null || chg.unitId === undefined) {
+                            chg.unitId = 0;
+                        }
+                        if (chg.id === null) {
+                            chg.id = SystemConstants.EMPTY_GUID;
+                        }
+                    });
                     this._accountingRepo.checkAllowUpdateDirectCharges(selectedCharges)
                         .subscribe(
                             (res: any) => {
