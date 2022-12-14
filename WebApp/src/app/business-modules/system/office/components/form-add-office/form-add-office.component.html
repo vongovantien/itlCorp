@@ -83,7 +83,8 @@
                                 Office Type
                                 <span class="text-danger">*</span>
                             </label>
-                            <ng-select class="custom" formControlName="officeType" [items]="officeTypes">
+                            <ng-select class="custom" formControlName="officeType" [items]="officeTypes"
+                                [clearable]="false">
                             </ng-select>
                         </div>
                     </div>
@@ -195,12 +196,12 @@
                         </div>
                     </div>
                     <div class="col-lg-3">
-                        <div class="form-group" 
-                        [ngClass]="{'m-form__group has-danger': (internalCode.dirty && internalCode.value?.length > 20) || (isSubmited && internalCode.value?.length > 20)}">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (internalCode.dirty && internalCode.value?.length > 20) || (isSubmited && internalCode.value?.length > 20)}">
                             <label class="form-control-label">Internal Code</label>
                             <div class="m-checkbox-inline">
                                 <input type="text" formControlName="internalCode" class="form-control"
-                                placeholder="Please Enter Internal Code">
+                                    placeholder="Please Enter Internal Code">
                             </div>
                             <div class="form-control-feedback"
                                 *ngIf="isSubmited && internalCode.value?.length > 20  || internalCode.value?.length > 20 && internalCode.dirty">

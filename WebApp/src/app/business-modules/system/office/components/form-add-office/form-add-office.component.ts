@@ -77,7 +77,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     isSubmited: boolean = false;
     @Input() isDetail: boolean = false;
     isCreate: boolean = false;
-    officeTypes: string[] = ['Head', 'Branch', 'OutSource']
+    officeTypes: string[] = ['Head', 'Branch', 'OutSource', 'Repo']
     constructor(
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,

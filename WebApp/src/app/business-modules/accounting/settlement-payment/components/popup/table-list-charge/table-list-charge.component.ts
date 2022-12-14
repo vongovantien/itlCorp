@@ -139,7 +139,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
         this._store.dispatch(new GetCatalogueUnitAction());
 
-        // this.getMasterCharges();
+        this.getMasterCharges();
         this.getShipmentCommonData();
         this.getCustomDecleration();
         this.initForm();
@@ -234,7 +234,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.listUnits = this._store.select(getCatalogueUnitState);
     }
 
-    getMasterCharges(officeId: string, serviceTypeId: string = null, isChangeService: boolean = false) {
+    getMasterCharges(officeId: string = null, serviceTypeId: string = null, isChangeService: boolean = false) {
         forkJoin([
             this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: serviceTypeId, officeId: officeId }),
             this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OBH, serviceTypeId: serviceTypeId, officeId: officeId }),
@@ -249,7 +249,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 if (isChangeService) {
                     this.charges.forEach((charge: Surcharge) => {
                         if (charge.chargeId) {
-                            charge.chargeId = null;
+                            charge.chargeId = SystemConstants.EMPTY_GUID;
                             charge.id = SystemConstants.EMPTY_GUID;
                             charge.chargeName = null;
                             charge.isChangeShipment = true;
@@ -927,6 +927,7 @@ interface IAdvanceShipment {
     amount: number;
     requestCurrency: string;
     advanceNo: string;
+    officeId: string;
 }
 
 
