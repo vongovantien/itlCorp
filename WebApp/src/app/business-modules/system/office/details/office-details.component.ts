@@ -105,7 +105,7 @@ export class OfficeDetailsComponent extends AppList {
 
     updateOffice() {
         this.formAdd.isSubmited = true;
-        if (this.formAdd.formGroup.valid && this.formAdd.internalCode.value?.length <= 20) {
+        if (this.formAdd.formGroup.valid) {
             this._progressRef.start();
             const body: any = {
                 id: this.officeId,
