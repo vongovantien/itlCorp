@@ -17,13 +17,20 @@
                             <i class="la la-print"></i>Preview<span class="caret"></span>
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item pointer" (click)="previewCdNote('ORIGIN')">Preview with Original</a>
-                            <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
-                            <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
-                            <a *ngIf="CdNoteDetail?.cdNote?.type === 'DEBIT'" class="dropdown-item pointer"
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('ORIGIN')">Preview with Original</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
+                            </div>
+                            <div>
+                                <a *ngIf="CdNoteDetail?.cdNote?.type === 'DEBIT'" class="dropdown-item pointer"
                                 (click)="previewCdNote('USD')">WP Template Debit</a>
-                            <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover"
-                                ClickStopPropagation>
+                            </div>
+                            <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
                                 <div class="d-flex justify-content-between ">
                                     <div>
                                         <a class="dropdown-item pointer">Download</a>
