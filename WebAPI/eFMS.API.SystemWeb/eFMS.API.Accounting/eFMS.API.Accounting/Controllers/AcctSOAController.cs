@@ -81,11 +81,11 @@ namespace eFMS.API.Accounting.Controllers
                 result = new ResultHandle { Status = hs.Status, Message = hs.Message, Data = model };
                 Response.OnCompleted(async () =>
                 {
-                    if (hs.Data != null)
-                    {
-                        // Update table acctCreditManagementAR
-                        await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Add");
-                    }
+                    //if (hs.Data != null)
+                    //{
+                    //    // Update table acctCreditManagementAR
+                    //    await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Add");
+                    //}
 
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
                     if (modelReceivableList.Count > 0)
@@ -134,10 +134,10 @@ namespace eFMS.API.Accounting.Controllers
                 result = new ResultHandle { Status = hs.Status, Message = hs.Message, Data = model };
                 Response.OnCompleted(async () =>
                 {
-                    if (hs.Data != null)
-                    {
-                        await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Update");
-                    }
+                    //if (hs.Data != null)
+                    //{
+                    //    await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Update");
+                    //}
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
@@ -207,10 +207,6 @@ namespace eFMS.API.Accounting.Controllers
                 result = new ResultHandle { Status = hs.Status, Message = hs.Message };
                 Response.OnCompleted(async () =>
                 {
-                    if (hs.Data != null)
-                    {
-                        await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, soaNo, "Delete");
-                    }
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(soaNo, "SOA");
                     if (modelReceivableList.Count > 0)
                     {

@@ -1413,4 +1413,7 @@ export class CatalogueRepo {
         )
     }
 
+    getStandChargeByType(type: string, transactionType: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStandardCharge/GetBy`, { type: type, transactionType: transactionType });
+    }
 }

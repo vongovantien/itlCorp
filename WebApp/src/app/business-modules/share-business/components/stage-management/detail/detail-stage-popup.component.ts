@@ -147,7 +147,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
     }
 
     onSelectHouseBill($event: CsTransactionDetail) {
-        this.selectedHbl.value = $event.hwbno;
+        this.selectedHbl.value = $event.id;
         this.hblno.setValue($event.hwbno);
     }
 
@@ -157,7 +157,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.configHbl.dataSource = res;
+                    this.configHbl.dataSource = res.filter(x => x.hwbno !== 'N/H').concat(res.find(x => x.hwbno === 'N/H') || []);
                 },
                 () => { }
             );
@@ -171,7 +171,7 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         if ((form.value.status === 'Pending' || form.value.status === "Deleted") && !form.value.comment) {
             return;
         }
-        if (!this.selectedMainPersonInCharge.value) {
+        if (!this.selectedMainPersonInCharge.value || !this.hblno.value && this.stageName.value !== 'Make Advance/ Settlement') {
             return;
         } else {
             const body = {
@@ -253,12 +253,20 @@ export class ShareBusinessStageManagementDetailComponent extends PopupBase imple
         this.hblno.setValue(null);
     }
 
-
     onRemoveData(type: string) {
         switch (type) {
             case "hbl":
                 this.selectedHbl = {};
                 this.hblno.setValue(null)
+                break;
+            case "main":
+                this.selectedMainPersonInCharge.value = null;
+                break;
+            case "real":
+                this.selectedRealPersonInCharge.value = null;
+                break;
+            case "deadline":
+                this.deadLineDate.setValue(null);
                 break;
             default:
                 break;

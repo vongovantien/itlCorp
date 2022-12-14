@@ -75,6 +75,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     ];
 
     isAdvCarrier: boolean = false;
+    payeeName: string = '';
 
     constructor(
         private _fb: FormBuilder,

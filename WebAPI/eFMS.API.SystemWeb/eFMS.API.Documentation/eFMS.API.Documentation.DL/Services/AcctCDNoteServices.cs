@@ -504,10 +504,10 @@ namespace eFMS.API.Documentation.DL.Services
                         trans.Dispose();
                     }
                 }
-                if (model.Type == "CREDIT" && hsSc.Success) // Add new Credit AR
-                {
-                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Add");
-                }
+                //if (model.Type == "CREDIT" && hsSc.Success) // Add new Credit AR
+                //{
+                //    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Add");
+                //}
                 return hs;
             }
             catch (Exception ex)
@@ -763,14 +763,14 @@ namespace eFMS.API.Documentation.DL.Services
                     //    UpdateCombineBilling(cdNote.CombineBillingNo);
                     //}
                 }
-                if (model.Type == "CREDIT" && hsSurSc.Success) // Update Credit AR
-                {
-                    // Get all origin data and updated soano data
-                    var hblExcept = surchargesCDNote.Select(x => x.Id).ToList();
-                    surchargeUpdate = surchargeUpdate.Where(x => !hblExcept.Any(z => z == x.Id)).ToList();
-                    surchargesCDNote.AddRange(surchargeUpdate);
-                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Update");
-                }
+                //if (model.Type == "CREDIT" && hsSurSc.Success) // Update Credit AR
+                //{
+                //    // Get all origin data and updated soano data
+                //    var hblExcept = surchargesCDNote.Select(x => x.Id).ToList();
+                //    surchargeUpdate = surchargeUpdate.Where(x => !hblExcept.Any(z => z == x.Id)).ToList();
+                //    surchargesCDNote.AddRange(surchargeUpdate);
+                //    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Update");
+                //}
                 return hs;
             }
             catch (Exception ex)
@@ -1371,10 +1371,10 @@ namespace eFMS.API.Documentation.DL.Services
                         //    }
                         //}
                         // Delete credit AR
-                        if (cdNote.Type == "CREDIT" && hsSur.Success)
-                        {
-                            UpdateAcctCreditManagement(surchargeUpdate, cdNote.Code, cdNote.CurrencyId, cdNote.ExcRateUsdToLocal, cdNote.PartnerId, "Delete");
-                        }
+                        //if (cdNote.Type == "CREDIT" && hsSur.Success)
+                        //{
+                        //    //UpdateAcctCreditManagement(surchargeUpdate, cdNote.Code, cdNote.CurrencyId, cdNote.ExcRateUsdToLocal, cdNote.PartnerId, "Delete");
+                        //}
                     }
                 }
 

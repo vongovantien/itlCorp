@@ -18,6 +18,8 @@ namespace eFMS.API.Report.Service.Models
         public virtual DbSet<AcctCdnote> AcctCdnote { get; set; }
         public virtual DbSet<CatCharge> CatCharge { get; set; }
         public virtual DbSet<CatChargeGroup> CatChargeGroup { get; set; }
+        public virtual DbSet<CatCommodity> CatCommodity { get; set; }
+        public virtual DbSet<CatCommodityGroup> CatCommodityGroup { get; set; }
         public virtual DbSet<CatCurrencyExchange> CatCurrencyExchange { get; set; }
         public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<CatIncoterm> CatIncoterm { get; set; }
@@ -286,6 +288,88 @@ namespace eFMS.API.Report.Service.Models
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(20)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatCommodity>(entity =>
+            {
+                entity.ToTable("catCommodity");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
+
+                entity.Property(e => e.CommodityNameEn)
+                    .HasColumnName("CommodityName_EN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.CommodityNameVn)
+                    .HasColumnName("CommodityName_VN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatCommodityGroup>(entity =>
+            {
+                entity.ToTable("catCommodityGroup");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.Active).HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.GroupNameEn)
+                    .HasColumnName("GroupName_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.GroupNameVn)
+                    .HasColumnName("GroupName_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.Note).HasMaxLength(4000);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 
@@ -1697,6 +1781,10 @@ namespace eFMS.API.Report.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
+
                 entity.Property(e => e.ExportCountryCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1798,6 +1886,8 @@ namespace eFMS.API.Report.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ClearanceDate).HasColumnType("datetime");
+
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
@@ -1825,7 +1915,13 @@ namespace eFMS.API.Report.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DeliveryDate).HasColumnType("datetime");
+
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
 
                 entity.Property(e => e.FieldOpsId)
                     .HasColumnName("FieldOpsID")
@@ -1948,6 +2044,8 @@ namespace eFMS.API.Report.Service.Models
                     .HasColumnName("SupplierID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SuspendTime).HasMaxLength(150);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

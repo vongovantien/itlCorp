@@ -273,14 +273,21 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public HandleState UpdateTransactionDetail(CsTransactionDetailModel model)
+        public async Task<HandleState> UpdateTransactionDetail(CsTransactionDetailModel model)
         {
+            bool isCreateStage = false;
             var hb = DataContext.Where(x => x.Id == model.Id).FirstOrDefault();
             var changedSalesman = false;
             if (hb == null)
             {
                 return new HandleState("Housebill not found !");
             }
+            if (model.ReferenceNoProof != hb.ReferenceNoProof || model.Note != hb.Note || model.DeliveryPerson != hb.DeliveryPerson || model.DeliveryDate != hb.DeliveryDate)
+            {
+                isCreateStage = true;
+            }
+
+
             model.JobId = hb.JobId;
             model.GroupId = hb.GroupId;
             model.DepartmentId = hb.DepartmentId;
@@ -340,6 +347,21 @@ namespace eFMS.API.Documentation.DL.Services
                     var isUpdateDone = DataContext.Update(houseBill, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
                     {
+                        if (isCreateStage)
+                        {
+                            var stage = await catStageService.GetStageByType(DocumentConstants.UPDATE_POD);
+                            var orderNumber = csStageAssignedService.Get(x => x.JobId == hb.JobId).OrderByDescending(x => x.OrderNumberProcessed).FirstOrDefault()?.OrderNumberProcessed ?? 0;
+                            CsStageAssignedModel newStage = new CsStageAssignedModel();
+                            newStage.Id = Guid.NewGuid();
+                            newStage.StageId = stage.Id;
+                            newStage.Hblid = hb.Id;
+                            newStage.Hblno = hb.Hwbno;
+                            newStage.JobId = hb.JobId;
+                            newStage.Type = DocumentConstants.FROM_SYSTEM;
+                            newStage.OrderNumberProcessed = orderNumber + 1;
+
+                            var hs = csStageAssignedService.AddNewStageAssigned(newStage);
+                        }
 
                         if (model.CsMawbcontainers != null)
                         {

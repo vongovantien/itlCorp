@@ -1,9 +1,9 @@
 <div class="modal fade" id="assign-modal" role="dialog" bsModal #popup="bs-modal">
-    <div class="modal-dialog c-modal-fullscreen" role="document">
+    <div class="modal-dialog modal-report" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 *ngIf="isAsignment === false" class="modal-title">OPS Assignment</h5>
-                <h5 *ngIf="isAsignment === true" class="modal-title"> Assignment</h5>
+                <h5 *ngIf="isAssignment === false" class="modal-title">OPS Assignment</h5>
+                <h5 *ngIf="isAssignment === true" class="modal-title"> Assignment</h5>
 
                 <button type="button" class="close" aria-label="Close" (click)=closePopup()>
                     <span aria-hidden="true">&times;</span>
@@ -11,11 +11,12 @@
             </div>
             <div class="modal-body">
                 <div class="row m-form m-form--state">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedStage.value}">
                             <label for="">Stage Content <span class="text-danger">(*)</span></label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedStage" [height]="150"
+                            <app-combo-grid-virtual-scroll placeholder="Please select"
+                                [currentActiveItemId]="selectedStage" [height]="150"
                                 (itemSelected)="onSelectData($event,'stage')" [dataSources]="configStage.dataSource"
                                 [displayFields]="configStage.displayFields"
                                 [selectedDisplayFields]="configStage.selectedDisplayFields"
@@ -27,11 +28,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedUser.value}">
                             <label for="">Assign To <span class="text-danger">(*)</span></label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedUser" [height]="150"
+                            <app-combo-grid-virtual-scroll placeholder="Please select"
+                                [currentActiveItemId]="selectedUser" [height]="150"
                                 (itemSelected)="onSelectData($event, 'user')" [dataSources]="configUser.dataSource"
                                 [displayFields]="configUser.displayFields"
                                 [selectedDisplayFields]="configUser.selectedDisplayFields"
@@ -42,26 +44,33 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="">House Bill</label>
-                            <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedHbl" [height]="150"
-                                (itemSelected)="onSelectData($event, 'hbl')" [dataSources]="configHbl.dataSource"
-                                [displayFields]="configHbl.displayFields"
-                                [selectedDisplayFields]="configHbl.selectedDisplayFields"
-                                (remove)="onRemoveData('hbl')">
-                            </app-combo-grid-virtual-scroll>
+                    <div class="col-md-12">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!this.selectedHbl || this.selectedHbl?.length <= 0 ) && this.selectedStage.value !== 'Make Advance/ Settlement'}">
+                            <label for="">House Bill <span *ngIf="selectedStage.value !== 'Make Advance/ Settlement'"
+                                    class=" text-danger">(*)</span></label>
+                            <ng-select [multiple]="true" [items]="houseBillList" [virtualScroll]="true"
+                                [clearable]="true" [(ngModel)]="selectedHbl" (change)="onSelectDataFormInfo($event)"
+                                placeholder="Please select" class="custom" bindLabel="hwbno" bindValue="id">
+                            </ng-select>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && (!this.selectedHbl || this.selectedHbl?.length <= 0 ) && this.selectedStage.value !== 'Make Advance/ Settlement'">
+                                House Bill is required!
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-12">
-                        <label for="">Description</label>
-                        <textarea cols="30" rows="10" class="form-control" [(ngModel)]="description"
-                            name=description></textarea>
+                        <div class="form-group">
+                            <label for="">Description</label>
+                            <textarea placeholder="Enter text" cols="20" rows="10" class="form-control"
+                                [(ngModel)]="description" name=description></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
-                <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="assignStage()">
+                <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
+                    (click)="assignMultipleStage()">
                     <span>
                         <i class="la la-save"></i>
                         <span>

@@ -69,5 +69,9 @@ namespace eFMS.API.Report.Service.Models
         public DateTime? DateCreatedLinkJob { get; set; }
         public bool? IsReplicate { get; set; }
         public bool? NoProfit { get; set; }
+        public DateTime? Eta { get; set; }
+        public string SuspendTime { get; set; }
+        public DateTime? DeliveryDate { get; set; }
+        public DateTime? ClearanceDate { get; set; }
     }
 }

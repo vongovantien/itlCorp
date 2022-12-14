@@ -20,7 +20,7 @@ namespace eFMS.API.Documentation.DL.IService
 
         List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria);
         HandleState AddTransactionDetail(CsTransactionDetailModel model);
-        HandleState UpdateTransactionDetail(CsTransactionDetailModel model);
+        Task<HandleState> UpdateTransactionDetail(CsTransactionDetailModel model);
         string GenerateHBLNo(TransactionTypeEnum transactionTypeEnum);
         HandleState DeleteTransactionDetail(Guid hbId, out List<ObjectReceivableModel> receivables);
         //CsTransactionDetailReport GetReportBy(Guid jobId);
@@ -70,6 +70,6 @@ namespace eFMS.API.Documentation.DL.IService
         void SendEmailNewHouseToSales(CsTransactionDetail transDetail);
         Task<HandleState> UpdateFlightInfo(Guid Id);
         List<object> GetHAWBListOfShipment(Guid jobId, Guid? hblId);
-       
+
     }
 }

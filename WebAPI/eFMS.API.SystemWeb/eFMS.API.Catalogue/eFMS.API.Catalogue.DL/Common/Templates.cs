@@ -133,6 +133,12 @@
                 public static string ListName = "CatBank";
             }
         }
-
+        public struct CatStandardCharge
+        {
+            public struct NameCaching
+            {
+                public static string ListName = "CatStandardCharge";
+            }
+        }
     }
 }
