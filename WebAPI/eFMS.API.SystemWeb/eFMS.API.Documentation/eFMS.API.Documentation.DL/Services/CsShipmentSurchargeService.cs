@@ -1700,20 +1700,26 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else
                     {
+                        var lookupcharges = chargeData[item.ChargeCode.Trim()];
                         // check valid obh partner
-                        if (chargeData[item.ChargeCode.Trim()].Any(x => x.Type == "CREDIT") && !string.IsNullOrEmpty(item.ObhPartner))
+                        if (lookupcharges.Any(x => x.Type == "CREDIT") && !string.IsNullOrEmpty(item.ObhPartner))
                         {
                             item.ObhPartnerError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_OBH_PARTNER_CODE_WRONG], item.ChargeCode);
                             item.IsValid = false;
                         }
-                        else if (chargeData[item.ChargeCode.Trim()].Where(x => x.Type == "OBH").Any() && string.IsNullOrEmpty(item.ObhPartner))
+                        else if (lookupcharges.Where(x => x.Type == "OBH").Any() && string.IsNullOrEmpty(item.ObhPartner))
                         {
                             item.ObhPartnerError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_OBH_PARTNER_CODE_EMPTY], item.ChargeCode);
                             item.IsValid = false;
                         }
-                        if (!chargeData[item.ChargeCode.Trim()].Any(x => x.ServiceTypeId.Contains("CL")))
+                        if (!lookupcharges.Any(x => x.ServiceTypeId.Contains("CL")))
                         {
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_WRONG_SERVICE], item.ChargeCode);
+                            item.IsValid = false;
+                        }
+                        if(lookupcharges.FirstOrDefault().Offices != null && !(lookupcharges.FirstOrDefault().Offices.Contains(currentUser.OfficeID.ToString())))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_WRONG_OFFICE], item.ChargeCode, currentUser.OfficeCode);
                             item.IsValid = false;
                         }
                     }

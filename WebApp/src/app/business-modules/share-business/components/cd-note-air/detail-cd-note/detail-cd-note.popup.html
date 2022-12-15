@@ -18,7 +18,8 @@
                         </button>
                         <div class="dropdown-menu">
                             <div>
-                                <a class="dropdown-item pointer" (click)="previewCdNote('ORIGIN')">Preview with Original</a>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('ORIGIN')">Preview with
+                                    Original</a>
                             </div>
                             <div>
                                 <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
@@ -26,14 +27,11 @@
                             <div>
                                 <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
                             </div>
-                            <!-- <a class="dropdown-item pointer" (click)="previewCdNote('ORIGIN')">Preview with Original</a>
-                            <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
-                            <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
-                            <a *ngIf="CdNoteDetail?.cdNote?.type === 'DEBIT'" class="dropdown-item pointer"
-                                (click)="previewCdNote('USD')">WP Template Debit</a>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('USD')">WP Template</a>
+                            </div>
                             <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover"
-                                ClickStopPropagation>-->
-                            <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
+                                ClickStopPropagation>
                                 <div class="d-flex justify-content-between ">
                                     <div>
                                         <a class="dropdown-item pointer">Download</a>

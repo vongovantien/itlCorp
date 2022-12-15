@@ -28,9 +28,9 @@
                             <div>
                                 <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
                             </div>
-                            <!-- <a class="dropdown-item pointer" (click)="exportCDNote()">Export Excel Template</a> -->
-                            <a *ngIf="CdNoteDetail?.cdNote?.type === 'DEBIT'" class="dropdown-item pointer"
-                                (click)="previewCdNote('USD')">WP Template Debit</a>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('USD')">WP Template</a>
+                            </div>
                             <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover"
                                 ClickStopPropagation>
                                 <div class="d-flex justify-content-between ">
@@ -42,7 +42,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
