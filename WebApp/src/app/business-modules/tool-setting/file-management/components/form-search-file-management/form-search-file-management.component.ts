@@ -67,8 +67,9 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             this.isAcc = true;
             this.dateModes = [
                 { title: 'Create Date', value: 0 },
-                { title: 'Accounting Date', value: 1 },]
-            //this.submitSearch(this.formSearchFileManagement?.value);
+                { title: 'Accounting Date', value: 1 },];
+            //this.accountantType.setValue([{ title: 'Cash Receipt', value: 0 }]);
+            //this.accountantType: [[this.accountantTypes[0]]];
         }
         this.formSearchFileManagement = this._fb.group({
             dateMode: [this.dateModes[0].value],
@@ -78,7 +79,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             }],
             searchType: [this.referenceTypes[0].value],
             referenceNo: [],
-            accountantType: [this.accountantTypes[0].value]
+            accountantType: [[this.accountantTypes[0].value]]
         });
         this.dateMode = this.formSearchFileManagement.controls['dateMode'];
         this.date = this.formSearchFileManagement.controls['date'];
@@ -119,7 +120,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         this.searchType.setValue(this.referenceTypes[0].value);
         this.dateMode.setValue(this.dateModes[0].value);
         if (this.isAcc) {
-            this.accountantType.setValue(this.accountantTypes[0].value);
+            this.accountantType.setValue([this.accountantTypes[0].value]);
         }
         this.onSearch.emit(bodySearch);
     }

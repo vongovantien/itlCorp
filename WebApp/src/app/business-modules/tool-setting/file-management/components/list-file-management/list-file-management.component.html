@@ -2,10 +2,13 @@
     <div class="m-form">
         <div class="m-portlet__body">
             <div class="table-wrapper table-scrollable">
-                <table class="table table-hover table-brand dataTable">
+                <table class="table table-hover  table-editable dataTable-edit table-brand ">
                     <thead app-table-header [headers]="headers"
                         (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                         <!-- <th class="first table-actions-col">Action</th> -->
+                        <th class="first table-actions-col">
+                            Stt
+                        </th>
                     </thead>
                     <tbody>
                         <ng-container *ngIf="!!listEdocFile?.data?.length">
@@ -20,16 +23,29 @@
                                         </app-permission-button>
                                     </div>
                                 </td> -->
-                                <td>{{edocFile.systemFileName}}</td>
+                                <td>{{i + 1}}</td>
+                                <td>
+                                    <a class="text-underline htmlLink" (click)="viewEdocFromName(edocFile.imageUrl)"
+                                    download>{{edocFile.systemFileName}}
+                                    <icon-file [url]="edocFile.imageUrl"></icon-file>
+                                </a>
                                 <td>{{edocFile.documentType}}</td>
                                 <td>{{edocFile.jobRef}}</td>
                                 <td>{{edocFile.hblNo}}</td>
                                 <td>{{edocFile.billingNo}}</td>
+                                <td *ngIf="tabType==='Acc'">
+                                    <ng-container *ngFor="let acRef of edocFile.acRef ;let i = index; trackBy: trackByFn">
+                                        <span [ngClass]="'badge badge-primary'">
+                                            {{acRef}}
+                                        </span>
+                                    </ng-container>
+                                </td>
+                                <!-- <td >{{edocFile.acRef}}</td> -->
                                 <td>{{edocFile.source}}</td>
                                 <td>{{edocFile.type}}</td>
                                 <td>{{edocFile.userFileName}}</td>
                                 <td>{{edocFile.datetimeCreated| date: 'dd/MM/yyyy'}}</td>
-                                <td>{{edocFile.userCreated}}</td>
+                                <td><span class="text-success">{{edocFile.userCreated}}</span></td>
                             </tr>
                         </ng-container>
                         <tr app-table-none-record *ngIf="!listEdocFile?.data?.length">
@@ -49,6 +65,9 @@
 
 <app-context-menu #fileManageContext (clickOutside)="selectedFile = null">
     <ng-container>
+        <div class="menu-context__item" (click)="viewFileEdoc()">
+            <span><i class="la la-eye align-middle text-primary"></i>View</span>
+        </div>
         <div class="menu-context__item" (click)="downloadEdoc()">
             <span><i class="la la-download align-middle text-primary"></i><span>Download</span></span>
         </div>
