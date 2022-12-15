@@ -1,6 +1,6 @@
 <div class="m-portlet">
     <div class="m-portlet__body">
-        <div class="m-form" [formGroup]="formSearchFileManagement">
+        <div [formGroup]="formSearchFile" class="m-form m-form--state">
             <div class="row">
                 <div class="col-lg-4">
                     <div class="form-group">
@@ -55,7 +55,7 @@
                                 <div class="row">
                                     <div class="col-lg-12 m--align-right">
                                         <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
-                                            (click)="submitSearch(formSearchFileManagement.value)">
+                                            (click)="submitSearch(formSearchFile.value)">
                                             <span>
                                                 <i class="la la-search"></i>
                                                 <span>

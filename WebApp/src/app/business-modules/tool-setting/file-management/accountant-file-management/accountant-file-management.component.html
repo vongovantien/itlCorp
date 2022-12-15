@@ -16,22 +16,20 @@
         </tab>
         <tab [active]="true">
             <ng-template tabHeading>
-                <a routerLink="/home/tool/file-management/accountant" class="dropdown-item" href="javascript:void(0)">Accountant</a>
+                <a routerLink="/home/tool/file-management/accountant" class="dropdown-item"
+                    href="javascript:void(0)">Accountant</a>
             </ng-template>
-            <div class="m-portlet">
-                <div class="m-portlet__body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <form-search-file-management (onSearch)="onSearchFile($event)" [tabType]="'fileAccManage'">
-                            </form-search-file-management>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <app-list-file-management [listEdocFile]="edocFiles" [headers]="headers" (reGetEdoc)="ReloadEDoc()" (changePage)="RepageEDoc($event)" [tabType]="'Acc'">
-                            </app-list-file-management>
-                        </div>
-                    </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <form-search-file-management (onSearch)="onSearchFile($event)" [tabType]="'fileAccManage'">
+                    </form-search-file-management>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <app-list-file-management [listEdocFile]="edocFiles" [headers]="headers" (reGetEdoc)="ReloadEDoc()"
+                        (changePage)="RepageEDoc($event)" [tabType]="'Acc'">
+                    </app-list-file-management>
                 </div>
             </div>
         </tab>

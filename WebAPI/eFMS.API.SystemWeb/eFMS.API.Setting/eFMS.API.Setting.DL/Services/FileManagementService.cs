@@ -21,6 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using eFMS.API.Common.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -301,10 +302,12 @@ namespace eFMS.API.Setting.DL.Services
         {
             Expression<Func<SysImageDetail, bool>> query = q => true;
             var lstRefNo = new List<string>();
-            var isRefNo = criteria.ReferenceNo != null;
+            var isRefNo = criteria.ReferenceNo != null&&criteria.ReferenceNo!="";
             if (isRefNo)
             {
-                lstRefNo = criteria.ReferenceNo.Split("\n").ToList();
+                criteria.ReferenceNo = criteria.ReferenceNo.Replace(" ","").Replace("\t", ";").Replace("\n",";");
+                lstRefNo = criteria.ReferenceNo.Split(";").ToList();
+                lstRefNo.Remove("");
             }
 
             var jobOps = new List<OpsTransaction>();
@@ -319,107 +322,126 @@ namespace eFMS.API.Setting.DL.Services
             {
                 query = query.And(x => x.BillingNo != null);
             }
-            switch (criteria.ReferenceType)
+            if (isRefNo)
             {
-                case ReferenceType.MasterBill:
-                    if (!isRefNo)
-                    {
-                        jobOps = await opsTranRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated<=criteria.ToDate);
-                        jobCs = await csTranRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated<=criteria.ToDate);
-                        lstId1 = jobOps.Select(x => x.Id).ToList();
-                        lstId2 = jobCs.Select(x => x.Id).ToList();
-                    }
-                    else
-                    {
-                        if (await opsTranRepo.AnyAsync(x => lstRefNo.Contains(x.Mblno)))
+                switch (criteria.ReferenceType)
+                {
+                    case ReferenceType.MasterBill:
+                        //if (!isRefNo)
+                        //{
+                        //    jobOps = await opsTranRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated<=criteria.ToDate);
+                        //    jobCs = await csTranRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated<=criteria.ToDate);
+                        //    lstId1 = jobOps.Select(x => x.Id).ToList();
+                        //    lstId2 = jobCs.Select(x => x.Id).ToList();
+                        //}
+                        //else
+                        //{
+                        if (opsTranRepo.Any(x => lstRefNo.Contains(x.Mblno)))
                         {
                             jobOps = await opsTranRepo.WhereAsync(x => lstRefNo.Contains(x.Mblno));
                             lstId1 = jobOps.Select(x => x.Id).ToList();
                         }
-                        if (await csTranRepo.AnyAsync(x => lstRefNo.Contains(x.Mawb)))
+                        if (csTranRepo.Any(x => lstRefNo.Contains(x.Mawb)))
                         {
                             jobCs = await csTranRepo.WhereAsync(x => lstRefNo.Contains(x.Mawb));
                             lstId2 = jobCs.Select(x => x.Id).ToList();
                         }
-                    }
-                    query = query.And(x => lstId1.Concat(lstId2).Contains((Guid)x.JobId));
-                    break;
-                case ReferenceType.HouseBill:
-                    if (!isRefNo)
-                    {
-                        jobOps = await opsTranRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated<=criteria.ToDate);
-                        jobCsde = await csTranDetailRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated<=criteria.ToDate);
-                        lstId1 = jobOps.Select(x => x.Id).ToList();
-                        lstId2 = jobCsde.Select(x => x.Id).ToList();
-                    }
-                    else
-                    {
-                        if (await opsTranRepo.AnyAsync(x => lstRefNo.Contains(x.Hwbno)))
-                        {
-                            jobOps = await opsTranRepo.WhereAsync(x => lstRefNo.Contains(x.Hwbno));
-                            lstId1 = jobOps.Select(x => x.Hblid).ToList();
-                        }
-                        if (await csTranDetailRepo.AnyAsync(x => lstRefNo.Contains(x.Hwbno)))
-                        {
-                            jobCsde = await csTranDetailRepo.WhereAsync(x => lstRefNo.Contains(x.Hwbno));
-                            lstId2 = jobCsde.Select(x => x.Id).ToList();
-                        }
-                    }
-                    query = query.And(x => lstId1.Concat(lstId2).Contains((Guid)x.Hblid));
-                    break;
-                case ReferenceType.JobId:
-                    if (!isRefNo)
-                    {
-                        jobOps = await opsTranRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated<=criteria.ToDate);
-                        jobCs = await csTranRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated<=criteria.ToDate);
-                        lstId1 = jobOps.Select(x => x.Id).ToList();
-                        lstId2 = jobCs.Select(x => x.Id).ToList();
-                    }
-                    else
-                    {
-                        if (opsTranRepo.Any(x => lstRefNo.Contains(x.JobNo)))
-                        {
-                            jobOps = await opsTranRepo.WhereAsync(x => lstRefNo.Contains(x.JobNo));
-                            lstId1 = jobOps.Select(x => x.Id).ToList();
-                        }
-                        if (csTranRepo.Any(x => lstRefNo.Contains(x.JobNo)))
-                        {
-                            jobCs = await csTranRepo.WhereAsync(x => lstRefNo.Contains(x.JobNo));
-                            lstId2 = jobCs.Select(x => x.Id).ToList();
-                        }
-                    }
-                    query = query.And(x => lstId1.Concat(lstId2).Contains((Guid)x.JobId));
-                    break;
-                case ReferenceType.AccountantNo:
-                    if (!isRefNo)
-                    {
-                        var accPayable = await accPayableRepo.GetAsync(x => x.DatetimeCreated>=criteria.FromDate && x.DatetimeCreated<=criteria.ToDate);
-                        var accPayableNo = accPayable.Select(x => x.BillingNo);
-                        var edocs = await edocRepo.GetAsync(x => accPayableNo.Contains(x.BillingNo));
-                        lstId1=edocs.Select(x => x.Id).ToList();
-                    }
-                    else
-                    {
-                        var accPayable = await accPayableRepo.GetAsync(x => lstRefNo.Contains(x.VoucherNo));
-                        var accPayableNo = accPayable.Select(x => x.BillingNo);
-                        var edocs = await edocRepo.GetAsync(x => accPayableNo.Contains(x.BillingNo));
-                        lstId1 = edocs.Select(x => x.Id).ToList();
-                    }
-                    query = query.And(x => lstId1.Contains((Guid)x.Id));
-                    break;
+                        //}
+                        query = query.And(x => lstId1.Concat(lstId2).Contains((Guid)x.JobId));
+                        break;
+                    case ReferenceType.HouseBill:
+                        //if (!isRefNo)
+                        //{
+                        //    jobOps = await opsTranRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated <= criteria.ToDate);
+                        //    jobCsde = await csTranDetailRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated <= criteria.ToDate);
+                        //    lstId1 = jobOps.Select(x => x.Id).ToList();
+                        //    lstId2 = jobCsde.Select(x => x.Id).ToList();
+                        //    query = query.And(x => lstId1.Concat(lstId2).Contains((Guid)x.Hblid));
+                        //}
+                        //else
+                        //{
+                            if (opsTranRepo.Any(x => lstRefNo.Contains(x.Hwbno)))
+                            {
+                                jobOps = await opsTranRepo.WhereAsync(x => lstRefNo.Contains(x.Hwbno));
+                                lstId1 = jobOps.Select(x => x.Id).ToList();
+                                query = query.And(x => lstId1.Contains((Guid)x.JobId));
+                            }
+                            if (csTranDetailRepo.Any(x => lstRefNo.Contains(x.Hwbno)))
+                            {
+                                jobCsde = await csTranDetailRepo.WhereAsync(x => lstRefNo.Contains(x.Hwbno));
+                                lstId2 = jobCsde.Select(x => x.JobId).ToList();
+                                var hblIds = jobCsde.Select(x => x.Id).ToList();
+                                query = query.And(x => lstId2.Contains((Guid)x.JobId) && (x.Hblid == null || hblIds.Contains(x.Id)));
+
+                                //jobCsde = await csTranDetailRepo.WhereAsync(x => lstRefNo.Contains(x.Hwbno));
+                                //jobCsde.GroupBy(x => x.JobId).ToList().ForEach(async x =>
+                                //{
+                                //    if (x.Select(z => z.Id).Count() == 1)
+                                //    {
+                                //        query = query.And(z => z.JobId==x.FirstOrDefault().JobId);
+
+                                //        jobCsde.Remove(jobCsde.Where(y => y.JobId == x.FirstOrDefault().JobId).FirstOrDefault());
+                                //    }
+                                //});
+                                //lstId2 = jobCsde.Select(x => x.Id).ToList();
+                                //query = query.And(x => lstId2.Contains((Guid)x.Hblid));
+                            }
+                        //}
+                        break;
+                    case ReferenceType.JobId:
+                        //if (!isRefNo)
+                        //{
+                        //    jobOps = await opsTranRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated <= criteria.ToDate);
+                        //    jobCs = await csTranRepo.WhereAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated <= criteria.ToDate);
+                        //    lstId1 = jobOps.Select(x => x.Id).ToList();
+                        //    lstId2 = jobCs.Select(x => x.Id).ToList();
+                        //}
+                        //else
+                        //{
+                            if (opsTranRepo.Any(x => lstRefNo.Contains(x.JobNo)))
+                            {
+                                jobOps = await opsTranRepo.WhereAsync(x => lstRefNo.Contains(x.JobNo));
+                                lstId1 = jobOps.Select(x => x.Id).ToList();
+                            }
+                            if (csTranRepo.Any(x => lstRefNo.Contains(x.JobNo)))
+                            {
+                                jobCs = await csTranRepo.WhereAsync(x => lstRefNo.Contains(x.JobNo));
+                                lstId2 = jobCs.Select(x => x.Id).ToList();
+                            }
+                        //}
+                        query = query.And(x => lstId1.Concat(lstId2).Contains((Guid)x.JobId));
+                        break;
+                    case ReferenceType.AccountantNo:
+                        //if (!isRefNo)
+                        //{
+                        //    var accPayable = await accPayableRepo.GetAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated <= criteria.ToDate);
+                        //    var accPayableNo = accPayable.Select(x => x.BillingNo);
+                        //    var edocs = await edocRepo.GetAsync(x => accPayableNo.Contains(x.BillingNo));
+                        //    lstId1 = edocs.Select(x => x.Id).ToList();
+                        //}
+                        //else
+                        //{
+                            var accPayable = await accPayableRepo.GetAsync(x => lstRefNo.Contains(x.VoucherNo));
+                            var accPayableNo = accPayable.Select(x => x.BillingNo);
+                            var edocs = await edocRepo.GetAsync(x => accPayableNo.Contains(x.BillingNo));
+                            lstId1 = edocs.Select(x => x.Id).ToList();
+                        //}
+                        query = query.And(x => lstId1.Contains((Guid)x.Id));
+                        break;
+                }
             }
-            
 
             if (criteria.FromDate.HasValue && criteria.ToDate.HasValue)
             {
                 switch (criteria.DateMode)
                 {
                     case DateMode.CreateDate:
-                        query=query.And(x=>x.DatetimeCreated>=criteria.FromDate.Value&&x.DatetimeCreated<=criteria.ToDate);
+                        query=query.And(x=>x.DatetimeCreated>=criteria.FromDate.Value&&x.DatetimeCreated<=criteria.ToDate.Value.AddDays(1));
                         break;
                     case DateMode.AccountingDate:
-                        var accManage = await accManageRepo.GetAsync(x => lstRefNo.Contains(x.VoucherId));
-                        query = query.And(x => accManage.FirstOrDefault().Date >= criteria.FromDate.Value && accManage.FirstOrDefault().Date <= criteria.ToDate);
+                        var accPayable = await accPayableRepo.GetAsync(x => x.VoucherDate >= criteria.FromDate && x.VoucherDate <= criteria.ToDate);
+                        var billingNo = accPayable.Select(x => x.BillingNo);
+                        query = query.And(x => billingNo.Contains(x.BillingNo));
                         break;
                 }
             }
