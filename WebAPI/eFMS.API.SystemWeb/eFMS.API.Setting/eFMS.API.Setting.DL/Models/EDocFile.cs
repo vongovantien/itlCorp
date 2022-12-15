@@ -11,6 +11,7 @@ namespace eFMS.API.Setting.DL.Models
         public string JobRef { get; set; }
         public string HBLNo { get; set; }
         public string Type { get; set; }
-
+        public string ImageUrl { get; set; }
+        public List<string> AcRef { get; set; }
     }
 }

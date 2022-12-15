@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { ConfirmPopupComponent } from '@common';
 import { SystemConstants } from '@constants';
 import { InjectViewContainerRefDirective } from '@directives';
-import { SystemFileManageRepo } from '@repositories';
+import { ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { AppList } from 'src/app/app.list';
 import { fileManagePaging } from '../../general-file-management/general-file-management.component';
@@ -13,6 +13,7 @@ import { fileManagePaging } from '../../general-file-management/general-file-man
 })
 export class ListFileManagementComponent extends AppList implements OnInit {
 
+    @Input() tabType: string;
     @Input() listEdocFile: fileManagePaging;
     @Input() headers: CommonInterface.IHeaderTable[];
     edocId: string = '';
@@ -25,6 +26,7 @@ export class ListFileManagementComponent extends AppList implements OnInit {
     constructor(
         private _systemFileRepo: SystemFileManageRepo,
         private _toast: ToastrService,
+        private readonly _exportRepo: ExportRepo,
     ) {
         super();
     }
@@ -42,8 +44,38 @@ export class ListFileManagementComponent extends AppList implements OnInit {
             { field: 'datetimeCreated', title: 'Attach Time', sortable: true },
             { field: 'userCreated', title: 'Attach Person', sortable: true },
         ]
+        if (this.tabType === 'Acc') {
+            this.headers.splice(5, 0, { field: 'acRefNo', title: 'A/C Ref No', sortable: true },)
+            this.headers.join();
+        }
     }
 
+    viewEdocFromName(imageUrl: string) {
+        this.selectedFile = Object.assign({}, this.selectedFile);
+        this.selectedFile.imageUrl = imageUrl;
+        this.viewFileEdoc();
+    }
+
+    viewFileEdoc() {
+        if (!this.selectedFile.imageUrl) {
+            return;
+        }
+        const extension = this.selectedFile.imageUrl.split('.').pop();
+        if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
+            this._exportRepo.previewExport(this.selectedFile.imageUrl);
+        }
+        else if (['html', 'htm'].includes(extension)) {
+            console.log();
+            this._systemFileRepo.getFileEdocHtml(this.selectedFile.imageUrl).subscribe(
+                (res: any) => {
+                    window.open('', '_blank').document.write(res.body);
+                }
+            )
+        }
+        else {
+            this._exportRepo.downloadExport(this.selectedFile.imageUrl);
+        }
+    }
     // onDeleteEdoc(id: string = '') {
     //     this.edocId = id;
     //     this.confirmDeletePopup.show();
@@ -88,23 +120,26 @@ export class ListFileManagementComponent extends AppList implements OnInit {
 
     onSelectFile(edoc: any) {
         this.selectedFile = edoc;
+        console.log(this.selectedFile);
+
     }
 
     downloadEdoc() {
+        console.log(this.selectedFile);
 
-        const selectedEdoc = Object.assign({}, this.selectedFile);
-        if (selectedEdoc.id === selectedEdoc.sysImageId) {
-            this._systemFileRepo.getFileEdoc(selectedEdoc.sysImageId).subscribe(
+        const selectedFile = Object.assign({}, this.selectedFile);
+        if (selectedFile.id === selectedFile.sysImageId) {
+            this._systemFileRepo.getFileEdoc(selectedFile.sysImageId).subscribe(
                 (data) => {
-                    const extention = selectedEdoc.userFileName.split('.').pop();
-                    this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.systemFileName + '.' + extention);
+                    const extention = selectedFile.userFileName.split('.').pop();
+                    this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedFile.systemFileName + '.' + extention);
                 }
             )
         } else {
-            this._systemFileRepo.getFileEdoc(selectedEdoc.sysImageId).subscribe(
+            this._systemFileRepo.getFileEdoc(selectedFile.sysImageId).subscribe(
                 (data) => {
-                    const extention = selectedEdoc.userFileName.split('.').pop();
-                    this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.systemFileName + '.' + extention);
+                    const extention = selectedFile.userFileName.split('.').pop();
+                    this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedFile.systemFileName + '.' + extention);
                 }
             )
         }

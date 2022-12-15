@@ -167,9 +167,10 @@ namespace eFMS.API.Setting.DL.Services
             var data = await edocRepo.WhereAsync(await ExpressionQuery(criterial));
             List<EDocFile> eDocFiles = new List<EDocFile>();
             var result = data.AsQueryable().Skip((criterial.Page - 1) * criterial.Size).Take(criterial.Size);
+            bool isAcc = criterial.AccountantTypes != null;
             result.ToList().ForEach(x =>
             {
-                var edocFile = MappingEDocFile(x);
+                var edocFile = MappingEDocFile(x,isAcc);
                 eDocFiles.Add(edocFile.Result);
             });
             return new ResponsePagingModel<EDocFile>()
@@ -190,7 +191,7 @@ namespace eFMS.API.Setting.DL.Services
             return DataContext.Get(x => x.Id == sysImageId).FirstOrDefault().Name;
         }
 
-        private async Task<EDocFile> MappingEDocFile(SysImageDetail imageDetail)
+        private async Task<EDocFile> MappingEDocFile(SysImageDetail imageDetail,bool isAcc)
         {
             var docType = await docTypeRepo.GetAsync(x => x.Id == imageDetail.DocumentTypeId);
             var edocFile = _mapper.Map<EDocFile>(imageDetail);
@@ -201,6 +202,8 @@ namespace eFMS.API.Setting.DL.Services
                 edocFile.JobRef = jobOps.FirstOrDefault().JobNo;
                 edocFile.HBLNo = imageDetail.Hblid!=null&&imageDetail.Hblid!=Guid.Empty? jobOps.Where(x => x.Hblid == imageDetail.Hblid).FirstOrDefault().Hwbno:null;
                 edocFile.Type = docType.FirstOrDefault().Type;
+                edocFile.ImageUrl = DataContext.Get(x => x.Id == imageDetail.SysImageId).FirstOrDefault()?.Url;
+                
                 if (imageDetail.SystemFileName.Substring(0, 3) == "OTH")
                 {
                     edocFile.UserFileName = getFileNameWithWxtention(edocFile.SysImageId,true);
@@ -217,6 +220,7 @@ namespace eFMS.API.Setting.DL.Services
                 var detailCs = await csTranDetailRepo.GetAsync(x => x.Id == edocFile.Hblid);
                 edocFile.HBLNo = imageDetail.Hblid != null && imageDetail.Hblid != Guid.Empty ? detailCs.FirstOrDefault().Hwbno:null;
                 edocFile.Type = docType.FirstOrDefault().Type;
+                edocFile.ImageUrl = DataContext.Get(x => x.Id == imageDetail.SysImageId).FirstOrDefault()?.Url;
                 if (imageDetail.SystemFileName.Substring(0, 3) == "OTH")
                 {
                     edocFile.UserFileName = getFileNameWithWxtention(edocFile.SysImageId,true);
@@ -225,6 +229,12 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     edocFile.UserFileName = getFileNameWithWxtention(edocFile.SysImageId, false);
                 }
+            }
+
+            if (isAcc)
+            {
+                var acc = await accPayableRepo.GetAsync(x => x.BillingNo == edocFile.BillingNo);
+                edocFile.AcRef = acc.Select(x => x.VoucherNo).ToList();
             }
 
             return edocFile;

@@ -23,6 +23,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <app-list-file-management [listEdocFile]="edocFiles" [headers]="headers" (reGetEdoc)="ReloadEDoc()" (changePage)="RepageEDoc($event)"
+                            [tabType]="'General'"
                             >
                             </app-list-file-management>
                         </div>
