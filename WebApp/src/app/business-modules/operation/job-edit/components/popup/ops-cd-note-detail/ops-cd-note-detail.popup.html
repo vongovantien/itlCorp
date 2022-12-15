@@ -21,8 +21,7 @@
                             <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
                             <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
                             <a class="dropdown-item pointer" (click)="exportCDNote()">Export Excel Template</a>
-                            <a *ngIf="CdNoteDetail?.cdNote?.type === 'DEBIT'" class="dropdown-item pointer"
-                                (click)="previewCdNote('USD')">WP Template Debit</a>
+                            <a class="dropdown-item pointer" (click)="previewCdNote('USD')">WP Template</a>
                         </div>
                     </div>
                 </div>
