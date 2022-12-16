@@ -472,7 +472,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             return false;
         }
         if (this.contractTypeDetail=='Prepaid' && this.contractType.value!=this.contractTypeDetail || this.selectedContract.debitAmount>0 && this.contractTypeDetail!='Prepaid'&& this.contractType.value=='Prepaid'){    
-            this._toastService.error('Contract can not change Agreement Type!');
+            this._toastService.error('Cannot change agreement type!');
             this.contractType.setValue(this.contractTypeDetail);
             return false;
         }
