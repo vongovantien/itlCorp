@@ -471,9 +471,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             (this.contractType.value !== 'Cash' && this.contractType.value !== 'Guarantee' && this.contractType.value !== 'Prepaid' && (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null)))) {
             return false;
         }
-        if (this.contractTypeDetail=='Prepaid' && this.contractType.value!=this.contractTypeDetail || !!this.contract.debitAmount && this.contractTypeDetail=='Prepaid')
-        {    
+        if (this.contractTypeDetail=='Prepaid' && this.contractType.value!=this.contractTypeDetail || this.selectedContract.debitAmount>0 && this.contractTypeDetail!='Prepaid'&& this.contractType.value=='Prepaid'){    
             this._toastService.error('Contract can not change Agreement Type!');
+            this.contractType.setValue(this.contractTypeDetail);
             return false;
         }
         if (!!this.contractType.value && this.contractType.value.length > 0) {
