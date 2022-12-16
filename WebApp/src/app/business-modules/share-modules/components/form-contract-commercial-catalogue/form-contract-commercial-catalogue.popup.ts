@@ -992,6 +992,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 break;
             case 'Official':
                 this.formGroup.controls['paymentTerm'].setValue(30);
+            case 'Prepaid':
+                this.formGroup.controls['paymentTerm'].setValue(1);
+            case 'Parent Contract':
+                this.formGroup.controls['paymentTerm'].setValue(1); 
             default:
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 break;
