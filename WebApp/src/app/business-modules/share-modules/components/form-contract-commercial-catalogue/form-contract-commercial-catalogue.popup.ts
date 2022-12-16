@@ -976,12 +976,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 break;
             case 'Guarantee':
                 if (this.isCreateNewCommercial) {
-                    this.formGroup.controls['paymentTerm'].setValue(1);
                     this.formGroup.controls['creditLimit'].setValue(20000000);
                     this.formGroup.controls['creditLimitRate'].setValue(120);
                 } else {
                     this.isDisabledExpiredDateField = false;
                 }
+                this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['creditCurrency'].setValue("VND");
                 this.formGroup.controls['currencyId'].setValue("VND");
