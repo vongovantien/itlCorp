@@ -972,6 +972,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     });
                 }
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
+                this.formGroup.controls['paymentTerm'].setValue(30);
                 break;
             case 'Guarantee':
                 if (this.isCreateNewCommercial) {
@@ -989,6 +990,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
                 break;
+            case 'Official':
+                this.formGroup.controls['paymentTerm'].setValue(30);
             default:
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 break;
