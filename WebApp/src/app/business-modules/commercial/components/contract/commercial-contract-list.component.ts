@@ -65,7 +65,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             .subscribe(
                 (res: SystemInterface.IUserPermission) => {
                     if (res !== null && res !== undefined) {
-                        console.log(res)
+                        // console.log(res)
                         this.menuPermission = res;
                     }
                 }

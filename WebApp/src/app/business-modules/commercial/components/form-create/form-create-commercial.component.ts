@@ -60,6 +60,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
     @Output() partnerLocationString: EventEmitter<string> = new EventEmitter<string>();
     isBranchSub: boolean;
+    isBranchSubCurrent: boolean;
     parentName: string = '';
     provinceIdName: string;
     countryIdName: string;

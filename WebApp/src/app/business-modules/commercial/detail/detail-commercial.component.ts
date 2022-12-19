@@ -37,6 +37,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     currency: string;
 
     isUpdated: boolean = false;
+    isBranchSubCurrent: boolean;
 
     constructor(
         protected _router: Router,
@@ -183,6 +184,9 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             paymentTerm: partner.paymentTerm,
             currency: partner.currency
         })
+        console.log(partner.parentId);
+        console.log(this.partnerId);
+        this.isBranchSubCurrent = !!partner.parentId && partner.parentId != this.partnerId;
     }
 
     getListContract(partneId: string) {
