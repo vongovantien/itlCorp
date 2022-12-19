@@ -184,7 +184,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             paymentTerm: partner.paymentTerm,
             currency: partner.currency
         })
-        this.isBranchSubCurrent = !!partner.parentId && partner.parentId != this.partnerId;
+        this.formCommercialComponent.isBranchSubCurrent = !!partner.parentId && partner.id != partner.parentId;
     }
 
     getListContract(partneId: string) {
