@@ -50,7 +50,7 @@
                                 [ngClass]="{'m-form__group has-danger':(isSubmitted || taxCode.dirty) && !taxCode.valid }">
                                 <label required>Tax Code</label>
                                 <input type="text" class="form-control" formControlName="taxCode"
-                                    [attr.disabled]="active || (!!this.parentId && parentId.value != this.partnerId) ? 'disabeld' : null"
+                                    [attr.disabled]="active || isBranchSubCurrent ? 'disabled' : null"
                                     (blur)="getInforCompanyByTaxCode(this.taxCode.value)">
                                 <div class="form-control-feedback"
                                     *ngIf="(isSubmitted &&
