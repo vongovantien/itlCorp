@@ -73,6 +73,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     minDateEffective: any = null;
     minDateExpired: any = null;
+    maxDateExpired: any = null;
     minDateExpiredTrial: any = null;
 
 
@@ -925,6 +926,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + 30)),
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 30)),
             });
+            this.maxDateExpired = this.createMoment(this.expiredDate.value.startDate);
+            console.log(this.maxDateExpired)
         }
     }
 
@@ -970,7 +973,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate() + 30)),
                         endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate() + 30)),
                     });
-                }
+                    this.maxDateExpired = this.createMoment(this.expiredDate.value.startDate);                 
+                }              
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 break;
             case 'Guarantee':
