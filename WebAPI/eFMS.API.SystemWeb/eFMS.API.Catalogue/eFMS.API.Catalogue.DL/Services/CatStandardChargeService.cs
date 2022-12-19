@@ -23,6 +23,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly ICatChargeService catChargeService;
         private readonly IContextBase<CatCharge> catChargeReposity;
+        private readonly IContextBase<CatUnit> unitRepository;
         private readonly IStringLocalizer stringLocalizer;
         public CatStandardChargeService(IContextBase<CatStandardCharge> repository,
             ICacheServiceBase<CatStandardCharge> cacheService,
@@ -30,12 +31,14 @@ namespace eFMS.API.Catalogue.DL.Services
             IStringLocalizer<LanguageSub> localizer,
             ICurrentUser user,
             IContextBase<CatCharge> catCharge,
+            IContextBase<CatUnit> unitRepo,
             ICatChargeService charService) : base(repository, cacheService, mapper)
         {
             currentUser = user;
             catChargeService = charService;
             catChargeReposity = catCharge;
             stringLocalizer = localizer;
+            unitRepository = unitRepo;
         }        
         public IQueryable<CatStandardChargeModel> GetBy(string type, string transactionType)
         {
@@ -102,8 +105,9 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = DateTime.Now,
                         UserModified = currentUser.UserID,
                         DatetimeModified = DateTime.Now,
-                        UnitId = item.UnitId,
-                        QuantityType = item.QuantityType
+                        UnitId = unitRepository.Get(x => x.Id == item.UnitId).FirstOrDefault()?.Id,
+                        QuantityType = item.QuantityType,
+                        
                     };
                     listData.Add(standardCharge);
                 }
