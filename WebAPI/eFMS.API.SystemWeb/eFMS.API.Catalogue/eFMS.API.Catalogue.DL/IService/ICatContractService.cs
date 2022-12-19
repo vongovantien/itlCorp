@@ -30,7 +30,7 @@ namespace eFMS.API.Catalogue.DL.IService
         //HandleState UpdateFileToContract(List<SysImage> files);
         //Task<HandleState> DeleteFileContract(Guid id);
         HandleState ActiveInActiveContract(Guid id, string partnerId, SalesmanCreditModel credit, out bool active);
-        IQueryable<CatContract> CheckExistedContractActive(Guid id, string salemanId, string partnerId);
+        IQueryable<CatContract> CheckExistedContractActive(Guid id, string partnerId);
         CatContract CheckExistedContractInActive(Guid id, string partnerId, out List<ServiceOfficeGroup> serviceOfficeGrps);
         List<CatContractImportModel> CheckValidImport(List<CatContractImportModel> list);
         HandleState Import(List<CatContractImportModel> data);
@@ -39,5 +39,6 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatAgreementModel> QueryAgreement(CatContractCriteria criteria);
         string CheckExistedContract(CatContractModel model);
         Task<HandleState> UpdateEmailContract(Guid id, string email);
+        string CheckDuplicatedContract(CatContractModel modelUpdate);
     }
 }

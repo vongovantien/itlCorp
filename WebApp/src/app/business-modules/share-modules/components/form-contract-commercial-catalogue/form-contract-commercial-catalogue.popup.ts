@@ -588,31 +588,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 if (this.selectedContract.active === false) {
                     this.isChangeAgrmentType = null;
                 }
-                if (this.selectedContract.active && this.isChangeSaleMan) {
-                    this._catalogueRepo.checkExistedContractActive(this.selectedContract.id, this.selectedContract.saleManId, this.partnerId).pipe(
-                        catchError(this.catchError)
-                    ).subscribe(
-                        (res: boolean) => {
-                            if (res === true) {
-                                this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
-                                    body: 'The contract already exists on the system, please edit the information on that contract or select the salesman/agreement type again.',
-                                    label: 'OK'
-                                }, () => {
-                                    this.isChangeSaleMan = true;
-                                    return;
-                                })
-                            }
-                            else {
-                                this.updateContract(body)
-                                this.isChangeSaleMan = false;
-                            }
-                        }
-                    )
-                }
-                else {
-                    this.updateContract(body)
-                    this.isChangeSaleMan = false;
-                }
+                this.updateContract(body);
             } else {
                 this.selectedContract.username = this.users.find(x => x.userId === this.selectedContract.saleManId).userName;
                 if (this.selectedContract.officeId.includes(';')) {
@@ -657,14 +633,23 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this._catalogueRepo.updateContract(body)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: CommonInterface.IResult) => {
+                (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.onRequest.emit(this.selectedContract);
                         this.formGroup.reset();
                         this.hide();
                     } else {
-                        this._toastService.error(res.message);
+                        if (!!res.data.errorCode) {
+                            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                body: res.message,
+                                label: 'OK'
+                            }, () => {
+                                return;
+                            })
+                        }else{
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -678,7 +663,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.confirmChangeAgreementTypePopup.hide();
             this.updateContract(body);
         }
-
     }
 
     getCurrentActiveService(Service: any) {

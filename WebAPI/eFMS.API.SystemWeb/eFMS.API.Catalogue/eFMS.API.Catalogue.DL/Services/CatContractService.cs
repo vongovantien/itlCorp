@@ -428,12 +428,46 @@ namespace eFMS.API.Catalogue.DL.Services
             return ContractServicesName;
         }
 
+        public string CheckDuplicatedContract(CatContractModel modelUpdate)
+        {
+            var isDuplicate = false;
+            var messageDuplicate = string.Empty;
+            var currentContract = DataContext.Get(x => x.Id == modelUpdate.Id).FirstOrDefault();
+
+            var contractOffices = modelUpdate.OfficeId.Split(";");
+            var contractServices = modelUpdate.SaleService.Split(";");
+
+            var contracts = DataContext.Get(x => x.Id != currentContract.Id && x.Active == true && x.PartnerId == modelUpdate.PartnerId && x.SaleManId == modelUpdate.SaleManId);
+            if (contracts == null)
+            {
+                return messageDuplicate;
+            }
+            foreach (var item in contracts)
+            {
+                var offices = item.OfficeId.Split(";");
+                var services = item.SaleService.Split(";");
+
+                var officeIntersect = contractOffices.Intersect(offices);
+                var serviceIntersect = contractServices.Intersect(services);
+                if (modelUpdate.SaleManId != currentContract.SaleManId || officeIntersect.Any() || serviceIntersect.Any())
+                {
+                    isDuplicate = (item.SaleManId == modelUpdate.SaleManId && officeIntersect.Any() && serviceIntersect.Any());
+                    if (isDuplicate)
+                    {
+                        return stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE];
+                    }
+                }
+            }
+            return messageDuplicate;
+        }
+
         public HandleState Update(CatContractModel model)
         {
+            var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
             var entity = mapper.Map<CatContract>(model);
             entity.UserModified = currentUser.UserID;
             entity.DatetimeModified = DateTime.Now;
-            var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+
             // Get payment term change type
             model.PaymentTermChanged = (model.PaymentTerm ?? 0) != (currentContract.PaymentTerm ?? 0) ? "DEBIT" : string.Empty;
             model.PaymentTermChanged += (model.PaymentTermObh ?? 0) != (currentContract.PaymentTermObh ?? 0) ? ";OBH" : string.Empty;
@@ -671,7 +705,7 @@ namespace eFMS.API.Catalogue.DL.Services
             active = false;
             var isUpdateDone = new HandleState();
             var objUpdate = DataContext.First(x => x.Id == id);
-            var dataCheckExisted = CheckExistedContractActive(id, objUpdate.SaleManId, partnerId);
+            var dataCheckExisted = CheckExistedContractActive(id, partnerId);
             if (dataCheckExisted != null && dataCheckExisted.Count() > 0 && objUpdate.Active == false)
             {
                 foreach (var item in dataCheckExisted)
@@ -739,16 +773,16 @@ namespace eFMS.API.Catalogue.DL.Services
             return isUpdateDone;
         }
 
-        public IQueryable<CatContract> CheckExistedContractActive(Guid id, string salemanId, string partnerId)
+        public IQueryable<CatContract> CheckExistedContractActive(Guid id, string partnerId)
         {
             var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            var contractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId && x.SaleManId == salemanId);
+            var contractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId && x.SaleManId == contract.SaleManId);
             if (contractActive.Count() == 0)
             {
                 return null;
             }
             var IsExisted = contractActive
-                .Any(x => x.SaleManId == salemanId && x.OfficeId.Intersect(contract.OfficeId).Any() && x.SaleService.Intersect(contract.SaleService).Any());
+                .Any(x => x.SaleManId == contract.SaleManId && x.OfficeId.Intersect(contract.OfficeId).Any() && x.SaleService.Intersect(contract.SaleService).Any());
             if (IsExisted)
             {
                 return contractActive;
