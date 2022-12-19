@@ -87,10 +87,9 @@
                 <div class="col-lg-4">
                     <div class="form-group"
                         [ngClass]="{ 'm-form__group has-danger': (isSubmitted || taxCode.dirty) && (taxCode.invalid|| (taxCode.errors | equalError:'maxlength' || taxCode.errors | equalError:'minlength')) }">
-                        <label class="form-control-label" for="">
-                            Tax Code <span class="m--font-danger">(*)</span>
+                        <label class="form-control-label" for="">Tax Code<span class="m--font-danger">(*)</span>
                         </label>
-                        <input [attr.disabled]="this.active.value === true ? 'disabled' : null" type="text" min="0"
+                        <input [attr.disabled]="active.value || this.isBranchSub ? 'disabled' : null" type="text" min="0"
                             class="form-control m-input m-input--square" title="Tax code must be number"
                             placeholder="Please enter Tax Code" autocomplete="nope" formControlName="taxCode"
                             [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }" required
@@ -112,9 +111,8 @@
                         <label class="form-control-label" for="">
                             Internal Reference
                         </label>
-                        <input #focusInput type="text" name="internalReferenceNo"
-                            [attr.disabled]="isDisabled === true ? 'disabeld' : null" class="form-control" minlength="3"
-                            formControlName="internalReferenceNo" />
+                        <input #focusInput type="text" class="form-control" formControlName="internalReferenceNo">
+
                         <div class="form-control-feedback" *ngIf="isSubmitted &&
                                 ((internalReferenceNo.errors | equalError: 'maxlength' )|| (internalReferenceNo.errors | equalError: 'minlength'))
                                 ">
