@@ -1042,7 +1042,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (houseIds.Count == 0) return null;
             foreach (var hblId in houseIds)
             {
-                IQueryable<CsShipmentSurcharge> surcharges = DataContext.Get(x => houseIds.Contains(x.Hblid) && x.Type == criteria.ChargeType && x.IsFromShipment == true);
+                IQueryable<CsShipmentSurcharge> surcharges = DataContext.Get(x => x.Hblid == hblId && x.Type == criteria.ChargeType && x.IsFromShipment == true);
                 if (surcharges.Count() == 0) continue;
 
                 IQueryable<CsShipmentSurchargeDetailsModel> result = (
