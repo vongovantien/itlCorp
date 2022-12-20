@@ -37,7 +37,7 @@ export class JobConstants {
 
         SERVICEMODES: <string[]>['Export', 'Import'],
 
-        PRODUCTSERVICE: <string[]>['Sea FCL', 'Sea LCL', 'Air', 'Sea Consol', 'Trucking', 'Cross border', 'Warehouse', 'Railway', 'Express', 'Bonded Warehouse', 'Other'],
+        PRODUCTSERVICE: <string[]>['Sea FCL', 'Sea LCL', 'Air', 'Sea', 'Sea Consol', 'Trucking', 'Cross border', 'Warehouse', 'Railway', 'Express', 'Bonded Warehouse', 'Other'],
 
         ROUTES: <string[]>['Red', 'Green', 'Yellow'],
 
