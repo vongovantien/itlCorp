@@ -6,6 +6,7 @@ import { ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { AppList } from 'src/app/app.list';
 import { fileManagePaging } from '../../general-file-management/general-file-management.component';
+import { SortService } from './../../../../../shared/services/sort.service';
 
 @Component({
     selector: 'app-list-file-management',
@@ -22,11 +23,12 @@ export class ListFileManagementComponent extends AppList implements OnInit {
     @Output() changePage: EventEmitter<any> = new EventEmitter<any>();
     selectedFile: any = null;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
-
+    isView: boolean = true;
     constructor(
         private _systemFileRepo: SystemFileManageRepo,
         private _toast: ToastrService,
         private readonly _exportRepo: ExportRepo,
+        private _sortService: SortService
     ) {
         super();
     }
@@ -50,9 +52,10 @@ export class ListFileManagementComponent extends AppList implements OnInit {
         }
     }
 
-    viewEdocFromName(imageUrl: string) {
-        this.selectedFile = Object.assign({}, this.selectedFile);
-        this.selectedFile.imageUrl = imageUrl;
+    viewEdocFromName(edocFile: any) {
+        //this.selectedFile = Object.assign({}, this.selectedFile);
+        //this.selectedFile.imageUrl = edocFile.imageUrl;
+        this.selectedFile = edocFile;
         this.viewFileEdoc();
     }
 
@@ -61,10 +64,10 @@ export class ListFileManagementComponent extends AppList implements OnInit {
             return;
         }
         const extension = this.selectedFile.imageUrl.split('.').pop();
-        if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
+        if (['xlsx', 'docx', 'doc', 'xls'].includes(extension.toLowerCase())) {
             this._exportRepo.previewExport(this.selectedFile.imageUrl);
         }
-        else if (['html', 'htm'].includes(extension)) {
+        else if (['html', 'htm'].includes(extension.toLowerCase())) {
             console.log();
             this._systemFileRepo.getFileEdocHtml(this.selectedFile.imageUrl).subscribe(
                 (res: any) => {
@@ -72,42 +75,16 @@ export class ListFileManagementComponent extends AppList implements OnInit {
                 }
             )
         }
-        else {
+        else if (['pdf', 'txt', 'png', 'jpeg'].includes(extension.toLowerCase())) {
             this._exportRepo.downloadExport(this.selectedFile.imageUrl);
+        } else {
+            this.downloadEdoc();
         }
     }
-    // onDeleteEdoc(id: string = '') {
-    //     this.edocId = id;
-    //     this.confirmDeletePopup.show();
-    // }
 
-    // deleteEdoc() {
-    //     this._systemFileRepo.deleteEdoc(this.edocId)
-    //         .pipe(
-    //             catchError(this.catchError),
-    //         )
-    //         .subscribe(
-    //             (res: any) => {
-    //                 if (res.status) {
-    //                     this._toast.success("Delete Sucess");
-    //                     this.confirmDeletePopup.close();
-    //                     this.reGetEdoc.emit(true);
-    //                 }
-    //             },
-    //         );
-    // }
-
-    // confirmDelete() {
-    //     let messageDelete = `Do you want to delete this Attach File ? `;
-    //     this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
-    //         title: 'Delete Attach File',
-    //         body: messageDelete,
-    //         labelConfirm: 'Yes',
-    //         classConfirmButton: 'btn-danger',
-    //         iconConfirm: 'la la-trash',
-    //         center: true
-    //     }, () => this.deleteEdoc())
-    // }
+    sortFile(sortField: string, order: boolean) {
+        this.listEdocFile.data = this._sortService.sort(this.listEdocFile.data, sortField, order);
+    }
 
 
     updatePagingEdocFile(e: { page: number, pageSize: number, data: any }) {
@@ -121,7 +98,11 @@ export class ListFileManagementComponent extends AppList implements OnInit {
     onSelectFile(edoc: any) {
         this.selectedFile = edoc;
         console.log(this.selectedFile);
-
+        this.isView = true;
+        const extension = this.selectedFile.imageUrl.split('.').pop();
+        if (!['xlsx', 'docx', 'doc', 'xls', 'html', 'htm', 'pdf', 'txt', 'png', 'jpeg'].includes(extension.toLowerCase())) {
+            this.isView = false;
+        }
     }
 
     downloadEdoc() {

@@ -9,32 +9,27 @@
     <tabset class="custom-class-tab">
         <tab [active]="true">
             <ng-template tabHeading>
-                <a routerLink="/home/tool/file-management/general" class="dropdown-item" href="javascript:void(0)">General</a>
+                <a routerLink="/home/tool/file-management/general" class="dropdown-item"
+                    href="javascript:void(0)">Files Managment</a>
             </ng-template>
-            <div class="m-portlet">
-                <div class="m-portlet__body">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <form-search-file-management (onSearch)="onSearchFile($event)"
-                                [tabType]="'fileGeneralManage'">
-                            </form-search-file-management>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <app-list-file-management [listEdocFile]="edocFiles" [headers]="headers" (reGetEdoc)="ReloadEDoc()" (changePage)="RepageEDoc($event)"
-                            [tabType]="'General'"
-                            >
-                            </app-list-file-management>
-                        </div>
-                    </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <form-search-file-management (onSearch)="onSearchFile($event)" [tabType]="'fileGeneralManage'">
+                    </form-search-file-management>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <app-list-file-management [listEdocFile]="edocFiles" [headers]="headers" (reGetEdoc)="ReloadEDoc()"
+                        (changePage)="RepageEDoc($event)" [tabType]="'General'">
+                    </app-list-file-management>
                 </div>
             </div>
         </tab>
         <tab (selectTab)="onSelectTab('Acc')">
             <ng-template tabHeading>
                 <a routerLink="/home/tool/file-management/accountant" style="color:#6f727d">
-                    Accountant
+                    Accountant Files
                 </a>
             </ng-template>
         </tab>

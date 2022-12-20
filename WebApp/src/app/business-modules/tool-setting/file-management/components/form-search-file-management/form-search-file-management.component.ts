@@ -1,6 +1,6 @@
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { DataService } from '@services';
 import { AppForm } from 'src/app/app.form';
@@ -34,7 +34,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         { title: 'Other Entry', value: 5 },
     ]
     @Output() onSearchF: EventEmitter<Partial<IFileManageSearch> | any> = new EventEmitter<Partial<IFileManageSearch> | any>();
-    formSearchFileManagement: FormGroup;
+    formSearchFile: FormGroup;
     @Input() tabType: string = '';
     isAcc: boolean = false;
     ruleName: AbstractControl;
@@ -48,11 +48,13 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         protected _fb: FormBuilder
     ) {
         super();
+        this.requestSearch = this.submitSearch;
+        this.requestReset = this.submitReset;
     }
 
     ngOnInit(): void {
         this.initFormSearch();
-        this.submitSearch(this.formSearchFileManagement.value);
+        this.submitSearch(this.formSearchFile.value);
     }
 
     initValue() {
@@ -71,7 +73,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             //this.accountantType.setValue([{ title: 'Cash Receipt', value: 0 }]);
             //this.accountantType: [[this.accountantTypes[0]]];
         }
-        this.formSearchFileManagement = this._fb.group({
+        this.formSearchFile = this._fb.group({
             dateMode: [this.dateModes[0].value],
             date: [{
                 startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
@@ -81,11 +83,11 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             referenceNo: [],
             accountantType: [[this.accountantTypes[0].value]]
         });
-        this.dateMode = this.formSearchFileManagement.controls['dateMode'];
-        this.date = this.formSearchFileManagement.controls['date'];
-        this.searchType = this.formSearchFileManagement.controls["searchType"];
-        this.referenceNo = this.formSearchFileManagement.controls["referenceNo"];
-        this.accountantType = this.formSearchFileManagement.controls["accountantType"];
+        this.dateMode = this.formSearchFile.controls['dateMode'];
+        this.date = this.formSearchFile.controls['date'];
+        this.searchType = this.formSearchFile.controls["searchType"];
+        this.referenceNo = this.formSearchFile.controls["referenceNo"];
+        this.accountantType = this.formSearchFile.controls["accountantType"];
     }
 
     submitSearch(formSearch: any) {
@@ -125,19 +127,14 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         this.onSearch.emit(bodySearch);
     }
 
-    // ngOnChanges(changes: any): void {
-    //     console.log(changes);
+    resetDate(control: FormControl | AbstractControl) {
+        this.date.setValue({
+            startDate: null,
+            endDate: null
+        });
+        control.setValue(null);
+    }
 
-    //     if (changes.tabType.currentValue === 'fileAccManage') {
-    //         this.referenceTypes = [
-    //             { title: 'House Bill', value: 1 },
-    //             { title: 'Mater Bill', value: 2 },
-    //             { title: 'Accountant No', value: 3 },
-    //         ]
-    //         this.isAcc = true;
-    //         this.submitSearch(this.formSearchFileManagement?.value);
-    //     }
-    // }
 }
 interface IFileManageSearch {
     referenceType: string,
