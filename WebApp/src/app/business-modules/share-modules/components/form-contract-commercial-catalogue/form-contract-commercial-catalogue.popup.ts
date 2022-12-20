@@ -73,6 +73,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     minDateEffective: any = null;
     minDateExpired: any = null;
+    maxDateExpired: any = null;
     minDateExpiredTrial: any = null;
 
 
@@ -951,6 +952,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
         if (this.effectiveDate.value.startDate != new Date(this.selectedContract.effectiveDate) && value.startDate != null) {
             this.minDateExpired = this.createMoment(this.formGroup.get("effectiveDate")?.value?.startDate);
+            this.maxDateExpired = this.createMoment(this.expiredDate.value.startDate);
+            console.log(this.maxDateExpired)
         }
     }
 
@@ -996,7 +999,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate() + 30)),
                         endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate() + 30)),
                     });
-                }
+                    this.maxDateExpired = this.createMoment(this.expiredDate.value.startDate);                 
+                }              
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['paymentTerm'].setValue(30);
                 break;
@@ -1011,10 +1015,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['creditCurrency'].setValue("VND");
                 this.formGroup.controls['currencyId'].setValue("VND");
+                this.maxDateExpired = null;
                 break;
             case 'Cash':
                 this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
+                this.maxDateExpired = null;
                 break;
             case 'Official':
                 this.formGroup.controls['paymentTerm'].setValue(30);
