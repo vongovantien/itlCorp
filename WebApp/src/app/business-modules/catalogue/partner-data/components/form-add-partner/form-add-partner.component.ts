@@ -547,7 +547,9 @@ export class FormAddPartnerComponent extends AppForm {
         else {
             this.isDisabled = true;
         }
-        this.isBranchSub = !!partner.parentId && this.partnerAccountRef?.value != partner.id ;
+
+        this.isBranchSub = !!partner.parentId && this.partnerAccountRef?.value != partner.id;
+        console.log('Branch sub:', this.isAddBranchSub);
     }
 
     getPartnerGroupActives(arg0: string[]): any {
