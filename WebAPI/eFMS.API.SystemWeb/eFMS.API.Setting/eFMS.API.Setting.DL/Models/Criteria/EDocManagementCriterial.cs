@@ -21,7 +21,8 @@ namespace eFMS.API.Setting.DL.Models.Criteria
         JobId,
         HouseBill,
         MasterBill,
-        AccountantNo
+        AccountantNo,
+        InvoiceNo
     }
     public enum AccountantType
     {

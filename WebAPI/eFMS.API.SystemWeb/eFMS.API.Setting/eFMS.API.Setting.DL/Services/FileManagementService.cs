@@ -304,7 +304,7 @@ namespace eFMS.API.Setting.DL.Services
                                     var voucherOTId = voucherOTIds.Select(x => x.VoucherId).ToList();
                                     var accOTPayables = accPayable.Where(x => voucherOTId.Contains(x.VoucherNo) && x.BillingNo != null);
                                     var accOTPayableNo = accOTPayables.Select(x => new accType { billingNo = x.BillingNo, billingType = x.BillingType });
-                                    edocOTs = GetListOtherFile(accOTPayableNo.ToList());
+                                    edocOTs.AddRange(GetListOtherFile(accOTPayableNo.ToList()));
                                 }
                                 break;
                             case AccountantType.CashPayment:
@@ -504,7 +504,7 @@ namespace eFMS.API.Setting.DL.Services
                             var accOTPayables = await accPayableRepo.WhereAsync(x => voucherOTId.Contains(x.VoucherNo) && x.BillingNo != null);
                             var accOTPayableNo = accOTPayables.Select(x => new { billingNo = x.BillingNo, billingType = x.BillingType });
                             var edocOTs = await edocRepo.GetAsync(x => accOTPayableNo.Select(z => z.billingNo).Contains(x.BillingNo));
-                            Acctype = edocOTs.Select(x => x.Id).ToList();
+                            Acctype.AddRange(edocOTs.Select(x => x.Id).ToList());
                         }
                         else
                         {
@@ -513,7 +513,7 @@ namespace eFMS.API.Setting.DL.Services
                             var accOTPayables = accPayable.Where(x => voucherOTId.Contains(x.VoucherNo) && x.BillingNo != null);
                             var accOTPayableNo = accOTPayables.Select(x => x.BillingNo);
                             var edocOTs = edocRepo.Get(x => accOTPayableNo.Contains(x.BillingNo));
-                            Acctype = edocOTs.Select(x => x.Id).ToList();
+                            Acctype.AddRange(edocOTs.Select(x => x.Id).ToList());
                         }
                         //var voucherOTId = accManage.Where(x => x.VoucherType.Replace(" ", "").ToUpper() == "OTHERENTRY").Select(x => x.VoucherId);
                         //var accOTPayables = accPayable.Where(x => voucherOTId.Contains(x.VoucherNo));
@@ -529,7 +529,7 @@ namespace eFMS.API.Setting.DL.Services
                             var accCPPayables = await accPayableRepo.WhereAsync(x => voucherCPId.Contains(x.VoucherNo) && x.BillingNo != null);
                             var accCPPayableNo = accCPPayables.Select(x => new { billingNo = x.BillingNo, billingType = x.BillingType });
                             var edocCPs = await edocRepo.GetAsync(x => accCPPayableNo.Select(z => z.billingNo).Contains(x.BillingNo));
-                            Acctype = edocCPs.Select(x => x.Id).ToList();
+                            Acctype.AddRange( edocCPs.Select(x => x.Id).ToList());
                         }
                         else
                         {
@@ -538,7 +538,7 @@ namespace eFMS.API.Setting.DL.Services
                             var accCPPayables = accPayable.Where(x => voucherCPId.Contains(x.VoucherNo) && x.BillingNo != null);
                             var accCPPayableNo = accCPPayables.Select(x => x.BillingNo);
                             var edocCPs = edocRepo.Get(x => accCPPayableNo.Contains(x.BillingNo));
-                            Acctype = edocCPs.Select(x => x.Id).ToList();
+                            Acctype.AddRange(edocCPs.Select(x => x.Id).ToList());
                         }
                         //var voucherCPId = accManage.Where(x => x.VoucherType.Replace(" ", "").ToUpper() == "CASHPAYMENT").Select(x => x.VoucherId);
                         //var accCPPayables = accPayable.Where(x => voucherCPId.Contains(x.VoucherNo));
@@ -556,7 +556,7 @@ namespace eFMS.API.Setting.DL.Services
                             var edocPNs = await edocRepo.GetAsync(x => accPNPayableNo.Select(z => z.billingNo).Contains(x.BillingNo));
                             //var edocOT = accPNPayableNo.Where(x => !edocPNs.Select(y => y.BillingNo).Contains(x.billingNo)).Distinct();
                             //var AccOT = GetListOtherFile(edocOT.ToList());
-                            Acctype = edocPNs.Select(x => x.Id).ToList();
+                            Acctype.AddRange(edocPNs.Select(x => x.Id).ToList());
                         }
                         else
                         {
@@ -565,7 +565,7 @@ namespace eFMS.API.Setting.DL.Services
                             var accPNPayables = accPayable.Where(x => voucherPNId.Contains(x.VoucherNo) && x.BillingNo != null);
                             var accPNPayableNo = accPNPayables.Select(x => x.BillingNo);
                             var edocPNs = edocRepo.Get(x => accPNPayableNo.Contains(x.BillingNo));
-                            Acctype = edocPNs.Select(x => x.Id).ToList();
+                            Acctype.AddRange(edocPNs.Select(x => x.Id).ToList());
                         }
                         break;
                     case AccountantType.CreditSlip:
@@ -584,7 +584,7 @@ namespace eFMS.API.Setting.DL.Services
                             var edocCLs = await edocRepo.GetAsync(x => accCLPayableNo.Select(z => z.billingNo).Contains(x.BillingNo));
                             //var edocOT = accPNPayableNo.Where(x => !edocPNs.Select(y => y.BillingNo).Contains(x.billingNo)).Distinct();
                             //var AccOT = GetListOtherFile(edocOT.ToList());
-                            Acctype = edocCLs.Select(x => x.Id).ToList();
+                            Acctype.AddRange(edocCLs.Select(x => x.Id).ToList());
                         }
                         else
                         {
@@ -593,7 +593,7 @@ namespace eFMS.API.Setting.DL.Services
                             var accCLPayables = accPayable.Where(x => voucherCLId.Contains(x.VoucherNo) && x.BillingNo != null);
                             var accCLPayableNo = accCLPayables.Select(x => x.BillingNo);
                             var edocCLs = edocRepo.Get(x => accCLPayableNo.Contains(x.BillingNo));
-                            Acctype = edocCLs.Select(x => x.Id).ToList();
+                            Acctype.AddRange(edocCLs.Select(x => x.Id).ToList());
                         }
                         break;
                     case AccountantType.CashReceipt:
@@ -604,7 +604,7 @@ namespace eFMS.API.Setting.DL.Services
                             var accRCPayables = await accPayableRepo.WhereAsync(x => voucherRCId.Contains(x.VoucherNo) && x.BillingNo != null);
                             var accRCPayableNo = accRCPayables.Select(x => new { billingNo = x.BillingNo, billingType = x.BillingType });
                             var edocRCs = await edocRepo.GetAsync(x => accRCPayableNo.Select(z => z.billingNo).Contains(x.BillingNo));
-                            Acctype = edocRCs.Select(x => x.Id).ToList();
+                            Acctype.AddRange(edocRCs.Select(x => x.Id).ToList());
                         }
                         else
                         {
@@ -613,7 +613,7 @@ namespace eFMS.API.Setting.DL.Services
                             var accRCPayables = accPayable.Where(x => voucherRCId.Contains(x.VoucherNo) && x.BillingNo != null);
                             var accRCPayableNo = accRCPayables.Select(x => x.BillingNo);
                             var edocRCs = edocRepo.Get(x => accRCPayableNo.Contains(x.BillingNo));
-                            Acctype = edocRCs.Select(x => x.Id).ToList();
+                            Acctype.AddRange(edocRCs.Select(x => x.Id).ToList());
                         }
                         //var voucherRCId = accManage.Where(x => x.VoucherType.Replace(" ", "").ToUpper() == "CASHRECEIPT").Select(x => x.VoucherId);
                         //var accRCPayables = accPayable.Where(x => voucherRCId.Contains(x.VoucherNo));
@@ -765,6 +765,23 @@ namespace eFMS.API.Setting.DL.Services
                         //}
                         query = query.And(x => lstId1.Contains((Guid)x.Id));
                         break;
+                    case ReferenceType.InvoiceNo:
+                        //if (!isRefNo)
+                        //{
+                        //    var accPayable = await accPayableRepo.GetAsync(x => x.DatetimeCreated >= criteria.FromDate && x.DatetimeCreated <= criteria.ToDate);
+                        //    var accPayableNo = accPayable.Select(x => x.BillingNo);
+                        //    var edocs = await edocRepo.GetAsync(x => accPayableNo.Contains(x.BillingNo));
+                        //    lstId1 = edocs.Select(x => x.Id).ToList();
+                        //}
+                        //else
+                        //{
+                        var accPayableIV = await accPayableRepo.GetAsync(x => lstRefNo.Contains(x.InvoiceNo));
+                        var accPayableIVNo = accPayableIV.Select(x => x.BillingNo);
+                        var edocIVs = await edocRepo.GetAsync(x => accPayableIVNo.Contains(x.BillingNo));
+                        lstId1 = edocIVs.Select(x => x.Id).ToList();
+                        //}
+                        query = query.And(x => lstId1.Contains((Guid)x.Id));
+                        break;
                 }
             }
 
@@ -795,7 +812,14 @@ namespace eFMS.API.Setting.DL.Services
                 }
                 else
                 {
-                    accPayable = await accPayableRepo.GetAsync(x => lstRefNo.Contains(x.VoucherNo));
+                    if (criteria.ReferenceType == ReferenceType.AccountantNo)
+                    {
+                        accPayable = await accPayableRepo.GetAsync(x => lstRefNo.Contains(x.VoucherNo));
+                    }
+                    else if(criteria.ReferenceType == ReferenceType.InvoiceNo)
+                    {
+                        accPayable = await accPayableRepo.GetAsync(x => lstRefNo.Contains(x.InvoiceNo));
+                    }
                     var accManageNo = accPayable.Select(x => x.VoucherNo);
                     accManage = await accManageRepo.GetAsync(x => accManageNo.Contains(x.VoucherId));
                 }
@@ -845,7 +869,7 @@ namespace eFMS.API.Setting.DL.Services
                                 imageMD.ForEach(x =>
                                 {
                                     x.BillingNo = settle.FirstOrDefault()?.SettlementNo;
-                                    x.BillingType = "SM";
+                                    x.BillingType = "Settlement";
                                 });
                                 result.AddRange(imageMD);
                             }
