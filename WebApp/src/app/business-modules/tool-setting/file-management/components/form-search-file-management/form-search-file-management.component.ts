@@ -1,6 +1,6 @@
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { DataService } from '@services';
 import { AppForm } from 'src/app/app.form';
@@ -125,6 +125,14 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             this.accountantType.setValue([this.accountantTypes[0].value]);
         }
         this.onSearch.emit(bodySearch);
+    }
+
+    resetDate(control: FormControl | AbstractControl) {
+        this.date.setValue({
+            startDate: null,
+            endDate: null
+        });
+        control.setValue(null);
     }
 
 }

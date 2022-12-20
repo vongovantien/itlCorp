@@ -20,8 +20,8 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date"
-                                        readonly formControlName="date"
-                                        [allowRemove]="false" />
+                                        formControlName="date"
+                                        [allowRemove]="!!date.value && !!date.value.startDate" (remove)="resetDate(date)" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>

@@ -23,7 +23,7 @@ export class ListFileManagementComponent extends AppList implements OnInit {
     @Output() changePage: EventEmitter<any> = new EventEmitter<any>();
     selectedFile: any = null;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
-
+    isView: boolean = true;
     constructor(
         private _systemFileRepo: SystemFileManageRepo,
         private _toast: ToastrService,
@@ -52,9 +52,10 @@ export class ListFileManagementComponent extends AppList implements OnInit {
         }
     }
 
-    viewEdocFromName(imageUrl: string) {
-        this.selectedFile = Object.assign({}, this.selectedFile);
-        this.selectedFile.imageUrl = imageUrl;
+    viewEdocFromName(edocFile: any) {
+        //this.selectedFile = Object.assign({}, this.selectedFile);
+        //this.selectedFile.imageUrl = edocFile.imageUrl;
+        this.selectedFile = edocFile;
         this.viewFileEdoc();
     }
 
@@ -63,10 +64,10 @@ export class ListFileManagementComponent extends AppList implements OnInit {
             return;
         }
         const extension = this.selectedFile.imageUrl.split('.').pop();
-        if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
+        if (['xlsx', 'docx', 'doc', 'xls'].includes(extension.toLowerCase())) {
             this._exportRepo.previewExport(this.selectedFile.imageUrl);
         }
-        else if (['html', 'htm'].includes(extension)) {
+        else if (['html', 'htm'].includes(extension.toLowerCase())) {
             console.log();
             this._systemFileRepo.getFileEdocHtml(this.selectedFile.imageUrl).subscribe(
                 (res: any) => {
@@ -74,8 +75,10 @@ export class ListFileManagementComponent extends AppList implements OnInit {
                 }
             )
         }
-        else {
+        else if (['pdf', 'txt', 'png', 'jpeg'].includes(extension.toLowerCase())) {
             this._exportRepo.downloadExport(this.selectedFile.imageUrl);
+        } else {
+            this.downloadEdoc();
         }
     }
 
@@ -95,7 +98,11 @@ export class ListFileManagementComponent extends AppList implements OnInit {
     onSelectFile(edoc: any) {
         this.selectedFile = edoc;
         console.log(this.selectedFile);
-
+        this.isView = true;
+        const extension = this.selectedFile.imageUrl.split('.').pop();
+        if (!['xlsx', 'docx', 'doc', 'xls', 'html', 'htm', 'pdf', 'txt', 'png', 'jpeg'].includes(extension.toLowerCase())) {
+            this.isView = false;
+        }
     }
 
     downloadEdoc() {
