@@ -976,23 +976,34 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     this.maxDateExpired = this.createMoment(this.expiredDate.value.startDate);                 
                 }              
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
+                this.formGroup.controls['paymentTerm'].setValue(30);
                 break;
             case 'Guarantee':
                 if (this.isCreateNewCommercial) {
-                    this.formGroup.controls['paymentTerm'].setValue(1);
                     this.formGroup.controls['creditLimit'].setValue(20000000);
                     this.formGroup.controls['creditLimitRate'].setValue(120);
                 } else {
                     this.isDisabledExpiredDateField = false;
                 }
+                this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['creditCurrency'].setValue("VND");
                 this.formGroup.controls['currencyId'].setValue("VND");
                 this.maxDateExpired = null;
                 break;
             case 'Cash':
+                this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
                 this.maxDateExpired = null;
+                break;
+            case 'Official':
+                this.formGroup.controls['paymentTerm'].setValue(30);
+                break;
+            case 'Prepaid':
+                this.formGroup.controls['paymentTerm'].setValue(1);
+                break;
+            case 'Parent Contract':
+                this.formGroup.controls['paymentTerm'].setValue(1); 
                 break;
             default:
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
