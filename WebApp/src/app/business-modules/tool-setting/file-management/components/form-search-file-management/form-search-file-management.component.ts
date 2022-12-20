@@ -65,6 +65,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         if (this.tabType === 'fileAccManage') {
             this.referenceTypes = [
                 { title: 'Accountant No', value: 3 },
+                { title: 'Invoice No', value: 4 },
             ]
             this.isAcc = true;
             this.dateModes = [
