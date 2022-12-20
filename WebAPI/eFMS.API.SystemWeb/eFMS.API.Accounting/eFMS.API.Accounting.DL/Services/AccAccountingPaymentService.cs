@@ -1144,7 +1144,7 @@ namespace eFMS.API.Accounting.DL.Services
                 OfficeId = x.OfficeId,
                 ServiceType = x.ServiceType,
                 PaymentTerm = x.PaymentTerm,
-                AccountNo = x.AccountNo,
+                AccountNo = x.AccountNo == "1313" ? null : x.AccountNo,
                 SourceModified = x.SourceModified,
                 PaidAmountVnd = x.PaidAmountVnd,
                 PaidAmountUsd = x.PaidAmountUsd
@@ -1920,9 +1920,9 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.InvoiceDate = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.IssuedDate;
                         payment.BillingRefNo = item.grp.BillingRefNo;
                         payment.BillingDate = null;
-                        payment.DueDate = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.DueDate;
-                        payment.OverdueDays = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.OverdueDays;
-                        payment.PaymentTerm = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.PaymentTerm;
+                        payment.DueDateOBH = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.DueDate;
+                        payment.OverdueDaysOBH = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.OverdueDays;
+                        payment.PaymentTermOBH = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.PaymentTerm;
                         payment.CombineNo = item.surcharge.Where(x => !string.IsNullOrEmpty(x.CombineNo)).FirstOrDefault()?.CombineNo;
                         if (invoiceObhGroup?.Count() > 0)
                         {
@@ -2251,9 +2251,13 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.InvoiceDate = invoiceDe?.invc.Count() > 0 ? invoiceDe.invc.FirstOrDefault()?.IssuedDate : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.IssuedDate;
                     payment.BillingRefNo = item.grp.BillingRefNo;
                     payment.BillingDate = invoiceDe?.invc.FirstOrDefault()?.ConfirmBillingDate;
-                    payment.DueDate = invoiceDe?.invc.Count() > 0 ? invoiceDe?.invc.FirstOrDefault()?.DueDate : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.DueDate;
-                    payment.OverdueDays = invoiceDe?.invc.Count() > 0 ? invoiceDe?.invc.FirstOrDefault()?.OverdueDays : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.OverdueDays;
-                    payment.PaymentTerm = invoiceDe?.invc.Count() > 0 ? invoiceDe?.invc.FirstOrDefault()?.PaymentTerm : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.PaymentTerm;
+                    payment.DueDate = invoiceDe?.invc.Count() > 0 ? invoiceDe?.invc.FirstOrDefault()?.DueDate : null;
+                    payment.DueDateOBH = invoiceDe?.invc.Count() > 0 ? null : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.DueDate;
+                    payment.OverdueDays = invoiceDe?.invc.Count() > 0 ? invoiceDe?.invc.FirstOrDefault()?.OverdueDays : null;
+                    payment.OverdueDaysOBH = invoiceDe?.invc.Count() > 0 ? null : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.OverdueDays;
+                    payment.PaymentTerm = invoiceDe?.invc.Count() > 0 ? invoiceDe?.invc.FirstOrDefault()?.PaymentTerm : null;
+                    payment.PaymentTermOBH = invoiceDe?.invc.Count() > 0 ? null : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.PaymentTerm;
+
                     if (invoiceDe?.invc.Count() > 0)
                     {
                         payment.AccountNo = invoiceDe.invc.FirstOrDefault()?.AccountNo;
