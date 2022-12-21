@@ -2258,7 +2258,7 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.OverdueDays = invoiceDe?.invc.FirstOrDefault()?.OverdueDays ;
                         payment.PaymentTerm =  invoiceDe?.invc.FirstOrDefault()?.PaymentTerm;
                     }
-                    if (invoiceObhGroup.FirstOrDefault()?.invc.Count() > 0)
+                    if (invoiceObhGroup != null && invoiceObhGroup.FirstOrDefault()?.invc.Count() > 0)
                     {
                         payment.DueDateOBH = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.DueDate;
                         payment.OverdueDaysOBH = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.OverdueDays;
