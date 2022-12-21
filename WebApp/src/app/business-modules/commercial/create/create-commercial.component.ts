@@ -113,7 +113,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
             map((value: Partner) => {
                 if (!!value) {
                     if (!!body.internalReferenceNo) {
-                        this.invalidTaxCode = `This Parnter is existed, please you check again!`;
+                        this.invalidTaxCode = `This <b>Taxcode</b> already <b>Existed</b> in <b>${value.shortName}</b>, If you want to Create Internal account, Please change <b>Internal Reference Info</b>.`;
                         this.infoPopupTaxCode.show();
                     } else {
                         this.invalidTaxCode = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${value.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
