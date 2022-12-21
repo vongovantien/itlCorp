@@ -527,7 +527,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'customer':
-                console.log(this.shipmentType);
+                // console.log(this.shipmentType);
                 this._toast.clear();
                 this.customerId.setValue(data.id);
                 if (!this.shipperId.value) {
