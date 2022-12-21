@@ -60,6 +60,22 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     initValue() {
     }
 
+    getEndDate(): Date {
+        let currYear = new Date().getFullYear();
+        let currMonth = new Date().getMonth();
+        if (currMonth === 11) {
+            currYear++,
+                currMonth = 1
+        } else if (currMonth === 12) {
+            currYear++,
+                currMonth = 2
+        } else {
+            currYear++,
+                currMonth++
+        }
+        return new Date(currYear, currMonth)
+    }
+
     initFormSearch() {
 
         if (this.tabType === 'fileAccManage') {
@@ -78,7 +94,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             dateMode: [this.dateModes[0].value],
             date: [{
                 startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-                endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+                endDate: this.getEndDate()
             }],
             searchType: [this.referenceTypes[0].value],
             referenceNo: [],
@@ -100,7 +116,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             fromDate: !!formSearch.date?.startDate ? formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en') : null,
             toDate: !!formSearch.date?.endDate ? formatDate(formSearch.date.endDate, "yyyy-MM-dd", 'en') : null,
             dateMode: formSearch.dateMode,
-            accountantTypes: this.isAcc ? formSearch.accountantType == 0 ? [0] : formSearch.accountantType : null
+            accountantTypes: this.isAcc ? formSearch.accountantType == 0 ? [0] : formSearch.accountantType : null,
         };
         console.log(bodySearch);
         this.onSearch.emit(bodySearch);
@@ -113,7 +129,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
             toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
             dateMode: this.accountantTypes[0].value,
-            accountantTypes: this.isAcc ? [0] : null
+            accountantTypes: this.isAcc ? [0] : null,
         };
         this.referenceNo.setValue(null)
         this.date.setValue({
@@ -143,5 +159,5 @@ interface IFileManageSearch {
     fromDate: any,
     toDate: any,
     dateMode: string,
-    accountantTypes: number[],
+    accountantTypes: number[]
 }

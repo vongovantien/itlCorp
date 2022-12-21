@@ -21,7 +21,7 @@
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date"
                                         formControlName="date"
-                                        [allowRemove]="!!date.value && !!date.value.startDate" (remove)="resetDate(date)" />
+                                        [allowRemove]="false" (remove)="resetDate(date)" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
