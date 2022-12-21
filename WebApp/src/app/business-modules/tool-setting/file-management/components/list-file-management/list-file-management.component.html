@@ -25,6 +25,13 @@
                                     </div>
                                 </td> -->
                                 <td>{{i + 1}}</td>
+                                <td *ngIf="tabType==='Acc'">
+                                    <ng-container *ngFor="let acRef of edocFile.acRef ;let i = index; trackBy: trackByFn">
+                                        <span [ngClass]="'badge badge-primary'">
+                                            {{acRef}}
+                                        </span>
+                                    </ng-container>
+                                </td>
                                 <td>
                                     <a class="text-underline htmlLink" (click)="viewEdocFromName(edocFile)"
                                     download>{{edocFile.systemFileName}}
@@ -34,13 +41,6 @@
                                 <td>{{edocFile.jobRef}}</td>
                                 <td>{{edocFile.hblNo}}</td>
                                 <td>{{edocFile.billingNo}}</td>
-                                <td *ngIf="tabType==='Acc'">
-                                    <ng-container *ngFor="let acRef of edocFile.acRef ;let i = index; trackBy: trackByFn">
-                                        <span [ngClass]="'badge badge-primary'">
-                                            {{acRef}}
-                                        </span>
-                                    </ng-container>
-                                </td>
                                 <!-- <td >{{edocFile.acRef}}</td> -->
                                 <td>{{edocFile.source}}</td>
                                 <td>{{edocFile.type}}</td>
