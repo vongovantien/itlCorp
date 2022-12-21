@@ -73,7 +73,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     minDateEffective: any = null;
     minDateExpired: any = null;
-    maxDateExpired: any = null;
     minDateExpiredTrial: any = null;
 
 
@@ -926,8 +925,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + 30)),
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 30)),
             });
-            this.maxDateExpired = this.createMoment(this.expiredDate.value.startDate);
-            console.log(this.maxDateExpired)
+        }
+    }
+    onUpdateExpiredDate(value: { startDate: any; endDate: any }) {
+        const effectiveDays = !!this.formGroup.controls['effectiveDate'].value ? this.formGroup.controls['effectiveDate'].value : 0;
+        if (!!value.startDate && this.contractType.value === 'Trial') {
+            if(value.startDate > (effectiveDays.getDate() + 30)){
+                return {error: "Expired Date should be less than or equal Effective Date"}
+            }
+            return null;
         }
     }
 
@@ -972,8 +978,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     this.expiredDate.setValue({
                         startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate() + 30)),
                         endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate() + 30)),
-                    });
-                    this.maxDateExpired = this.createMoment(this.expiredDate.value.startDate);                 
+                    });                
                 }              
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['paymentTerm'].setValue(30);
@@ -989,24 +994,19 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['creditCurrency'].setValue("VND");
                 this.formGroup.controls['currencyId'].setValue("VND");
-                this.maxDateExpired = null;
                 break;
             case 'Cash':
                 this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
-                this.maxDateExpired = null;
                 break;
             case 'Official':
                 this.formGroup.controls['paymentTerm'].setValue(30);
-                this.maxDateExpired = null;
                 break;
             case 'Prepaid':
                 this.formGroup.controls['paymentTerm'].setValue(1);
-                this.maxDateExpired = null;
                 break;
             case 'Parent Contract':
                 this.formGroup.controls['paymentTerm'].setValue(1); 
-                this.maxDateExpired = null;
                 break;
             default:
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
