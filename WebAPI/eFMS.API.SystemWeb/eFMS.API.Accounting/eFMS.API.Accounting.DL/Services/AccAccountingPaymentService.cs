@@ -1019,8 +1019,8 @@ namespace eFMS.API.Accounting.DL.Services
             if (rangeSearch == PermissionRange.None) return null;
             Expression<Func<AccAccountingManagement, bool>> perQuery = GetQueryInvoicePermission(rangeSearch, _user);
             Expression<Func<AccAccountingManagement, bool>> query = x => x.InvoiceNoReal != null && (x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE)
-                                                                      && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
-                                                                      && !x.AccountNo.Contains("1313"); // TH synce inv từ bravo && x.Status != "New"
+                                                                      && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId)); // TH synce inv từ bravo && x.Status != "New"
+
             var acctManagementIds = new List<Guid?>();
             if (criteria.ReferenceNos?.Count(x => !string.IsNullOrEmpty(x)) > 0)
             {
@@ -1657,7 +1657,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public IQueryable<AccountingCustomerPaymentExport> GetDataExportAccountingCustomerPayment(PaymentCriteria criteria)
         {
-            var data = Query(criteria).Where(x => x.Currency == AccountingConstants.CURRENCY_LOCAL); // CR: 16859 => lấy tất cả partner và lọc theo currency vnd của billing
+            var data = Query(criteria).Where(x => x.Currency == AccountingConstants.CURRENCY_LOCAL && !x.AccountNo.Contains("1313")); // CR: 16859 => lấy tất cả partner và lọc theo currency vnd của billing
             if (data == null) return null;
             var partners = partnerRepository.Get(x => x.Active == true);
             var paymentData = QueryInvoiceDataPayment(criteria);
