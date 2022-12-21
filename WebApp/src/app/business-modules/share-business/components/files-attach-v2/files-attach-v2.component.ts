@@ -125,7 +125,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: CsTransaction) => {
                             this.transactionType = res.transactionType;
-                            this.getDocumentType(res.transactionType, null);
+                            this.getDocumentType(res.transactionType);
                             this.getEDoc(res.transactionType);
                             this.jobNo = res.jobNo;
                             this.isLocked = res.isLocked;
@@ -137,7 +137,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: any) => {
                             this.transactionType = 'CL';
-                            this.getDocumentType('CL', null);
+                            this.getDocumentType('CL');
                             this.getEDoc('CL');
                             this.jobNo = res.opstransaction.jobNo;
                             this.isLocked = res.opstransaction.isLocked;
@@ -147,7 +147,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         } else {
             this.transactionType = this.typeFrom;
             this.getJobList();
-            this.getDocumentType(this.typeFrom, this.billingId);
+            this.getDocumentType(this.typeFrom);
             this.getEDoc(this.typeFrom);
         }
         this.headers = [
@@ -335,8 +335,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
 
-    getDocumentType(transactionType: string, billingId: string) {
-        this._systemFileRepo.getDocumentType(transactionType, billingId)
+    getDocumentType(transactionType: string) {
+        this._systemFileRepo.getDocumentType(transactionType)
             .pipe(
                 catchError(this.catchError),
             )
@@ -402,15 +402,21 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     viewEdocFromName(edoc: any) {
         // this.selectedEdoc = Object.assign({}, this.selectedEdoc);
         // this.selectedEdoc.imageUrl = edoc.imageUrl;
-        this.selectedEdoc = this.selectedEdoc;
+        console.log(edoc);
+
+        this.selectedEdoc = edoc;
         this.viewFileEdoc();
     }
 
     viewFileEdoc() {
+        console.log(this.selectedEdoc);
+
         if (!this.selectedEdoc.imageUrl) {
             return;
         }
         const extension = this.selectedEdoc.imageUrl.split('.').pop();
+        console.log(extension);
+
         if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
             this._exportRepo.previewExport(this.selectedEdoc.imageUrl);
         }

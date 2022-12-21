@@ -24,6 +24,11 @@ const routing: Routes = [
     {
         path: 'accountant', component: AccountantFileManagementComponent,
         data: { name: "Accountant", title: 'Accountant File Management' },
+    },
+
+    {
+        path: 'user-attach-file', loadChildren: () => import('./user-attach-file-management/user-attach-file-management.module').then(m => m.UserAttachFileManagementModule),
+        data: { name: 'Attach file', title: 'Attach file' }
     }
 ]
 

@@ -47,7 +47,7 @@ export class ListFileManagementComponent extends AppList implements OnInit {
             { field: 'userCreated', title: 'Attach Person', sortable: true },
         ]
         if (this.tabType === 'Acc') {
-            this.headers.splice(5, 0, { field: 'acRefNo', title: 'A/C Ref No', sortable: true },)
+            this.headers.splice(0, 0, { field: 'acRefNo', title: 'A/C Ref No', sortable: true },)
             this.headers.join();
         }
     }
