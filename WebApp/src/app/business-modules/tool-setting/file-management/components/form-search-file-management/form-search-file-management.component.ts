@@ -1,6 +1,7 @@
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { JobConstants } from '@constants';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { DataService } from '@services';
 import { AppForm } from 'src/app/app.form';
@@ -60,21 +61,20 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     initValue() {
     }
 
-    getEndDate(): Date {
-        let currYear = new Date().getFullYear();
-        let currMonth = new Date().getMonth();
-        if (currMonth === 11) {
-            currYear++,
-                currMonth = 1
-        } else if (currMonth === 12) {
-            currYear++,
-                currMonth = 2
-        } else {
-            currYear++,
-                currMonth++
-        }
-        return new Date(currYear, currMonth)
-    }
+    // getStartDate(): Date {
+    //     let currYear = new Date().getFullYear();
+    //     let currMonth = new Date().getMonth();
+    //     if (currMonth === 1) {
+    //         currYear--,
+    //             currMonth = 11
+    //     } else if (currMonth === 2) {
+    //         currYear--,
+    //             currMonth = 12
+    //     } else {
+    //         currMonth - 2
+    //     }
+    //     return new Date(currYear, currMonth, 1)
+    // }
 
     initFormSearch() {
 
@@ -93,8 +93,8 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         this.formSearchFile = this._fb.group({
             dateMode: [this.dateModes[0].value],
             date: [{
-                startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-                endDate: this.getEndDate()
+                startDate: new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate),
+                endDate: new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate),
             }],
             searchType: [this.referenceTypes[0].value],
             referenceNo: [],
