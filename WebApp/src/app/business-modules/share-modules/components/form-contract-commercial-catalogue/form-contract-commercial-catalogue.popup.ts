@@ -848,7 +848,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             return;
         }
         if (this.selectedContract.active === false) {
-            this._catalogueRepo.checkExistedContractActive(id, this.selectedContract.saleManId, this.partnerId).pipe(
+            this._catalogueRepo.checkExistedContractActive(id, this.partnerId).pipe(
                 catchError(this.catchError)
             ).subscribe(
                 (res: boolean) => {
