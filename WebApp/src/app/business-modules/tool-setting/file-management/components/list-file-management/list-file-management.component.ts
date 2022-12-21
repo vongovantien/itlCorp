@@ -19,7 +19,6 @@ export class ListFileManagementComponent extends AppList implements OnInit {
     @Input() headers: CommonInterface.IHeaderTable[];
     edocId: string = '';
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
-    @Output() reGetEdoc: EventEmitter<boolean> = new EventEmitter<false>();
     @Output() changePage: EventEmitter<any> = new EventEmitter<any>();
     selectedFile: any = null;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;

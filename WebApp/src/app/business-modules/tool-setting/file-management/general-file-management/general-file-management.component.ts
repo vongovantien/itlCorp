@@ -39,7 +39,6 @@ export class GeneralFileManagementComponent extends AppList implements OnInit {
 
     onSearchFile(body: any) {
         console.log(body);
-
         body.Size = this.pageSize;
         body.Page = this.page;
         this.dataSearch = body;
@@ -53,6 +52,7 @@ export class GeneralFileManagementComponent extends AppList implements OnInit {
                     this.listFile.totalItems = res.totalItems;
                     this.listFile.page = res.page;
                     this.listFile.pageSize = res.size;
+                    this.page = 1;
                 }
             );
     }
@@ -75,6 +75,7 @@ export class GeneralFileManagementComponent extends AppList implements OnInit {
         console.log(event);
         this.page = event.page;
         this.pageSize = event.pageSize;
+        this.dataSearch.isSearch = false;
         this.onSearchFile(this.dataSearch);
     }
 
