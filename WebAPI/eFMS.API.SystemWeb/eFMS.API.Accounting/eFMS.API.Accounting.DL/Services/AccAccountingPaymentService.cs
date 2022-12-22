@@ -1657,7 +1657,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public IQueryable<AccountingCustomerPaymentExport> GetDataExportAccountingCustomerPayment(PaymentCriteria criteria)
         {
-            var data = Query(criteria).Where(x => x.Currency == AccountingConstants.CURRENCY_LOCAL && !x.AccountNo.Contains("1313")); // CR: 16859 => lấy tất cả partner và lọc theo currency vnd của billing
+            var data = Query(criteria).Where(x => x.Currency == AccountingConstants.CURRENCY_LOCAL); // CR: 16859 => lấy tất cả partner và lọc theo currency vnd của billing
             if (data == null) return null;
             var partners = partnerRepository.Get(x => x.Active == true);
             var paymentData = QueryInvoiceDataPayment(criteria);
@@ -2005,6 +2005,13 @@ namespace eFMS.API.Accounting.DL.Services
                 for (var i = 0; i < invoiceDebitGroupLst.Count(); i++)
                 {
                     var invoiceDe = invoiceDebitGroupLst[i];
+                    if (invoiceDe?.invc.Count() > 0)
+                    {
+                        if (invoiceDe.invc.FirstOrDefault()?.AccountNo == "1313")
+                        {
+                            continue;
+                        }
+                    }
                     var payment = new AccountingCustomerPaymentExport();
                     var statusOBH = string.Empty;
                     var statusDebit = "Unpaid";
