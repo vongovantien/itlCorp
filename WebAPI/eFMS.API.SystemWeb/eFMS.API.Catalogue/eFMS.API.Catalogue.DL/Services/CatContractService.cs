@@ -428,18 +428,20 @@ namespace eFMS.API.Catalogue.DL.Services
             return ContractServicesName;
         }
 
-        public IQueryable<CatContract> CheckDuplicatedContract(CatContractModel modelUpdate)
+        public IQueryable<CatContract> CheckDuplicatedContract(CatContractModel modelUpdate, bool isCurrentContract)
         {
             var isDuplicate = false;
-            var messageDuplicate = string.Empty;
-
-            var currentContract = DataContext.Get(x => x.Id == modelUpdate.Id).FirstOrDefault();
+            var currentContract = DataContext.Get(x => x.Id == modelUpdate.Id && x.PartnerId == modelUpdate.PartnerId).FirstOrDefault();
+            if (isCurrentContract == true)
+            {
+                modelUpdate = mapper.Map<CatContractModel>(currentContract);
+            }
 
             var contractOffices = modelUpdate.OfficeId.Split(";");
             var contractServices = modelUpdate.SaleService.Split(";");
 
             var contracts = DataContext.Get(x => x.Id != currentContract.Id && x.Active == true && x.PartnerId == modelUpdate.PartnerId && x.SaleManId == modelUpdate.SaleManId);
-            if (contracts == null)
+            if (contracts == null || (modelUpdate.Active == false && isCurrentContract == false))
             {
                 return null;
             }
@@ -706,9 +708,9 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             active = false;
             var isUpdateDone = new HandleState();
-            //CatContract objUpdate = DataContext.First(x => x.Id == id);
             CatContractModel objUpdate = mapper.Map<CatContractModel>(DataContext.First(x => x.Id == id));
-            var dataCheckExisted = CheckDuplicatedContract(objUpdate);
+
+            var dataCheckExisted = CheckDuplicatedContract(objUpdate, true);
             if (dataCheckExisted != null && dataCheckExisted.Count() > 0 && objUpdate.Active == false)
             {
                 foreach (var item in dataCheckExisted)
