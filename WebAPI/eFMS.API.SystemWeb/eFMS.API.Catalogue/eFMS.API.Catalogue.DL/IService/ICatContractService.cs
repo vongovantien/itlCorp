@@ -38,7 +38,7 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatAgreementModel> QueryAgreement(CatContractCriteria criteria);
         string CheckExistedContract(CatContractModel model);
         Task<HandleState> UpdateEmailContract(Guid id, string email);
-        IQueryable<CatContract> CheckDuplicatedContract(CatContractModel modelUpdate);
+        IQueryable<CatContract> CheckDuplicatedContract(CatContractModel modelUpdate, bool isCurrentContract);
 
     }
 }
