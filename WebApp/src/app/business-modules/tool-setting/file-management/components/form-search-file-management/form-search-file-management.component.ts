@@ -1,4 +1,3 @@
-import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { JobConstants } from '@constants';
@@ -113,8 +112,8 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         const bodySearch: Partial<IFileManageSearch> = {
             referenceNo: formSearch.referenceNo,
             referenceType: formSearch.searchType,
-            fromDate: !!formSearch.date?.startDate ? formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en') : null,
-            toDate: !!formSearch.date?.endDate ? formatDate(formSearch.date.endDate, "yyyy-MM-dd", 'en') : null,
+            fromDate: !!formSearch.date?.startDate ? new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate) : null,
+            toDate: !!formSearch.date?.endDate ? new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate) : null,
             dateMode: formSearch.dateMode,
             accountantTypes: this.isAcc ? formSearch.accountantType == 0 ? [0] : formSearch.accountantType : null,
         };

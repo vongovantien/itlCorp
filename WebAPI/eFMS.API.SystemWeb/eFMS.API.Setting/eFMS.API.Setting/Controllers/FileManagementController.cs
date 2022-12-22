@@ -73,11 +73,19 @@ namespace eFMS.API.Setting.Controllers
         [Authorize]
         public IActionResult GetEdocManagement(EDocManagementCriterial criteria)
         {
-            var result = fileManagementService.GetEdocManagement(criteria).Result;
-            if (result == null)
+            var data = fileManagementService.GetEdocManagement(criteria).Result;
+            if (data == null)
             {
                 return BadRequest();
             }
+            var result= new ResponsePagingModel<EDocFile>()
+            {
+                Data = data,
+                Page = criteria.Page,
+                Size = criteria.Size,
+                //TotalItems = other.Count() > 0 ? data.Count() + other.Count() : data.Count,
+                TotalItems=100
+            };
             return Ok(result);
         }
     }
