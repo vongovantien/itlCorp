@@ -312,28 +312,28 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
 
-        private Expression<Func<AccAccountPayable, bool>> QueryPayable(AccountPayableCriteria criteria)
+        private IQueryable<AccAccountPayable> QueryPayable(AccountPayableCriteria criteria)
         {
-            Expression<Func<AccAccountPayable, bool>> query = x => !string.IsNullOrEmpty(x.ReferenceNo);
+            var data = DataContext.Get(x => !string.IsNullOrEmpty(x.ReferenceNo));
             if (!string.IsNullOrEmpty(criteria.SearchType) && !string.IsNullOrEmpty(criteria.ReferenceNos?.Trim()))
             {
                 var searchNoList = criteria.ReferenceNos.Split('\n').Where(x => !string.IsNullOrEmpty(x?.Trim())).ToList();
                 switch (criteria.SearchType)
                 {
                     case "VoucherNo":
-                        query = query.And(x => searchNoList.Any(z => z == x.VoucherNo));
+                        data = data.Where(x => searchNoList.Any(z => z == x.VoucherNo));
                         break;
                     case "DocumentNo":
-                        query = query.And(x => searchNoList.Any(z => z == x.BillingNo));
+                        data = data.Where(x => searchNoList.Any(z => z == x.BillingNo));
                         break;
                     case "VatInv":
-                        query = query.And(x => searchNoList.Any(z => z == x.InvoiceNo));
+                        data = data.Where(x => searchNoList.Any(z => z == x.InvoiceNo));
                         break;
                 }
             }
             if (!string.IsNullOrEmpty(criteria.PartnerId))
             {
-                query = query.And(x => x.PartnerId == criteria.PartnerId);
+                data = data.Where(x => x.PartnerId == criteria.PartnerId);
             }
             //if (criteria.FromPaymentDate != null)
             //{
@@ -341,7 +341,7 @@ namespace eFMS.API.Accounting.DL.Services
             //}
             if (criteria.Office != null && criteria.Office.Count > 0)
             {
-                query = query.And(x => x.OfficeId != null && criteria.Office.Contains(x.OfficeId.ToString()));
+                data = data.Where(x => x.OfficeId != null && criteria.Office.Contains(x.OfficeId.ToString()));
             }
             //if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
             //{
@@ -349,11 +349,11 @@ namespace eFMS.API.Accounting.DL.Services
             //}
             if (criteria.TransactionType != null && criteria.TransactionType.Count > 0)
             {
-                query = query.And(x => criteria.TransactionType.Any(z => z.ToLower().Contains(x.TransactionType.ToLower())));
+                data = data.Where(x => criteria.TransactionType.Any(z => z.ToLower().Contains(x.TransactionType.ToLower())));
             }
             // Lấy các dòng có refno
             {
-                query = query.And(x => !string.IsNullOrEmpty(x.ReferenceNo));
+                data = data.Where(x => !string.IsNullOrEmpty(x.ReferenceNo));
             }
 
             // Get data within 1 months if search without anything
@@ -361,16 +361,20 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var maxDate = (DataContext.Get().Max(x => x.VoucherDate) ?? DateTime.Now).AddDays(1).Date;
                 var minDate = maxDate.AddMonths(-1).AddDays(-1).Date; // Start from 1 months ago
-                query = query.And(x => x.VoucherDate != null && (x.VoucherDate.Value > minDate && x.VoucherDate.Value < maxDate));
+                data = data.Where(x => x.VoucherDate != null && (x.VoucherDate.Value > minDate && x.VoucherDate.Value < maxDate));
             }
-            return query;
+            return data;
         }
 
         private IQueryable<AcctPayablePaymentDetailModel> GetDataAcctPayable(AccountPayableCriteria criteria)
        {
             IQueryable<AcctPayablePaymentDetailModel> results = null;
 
-            var payableData = DataContext.Get(QueryPayable(criteria));
+            var payableData = QueryPayable(criteria);
+            if(criteria.IsPaging == true)
+            {
+                payableData = payableData.Take(300);
+            }
             if (payableData == null) return null;
             var paymentData = accountPayablePaymentRepository.Get(x => x.PaymentType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE);
             var data = from payable in payableData
