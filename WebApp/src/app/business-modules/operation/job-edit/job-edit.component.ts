@@ -318,6 +318,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.sumNetWeight = form.sumNetWeight === 0 ? null : form.sumNetWeight;
         this.opsTransaction.sumPackages = form.sumPackages === 0 ? null : form.sumPackages;
         this.opsTransaction.sumContainers = form.sumContainers === 0 ? null : form.sumContainers;
+        this.opsTransaction.sumChargeWeight = (this.lstMasterContainers || []).reduce((acc, curr) => acc += curr.chargeAbleWeight, 0);
         this.opsTransaction.sumCbm = form.sumCbm === 0 ? null : form.sumCbm;
         this.opsTransaction.containerDescription = form.containerDescription;
         this.opsTransaction.note = form.note;

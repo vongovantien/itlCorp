@@ -713,6 +713,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     data = this.hbl.chargeWeight;
                 }
                 break;
+            case 'gw':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.grossWeight;
+                } else {
+                    data = this.hbl.grossWeight;
+                }
+                break;
             default:
                 break;
         }
@@ -1286,6 +1293,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                             c.mblno = this.getMblNo(this.shipment, this.hbl);
                             c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            if (!!c.quantityType) {
+                                c.quantity = this.getQuantityByquantityType(c.quantityType);
+                            }
                             this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
                         });
                     }
@@ -1295,11 +1305,42 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                             c.mblno = this.getMblNo(this.shipment, this.hbl);
                             c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            if (!!c.quantityType) {
+                                c.quantity = this.getQuantityByquantityType(c.quantityType);
+                            }
                             this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
                         });
                     }
                 }
             );
+    }
+
+    getQuantityByquantityType(quantityType: string) {
+        let quantity: number = null;
+        switch (quantityType) {
+            case CommonEnum.QUANTITY_TYPE.GW:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'gw') : this.getDataHint('gw');
+                break;
+            case CommonEnum.QUANTITY_TYPE.NW:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'nw') : this.getDataHint('nw');
+                break;
+            case CommonEnum.QUANTITY_TYPE.CBM:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'cbm') : this.getDataHint('cbm');
+                break;
+            case CommonEnum.QUANTITY_TYPE.CONT:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'quantity') : this.getDataHint('quantity');
+                break;
+            case CommonEnum.QUANTITY_TYPE.CW:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'chargeAbleWeight') : this.getDataHint('chargeAbleWeight');
+                break;
+            case CommonEnum.QUANTITY_TYPE.PACKAGE:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'packageQuantity') : this.getDataHint('packageQuantity');
+                break;
+            default:
+                break;
+        }
+
+        return quantity;
     }
 
     getRecentlyCharge() {
@@ -1331,6 +1372,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 c.mblno = this.getMblNo(this.shipment, this.hbl);
                                 c.jobNo = this.shipment.jobNo || null;
                                 c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                                if (!!c.quantityType) {
+                                    c.quantity = this.getQuantityByquantityType(c.quantityType);
+                                }
                                 this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
                             });
                         }
@@ -1340,6 +1384,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 c.mblno = this.getMblNo(this.shipment, this.hbl);
                                 c.jobNo = this.shipment.jobNo || null;
                                 c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                                if (!!c.quantityType) {
+                                    c.quantity = this.getQuantityByquantityType(c.quantityType);
+                                }
                                 this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
                             });
                         }
@@ -1349,6 +1396,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 c.mblno = this.getMblNo(this.shipment, this.hbl);
                                 c.jobNo = this.shipment.jobNo || null;
                                 c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                                if (!!c.quantityType) {
+                                    c.quantity = this.getQuantityByquantityType(c.quantityType);
+                                }
                                 this._store.dispatch(new fromStore.AddOBHSurchargeAction(c));
                             });
                         }
