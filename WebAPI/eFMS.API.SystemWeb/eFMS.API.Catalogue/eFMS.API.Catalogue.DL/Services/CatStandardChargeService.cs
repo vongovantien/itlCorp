@@ -105,7 +105,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         DatetimeCreated = DateTime.Now,
                         UserModified = currentUser.UserID,
                         DatetimeModified = DateTime.Now,
-                        UnitId = unitRepository.Get(x => x.Id == item.UnitId).FirstOrDefault()?.Id,
+                        UnitId = unitRepository.Get(x => x.Code == item.UnitCode).FirstOrDefault()?.Id,
                         QuantityType = item.QuantityType,
                         
                     };
