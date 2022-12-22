@@ -1265,6 +1265,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             agentId: this.shipment.agentId,
             chargeType: this.TYPE,
             customerId: this.shipment.customerId,
+            salesmanId: this.hbl.saleManId
         };
         this._documentRepo.getRecentlyChargesOps(body)
             .pipe(map((v: any[]) => (v || []).map((i => new CsShipmentSurcharge(i)))))
@@ -1309,6 +1310,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 agentId: this.shipment.agentId,
                 chargeType: this.TYPE,
                 customerId: this.hbl.customerId,
+                salesmanId: this.hbl.saleManId
             };
             this._documentRepo.getRecentlyCharges(body)
                 .pipe(map((v: any[]) => (v || []).map((i => new CsShipmentSurcharge(i)))))
@@ -1598,4 +1600,5 @@ interface IRecentlyCharge {
     coloaderId: string; // * MBL
     chargeType: string; // * BUY/SELL/OBH
     jobId: string;
+    salesmanId: string;
 }
