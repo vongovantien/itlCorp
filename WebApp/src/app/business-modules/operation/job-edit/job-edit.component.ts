@@ -4,7 +4,7 @@ import { AbstractControl } from '@angular/forms';
 import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import { ActionsSubject, Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
-import { getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
+import { getCurrentUserState, getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
 
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent, SubHeaderComponent } from '@common';
@@ -79,6 +79,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.subscriptionParamURLChange();
         this.subscriptionSaveContainerChange();
+
+        this.currentUser$ = this._store.select(getCurrentUserState);
     }
 
     subscriptionParamURLChange() {

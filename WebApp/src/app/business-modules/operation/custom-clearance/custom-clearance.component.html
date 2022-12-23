@@ -149,7 +149,8 @@
 <permission-403-popup></permission-403-popup>
 
 <app-dropdown #dropdownMenuClearance>
-    <a class="dropdown-item pointer" (click)="confirmConvert(true)" *ngIf="(currentUser$ | async)?.officeType !== 'OutSource'" title="Create clearance with replicate">
+    <a class="dropdown-item pointer" (click)="confirmConvert(true)"
+        *ngIf="(currentUser$ | async)?.officeType === 'Head'" title="Create clearance with replicate">
         <i class="la la-copy"></i>
         <span> Replicate</span>
     </a>

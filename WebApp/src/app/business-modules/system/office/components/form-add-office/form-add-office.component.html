@@ -83,7 +83,8 @@
                                 Office Type
                                 <span class="text-danger">*</span>
                             </label>
-                            <ng-select class="custom" formControlName="officeType" [items]="officeTypes">
+                            <ng-select class="custom" formControlName="officeType" [items]="officeTypes"
+                                [clearable]="false">
                             </ng-select>
                         </div>
                     </div>
@@ -113,8 +114,7 @@
                                 [currentActiveItemId]="{ field: 'id', value: partnerMapping.value}"
                                 (itemSelected)="onSelectDataFormInfo($event,'partner')"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
-                                (remove)="resetPartnerMapping(partnerMapping)"
-                                [displayFields]="displayFieldsPartner"
+                                (remove)="resetPartnerMapping(partnerMapping)" [displayFields]="displayFieldsPartner"
                                 placeholder="Select Partner">
                             </app-combo-grid-virtual-scroll>
                         </div>

@@ -1,3 +1,4 @@
+import { X } from '@angular/cdk/keycodes';
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -82,6 +83,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     contracts: Contract[] = [];
 
     offices: CommonInterface.INg2Select[] = [];
+    listOffice: Office[] = [];
     activeServices: any = [];
     activeVas: any = [];
     activeOffice: any = [];
@@ -322,7 +324,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     getOffices() {
-        this._systemRepo.queryOffices({ officeType: ['Head', 'Branch'] })
+        this._systemRepo.queryOffices({ officeType: ['Head', 'Branch', 'Repo'] })
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -330,6 +332,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             .subscribe(
                 (res: Office[]) => {
                     if (!!res) {
+                        this.listOffice = res;
                         this.offices = this.utility.prepareNg2SelectData(res || [], 'id', 'shortName');
                         this.offices = [{ id: 'All', text: 'All' }, ...this.offices];
                     }
@@ -1023,7 +1026,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     mapOfficeId() {
         let officeId = '';
-        const off = this.offices.filter(office => office.id !== 'All');
+        const off = this.listOffice.filter((office: Office) => ['Head', 'Branch'].includes(office?.officeType));
         officeId = off.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
         return officeId;
     }

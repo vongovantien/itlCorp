@@ -24,6 +24,7 @@ export class Office {
     companyName: string = '';
     active: boolean = false;
     location: string = '';
+    officeType: string = null;
 
     constructor(data?: any) {
         const self = this;

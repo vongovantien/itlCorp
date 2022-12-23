@@ -22,6 +22,7 @@ namespace SystemInterface {
         photo: string;
         title: string;
         internalCode: string;
+        officeType: string;
     }
 
     export interface IDepartmentGroup {
