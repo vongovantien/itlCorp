@@ -766,6 +766,10 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("PaymentTerm", item.PaymentTerm?.ToString("N0"));
                         listKeyData.Add("DueDate", item.DueDate?.ToString("dd/MM/yy"));
                         listKeyData.Add("OverdueDays", item.OverdueDays?.ToString("N0"));
+                        listKeyData.Add("PaymentTermOBH", item.PaymentTermOBH?.ToString("N0"));
+                        listKeyData.Add("DueDateOBH", item.DueDateOBH?.ToString("dd/MM/yy"));
+                        listKeyData.Add("OverdueDaysOBH", item.OverdueDaysOBH?.ToString("N0"));
+
                         listKeyData.Add("JobNo", item.JobNo);
                         listKeyData.Add("MBL", item.MBL);
                         listKeyData.Add("HBL", item.HBL);
