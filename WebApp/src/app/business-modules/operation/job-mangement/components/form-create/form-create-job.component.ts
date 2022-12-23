@@ -7,7 +7,7 @@ import { CommodityGroup, Customer, LinkAirSeaModel, PortIndex, User } from '@mod
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { IShareBussinessState } from '@share-bussiness';
-import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState } from '@store';
+import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState, getMenuUserSpecialPermissionState } from '@store';
 import { FormValidators } from '@validators';
 
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -95,6 +95,8 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
 
