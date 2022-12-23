@@ -125,7 +125,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             grpVoucherDetail.ForEach(c =>
                             {
                                 //var giamValue = sucharges.Where(x => x.Id == c.FirstOrDefault().ChargeId).FirstOrDefault().UnitPrice < 0 ? (-1) : 1;
-                                var acctId = accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
+                                var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
                                 AccAccountPayable payable = new AccAccountPayable
                                 {
                                     Id = Guid.NewGuid(),
@@ -184,7 +184,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                                                 .Select(s => s).ToList();
                             grpVoucherDetail.ForEach(c =>
                             {
-                                var acctId = accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
+                                var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
                                 AccAccountPayable payable = new AccAccountPayable
                                 {
                                     Id = Guid.NewGuid(),
@@ -249,7 +249,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         var grpVoucherDetail = voucherDetail.Where(z => !invChargeIds.Any(chg => chg == z.ChargeId)).GroupBy(z => customer.PartnerMode == ForPartnerConstants.PARTNER_MODE_INTERNAL ? new { z.VoucherNo, z.VoucherDate, z.BravoRefNo } : new { VoucherNo = string.Empty, VoucherDate = (DateTime?)null, z.BravoRefNo }).Select(z => z).ToList();
                         grpVoucherDetail.ForEach(c =>
                         {
-                            var acctId = accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
+                            var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
                             AccAccountPayable payable = new AccAccountPayable
                             {
                                 Id = Guid.NewGuid(),
