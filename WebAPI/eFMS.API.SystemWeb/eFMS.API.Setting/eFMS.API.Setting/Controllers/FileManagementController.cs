@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using System.Linq;
 
 namespace eFMS.API.Setting.Controllers
 {
@@ -70,10 +71,10 @@ namespace eFMS.API.Setting.Controllers
             }
             var result = new ResponsePagingModel<EDocFile>()
             {
-                Data = data,
+                Data = data.Data,
                 Page = criteria.Page,
                 Size = criteria.Size,
-                TotalItems = 100
+                TotalItems = data.TotalItem
             };
             return Ok(result);
         }
