@@ -212,7 +212,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             officeType: ['Branch', Validators.compose([
                 Validators.required
             ])],
-            internalCode: [],
+            internalCode: [null, Validators.maxLength(20)],
             partnerMapping: [],
         });
 

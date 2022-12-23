@@ -195,15 +195,15 @@
                         </div>
                     </div>
                     <div class="col-lg-3">
-                        <div class="form-group" 
-                        [ngClass]="{'m-form__group has-danger': (internalCode.dirty && internalCode.value?.length > 20) || (isSubmited && internalCode.value?.length > 20)}">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': (internalCode.dirty && !internalCode.valid) || (isSubmited && !internalCode.valid)}">
                             <label class="form-control-label">Internal Code</label>
                             <div class="m-checkbox-inline">
                                 <input type="text" formControlName="internalCode" class="form-control"
-                                placeholder="Please Enter Internal Code">
+                                    placeholder="Please Enter Internal Code">
                             </div>
                             <div class="form-control-feedback"
-                                *ngIf="isSubmited && internalCode.value?.length > 20  || internalCode.value?.length > 20 && internalCode.dirty">
+                                *ngIf="isSubmited && (internalCode.errors | equalError: 'maxlength')">
                                 Internal code just have maximum 20 character!
                             </div>
                         </div>
