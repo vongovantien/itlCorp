@@ -471,6 +471,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             (this.contractType.value !== 'Cash' && this.contractType.value !== 'Guarantee' && this.contractType.value !== 'Prepaid' && (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null)))) {
             return false;
         }
+        if (this.contractTypeDetail=='Prepaid' && this.contractType.value!=this.contractTypeDetail || this.selectedContract.debitAmount>0 && this.contractTypeDetail!='Prepaid'&& this.contractType.value=='Prepaid'){    
+            this._toastService.error('Cannot change agreement type!');
+            this.contractType.setValue(this.contractTypeDetail);
+            return false;
+        }
         if (!!this.contractType.value && this.contractType.value.length > 0) {
             if (this.contractType.value === this.contractTypes[1] && !this.contractNo.value) {
                 this.isRequiredContractNo = true;
@@ -1104,7 +1109,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         this._toastService.success("File deleted successfully!");
                         this.getFileContract();
                     } else {
-                        this._toastService.error("some thing wrong");
+                        this._toastService.error("Something wrong");
                     }
                 }
             );
