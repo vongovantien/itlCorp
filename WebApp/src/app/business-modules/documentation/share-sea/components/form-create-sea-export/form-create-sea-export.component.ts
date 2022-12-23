@@ -17,7 +17,7 @@ import { takeUntil, skip, distinctUntilChanged, shareReplay, catchError } from '
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../../share-business/store';
-import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, } from '@store';
+import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, getMenuUserSpecialPermissionState, } from '@store';
 @Component({
     selector: 'app-form-create-sea-export',
     templateUrl: './form-create-sea-export.component.html'
@@ -103,8 +103,9 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.initForm();
-
+        
         this._store.dispatch(new GetCatalogueAgentAction());
         this._store.dispatch(new GetCatalogueCarrierAction(CommonEnum.PartnerGroupEnum.CARRIER));
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }));
