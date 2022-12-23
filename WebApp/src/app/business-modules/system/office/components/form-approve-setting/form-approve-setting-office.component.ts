@@ -169,6 +169,10 @@ export class OfficeFormApproveSettingComponent
                     if (!res.account.applyType) {
                         this.accountReceivable.applyType = "None";
                     }
+                    if (!res.account) {
+                        this.accountReceivable.applyPartner = "None";
+                        this.accountReceivable.applyType = "None";
+                    }
                     this.replicateOffice = !!res['replicateOffice'] ? res['replicateOffice'] : this.initRepilicate;
                 }
             );
