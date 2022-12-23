@@ -149,9 +149,9 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.commodityGroups = this._store.select(getCatalogueCommodityGroupState);
         this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
         this.containers = this._store.select(getContainerSaveState);
-        
+
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
-        
+
         this.initForm();
     }
 
@@ -433,7 +433,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     getSalesmanList(data: any) {
         this.shipmentType.setValue(data);
-        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
+        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value, this.opsTransaction.officeId)
             .subscribe(
                 (res: any) => {
                     if (!!res) {
