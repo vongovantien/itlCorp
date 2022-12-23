@@ -3,7 +3,6 @@ import { ConfirmPopupComponent } from '@common';
 import { SystemConstants } from '@constants';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ExportRepo, SystemFileManageRepo } from '@repositories';
-import { ToastrService } from 'ngx-toastr';
 import { AppList } from 'src/app/app.list';
 import { fileManagePaging } from '../../general-file-management/general-file-management.component';
 import { SortService } from './../../../../../shared/services/sort.service';
@@ -14,18 +13,18 @@ import { SortService } from './../../../../../shared/services/sort.service';
 })
 export class ListFileManagementComponent extends AppList implements OnInit {
 
+    @Output() changePage: EventEmitter<any> = new EventEmitter<any>();
     @Input() tabType: string;
     @Input() listEdocFile: fileManagePaging;
     @Input() headers: CommonInterface.IHeaderTable[];
-    edocId: string = '';
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
-    @Output() changePage: EventEmitter<any> = new EventEmitter<any>();
-    selectedFile: any = null;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
+    edocId: string = '';
+    selectedFile: any = null;
     isView: boolean = true;
+
     constructor(
         private _systemFileRepo: SystemFileManageRepo,
-        private _toast: ToastrService,
         private readonly _exportRepo: ExportRepo,
         private _sortService: SortService
     ) {
@@ -52,8 +51,6 @@ export class ListFileManagementComponent extends AppList implements OnInit {
     }
 
     viewEdocFromName(edocFile: any) {
-        //this.selectedFile = Object.assign({}, this.selectedFile);
-        //this.selectedFile.imageUrl = edocFile.imageUrl;
         this.selectedFile = edocFile;
         this.viewFileEdoc();
     }
@@ -96,7 +93,6 @@ export class ListFileManagementComponent extends AppList implements OnInit {
 
     onSelectFile(edoc: any) {
         this.selectedFile = edoc;
-        console.log(this.selectedFile);
         this.isView = true;
         const extension = this.selectedFile.imageUrl.split('.').pop();
         if (!['xlsx', 'docx', 'doc', 'xls', 'html', 'htm', 'pdf', 'txt', 'png', 'jpeg'].includes(extension.toLowerCase())) {
@@ -105,8 +101,6 @@ export class ListFileManagementComponent extends AppList implements OnInit {
     }
 
     downloadEdoc() {
-        console.log(this.selectedFile);
-
         const selectedFile = Object.assign({}, this.selectedFile);
         if (selectedFile.id === selectedFile.sysImageId) {
             this._systemFileRepo.getFileEdoc(selectedFile.sysImageId).subscribe(

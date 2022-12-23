@@ -32,12 +32,6 @@ export class SidebarFileManagementComponent extends AppForm implements OnChanges
         this.initForm();
     }
 
-    // ngOnChanges(changes: SimpleChanges): void {
-    //     this.title = this.route.snapshot.data['title']
-    //     this.onActiveRouting(this.title);
-    //     this.formSearch?.reset()
-    // }
-
     initForm() {
         this.formSearch = this._fb.group({
             listKeyWord: []
@@ -48,15 +42,6 @@ export class SidebarFileManagementComponent extends AppForm implements OnChanges
     changeBreadcrumb() {
         this.title = this.route.snapshot.data['title']
     }
-
-    // navigateFileMngt(moduleUrl: string) {
-    //     if (moduleUrl === 'accounting') {
-    //         this._router.navigate([RoutingConstants.TOOL.FILE_MANAGMENT]);
-    //     }
-    //     else {
-    //         this._router.navigate([RoutingConstants.TOOL.FILE_MANAGMENT + "/" + moduleUrl]);
-    //     }
-    // }
 
     redirectTo(type: string) {
         this.directTo.emit(type);
@@ -76,19 +61,7 @@ export class SidebarFileManagementComponent extends AppForm implements OnChanges
         this.objectBack.emit(item)
     }
 
-    // onSubmitSearch() {
-    //     let dataSearch = !!this.listKeyWord.value ? this.listKeyWord.value.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null;
-    //     this.listKeySearch.emit(dataSearch)
-    // }
-
     onResetSearch() {
         this.listKeySearch.emit([]);
     }
-
-    // onActiveRouting(event) {
-    //     if (this.title === event) {
-    //         return this.isActiveRouting = true;
-    //     }
-    //     return this.isActiveRouting = false;
-    // }
 }

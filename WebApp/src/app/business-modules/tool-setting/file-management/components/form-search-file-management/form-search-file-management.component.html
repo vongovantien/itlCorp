@@ -5,8 +5,8 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label required>Reference No</label>
-                        <ng-select formControlName="searchType" [items]="referenceTypes" class="custom" bindLabel="title"
-                            bindValue="value" [clearable]="false">
+                        <ng-select formControlName="searchType" [items]="referenceTypes" class="custom"
+                            bindLabel="title" bindValue="value" [clearable]="false">
                         </ng-select>
                         <textarea [rows]="4" class="form-control" formControlName="referenceNo" required></textarea>
                     </div>
@@ -20,8 +20,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date"
-                                        formControlName="date"
-                                        [allowRemove]="false" (remove)="resetDate(date)" />
+                                        formControlName="date" [allowRemove]="false" (remove)="resetDate(date)" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -33,18 +32,17 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="">Date Mode</label>
-                                <ng-select formControlName="dateMode" [items]="dateModes" class="custom" bindLabel="title"
-                                bindValue="value" [clearable]="false">
-                            </ng-select>
+                                <ng-select formControlName="dateMode" [items]="dateModes" class="custom"
+                                    bindLabel="title" bindValue="value" [clearable]="false">
+                                </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-6" *ngIf="isAcc">
                             <div class="form-group">
                                 <label>Accountant Type</label>
-                                <ng-select formControlName="accountantType" [items]="accountantTypes" class="custom" bindLabel="title"
-                                [multiple]="true"
-                                bindValue="value" [clearable]="false">
-                            </ng-select>
+                                <ng-select formControlName="accountantType" [items]="accountantTypes" class="custom"
+                                    bindLabel="title" [multiple]="true" bindValue="value" [clearable]="false">
+                                </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-6" *ngIf="!isAcc">

@@ -1,4 +1,3 @@
-import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { JobConstants } from '@constants';
@@ -14,6 +13,8 @@ import { AppForm } from 'src/app/app.form';
 export class FormSearchFileManagementComponent extends AppForm implements OnInit {
 
     @Output() onSearch: EventEmitter<Partial<IFileManageSearch> | any> = new EventEmitter<Partial<IFileManageSearch> | any>();
+    @Output() onSearchF: EventEmitter<Partial<IFileManageSearch> | any> = new EventEmitter<Partial<IFileManageSearch> | any>();
+    @Input() tabType: string = '';
     referenceTypes: CommonInterface.ICommonTitleValue[] = [
         { title: 'Job ID', value: 0 },
         { title: 'House Bill', value: 1 },
@@ -34,9 +35,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         { title: 'Purchasing Note', value: 4 },
         { title: 'Other Entry', value: 5 },
     ]
-    @Output() onSearchF: EventEmitter<Partial<IFileManageSearch> | any> = new EventEmitter<Partial<IFileManageSearch> | any>();
     formSearchFile: FormGroup;
-    @Input() tabType: string = '';
     isAcc: boolean = false;
     ruleName: AbstractControl;
     serviceBuying: AbstractControl;
@@ -61,21 +60,6 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     initValue() {
     }
 
-    // getStartDate(): Date {
-    //     let currYear = new Date().getFullYear();
-    //     let currMonth = new Date().getMonth();
-    //     if (currMonth === 1) {
-    //         currYear--,
-    //             currMonth = 11
-    //     } else if (currMonth === 2) {
-    //         currYear--,
-    //             currMonth = 12
-    //     } else {
-    //         currMonth - 2
-    //     }
-    //     return new Date(currYear, currMonth, 1)
-    // }
-
     initFormSearch() {
 
         if (this.tabType === 'fileAccManage') {
@@ -87,8 +71,6 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             this.dateModes = [
                 { title: 'Create Date', value: 0 },
                 { title: 'Accounting Date', value: 1 },];
-            //this.accountantType.setValue([{ title: 'Cash Receipt', value: 0 }]);
-            //this.accountantType: [[this.accountantTypes[0]]];
         }
         this.formSearchFile = this._fb.group({
             dateMode: [this.dateModes[0].value],
@@ -108,17 +90,14 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     }
 
     submitSearch(formSearch: any) {
-        console.log(formSearch.accountantType);
-
         const bodySearch: Partial<IFileManageSearch> = {
             referenceNo: formSearch.referenceNo,
             referenceType: formSearch.searchType,
-            fromDate: !!formSearch.date?.startDate ? formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en') : null,
-            toDate: !!formSearch.date?.endDate ? formatDate(formSearch.date.endDate, "yyyy-MM-dd", 'en') : null,
+            fromDate: !!formSearch.date?.startDate ? new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate) : null,
+            toDate: !!formSearch.date?.endDate ? new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate) : null,
             dateMode: formSearch.dateMode,
             accountantTypes: this.isAcc ? formSearch.accountantType == 0 ? [0] : formSearch.accountantType : null,
         };
-        console.log(bodySearch);
         this.onSearch.emit(bodySearch);
     }
 

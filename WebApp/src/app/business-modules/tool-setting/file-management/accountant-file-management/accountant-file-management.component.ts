@@ -14,8 +14,6 @@ import { fileManagePaging } from '../general-file-management/general-file-manage
 export class AccountantFileManagementComponent extends AppList implements OnInit {
 
     @ViewChild(ListFileManagementComponent) listFile: ListFileManagementComponent;
-    listBreadcrumb: Array<object> = [];
-    isDisplayFolderParent: boolean = false;
     edocFiles: fileManagePaging = {
         data: [],
         page: 0,
@@ -23,6 +21,7 @@ export class AccountantFileManagementComponent extends AppList implements OnInit
         totalItems: 0
     };
     headers: CommonInterface.IHeaderTable[] = [];
+
     constructor(
         private _settingRepo: SettingRepo,
         private _router: Router
@@ -34,8 +33,6 @@ export class AccountantFileManagementComponent extends AppList implements OnInit
     }
 
     onSearchFile(body: any) {
-        console.log(body);
-
         body.Size = this.pageSize;
         body.Page = this.page;
         this.dataSearch = body;
@@ -54,15 +51,8 @@ export class AccountantFileManagementComponent extends AppList implements OnInit
     }
 
 
-    onSelectTab(tabName: string) {
-        switch (tabName) {
-
-            case 'General':
-                this._router.navigate([`${RoutingConstants.TOOL.FILE_MANAGMENT}/general`]);
-                break;
-            default:
-                break;
-        }
+    directToGeneral() {
+        this._router.navigate([`${RoutingConstants.TOOL.FILE_MANAGMENT}/general`]);
     }
 
     ReloadEDoc() {
@@ -70,7 +60,6 @@ export class AccountantFileManagementComponent extends AppList implements OnInit
     }
 
     RepageEDoc(event) {
-        console.log(event);
         this.page = event.page;
         this.pageSize = event.pageSize;
         this.onSearchFile(this.dataSearch);
