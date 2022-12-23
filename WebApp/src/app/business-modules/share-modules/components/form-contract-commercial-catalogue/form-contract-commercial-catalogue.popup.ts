@@ -1,6 +1,7 @@
+import { C } from '@angular/cdk/keycodes';
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
 import { JobConstants, SystemConstants } from '@constants';
@@ -74,6 +75,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     minDateEffective: any = null;
     minDateExpired: any = null;
     minDateExpiredTrial: any = null;
+    checkError: boolean = false; 
 
 
     partnerId: string = null;
@@ -221,7 +223,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             officeId: [null, Validators.required],
             contractNo: [null, Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
-            expiredDate: [null, Validators.required],
+            expiredDate: [null, Validators.compose([
+                Validators.required,
+                this.checkExpiredDate
+            ])],
             contractType: [null, Validators.required],
             saleService: [null, Validators.required],
             paymentMethod: ['All'],
@@ -927,14 +932,28 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             });
         }
     }
-    onUpdateExpiredDate(value: { startDate: any; endDate: any }) {
-        const effectiveDays = !!this.formGroup.controls['effectiveDate'].value ? this.formGroup.controls['effectiveDate'].value : 0;
-        if (!!value.startDate && this.contractType.value === 'Trial') {
-            if(value.startDate > (effectiveDays.getDate() + 30)){
-                return {error: "Expired Date should be less than or equal Effective Date"}
-            }
-            return null;
+    checkExpiredDate: ValidatorFn = (): { [key: string]: any; } | null => {
+        let effDate = this.formGroup && this.formGroup.get('effectiveDate').value;
+        let expDate = this.formGroup && this.formGroup.get('expiredDate').value;
+        let expDateValid = null;
+        if (!!effDate) {
+            expDateValid = new Date(new Date(effDate.startDate).setDate(new Date(effDate.startDate)?.getDate() + 30));
         }
+        // console.log(expDate)
+        console.log(typeof(expDateValid))
+        if (!!expDateValid) {
+            const date2: any = new Date(expDate);
+            const date1: any = new Date(expDate);
+            const diffTime = Math.abs(date1 - expDateValid);
+            if (diffTime > 0) {
+                this.checkError = true;
+                return;
+            }
+            // console.log(expDate)
+            // console.log(date1)
+
+        }
+        return null;
     }
 
     selectedService($event: any) {

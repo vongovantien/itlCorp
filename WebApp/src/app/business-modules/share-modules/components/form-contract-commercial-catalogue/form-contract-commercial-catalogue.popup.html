@@ -125,7 +125,8 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted && !expiredDate.value.startDate && contractType.value !=='Cash' && contractType.value !=='Guarantee' && contractType.value !=='Prepaid'}">
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted && ((!expiredDate.value.startDate && contractType.value !=='Cash' && contractType.value !=='Guarantee' && contractType.value !=='Prepaid') 
+                                            || (contractType.value ==='Trial' && checkError && !expiredDate.value?.startDate.valid))}">
                                         <label
                                             *ngIf="contractType.value !=='Cash' && contractType.value !== 'Guarantee' && contractType.value !== 'Prepaid'"
                                             required for=""><strong>Expired Date</strong></label>
@@ -137,8 +138,7 @@
                                                 ngxDaterangepickerMd
                                                 [attr.disabled]="!isDisabledExpiredDateField ?  null : 'disabled'"
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                                [singleDatePicker]="true" name="daterange" [autoApply]="true"
-                                                (datesUpdated)="onUpdateExpiredDate($event)"
+                                                [singleDatePicker]="true" name="daterange" [autoApply]="true"                                          
                                                 formControlName="expiredDate" readonly [minDate]="minDateExpired"/>
                                             <span class="m-input-icon__icon m-input-icon__icon--right"> 
                                                 <span>
