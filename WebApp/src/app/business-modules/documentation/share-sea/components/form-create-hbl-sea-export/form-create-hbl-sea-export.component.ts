@@ -16,12 +16,13 @@ import { AppForm } from 'src/app/app.form';
 import * as fromShareBussiness from './../../../../share-business/store';
 
 import { Observable, of } from 'rxjs';
-import { catchError, takeUntil, skip, finalize, tap, concatMap, startWith } from 'rxjs/operators';
+import { catchError, takeUntil, skip, finalize, tap, concatMap, startWith, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { DataService } from '@services';
 
 import _merge from 'lodash/merge';
 import _cloneDeep from 'lodash/cloneDeep';
 import { ToastrService } from 'ngx-toastr';
+import { getTransactionDetailCsTransactionState, getTransactionState } from './../../../../share-business/store';
 
 @Component({
     selector: 'app-form-create-hbl-sea-export',
@@ -34,7 +35,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
     @Input() isUpdate: boolean = false;
     @Input() set type(t: string) { this._type = t; }
-
+    @Input() jobId: string='';
     get type() { return this._type; }
 
     private _type: string = ChargeConstants.SFE_CODE; // SLE | SFE
@@ -76,7 +77,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     incotermId: AbstractControl;
 
     customers: Observable<Customer[]>;
-    saleMans: User[];
+    saleMans: any = [];
     shipppers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
     countries: Observable<CountryModel[]>;
@@ -158,6 +159,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         this.agents = this._store.select(getCatalogueAgentState);
         this.ports = this._store.select(getCataloguePortState);
         this.countries = this._store.select(getCatalogueCountryState);
+        // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
 
         if (this.isUpdate) {
             this._store.select(fromShareBussiness.getDetailHBlState)
@@ -172,6 +174,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                             this.userModified = res.userNameModified;
                             this.type = res.transactionType;
                             this.hblId = res.id;
+                            this.getShipmentType();
                             this.updateFormValue(res);
                         }
                     }
@@ -180,6 +183,16 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             this.getShipmentDetailAndUpdateDefault();
         }
 
+    }
+
+    getShipmentType(){
+        this._store.select(fromShareBussiness.getDetailHBlState)
+            .pipe(catchError(this.catchError),
+                distinctUntilChanged(),
+                switchMap((shipment: any) => this._store.select(getTransactionDetailCsTransactionState))
+            ).subscribe((res: any) => {
+                this.shipmentType = res.shipmentType;
+            });
     }
 
     getShipmentDetailAndUpdateDefault() {
@@ -389,7 +402,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     updateFormValue(data: CsTransactionDetail) {
         this.customerName = data.customerName;
         this.shipperName = data.shipperName;
-
+        this.shipmentType = data.shipmentType;
         const formValue = {
             closingDate: !!data.closingDate ? { startDate: new Date(data.closingDate), endDate: new Date(data.closingDate) } : null,
             sailingDate: !!data.sailingDate ? { startDate: new Date(data.sailingDate), endDate: new Date(data.sailingDate) } : null,
@@ -413,9 +426,9 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
 
-        this._catalogueRepo.getListSalemanByPartner(data.customerId, this.type)
+        this._catalogueRepo.GetListSalemanByShipmentType(data.customerId, this.type, this.shipmentType)
             .subscribe((salesmans: any) => {
-                this.saleMans = salesmans;
+                this.saleMans = salesmans || [];
             });
     }
 
@@ -470,6 +483,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             hbltype: data.hbltype,
             polDescription: data.polDescription,
             podDescription: data.podDescription,
+            shipmentType: data.shipmentType
         });
 
         this.ports.pipe(takeUntil(this.ngUnsubscribe)).subscribe(

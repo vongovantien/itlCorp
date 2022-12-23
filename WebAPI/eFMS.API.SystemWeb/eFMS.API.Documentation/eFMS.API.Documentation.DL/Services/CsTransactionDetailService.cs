@@ -287,7 +287,6 @@ namespace eFMS.API.Documentation.DL.Services
                 isCreateStage = true;
             }
 
-
             model.JobId = hb.JobId;
             model.GroupId = hb.GroupId;
             model.DepartmentId = hb.DepartmentId;
@@ -295,6 +294,8 @@ namespace eFMS.API.Documentation.DL.Services
             model.CompanyId = hb.CompanyId;
             model.UserCreated = hb.UserCreated;
             model.UserModified = currentUser.UserID;
+            var detailJob = DataContext.Where(x => x.JobId == model.JobId).FirstOrDefault();
+            model.ShipmentType = detailJob.ShipmentType;
             if (model.SaleManId != hb.SaleManId)
             {
                 changedSalesman = true;
@@ -325,7 +326,6 @@ namespace eFMS.API.Documentation.DL.Services
                 model.SalesOfficeId = hb.SalesOfficeId;
                 model.SalesCompanyId = hb.SalesCompanyId;
             }
-
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
             var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
             int code = checkOwnerPermission(model) ? 200 : GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
@@ -611,6 +611,7 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
                     detail.ShipmentPIC = shipment.PersonIncharge;
                     detail.JobStatus = shipment.CurrentStatus;
+                    detail.ShipmentType = shipment.ShipmentType;
                     //detail.DeliveryPlace = detail.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
                     detail.DeptSign = catDepartmentRepository.Get(x => x.Id == shipment.DepartmentId)?.FirstOrDefault()?.SignPath;
                     detail.Department = catDepartmentRepository.Get(x => x.Id == detail.DepartmentId)?.FirstOrDefault()?.DeptNameAbbr;
@@ -657,7 +658,11 @@ namespace eFMS.API.Documentation.DL.Services
             if (detail == null) return null;
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(detail.TransactionType, currentUser);
 
-
+            if(detail.ShipmentType == null)
+            {
+                var detailJob = DataContext.Where(x => x.JobId == detail.JobId).FirstOrDefault();
+                detail.ShipmentType = detailJob.ShipmentType;
+            }
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
 
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);

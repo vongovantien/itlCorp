@@ -27,6 +27,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
 
     hblId: string;
     hblDetail: CsTransactionDetail;
+    shipmentType: string;
 
     constructor(
         protected _activedRoute: ActivatedRoute,
@@ -120,6 +121,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
         modelUpdate.userCreated = this.hblDetail.userCreated;
+        modelUpdate.shipmentType = this.shipmentType;
 
         this.updateHbl(modelUpdate);
 
