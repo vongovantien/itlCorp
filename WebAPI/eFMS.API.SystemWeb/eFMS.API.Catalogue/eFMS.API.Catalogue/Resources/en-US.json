@@ -81,6 +81,7 @@
   "MSG_CONTRACT_SALESMAN_EMPTY": "Salesman is not allow empty!",
   "MSG_CONTRACT_DUPLICATE_SERVICE": "Duplicate service, office, salesman!",
   "MSG_CONTRACT_DUPLICATE_SERVICE_IMPORT": "Service {0} already exists salesman",
+  "MSG_CONTRACT_DUPLICATE": "The contract already exists on the system, please edit the information on that contract or select the salesman/agreement type again.",
   //-----------end contract
 
   //------------start: place
