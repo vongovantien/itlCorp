@@ -861,6 +861,7 @@ namespace eFMS.API.Documentation.DL.Services
                         cdNote.SyncStatus = cdNote.SyncStatus;
                         cdNote.LastSyncDate = cdNote.LastSyncDate;
                         cdNote.TransactionTypeEnum = DataTypeEx.GetEnumType(listCharges.FirstOrDefault()?.TransactionType);
+                        cdNote.Hblid = chargesOfCDNote?.FirstOrDefault().Hblid;
                         listCDNote.Add(cdNote);
                     }
 

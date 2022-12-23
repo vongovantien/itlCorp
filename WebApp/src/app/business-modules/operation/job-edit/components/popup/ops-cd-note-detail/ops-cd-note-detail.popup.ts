@@ -17,6 +17,7 @@ import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-m
 import { of } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { Crystal } from '@models';
+import { clearScreenDown } from 'readline';
 @Component({
     selector: 'ops-cd-note-detail',
     templateUrl: './ops-cd-note-detail.popup.html'
@@ -472,5 +473,74 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
 
     onSaveAdjustDebit() {
         this.getDetailCdNote(this.jobId, this.cdNote)
+    }
+    exportItem(jobId: string, cdNote:string, format: string) {
+        let url: string;
+        let _format = 0;
+        switch (format) {
+            case 'PDF':
+                _format = 5;
+                break;
+            case 'WORD':
+                _format = 3;
+                break;
+            case 'EXCEL':
+                _format = 4;
+                break;
+            default:
+                _format = 5;
+                break;
+        }
+        let sourcePreview$;
+        if (this.CdNoteDetail.cdNote.type === "DEBIT") {
+            sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
+                partnerId: this.CdNoteDetail.partnerId,
+                hblId: this.CdNoteDetail.listSurcharges[0].hblid,
+                transactionType: 'CL',
+                type: 3
+            }).pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+                                .pipe(
+                                    switchMap(() => {
+                                        return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                                    }),
+                                    concatMap((x) => {
+                                        url = x.pathReportGenerate;
+                                        return this._exportRepo.exportCrystalReportPDF(x);
+                                    }), takeUntil(this.ngUnsubscribe)
+                                )
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+            )
+        } else {
+            sourcePreview$ = this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+            .pipe(
+                switchMap(() => {
+                    return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                }),
+                concatMap((x) => {
+                    url = x.pathReportGenerate;
+                    return this._exportRepo.exportCrystalReportPDF(x);
+                }), takeUntil(this.ngUnsubscribe))
+                
+        }
+        sourcePreview$.subscribe(
+            (res: any) => {
+
+            },
+            (error) => {
+                if(error.status === 200)
+                {
+                    this._exportRepo.downloadExport(url);
+                }
+            },
+            () => {
+                console.log(url);
+            }
+        );  
     }
 }
