@@ -7,7 +7,7 @@
 </div>
 <div class="m-content m-portlet__body">
     <tabset class="custom-class-tab">
-        <tab (selectTab)="onSelectTab('General')">
+        <tab (selectTab)="directToGeneral()">
             <ng-template tabHeading>
                 <a routerLink="/home/tool/file-management/general" style="color:#6f727d">
                     Files Managment
@@ -16,8 +16,8 @@
         </tab>
         <tab [active]="true">
             <ng-template tabHeading>
-                <a routerLink="/home/tool/file-management/accountant" class="dropdown-item"
-                    href="javascript:void(0)">                    Accountant Files
+                <a routerLink="/home/tool/file-management/accountant" class="dropdown-item" href="javascript:void(0)">
+                    Accountant Files
                 </a>
             </ng-template>
             <div class="row">

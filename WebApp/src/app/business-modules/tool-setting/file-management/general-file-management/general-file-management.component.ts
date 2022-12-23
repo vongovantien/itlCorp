@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { RoutingConstants } from '@constants';
-import { SettingRepo, SystemFileManageRepo } from '@repositories';
-import { ToastrService } from 'ngx-toastr';
+import { SettingRepo } from '@repositories';
 import { catchError } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { ListFileManagementComponent } from '../components/list-file-management/list-file-management.component';
@@ -25,11 +24,10 @@ export class GeneralFileManagementComponent extends AppList implements OnInit {
     headers: CommonInterface.IHeaderTable[] = [];
     dataSearch: any = null;
     TotalItems: number = 0;
+
     constructor(
         private _settingRepo: SettingRepo,
-        private _systemFileRepo: SystemFileManageRepo,
         private _router: Router,
-        private _toast: ToastrService,
     ) {
         super();
     }
@@ -38,7 +36,6 @@ export class GeneralFileManagementComponent extends AppList implements OnInit {
     }
 
     onSearchFile(body: any) {
-        console.log(body);
         body.Size = this.pageSize;
         body.Page = this.page;
         this.dataSearch = body;
@@ -74,7 +71,6 @@ export class GeneralFileManagementComponent extends AppList implements OnInit {
     }
 
     RepageEDoc(event) {
-        console.log(event);
         this.page = event.page;
         this.pageSize = event.pageSize;
         this.dataSearch.isSearch = false;

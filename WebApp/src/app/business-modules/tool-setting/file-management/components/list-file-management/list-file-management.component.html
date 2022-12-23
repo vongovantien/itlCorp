@@ -3,30 +3,20 @@
         <div class="m-portlet__body">
             <div class="table-wrapper table-scrollable">
                 <table class="table table-hover dataTable table-brand ">
-                    <thead app-table-header [headers]="headers"
-                        (onClick)="sortFile($event.sortField, $event.order)"
-                        >
-                        <!-- <th class="first table-actions-col">Action</th> -->
+                    <thead app-table-header [headers]="headers" (onClick)="sortFile($event.sortField, $event.order)">
                         <th class="first table-actions-col">
                             Stt
                         </th>
                     </thead>
                     <tbody>
                         <ng-container *ngIf="!!listEdocFile?.data?.length">
-                            <tr class="collapse-toggle-row" [contextMenu]="fileManageContext" (onTouch)="onSelectFile(edocFile)"
+                            <tr class="collapse-toggle-row" [contextMenu]="fileManageContext"
+                                (onTouch)="onSelectFile(edocFile)"
                                 *ngFor="let edocFile of listEdocFile?.data ;let i = index; trackBy: trackByFn">
-
-                                <!-- <td class="table-actions-col">
-                                    <div class="table-actions" style="width: 70px">
-                                        <app-permission-button (onClick)="onDeleteEdoc(edocFile.id)" type="delete">
-                                        </app-permission-button>
-                                        <app-permission-button (onClick)="downloadEdoc(edocFile)" type="download">
-                                        </app-permission-button>
-                                    </div>
-                                </td> -->
                                 <td>{{i + 1}}</td>
                                 <td *ngIf="tabType==='Acc'">
-                                    <ng-container *ngFor="let acRef of edocFile.acRef ;let i = index; trackBy: trackByFn">
+                                    <ng-container
+                                        *ngFor="let acRef of edocFile.acRef ;let i = index; trackBy: trackByFn">
                                         <span [ngClass]="'badge badge-primary'">
                                             {{acRef}}
                                         </span>
@@ -34,14 +24,13 @@
                                 </td>
                                 <td>
                                     <a class="text-underline htmlLink" (click)="viewEdocFromName(edocFile)"
-                                    download>{{edocFile.systemFileName}}
-                                    <icon-file [url]="edocFile.imageUrl"></icon-file>
-                                </a>
+                                        download>{{edocFile.systemFileName}}
+                                        <icon-file [url]="edocFile.imageUrl"></icon-file>
+                                    </a>
                                 <td>{{edocFile.documentType}}</td>
                                 <td>{{edocFile.jobRef}}</td>
                                 <td>{{edocFile.hblNo}}</td>
                                 <td>{{edocFile.billingNo}}</td>
-                                <!-- <td >{{edocFile.acRef}}</td> -->
                                 <td>{{edocFile.source}}</td>
                                 <td>{{edocFile.type}}</td>
                                 <td>{{edocFile.userFileName}}</td>
@@ -54,16 +43,11 @@
                     </tbody>
                 </table>
             </div>
-            <!-- <app-pagination (onChange)="updatePagingData($event)" [total]="listEdocFile.totalItems" [pageNum]="listEdocFile.page"
-                [itemPerPage]="listEdocFile.pageSize"></app-pagination> -->
             <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
                 (onChange)="updatePagingEdocFile($event)"></app-pagination>
         </div>
     </div>
 </div>
-
-<!-- <confirm-popup body="Do you want to delete?" (onSubmit)="deleteEdoc()"></confirm-popup> -->
-
 <app-context-menu #fileManageContext (clickOutside)="selectedFile = null">
     <ng-container>
         <div class="menu-context__item" *ngIf="isView" (click)="viewFileEdoc()">
@@ -72,10 +56,6 @@
         <div class="menu-context__item" (click)="downloadEdoc()">
             <span><i class="la la-download align-middle text-primary"></i><span>Download</span></span>
         </div>
-        <!-- <div class="menu-context__item {{(selectedFile?.userCreated === currentUser.userName && !readonly) === false ? 'disabled':''}}"
-        (click)="confirmDelete()">
-        <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
-    </div>-->
     </ng-container>
 </app-context-menu>
 
