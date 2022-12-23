@@ -1094,6 +1094,7 @@ namespace eFMS.API.Documentation.DL.Services
             switch (serviceName)
             {
                 case "Sea":
+                case "Sea Consol":
                     if (serviceMode == "Import")
                     {
                         type = TermData.SeaConsolImport;
