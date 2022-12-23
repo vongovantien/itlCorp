@@ -88,7 +88,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return currentUser;
         }
 
-        public async Task<HandleState> InsertAccPayable(VoucherSyncCreateModel model)
+        public async Task<HandleState> InsertAccPayable(VoucherSyncCreateModel model, List<AccAccountingManagement> accountingDatas)
         {
             HandleState hsAddPayable = new HandleState();
             List<AccAccountPayable> payables = new List<AccAccountPayable>();
@@ -125,6 +125,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             grpVoucherDetail.ForEach(c =>
                             {
                                 //var giamValue = sucharges.Where(x => x.Id == c.FirstOrDefault().ChargeId).FirstOrDefault().UnitPrice < 0 ? (-1) : 1;
+                                var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
                                 AccAccountPayable payable = new AccAccountPayable
                                 {
                                     Id = Guid.NewGuid(),
@@ -161,7 +162,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                     DatetimeCreated = DateTime.Now,
                                     UserModified = currentUser.UserID,
                                     DatetimeModified = DateTime.Now,
-                                    Description = c.FirstOrDefault().Description
+                                    Description = c.FirstOrDefault().Description,
+                                    AcctManagementId = acctId
                                 };
                                 payables.Add(payable);
                             });
@@ -182,6 +184,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                                                 .Select(s => s).ToList();
                             grpVoucherDetail.ForEach(c =>
                             {
+                                var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
                                 AccAccountPayable payable = new AccAccountPayable
                                 {
                                     Id = Guid.NewGuid(),
@@ -218,7 +221,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                     DatetimeCreated = DateTime.Now,
                                     UserModified = currentUser.UserID,
                                     DatetimeModified = DateTime.Now,
-                                    Description = c.FirstOrDefault().Description
+                                    Description = c.FirstOrDefault().Description,
+                                    AcctManagementId = acctId
                                 };
 
                                 payablesWithRefNo.Add(payable);
@@ -245,6 +249,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         var grpVoucherDetail = voucherDetail.Where(z => !invChargeIds.Any(chg => chg == z.ChargeId)).GroupBy(z => customer.PartnerMode == ForPartnerConstants.PARTNER_MODE_INTERNAL ? new { z.VoucherNo, z.VoucherDate, z.BravoRefNo } : new { VoucherNo = string.Empty, VoucherDate = (DateTime?)null, z.BravoRefNo }).Select(z => z).ToList();
                         grpVoucherDetail.ForEach(c =>
                         {
+                            var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
                             AccAccountPayable payable = new AccAccountPayable
                             {
                                 Id = Guid.NewGuid(),
@@ -281,7 +286,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                 DatetimeCreated = DateTime.Now,
                                 UserModified = currentUser.UserID,
                                 DatetimeModified = DateTime.Now,
-                                Description = c.FirstOrDefault().Description
+                                Description = c.FirstOrDefault().Description,
+                                AcctManagementId = acctId
                             };
                             payables.Add(payable);
                         });
@@ -730,7 +736,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                     DatetimeCreated = DateTime.Now,
                                     UserModified = currentUser.UserID,
                                     DatetimeModified = DateTime.Now,
-                                    Description = null
+                                    Description = null,
+                                    AcctManagementId = null
                                 };
                                 #endregion
                                 listInsertPayment.Add(accPayablePayment);
