@@ -19,6 +19,7 @@ export class OfficeFormApproveSettingComponent
     unlockShipments: FlowSetting[] = [];
     accountReceivable: FlowSetting = new FlowSetting();
     accountPayable: FlowSetting = new FlowSetting();
+    opex: FlowSetting = new FlowSetting();
 
     initRepilicate = new FlowSetting({ type: 'Other', flow: 'Replicate' });
     replicateOffice: FlowSetting = this.initRepilicate;
@@ -123,6 +124,7 @@ export class OfficeFormApproveSettingComponent
                     account: FlowSetting,
                     replicateOffice: FlowSetting,
                     accountPayable: FlowSetting,
+                    opex: FlowSetting,
                 }) => {
                     console.log(res);
 
@@ -155,6 +157,12 @@ export class OfficeFormApproveSettingComponent
                     } else {
                         this.accountPayable = res.accountPayable;
                     }
+                    if (!res.opex) {
+                        // this.opex = new FlowSetting();
+                        this.opex.type = "Opex";
+                    } else {
+                        this.opex = res.opex;
+                    }
                     if (!res.account.applyPartner) {
                         this.accountReceivable.applyPartner = "None";
                     }
@@ -182,6 +190,7 @@ export class OfficeFormApproveSettingComponent
             accountReceivable: this.accountReceivable,
             replicateOffice: this.replicateOffice,
             accountPayable: this.accountPayable,
+            opex: this.opex,
         };
 
         this._systemRepo
@@ -218,4 +227,5 @@ interface ISettingFlowEditModel {
     accountReceivable: FlowSetting;
     replicateOffice: FlowSetting;
     accountPayable: FlowSetting;
+    opex: FlowSetting;
 }
