@@ -2,7 +2,7 @@ import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Company, Customer, Office, User } from '@models';
@@ -33,8 +33,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     @ViewChild(SalesmanCreditLimitPopupComponent) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
     @ViewChild(PartnerRejectPopupComponent) popupRejectPartner: PartnerRejectPopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmChangeAgreementTypePopup: ConfirmPopupComponent;
-    @ViewChild('confirmActive') confirmActiveContractPopup: ConfirmPopupComponent;
-    @ViewChild('confirmDelete') confirmDeletePopup: ConfirmPopupComponent;
 
     openOnPartner: boolean = false;
 
@@ -42,6 +40,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     isCreateNewCommercial: boolean = false;
     isDuplicateContract: boolean = false;
     statusContract: boolean = false;
+    isChangeSaleMan: boolean = false;
 
     // salesmanId: AbstractControl;
     companyId: AbstractControl;
@@ -346,6 +345,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     this.selectedSalesman = { field: 'userId', value: data.userId };
                 } else {
                     this.selectedSalesman = { field: 'id', value: data.userId + '-' + data.userGroupId + '-' + data.userDeparmentId };
+                    if (!!data.userId && data.userId !== this.selectedContract.saleManId) {
+                        this.isChangeSaleMan = true;
+                    }
                 }
                 this.selectedSalesmanData = data;
                 break;
@@ -626,14 +628,23 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this._catalogueRepo.updateContract(body)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: CommonInterface.IResult) => {
+                (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.onRequest.emit(this.selectedContract);
                         this.formGroup.reset();
                         this.hide();
                     } else {
-                        this._toastService.error(res.message);
+                        if (!!res.data.errorCode) {
+                            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                body: res.message,
+                                label: 'OK'
+                            }, () => {
+                                return;
+                            })
+                        }else{
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -647,7 +658,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.confirmChangeAgreementTypePopup.hide();
             this.updateContract(body);
         }
-
     }
 
     getCurrentActiveService(Service: any) {
@@ -744,6 +754,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
         this.formatAutoExtendDays();
     }
+
     assignValueToModel() {
         if (this.isUpdate) {
             this.selectedContract.id = this.idContract;
@@ -833,12 +844,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.paymentTermObh = this.formGroup.controls['paymentTermObh'].value;
     }
 
-    onSubmitActiveContract() {
-        this.confirmActiveContractPopup.hide();
-        this.processActiveInActiveContract(this.selectedContract.id);
-
-    }
-
     activeInactiveContract(id: string) {
         if (this.contractType.value === 'Guaranteed'
             && ((this.formGroup.controls['creditLimit'].value <= 0
@@ -853,7 +858,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             ).subscribe(
                 (res: boolean) => {
                     if (res === true) {
-                        this.confirmActiveContractPopup.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: 'There are Other Agreement that same service, If Agreement is actived, Those Agreement will be Inactive. Are You Sure Active this agreement ?',
+                            label: 'OK'
+                        }, () => {
+                            this.processActiveInActiveContract(id);
+                        });
                     }
                     else {
                         this.processActiveInActiveContract(id);
@@ -1077,6 +1087,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     close() {
         this.selectedSalesmanData = null;
+        this.isChangeSaleMan = null;
         this.formGroup.reset()
         this.hide();
     }
@@ -1094,11 +1105,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         if (!!file) {
             this.selectedFile = file;
         }
-        this.confirmDeletePopup.show();
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Are you sure to delete this file ?',
+            label: 'OK'
+        }, () => {
+            this.onDeleteFile();
+        })
     }
 
     onDeleteFile() {
-        this.confirmDeletePopup.hide();
         this._systemFileManageRepo.deleteFile('Catalogue', 'CatContract', this.selectedContract.id, this.selectedFile.name)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
