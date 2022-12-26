@@ -39,8 +39,20 @@
                                                 <a class="dropdown-item pointer" (click)="previewCombine('USD')">USD</a>
                                             </div>
                                         </div>
-                                        <app-permission-button type="export" (onClick)="exportInvoice()">
-                                        </app-permission-button>
+                                        <div class="dropdown m-dropdown m-dropdown--inline">
+                                            <button type="button" class="btn btn-danger dropdown-toggle"
+                                            [dpToggle]="dropdownMenu">
+                                            <i class="la la-download"></i>Export<span class="caret"></span>
+                                            </button>
+                                            <app-dropdown #dropdownMenu>
+                                                <a class="dropdown-item pointer" (onClick)="exportInvoice()">
+                                                    <span>Invoice List</span>
+                                                </a>
+                                                <a class="dropdown-item pointer" (onClick)="exportAgencyTemplate()">
+                                                    <span>Agency Template</span>
+                                                </a>
+                                            </app-dropdown>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -787,6 +787,29 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// Export accounting management agency template
+        /// </summary>
+        /// <param name="criteria">List Voucher or Invoices</param>
+        /// <returns></returns>
+        [Route("ExportAccountingManagementAgencyTemplate")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingManagementAgencyTemplate(AccAccountingManagementCriteriaDebCreInvoice criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataExportAgencyInvUrl, accessToken);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
+            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
+
+            var stream = new AccountingHelper().GenerateAccountingManagementDebCreInvExcel(dataObjects.Result, criteria.TypeOfAcctManagement);
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, (criteria.TypeOfAcctManagement == "Invoice" ? "VAT INVOICE" : "INVOICE LIST") + " - eFMS");
+            HeaderResponse(fileContent.FileDownloadName);
+            return fileContent;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>

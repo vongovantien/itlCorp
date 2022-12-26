@@ -59,6 +59,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<CatCommodityGroup> catCommodityGroupRepository;
         IContextBase<AccAccountingManagement> accountingManagementRepository;
         IContextBase<CatDepartment> departmentRepository;
+        IContextBase<AcctCdnote> acctCdnoteRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
         IContextBase<AcctSoa> acctSoaRepo;
         private readonly IContextBase<AcctCombineBilling> acctCombineBillingRepository;
@@ -3853,15 +3854,77 @@ namespace eFMS.API.Documentation.DL.Services
             return res;
         }
 
-        #region -- Store procedures
-        /// <summary>
-        /// Store Proceduce to insert/update Credit Manegement AR Table
-        /// </summary>
-        /// <param name="updateLst">List to insert/update</param>
-        /// <param name="deleteLst">List to delete</param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        private sp_AcctInsertUpdateCreditMng UpdateCreditManagement(List<AcctCreditManagementModel> updateLst, List<AcctCreditManagementModel> deleteLst, string action)
+
+        public List<AccAccountingManagementResult> GetDataAcctMngtAgencyExport(CDNoteCriteria criteria)
+        {
+            var cdNoteData = GetDataCdNote(criteria);
+            var soaData = GetDataSoaNotIssuedCdNote(criteria);
+
+            if (cdNoteData == null && soaData == null)
+            {
+                return new List<AccAccountingManagementResult>();
+            }
+            var queryData = cdNoteData;
+            if (queryData == null || queryData.Count() == 0)
+            {
+                queryData = soaData;
+            }
+            else if (soaData?.Count() > 0)
+            {
+                queryData = queryData.Union(soaData);
+            }
+            // queryData
+            queryData = GetStatusInvoiceList(criteria.Status, queryData);
+            var _resultDatas = queryData.OrderByDescending(o => o.DatetimeModified).ToList();
+
+            var departments = departmentRepository.Get();
+            var transaction = cstransRepository.Get();
+            var opstransaction = opstransRepository.Get();
+            var acctCDNote = acctCdnoteRepository.Get();
+
+            var dataTrans = from cd in _resultDatas
+                            join trans in transaction on cd.JobId equals trans.Id into transGrp
+                            from trans in transGrp.DefaultIfEmpty()
+                            join ops in opstransaction on cd.JobId equals ops.Id into opsGrp
+                            join creator in sysUserRepo.Get() on cd.Creator equals creator.Id into creatorGrp
+                            from creator in creatorGrp.DefaultIfEmpty()
+                            join departs in departments on cd.DepartmentId equals departs.Id into departGrp
+                            from acctCd in transGrp.DefaultIfEmpty()
+                            join acctCds in acctCDNote on cd.JobId equals acctCds.JobId into acctCdGrp
+                            from departs in departGrp.DefaultIfEmpty()
+                            select new AccAccountingManagementResult
+                            {
+                                InvoiceNo = cd.InvoiceNo,
+                                JobNo = cd.JobNo,
+                                Type = cd.CodeType,
+                                IssueDate = cd.IssuedDate,
+                                FlexId = cd.FlexID,
+                                Mbl = cd.MBLNo,
+                                VoucherId = cd.VoucherId,
+                                CdNoteNo = cd.CodeNo,
+                                ChargeType = cd.ChargeType,
+                                Amount = cd.Total,
+                                Destination = cd.FinalDestination,
+                                IssueBy = creator != null ? creator.Username : "",
+                                Bu = departs != null ? departs.DeptNameEn : "",
+                                VoucherIddate = cd.VoucherIddate,
+                                AccountNo = cd.AccountNo
+                            };
+
+            var res = dataTrans.OrderByDescending(o => o.SoaNo).ToList<AccAccountingManagementResult>();
+            return res;
+        }
+    
+
+            #region -- Store procedures
+            /// <summary>
+            /// Store Proceduce to insert/update Credit Manegement AR Table
+            /// </summary>
+            /// <param name="updateLst">List to insert/update</param>
+            /// <param name="deleteLst">List to delete</param>
+            /// <param name="action"></param>
+            /// <returns></returns>
+            private sp_AcctInsertUpdateCreditMng UpdateCreditManagement(List<AcctCreditManagementModel> updateLst, List<AcctCreditManagementModel> deleteLst, string action)
         {
             var parameters = new[]{
                 new SqlParameter()

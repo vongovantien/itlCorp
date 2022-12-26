@@ -39,5 +39,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string BillingType { get; set; }
         public string PaymentStatus { get; set; }
         public string SoaNo { get; set; }
+        public string FlexID { get; set; }
+        public string FinalDestination { get; set; }
     }
 }
