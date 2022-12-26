@@ -11,6 +11,7 @@ import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemFileManageRepo, SystemRepo } from '@repositories';
 import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, getCurrentUserState, getMenuUserSpecialPermissionState, IAppState } from '@store';
+import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { catchError, distinctUntilChanged, finalize, map, takeUntil } from 'rxjs/operators';
@@ -75,7 +76,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     minDateEffective: any = null;
     minDateExpired: any = null;
     minDateExpiredTrial: any = null;
-    checkError: boolean = false; 
 
 
     partnerId: string = null;
@@ -936,24 +936,19 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         let effDate = this.formGroup && this.formGroup.get('effectiveDate').value;
         let expDate = this.formGroup && this.formGroup.get('expiredDate').value;
         let expDateValid = null;
+        let expDate1 = null;
+        let checkError = false;
         if (!!effDate) {
             expDateValid = new Date(new Date(effDate.startDate).setDate(new Date(effDate.startDate)?.getDate() + 30));
+            expDate1 = new Date(new Date(expDate.startDate));
         }
-        // console.log(expDate)
-        console.log(typeof(expDateValid))
+        const date2: any = new Date(expDateValid).valueOf();
+        const date1: any = new Date(expDate1).valueOf();
         if (!!expDateValid) {
-            const date2: any = new Date(expDate);
-            const date1: any = new Date(expDate);
-            const diffTime = Math.abs(date1 - expDateValid);
-            if (diffTime > 0) {
-                this.checkError = true;
-                return;
-            }
-            // console.log(expDate)
-            // console.log(date1)
-
+            if (date1 > date2)
+                checkError = true;
         }
-        return null;
+        return checkError ? { invalidRange: { effDate, expDate } } : null;
     }
 
     selectedService($event: any) {
@@ -1001,6 +996,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 }              
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['paymentTerm'].setValue(30);
+                this.formGroup.get('expiredDate').setValidators([
+                    this.checkExpiredDate
+                ])
                 break;
             case 'Guarantee':
                 if (this.isCreateNewCommercial) {
@@ -1013,19 +1011,21 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['creditCurrency'].setValue("VND");
                 this.formGroup.controls['currencyId'].setValue("VND");
+                this.formGroup.get('expiredDate').clearValidators();
                 break;
             case 'Cash':
                 this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
+                this.formGroup.get('expiredDate').clearValidators();
                 break;
             case 'Official':
                 this.formGroup.controls['paymentTerm'].setValue(30);
+                this.formGroup.get('expiredDate').clearValidators();
                 break;
             case 'Prepaid':
-                this.formGroup.controls['paymentTerm'].setValue(1);
-                break;
             case 'Parent Contract':
                 this.formGroup.controls['paymentTerm'].setValue(1); 
+                this.formGroup.get('expiredDate').clearValidators();
                 break;
             default:
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');

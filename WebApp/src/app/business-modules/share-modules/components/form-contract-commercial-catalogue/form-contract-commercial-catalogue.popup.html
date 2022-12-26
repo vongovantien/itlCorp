@@ -125,8 +125,8 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted && ((!expiredDate.value.startDate && contractType.value !=='Cash' && contractType.value !=='Guarantee' && contractType.value !=='Prepaid') 
-                                            || (contractType.value ==='Trial' && checkError && !expiredDate.value?.startDate.valid))}">
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted && ((!expiredDate.value?.startDate && contractType.value !=='Cash' && contractType.value !=='Guarantee'
+                                         && contractType.value !=='Prepaid') || (contractType.value ==='Trial' && !expiredDate?.valid)) }">
                                         <label
                                             *ngIf="contractType.value !=='Cash' && contractType.value !== 'Guarantee' && contractType.value !== 'Prepaid'"
                                             required for=""><strong>Expired Date</strong></label>
@@ -145,6 +145,9 @@
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
+                                            <div class="m--font-danger" *ngIf="!expiredDate?.valid && contractType.value ==='Trial'">
+                                                The times is not valid
+                                            </div>
                                             <ng-container
                                                 *ngIf="!!expiredDate.value && !!expiredDate.value.startDate && !isDisabledExpiredDateField">
                                                 <span class="m-input-icon_clear"
