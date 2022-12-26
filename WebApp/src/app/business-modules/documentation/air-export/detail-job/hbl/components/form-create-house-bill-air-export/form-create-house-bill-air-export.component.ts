@@ -391,7 +391,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             originBlnumber: [],
             wtorValpayment: [this.wts[0]],
             otherPayment: [this.wts[0]],
-            shipmenttype: ['Freehand'],
+            shipmenttype: [],
             // * Date
             etd: [],
             eta: [],
@@ -440,7 +440,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.incotermId = this.formCreate.controls["incotermId"];
         this.polDescription = this.formCreate.controls["polDescription"];
         this.podDescription = this.formCreate.controls["podDescription"];
-        this.shipmentType = this.shipmenttype.value;
+        // this.shipmentType = this.shipmenttype.value;
 
         // this.formCreate.get('dimensionDetails')
         //     .valueChanges
