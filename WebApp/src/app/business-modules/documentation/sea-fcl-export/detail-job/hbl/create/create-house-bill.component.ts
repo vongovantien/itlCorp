@@ -13,7 +13,9 @@ import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
     getTransactionPermission,
-    ShareBusinessAttachListHouseBillComponent
+    ShareBusinessAttachListHouseBillComponent,
+    getTransactionState,
+    ITransactionState
 } from '@share-bussiness';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
@@ -44,6 +46,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
     containers: Container[] = [];
 
     selectedHbl: CsTransactionDetail;
+    shipmentType: string;
 
     constructor(
         protected _activedRoute: ActivatedRoute,
@@ -135,6 +138,15 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
 
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
+        
+        this._store.select(getTransactionState)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
+            (res: ITransactionState) => {
+                this.shipmentType = res.cstransaction.shipmentType;
+            }
+        );
+        
         const formData = {
             id: SystemConstants.EMPTY_GUID,
             jobId: this.jobId,
@@ -197,6 +209,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             contSealNo: this.goodSummaryComponent.containerDescription,
             chargeWeight: this.goodSummaryComponent.totalChargeWeight,
             attachList: this.attachListComponent.attachList.replace(form.hwbno, '[[HBLNo]]'),
+            shipmentType: this.shipmentType,
         };
 
         return formData;
