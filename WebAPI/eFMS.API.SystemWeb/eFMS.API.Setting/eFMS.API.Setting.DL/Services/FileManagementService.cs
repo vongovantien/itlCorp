@@ -8,6 +8,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.AspNetCore.Razor.Parser.SyntaxTree;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Localization;
 using System;
@@ -156,12 +157,38 @@ namespace eFMS.API.Setting.DL.Services
             return result;
         }
 
-        private List<EDocFile> ConvertToEDoc(List<SysImage> images)
+        //private List<EDocFile> ConvertToEDoc(List<SysImageDetail> images)
+        //{
+        //    List<EDocFile> result = new List<EDocFile>();
+        //    images.ForEach(x =>
+        //    {
+        //        var detail = new EDocFile
+        //        {
+        //            UserCreated = x.UserCreated,
+        //            DatetimeCreated = x.DatetimeCreated,
+        //            SystemFileName =x.SystemFileName,
+        //            UserFileName = x.UserFileName,
+        //            Id = x.Id,
+        //            SysImageId = x.Id,
+        //            UserModified = x.UserModified,
+        //            Source = x.Source,
+        //            DatetimeModified = x.DatetimeModified,
+        //            DocumentType = "Accountant",
+        //            AcRef = GetACRefNo(x.BillingNo, x.BillingType,false).Result,
+        //            BillingNo = x.BillingNo,
+        //            BillingType = x.BillingType
+        //        };
+        //        result.Add(detail);
+        //    });
+        //    return result;
+        //}
+
+        private List<SysImageDetail> ConvertToEDocOther(List<SysImage> images)
         {
-            List<EDocFile> result = new List<EDocFile>();
+            List<SysImageDetail> result = new List<SysImageDetail>();
             images.ForEach(x =>
             {
-                var detail = new EDocFile
+                var detail = new SysImageDetail
                 {
                     UserCreated = x.UserCreated,
                     DatetimeCreated = x.DateTimeCreated,
@@ -172,29 +199,70 @@ namespace eFMS.API.Setting.DL.Services
                     UserModified = x.UserModified,
                     Source = x.Folder,
                     DatetimeModified = x.DatetimeModified,
-                    DocumentType = "Accountant",
-                    AcRef = GetACRefNo(x.ObjectId, x.Folder).Result,
+                    //DocumentType = "Accountant",
+                    //AcRef = GetACRefNo(x.ObjectId, x.Folder,true).Result,
+                    BillingNo = GetBillingNo(x.ObjectId, x.Folder).Result,
+                    BillingType=x.Folder
                 };
                 result.Add(detail);
             });
             return result;
         }
 
-        private async Task<List<string>> GetACRefNo(string billingId, string Type)
+        private async Task<string> GetBillingNo(string billingId,string billingType)
+        {
+            string billingNo = "";
+            switch (billingType)
+            {
+                case "SOA":
+                    var soa= await acctSOARepo.GetAsync(x => x.Id == billingId);
+                    billingNo= soa.FirstOrDefault().Soano;
+                    break;
+                case "Settlement":
+                    var settle = await acctSettleRepo.GetAsync(x => x.Id.ToString() == billingId);
+                    billingNo= settle.FirstOrDefault().SettlementNo;
+                    break;
+                default: break;
+            }
+            return billingNo;
+        }
+
+        private async Task<List<string>> GetACRefNo(string billingNo, string Type,bool isOther)
         {
             var result = new List<AccAccountingManagement>();
-            if (Type == "SOA")
-            {
-                var SOA = await acctSOARepo.GetAsync(x => x.Id == billingId);
-                var soaNo = SOA.FirstOrDefault().Soano;
-                result = await accManageRepo.GetAsync(x => x.AttachDocInfo == soaNo);
-            }
-            if (Type == "Settlement")
-            {
-                var settle = await acctSettleRepo.GetAsync(x => x.Id.ToString() == billingId);
-                var smNo = settle.FirstOrDefault().SettlementNo;
-                result = await accManageRepo.GetAsync(x => x.AttachDocInfo == smNo);
-            }
+            //if (Type == "SOA")
+            //{
+            //    if (isOther)
+            //    {
+            //        var SOA = await acctSOARepo.GetAsync(x => x.Id == billingId);
+            //        var soaNo = SOA.FirstOrDefault()?.Soano;
+            //        if (soaNo != null)
+            //        {
+            //            result = await accManageRepo.GetAsync(x => x.AttachDocInfo == soaNo);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        result = await accManageRepo.GetAsync(x => x.AttachDocInfo == billingId);
+            //    }
+            //}
+            //if (Type == "Settlement")
+            //{
+            //    if (isOther)
+            //    {
+            //        var settle = await acctSettleRepo.GetAsync(x => x.Id.ToString() == billingId);
+            //        var smNo = settle.FirstOrDefault()?.SettlementNo;
+            //        if (smNo != null)
+            //        {
+            //            result = await accManageRepo.GetAsync(x => x.AttachDocInfo == smNo);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        result = await accManageRepo.GetAsync(x => x.AttachDocInfo == billingId);
+            //    }
+            //}
+            result = await accManageRepo.GetAsync(x => x.AttachDocInfo == billingNo);
             return result.Select(x => x.VoucherId).ToList();
         }
 
@@ -203,14 +271,14 @@ namespace eFMS.API.Setting.DL.Services
             var data = await edocRepo.WhereAsync(await ExpressionQuery(criterial));
             List<EDocFile> eDocFiles = new List<EDocFile>();
             var result = new List<SysImageDetail>();
-            var other = new List<EDocFile>();
+            var other = new List<SysImageDetail>();
             int totalData = 0;
             if (criterial.isAcc)
             {
                 var countData = criterial.Size - data.Count();
                 if (countData > 0)
                 {
-                    other = ConvertToEDoc(await DataContext.WhereAsync(await QueryOther(criterial)));
+                    other = ConvertToEDocOther(await DataContext.WhereAsync(await QueryOther(criterial)));
                     totalData = other.Count() + data.Count();
                     result = data.Concat(other).AsQueryable().Skip((criterial.Page - 1) * (criterial.Size + other.Count())).Take(criterial.Size).ToList();
                 }
@@ -243,22 +311,11 @@ namespace eFMS.API.Setting.DL.Services
         {
             if (!isRef)
             {
-                if (criteria.FromDate.HasValue && criteria.ToDate.HasValue)
-                {
                     if (Type == "INVOICE")
                     {
                         return await accManageRepo.WhereAsync(x => (x.VoucherType.ToUpper().Replace(" ", "").Contains("Invoice") || x.VoucherType.ToUpper().Replace(" ", "").Contains("Invoice Temp")) && x.InvoiceNoReal != null && x.Date >= criteria.FromDate && x.Date <= criteria.ToDate.Value.AddDays(1));
                     }
                     return await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains(Type) && x.VoucherId != null && x.Date >= criteria.FromDate && x.Date <= criteria.ToDate.Value.AddDays(1));
-                }
-                else
-                {
-                    if (Type == "INVOICE")
-                    {
-                        return await accManageRepo.WhereAsync(x => (x.VoucherType.ToUpper().Replace(" ", "").Contains("Invoice") || x.VoucherType.ToUpper().Replace(" ", "").Contains("Invoice Temp")) && x.InvoiceNoReal != null);
-                    }
-                    return await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains(Type) && x.VoucherId != null);
-                }
             }
             else
             {
@@ -287,6 +344,44 @@ namespace eFMS.API.Setting.DL.Services
             }
         }
 
+        private async Task<IEnumerable<Guid>> GetOtherByCreateDate(EDocManagementCriterial criterial,string accType)
+        {
+            var result = new List<Guid>();
+            var data = await DataContext.GetAsync(x => x.DateTimeCreated <= criterial.ToDate.Value.AddDays(1) && x.DateTimeCreated >= criterial.FromDate && x.Folder != "Shipment");
+            data.Select(x => new { id = x.Id, objId = x.ObjectId, type = x.Folder }).ToList().ForEach( x =>
+            {
+                switch (x.type)
+                {
+                    case "SOA":
+                        var soa = acctSOARepo.Get(z => z.Id == x.objId);
+                        var soaNo = soa.FirstOrDefault()?.Soano;
+                        if (soaNo != null)
+                        {
+                            if (accManageRepo.Any(z => z.AttachDocInfo == soaNo && z.VoucherType == accType))
+                            {
+                                result.Add(x.id);
+                            }
+                        }
+                        break;
+                    case "Settlement":
+                        var sm = acctSettleRepo.Get(z => z.Id.ToString() == x.objId);
+                        var smNo = sm.FirstOrDefault()?.SettlementNo;
+                        if (smNo != null)
+                        {
+                            if (accManageRepo.Any(z => z.AttachDocInfo == smNo && z.VoucherType == accType))
+                            {
+                                result.Add(x.id);
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            return result;
+        }
+
         private async Task<Expression<Func<SysImage, bool>>> QueryOther(EDocManagementCriterial criteria)
         {
             Expression<Func<SysImage, bool>> query = q => true;
@@ -302,53 +397,114 @@ namespace eFMS.API.Setting.DL.Services
                         switch (criteria.AccountantTypes[i])
                         {
                             case AccountantType.OtherEntry:
-                                var voucherOTIds = GetByDate(criteria, isRefNo, "OTHERENTRY").Result;
-                                var voucherOTId = voucherOTIds.Select(x => x.VoucherId).ToList();
-                                var otherOTId = GetListOtherFile(voucherOTId);
-                                if (otherOTId.Count() > 0)
+                                if (criteria.DateMode == DateMode.AccountingDate)
                                 {
-                                    haveQuery = true;
-                                    query = query.And(x => otherOTId.Contains(x.ObjectId));
+                                    var voucherOTIds = GetByDate(criteria, isRefNo, "OTHERENTRY").Result;
+                                    var voucherOTId = voucherOTIds.Select(x => x.VoucherId).ToList();
+                                    var otherOTId = GetListOtherFile(voucherOTId);
+                                    if (otherOTId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        query = query.And(x => otherOTId.Contains(x.ObjectId));
+                                    }
                                 }
+                                else
+                                {
+                                    var otherOTId = GetOtherByCreateDate(criteria, "Other Entry").Result;
+                                    if (otherOTId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        query = query.And(x => otherOTId.Contains(x.Id));
+                                    }
+                                }
+                                
                                 break;
                             case AccountantType.CashPayment:
-                                var voucherCPIds = GetByDate(criteria, isRefNo, "CASHPAYMENT").Result;
-                                var voucherCPId = voucherCPIds.Select(x => x.VoucherId).ToList();
-                                var otherCPId = GetListOtherFile(voucherCPId);
-                                if (otherCPId.Count() > 0)
+                                if (criteria.DateMode == DateMode.AccountingDate)
                                 {
-                                    haveQuery = true;
-                                    query = query.And(x => otherCPId.Contains(x.ObjectId));
+                                    var voucherCPIds = GetByDate(criteria, isRefNo, "CASHPAYMENT").Result;
+                                    var voucherCPId = voucherCPIds.Select(x => x.VoucherId).ToList();
+                                    var otherCPId = GetListOtherFile(voucherCPId);
+                                    if (otherCPId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        query = query.And(x => otherCPId.Contains(x.ObjectId));
+                                    }
+                                }
+                                else
+                                {
+                                    var otherOTId = GetOtherByCreateDate(criteria, "Cash payment").Result;
+                                    if (otherOTId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        query = query.And(x => otherOTId.Contains(x.Id));
+                                    }
                                 }
                                 break;
                             case AccountantType.PurchasingNote:
-                                var voucherPNIds = GetByDate(criteria, isRefNo, "PURCHASINGNOTE").Result;
-                                var voucherPNId = voucherPNIds.Select(x => x.VoucherId).ToList();
-                                var otherPNId = GetListOtherFile(voucherPNId);
-                                if (otherPNId.Count() > 0)
+                                if (criteria.DateMode == DateMode.AccountingDate)
                                 {
-                                    haveQuery = true;
-                                    query = query.And(x => otherPNId.Contains(x.ObjectId));
+                                    var voucherPNIds = GetByDate(criteria, isRefNo, "PURCHASINGNOTE").Result;
+                                    var voucherPNId = voucherPNIds.Select(x => x.VoucherId).ToList();
+                                    var otherPNId = GetListOtherFile(voucherPNId);
+                                    if (otherPNId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        query = query.And(x => otherPNId.Contains(x.ObjectId));
+                                    }
+                                }
+                                else
+                                {
+                                    var otherOTId = GetOtherByCreateDate(criteria, "Purchasing note").Result;
+                                    if (otherOTId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        query = query.And(x => otherOTId.Contains(x.Id));
+                                    }
                                 }
                                 break;
                             case AccountantType.CreditSlip:
-                                var voucherCLIds = GetByDate(criteria, isRefNo, "CREDITSLIP").Result;
-                                var voucherCLId = voucherCLIds.Select(x => x.VoucherId).ToList();
-                                var otherCLId = GetListOtherFile(voucherCLId);
-                                if (otherCLId.Count() > 0)
+                                if (criteria.DateMode == DateMode.AccountingDate)
                                 {
-                                    haveQuery = true;
-                                    query = query.And(x => otherCLId.Contains(x.ObjectId));
+                                    var voucherCLIds = GetByDate(criteria, isRefNo, "CREDITSLIP").Result;
+                                    var voucherCLId = voucherCLIds.Select(x => x.VoucherId).ToList();
+                                    var otherCLId = GetListOtherFile(voucherCLId);
+                                    if (otherCLId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        query = query.And(x => otherCLId.Contains(x.ObjectId));
+                                    }
+                                }
+                                else
+                                {
+                                    var otherOTId = GetOtherByCreateDate(criteria, "Credit Slip").Result;
+                                    if (otherOTId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        query = query.And(x => otherOTId.Contains(x.Id));
+                                    }
                                 }
                                 break;
                             case AccountantType.CashReceipt:
-                                var voucherCRIds = GetByDate(criteria, isRefNo, "CASHRECEIPT").Result;
-                                var voucherCRId = voucherCRIds.Select(x => x.VoucherId).ToList();
-                                var otherCRId = GetListOtherFile(voucherCRId);
-                                if (otherCRId.Count() > 0)
+                                if (criteria.DateMode == DateMode.AccountingDate)
                                 {
-                                    haveQuery = true;
-                                    query = query.And(x => otherCRId.Contains(x.Id.ToString()));
+                                    var voucherCRIds = GetByDate(criteria, isRefNo, "CASHRECEIPT").Result;
+                                    var voucherCRId = voucherCRIds.Select(x => x.VoucherId).ToList();
+                                    var otherCRId = GetListOtherFile(voucherCRId);
+                                    if (otherCRId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        query = query.And(x => otherCRId.Contains(x.Id.ToString()));
+                                    }
+                                }
+                                else
+                                {
+                                    var otherOTId = GetOtherByCreateDate(criteria, "Cash receipt").Result;
+                                    if (otherOTId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        query = query.And(x => otherOTId.Contains(x.Id));
+                                    }
                                 }
                                 break;
                         }
@@ -435,6 +591,12 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     edocFile.UserFileName = getFileNameWithWxtention(edocFile.SysImageId, false);
                 }
+            }
+            edocFile.BillingNo = imageDetail.BillingNo;
+            edocFile.BillingType = imageDetail.BillingType;
+            if (isAcc)
+            {
+                edocFile.AcRef = GetACRefNo(imageDetail.BillingNo, imageDetail.Source, true).Result;
             }
             return edocFile;
         }
@@ -699,12 +861,12 @@ namespace eFMS.API.Setting.DL.Services
             var result = new List<string>();
             if (billingNos.ToList().Count > 0)
             {
-                billingNos.ToList().ForEach(item =>
+                billingNos.ToList().ForEach(async item =>
                     {
                         if (item.Contains("SM"))
                         {
 
-                            var settle = acctSettleRepo.Get(x => x.SettlementNo == item);
+                            var settle = await acctSettleRepo.GetAsync(x => x.SettlementNo == item);
                             var smId = settle.FirstOrDefault()?.Id;
                             if (smId != null)
                             {
@@ -713,13 +875,13 @@ namespace eFMS.API.Setting.DL.Services
                         }
                         else if (item.Contains("CN"))
                         {
-                            var job = cdNoteRepo.Get(x => x.Code == item);
+                            var job = await cdNoteRepo.GetAsync(x => x.Code == item);
                             var jobIds = job.Select(x => x.JobId.ToString());
                             result.AddRange(jobIds);
                         }
                         else
                         {
-                            var soa = acctSOARepo.Get(x => x.Soano == item);
+                            var soa = await acctSOARepo.GetAsync(x => x.Soano == item);
                             var soaId = soa.FirstOrDefault()?.Id;
                             if (soaId != null && soaId != string.Empty)
                             {

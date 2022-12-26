@@ -42,6 +42,7 @@ export class AccountantFileManagementComponent extends AppList implements OnInit
                 catchError(this.catchError),
             ).subscribe(
                 (res: any) => {
+                    console.log(res.data);
                     this.edocFiles.data = res.data || [];
                     this.listFile.totalItems = res.totalItems;
                     this.listFile.page = res.page;
