@@ -20,6 +20,7 @@ import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import { Observable } from 'rxjs';
 import { catchError, finalize, pluck, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { ShareBussinessAttachFileV2Component } from 'src/app/business-modules/share-business/components/files-attach-v2/files-attach-v2.component';
 import isUUID from 'validator/lib/isUUID';
 import { ISettlementPaymentState, LoadDetailSettlePayment, LoadDetailSettlePaymentSuccess } from '../../settlement-payment/components/store';
 
@@ -35,6 +36,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(InjectViewContainerRefDirective) public containerRef: InjectViewContainerRefDirective;
     @ViewChild(HistoryDeniedPopupComponent) historyDeniedPopup: HistoryDeniedPopupComponent;
+    @ViewChild(ShareBussinessAttachFileV2Component) attachList: ShareBussinessAttachFileV2Component;
     @ViewChild('modal_deny') templateModalDeny: TemplateRef<any>;
 
     settlementId: string = '';
@@ -344,6 +346,18 @@ export class ApporveSettlementPaymentComponent extends AppPage {
         } else {
             window.history.back();
         }
+    }
+
+    getFilesAdvance() {
+        this._accoutingRepo.genEdocFromAdvToSettle(this.settlementPayment.settlement.settlementNo)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this.attachList.getEDoc('Settlement');
+                    }
+                },
+            );
     }
 }
 

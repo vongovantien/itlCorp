@@ -1072,6 +1072,12 @@ export class AccountingRepo {
     confirmCdNotePrepaid(body: any) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPrePaidPayment`, body);
     }
+
+    genEdocFromAdvToSettle(settleNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GenEdocFromAdvToSettle`, { settleNo: settleNo }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

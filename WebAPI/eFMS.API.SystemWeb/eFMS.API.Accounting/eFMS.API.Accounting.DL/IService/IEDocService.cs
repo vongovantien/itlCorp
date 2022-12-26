@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using ITL.NetCore.Common;
+using System;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.IService
@@ -11,5 +12,6 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> GenerateEdocSOA(AcctSoaModel model);
         Task<HandleState> GenerateEdocAdvance(AcctAdvancePaymentModel model);
         Task DeleteEdocByBillingNo(string billingNo);
+        Task<HandleState> GenerateEdocFromAdvacneToSettle(string SettleNo);
     }
 }
