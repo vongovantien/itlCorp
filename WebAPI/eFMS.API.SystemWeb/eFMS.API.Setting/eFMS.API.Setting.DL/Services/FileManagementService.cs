@@ -157,32 +157,6 @@ namespace eFMS.API.Setting.DL.Services
             return result;
         }
 
-        //private List<EDocFile> ConvertToEDoc(List<SysImageDetail> images)
-        //{
-        //    List<EDocFile> result = new List<EDocFile>();
-        //    images.ForEach(x =>
-        //    {
-        //        var detail = new EDocFile
-        //        {
-        //            UserCreated = x.UserCreated,
-        //            DatetimeCreated = x.DatetimeCreated,
-        //            SystemFileName =x.SystemFileName,
-        //            UserFileName = x.UserFileName,
-        //            Id = x.Id,
-        //            SysImageId = x.Id,
-        //            UserModified = x.UserModified,
-        //            Source = x.Source,
-        //            DatetimeModified = x.DatetimeModified,
-        //            DocumentType = "Accountant",
-        //            AcRef = GetACRefNo(x.BillingNo, x.BillingType,false).Result,
-        //            BillingNo = x.BillingNo,
-        //            BillingType = x.BillingType
-        //        };
-        //        result.Add(detail);
-        //    });
-        //    return result;
-        //}
-
         private List<SysImageDetail> ConvertToEDocOther(List<SysImage> images)
         {
             List<SysImageDetail> result = new List<SysImageDetail>();
