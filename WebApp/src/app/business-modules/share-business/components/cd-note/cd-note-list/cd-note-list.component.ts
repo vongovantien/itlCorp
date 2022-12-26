@@ -1,26 +1,26 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ChargeConstants, SystemConstants } from '@constants';
-import { delayTime } from '@decorators';
-import { InjectViewContainerRefDirective } from '@directives';
-import { Crystal } from '@models';
-import { Store } from '@ngrx/store';
+import { AppList } from 'src/app/app.list';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from 'src/app/shared/repositories';
+import { catchError, concatMap, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import _uniq from 'lodash/uniq';
-import { ToastrService } from 'ngx-toastr';
 import { combineLatest, of } from 'rxjs';
-import { catchError, concatMap, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
-import { AppList } from 'src/app/app.list';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common/report-preview/report-preview.component';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
 import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
-import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { TransactionActions } from '../../../store';
 import { ShareBussinessCdNoteAddPopupComponent } from '../add-cd-note/add-cd-note.popup';
 import { ShareBussinessCdNoteDetailPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
+import { Store } from '@ngrx/store';
+import { ActivatedRoute } from '@angular/router';
+import { InjectViewContainerRefDirective } from '@directives';
+import { delayTime } from '@decorators';
+import { Crystal } from '@models';
+import { ChargeConstants, SystemConstants } from '@constants';
 
 @Component({
     selector: 'cd-note-list',
@@ -314,7 +314,6 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                     if (!res) return;
                     if (res.status) {
                         this._toastService.success(res.message);
-                        //this.closeReport();
                     } else {
                         this._toastService.success(res.message || "Upload fail");
                     }
@@ -378,7 +377,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 },
             );
     }
-    previewItem(jobId: string, cdNote:string , currency: string = 'VND') {
+    previewItem(jobId: string, cdNote: string, currency: string = 'VND') {
         let typeCdNote = this.selectedCdNote.type;
         if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
             this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
@@ -415,9 +414,9 @@ export class ShareBussinessCdNoteListComponent extends AppList {
 
     onSelectCdNote(cd: AcctCDNote) {
         this.selectedCdNote = cd;
-        
+
     }
-    exportItem(jobId: string, cdNote:string, format: string) {
+    exportItem(jobId: string, cdNote: string, format: string) {
         let url: string;
         let _format = 0;
         switch (format) {
@@ -435,31 +434,30 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 break;
         }
         this._documentationRepo.getDetailsCDNote(jobId, cdNote)
-        .pipe(
-            switchMap((detail) => {
-                if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport)
-                {
-                    return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
-                }
-                else{
-                    return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format })
-                }
-            }),
-            concatMap((x) => {
-                url = x.pathReportGenerate;
-                return this._exportRepo.exportCrystalReportPDF(x);
-            })
-        ).subscribe(
-            (res: any) => {
+            .pipe(
+                switchMap((detail) => {
+                    if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
+                        return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                    }
+                    else {
+                        return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format })
+                    }
+                }),
+                concatMap((x) => {
+                    url = x.pathReportGenerate;
+                    return this._exportRepo.exportCrystalReportPDF(x);
+                })
+            ).subscribe(
+                (res: any) => {
 
-            },
-            (error) => {
-                this._exportRepo.downloadExport(url);
-            },
-            () => {
-                console.log(url);
-            }
-        );
-  
+                },
+                (error) => {
+                    this._exportRepo.downloadExport(url);
+                },
+                () => {
+                    console.log(url);
+                }
+            );
+
     }
 }

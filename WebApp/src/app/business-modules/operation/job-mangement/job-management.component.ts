@@ -19,6 +19,7 @@ import { GetCurrenctUser, getCurrentUserState, getMenuUserSpecialPermissionState
 import { Observable, of } from 'rxjs';
 import { delayTime } from '@decorators';
 import { LinkChargeJobRepPopupComponent } from './components/popup/link-charge-from-jobRep-popup/link-charge-from-job-rep.popup';
+import { formatDate } from '@angular/common';
 
 
 
@@ -44,7 +45,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
     defaultDataSearch = {
-        createdDateFrom: JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate,
+        createdDateFrom: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()), 'yyyy-MM-dd', 'en'),
         createdDateTo: JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate,
     };
 

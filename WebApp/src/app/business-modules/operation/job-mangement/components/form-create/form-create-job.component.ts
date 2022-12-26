@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from '@app';
 import { ComboGridVirtualScrollComponent, InfoPopupComponent } from '@common';
-import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
+import { ChargeConstants, JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { CommodityGroup, Customer, LinkAirSeaModel, PortIndex, User } from '@models';
 import { Store } from '@ngrx/store';

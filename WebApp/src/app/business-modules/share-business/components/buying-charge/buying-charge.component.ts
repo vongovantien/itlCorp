@@ -1063,38 +1063,24 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     c = this.updatePayer(c, coloaderPayer);
 
                     if (c.chargeCode === ChargeConstants.DEFAULT_AIR[0]) {
-                        // c = this.updateUnitSurcharge(c, 'KGS');
-                        // c.quantityType = CommonEnum.QUANTITY_TYPE.CW;
                         c.quantity = this.shipment.chargeWeight;
                     }
                     if (c.chargeCode === ChargeConstants.DEFAULT_AIR[1]) {
-                        // c = this.updateUnitSurcharge(c, 'KGS');
-                        // c.quantityType = CommonEnum.QUANTITY_TYPE.GW;
                         c.quantity = this.shipment.grossWeight;
                     }
-                    // if (c.chargeCode === ChargeConstants.DEFAULT_AIR[2]) {
-                    //     c = this.updateUnitSurcharge(c, 'SET');
-                    //     c.quantity = 1;
-                    // }
-                    // if (c.chargeCode === ChargeConstants.DEFAULT_AIR[3]) {
-                    //     c = this.updateUnitSurcharge(c, 'HAWB');
-                    //     c.quantity = 1;
-                    //     c.vatrate = 10;
-                    //     c.currencyId = "VND";
-                    //     c.unitPrice = 250000;
-                    // }
                 });
                 break;
             case ChargeConstants.SFE_CODE:
+            case ChargeConstants.SCE_CODE:
                 if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
                         c = this.updatePayer(c, coloaderPayer);
 
                         if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_FCL_EXPORT[1]) {
-                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            // c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
-                            c = this.updateUnitSurcharge(c, 'CONT');
+                            // c = this.updateUnitSurcharge(c, 'CONT');
                             c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
                         }
                     });
@@ -1103,10 +1089,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         c = this.updatePayer(c, customerPayer);
 
                         if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_FCL_EXPORT[1]) {
-                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            // c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
-                            c = this.updateUnitSurcharge(c, 'CONT');
+                            // c = this.updateUnitSurcharge(c, 'CONT');
                             c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
                         }
                     });
@@ -1118,10 +1104,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         c = this.updatePayer(c, coloaderPayer);
 
                         if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_LCL_EXPORT[1]) {
-                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            // c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
-                            c = this.updateUnitSurcharge(c, 'CONT');
+                            // c = this.updateUnitSurcharge(c, 'CONT');
                             c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
                         }
                     });
@@ -1130,25 +1116,26 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         c = this.updatePayer(c, customerPayer);
 
                         if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_LCL_EXPORT[1]) {
-                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            // c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
-                            c = this.updateUnitSurcharge(c, 'CONT');
+                            // c = this.updateUnitSurcharge(c, 'CONT');
                             c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
                         }
                     });
                 }
                 break;
             case ChargeConstants.SFI_CODE:
+            case ChargeConstants.SCI_CODE:
                 if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
                         c = this.updatePayer(c, coloaderPayer);
 
                         if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_FCL_IMPORT[1] || c.chargeCode === ChargeConstants.BUYING_DEFAULT_FCL_IMPORT[4]) {
-                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            // c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
-                            c = this.updateUnitSurcharge(c, 'CONT');
+                            // c = this.updateUnitSurcharge(c, 'CONT');
                             c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
                         }
                     });
@@ -1157,10 +1144,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         c = this.updatePayer(c, customerPayer);
 
                         if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_FCL_IMPORT[1] || c.chargeCode === ChargeConstants.SELLING_DEFAULT_FCL_IMPORT[4]) {
-                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            // c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
-                            c = this.updateUnitSurcharge(c, 'CONT');
+                            // c = this.updateUnitSurcharge(c, 'CONT');
                             c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
                         }
                     });
@@ -1172,7 +1159,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         c = this.updatePayer(c, coloaderPayer);
 
                         if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_LCL_IMPORT[1] || c.chargeCode === ChargeConstants.BUYING_DEFAULT_FCL_IMPORT[4]) {
-                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            // c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
                             c = this.updateUnitSurcharge(c, 'CONT');
@@ -1184,10 +1171,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         c = this.updatePayer(c, customerPayer);
 
                         if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_LCL_IMPORT[1] || c.chargeCode === ChargeConstants.SELLING_DEFAULT_LCL_IMPORT[4]) {
-                            c = this.updateUnitSurcharge(c, 'SHIPT');
+                            // c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
-                            c = this.updateUnitSurcharge(c, 'CONT');
+                            // c = this.updateUnitSurcharge(c, 'CONT');
                             c.quantity = this.calculateContainer(this.shipmentContainers, 'quantity');
                         }
                     });

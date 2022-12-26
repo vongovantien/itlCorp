@@ -149,9 +149,9 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.commodityGroups = this._store.select(getCatalogueCommodityGroupState);
         this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
         this.containers = this._store.select(getContainerSaveState);
-        
+
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
-        
+
         this.initForm();
     }
 

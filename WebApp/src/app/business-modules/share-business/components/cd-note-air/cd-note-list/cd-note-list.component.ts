@@ -1,28 +1,24 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
+import { AppList } from 'src/app/app.list';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from 'src/app/shared/repositories';
+import { catchError, concatMap, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { ToastrService } from 'ngx-toastr';
+import { NgProgress } from '@ngx-progressbar/core';
+import { SortService } from 'src/app/shared/services';
+import { combineLatest, of } from 'rxjs';
+import _uniq from 'lodash/uniq';
+import { TransactionTypeEnum } from 'src/app/shared/enums';
+import { ShareBussinessCdNoteAddAirPopupComponent } from '../add-cd-note/add-cd-note.popup';
+import { ShareBussinessCdNoteDetailAirPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
 import { ActivatedRoute } from '@angular/router';
 import { ReportPreviewComponent } from '@common';
 import { ChargeConstants, SystemConstants } from '@constants';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { Crystal } from '@models';
-import { Store } from '@ngrx/store';
-import { NgProgress } from '@ngx-progressbar/core';
-import { SystemFileManageRepo } from '@repositories';
-import { getCurrentUserState, IAppState } from '@store';
-import _uniq from 'lodash/uniq';
-import { ToastrService } from 'ngx-toastr';
-import { combineLatest, of } from 'rxjs';
-import { catchError, concatMap, filter, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
-import { AppList } from 'src/app/app.list';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { TransactionTypeEnum } from 'src/app/shared/enums';
 import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
-import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
-import { SortService } from 'src/app/shared/services';
-import { ShareBussinessCdNoteAddAirPopupComponent } from '../add-cd-note/add-cd-note.popup';
-import { ShareBussinessCdNoteDetailAirPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
-
 @Component({
     selector: 'cd-note-list-air',
     templateUrl: './cd-note-list.component.html',
@@ -55,8 +51,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
         private _sortService: SortService,
         private _activedRoute: ActivatedRoute,
         private _exportRepo: ExportRepo,
-        private _fileMngtRepo: SystemFileManageRepo,
-        private _store: Store<IAppState>
+        private _fileMngtRepo: SystemFileManageRepo
 
     ) {
         super();
@@ -285,7 +280,6 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                     if (!res) return;
                     if (res.status) {
                         this._toastService.success(res.message);
-                        //this.closeReport();
                     } else {
                         this._toastService.success(res.message || "Upload fail");
                     }
@@ -296,7 +290,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                 () => {
                     sub.unsubscribe();
                 }
-            ); 
+            );
     }
 
     checkValidCDNote() {
@@ -385,13 +379,13 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                 },
             );
     }
-    previewCdNoteItem(jobId: string, cdNote:string, data: string) {
+    previewCdNoteItem(jobId: string, cdNote: string, data: string) {
         if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
-            this.previewAirCdNote(jobId, cdNote ,data);
+            this.previewAirCdNote(jobId, cdNote, data);
         }
     }
 
-    previewAirCdNote(jobId: string, cdNote:string, data: string) {
+    previewAirCdNote(jobId: string, cdNote: string, data: string) {
         let typeCdNote = this.selectedCdNote.type;
         let hblidCdNote = this.selectedCdNote.hblid;
         let sourcePreview$;
@@ -432,7 +426,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
     onSelectCdNote(cd: AcctCDNote) {
         this.selectedCdNote = cd;
     }
-    exportItem(jobId: string, cdNote:string, format: string) {
+    exportItem(jobId: string, cdNote: string, format: string) {
         let url: string;
         let _format = 0;
         switch (format) {
@@ -459,46 +453,45 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
-                         return this._documentationRepo.getDetailsCDNote(jobId, cdNote)
-                                .pipe(
-                                    switchMap(() => {
-                                        return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
-                                    }),
-                                    concatMap((x) => {
-                                        url = x.pathReportGenerate;
-                                        return this._exportRepo.exportCrystalReportPDF(x);
-                                    }), takeUntil(this.ngUnsubscribe)
-                                )
+                        return this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+                            .pipe(
+                                switchMap(() => {
+                                    return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                                }),
+                                concatMap((x) => {
+                                    url = x.pathReportGenerate;
+                                    return this._exportRepo.exportCrystalReportPDF(x);
+                                }), takeUntil(this.ngUnsubscribe)
+                            )
                     }
                     this._toastService.warning(res.message);
                     return of(false);
                 }))
         } else {
             sourcePreview$ = this._documentationRepo.getDetailsCDNote(jobId, cdNote)
-            .pipe(
-                switchMap(() => {
-                    return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
-                }),
-                concatMap((x) => {
-                    url = x.pathReportGenerate;
-                    return this._exportRepo.exportCrystalReportPDF(x);
-                }), takeUntil(this.ngUnsubscribe))
-            }
-            sourcePreview$.subscribe(
-                (res:  any) => {
+                .pipe(
+                    switchMap(() => {
+                        return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                    }),
+                    concatMap((x) => {
+                        url = x.pathReportGenerate;
+                        return this._exportRepo.exportCrystalReportPDF(x);
+                    }), takeUntil(this.ngUnsubscribe))
+        }
+        sourcePreview$.subscribe(
+            (res: any) => {
 
-                },
-                (error) => {
-                    if(error.status === 200)
-                    {
-                        this._exportRepo.downloadExport(url);
-                    }
-                },
-                () => {
-                    console.log(url);
+            },
+            (error) => {
+                if (error.status === 200) {
+                    this._exportRepo.downloadExport(url);
                 }
-            );
-        
+            },
+            () => {
+                console.log(url);
+            }
+        );
+
     }
 
 }
