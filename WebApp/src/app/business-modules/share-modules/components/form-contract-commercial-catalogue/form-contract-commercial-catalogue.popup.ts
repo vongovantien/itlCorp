@@ -1,7 +1,8 @@
 import { X } from '@angular/cdk/keycodes';
+import { C } from '@angular/cdk/keycodes';
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { JobConstants, SystemConstants } from '@constants';
@@ -11,6 +12,7 @@ import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemFileManageRepo, SystemRepo } from '@repositories';
 import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, getCurrentUserState, getMenuUserSpecialPermissionState, IAppState } from '@store';
+import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { catchError, distinctUntilChanged, finalize, map, takeUntil } from 'rxjs/operators';
@@ -73,7 +75,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     minDateEffective: any = null;
     minDateExpired: any = null;
-    maxDateExpired: any = null;
     minDateExpiredTrial: any = null;
 
 
@@ -225,7 +226,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             officeId: [null, Validators.required],
             contractNo: [null, Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
-            expiredDate: [null, Validators.required],
+            expiredDate: [null, Validators.compose([
+                Validators.required,
+                this.checkExpiredDate
+            ])],
             contractType: [null, Validators.required],
             saleService: [null, Validators.required],
             paymentMethod: ['All'],
@@ -947,14 +951,25 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + 30)),
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + 30)),
             });
-            this.minDateExpired = this.createMoment(new Date(value.startDate));
         }
-
-        if (this.effectiveDate.value.startDate != new Date(this.selectedContract.effectiveDate) && value.startDate != null) {
-            this.minDateExpired = this.createMoment(this.formGroup.get("effectiveDate")?.value?.startDate);
-            this.maxDateExpired = this.createMoment(this.expiredDate.value.startDate);
-            console.log(this.maxDateExpired)
+    }
+    checkExpiredDate: ValidatorFn = (): { [key: string]: any; } | null => {
+        let effDate = this.formGroup && this.formGroup.get('effectiveDate').value;
+        let expDate = this.formGroup && this.formGroup.get('expiredDate').value;
+        let expDateValid = null;
+        let expDate1 = null;
+        let checkError = false;
+        if (!!effDate) {
+            expDateValid = new Date(new Date(effDate.startDate).setDate(new Date(effDate.startDate)?.getDate() + 30));
+            expDate1 = new Date(new Date(expDate.startDate));
         }
+        const date2: any = new Date(expDateValid).valueOf();
+        const date1: any = new Date(expDate1).valueOf();
+        if (!!expDateValid) {
+            if (date1 > date2)
+                checkError = true;
+        }
+        return checkError ? { invalidRange: { effDate, expDate } } : null;
     }
 
     selectedService($event: any) {
@@ -998,11 +1013,13 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     this.expiredDate.setValue({
                         startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate() + 30)),
                         endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate() + 30)),
-                    });
-                    this.maxDateExpired = this.createMoment(this.expiredDate.value.startDate);                 
+                    });                
                 }              
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['paymentTerm'].setValue(30);
+                this.formGroup.get('expiredDate').setValidators([
+                    this.checkExpiredDate
+                ])
                 break;
             case 'Guarantee':
                 if (this.isCreateNewCommercial) {
@@ -1015,24 +1032,21 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['creditCurrency'].setValue("VND");
                 this.formGroup.controls['currencyId'].setValue("VND");
-                this.maxDateExpired = null;
+                this.formGroup.get('expiredDate').clearValidators();
                 break;
             case 'Cash':
                 this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
-                this.maxDateExpired = null;
+                this.formGroup.get('expiredDate').clearValidators();
                 break;
             case 'Official':
                 this.formGroup.controls['paymentTerm'].setValue(30);
-                this.maxDateExpired = null;
+                this.formGroup.get('expiredDate').clearValidators();
                 break;
             case 'Prepaid':
-                this.formGroup.controls['paymentTerm'].setValue(1);
-                this.maxDateExpired = null;
-                break;
             case 'Parent Contract':
                 this.formGroup.controls['paymentTerm'].setValue(1); 
-                this.maxDateExpired = null;
+                this.formGroup.get('expiredDate').clearValidators();
                 break;
             case 'Official':
                 this.formGroup.controls['paymentTerm'].setValue(30);
