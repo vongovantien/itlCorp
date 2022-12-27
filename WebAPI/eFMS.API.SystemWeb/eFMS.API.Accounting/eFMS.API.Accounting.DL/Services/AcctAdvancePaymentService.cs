@@ -63,6 +63,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatCharge> catChargeRepository;
         private readonly IContextBase<SysSettingFlow> sysSettingFlowRepository;
         private readonly IContextBase<SysImageDetail> imagedetailRepository;
+        private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -99,7 +100,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysEmailSetting> sysEmailSettingRepo,
             IContextBase<SysImageDetail> imageDetailRepo,
             IContextBase<SysSettingFlow> sysSettingFlowRepos,
-            IContextBase<CatCharge> catChargeRepo) : base(repository, mapper)
+            IContextBase<CatCharge> catChargeRepo, IContextBase<CustomsDeclaration> customsDeclarationRepo) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = wUrl;
@@ -135,6 +136,7 @@ namespace eFMS.API.Accounting.DL.Services
             catChargeRepository = catChargeRepo;
             sysSettingFlowRepository = sysSettingFlowRepo;
             imagedetailRepository = imageDetailRepo;
+            customsDeclarationRepository = customsDeclarationRepo;
         }
 
         #region --- LIST & PAGING ---
@@ -1038,7 +1040,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new List<ShipmentExistedInAdvanceModel>();
             }
@@ -1283,7 +1285,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Hblid = (Guid)item.Hblid;
                     charge.Mblno = item.Mbl;
                     charge.Hblno = item.Hbl;
-                    charge.ClearanceNo = string.IsNullOrEmpty(item.CustomNo) ? null : item.CustomNo;
+                    charge.ClearanceNo = string.IsNullOrEmpty(item.CustomNo) ? (string.IsNullOrEmpty(GetCustomNoOldOfShipment(item.JobId)) ? null : GetCustomNoOldOfShipment(item.JobId)) : item.CustomNo;
                     charge.AdvanceNoFor = model.AdvanceNo;
                     charge.Type = AccountingConstants.TYPE_CHARGE_BUY;
                     charge.PaymentObjectId = model.Payee;
@@ -1338,6 +1340,29 @@ namespace eFMS.API.Accounting.DL.Services
             return model;
         }
 
+        private string GetCustomNoOldOfShipment(string jobNo)
+        {
+            var customNos = "";
+            var mainClaranceNo = customsDeclarationRepository.Get(x => x.JobNo == jobNo && x.ConvertTime != null).FirstOrDefault();
+            if (mainClaranceNo != null)
+            {
+                customNos = mainClaranceNo.ClearanceNo;
+            }
+            else
+            {
+                var customLastGrp = customsDeclarationRepository.Get(x => x.JobNo == jobNo).ToList();
+                if (customLastGrp.Count() > 0)
+                {
+                    var CustomLastOrder = customLastGrp.OrderBy(o => o.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
+                    if (CustomLastOrder.Count() > 1)
+                    {
+                        CustomLastOrder.OrderBy(x => x.DatetimeModified);
+                    }
+                    customNos = CustomLastOrder.FirstOrDefault().ClearanceNo;
+                }
+            }
+            return customNos;
+        }
         public HandleState UpdateAdvancePayment(AcctAdvancePaymentModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
@@ -4253,7 +4278,6 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<AccAdvancePaymentVoucherImportModel> CheckValidImport(List<AccAdvancePaymentVoucherImportModel> list, bool validDate)
         {
-            DateTime dt;
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.AdvanceNo))

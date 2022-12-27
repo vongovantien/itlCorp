@@ -43,6 +43,8 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<SysUser> userRepository;
         private readonly IContextBase<CatPartner> customerRepository;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
+        private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
+
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
@@ -58,6 +60,7 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<SysUser> userRepo,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
+            IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
         IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
@@ -73,6 +76,7 @@ namespace eFMS.API.Operation.DL.Services
             customerRepository = customerRepo;
             csShipmentSurchargeRepo = csShipmentSurcharge;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
+            accAdvancePaymentRepository = accAdvancePaymentRepo;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -1700,7 +1704,7 @@ namespace eFMS.API.Operation.DL.Services
         public async Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model)
         {
             bool isUpdateCharge = false;
-            var listCustom = await DataContext.Get(x => x.JobNo == model.JobNo)?.FirstOrDefaultAsync();
+            var listCustom = await DataContext.Get(x => x.JobNo == model.JobNo).OrderBy(x => x.ClearanceDate).ThenByDescending(x => x.DatetimeModified)?.FirstOrDefaultAsync();
             if (listCustom == null)
             {
                 isUpdateCharge = true;
@@ -1709,7 +1713,15 @@ namespace eFMS.API.Operation.DL.Services
             if (isUpdateCharge && hs.Success)
             {
                 var listSurcharge = csShipmentSurchargeRepo.Get(x => x.JobNo == model.JobNo && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom));
-                await listSurcharge.ForEachAsync(x => x.ClearanceNo = model.ClearanceNo);
+                var query = from surcharge in listSurcharge.Where(x => x.AdvanceNoFor != null)
+                            join advances in accAdvancePaymentRepository.Get()
+                            on surcharge.AdvanceNoFor equals advances.AdvanceNo
+                            where advances.SyncStatus == null
+                            select surcharge;
+
+                var listUpdateItem = listSurcharge.Where(x => string.IsNullOrEmpty(x.AdvanceNoFor)).Union(query);
+                await listUpdateItem.ForEachAsync(x => x.ClearanceNo = model.ClearanceNo);
+
                 hs = csShipmentSurchargeRepo.SubmitChanges();
             }
             DataContext.SubmitChanges();
