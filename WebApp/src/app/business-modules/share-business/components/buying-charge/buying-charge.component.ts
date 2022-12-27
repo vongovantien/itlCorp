@@ -40,7 +40,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     @Input() showSyncOtherCharge: boolean = false; // * show/hide sync other charge in getCharge button.
     @Input() showGetCharge: boolean = true; // * show/hide getCharge button
     @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
-    @Input() showGetChargeStandart: boolean = true; // * show/hide getCharge standart button
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
     @ViewChildren('containerCharge', { read: ViewContainerRef }) public chargeContainerRef: QueryList<ViewContainerRef>;
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
@@ -1050,6 +1049,17 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         });
 
         switch (serviceTypeId) {
+            case ChargeConstants.CL_CODE:
+                if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                        c = this.updatePayer(c, coloaderPayer);
+                    });
+                } else {
+                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                        c = this.updatePayer(c, customerPayer);
+                    });
+                }
+                break;
             case ChargeConstants.AE_CODE:
             case ChargeConstants.AI_CODE:
                 shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
