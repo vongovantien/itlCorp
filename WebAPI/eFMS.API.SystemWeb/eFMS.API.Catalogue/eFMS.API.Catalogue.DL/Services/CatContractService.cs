@@ -478,9 +478,9 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.UserCreated = currentContract.UserCreated;
             if (entity.ExpiredDate != null)
             {
-                if (entity.Active == true)
+                if (entity.Active == true && entity.NoDue == false || entity.NoDue == null)
                 {
-                    var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate).Date);
+                    var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate));
                     if (expiredCheck <= 0)
                     {
                         entity.IsExpired = false;
@@ -737,15 +737,18 @@ namespace eFMS.API.Catalogue.DL.Services
                 DateTime localDate = DateTime.Now;
                 if (objUpdate.ExpiredDate != null)
                 {
-                    var expiredCheck = DateTime.Compare(localDate, (DateTime)objUpdate.ExpiredDate);
+                    if (objUpdate.NoDue == null || objUpdate.NoDue == false)
+                    {
+                        var expiredCheck = DateTime.Compare(((DateTime.Now).Date), (DateTime)objUpdate.ExpiredDate);
 
-                    if (expiredCheck <= 0)
-                    {
-                        objUpdate.IsExpired = false;
-                    }
-                    else if (expiredCheck > 0)
-                    {
-                        objUpdate.IsExpired = true;
+                        if (expiredCheck <= 0)
+                        {
+                            objUpdate.IsExpired = false;
+                        }
+                        else if (expiredCheck > 0)
+                        {
+                            objUpdate.IsExpired = true;
+                        }
                     }
                 }
                 else
