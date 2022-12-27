@@ -231,7 +231,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var edocSMDefault = await DataContext.GetAsync(z => z.BillingNo == SettleNo);
                         var edocSMIds = edocSMDefault.Select(z => z.SysImageId);
                         var edocADV =  DataContext.Get(z => x.advanceNo == z.BillingNo && z.BillingType == "Advance"&& !edocSMIds.Contains(z.SysImageId));
-                        var docType = attachRepo.Get(y => y.Code == "OTH" && y.TransactionType == x.transtype);
+                        var docType = attachRepo.Get(y => y.Code == "AD-SM" && y.TransactionType == x.transtype);
                         var edocSMs = new List<SysImageDetail>();
                         edocADV.ToList().ForEach(async edocAD =>
                         {
