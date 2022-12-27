@@ -1266,7 +1266,9 @@ namespace eFMS.API.Accounting.DL.Services
             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             var existAdvanceRequest = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == model.AdvanceNo);
             var surcharges = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == model.AdvanceNo);
-            if(surcharges?.Count() > 0)
+            string clearanceNo = string.Empty;
+
+            if (surcharges?.Count() > 0)
             {
                 var idDelete = surcharges.Select(x => x.Id).ToList();
                 var hsSur = csShipmentSurchargeRepo.Delete(x => idDelete.Any(z => z == x.Id), false);
@@ -1285,7 +1287,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Hblid = (Guid)item.Hblid;
                     charge.Mblno = item.Mbl;
                     charge.Hblno = item.Hbl;
-                    charge.ClearanceNo = string.IsNullOrEmpty(item.CustomNo) ? (string.IsNullOrEmpty(GetCustomNoOldOfShipment(item.JobId)) ? null : GetCustomNoOldOfShipment(item.JobId)) : item.CustomNo;
+                    charge.ClearanceNo = string.IsNullOrEmpty(item.CustomNo) ? null : item.CustomNo;
                     charge.AdvanceNoFor = model.AdvanceNo;
                     charge.Type = AccountingConstants.TYPE_CHARGE_BUY;
                     charge.PaymentObjectId = model.Payee;
@@ -1336,6 +1338,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 item.Amount = _totalAmount;
             }
+
             var hs = csShipmentSurchargeRepo.SubmitChanges();
             return model;
         }

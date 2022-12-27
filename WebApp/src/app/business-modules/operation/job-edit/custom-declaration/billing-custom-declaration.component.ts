@@ -12,7 +12,7 @@ import { CustomDeclaration } from '@models';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
-import { AddNewModalComponent } from './add-new-modal/add-new-modal.component';
+import { CustomClearanceAddNewModalComponent } from './components/custom-clearance-add-new-modal/custom-clearance-add-new-modal.component';
 
 @Component({
     selector: 'app-billing-custom-declaration',
@@ -21,7 +21,7 @@ import { AddNewModalComponent } from './add-new-modal/add-new-modal.component';
 export class BillingCustomDeclarationComponent extends AppList implements OnInit {
     @ViewChild(InjectViewContainerRefDirective) injectViewContainerRef: InjectViewContainerRefDirective;
     @ViewChild(AddMoreModalComponent) popUpAddMore: AddMoreModalComponent;
-    @ViewChild(AddNewModalComponent) popUpAddNew: AddNewModalComponent;
+    @ViewChild(CustomClearanceAddNewModalComponent) popUpAddNew: CustomClearanceAddNewModalComponent;
 
     currentJob: OpsTransaction;
     customClearances: any[];
@@ -68,9 +68,11 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
             }
         });
     }
+
     sortLocal(sort: string): void {
         this.customClearances = this._sortService.sort(this.customClearances, sort, this.order);
     }
+
     getShipmentDetails(id: any) {
         this._progressRef.start();
         this._documentRepo.getDetailShipment(id)

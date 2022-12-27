@@ -10,6 +10,7 @@ import { CatalogueRepo } from '@repositories';
 import { IShareBussinessState } from '@share-bussiness';
 import { GetCatalogueCommodityAction, getCatalogueCommodityState, GetCatalogueCountryAction, getCatalogueCountryState, GetCataloguePortAction, getCataloguePortState, GetCurrenctUser, getCurrentUserState } from '@store';
 import { Observable } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 
@@ -89,7 +90,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this._store.dispatch(new GetCatalogueCommodityAction());
         this._store.dispatch(new GetCatalogueCountryAction());
-        this._store.select(getCurrentUserState).subscribe(res => this.currentUser = res);
+        this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => this.currentUser = res);
 
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
         this.ports = this._store.select(getCataloguePortState);
