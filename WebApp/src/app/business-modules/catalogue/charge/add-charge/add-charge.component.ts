@@ -59,7 +59,9 @@ export class AddChargeComponent extends AppPage {
         this.ChargeToAdd.charge.productDept = this.formAddCharge.formGroup.controls['productDept'].value;
         this.ChargeToAdd.charge.mode = this.formAddCharge.formGroup.controls['mode'].value;
         this.ChargeToAdd.charge.creditCharge = this.formAddCharge.creditCharge.value;
-
+        if (this.formAddCharge.offices.value.length) {
+            this.ChargeToAdd.charge.offices = this.formAddCharge.offices.value?.toString();
+        }
         let serviceTypeId = '';
         this.ChargeToAdd.charge.type = this.formAddCharge.type.value;
         if (this.formAddCharge.service.value !== null) {
@@ -80,6 +82,7 @@ export class AddChargeComponent extends AppPage {
         } else {
             return null;
         }
+
     }
 
     addCharge() {

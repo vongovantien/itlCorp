@@ -7,7 +7,6 @@ import { AddChargeComponent } from '../add-charge/add-charge.component';
 import { CatalogueRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
-import { RoutingConstants } from '@constants';
 @Component({
     selector: 'detail-charge',
     templateUrl: './detail-charge.component.html',
@@ -44,7 +43,7 @@ export class DetailChargeComponent extends AddChargeComponent {
         protected router: Router,
         protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
-        protected _progressService: NgProgress, ) {
+        protected _progressService: NgProgress) {
         super(router, _catalogueRepo, _toastService, _progressService);
     }
 
@@ -68,7 +67,7 @@ export class DetailChargeComponent extends AddChargeComponent {
                 this.formAddCharge.activeServices = this.formAddCharge.getCurrentActiveService(this.Charge.charge.serviceTypeId);
                 this.formAddCharge.updateDataToForm(this.Charge);
                 console.log(this.formAddCharge.activeServices);
-                
+
                 this.voucherList.ChargeToAdd.listChargeDefaultAccount = this.Charge.listChargeDefaultAccount;
                 this.voucherList.isShowUpdate = this.Charge.permission.allowUpdate;
                 this.Charge.charge.userCreated = res.charge.userCreated;

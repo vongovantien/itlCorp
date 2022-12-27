@@ -413,8 +413,6 @@ namespace eFMS.API.Accounting.DL.Services
                        from parent in parents.DefaultIfEmpty()
                        join user in users on contract.AgreementSalesmanId equals user.Id into users2
                        from user in users2.DefaultIfEmpty()
-                       join employee in employees on user.EmployeeId equals employee.Id into employees2
-                       from employee in employees2.DefaultIfEmpty()
                        select new AccountReceivableResult
                        {
                            AgreementId = contract.AgreementId,
@@ -430,7 +428,7 @@ namespace eFMS.API.Accounting.DL.Services
                            AgreementType = contract.AgreementType,
                            AgreementStatus = contract.AgreementStatus,
                            AgreementSalesmanId = contract.AgreementSalesmanId,
-                           AgreementSalesmanName = employee.EmployeeNameVn,
+                           AgreementSalesmanName = user.Username,
                            AgreementCurrency = contract.AgreementCurrency,
                            OfficeId = contract.OfficeId,
                            ArServiceCode = contract.ArServiceCode,

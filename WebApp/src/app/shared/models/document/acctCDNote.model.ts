@@ -50,4 +50,5 @@ export class AcctCDNote {
   // exchangeRate:number = null;
   excRateUsdToLocal:number = null;
   salemanId: string = null;
+  hblid: string = null;
 }

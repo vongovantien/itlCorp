@@ -63,6 +63,11 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.AcctManagementId)
+                    .HasColumnName("AcctManagementID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.BillingNo)
                     .HasMaxLength(30)
                     .IsUnicode(false);
