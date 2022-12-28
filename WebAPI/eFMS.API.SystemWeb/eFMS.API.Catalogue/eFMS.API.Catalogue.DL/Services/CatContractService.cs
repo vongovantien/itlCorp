@@ -1309,7 +1309,7 @@ namespace eFMS.API.Catalogue.DL.Services
             // var mailRequester = sysEmployeeRepository.Get(e => e.Id == requester).FirstOrDefault()?.Email;
 
             List<string> lstBCc = ListMailCC();
-            ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract, DataEnums.EMAIL_TYPE_ACTIVE_PARTNER);
+            ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract, DataEnums.EMAIL_TYPE_ACTIVE_CONTRACT);
             switch (partner.PartnerType)
             {
                 case "Customer":

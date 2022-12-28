@@ -466,44 +466,6 @@ namespace eFMS.API.Operation.DL.Services
             return results;
         }
 
-        private string GetOldestCleranceNo(List<CustomsDeclarationModel> clearances, string JobNo, bool isDelete)
-        {
-            var cleranceLastGrp = clearances.OrderBy(x => x.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
-            var clearanceContextGrp = DataContext.Get(x => x.JobNo == JobNo).FirstOrDefault() != null ? DataContext.Get(x => x.JobNo == JobNo).OrderBy(x => x.ClearanceDate).OrderBy(x => x.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault() : null;
-            var cleranceLastInput = new CustomsDeclarationModel();
-            var cleranceContextInput = new CustomsDeclaration();
-            if (clearanceContextGrp == null)
-            {
-                return null;
-            }
-            else if (isDelete)
-            {
-                if (clearanceContextGrp.Count() == 0)
-                {
-                    return null;
-                }
-                return clearanceContextGrp.Count() == 1 ? clearanceContextGrp.FirstOrDefault().ClearanceNo : clearanceContextGrp.OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
-            }
-            else
-            {
-                cleranceLastInput = cleranceLastGrp.Count() == 1 ? cleranceLastGrp.FirstOrDefault() : cleranceLastGrp.OrderBy(x => x.DatetimeModified).FirstOrDefault();
-                cleranceContextInput = clearanceContextGrp.Count() == 1 ? clearanceContextGrp.FirstOrDefault() : clearanceContextGrp.OrderBy(x => x.DatetimeModified).FirstOrDefault();
-
-                if (cleranceLastInput.ClearanceDate > cleranceContextInput.ClearanceDate)
-                {
-                    return cleranceContextInput.ClearanceNo;
-                }
-                else if (cleranceLastInput.ClearanceDate == cleranceContextInput.ClearanceDate)
-                {
-                    if (cleranceLastInput.DatetimeModified > cleranceContextInput.DatetimeModified)
-                    {
-                        return cleranceContextInput.ClearanceNo;
-                    }
-                }
-                return cleranceLastInput.ClearanceNo;
-            }
-        }
-
         public HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
             var result = new HandleState();
@@ -529,53 +491,6 @@ namespace eFMS.API.Operation.DL.Services
                 result = new HandleState(ex.Message);
             }
             return result;
-        }
-
-        private void UpdateChargeAndAdvReq(string jobNo)
-        {
-            var surcharges = csShipmentSurchargeRepo.Get(x => x.JobNo == jobNo && x.AcctManagementId == null & x.PayerAcctManagementId == null && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom));
-            var advRQs = accAdvanceRequestRepository.Get(x => x.JobId == jobNo);
-            var clearanceData = DataContext.Get(x => x.JobNo == jobNo);
-            string oldestyCleNo = null;
-            if (clearanceData.Count() > 0)
-            {
-                oldestyCleNo = clearanceData.OrderBy(x => x.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault().OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
-            }
-            if (surcharges.Count() > 0 || advRQs.Count() > 0)
-            {
-                var clearanceNo = surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault() != null ? surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault().ClearanceNo : null;
-                if (clearanceNo == null)
-                {
-                    if (clearanceData.Count() > 0)
-                    {
-                        clearanceNo = oldestyCleNo;
-                    }
-                    else
-                    {
-                        clearanceNo = null;
-                    }
-
-                }
-                else if (string.IsNullOrEmpty(clearanceNo) && advRQs.Where(x => !string.IsNullOrEmpty(x.CustomNo)).FirstOrDefault() != null)
-                {
-                    clearanceNo = advRQs.Where(x => !string.IsNullOrEmpty(x.CustomNo)).FirstOrDefault().CustomNo;
-                }
-                else if (!clearanceData.Any(x => x.ClearanceNo == clearanceNo))
-                {
-                    clearanceNo = oldestyCleNo;
-                }
-                foreach (var item in surcharges)
-                {
-                    item.ClearanceNo = clearanceNo;
-                    csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id, false);
-                }
-                csShipmentSurchargeRepo.SubmitChanges();
-                foreach (var item in advRQs)
-                {
-                    item.CustomNo = clearanceNo;
-                    accAdvanceRequestRepository.Update(item, x => x.Id == item.Id);
-                }
-            }
         }
 
         public CustomsDeclaration GetById(int id)

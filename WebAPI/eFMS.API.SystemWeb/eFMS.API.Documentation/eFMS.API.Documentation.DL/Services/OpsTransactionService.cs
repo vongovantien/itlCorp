@@ -614,6 +614,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return clearances.Where(x => x.JobNo == jobNo)?.OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
             }
         }
+
         public bool CheckAllowDelete(Guid jobId)
         {
             var detail = DataContext.Get(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled)?.FirstOrDefault();

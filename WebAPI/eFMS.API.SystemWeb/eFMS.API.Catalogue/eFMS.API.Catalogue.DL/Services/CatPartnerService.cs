@@ -2490,53 +2490,19 @@ namespace eFMS.API.Catalogue.DL.Services
             return hs;
         }
 
-        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType, string officeId = null)
+        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType)
         {
             List<SysUserViewModel> salemans = new List<SysUserViewModel>();
-            Expression<Func<CatContract, bool>> contractExp = x => x.PartnerId == partnerId
-            && x.Active == true
+            var contracts = contractRepository.Get(x => x.PartnerId == partnerId
+            && ((shipmentType == "Freehand") ? (x.ShipmentType != "Nominated") : true)
+            && x.OfficeId.Contains(currentUser.OfficeID.ToString())
             && x.SaleService.Contains(transactionType)
-            && x.SaleService.Contains(transactionType)
-            && ((shipmentType == "Freehand") ? (x.ShipmentType != "Nominated") : true);
-            if (!string.IsNullOrEmpty(officeId))
+            && x.Active == true);
+            if (contracts.Count() > 0)
             {
-                var office = officeRepository.Get(x => x.Id.ToString() == officeId)?.FirstOrDefault();
-                if (office != null && office.OfficeType == "OutSource")
-                {
-                    salemans.Add(new SysUserViewModel
-                    {
-                        Active = true,
-                        EmployeeNameVn = salemanBOD.Username,
-                        EmployeeNameEn = salemanBOD.Username,
-                        Id = salemanBOD.Id,
-                        Username = salemanBOD.Username,
-                    });
-
-                    return salemans;
-                }
-                else
-                {
-                    var contracts = contractRepository.Get(contractExp);
-                    salemans = GetSysUserViewModelByContract(contracts);
-                }
-            }
-            else
-            {
-                var contracts = contractRepository.Get(contractExp);
-                if (contracts.Count() > 0)
-                {
-                    salemans = GetSysUserViewModelByContract(contracts);
-                }
-            }
-            return salemans;
-        }
-
-        private List<SysUserViewModel> GetSysUserViewModelByContract(IQueryable<CatContract> contracts)
-        {
-            List<SysUserViewModel> salemans = new List<SysUserViewModel>();
-            var salemansIds = contracts.Select(x => x.SaleManId).ToList();
-            var users = sysUserRepository.Get(x => salemansIds.Contains(x.Id));
-            var employees = sysEmployeeRepository.Get();
+                var salemansIds = contracts.Select(x => x.SaleManId).ToList();
+                var users = sysUserRepository.Get(x => salemansIds.Contains(x.Id));
+                var employees = sysEmployeeRepository.Get();
 
                 var userQ = from u in users
                             join em in employees on u.EmployeeId equals em.Id into emGrps
@@ -2553,7 +2519,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                 Username = u.Username,
                                 UserType = u.UserType
                             };
-                if(userQ.Count() > 0)
+                if (userQ.Count() > 0)
                 {
                     salemans = userQ.ToList();
                 }
