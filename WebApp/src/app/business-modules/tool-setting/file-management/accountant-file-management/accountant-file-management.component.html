@@ -22,7 +22,7 @@
             </ng-template>
             <div class="row">
                 <div class="col-md-12">
-                    <form-search-file-management (onSearch)="onSearchFile($event)" [tabType]="'fileAccManage'">
+                    <form-search-file-management (onSearch)="onSearchFile($event)" (onReset)="reset($event)" [tabType]="'fileAccManage'">
                     </form-search-file-management>
                 </div>
             </div>
