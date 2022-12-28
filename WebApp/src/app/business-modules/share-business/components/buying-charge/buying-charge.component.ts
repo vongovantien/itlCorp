@@ -967,9 +967,13 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getStandardCharge(type: CommonEnum.SurchargeTypeEnum | string = CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
-        // const chargeCodes: string[] = this.detectDefaultCode(this.serviceTypeId, type);
-        // this._catalogueRepo.getChargeByCodes(chargeCodes)
-        this._catalogueRepo.getStandChargeByType(type, this.serviceTypeId)
+        const criteria: IStandardChargeCriteria = {
+            type: this.TYPE,
+            transactionType: this.serviceTypeId,
+            service: this.serviceTypeId === 'CL' ? this.shipment.productService : null,
+            serviceType: this.serviceTypeId === 'CL' ? this.shipment.serviceMode : null,
+        }
+        this._catalogueRepo.getStandChargeByType(criteria)
             .pipe(catchError(this.catchError))
             .subscribe((charges: StandardCharge[]) => {
                 if (charges && !!charges.length) {
@@ -1050,15 +1054,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         switch (serviceTypeId) {
             case ChargeConstants.CL_CODE:
-                if (type === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
-                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
-                        c = this.updatePayer(c, coloaderPayer);
-                    });
-                } else {
-                    shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
-                        c = this.updatePayer(c, customerPayer);
-                    });
-                }
+                shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
+                    c = this.updatePayer(c, customerPayer);
+                });
                 break;
             case ChargeConstants.AE_CODE:
             case ChargeConstants.AI_CODE:
@@ -1600,4 +1598,11 @@ interface IRecentlyCharge {
     coloaderId: string; // * MBL
     chargeType: string; // * BUY/SELL/OBH
     jobId: string;
+}
+
+interface IStandardChargeCriteria {
+    type: string;
+    transactionType: string;
+    service: string;
+    serviceType: string;
 }
