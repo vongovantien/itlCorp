@@ -795,8 +795,7 @@ namespace eFMS.API.Documentation.DL.Services
             var shipmentsOpsPIC = operations.Where(x => x.BillingOpsId == userCurrent);
             //Merger Shipment Ops assign & PIC
             var shipmentsOpsMerge = from data in shipmentsOps.Union(shipmentsOpsPIC)
-                                    from sur in grpSur.DefaultIfEmpty()
-                                    join cus in customs on sur.ClearanceNo equals cus.ClearanceNo into grpCus
+                                    join cus in customs on data.JobNo equals cus.JobNo into grpCus
                                     from cus in grpCus.DefaultIfEmpty()
                                     select new Shipments
                                     {

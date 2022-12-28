@@ -1701,11 +1701,6 @@ namespace eFMS.API.Documentation.DL.Services
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_WRONG_SERVICE], item.ChargeCode);
                             item.IsValid = false;
                         }
-                        if (lookupcharges.FirstOrDefault().Offices != null && !(lookupcharges.FirstOrDefault().Offices.Contains(currentUser.OfficeID.ToString())))
-                        {
-                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_WRONG_OFFICE], item.ChargeCode, currentUser.OfficeCode);
-                            item.IsValid = false;
-                        }
                     }
                 }
 
