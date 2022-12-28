@@ -31,7 +31,8 @@ namespace eFMS.API.Setting.DL.Models.Criteria
         DebitSlip,
         CreditSlip,
         PurchasingNote,
-        OtherEntry
+        OtherEntry,
+        All
     }
     public enum DateMode
     {

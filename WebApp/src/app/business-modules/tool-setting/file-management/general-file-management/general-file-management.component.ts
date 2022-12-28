@@ -66,6 +66,12 @@ export class GeneralFileManagementComponent extends AppList implements OnInit {
         }
     }
 
+    reset(event: any) {
+        this.page = 1;
+        this.listFile.page = 1;
+        this.onSearchFile(event);
+    }
+
     ReloadEDoc() {
         this.onSearchFile(this.dataSearch);
     }

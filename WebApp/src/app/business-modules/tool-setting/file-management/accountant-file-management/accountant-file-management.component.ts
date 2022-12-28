@@ -42,6 +42,7 @@ export class AccountantFileManagementComponent extends AppList implements OnInit
                 catchError(this.catchError),
             ).subscribe(
                 (res: any) => {
+                    console.log(res.data);
                     this.edocFiles.data = res.data || [];
                     this.listFile.totalItems = res.totalItems;
                     this.listFile.page = res.page;
@@ -50,6 +51,11 @@ export class AccountantFileManagementComponent extends AppList implements OnInit
             );
     }
 
+    reset(event: any) {
+        this.page = 1;
+        this.listFile.page = 1;
+        this.onSearchFile(event);
+    }
 
     directToGeneral() {
         this._router.navigate([`${RoutingConstants.TOOL.FILE_MANAGMENT}/general`]);
