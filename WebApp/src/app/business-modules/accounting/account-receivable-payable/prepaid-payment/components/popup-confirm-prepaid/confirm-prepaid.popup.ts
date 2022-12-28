@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { ConfirmPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { PopupBase } from 'src/app/popup.base';
@@ -12,6 +12,9 @@ export class ARPrePaidPaymentConfirmPopupComponent extends PopupBase implements 
     @Output() onConfirm: EventEmitter<any> = new EventEmitter<any>();
 
     groupData: any[] = [];
+
+    sumAmountUSD: number = 0;
+    sumAmountVND: number = 0;
 
     constructor() {
         super();
@@ -37,14 +40,30 @@ export class ARPrePaidPaymentConfirmPopupComponent extends PopupBase implements 
 
     deletegroupItem(groupIndex: number) {
         this.groupData.splice(groupIndex, 1);
+        this.calculateTotalAmountAfterSelectItems();
+
         return;
     }
 
     deleteDebitnoteItem(groupIndex: number, itemIndex: number) {
         if (this.groupData[groupIndex].details.length === 1) {
             this.groupData.splice(groupIndex, 1);
+            this.calculateTotalAmountAfterSelectItems();
+
             return;
         }
         this.groupData[groupIndex].details.splice(itemIndex, 1);
+
+        this.calculateTotalAmountAfterSelectItems();
+
+    }
+
+    calculateTotalAmountAfterSelectItems() {
+        const flattenArr = this.utility.deepFlatten(this.groupData.map(x => x.details.map(x => x)));
+
+        this.sumAmountVND = 0;
+        this.sumAmountUSD = 0;
+        flattenArr.reduce((acc, curr) => this.sumAmountVND += curr.totalAmountVND, 0);
+        flattenArr.reduce((acc, curr) => this.sumAmountUSD += curr.totalAmountUSD, 0);
     }
 }
