@@ -445,10 +445,6 @@ namespace eFMS.API.Documentation.DL.Services
 
                 CatPartner customer = partnerRepository.Get(x => x.Id == details.CustomerId).FirstOrDefault();
                 details.CustomerName = customer?.ShortName;
-                details.CustomerAccountNo = customer?.AccountNo;
-
-                CatPlace place = placeRepository.Get(x => x.Id == details.ClearanceLocation).FirstOrDefault();
-                details.PlaceNameCode = place?.Code;
 
                 details.UserCreatedName = userRepository.Get(x => x.Id == details.UserCreated).FirstOrDefault()?.Username;
                 details.UserModifiedName = userRepository.Get(x => x.Id == details.UserModified).FirstOrDefault()?.Username;
@@ -598,6 +594,25 @@ namespace eFMS.API.Documentation.DL.Services
                 TotalCanceled = totalCanceled
             };
             return results;
+        }
+        private string GetClearanceNoOfShipment(string jobNo, IQueryable<CsShipmentSurcharge> surcharge, IQueryable<CustomsDeclaration> clearances)
+        {
+            var surchargeShipment = surcharge.Where(x => x.JobNo == jobNo);
+            var clearanceNos = surchargeShipment.Select(x => x.ClearanceNo).ToList();
+            var clearanceShipments = clearances.Where(x => x.JobNo == jobNo && clearanceNos.Contains(x.ClearanceNo))?.OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).ToList();
+            var clearanceShipment = clearanceShipments.FirstOrDefault();
+            if (clearanceShipments.Any(x => x.ConvertTime != null))
+            {
+                clearanceShipment = clearanceShipments.FirstOrDefault(x => x.ConvertTime != null);
+            }
+            if (surchargeShipment.Count() > 0 && clearanceShipment != null)
+            {
+                return clearanceShipment.ClearanceNo;
+            }
+            else
+            {
+                return clearances.Where(x => x.JobNo == jobNo)?.OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+            }
         }
         public bool CheckAllowDelete(Guid jobId)
         {

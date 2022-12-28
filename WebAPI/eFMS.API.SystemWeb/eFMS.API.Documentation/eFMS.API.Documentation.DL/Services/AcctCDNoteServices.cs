@@ -9,24 +9,24 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.Exports;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
-using eFMS.API.Documentation.Service.ViewModels;
-using System.Data.SqlClient;
-using System.Data;
-using eFMS.API.Documentation.Service.Contexts;
-using ITL.NetCore.Connection;
-using Microsoft.Extensions.Options;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -327,8 +327,8 @@ namespace eFMS.API.Documentation.DL.Services
                     _partnerAcRef = _partner;
                 }
                 var _transactionType = GetTransactionType(model.TransactionTypeEnum);
-                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) 
-                && x.OfficeId.Contains(currentUser.OfficeID.ToString()) 
+                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty)
+                && x.OfficeId.Contains(currentUser.OfficeID.ToString())
                 && x.SaleManId == (model.SalemanId != null ? model.SalemanId : x.SaleManId)
                 && x.SaleService.Contains(_transactionType)).FirstOrDefault();
 
@@ -358,7 +358,7 @@ namespace eFMS.API.Documentation.DL.Services
                             model.Status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
                         }
 
-                        if(model.Status == "New")
+                        if (model.Status == "New")
                         {
                             _customerId = chargeFirst.PaymentObjectId;
                             model.Status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
@@ -383,7 +383,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
 
-                        if(!hasPrepaid)
+                        if (!hasPrepaid)
                         {
                             foreach (var item in dataGrpPartners)
                             {
@@ -681,34 +681,34 @@ namespace eFMS.API.Documentation.DL.Services
                         //[9/11/2021][Cho update phí cập nhật lại tỷ giá]
                         //if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
                         //{
-                            //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
-                            charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
+                        //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
+                        charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
 
-                            if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
-                            {
-                                charge.FinalExchangeRate = cdNote.ExcRateUsdToLocal;
-                            }
-                            else if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                charge.FinalExchangeRate = 1;
-                            }
-                            else
-                            {
-                                charge.FinalExchangeRate = null;
-                            }
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                        {
+                            charge.FinalExchangeRate = cdNote.ExcRateUsdToLocal;
+                        }
+                        else if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            charge.FinalExchangeRate = 1;
+                        }
+                        else
+                        {
+                            charge.FinalExchangeRate = null;
+                        }
 
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
-                            charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                            charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                            charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                            charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                            charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                            charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                            charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                        //}
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
+                        charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                        charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                        charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                        charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                        charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                        charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                        charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                                                                            //}
 
 
-                 
+
 
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = currentUser.UserID;
@@ -1687,7 +1687,6 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (data != null)
             {
-                int i = 1;
                 foreach (var item in data.ListSurcharges)
                 {
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
@@ -2185,8 +2184,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaDebitAgentsNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(format);
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = data.CDNote.Code + CrystalEx.GetExtension(format);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
@@ -2257,11 +2256,6 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.UnitPriceStr = (_unitPrice + _decimalNumber).ToString(); //cộng thêm phần thập phân
                     //Giá trị thực tế VAT (% VAT hoặc số tiền tuyệt đối)
                     charge.VAT = Math.Abs(item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
-
-                    //Amount trước thuế
-                    // decimal _netAmount = _unitPrice * item.Quantity;
-                    //Tiền thuế (nếu có)
-                    decimal _taxMoney = 0;
                     //if (isOriginCurr)
                     //{
                     //    _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
@@ -3702,6 +3696,7 @@ namespace eFMS.API.Documentation.DL.Services
             IQueryable<CsShipmentSurcharge> surcharges = null;
             var surchargesCDNote = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.CreditNo)) && (x.PayerId == cdNotePartnerId || x.PaymentObjectId == cdNotePartnerId) && billingCodes.Any(a => a == x.CreditNo || a == x.DebitNo)).AsQueryable(); // lấy surcharge issued cdnote
             var surchargesSoa = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.DebitNo) && !string.IsNullOrEmpty(x.CreditNo) && (x.PayerId == cdNotePartnerId || x.PaymentObjectId == cdNotePartnerId) && billingCodes.Any(a => a == x.Soano || a == x.PaySoano)).AsQueryable(); // lấy surcharge chỉ issued soa
+
             surcharges = surchargesCDNote;
             if (surchargesCDNote == null || surchargesCDNote.Count() == 0)
             {

@@ -27,7 +27,5 @@ namespace eFMS.API.Documentation.DL.Models
         public string SalesmanName { get; set; }
         public string DepartmentName { get; set; }
         public string GroupName { get; set; }
-        public string PlaceNameCode { get; set; }
-        public string CustomerAccountNo { get; set; }
     }
 }
