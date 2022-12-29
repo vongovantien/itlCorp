@@ -29,6 +29,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctSettlementPayment> settleRepo;
         private readonly IContextBase<SysAttachFileTemplate> attachRepo;
         private readonly IContextBase<AcctAdvancePayment> advRepo;
+        private readonly ICurrentUser currentUser;
         public EDocService(
             IContextBase<SysImageDetail> repository,
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepository,
@@ -40,6 +41,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctSettlementPayment> settleRepository,
             IContextBase<SysAttachFileTemplate> attachRepository,
             IContextBase<AcctAdvancePayment> advRepository,
+            ICurrentUser currentUserRepo,
         IMapper mapper) : base(repository, mapper)
         {
             acctApproveSettlementRepo = acctApproveSettlementRepository;
@@ -51,6 +53,7 @@ namespace eFMS.API.Accounting.DL.Services
             settleRepo = settleRepository;
             attachRepo = attachRepository;
             advRepo = advRepository;
+            currentUser = currentUserRepo;
         }
 
         public async Task<HandleState> GenerateEdocSettlement(CreateUpdateSettlementModel model)
@@ -217,49 +220,117 @@ namespace eFMS.API.Accounting.DL.Services
             return jobCs.FirstOrDefault().Id;
         }
 
-        public async Task<HandleState> GenerateEdocFromAdvacneToSettle(string SettleNo)
+        //public async Task<HandleState> GenerateEdocFromAdvacneToSettle(string SettleNo)
+        //{
+        //    HandleState result = new HandleState();
+        //    var surcharge = await surchargetRepo.WhereAsync(x => x.SettlementCode == SettleNo);
+        //    var charges = surcharge.Select(x => new { advanceNo = x.AdvanceNo, transtype = x.TransactionType, jobNo = x.JobNo });
+        //    try
+        //    {
+        //        charges.ToList().ForEach(async x =>
+        //        {
+        //            if (advRepo.GetAsync(z => z.SyncStatus == "Synced" && z.AdvanceNo == x.advanceNo) != null)
+        //            {
+        //                var edocSMDefault = await DataContext.GetAsync(z => z.BillingNo == SettleNo);
+        //                var edocSMIds = edocSMDefault.Select(z => z.SysImageId);
+        //                var edocADV =  DataContext.Get(z => x.advanceNo == z.BillingNo && z.BillingType == "Advance"&& !edocSMIds.Contains(z.SysImageId));
+        //                var docType = attachRepo.Get(y => y.Code == "AD-SM" && y.TransactionType == x.transtype);
+        //                var edocSMs = new List<SysImageDetail>();
+        //                edocADV.ToList().ForEach(async edocAD =>
+        //                {
+        //                    var edocSM = edocAD;
+        //                    edocSM.Id = Guid.NewGuid();
+        //                    edocSM.Source = "Settlement";
+        //                    edocSM.BillingNo = SettleNo;
+        //                    edocSM.BillingType = "Settlement";
+        //                    edocSM.SystemFileName = edocSM.SystemFileName.Replace("AD_", "SM_");
+        //                    edocSM.DocumentTypeId = docType.FirstOrDefault().Id;
+        //                    edocSM.JobId = GetJobId(x.jobNo, x.transtype);
+        //                    edocSMs.Add(edocSM);
+        //                });
+        //                await DataContext.AddAsync(edocSMs, false);
+        //            }
+        //        });
+
+        //        HandleState hs = DataContext.SubmitChanges();
+        //        if (hs.Success)
+        //        {
+        //            return hs;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new HandleState((object)ex.Message);
+        //    }
+        //    return result;
+        //}
+        public async Task<HandleState> GenerateEdocFromAdvacneToSettle(string settleNo)
         {
-            HandleState result = new HandleState();
-            var surcharge = await surchargetRepo.WhereAsync(x => x.SettlementCode == SettleNo);
-            var charges = surcharge.Select(x => new { advanceNo = x.AdvanceNo, transtype = x.TransactionType, jobNo = x.JobNo });
             try
             {
-                charges.ToList().ForEach(async x =>
+                var charge = surchargetRepo.Get(x => x.SettlementCode == settleNo && x.AdvanceNo != null);
+                var jobSettle = charge.Select(x => new { jobNo = x.JobNo, tranType = x.TransactionType, advNo = x.AdvanceNo });
+                var edocs = new List<SysImageDetail>();
+                jobSettle.ToList().ForEach(async x =>
                 {
-                    if (advRepo.GetAsync(z => z.SyncStatus == "Synced" && z.AdvanceNo == x.advanceNo) != null)
+                    var adv =  advRepo.Get(z => z.AdvanceNo == x.advNo);
+                    var advId = adv.FirstOrDefault().Id.ToString();
+                    var images =  sysImageRepo.Get(z => advId == z.ObjectId && z.SyncStatus == "Synced" && z.Folder == "Advance");
+                    var img = images.FirstOrDefault();
+                    var tranType =  attachRepo.Get(z => z.TransactionType == x.tranType && z.Code == "AD-SM");
+                    var tranTypeId = tranType.FirstOrDefault().Id;
+                    var edocExist =  DataContext.Get(z => z.SysImageId == img.Id && z.BillingNo == settleNo && z.Source == "Settlement");
+                    if (edocExist.Count() == 0)
                     {
-                        var edocSMDefault = await DataContext.GetAsync(z => z.BillingNo == SettleNo);
-                        var edocSMIds = edocSMDefault.Select(z => z.SysImageId);
-                        var edocADV =  DataContext.Get(z => x.advanceNo == z.BillingNo && z.BillingType == "Advance"&& !edocSMIds.Contains(z.SysImageId));
-                        var docType = attachRepo.Get(y => y.Code == "AD-SM" && y.TransactionType == x.transtype);
-                        var edocSMs = new List<SysImageDetail>();
-                        edocADV.ToList().ForEach(async edocAD =>
+                        var edoc = new SysImageDetail()
                         {
-                            var edocSM = edocAD;
-                            edocSM.Id = Guid.NewGuid();
-                            edocSM.Source = "Settlement";
-                            edocSM.BillingNo = SettleNo;
-                            edocSM.BillingType = "Settlement";
-                            edocSM.SystemFileName = edocSM.SystemFileName.Replace("AD_", "SM_");
-                            edocSM.DocumentTypeId = docType.FirstOrDefault().Id;
-                            edocSM.JobId = GetJobId(x.jobNo, x.transtype);
-                            edocSMs.Add(edocSM);
-                        });
-                        await DataContext.AddAsync(edocSMs, false);
+                            Id = Guid.NewGuid(),
+                            BillingNo = settleNo,
+                            BillingType = "Settlement",
+                            DatetimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            DepartmentId = currentUser.DepartmentId,
+                            ExpiredDate = null,
+                            GroupId = currentUser.GroupId,
+                            DocumentTypeId = tranTypeId,
+                            JobId = getJobId(x.jobNo, x.tranType).Result,
+                            SysImageId = img.Id,
+                            SystemFileName = img.Name,
+                            UserFileName = img.Name,
+                            UserCreated = currentUser.UserName,
+                            UserModified = currentUser.UserName,
+                            OfficeId = currentUser.OfficeID,
+                            Source = "Settlement",
+                            Hblid = null,
+                            Note = null
+                        };
+                        edocs.Add(edoc);
                     }
                 });
-
-                HandleState hs = DataContext.SubmitChanges();
+                DataContext.Add(edocs,false);
+                var hs= DataContext.SubmitChanges();
                 if (hs.Success)
                 {
-                    return hs;
+                    return new HandleState(hs.Success,hs.Message);
                 }
+                return new HandleState("Something Wrong");
             }
             catch (Exception ex)
             {
-                return new HandleState((object)ex.Message);
+                return new HandleState(ex.Message);
             }
-            return result;
         }
+
+        private async Task<Guid> getJobId(string jobNo,string trantype)
+        {
+            if (trantype == "CL")
+            {
+                var ops = await opsTranRepo.GetAsync(x => x.JobNo == jobNo);
+                return ops.FirstOrDefault().Id;
+            }
+            var cs = await csTranRepo.GetAsync(x => x.JobNo == jobNo);
+            return cs.FirstOrDefault().Id;
+        }
+
     }
 }

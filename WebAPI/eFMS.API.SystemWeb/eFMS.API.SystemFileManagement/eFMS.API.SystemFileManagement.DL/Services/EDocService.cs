@@ -1194,7 +1194,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return template;
         }
 
-        private async Task<List<SysImage>> UpLoadS3(FileUploadModel model)
+        private async Task<List<SysImage>> UpLoadS3(FileUploadModel model,bool isSync)
         {
             var urlImage = "";
             List<SysImage> list = new List<SysImage>();
@@ -1233,7 +1233,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         DateTimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now,
                         ChildId = model.Child,
-                        KeyS3 = key
+                        KeyS3 = key,
+                        SyncStatus=isSync==true?"Synced":""
                     };
                     list.Add(sysImage);
                 }
@@ -1246,7 +1247,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             try
             {
-                List<SysImage> imageList = await UpLoadS3(model);
+                List<SysImage> imageList = await UpLoadS3(model,false);
                 HandleState result = new HandleState();
                 if (imageList.Count > 0)
                 {
@@ -1321,7 +1322,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         public async Task<string> PostAttachFileTemplateToEDoc(FileUploadModel model)
         {
             var urlImage = "";
-            List<SysImage> imageList = await UpLoadS3(model);
+            List<SysImage> imageList = await UpLoadS3(model,true);
             urlImage = imageList.FirstOrDefault()?.Url;
             if (imageList.Count > 0)
             {
@@ -1365,7 +1366,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = model.ObjectId,
                         ModuleName = model.Module
                     };
-                    List<SysImage> imageList = await UpLoadS3(UploadModel);
+                    List<SysImage> imageList = await UpLoadS3(UploadModel,false);
 
                     if (imageList.Count > 0)
                     {

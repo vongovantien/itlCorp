@@ -347,17 +347,5 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             window.history.back();
         }
     }
-
-    getFilesAdvance() {
-        this._accoutingRepo.genEdocFromAdvToSettle(this.settlementPayment.settlement.settlementNo)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    if (res.status) {
-                        this.attachList.getEDoc('Settlement');
-                    }
-                },
-            );
-    }
 }
 

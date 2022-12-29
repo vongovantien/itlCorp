@@ -1170,7 +1170,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             HandleState hs = _eDocService.GenerateEdocFromAdvacneToSettle(SettleNo).Result;
             string message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value};
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
