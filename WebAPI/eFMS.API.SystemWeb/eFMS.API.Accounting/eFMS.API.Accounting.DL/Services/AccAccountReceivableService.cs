@@ -1388,13 +1388,14 @@ namespace eFMS.API.Accounting.DL.Services
                     var invoiceData = contractModel.PaymentTermChanged.Contains("DEBIT") ? accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId &&
                                              (!string.IsNullOrEmpty(x.ServiceType) && contractModel.SaleService.Contains(x.ServiceType.ToLower())) &&
                                             (x.OfficeId != null && contractModel.OfficeId.Contains(x.OfficeId.ToString().ToLower())) &&
-                                            x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).ToList()
+                                            x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
+                                            && x.SalesmanId == contractModel.SaleManId).ToList()
                                             : new List<AccAccountingManagement>();
                     if (contractModel.PaymentTermChanged.Contains("OBH"))
                     {
                         var acctOBH = accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId && contractModel.SaleService.Contains(x.ServiceType.ToLower()) &&
                                                  contractModel.OfficeId.ToLower().Contains(x.OfficeId.ToString().ToLower()) &&
-                                                 x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
+                                                 x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && x.SalesmanId == contractModel.SaleManId);
                         if (acctOBH.Count() > 0)
                         {
                             var surcharges = surchargeRepo.Get(x => x.AcctManagementId != null && x.PaymentObjectId == contractModel.PartnerId);
