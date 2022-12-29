@@ -1383,24 +1383,26 @@ namespace eFMS.API.Operation.DL.Services
             return new List<CustomsDeclarationModel>();
         }
 
-        public bool CheckAllowUpdate(Guid? jobId)
+        public bool CheckAllowUpdate(Guid? jobId, List<string> clearanceNos)
         {
             var detail = opsTransactionRepo.Get(x => x.Id == jobId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
             var query = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Hblid &&
-                          (!string.IsNullOrEmpty(x.CreditNo)
+            (!string.IsNullOrEmpty(x.CreditNo)
                           || !string.IsNullOrEmpty(x.DebitNo)
                           || !string.IsNullOrEmpty(x.Soano)
                           || !string.IsNullOrEmpty(x.PaymentRefNo)
                           || !string.IsNullOrEmpty(x.AdvanceNo)
                           || !string.IsNullOrEmpty(x.VoucherId)
+
                           || !string.IsNullOrEmpty(x.PaySoano)
                           || !string.IsNullOrEmpty(x.SettlementCode)
-                          || !string.IsNullOrEmpty(x.SyncedFrom))
-                          );
-            if (query.Any() || accAdvanceRequestRepository.Any(x => x.JobId == detail.JobNo))
+                          || !string.IsNullOrEmpty(x.SyncedFrom))).Select(x => x.ClearanceNo);
+            var cleanceNoRequet = accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo && !string.IsNullOrEmpty(y.CustomNo)).Select(x => x.CustomNo).ToList();
+            if (clearanceNos.Any(x => query.Any(y => y == x) || cleanceNoRequet.Any(z => z == x)))
             {
                 return false;
             }
+
             return true;
         }
 

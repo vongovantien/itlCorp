@@ -44,7 +44,9 @@ export class CustomClearanceAddNewModalComponent extends PopupBase implements On
     }
 
     setFormValue(data: OpsTransaction) {
+        console.log(data)
         this.detailComponent.customerName = data.customerName;
+        console.log(this.detailComponent.customerName)
         this.detailComponent.formGroup.patchValue({
             partnerTaxCode: data.customerAccountNo,
             gateway: data.placeNameCode,
@@ -89,6 +91,7 @@ export class CustomClearanceAddNewModalComponent extends PopupBase implements On
     closePopUpAddNew() {
         this.detailComponent.formGroup.reset();
         this.isCloseModal.emit(true)
+        this.hide()
     }
 
 }

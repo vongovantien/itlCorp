@@ -299,7 +299,7 @@ namespace eFMS.API.Operation.Controllers
         {
             if (clearances.Any(x => x.isDelete == true))
             {
-                if (customsDeclarationService.CheckAllowUpdate(clearances.Select(t => t.jobId).FirstOrDefault()) == false)
+                if (customsDeclarationService.CheckAllowUpdate(clearances.Select(t => t.jobId).FirstOrDefault(), clearances.Select(x => x.ClearanceNo).ToList()) == false)
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[OperationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
                 }
