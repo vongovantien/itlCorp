@@ -106,82 +106,149 @@ namespace eFMS.API.ForPartner.DL.Service
                                             && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE
                                             && x.TransactionType != ForPartnerConstants.TYPE_DEBIT
                                             && x.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE).ToList();
-                    voucherDetail.ToList().ForEach(x => x.TransactionType = x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) ? ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT : x.TransactionType);
-                    var billingNo = GetBillingNameFromId(model.DocID, model.DocCode, model.DocType);
-                    // Update TransactionType without charge mode
-
-                    // Get surcharges info => comment use case hd có tiền âm
-                    //var listCharges = model.Details.Select(x => x.ChargeId).ToList();
-                    //var sucharges = surchargeRepository.Get(x => listCharges.Any(chg => chg == x.Id));
-
-                    if (paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_BANK.ToLower()
-                        || paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_CASH.ToLower())
+                    if (voucherDetail.Count > 0)
                     {
-                        if (voucherDetail.Any(z => string.IsNullOrEmpty(z.BravoRefNo)))
+                        voucherDetail.ForEach(x => x.TransactionType = x.TransactionType.Contains(ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT) ? ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT : x.TransactionType);
+                        var billingNo = GetBillingNameFromId(model.DocID, model.DocCode, model.DocType);
+                        // Update TransactionType without charge mode
+
+                        // Get surcharges info => comment use case hd có tiền âm
+                        //var listCharges = model.Details.Select(x => x.ChargeId).ToList();
+                        //var sucharges = surchargeRepository.Get(x => listCharges.Any(chg => chg == x.Id));
+
+                        if (paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_BANK.ToLower()
+                            || paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_CASH.ToLower())
                         {
-                            // Bank Transfer/Cash và không có số ref sẽ ghi nhận công nợ => Paid
-                            var noneRefNoVoucherDetail = voucherDetail.Where(z => string.IsNullOrEmpty(z.BravoRefNo));
-                            var grpVoucherDetail = noneRefNoVoucherDetail.GroupBy(z => new { z.VoucherNo, z.VoucherDate }).Select(z => z).ToList();
-                            grpVoucherDetail.ForEach(c =>
+                            if (voucherDetail.Any(z => string.IsNullOrEmpty(z.BravoRefNo)))
                             {
+                                // Bank Transfer/Cash và không có số ref sẽ ghi nhận công nợ => Paid
+                                var noneRefNoVoucherDetail = voucherDetail.Where(z => string.IsNullOrEmpty(z.BravoRefNo));
+                                var grpVoucherDetail = noneRefNoVoucherDetail.GroupBy(z => new { z.VoucherNo, z.VoucherDate }).Select(z => z).ToList();
+                                grpVoucherDetail.ForEach(c =>
+                                {
                                 //var giamValue = sucharges.Where(x => x.Id == c.FirstOrDefault().ChargeId).FirstOrDefault().UnitPrice < 0 ? (-1) : 1;
                                 var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
-                                AccAccountPayable payable = new AccAccountPayable
-                                {
-                                    Id = Guid.NewGuid(),
-                                    Currency = c.FirstOrDefault().Currency,
-                                    PartnerId = customer?.Id,
-                                    PaymentAmount = 0,
-                                    PaymentAmountVnd = 0,
-                                    PaymentAmountUsd = 0,
-                                    RemainAmount = 0,
-                                    RemainAmountVnd = 0,
-                                    RemainAmountUsd = 0,
-                                    TotalAmountVnd = c.Sum(pa => pa.VatAmountVnd + pa.AmountVnd), // * giamValue,
+                                    AccAccountPayable payable = new AccAccountPayable
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Currency = c.FirstOrDefault().Currency,
+                                        PartnerId = customer?.Id,
+                                        PaymentAmount = 0,
+                                        PaymentAmountVnd = 0,
+                                        PaymentAmountUsd = 0,
+                                        RemainAmount = 0,
+                                        RemainAmountVnd = 0,
+                                        RemainAmountUsd = 0,
+                                        TotalAmountVnd = c.Sum(pa => pa.VatAmountVnd + pa.AmountVnd), // * giamValue,
                                     TotalAmountUsd = c.Sum(pa => pa.VatAmountUsd + pa.AmountUsd), // * giamValue,
                                     ReferenceNo = c.FirstOrDefault().BravoRefNo,
-                                    Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID,
-                                    CompanyId = currentUser.CompanyID,
-                                    OfficeId = office.Id,
-                                    GroupId = currentUser.GroupId,
-                                    DepartmentId = currentUser.DepartmentId,
-                                    TransactionType = c.FirstOrDefault().TransactionType,
-                                    VoucherNo = c.FirstOrDefault().VoucherNo,
-                                    BillingNo = billingNo,
-                                    BillingType = model.DocType,
-                                    ExchangeRate = c.FirstOrDefault().ExchangeRate,
-                                    PaymentTerm = c.FirstOrDefault().PaymentTerm,
-                                    VoucherDate = c.FirstOrDefault().VoucherDate,
-                                    PaymentDueDate = c.FirstOrDefault().VoucherDate?.AddDays((double)(c.FirstOrDefault().PaymentTerm)),
-                                    InvoiceNo = c.FirstOrDefault().InvoiceNo,
-                                    InvoiceDate = c.FirstOrDefault().InvoiceDate,
-                                    Over16To30Day = 0,
-                                    Over1To15Day = 0,
-                                    Over30Day = 0,
-                                    UserCreated = currentUser.UserID,
-                                    DatetimeCreated = DateTime.Now,
-                                    UserModified = currentUser.UserID,
-                                    DatetimeModified = DateTime.Now,
-                                    Description = c.FirstOrDefault().Description,
-                                    AcctManagementId = acctId
-                                };
-                                payables.Add(payable);
-                            });
-                            foreach (var item in payables)
-                            {
-                                item.TotalAmount = item.PaymentAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
+                                        Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_PAID,
+                                        CompanyId = currentUser.CompanyID,
+                                        OfficeId = office.Id,
+                                        GroupId = currentUser.GroupId,
+                                        DepartmentId = currentUser.DepartmentId,
+                                        TransactionType = c.FirstOrDefault().TransactionType,
+                                        VoucherNo = c.FirstOrDefault().VoucherNo,
+                                        BillingNo = billingNo,
+                                        BillingType = model.DocType,
+                                        ExchangeRate = c.FirstOrDefault().ExchangeRate,
+                                        PaymentTerm = c.FirstOrDefault().PaymentTerm,
+                                        VoucherDate = c.FirstOrDefault().VoucherDate,
+                                        PaymentDueDate = c.FirstOrDefault().VoucherDate?.AddDays((double)(c.FirstOrDefault().PaymentTerm)),
+                                        InvoiceNo = c.FirstOrDefault().InvoiceNo,
+                                        InvoiceDate = c.FirstOrDefault().InvoiceDate,
+                                        Over16To30Day = 0,
+                                        Over1To15Day = 0,
+                                        Over30Day = 0,
+                                        UserCreated = currentUser.UserID,
+                                        DatetimeCreated = DateTime.Now,
+                                        UserModified = currentUser.UserID,
+                                        DatetimeModified = DateTime.Now,
+                                        Description = c.FirstOrDefault().Description,
+                                        AcctManagementId = acctId
+                                    };
+                                    payables.Add(payable);
+                                });
+                                foreach (var item in payables)
+                                {
+                                    item.TotalAmount = item.PaymentAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
 
-                                item.PaymentAmountVnd = item.TotalAmountVnd;
-                                item.PaymentAmountUsd = item.TotalAmountUsd;
-                                await DataContext.AddAsync(item, false);
+                                    item.PaymentAmountVnd = item.TotalAmountVnd;
+                                    item.PaymentAmountUsd = item.TotalAmountUsd;
+                                    await DataContext.AddAsync(item, false);
+                                }
+                            }
+                            //else => TH có số bravo no
+                            {
+                                List<AccAccountPayable> payablesWithRefNo = new List<AccAccountPayable>();
+                                var grpVoucherDetail = voucherDetail.Where(z => !string.IsNullOrEmpty(z.BravoRefNo))
+                                                                    .GroupBy(x => new { x.VoucherNo, x.TransactionType, model.DocType, model.DocCode, x.BravoRefNo })
+                                                                    .Select(s => s).ToList();
+                                grpVoucherDetail.ForEach(c =>
+                                {
+                                    var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
+                                    AccAccountPayable payable = new AccAccountPayable
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Currency = c.FirstOrDefault().Currency,
+                                        PartnerId = customer?.Id,
+                                        PaymentAmount = 0,
+                                        PaymentAmountVnd = 0,
+                                        PaymentAmountUsd = 0,
+                                        RemainAmount = 0,
+                                        RemainAmountVnd = 0,
+                                        RemainAmountUsd = 0,
+                                        TotalAmountVnd = c.Sum(pa => pa.VatAmountVnd + pa.AmountVnd),
+                                        TotalAmountUsd = c.Sum(pa => pa.VatAmountUsd + pa.AmountUsd),
+                                        ReferenceNo = c.FirstOrDefault().BravoRefNo,
+                                        Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID,
+                                        CompanyId = currentUser.CompanyID,
+                                        OfficeId = office.Id,
+                                        GroupId = currentUser.GroupId,
+                                        DepartmentId = currentUser.DepartmentId,
+                                        TransactionType = c.FirstOrDefault().TransactionType,
+                                        VoucherNo = c.FirstOrDefault().VoucherNo,
+                                        BillingNo = billingNo,
+                                        BillingType = model.DocType,
+                                        ExchangeRate = c.FirstOrDefault().ExchangeRate,
+                                        PaymentTerm = c.FirstOrDefault().PaymentTerm,
+                                        VoucherDate = c.FirstOrDefault().VoucherDate,
+                                        PaymentDueDate = c.FirstOrDefault().VoucherDate?.AddDays((double)(c.FirstOrDefault().PaymentTerm)),
+                                        InvoiceNo = c.FirstOrDefault().InvoiceNo,
+                                        InvoiceDate = c.FirstOrDefault().InvoiceDate,
+                                        Over16To30Day = 0,
+                                        Over1To15Day = 0,
+                                        Over30Day = 0,
+                                        UserCreated = currentUser.UserID,
+                                        DatetimeCreated = DateTime.Now,
+                                        UserModified = currentUser.UserID,
+                                        DatetimeModified = DateTime.Now,
+                                        Description = c.FirstOrDefault().Description,
+                                        AcctManagementId = acctId
+                                    };
+
+                                    payablesWithRefNo.Add(payable);
+                                });
+                                foreach (var item in payablesWithRefNo)
+                                {
+                                    item.TotalAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
+                                    item.RemainAmount = item.TotalAmount;
+                                    item.RemainAmountVnd = item.TotalAmountVnd;
+                                    item.RemainAmountUsd = item.TotalAmountUsd;
+
+                                    await DataContext.AddAsync(item, false);
+                                }
                             }
                         }
-                        //else => TH có số bravo no
+                        else if (paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_OTHER.ToLower()
+                                || paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_NETOFF.ToLower())
                         {
-                            List<AccAccountPayable> payablesWithRefNo = new List<AccAccountPayable>();
-                            var grpVoucherDetail = voucherDetail.Where(z => !string.IsNullOrEmpty(z.BravoRefNo))
-                                                                .GroupBy(x => new { x.VoucherNo, x.TransactionType, model.DocType, model.DocCode, x.BravoRefNo })
-                                                                .Select(s => s).ToList();
+                            var invChargeIds = new List<Guid>();
+                            if (customer.PartnerMode == ForPartnerConstants.PARTNER_MODE_INTERNAL)
+                            {
+                                invChargeIds = catChargeRepository.Get(x => x.Mode == ForPartnerConstants.CHARGE_MODE_NINV).Select(x => x.Id).ToList();
+                            }
+                            var grpVoucherDetail = voucherDetail.Where(z => !invChargeIds.Any(chg => chg == z.ChargeId)).GroupBy(z => customer.PartnerMode == ForPartnerConstants.PARTNER_MODE_INTERNAL ? new { z.VoucherNo, z.VoucherDate, z.BravoRefNo } : new { VoucherNo = string.Empty, VoucherDate = (DateTime?)null, z.BravoRefNo }).Select(z => z).ToList();
                             grpVoucherDetail.ForEach(c =>
                             {
                                 var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
@@ -224,87 +291,23 @@ namespace eFMS.API.ForPartner.DL.Service
                                     Description = c.FirstOrDefault().Description,
                                     AcctManagementId = acctId
                                 };
-
-                                payablesWithRefNo.Add(payable);
+                                payables.Add(payable);
                             });
-                            foreach (var item in payablesWithRefNo)
+                            foreach (var item in payables)
                             {
                                 item.TotalAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
-                                item.RemainAmount = item.TotalAmount;
+                                item.RemainAmount = item.TotalAmount; ;
                                 item.RemainAmountVnd = item.TotalAmountVnd;
                                 item.RemainAmountUsd = item.TotalAmountUsd;
 
                                 await DataContext.AddAsync(item, false);
                             }
                         }
-                    }
-                    else if (paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_OTHER.ToLower()
-                            || paymentMethod.ToLower() == ForPartnerConstants.PAYMENT_METHOD_NETOFF.ToLower())
-                    {
-                        var invChargeIds = new List<Guid>();
-                        if (customer.PartnerMode == ForPartnerConstants.PARTNER_MODE_INTERNAL)
+                        hsAddPayable = DataContext.SubmitChanges();
+                        if (hsAddPayable.Success)
                         {
-                            invChargeIds = catChargeRepository.Get(x => x.Mode == ForPartnerConstants.CHARGE_MODE_NINV).Select(x => x.Id).ToList();
+                            trans.Commit();
                         }
-                        var grpVoucherDetail = voucherDetail.Where(z => !invChargeIds.Any(chg => chg == z.ChargeId)).GroupBy(z => customer.PartnerMode == ForPartnerConstants.PARTNER_MODE_INTERNAL ? new { z.VoucherNo, z.VoucherDate, z.BravoRefNo } : new { VoucherNo = string.Empty, VoucherDate = (DateTime?)null, z.BravoRefNo }).Select(z => z).ToList();
-                        grpVoucherDetail.ForEach(c =>
-                        {
-                            var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
-                            AccAccountPayable payable = new AccAccountPayable
-                            {
-                                Id = Guid.NewGuid(),
-                                Currency = c.FirstOrDefault().Currency,
-                                PartnerId = customer?.Id,
-                                PaymentAmount = 0,
-                                PaymentAmountVnd = 0,
-                                PaymentAmountUsd = 0,
-                                RemainAmount = 0,
-                                RemainAmountVnd = 0,
-                                RemainAmountUsd = 0,
-                                TotalAmountVnd = c.Sum(pa => pa.VatAmountVnd + pa.AmountVnd),
-                                TotalAmountUsd = c.Sum(pa => pa.VatAmountUsd + pa.AmountUsd),
-                                ReferenceNo = c.FirstOrDefault().BravoRefNo,
-                                Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID,
-                                CompanyId = currentUser.CompanyID,
-                                OfficeId = office.Id,
-                                GroupId = currentUser.GroupId,
-                                DepartmentId = currentUser.DepartmentId,
-                                TransactionType = c.FirstOrDefault().TransactionType,
-                                VoucherNo = c.FirstOrDefault().VoucherNo,
-                                BillingNo = billingNo,
-                                BillingType = model.DocType,
-                                ExchangeRate = c.FirstOrDefault().ExchangeRate,
-                                PaymentTerm = c.FirstOrDefault().PaymentTerm,
-                                VoucherDate = c.FirstOrDefault().VoucherDate,
-                                PaymentDueDate = c.FirstOrDefault().VoucherDate?.AddDays((double)(c.FirstOrDefault().PaymentTerm)),
-                                InvoiceNo = c.FirstOrDefault().InvoiceNo,
-                                InvoiceDate = c.FirstOrDefault().InvoiceDate,
-                                Over16To30Day = 0,
-                                Over1To15Day = 0,
-                                Over30Day = 0,
-                                UserCreated = currentUser.UserID,
-                                DatetimeCreated = DateTime.Now,
-                                UserModified = currentUser.UserID,
-                                DatetimeModified = DateTime.Now,
-                                Description = c.FirstOrDefault().Description,
-                                AcctManagementId = acctId
-                            };
-                            payables.Add(payable);
-                        });
-                        foreach (var item in payables)
-                        {
-                            item.TotalAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
-                            item.RemainAmount = item.TotalAmount; ;
-                            item.RemainAmountVnd = item.TotalAmountVnd;
-                            item.RemainAmountUsd = item.TotalAmountUsd;
-
-                            await DataContext.AddAsync(item, false);
-                        }
-                    }
-                    hsAddPayable = DataContext.SubmitChanges();
-                    if (hsAddPayable.Success)
-                    {
-                        trans.Commit();
                     }
                     return hsAddPayable;
                 }
