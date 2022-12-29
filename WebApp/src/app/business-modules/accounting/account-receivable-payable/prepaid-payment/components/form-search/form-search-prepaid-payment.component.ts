@@ -7,7 +7,7 @@ import { Department, Office, Partner, User } from '@models';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { getCurrentUserState, IAppState } from '@store';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { map, startWith, switchMap, takeUntil, filter, tap } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 
@@ -27,8 +27,8 @@ export class ARPrePaidPaymentFormSearchComponent extends AppForm implements OnIn
 
     partners: Observable<Partner[]>;
     salesmans: Observable<User[]>;
-    departments: Observable<any>;
-    offices: Observable<Office[]>;
+    departments: Department[];
+    offices: Office[];
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
@@ -65,21 +65,34 @@ export class ARPrePaidPaymentFormSearchComponent extends AppForm implements OnIn
 
         this.partners = this._catalogue.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER]);
         this.salesmans = this._systemRepo.getListSystemUser();
-        this.departments = this._systemRepo.getDepartment(null, null, { active: true });
-        this.offices = this._store.select(getCurrentUserState)
+
+        this._store.select(getCurrentUserState)
             .pipe(
                 filter((c: any) => !!c.userName),
-                tap((c) => this.currentUser = c),
+                tap((c) => {
+                    this.currentUser = c;
+                    this.form.controls['office'].setValue(this.currentUser.officeId);
+                }),
                 switchMap((currentUser: SystemInterface.IClaimUser | any) => {
                     if (!!currentUser.userName) {
-                        return this._systemRepo.getOfficePermission(currentUser.id, currentUser.companyId)
-                            .pipe(startWith([]))
+                        return forkJoin([
+                            this._systemRepo.getOfficePermission(currentUser.id, currentUser.companyId),
+                            this._systemRepo.getDepartment(null, null, { active: true })
+                        ]).pipe(startWith([]))
                     }
                 }),
-                tap((o) => { this.form.controls['office'].setValue(this.currentUser.officeId) }),
                 takeUntil(this.ngUnsubscribe),
             )
+            .subscribe(
+                (data: any[
 
+                ]) => {
+                    this.offices = data[0] || [];
+
+                    const officeIds = this.offices.map(x => x.id);
+                    this.departments = (data[1] || []).filter(x => officeIds.includes(x.branchId));
+                }
+            )
     }
 
     onSubmit() {

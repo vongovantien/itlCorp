@@ -1,15 +1,16 @@
-import { G, T } from '@angular/cdk/keycodes';
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmPopupComponent, ReportPreviewComponent } from '@common';
 import { AccountingConstants } from '@constants';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';
+import { Store } from '@ngrx/store';
 import { AccountingRepo, DocumentationRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
+import { getCurrentUserState, IAppState } from '@store';
 import _groupBy from 'lodash/groupBy';
 import { ToastrService } from 'ngx-toastr';
-import { concatMap, finalize, switchMap } from 'rxjs/operators';
+import { concatMap, finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { ARPrePaidPaymentConfirmPopupComponent } from './components/popup-confirm-prepaid/confirm-prepaid.popup';
 
@@ -34,8 +35,7 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
         private readonly _toast: ToastrService,
         private readonly _documentationRepo: DocumentationRepo,
         private readonly _export: ExportRepo,
-        private readonly _cd: ChangeDetectorRef
-
+        private readonly _store: Store<IAppState>
 
     ) {
         super();
@@ -59,10 +59,20 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
             { title: 'Issue Date', field: 'datetimeCreated', sortable: true },
             { title: 'Salesman', field: 'salesmanName', sortable: true },
         ];
-        this.dataSearch = {
-            keywords: []
-        }
-        this.getPaging();
+        this._store.select(getCurrentUserState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (data: SystemInterface.IClaimUser) => {
+                    if (!!data.userName) {
+                        this.dataSearch = {
+                            keywords: [],
+                            officeId: data.officeId
+                        };
+                        this.getPaging();
+                    }
+                }
+            )
+
     }
 
     getPaging() {
