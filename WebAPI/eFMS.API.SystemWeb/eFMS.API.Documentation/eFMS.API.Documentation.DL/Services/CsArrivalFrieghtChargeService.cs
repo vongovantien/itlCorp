@@ -997,9 +997,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 Consignee = "s",
                 No = "s",
-                CompanyName = companyUser?.BunameVn, //Company Name En of user
+                CompanyName = language == "EN" ? companyUser?.BunameEn : companyUser?.BunameVn, //Company Name En of user
                 CompanyDescription = "Company Description",
-                CompanyAddress1 = officeUser?.AddressVn, //Office Address En of user
+                CompanyAddress1 = language == "EN" ? officeUser?.AddressEn : officeUser?.AddressVn, //Office Address En of user
                 CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty), //Tel & Fax of Office user
                 Website = companyUser?.Website, //Website Company of user
                 MAWB = detail.Mawb?.ToUpper(),
