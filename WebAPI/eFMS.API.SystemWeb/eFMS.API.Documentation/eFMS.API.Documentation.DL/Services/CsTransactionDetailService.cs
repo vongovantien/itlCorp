@@ -2132,8 +2132,8 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = companyUser?.BunameVn, // Company Name Vn of user
-                CompanyAddress1 = officeUser?.AddressVn, // Office Address Vn of user
+                CompanyName = language == "EN" ? companyUser?.BunameEn : companyUser?.BunameVn, // Company Name Vn of user
+                CompanyAddress1 = language == "EN" ? officeUser?.AddressEn : officeUser?.AddressVn, // Office Address Vn of user
                 CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty), //Tel & Fax of Office user
                 Website = officeUser?.Taxcode, //(Sửa lại thành MST)
                 DecimalNo = 2,
@@ -2147,7 +2147,6 @@ namespace eFMS.API.Documentation.DL.Services
                 parameter.PrintMonth = data.DeliveryOrderPrintedDate.Value.Month.ToString();
                 parameter.PrintYear = data.DeliveryOrderPrintedDate.Value.Year.ToString();
             }
-
 
             result = new Crystal
             {
