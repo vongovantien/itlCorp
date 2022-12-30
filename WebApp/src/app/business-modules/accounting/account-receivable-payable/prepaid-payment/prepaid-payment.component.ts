@@ -66,7 +66,7 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
                     if (!!data.userName) {
                         this.dataSearch = {
                             keywords: [],
-                            officeId: data.officeId
+                            officeIds: [data.officeId]
                         };
                         this.getPaging();
                     }
