@@ -521,7 +521,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     getFilesAdvance() {
-        this._accoutingRepo.genEdocFromAdvToSettle(this.billingNo)
+        this._systemFileRepo.genEdocFromBilling(this.billingNo, this.typeFrom)
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {

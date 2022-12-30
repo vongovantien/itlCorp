@@ -12,6 +12,5 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> GenerateEdocSOA(AcctSoaModel model);
         Task<HandleState> GenerateEdocAdvance(AcctAdvancePaymentModel model);
         Task DeleteEdocByBillingNo(string billingNo);
-        Task<HandleState> GenerateEdocFromAdvacneToSettle(string SettleNo);
     }
 }

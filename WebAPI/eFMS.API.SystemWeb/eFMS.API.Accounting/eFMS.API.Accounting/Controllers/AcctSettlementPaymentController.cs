@@ -1164,19 +1164,5 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctSettlementPaymentService.CheckAllowDenySettle(ids);
             return Ok(result);
         }
-
-        [HttpGet("GenEdocFromAdvToSettle")]
-        public IActionResult GenEdocFromAdvToSettle(string SettleNo)
-        {
-            HandleState hs = _eDocService.GenerateEdocFromAdvacneToSettle(SettleNo).Result;
-            string message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
-            {
-                return BadRequest(result);
-            }
-
-            return Ok(result);
-        }
     }
 }
