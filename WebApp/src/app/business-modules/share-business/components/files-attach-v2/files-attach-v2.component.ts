@@ -520,8 +520,20 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
 
-    getFilesAdvance() {
-        this._systemFileRepo.genEdocFromBilling(this.billingNo, this.typeFrom)
+    genFileAdvToSM() {
+        this._systemFileRepo.genEdocFromBilling(this.billingNo, "Advance")
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this.getEDoc(this.transactionType);
+                    }
+                },
+            );
+    }
+
+    genFileSOAToSM() {
+        this._systemFileRepo.genEdocFromBilling(this.billingNo, "SOA")
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {

@@ -132,12 +132,26 @@
                                     </span>
                                 </span>
                             </button>
-                            <button type="button" class="btn btn-primary m-btn--icon m-btn--uppercase" (click)="getFilesAdvance()">
+                            <button type="button" class="btn btn-primary m-btn--icon m-btn--uppercase" [dpToggle]="dropdownMenu" position="bottomLeft"
+                            mode="dropdown">
                                 <span>
                                     <i class="la la-download"></i>
-                                    <span> Get Files Advance</span>
+                                    <span> Get Files</span>
                                 </span>
                             </button>
+                            <app-dropdown #dropdownMenu>
+                                <a class="dropdown-item pointer" (click)="genFileAdvToSM()">
+                                    <span>Get Files Advance</span>
+                                </a>
+                                <a class="dropdown-item pointer" (click)="genFileSOAToSM()">
+                                    <span>Get Files SOA</span>
+                                </a>
+                            </app-dropdown>
+                            <!-- <div class="btn-group" [autoClose]="!isClickSubMenu" dropdown container="body">
+                                <app-permission-button type="export" title="Get Files" [dpToggle]="dropdownMenu" position="bottomLeft"
+                                    mode="dropdown">
+                                </app-permission-button>
+                            </div> -->
                         </div>
                     </div>
                     <!-- <div class="c-button-actions" *ngIf="(typeFrom ==='Settlement' && !readonly)">
