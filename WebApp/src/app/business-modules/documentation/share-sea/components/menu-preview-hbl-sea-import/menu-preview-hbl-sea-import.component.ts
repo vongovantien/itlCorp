@@ -95,8 +95,9 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
         this.isClickSubMenu = false;
         this._toastService.clear();
         // Preview Delivery Order
-        if (type === 'DELIVERY_ORDER') {
-            this.previewDeliveryOrder();
+        if (type === 'DELIVERY_ORDER' || type === 'DELIVERY_ORDER_EN') {
+            const language = type === 'DELIVERY_ORDER_EN' ? 'EN': ''
+            this.previewDeliveryOrder(this.hblDetail.id, language);
         }
 
         // Preview Arrival Notice
@@ -177,10 +178,10 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
             );
     }
 
-    previewDeliveryOrder() {
+    previewDeliveryOrder(hblId: string, language: string) {
         this._documentationRepo.validateCheckPointContractPartner({
             partnerId: this.hblDetail.customerId,
-            hblId: this.hblDetail.id,
+            hblId: hblId,
             salesmanId: this.hblDetail.saleManId,
             settlementCode: null,
             transactionType: 'DOC',
@@ -189,7 +190,7 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
-                        return this._documentationRepo.previewDeliveryOrder(this.hblDetail.id);
+                        return this._documentationRepo.previewDeliveryOrder(hblId, language);
                     }
                     this._toastService.warning(res.message);
                     return of(false);
