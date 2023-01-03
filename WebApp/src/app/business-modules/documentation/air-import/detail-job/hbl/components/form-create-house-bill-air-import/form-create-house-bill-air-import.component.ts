@@ -13,7 +13,7 @@ import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
 import { DataService } from '@services';
 import { InfoPopupComponent } from '@common';
 
-import { takeUntil, catchError, skip, tap, mergeMap, shareReplay } from 'rxjs/operators';
+import { takeUntil, catchError, skip, tap, mergeMap, shareReplay, map, switchMap, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import cloneDeep from 'lodash/cloneDeep';
@@ -136,6 +136,14 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     ngOnInit(): void {
+        // this._store.select(getTransactionDetailCsTransactionState)
+        //     .pipe(catchError(this.catchError))
+        //     .subscribe(
+        //         (res: CsTransaction) => {
+        //             this.shipmentType = res.shipmentType;
+        //         }
+        //     );
+
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR }));
         this._store.dispatch(new GetCatalogueUnitAction({ active: true }));
         this._store.dispatch(new GetCatalogueWarehouseAction());
@@ -143,10 +151,18 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.initForm();
         this.getMasterData();
         this.incoterms = this._catalogueRepo.getIncoterm({ service: ['AI'] });
-
         if (!this.isUpdate) {
             this.getShipmentAndSetDefault();
         } else {
+            this._store.select(getDetailHBlState)
+            .pipe(catchError(this.catchError),
+                distinctUntilChanged(),
+                switchMap((shipment: any) => this._store.select(getTransactionDetailCsTransactionState))
+            ).subscribe((res: any) => {
+                this.shipmentType = res.shipmentType;
+                // console.log("useswitch map:", this.shipmentType);
+            }
+            );
             this.getDetailHBLState();
         }
     }
@@ -211,7 +227,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                         this.dateTimeModified = hbl.datetimeModified;
                         this.userCreated = hbl.userNameCreated;
                         this.userModified = hbl.userNameModified;
-
                         this.updateFormValue(hbl);
                     }
                 }
@@ -326,11 +341,10 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.incotermId = this.formCreate.controls['incotermId'];
         this.polDescription = this.formCreate.controls['polDescription'];
         this.podDescription = this.formCreate.controls['podDescription'];
-
     }
 
     onSelectDataFormInfo(data: any, type: string) {
-        console.log(data)
+        // console.log(data)
         switch (type) {
             case 'customer':
                 this._toaster.clear();
@@ -417,6 +431,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     }
 
     updateFormValue(data: HouseBill) {
+        // console.log('Shipment type:', this.shipmentType);
         const formValue = {
             issueHBLDate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
@@ -426,14 +441,12 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
             hbltype: data.hbltype,
             freightPayment: data.freightPayment,
-            packageType: data.packageType
         };
-
         this.formCreate.patchValue(_merge(cloneDeep(data), formValue));
-
-        this._catalogueRepo.getListSalemanByPartner(data.customerId, ChargeConstants.AI_CODE)
+        
+        this._catalogueRepo.GetListSalemanByShipmentType(data.customerId, ChargeConstants.AI_CODE, this.shipmentType)
             .subscribe((salesmans: any) => {
-                this.saleMans = salesmans;
+                this.saleMans = salesmans || [];
             })
     }
 }

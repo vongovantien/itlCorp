@@ -80,6 +80,7 @@
         public static readonly string MSG_CONTRACT_CONTRACT_NO_DUPLICATE = "MSG_CONTRACT_CONTRACT_NO_DUPLICATE";
         public static readonly string MSG_CONTRACT_CONTRACT_NO_EXISTED = "MSG_CONTRACT_CONTRACT_NO_EXISTED";
         public static readonly string MSG_CONTRACT_CONTRACTNO_LENGTH = "MSG_CONTRACT_CONTRACTNO_LENGTH";
+        public static readonly string MSG_CONTRACT_DUPLICATE = "MSG_CONTRACT_DUPLICATE";
 
 
 

@@ -194,7 +194,7 @@
                                                 [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                                 (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                                 [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                                [dataSources]="listCharges$ | async"
+                                                [dataSources]="listCharges"
                                                 [displayFields]="configComboGridCharge.displayFields" [height]="150"
                                                 placeholder="Select charge" (remove)="charge.chargeId = null">
                                             </app-combo-grid-virtual-scroll>

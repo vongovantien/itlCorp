@@ -15,8 +15,11 @@ namespace FMS.API.ReportData.Models.Accounting
         public string BillingRefNo { get; set; }
         public DateTime? BillingDate { get; set; }
         public DateTime? DueDate { get; set; }
+        public DateTime? DueDateOBH { get; set; }
         public int? OverdueDays { get; set; }
+        public int? OverdueDaysOBH { get; set; }
         public decimal? PaymentTerm { get; set; }
+        public decimal? PaymentTermOBH { get; set; }
         public decimal? UnpaidAmountInv { get; set; }
         public decimal? UnpaidAmountInvUsd { get; set; }
         public decimal? UnpaidAmountOBH { get; set; }

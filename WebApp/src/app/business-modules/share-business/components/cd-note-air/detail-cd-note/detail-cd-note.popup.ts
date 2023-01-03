@@ -1,19 +1,21 @@
 import { Component, ViewChild, Output, EventEmitter } from "@angular/core";
 import { DocumentationRepo, AccountingRepo, SystemFileManageRepo, ExportRepo } from "src/app/shared/repositories";
 import { ShareBussinessCdNoteAddAirPopupComponent } from "../add-cd-note/add-cd-note.popup";
-import { catchError, switchMap } from "rxjs/operators";
+import { catchError, concatMap, filter, switchMap, takeUntil } from "rxjs/operators";
 import { SortService } from "src/app/shared/services";
 import { ToastrService } from "ngx-toastr";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
-import { AccountingConstants } from "@constants";
+import { AccountingConstants, SystemConstants } from "@constants";
 import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/payment-method.popup";
 import { of } from "rxjs";
 import { ShareBussinessAdjustDebitValuePopupComponent } from "src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup";
 import { InjectViewContainerRefDirective } from "@directives";
 import { ICrystalReport } from "@interfaces";
 import { DetailCDNoteBase } from "../../cd-note/detail-cd-note.base";
+import { Store } from "@ngrx/store";
+import { getCurrentUserState, IAppState } from "@store";
 
 @Component({
     selector: 'cd-note-detail-air-popup',
@@ -46,7 +48,8 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends DetailCDNoteBas
         protected _toastService: ToastrService,
         protected _fileMngtRepo: SystemFileManageRepo,
         protected _accountantRepo: AccountingRepo,
-        protected _exportRepo: ExportRepo
+        protected _exportRepo: ExportRepo,
+        private _store: Store<IAppState>,
     ) {
         super(_documentationRepo, _sortService, _toastService, _accountantRepo, _fileMngtRepo, _exportRepo);
         this.requestSort = this.sortChargeCdNote;
@@ -371,5 +374,72 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends DetailCDNoteBas
     onSaveAdjustDebit() {
         this.getDetailCdNote(this.jobId, this.cdNote)
     }
+    exportItem(jobId: string, cdNote:string, format: string) {
+        let url: string;
+        let _format = 0;
+        switch (format) {
+            case 'PDF':
+                _format = 5;
+                break;
+            case 'WORD':
+                _format = 3;
+                break;
+            case 'EXCEL':
+                _format = 4;
+                break;
+            default:
+                _format = 5;
+                break;
+        }
+        let sourcePreview$;
+        if (this.CdNoteDetail.cdNote.type === "DEBIT") {
+            sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
+                partnerId: this.CdNoteDetail.partnerId,
+                hblId: this.CdNoteDetail.listSurcharges[0].hblid,
+                transactionType: 'DOC',
+                type: 3
+            }).pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+                                .pipe(
+                                    switchMap(() => {
+                                        return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                                    }),
+                                    concatMap((x) => {
+                                        url = x.pathReportGenerate;
+                                        return this._exportRepo.exportCrystalReportPDF(x);
+                                    }), takeUntil(this.ngUnsubscribe)
+                                )
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+            )
+        } else {
+            sourcePreview$ = this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+            .pipe(
+                switchMap(() => {
+                    return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                }),
+                concatMap((x) => {
+                    url = x.pathReportGenerate;
+                    return this._exportRepo.exportCrystalReportPDF(x);
+                }), takeUntil(this.ngUnsubscribe))
+        }
+        sourcePreview$.subscribe(
+            (res:  any) => {
 
+            },
+            (error) => {
+                if(error.status === 200)
+                {
+                    this._exportRepo.downloadExport(url);
+                }
+            },
+            () => {
+                console.log(url);
+            }
+        );   
+    }
 }

@@ -220,7 +220,7 @@
                                         [currentActiveItemId]="{ field: 'id', value: supplierId.value}"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                         [displayFields]="displayFieldsCustomer" placeholder="Select supplier"
-                                        (remove)="resetFormControl(supplierId)">
+                                        (remove)="resetFormControl(supplierId)" [clearable]="false">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
@@ -257,7 +257,8 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !billingOpsId.value}">
                                     <label class="form-control-label" required>
                                         Billing OPS
                                     </label>
@@ -266,7 +267,8 @@
                                         [currentActiveItemId]="{ field: 'id', value: billingOpsId.value}"
                                         [selectedDisplayFields]="['username']" [dataSources]="users | async"
                                         [displayFields]="[{field:'username',label:'User Name'}, {field:'employeeNameEn',label:'Full Name'}]"
-                                        placeholder="Select billing ops" (remove)="resetFormControl(billingOpsId)">
+                                        placeholder="Select billing ops" (remove)="resetFormControl(billingOpsId)"
+                                        [clearable]="false">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
@@ -292,7 +294,7 @@
                                         (itemSelected)="onSelectDataFormInfo($event, 'salesman')"
                                         [selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans" size="15"
                                         [displayFields]="displayFieldSalesman" placeholder="Please select"
-                                        (remove)="resetFormControl(salemansId)">
+                                        (remove)="resetFormControl(salemansId)" [clearable]="false">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
@@ -312,16 +314,18 @@
                             </div>
                             <div class="col-lg-4">
                                 <div class="row">
-                                    <div class="col-lg-3">
-                                        <div class="form-group">
-                                            <label class="form-control-label">
-                                                Replicate
-                                            </label>
-                                            <app-switch size="md" formControlName="isReplicate"></app-switch>
+                                    <ng-container *ngIf="userLogged?.officeType === 'Head' || userLogged?.officeType === 'Branch'">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label class="form-control-label">
+                                                    Replicate
+                                                </label>
+                                                <app-switch size="md" formControlName="isReplicate"></app-switch>
+                                            </div>
                                         </div>
-                                    </div>
+                                    </ng-container>
                                     <div class="col-lg-3">
-                                        <div class="form-group">
+                                        <div class="form-group"*ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                                             <label class="form-control-label">
                                                 No Profit
                                             </label>

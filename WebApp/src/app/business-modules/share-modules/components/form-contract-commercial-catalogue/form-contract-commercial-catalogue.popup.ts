@@ -1,8 +1,9 @@
+import { X } from '@angular/cdk/keycodes';
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Company, Customer, Office, User } from '@models';
@@ -33,8 +34,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     @ViewChild(SalesmanCreditLimitPopupComponent) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
     @ViewChild(PartnerRejectPopupComponent) popupRejectPartner: PartnerRejectPopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmChangeAgreementTypePopup: ConfirmPopupComponent;
-    @ViewChild('confirmActive') confirmActiveContractPopup: ConfirmPopupComponent;
-    @ViewChild('confirmDelete') confirmDeletePopup: ConfirmPopupComponent;
 
     openOnPartner: boolean = false;
 
@@ -42,6 +41,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     isCreateNewCommercial: boolean = false;
     isDuplicateContract: boolean = false;
     statusContract: boolean = false;
+    isChangeSaleMan: boolean = false;
 
     // salesmanId: AbstractControl;
     companyId: AbstractControl;
@@ -83,6 +83,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     contracts: Contract[] = [];
 
     offices: CommonInterface.INg2Select[] = [];
+    listOffice: Office[] = [];
     activeServices: any = [];
     activeVas: any = [];
     activeOffice: any = [];
@@ -323,7 +324,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     getOffices() {
-        this._systemRepo.queryOffices({ officeType: ['Head', 'Branch'] })
+        this._systemRepo.queryOffices({ officeType: ['Head', 'Branch', 'Repo'] })
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
@@ -331,6 +332,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             .subscribe(
                 (res: Office[]) => {
                     if (!!res) {
+                        this.listOffice = res;
                         this.offices = this.utility.prepareNg2SelectData(res || [], 'id', 'shortName');
                         this.offices = [{ id: 'All', text: 'All' }, ...this.offices];
                     }
@@ -346,6 +348,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     this.selectedSalesman = { field: 'userId', value: data.userId };
                 } else {
                     this.selectedSalesman = { field: 'id', value: data.userId + '-' + data.userGroupId + '-' + data.userDeparmentId };
+                    if (!!data.userId && data.userId !== this.selectedContract.saleManId) {
+                        this.isChangeSaleMan = true;
+                    }
                 }
                 this.selectedSalesmanData = data;
                 break;
@@ -469,6 +474,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     checkSubmitData() {
         if ((this.effectiveDate.value == null || (!this.effectiveDate.value.startDate || this.effectiveDate.value.startDate == null)) ||
             (this.contractType.value !== 'Cash' && this.contractType.value !== 'Guarantee' && this.contractType.value !== 'Prepaid' && (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null)))) {
+            return false;
+        }
+        if (this.contractTypeDetail=='Prepaid' && this.contractType.value!=this.contractTypeDetail || this.selectedContract.debitAmount>0 && this.contractTypeDetail!='Prepaid'&& this.contractType.value=='Prepaid'){    
+            this._toastService.error('Cannot change agreement type!');
+            this.contractType.setValue(this.contractTypeDetail);
             return false;
         }
         if (!!this.contractType.value && this.contractType.value.length > 0) {
@@ -621,14 +631,23 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this._catalogueRepo.updateContract(body)
             .pipe(catchError(this.catchError))
             .subscribe(
-                (res: CommonInterface.IResult) => {
+                (res: any) => {
                     if (res.status) {
                         this._toastService.success(res.message);
                         this.onRequest.emit(this.selectedContract);
                         this.formGroup.reset();
                         this.hide();
                     } else {
-                        this._toastService.error(res.message);
+                        if (!!res.data.errorCode) {
+                            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                body: res.message,
+                                label: 'OK'
+                            }, () => {
+                                return;
+                            })
+                        }else{
+                            this._toastService.error(res.message);
+                        }
                     }
                 }
             );
@@ -642,7 +661,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.confirmChangeAgreementTypePopup.hide();
             this.updateContract(body);
         }
-
     }
 
     getCurrentActiveService(Service: any) {
@@ -739,6 +757,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
         this.formatAutoExtendDays();
     }
+
     assignValueToModel() {
         if (this.isUpdate) {
             this.selectedContract.id = this.idContract;
@@ -828,12 +847,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.paymentTermObh = this.formGroup.controls['paymentTermObh'].value;
     }
 
-    onSubmitActiveContract() {
-        this.confirmActiveContractPopup.hide();
-        this.processActiveInActiveContract(this.selectedContract.id);
-
-    }
-
     activeInactiveContract(id: string) {
         if (this.contractType.value === 'Guaranteed'
             && ((this.formGroup.controls['creditLimit'].value <= 0
@@ -848,7 +861,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             ).subscribe(
                 (res: boolean) => {
                     if (res === true) {
-                        this.confirmActiveContractPopup.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            body: 'There are Other Agreement that same service, If Agreement is actived, Those Agreement will be Inactive. Are You Sure Active this agreement ?',
+                            label: 'OK'
+                        }, () => {
+                            this.processActiveInActiveContract(id);
+                        });
                     }
                     else {
                         this.processActiveInActiveContract(id);
@@ -972,21 +990,32 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     });
                 }
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
+                this.formGroup.controls['paymentTerm'].setValue(30);
                 break;
             case 'Guarantee':
                 if (this.isCreateNewCommercial) {
-                    this.formGroup.controls['paymentTerm'].setValue(1);
                     this.formGroup.controls['creditLimit'].setValue(20000000);
                     this.formGroup.controls['creditLimitRate'].setValue(120);
                 } else {
                     this.isDisabledExpiredDateField = false;
                 }
+                this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['creditCurrency'].setValue("VND");
                 this.formGroup.controls['currencyId'].setValue("VND");
                 break;
             case 'Cash':
+                this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
+                break;
+            case 'Official':
+                this.formGroup.controls['paymentTerm'].setValue(30);
+                break;
+            case 'Prepaid':
+                this.formGroup.controls['paymentTerm'].setValue(1);
+                break;
+            case 'Parent Contract':
+                this.formGroup.controls['paymentTerm'].setValue(1); 
                 break;
             default:
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
@@ -997,7 +1026,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     mapOfficeId() {
         let officeId = '';
-        const off = this.offices.filter(office => office.id !== 'All');
+        const off = this.listOffice.filter((office: Office) => ['Head', 'Branch'].includes(office?.officeType));
         officeId = off.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
         return officeId;
     }
@@ -1061,6 +1090,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     close() {
         this.selectedSalesmanData = null;
+        this.isChangeSaleMan = null;
         this.formGroup.reset()
         this.hide();
     }
@@ -1078,11 +1108,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         if (!!file) {
             this.selectedFile = file;
         }
-        this.confirmDeletePopup.show();
+        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Are you sure to delete this file ?',
+            label: 'OK'
+        }, () => {
+            this.onDeleteFile();
+        })
     }
 
     onDeleteFile() {
-        this.confirmDeletePopup.hide();
         this._systemFileManageRepo.deleteFile('Catalogue', 'CatContract', this.selectedContract.id, this.selectedFile.name)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
@@ -1093,7 +1127,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         this._toastService.success("File deleted successfully!");
                         this.getFileContract();
                     } else {
-                        this._toastService.error("some thing wrong");
+                        this._toastService.error("Something wrong");
                     }
                 }
             );

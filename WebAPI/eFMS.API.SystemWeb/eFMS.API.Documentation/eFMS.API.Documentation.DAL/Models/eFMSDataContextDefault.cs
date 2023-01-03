@@ -85,7 +85,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountReceivable>(entity =>
             {
@@ -1143,6 +1143,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.Offices).HasMaxLength(250);
 
                 entity.Property(e => e.ProductDept)
                     .HasMaxLength(50)
@@ -3089,13 +3091,9 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ContainerNote).HasMaxLength(250);
 
-                entity.Property(e => e.ContainerSealNo).HasMaxLength(250);
-
                 entity.Property(e => e.CreatedDate)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
-
-                entity.Property(e => e.GoodsDescription).HasMaxLength(500);
 
                 entity.Property(e => e.GrossWeight).HasColumnType("decimal(18, 4)");
 
@@ -3134,8 +3132,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.RouteInfo).HasMaxLength(500);
 
                 entity.Property(e => e.Shipper).HasMaxLength(500);
-
-                entity.Property(e => e.ShippingMark).HasMaxLength(500);
 
                 entity.Property(e => e.Supplier).HasMaxLength(250);
 

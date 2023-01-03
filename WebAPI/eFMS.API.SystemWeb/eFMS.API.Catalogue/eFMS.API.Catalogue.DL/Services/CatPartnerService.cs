@@ -57,7 +57,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICacheServiceBase<CatPartner> cache;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
-        string salemanBOD;
+        SysUser salemanBOD;
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
             IMapper mapper,
@@ -115,7 +115,7 @@ namespace eFMS.API.Catalogue.DL.Services
             SetChildren<CsShipmentSurcharge>("Id", "PayerID");
             SetChildren<CsShipmentSurcharge>("Id", "PaymentObjectID");
 
-            salemanBOD = sysUserRepository.First(x => x.Username == "ITL.BOD").Id;
+            salemanBOD = sysUserRepository.First(x => x.Username == "ITL.BOD");
         }
 
         public IQueryable<CatPartnerModel> GetPartners()
@@ -2490,42 +2490,70 @@ namespace eFMS.API.Catalogue.DL.Services
             return hs;
         }
         
-        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType)
+        public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType, string officeId = null)
         {
             List<SysUserViewModel> salemans = new List<SysUserViewModel>();
-            var contracts = contractRepository.Get(x => x.PartnerId == partnerId
-            && ((shipmentType == "Freehand") ? (x.ShipmentType != "Nominated") : true)
-            && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-            && x.SaleService.Contains(transactionType) 
-            && x.Active == true);
-            if(contracts.Count() > 0)
+            Expression<Func<CatContract, bool>> contractExp = x => x.PartnerId == partnerId
+            && x.Active == true
+            && x.SaleService.Contains(transactionType)
+            && x.SaleService.Contains(transactionType)
+            && ((shipmentType == "Freehand") ? (x.ShipmentType != "Nominated") : true);
+            if(!string.IsNullOrEmpty(officeId))
             {
-                var salemansIds = contracts.Select(x => x.SaleManId).ToList();
-                var users = sysUserRepository.Get(x => salemansIds.Contains(x.Id));
-                var employees = sysEmployeeRepository.Get();
-
-
-                var userQ = from u in users
-                            join em in employees on u.EmployeeId equals em.Id into emGrps
-                            from emGrp in emGrps.DefaultIfEmpty()
-                            select new SysUserViewModel
-                            {
-                                Id = u.Id,
-                                Active = u.Active,
-                                EmployeeNameEn = emGrp.EmployeeNameEn,
-                                EmployeeNameVn = emGrp.EmployeeNameVn,
-                                StaffCode = emGrp.StaffCode,
-                                Status = u.WorkingStatus,
-                                Title = emGrp.Title,
-                                Username = u.Username,
-                                UserType = u.UserType
-                            };
-                if(userQ.Count() > 0)
+                var office = officeRepository.Get(x => x.Id.ToString() == officeId)?.FirstOrDefault();
+                if(office != null && office.OfficeType == "OutSource")
                 {
-                    salemans = userQ.ToList();
+                    salemans.Add(new SysUserViewModel {
+                        Active = true,
+                        EmployeeNameVn = salemanBOD.Username,
+                        EmployeeNameEn = salemanBOD.Username,
+                        Id = salemanBOD.Id,
+                        Username = salemanBOD.Username,
+                    });
+
+                    return salemans;
+                } else
+                {
+                    var contracts = contractRepository.Get(contractExp);
+                    salemans = GetSysUserViewModelByContract(contracts);
+                }
+            } else
+            {
+                var contracts = contractRepository.Get(contractExp);
+                if (contracts.Count() > 0)
+                {
+                    salemans = GetSysUserViewModelByContract(contracts);
                 }
             }
+            return salemans;
+        }
 
+        private List<SysUserViewModel> GetSysUserViewModelByContract(IQueryable<CatContract> contracts)
+        {
+            List<SysUserViewModel> salemans = new List<SysUserViewModel>();
+            var salemansIds = contracts.Select(x => x.SaleManId).ToList();
+            var users = sysUserRepository.Get(x => salemansIds.Contains(x.Id));
+            var employees = sysEmployeeRepository.Get();
+
+            var userQ = from u in users
+                        join em in employees on u.EmployeeId equals em.Id into emGrps
+                        from emGrp in emGrps.DefaultIfEmpty()
+                        select new SysUserViewModel
+                        {
+                            Id = u.Id,
+                            Active = u.Active,
+                            EmployeeNameEn = emGrp.EmployeeNameEn,
+                            EmployeeNameVn = emGrp.EmployeeNameVn,
+                            StaffCode = emGrp.StaffCode,
+                            Status = u.WorkingStatus,
+                            Title = emGrp.Title,
+                            Username = u.Username,
+                            UserType = u.UserType
+                        };
+            if (userQ.Count() > 0)
+            {
+                salemans = userQ.ToList();
+            }
             return salemans;
         }
 

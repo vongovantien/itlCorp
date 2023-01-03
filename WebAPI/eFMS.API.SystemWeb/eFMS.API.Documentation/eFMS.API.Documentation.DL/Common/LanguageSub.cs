@@ -107,5 +107,7 @@
         public static readonly string MSG_CLEARANCE_IS_EXPIRED = "MSG_CLEARANCE_IS_EXPIRED";
         public static readonly string MSG_CLEARANCE_IS_OVERDUE = "MSG_CLEARANCE_IS_OVERDUE";
         public static readonly string MSG_CLEARANCE_IS_OVERLIMIT = "MSG_CLEARANCE_IS_OVERLIMIT";
+        public static readonly string MSG_CHARGE_CODE_WRONG_OFFICE = "MSG_CHARGE_CODE_WRONG_OFFICE";
+
     }
 }

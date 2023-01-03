@@ -196,7 +196,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
             }
             int count = 0;
-            var cdCode = GetCdNoteToGenerateCode(office, code)?.Code;
+            var cdCode = GetCdNoteToGenerateCode(office, code, typeCDNote)?.Code;
             if (cdCode != null)
             {
                 cdCode = cdCode.Substring(code.Length + 4, 5);
@@ -206,33 +206,30 @@ namespace eFMS.API.Documentation.DL.Services
             return code;
         }
 
-        private AcctCdnote GetCdNoteToGenerateCode(SysOffice office, string code)
+        private AcctCdnote GetCdNoteToGenerateCode(SysOffice office, string code, string type)
         {
             AcctCdnote currentCdNote = null;
             var currentCdNotes = DataContext.Get(x => x.Code.StartsWith(code)
+                                                    && x.Type == type
+                                                    && x.OfficeId == office.Id
                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                     && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
                                                     .OrderByDescending(x => x.DatetimeCreated);
-            if (office != null)
+            switch (office.Code)
             {
-                if (office.Code == "ITLHAN")
-                {
+                case "ITLHAN":
                     currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault(); //CR: HAN -> H [15202]
-                }
-                else if (office.Code == "ITLDAD")
-                {
+                    break;
+                case "ITLDAD":
                     currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")).FirstOrDefault(); //CR: DAD -> D [15202]
-                }
-                else
-                {
+                    break;
+                case "ITLCAM":
+                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("C") && !x.Code.StartsWith("CAM-")).FirstOrDefault(); //CR: DAD -> D [15202]
+                    break;
+                default:
                     currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")
                                                            && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault();
-                }
-            }
-            else
-            {
-                currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")
-                                                       && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault();
+                    break;
             }
             return currentCdNote;
         }
@@ -240,16 +237,19 @@ namespace eFMS.API.Documentation.DL.Services
         private string SetPrefixJobIdByOfficeCode(string officeCode)
         {
             string prefixCode = string.Empty;
-            if (!string.IsNullOrEmpty(officeCode))
+            switch (officeCode)
             {
-                if (officeCode == "ITLHAN")
-                {
+                case "ITLHAN":
                     prefixCode = "H"; //HAN- >> H
-                }
-                else if (officeCode == "ITLDAD")
-                {
-                    prefixCode = "D"; //DAD- >> D
-                }
+                    break;
+                case "ITLDAD":
+                    prefixCode = "D"; //HAN- >> H
+                    break;
+                case "ITLCAM":
+                    prefixCode = "C"; //HAN- >> H
+                    break;
+                default:
+                    break;
             }
             return prefixCode;
         }
@@ -861,6 +861,7 @@ namespace eFMS.API.Documentation.DL.Services
                         cdNote.SyncStatus = cdNote.SyncStatus;
                         cdNote.LastSyncDate = cdNote.LastSyncDate;
                         cdNote.TransactionTypeEnum = DataTypeEx.GetEnumType(listCharges.FirstOrDefault()?.TransactionType);
+                        cdNote.Hblid = chargesOfCDNote?.FirstOrDefault().Hblid;
                         listCDNote.Add(cdNote);
                     }
 
