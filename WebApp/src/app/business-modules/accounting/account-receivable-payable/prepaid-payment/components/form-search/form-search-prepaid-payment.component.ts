@@ -126,7 +126,8 @@ export class ARPrePaidPaymentFormSearchComponent extends AppForm implements OnIn
         this.onSearch.emit(<any>{
             agreementType: this.form.controls['agreementType'].value,
             keywords: [],
-            searchType: this.searchTypes[0]
+            searchType: this.searchTypes[0],
+            officeIds: [this.currentUser.officeId]
         });
 
     }
