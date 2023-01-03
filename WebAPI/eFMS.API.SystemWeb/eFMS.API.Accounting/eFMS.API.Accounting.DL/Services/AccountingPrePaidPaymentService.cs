@@ -66,7 +66,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.SalemanId == criteria.SalesmanId);
             }
-            if (criteria.OfficeIds.Count > 0)
+            if (criteria.OfficeIds != null && criteria.OfficeIds.Count > 0)
             {
                 query = query.And(x => criteria.OfficeIds.Contains(x.OfficeId));
             }
