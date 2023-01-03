@@ -1925,8 +1925,8 @@ namespace eFMS.API.Documentation.DL.Services
             var jobNoProfits = InvalidShipmentNoProfitImport(validList);
             if (jobNoProfits.Count > 0)
             {
-                var notSellingCharges = list.Where(x => !x.IsValid || x.Type.ToLower() != "sell").ToList();
-                var sellingCharges = list.Where(x => x.IsValid && x.Type.ToLower() == "sell").ToList();
+                var notSellingCharges = list.Where(x => !x.IsValid || x.Type.ToLower() != "selling").ToList();
+                var sellingCharges = list.Where(x => x.IsValid && x.Type.ToLower() == "selling").ToList();
                 sellingCharges.ForEach(item =>
                 {
                     //if (item.IsValid && item.Type.ToLower() == "sell") Check import fee is valid with no profit and noti to selling charges
@@ -1954,7 +1954,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             list[i].IsValid = false;
                             list[j].IsValid = false;
-                            if ((list[i].Type == "OBH" && list[j].Type == "Buying") || (list[j].Type == "OBH" && list[i].Type == "Buying"))
+                            if ((list[i].Type.ToLower() == "obh" && list[j].Type.ToLower() == "buying") || (list[j].Type.ToLower() == "obh" && list[i].Type.ToLower() == "buying"))
                             {
                                 list[i].IsValid = true;
                                 list[j].IsValid = true;
@@ -1988,26 +1988,27 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         shipment.charges.ForEach(item =>
                         {
-                            switch (item.Type.ToLower())
+                            var charge = mapper.Map<CsShipmentSurcharge>(item);
+                            switch (charge.Type.ToLower())
                             {
                                 case "buying":
-                                    item.Type = "BUY";
+                                    charge.Type = "BUY";
                                     break;
                                 case "obh":
-                                    item.Type = "OBH";
+                                    charge.Type = "OBH";
                                     break;
                                 case "selling":
-                                    item.Type = "SELL";
+                                    charge.Type = "SELL";
                                     break;
                             }
-                            var chargeGroupId = catCharge.Where(x => x.Id == item.ChargeId).Select(x => x.ChargeGroup).FirstOrDefault();
-                            item.KickBack = chargeGroup.Where(x => x.Id == chargeGroupId && x.Name == "Com").FirstOrDefault() != null ? true : false;
+                            var chargeGroupId = catCharge.Where(x => x.Id == charge.ChargeId).Select(x => x.ChargeGroup).FirstOrDefault();
+                            charge.KickBack = chargeGroup.Where(x => x.Id == chargeGroupId && x.Name == "Com").FirstOrDefault() != null ? true : false;
 
                             decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                             #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
-                            item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
+                            charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
                             #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                         });
                         var surcharges = DataContext.Get(x => x.Hblid == opsDetail.Hblid && x.Type != DocumentConstants.CHARGE_OBH_TYPE);
