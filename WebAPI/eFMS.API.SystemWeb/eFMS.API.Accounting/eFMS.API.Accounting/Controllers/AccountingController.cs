@@ -342,20 +342,7 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listAdd.Count > 0)
                     {
-                        foreach (var item in listAdd)
-                        {
-                            string fileNameAttached = request.Where(x => x.Action == ACTION.ADD && item.Stt == x.Id)?.FirstOrDefault().fileName;
-                            if(!string.IsNullOrEmpty(fileNameAttached))
-                            {
-                                item.AtchDocInfo.Add(new BravoAttachDoc
-                                {
-                                    AttachDocRowId = Guid.NewGuid().ToString(),
-                                    AttachDocName = item.ReferenceNo,
-                                    AttachDocPath = fileNameAttached,
-                                    AttachDocDate = DateTime.Now
-                                });
-                            }
-                        }
+xc
                         resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSAdvanceSyncAdd", listAdd, loginResponse.TokenKey);
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -376,20 +363,20 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listUpdate.Count > 0)
                     {
-                        foreach (var item in listUpdate)
-                        {
-                            string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
-                            if (!string.IsNullOrEmpty(fileNameAttached))
-                            {
-                                item.AtchDocInfo.Add(new BravoAttachDoc
-                                {
-                                    AttachDocRowId = Guid.NewGuid().ToString(),
-                                    AttachDocName = "Advance Preview Template",
-                                    AttachDocPath = fileNameAttached,
-                                    AttachDocDate = DateTime.Now
-                                });
-                            }
-                        }
+                        //foreach (var item in listUpdate)
+                        //{
+                        //    string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
+                        //    if (!string.IsNullOrEmpty(fileNameAttached))
+                        //    {
+                        //        item.AtchDocInfo.Add(new BravoAttachDoc
+                        //        {
+                        //            AttachDocRowId = Guid.NewGuid().ToString(),
+                        //            AttachDocName = "Advance Preview Template",
+                        //            AttachDocPath = fileNameAttached,
+                        //            AttachDocDate = DateTime.Now
+                        //        });
+                        //    }
+                        //}
                         resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSAdvanceSyncUpdate", listUpdate, loginResponse.TokenKey);
                         responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -467,20 +454,20 @@ namespace eFMS.API.Accounting.Controllers
                     // 3. Call Bravo to SYNC.
                     if (listAdd.Count > 0)
                     {
-                        foreach (var item in listAdd)
-                        {
-                            string fileNameAttached = request.Where(x => x.Action == ACTION.ADD && item.Stt == x.Id)?.FirstOrDefault().fileName;
-                            if (!string.IsNullOrEmpty(fileNameAttached))
-                            {
-                                item.AtchDocInfo.Add(new BravoAttachDoc
-                                {
-                                    AttachDocRowId = Guid.NewGuid().ToString(),
-                                    AttachDocName = "SM Preview Template",
-                                    AttachDocPath = fileNameAttached,
-                                    AttachDocDate = DateTime.Now
-                                });
-                            }
-                        }
+                        //foreach (var item in listAdd)
+                        //{
+                        //    string fileNameAttached = request.Where(x => x.Action == ACTION.ADD && item.Stt == x.Id)?.FirstOrDefault().fileName;
+                        //    if (!string.IsNullOrEmpty(fileNameAttached))
+                        //    {
+                        //        item.AtchDocInfo.Add(new BravoAttachDoc
+                        //        {
+                        //            AttachDocRowId = Guid.NewGuid().ToString(),
+                        //            AttachDocName = "SM Preview Template",
+                        //            AttachDocPath = fileNameAttached,
+                        //            AttachDocDate = DateTime.Now
+                        //        });
+                        //    }
+                        //}
                         resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", listAdd, loginResponse.TokenKey);
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -501,20 +488,20 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listUpdate.Count > 0)
                     {
-                        foreach (var item in listUpdate)
-                        {
-                            string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
-                            if (!string.IsNullOrEmpty(fileNameAttached))
-                            {
-                                item.AtchDocInfo.Add(new BravoAttachDoc
-                                {
-                                    AttachDocRowId = Guid.NewGuid().ToString(),
-                                    AttachDocName = "SM Preview Template",
-                                    AttachDocPath = fileNameAttached,
-                                    AttachDocDate = DateTime.Now
-                                });
-                            }
-                        }
+                        //foreach (var item in listUpdate)
+                        //{
+                        //    string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
+                        //    if (!string.IsNullOrEmpty(fileNameAttached))
+                        //    {
+                        //        item.AtchDocInfo.Add(new BravoAttachDoc
+                        //        {
+                        //            AttachDocRowId = Guid.NewGuid().ToString(),
+                        //            AttachDocName = "SM Preview Template",
+                        //            AttachDocPath = fileNameAttached,
+                        //            AttachDocDate = DateTime.Now
+                        //        });
+                        //    }
+                        //}
                         resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncUpdate", listUpdate, loginResponse.TokenKey);
                         responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
 

@@ -61,6 +61,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmailSetting> emailSettingRepository;
         private readonly IUserBaseService userBaseService;
         private readonly IContextBase<SysImage> sysFileRepository;
+        private readonly IContextBase<SysImageDetail> sysFileDetailRepository;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
@@ -116,6 +117,7 @@ namespace eFMS.API.Accounting.DL.Services
             ICurrentUser cUser,
             IAcctSettlementPaymentService settlementService,
             IContextBase<SysImage> sysFileRepo,
+            IContextBase<SysImageDetail> sysFileDetail,
             IDatabaseUpdateService _databaseUpdateService,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<CsTransaction> csTransactionRepo,
@@ -157,6 +159,7 @@ namespace eFMS.API.Accounting.DL.Services
             emailSettingRepository = emailSettingRepo;
 
             sysFileRepository = sysFileRepo;
+            sysFileDetailRepository = sysFileDetail;
             settlementPaymentService = settlementService;
             databaseUpdateService = _databaseUpdateService;
             sysEmailTemplateRepository = sysEmailTemplateRepo;
@@ -3547,18 +3550,22 @@ namespace eFMS.API.Accounting.DL.Services
         {
             List<BravoAttachDoc> results = new List<BravoAttachDoc>();
 
-            var files = sysFileRepository.Get(x => x.Folder == folder && x.ObjectId == objectId).ToList();
-            if(files.Count > 0)
+            var fileOrigins = sysFileRepository.Get(x => x.Folder == folder && x.ObjectId == objectId);
+            var files = from f in fileOrigins
+                        join e in sysFileDetailRepository.Get() on f.Id equals e.SysImageId into fGrps
+                        select new { fileOrigin = f, edoc = fGrps.DefaultIfEmpty() };
+            if (files.Count() > 0)
             {
-                files.ForEach(c =>
+                foreach (var file in files)
                 {
-                    results.Add(new BravoAttachDoc {
-                        AttachDocRowId = c.Id.ToString(),
-                        AttachDocName = c.Name,
-                        AttachDocPath = c.Url,
-                        AttachDocDate = c.DateTimeCreated
+                    results.Add(new BravoAttachDoc
+                    {
+                        AttachDocRowId = file.fileOrigin.Id.ToString(),
+                        AttachDocName = file.edoc.FirstOrDefault().SystemFileName,
+                        AttachDocPath = file.fileOrigin.Url,
+                        AttachDocDate = file.fileOrigin.DateTimeCreated
                     });
-                });
+                }
             }
             string queryParamUrlAttachFile = string.Format(@"/en/#/home/tool/file-management/user-attach-file?module={0}&folder={1}&objectId={2}&billingNo={3}", "Accounting", folder, objectId, billingNo);
             results.Add(new BravoAttachDoc
