@@ -2711,7 +2711,7 @@ namespace eFMS.API.Documentation.DL.Services
             surcharge.ChargeId = chargeBuy.DebitCharge ?? Guid.Empty;
 
             surcharge.Quantity = 1;
-            surcharge.Vatrate = 8;
+            surcharge.Vatrate = chargeBuy.ServiceDate.Value < new DateTime(2023, 1, 1) ? 8 : 10; // [CR:18726] update 8 -> 10% from 1/1/2023
 
             surcharge.Soano = null;
             surcharge.PaySoano = null;

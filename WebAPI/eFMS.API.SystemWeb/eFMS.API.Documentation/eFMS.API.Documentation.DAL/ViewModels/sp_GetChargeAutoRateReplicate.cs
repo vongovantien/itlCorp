@@ -82,6 +82,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public Guid? UserIdLinkFee { get; set; }
         public string UserNameLinkFee { get; set; }
         public string LinkChargeId { get; set; }
+        public DateTime? ServiceDate { get; set; }
 
     }
 }
