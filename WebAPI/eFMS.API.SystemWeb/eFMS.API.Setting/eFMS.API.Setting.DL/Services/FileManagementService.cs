@@ -162,23 +162,24 @@ namespace eFMS.API.Setting.DL.Services
             List<SysImageDetail> result = new List<SysImageDetail>();
             images.ForEach(x =>
             {
-                var detail = new SysImageDetail
+                if (isOther(x.Id).Result==false)
                 {
-                    UserCreated = x.UserCreated,
-                    DatetimeCreated = x.DateTimeCreated,
-                    SystemFileName = "OTH_" + x.Name,
-                    UserFileName = x.Name,
-                    Id = x.Id,
-                    SysImageId = x.Id,
-                    UserModified = x.UserModified,
-                    Source = x.Folder,
-                    DatetimeModified = x.DatetimeModified,
-                    //DocumentType = "Accountant",
-                    //AcRef = GetACRefNo(x.ObjectId, x.Folder,true).Result,
-                    BillingNo = GetBillingNo(x.ObjectId, x.Folder).Result,
-                    BillingType=x.Folder
-                };
-                result.Add(detail);
+                    var detail = new SysImageDetail
+                    {
+                        UserCreated = x.UserCreated,
+                        DatetimeCreated = x.DateTimeCreated,
+                        SystemFileName = "OTH_" + x.Name,
+                        UserFileName = x.Name,
+                        Id = x.Id,
+                        SysImageId = x.Id,
+                        UserModified = x.UserModified,
+                        Source = x.Folder,
+                        DatetimeModified = x.DatetimeModified,
+                        BillingNo = GetBillingNo(x.ObjectId, x.Folder).Result,
+                        BillingType = x.Folder
+                    };
+                    result.Add(detail);
+                }
             });
             return result;
         }
@@ -190,11 +191,11 @@ namespace eFMS.API.Setting.DL.Services
             {
                 case "SOA":
                     var soa= await acctSOARepo.GetAsync(x => x.Id == billingId);
-                    billingNo= soa.FirstOrDefault().Soano;
+                    billingNo= soa.FirstOrDefault()?.Soano;
                     break;
                 case "Settlement":
                     var settle = await acctSettleRepo.GetAsync(x => x.Id.ToString() == billingId);
-                    billingNo= settle.FirstOrDefault().SettlementNo;
+                    billingNo= settle.FirstOrDefault()?.SettlementNo;
                     break;
                 default: break;
             }
@@ -204,40 +205,21 @@ namespace eFMS.API.Setting.DL.Services
         private async Task<List<string>> GetACRefNo(string billingNo, string Type,bool isOther)
         {
             var result = new List<AccAccountingManagement>();
-            //if (Type == "SOA")
-            //{
-            //    if (isOther)
-            //    {
-            //        var SOA = await acctSOARepo.GetAsync(x => x.Id == billingId);
-            //        var soaNo = SOA.FirstOrDefault()?.Soano;
-            //        if (soaNo != null)
-            //        {
-            //            result = await accManageRepo.GetAsync(x => x.AttachDocInfo == soaNo);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        result = await accManageRepo.GetAsync(x => x.AttachDocInfo == billingId);
-            //    }
-            //}
-            //if (Type == "Settlement")
-            //{
-            //    if (isOther)
-            //    {
-            //        var settle = await acctSettleRepo.GetAsync(x => x.Id.ToString() == billingId);
-            //        var smNo = settle.FirstOrDefault()?.SettlementNo;
-            //        if (smNo != null)
-            //        {
-            //            result = await accManageRepo.GetAsync(x => x.AttachDocInfo == smNo);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        result = await accManageRepo.GetAsync(x => x.AttachDocInfo == billingId);
-            //    }
-            //}
+            if (billingNo == null)
+            {
+                return null;
+            }
             result = await accManageRepo.GetAsync(x => x.AttachDocInfo == billingNo);
             return result.Select(x => x.VoucherId).ToList();
+        }
+
+        private List<string> getListRefNo(EDocManagementCriterial criteria)
+        {
+            if(criteria.ReferenceNo == null){
+                return null;
+            }
+            criteria.ReferenceNo = criteria.ReferenceNo.Replace(" ", "").Replace("\t", ";").Replace("\n", ";");
+            return criteria.ReferenceNo.Split(";").ToList();
         }
 
         public async Task<FileManageResponse> GetEdocManagement(EDocManagementCriterial criterial)
@@ -252,9 +234,11 @@ namespace eFMS.API.Setting.DL.Services
                 var countData = criterial.Size - data.Count();
                 if (countData > 0)
                 {
-                    other = ConvertToEDocOther(await DataContext.WhereAsync(await QueryOther(criterial)));
+                    var query = QueryOther(criterial).Result;
+                    var otherData = await DataContext.WhereAsync(query);
+                    other = ConvertToEDocOther(otherData);
                     totalData = other.Count() + data.Count();
-                    result = data.Concat(other).AsQueryable().Skip((criterial.Page - 1) * (criterial.Size + other.Count())).Take(criterial.Size).ToList();
+                    result = data.Concat(other).AsQueryable().OrderBy(x=>x.BillingNo).Skip((criterial.Page - 1) * (criterial.Size + other.Count())).Take(criterial.Size).ToList();
                 }
                 else
                 {
@@ -289,7 +273,11 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         return await accManageRepo.WhereAsync(x => (x.VoucherType.ToUpper().Replace(" ", "").Contains("Invoice") || x.VoucherType.ToUpper().Replace(" ", "").Contains("Invoice Temp")) && x.InvoiceNoReal != null && x.Date >= criteria.FromDate && x.Date <= criteria.ToDate.Value.AddDays(1));
                     }
-                    return await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains(Type) && x.VoucherId != null && x.Date >= criteria.FromDate && x.Date <= criteria.ToDate.Value.AddDays(1));
+                if (Type == null)
+                {
+                    return await accManageRepo.WhereAsync(x => x.VoucherId != null && x.Date >= criteria.FromDate && x.Date <= criteria.ToDate.Value.AddDays(1));
+                }
+                return await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains(Type) && x.VoucherId != null && x.Date >= criteria.FromDate && x.Date <= criteria.ToDate.Value.AddDays(1));
             }
             else
             {
@@ -299,6 +287,11 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         var accManageIV = await accManageRepo.GetAsync(x => criteria.ReferenceNo.Contains(x.InvoiceNoReal) && x.Type != null);
                         return accManageIV.ToList().Where(x => (x.Type.ToUpper().Replace(" ", "").Contains("INVOICE") || x.Type.ToUpper().Replace(" ", "").Contains("INVOICETEMP")) && x.VoucherId != null && x.Date >= criteria.FromDate && x.Date <= criteria.ToDate.Value.AddDays(1)).ToList();
+                    }
+                    if (Type == null)
+                    {
+                        var accManageAll = await accManageRepo.GetAsync(x => criteria.ReferenceNo.Contains(x.VoucherId) && x.VoucherType != null);
+                        return accManageAll.ToList().Where(x => x.VoucherId != null && x.Date >= criteria.FromDate && x.Date <= criteria.ToDate.Value.AddDays(1)).ToList();
                     }
                     var accManage = await accManageRepo.GetAsync(x => criteria.ReferenceNo.Contains(x.VoucherId) && x.VoucherType != null);
                     return accManage.ToList().Where(x => x.VoucherType.ToUpper().Replace(" ", "").Contains(Type) && x.VoucherId != null && x.Date >= criteria.FromDate && x.Date <= criteria.ToDate.Value.AddDays(1)).ToList();
@@ -311,6 +304,11 @@ namespace eFMS.API.Setting.DL.Services
                         var accManageIV = await accManageRepo.GetAsync(x => criteria.ReferenceNo.Contains(x.InvoiceNoReal) && x.Type != null);
                         return accManageIV.ToList().Where(x => (x.Type.ToUpper().Replace(" ", "").Contains("INVOICE") || x.Type.ToUpper().Replace(" ", "").Contains("INVOICETEMP")) && x.VoucherId != null).ToList();
                     }
+                    if (Type == null)
+                    {
+                        var accManageAll = await accManageRepo.GetAsync(x => criteria.ReferenceNo.Contains(x.VoucherId) && x.VoucherType != null);
+                        return accManageAll.ToList().Where(x => x.VoucherId != null).ToList();
+                    }
                     var accManage = await accManageRepo.GetAsync(x => criteria.ReferenceNo.Contains(x.VoucherId) && x.VoucherType != null);
                     return accManage.ToList().Where(x => x.VoucherType.ToUpper().Replace(" ", "").Contains(Type) && x.VoucherId != null).ToList();
                 }
@@ -318,10 +316,38 @@ namespace eFMS.API.Setting.DL.Services
             }
         }
 
-        private async Task<IEnumerable<Guid>> GetOtherByCreateDate(EDocManagementCriterial criterial,string accType)
+        private Boolean haveAcc(string billingNo,string accType, List<string> refNo)
+        {
+            if (accType == null)
+            {
+                if (refNo != null && refNo.Count() > 0)
+                {
+                    return accManageRepo.Any(z => z.AttachDocInfo == billingNo && refNo.Contains(z.VoucherId));
+                }
+                else
+                {
+                    return accManageRepo.Any(z => z.AttachDocInfo == billingNo);
+                }
+            }
+            else
+            {
+                if (refNo != null && refNo.Count() > 0)
+                {
+                    return accManageRepo.Any(z => z.AttachDocInfo == billingNo && z.VoucherType == accType && refNo.Contains(z.VoucherId));
+                }
+                else
+                {
+                    return accManageRepo.Any(z => z.AttachDocInfo == billingNo && z.VoucherType == accType);
+                }
+            }
+          
+        }
+
+        private List<Guid> GetOtherByCreateDate(EDocManagementCriterial criterial,string accType)
         {
             var result = new List<Guid>();
-            var data = await DataContext.GetAsync(x => x.DateTimeCreated <= criterial.ToDate.Value.AddDays(1) && x.DateTimeCreated >= criterial.FromDate && x.Folder != "Shipment");
+            var refNo = getListRefNo(criterial);
+            var data =  DataContext.Get(x => x.DateTimeCreated <= criterial.ToDate.Value.AddDays(1) && x.DateTimeCreated >= criterial.FromDate && (x.Folder == "SOA"|| x.Folder == "Settlement"));
             data.Select(x => new { id = x.Id, objId = x.ObjectId, type = x.Folder }).ToList().ForEach( x =>
             {
                 switch (x.type)
@@ -331,7 +357,7 @@ namespace eFMS.API.Setting.DL.Services
                         var soaNo = soa.FirstOrDefault()?.Soano;
                         if (soaNo != null)
                         {
-                            if (accManageRepo.Any(z => z.AttachDocInfo == soaNo && z.VoucherType == accType))
+                            if (haveAcc(soaNo,accType,refNo))
                             {
                                 result.Add(x.id);
                             }
@@ -342,7 +368,7 @@ namespace eFMS.API.Setting.DL.Services
                         var smNo = sm.FirstOrDefault()?.SettlementNo;
                         if (smNo != null)
                         {
-                            if (accManageRepo.Any(z => z.AttachDocInfo == smNo && z.VoucherType == accType))
+                            if (haveAcc(smNo, accType, refNo))
                             {
                                 result.Add(x.id);
                             }
@@ -359,11 +385,13 @@ namespace eFMS.API.Setting.DL.Services
         private async Task<Expression<Func<SysImage, bool>>> QueryOther(EDocManagementCriterial criteria)
         {
             Expression<Func<SysImage, bool>> query = q => true;
+            var isRefNo = criteria.ReferenceNo != null && criteria.ReferenceNo != "";
             bool haveQuery = false;
+            var imageId=new List<Guid>();
+            var objectid = new List<string>();
             var result = new List<EDocFile>();
             if (criteria.AccountantTypes != null && criteria.AccountantTypes.Count() > 0)
             {
-                var isRefNo = criteria.ReferenceNo != null && criteria.ReferenceNo != "";
                 if (criteria.ReferenceType != ReferenceType.InvoiceNo)
                 {
                     for (int i = 0; i < criteria.AccountantTypes.Count; i++)
@@ -377,18 +405,20 @@ namespace eFMS.API.Setting.DL.Services
                                     var voucherOTId = voucherOTIds.Select(x => x.VoucherId).ToList();
                                     var otherOTId = GetListOtherFile(voucherOTId);
                                     if (otherOTId.Count() > 0)
-                                    {
+                                    {   
                                         haveQuery = true;
-                                        query = query.And(x => otherOTId.Contains(x.ObjectId));
+                                        //query = query.And(x => otherOTId.Contains(x.ObjectId));
+                                        objectid.AddRange(otherOTId);
                                     }
                                 }
                                 else
                                 {
-                                    var otherOTId = GetOtherByCreateDate(criteria, "Other Entry").Result;
+                                    var otherOTId = GetOtherByCreateDate(criteria, "Other Entry");
                                     if (otherOTId.Count() > 0)
                                     {
                                         haveQuery = true;
-                                        query = query.And(x => otherOTId.Contains(x.Id));
+                                        //query = query.And(x => otherOTId.Contains(x.Id));
+                                        imageId.AddRange(otherOTId);
                                     }
                                 }
                                 
@@ -402,16 +432,18 @@ namespace eFMS.API.Setting.DL.Services
                                     if (otherCPId.Count() > 0)
                                     {
                                         haveQuery = true;
-                                        query = query.And(x => otherCPId.Contains(x.ObjectId));
+                                        //query = query.And(x => otherCPId.Contains(x.ObjectId));
+                                        objectid.AddRange(otherCPId);
                                     }
                                 }
                                 else
                                 {
-                                    var otherOTId = GetOtherByCreateDate(criteria, "Cash payment").Result;
-                                    if (otherOTId.Count() > 0)
+                                    var otherCPId = GetOtherByCreateDate(criteria, "Cash payment");
+                                    if (otherCPId.Count() > 0)
                                     {
                                         haveQuery = true;
-                                        query = query.And(x => otherOTId.Contains(x.Id));
+                                        //query = query.And(x => otherCPId.Contains(x.Id));
+                                        imageId.AddRange(otherCPId);
                                     }
                                 }
                                 break;
@@ -424,16 +456,18 @@ namespace eFMS.API.Setting.DL.Services
                                     if (otherPNId.Count() > 0)
                                     {
                                         haveQuery = true;
-                                        query = query.And(x => otherPNId.Contains(x.ObjectId));
+                                        //query = query.And(x => otherPNId.Contains(x.ObjectId));
+                                        objectid.AddRange(otherPNId);
                                     }
                                 }
                                 else
                                 {
-                                    var otherOTId = GetOtherByCreateDate(criteria, "Purchasing note").Result;
-                                    if (otherOTId.Count() > 0)
+                                    var otherPNId = GetOtherByCreateDate(criteria, "Purchasing note");
+                                    if (otherPNId.Count() > 0)
                                     {
                                         haveQuery = true;
-                                        query = query.And(x => otherOTId.Contains(x.Id));
+                                        //query = query.And(x => otherPNId.Contains(x.Id));
+                                        imageId.AddRange(otherPNId);
                                     }
                                 }
                                 break;
@@ -446,16 +480,18 @@ namespace eFMS.API.Setting.DL.Services
                                     if (otherCLId.Count() > 0)
                                     {
                                         haveQuery = true;
-                                        query = query.And(x => otherCLId.Contains(x.ObjectId));
+                                        //query = query.And(x => otherCLId.Contains(x.ObjectId));
+                                        objectid.AddRange(otherCLId);
                                     }
                                 }
                                 else
                                 {
-                                    var otherOTId = GetOtherByCreateDate(criteria, "Credit Slip").Result;
-                                    if (otherOTId.Count() > 0)
+                                    var otherCLId = GetOtherByCreateDate(criteria, "Credit Slip");
+                                    if (otherCLId.Count() > 0)
                                     {
                                         haveQuery = true;
-                                        query = query.And(x => otherOTId.Contains(x.Id));
+                                        //query = query.And(x => otherCLId.Contains(x.Id));
+                                        imageId.AddRange(otherCLId);
                                     }
                                 }
                                 break;
@@ -468,16 +504,42 @@ namespace eFMS.API.Setting.DL.Services
                                     if (otherCRId.Count() > 0)
                                     {
                                         haveQuery = true;
-                                        query = query.And(x => otherCRId.Contains(x.Id.ToString()));
+                                        //query = query.And(x => otherCRId.Contains(x.Id.ToString()));
+                                        objectid.AddRange(otherCRId);
                                     }
                                 }
                                 else
                                 {
-                                    var otherOTId = GetOtherByCreateDate(criteria, "Cash receipt").Result;
-                                    if (otherOTId.Count() > 0)
+                                    var otherCRId = GetOtherByCreateDate(criteria, "Cash receipt");
+                                    if (otherCRId.Count() > 0)
                                     {
                                         haveQuery = true;
-                                        query = query.And(x => otherOTId.Contains(x.Id));
+                                        //query = query.And(x => otherCRId.Contains(x.Id));
+                                        imageId.AddRange(otherCRId);
+                                    }
+                                }
+                                break;
+                            case AccountantType.All:
+                                if (criteria.DateMode == DateMode.AccountingDate)
+                                {
+                                    var voucherALLIds = GetByDate(criteria, isRefNo, null).Result;
+                                    var voucherALLId = voucherALLIds.Select(x => x.VoucherId).ToList();
+                                    var otherALLId = GetListOtherFile(voucherALLId);
+                                    if (otherALLId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        //query = query.And(x => otherALLId.Contains(x.Id.ToString()));
+                                        objectid.AddRange(otherALLId);
+                                    }
+                                }
+                                else
+                                {
+                                    var otherALLId = GetOtherByCreateDate(criteria, null);
+                                    if (otherALLId.Count() > 0)
+                                    {
+                                        haveQuery = true;
+                                        //query = query.And(x => otherALLId.Contains(x.Id));
+                                        imageId.AddRange(otherALLId);
                                     }
                                 }
                                 break;
@@ -486,7 +548,19 @@ namespace eFMS.API.Setting.DL.Services
                     if (!haveQuery)
                     {
                         query = q => false;
-                    };
+                    }
+                    if(haveQuery)
+                    {
+                        if (imageId.Count > 0)
+                        {
+                            query = query.And(x => imageId.Contains(x.Id));
+                        }
+                        if (objectid.Count > 0)
+                        {
+                            query = query.And(x => objectid.Contains(x.ObjectId));
+                        }
+                            
+                    }
                 }
                 else
                 {
@@ -497,13 +571,14 @@ namespace eFMS.API.Setting.DL.Services
                 }
             }
             var data = DataContext.Where(query).ToList();
-            if (criteria.DateMode == DateMode.CreateDate)
+             if (criteria.DateMode == DateMode.CreateDate)
             {
                 if (criteria.FromDate.HasValue && criteria.ToDate.HasValue)
                 {
                     query = query.And((z => z.DateTimeCreated >= criteria.FromDate.Value && z.DateTimeCreated <= criteria.ToDate.Value.AddDays(1)));
                 }
             }
+            query = query.And(x => x.Folder == "Settlement" || x.Folder == "SOA");
             return query;
         }
         private string getFileNameWithWxtention(Guid? sysImageId, bool isOTH)
@@ -584,84 +659,100 @@ namespace eFMS.API.Setting.DL.Services
                 switch (accTypes[i])
                 {
                     case AccountantType.OtherEntry:
-                        if (accManage == null)
-                        {
-                            var voucherOTIds = await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("OTHERENTRY") && x.VoucherId != null); ;
-                            var billingNo = voucherOTIds.Select(x => x.AttachDocInfo);
-                            var edocOTs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
-                            Acctype.AddRange(edocOTs.Select(x => x.Id).ToList());
-                        }
-                        else
-                        {
+                        //if (accManage == null)
+                        //{
+                        //    var voucherOTIds = await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("OTHERENTRY") && x.VoucherId != null); ;
+                        //    var billingNo = voucherOTIds.Select(x => x.AttachDocInfo);
+                        //    var edocOTs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
+                        //    Acctype.AddRange(edocOTs.Select(x => x.Id).ToList());
+                        //}
+                        //else
+                        //{
                             var voucherOTIds = accManage.Where(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("OTHERENTRY") && x.VoucherId != null);
-                            var billingNo = voucherOTIds.Select(x => x.AttachDocInfo);
-                            var edocOTs = edocRepo.Get(x => billingNo.Contains(x.BillingNo));
+                            var billingNoOT = voucherOTIds.Select(x => x.AttachDocInfo);
+                            var edocOTs = edocRepo.Get(x => billingNoOT.Contains(x.BillingNo));
                             Acctype.AddRange(edocOTs.Select(x => x.Id).ToList());
-                        }
+                        //}
                         break;
                     case AccountantType.CashPayment:
-                        if (accManage == null)
-                        {
-                            var voucherCPIds = await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("CASHPAYMENT") && x.VoucherId != null);
-                            var billingNo = voucherCPIds.Select(x => x.AttachDocInfo);
-                            var edocCPs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
-                            Acctype.AddRange(edocCPs.Select(x => x.Id).ToList());
-                        }
-                        else
-                        {
+                        //if (accManage == null)
+                        //{
+                        //    var voucherCPIds = await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("CASHPAYMENT") && x.VoucherId != null);
+                        //    var billingNo = voucherCPIds.Select(x => x.AttachDocInfo);
+                        //    var edocCPs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
+                        //    Acctype.AddRange(edocCPs.Select(x => x.Id).ToList());
+                        //}
+                        //else
+                        //{
                             var voucherCPIds = accManage.Where(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("CASHPAYMENT") && x.VoucherId != null);
-                            var billingNo = voucherCPIds.Select(x => x.AttachDocInfo);
-                            var edocCPs = edocRepo.Get(x => billingNo.Contains(x.BillingNo));
+                            var billingNoCP = voucherCPIds.Select(x => x.AttachDocInfo);
+                            var edocCPs = edocRepo.Get(x => billingNoCP.Contains(x.BillingNo));
                             Acctype.AddRange(edocCPs.Select(x => x.Id).ToList());
-                        }
+                        //}
                         break;
                     case AccountantType.PurchasingNote:
-                        if (accManage == null)
-                        {
-                            var voucherPNIds = await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("PURCHASINGNOTE") && x.VoucherId != null);
-                            var billingNo = voucherPNIds.Select(x => x.AttachDocInfo).Distinct();
-                            var edocPNs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
-                            Acctype.AddRange(edocPNs.Select(x => x.Id).ToList());
-                        }
-                        else
-                        {
+                        //if (accManage == null)
+                        //{
+                        //    var voucherPNIds = await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("PURCHASINGNOTE") && x.VoucherId != null);
+                        //    var billingNo = voucherPNIds.Select(x => x.AttachDocInfo).Distinct();
+                        //    var edocPNs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
+                        //    Acctype.AddRange(edocPNs.Select(x => x.Id).ToList());
+                        //}
+                        //else
+                        //{
                             var voucherPNIds = accManage.Where(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("PURCHASINGNOTE") && x.VoucherId != null);
-                            var billingNo = voucherPNIds.Select(x => x.AttachDocInfo);
-                            var edocPNs = edocRepo.Get(x => billingNo.Contains(x.BillingNo));
+                            var billingNoPN = voucherPNIds.Select(x => x.AttachDocInfo);
+                            var edocPNs = edocRepo.Get(x => billingNoPN.Contains(x.BillingNo));
                             Acctype.AddRange(edocPNs.Select(x => x.Id).ToList());
-                        }
+                        //}
                         break;
                     case AccountantType.CreditSlip:
-                        if (accManage == null)
-                        {
-                            var voucherCLIds = await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("CREDITSLIP") && x.VoucherId != null);
-                            var billingNo = voucherCLIds.Select(x => x.AttachDocInfo).Distinct();
-                            var edocCLs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
-                            Acctype.AddRange(edocCLs.Select(x => x.Id).ToList());
-                        }
-                        else
-                        {
+                        //if (accManage == null)
+                        //{
+                        //    var voucherCLIds = await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("CREDITSLIP") && x.VoucherId != null);
+                        //    var billingNo = voucherCLIds.Select(x => x.AttachDocInfo).Distinct();
+                        //    var edocCLs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
+                        //    Acctype.AddRange(edocCLs.Select(x => x.Id).ToList());
+                        //}
+                        //else
+                        //{
                             var voucherCLIds = accManage.Where(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("CREDITSLIP") && x.VoucherId != null);
-                            var billingNo = voucherCLIds.Select(x => x.AttachDocInfo);
-                            var edocCLs = edocRepo.Get(x => billingNo.Contains(x.BillingNo));
+                            var billingNoCL = voucherCLIds.Select(x => x.AttachDocInfo);
+                            var edocCLs = edocRepo.Get(x => billingNoCL.Contains(x.BillingNo));
                             Acctype.AddRange(edocCLs.Select(x => x.Id).ToList());
-                        }
+                        //}
                         break;
                     case AccountantType.CashReceipt:
-                        if (accManage == null)
-                        {
-                            var voucherRCIds = await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("CASHRECEIPT") && x.VoucherId != null);
-                            var billingNo = voucherRCIds.Select(x => x.AttachDocInfo);
-                            var edocRCs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
-                            Acctype.AddRange(edocRCs.Select(x => x.Id).ToList());
-                        }
-                        else
-                        {
+                        //if (accManage == null)
+                        //{
+                        //    var voucherRCIds = await accManageRepo.WhereAsync(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("CASHRECEIPT") && x.VoucherId != null);
+                        //    var billingNo = voucherRCIds.Select(x => x.AttachDocInfo);
+                        //    var edocRCs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
+                        //    Acctype.AddRange(edocRCs.Select(x => x.Id).ToList());
+                        //}
+                        //else
+                        //{
                             var voucherRCIds = accManage.Where(x => x.VoucherType.ToUpper().Replace(" ", "").Contains("CASHRECEIPT") && x.VoucherId != null);
-                            var billingNo = voucherRCIds.Select(x => x.AttachDocInfo);
-                            var edocRCs = edocRepo.Get(x => billingNo.Contains(x.BillingNo));
+                            var billingNoRC = voucherRCIds.Select(x => x.AttachDocInfo);
+                            var edocRCs = edocRepo.Get(x => billingNoRC.Contains(x.BillingNo));
                             Acctype.AddRange(edocRCs.Select(x => x.Id).ToList());
-                        }
+                        //}
+                        break;
+                    case AccountantType.All:
+                        //if (accManage == null)
+                        //{
+                        //    var voucherRCIds = await accManageRepo.WhereAsync(x => x.VoucherId != null);
+                        //    var billingNo = voucherRCIds.Select(x => x.AttachDocInfo);
+                        //    var edocRCs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
+                        //    Acctype.AddRange(edocRCs.Select(x => x.Id).ToList());
+                        //}
+                        //else
+                        //{
+                            var voucherALLIds = accManage.Where(x =>x.VoucherId != null);
+                            var billingNoALL = voucherALLIds.Select(x => x.AttachDocInfo);
+                            var edocALLs = edocRepo.Get(x => billingNoALL.Contains(x.BillingNo));
+                            Acctype.AddRange(edocALLs.Select(x => x.Id).ToList());
+                        //}
                         break;
                 }
                 if (Acctype.Count() > 0)
@@ -684,9 +775,7 @@ namespace eFMS.API.Setting.DL.Services
             var isRefNo = criteria.ReferenceNo != null && criteria.ReferenceNo != "";
             if (isRefNo)
             {
-                criteria.ReferenceNo = criteria.ReferenceNo.Replace(" ", "").Replace("\t", ";").Replace("\n", ";");
-                lstRefNo = criteria.ReferenceNo.Split(";").ToList();
-                lstRefNo.Remove("");
+             lstRefNo = getListRefNo(criteria);
             }
 
             var jobOps = new List<OpsTransaction>();
@@ -815,17 +904,36 @@ namespace eFMS.API.Setting.DL.Services
                 var accManage = new List<AccAccountingManagement>();
                 if (!isRefNo)
                 {
-                    accManage = null;
+                    if (criteria.DateMode == DateMode.CreateDate)
+                    {
+                        accManage = await accManageRepo.GetAsync((x => x.DatetimeCreated >= criteria.FromDate.Value && x.DatetimeCreated <= criteria.ToDate.Value.AddDays(1)&&x.VoucherType!=null));
+                    }
+                    else
+                    {
+                        accManage = await accManageRepo.GetAsync(x => x.Date >= criteria.FromDate && x.Date <= criteria.ToDate.Value.AddDays(1)&&x.VoucherType != null);
+                    }
+                    
                 }
                 else
                 {
-                    accManage = await accManageRepo.GetAsync(x => lstRefNo.Contains(x.VoucherId));
+                    accManage = await accManageRepo.GetAsync(x => lstRefNo.Contains(x.VoucherId)&&x.VoucherType != null);
                 }
                 var query3 = await QueryAccType(criteria.AccountantTypes, accManage);
                 query = query.And(query3);
             }
 
             return query;
+        }
+
+        private async Task<bool> isOther(Guid objectId)
+        {
+            var images = await DataContext.GetAsync(x => x.Id == objectId);
+            var imageId = images.FirstOrDefault()?.Id;
+            if (imageId == null)
+            {
+                return false;
+            }
+            return edocRepo.Any(x => x.SysImageId == imageId);
         }
 
         private List<string> GetListOtherFile(List<string> accNo)
@@ -851,7 +959,14 @@ namespace eFMS.API.Setting.DL.Services
                         {
                             var job = await cdNoteRepo.GetAsync(x => x.Code == item);
                             var jobIds = job.Select(x => x.JobId.ToString());
-                            result.AddRange(jobIds);
+                            if (jobIds.Count() > 0)
+                            {
+                                jobIds.ToList().ForEach(x =>
+                                {
+                                        result.AddRange(jobIds);
+                                });
+                            }
+                            
                         }
                         else
                         {
@@ -862,7 +977,7 @@ namespace eFMS.API.Setting.DL.Services
                                 Guid soaIdConverted;
                                 if (Guid.TryParse(soaId, out soaIdConverted))
                                 {
-                                    result.Add(soaId);
+                                        result.Add(soaId);
                                 }
                             }
                         }

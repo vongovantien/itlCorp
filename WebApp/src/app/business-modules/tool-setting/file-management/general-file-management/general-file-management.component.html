@@ -14,7 +14,7 @@
             </ng-template>
             <div class="row">
                 <div class="col-md-12">
-                    <form-search-file-management (onSearch)="onSearchFile($event)" [tabType]="'fileGeneralManage'">
+                    <form-search-file-management (onSearch)="onSearchFile($event)" [tabType]="'fileGeneralManage'" (onReset)="reset($event)" >
                     </form-search-file-management>
                 </div>
             </div>

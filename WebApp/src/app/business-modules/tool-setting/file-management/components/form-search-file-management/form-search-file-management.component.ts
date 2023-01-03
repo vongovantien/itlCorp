@@ -14,7 +14,7 @@ import { AppForm } from 'src/app/app.form';
 export class FormSearchFileManagementComponent extends AppForm implements OnInit {
 
     @Output() onSearch: EventEmitter<Partial<IFileManageSearch> | any> = new EventEmitter<Partial<IFileManageSearch> | any>();
-    @Output() onSearchF: EventEmitter<Partial<IFileManageSearch> | any> = new EventEmitter<Partial<IFileManageSearch> | any>();
+    @Output() onReset: EventEmitter<Partial<IFileManageSearch> | any> = new EventEmitter<Partial<IFileManageSearch> | any>();
     @Input() tabType: string = '';
     referenceTypes: CommonInterface.ICommonTitleValue[] = [
         { title: 'Job ID', value: 0 },
@@ -35,12 +35,15 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         { title: 'Credit Slip', value: 3 },
         { title: 'Purchasing Note', value: 4 },
         { title: 'Other Entry', value: 5 },
+        { title: 'All', value: 6 },
     ]
     formSearchFile: FormGroup;
     isAcc: boolean = false;
     ruleName: AbstractControl;
     serviceBuying: AbstractControl;
     serviceSelling: AbstractControl;
+    //accTypeSelected: number[] = [];
+
 
     constructor(
         protected _dataService: DataService,
@@ -62,7 +65,6 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     }
 
     initFormSearch() {
-
         if (this.tabType === 'fileAccManage') {
             this.referenceTypes = [
                 { title: 'Accountant No', value: 3 },
@@ -81,23 +83,27 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             }],
             searchType: [this.referenceTypes[0].value],
             referenceNo: [],
-            accountantType: [[this.accountantTypes[0].value]]
+            accountantType: [[this.accountantTypes[6].value]]
         });
         this.dateMode = this.formSearchFile.controls['dateMode'];
         this.date = this.formSearchFile.controls['date'];
         this.searchType = this.formSearchFile.controls["searchType"];
         this.referenceNo = this.formSearchFile.controls["referenceNo"];
         this.accountantType = this.formSearchFile.controls["accountantType"];
+
     }
 
     submitSearch(formSearch: any) {
+        // if (this.isAcc) {
+        //     this.accountantType.setValue([this.accountantTypes[6].value]);
+        // }
         const bodySearch: Partial<IFileManageSearch> = {
             referenceNo: formSearch.referenceNo,
             referenceType: formSearch.searchType,
             fromDate: !!formSearch.date?.startDate ? formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en') : new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate),
             toDate: !!formSearch.date?.endDate ? formatDate(formSearch.date.endDate, "yyyy-MM-dd", 'en') : new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate),
             dateMode: formSearch.dateMode,
-            accountantTypes: this.isAcc ? formSearch.accountantType == 0 ? [0] : formSearch.accountantType : null,
+            accountantTypes: this.isAcc ? this.accountantType.value : null,
         };
         this.onSearch.emit(bodySearch);
     }
@@ -109,7 +115,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
             toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
             dateMode: this.accountantTypes[0].value,
-            accountantTypes: this.isAcc ? [0] : null,
+            accountantTypes: this.isAcc ? [6] : null,
         };
         this.referenceNo.setValue(null)
         this.date.setValue({
@@ -119,9 +125,9 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         this.searchType.setValue(this.referenceTypes[0].value);
         this.dateMode.setValue(this.dateModes[0].value);
         if (this.isAcc) {
-            this.accountantType.setValue([this.accountantTypes[0].value]);
+            this.accountantType.setValue([this.accountantTypes[6].value]);
         }
-        this.onSearch.emit(bodySearch);
+        this.onReset.emit(bodySearch);
     }
 
     resetDate(control: FormControl | AbstractControl) {
@@ -130,6 +136,23 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             endDate: null
         });
         control.setValue(null);
+    }
+
+    selelectedSelect(event: any) {
+        const currTrans = this.accountantType.value;
+        console.log(currTrans);
+        console.log(event);
+        if (currTrans.filter(x => x === 6).length > 0 && event !== 6) {
+            currTrans.splice(0);
+            currTrans.push(event.value);
+            this.accountantType.setValue(currTrans);
+            console.log(currTrans);
+        }
+        console.log(currTrans);
+
+        if (event.value === 6) {
+            this.accountantType.setValue([6]);
+        }
     }
 
 }
