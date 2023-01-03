@@ -5,16 +5,15 @@ import { OperationRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
+import { CustomClearanceFormDetailComponent } from 'src/app/business-modules/operation/custom-clearance/components/form-detail-clearance/form-detail-clearance.component';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { PopupBase } from 'src/app/popup.base';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
-import { CustomClearanceFormDetailComponent } from '../../../custom-clearance/components/form-detail-clearance/form-detail-clearance.component';
-
 @Component({
-    selector: 'add-new-modal',
-    templateUrl: './add-new-modal.component.html'
+    selector: 'custom-clearance-add-new-modal',
+    templateUrl: './custom-clearance-add-new-modal.component.html'
 })
-export class AddNewModalComponent extends PopupBase implements OnInit, AfterViewInit {
+export class CustomClearanceAddNewModalComponent extends PopupBase implements OnInit, AfterViewInit {
     @ViewChild(CustomClearanceFormDetailComponent) detailComponent: CustomClearanceFormDetailComponent;
     @Output() isCloseModal = new EventEmitter();
     @Input() currentJob: OpsTransaction;
@@ -88,8 +87,9 @@ export class AddNewModalComponent extends PopupBase implements OnInit, AfterView
     }
 
     closePopUpAddNew() {
-        this.detailComponent.formGroup.reset();
-        this.isCloseModal.emit(true)
+        this.detailComponent.isSubmitted = false;
+        this.isCloseModal.emit(true);
+        this.detailComponent.reset();
     }
 
 }

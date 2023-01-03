@@ -506,7 +506,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.ShipmentType = "Freehand & Nominated";
 
             }
-            
             var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
             if (hs.Success)
             {

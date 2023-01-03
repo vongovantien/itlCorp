@@ -7,7 +7,7 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { AddMoreModalComponent } from './add-more-modal/add-more-modal.component';
 import { SearchMultipleComponent } from './components/search-multiple/search-multiple.component';
 import { SharedOperationModule } from '../../shared-operation.module';
-import { AddNewModalComponent } from './add-new-modal/add-new-modal.component';
+import { CustomClearanceAddNewModalComponent } from './components/custom-clearance-add-new-modal/custom-clearance-add-new-modal.component';
 
 const LIB = [
     ModalModule.forRoot(),
@@ -19,7 +19,7 @@ const LIB = [
         BillingCustomDeclarationComponent,
         AddMoreModalComponent,
         SearchMultipleComponent,
-        AddNewModalComponent,
+        CustomClearanceAddNewModalComponent,
     ],
     exports: [],
     providers: [],

@@ -449,7 +449,6 @@ namespace eFMS.API.Documentation.DL.Services
                 CatPartner customer = partnerRepository.Get(x => x.Id == details.CustomerId).FirstOrDefault();
                 details.CustomerName = customer?.ShortName;
                 details.CustomerAccountNo = customer?.AccountNo;
-
                 CatPlace place = placeRepository.Get(x => x.Id == details.ClearanceLocation).FirstOrDefault();
                 details.PlaceNameCode = place?.Code;
 
@@ -608,7 +607,7 @@ namespace eFMS.API.Documentation.DL.Services
             };
             return results;
         }
-        private string GetClearanceNoOfShipment(string jobNo,IQueryable<CsShipmentSurcharge>surcharge,IQueryable<CustomsDeclaration> clearances)
+        private string GetClearanceNoOfShipment(string jobNo, IQueryable<CsShipmentSurcharge> surcharge, IQueryable<CustomsDeclaration> clearances)
         {
             var surchargeShipment = surcharge.Where(x => x.JobNo == jobNo);
             var clearanceNos = surchargeShipment.Select(x => x.ClearanceNo).ToList();
@@ -616,7 +615,7 @@ namespace eFMS.API.Documentation.DL.Services
             var clearanceShipment = clearanceShipments.FirstOrDefault();
             if (clearanceShipments.Any(x => x.ConvertTime != null))
             {
-               clearanceShipment= clearanceShipments.FirstOrDefault(x => x.ConvertTime != null);
+                clearanceShipment = clearanceShipments.FirstOrDefault(x => x.ConvertTime != null);
             }
             if (surchargeShipment.Count() > 0 && clearanceShipment != null)
             {

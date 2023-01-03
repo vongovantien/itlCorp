@@ -129,7 +129,7 @@ namespace eFMS.API.Operation.Controllers
         [HttpPost]
         [Route("Add")]
         [AuthorizeEx(Menu.opsCustomClearance, UserPermission.Add)]
-        public IActionResult AddNew(CustomsDeclarationModel model)
+        public async Task<IActionResult> AddNew(CustomsDeclarationModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var code = CheckForbitUpdate(_user.UserMenuPermission.Write);
@@ -140,7 +140,7 @@ namespace eFMS.API.Operation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
             model = GetModelAdd(model);
-            var hs = customsDeclarationService.Add(model);
+            var hs = await customsDeclarationService.AddNewCustomsDeclaration(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
