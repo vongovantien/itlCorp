@@ -1,4 +1,9 @@
 :host /deep/ {
+    .list-master-charge {
+        .e--combogrid-content {
+            min-width: 520px;
+        }
+    }
     .dropzone {
         padding: 20px;
         text-align: center;

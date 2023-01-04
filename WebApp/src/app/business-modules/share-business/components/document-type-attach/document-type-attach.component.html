@@ -29,7 +29,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <table class="table table-brand table-wrapper table-editable">
+                        <table class="table table-brand table-fixed table-editable">
                             <thead app-table-header [headers]="headers">
                                 <th class="first">Action</th>
                             </thead>
@@ -66,6 +66,9 @@
                                                                 {{docType.nameEn}}
                                                             </option>
                                                         </select>
+                                                        <!-- <ng-select [multiple]="false" class="custom" [items]="documentTypes"
+                                                            placeholder="Select Document Type" (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
+                                                        </ng-select> -->
                                                     </div>
                                                 </td>
                                                 <td class="disabled" *ngIf="typeFrom==='Shipment'">
@@ -74,24 +77,32 @@
                                                             disabled>
                                                     </div>
                                                 </td>
-                                                    <td class="disabled" *ngIf="typeFrom!=='Shipment'">
-                                                        <select class="form-control" [(ngModel)]="file.job"
+                                                <td class="disabled" *ngIf="typeFrom!=='Shipment'">
+                                                    <!-- <select class="form-control" [(ngModel)]="file.job"
                                                             (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
                                                             <option *ngFor="let job of jobs" [ngValue]="job">
                                                                 {{job.jobNo}}
                                                             </option>
+                                                        </select> -->
+                                                    <div class="list-master-charge">
+                                                        <app-combo-grid-virtual-scroll [height]="150"
+                                                            (itemSelected)="onSelectDataFormInfo($event,i, 'job')"
+                                                            [dataSources]="configJob.dataSource"
+                                                            [displayFields]="configJob.displayFields"
+                                                            (remove)="removeJob(i)">
+                                                        </app-combo-grid-virtual-scroll>
+                                                    </div>
+                                                </td>
+                                                <td class="" *ngIf="typeFrom==='Shipment'">
+                                                    <div class="form-group ">
+                                                        <select class="form-control" [(ngModel)]="file.hwbNo"
+                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
+                                                            <option *ngFor="let hbl of housebills" [ngValue]="hbl">
+                                                                {{hbl.hwbno}}
+                                                            </option>
                                                         </select>
-                                                    </td>
-                                                    <td class="" *ngIf="typeFrom==='Shipment'">
-                                                        <div class="form-group ">
-                                                            <select class="form-control" [(ngModel)]="file.hwbNo"
-                                                                (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
-                                                                <option *ngFor="let hbl of housebills" [ngValue]="hbl">
-                                                                    {{hbl.hwbno}}
-                                                                </option>
-                                                            </select>
-                                                        </div>
-                                                    </td>
+                                                    </div>
+                                                </td>
                                                 <td class="">
                                                     <div class="form-group ">
                                                         <input type="text" class="form-control " placeholder="Note"
