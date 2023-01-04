@@ -320,8 +320,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         public SysAttachFileTemplate GetAttTepmlateByJob(string Code, int docId, string transationType)
         {
-            var nameEn = _attachFileTemplateRepo.Get(x => x.Id == docId).FirstOrDefault()?.NameEn;
-            return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.NameEn == nameEn && x.TransactionType == transationType).FirstOrDefault();
+            //var nameEn = _attachFileTemplateRepo.Get(x => x.Id == docId).FirstOrDefault()?.NameEn;
+            return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.TransactionType == transationType).FirstOrDefault();
         }
         public async Task<List<EDocGroupByType>> GetEDocByJob(Guid jobID, string transactionType)
         {
