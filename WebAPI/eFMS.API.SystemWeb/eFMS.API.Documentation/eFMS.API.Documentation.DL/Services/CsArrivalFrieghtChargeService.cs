@@ -673,6 +673,9 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new AirImptArrivalReportParams();
             parameter.No = string.Empty;
             parameter.MAWB = houseBill != null ? (houseBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
+            var officeId = transactionRepository.First(x => x.Id == houseBill.JobId)?.OfficeId;
+            parameter.OfficeLocation = officeRepo.First(x => x.Id == officeId)?.Location ?? string.Empty;
+
             // Thông tin Company
 
             //[ADD][08/10/2021][Change company name -> branch name office ]
@@ -1054,6 +1057,7 @@ namespace eFMS.API.Documentation.DL.Services
                 NoPieces = nopieces,
                 GrossWeight = detail.GrossWeight,
                 Unit = unitOfMeasures,
+                DateConfirm = detail.DeliveryOrderPrintedDate ?? DateTime.Now,
                 CBM = detail.Cbm ?? 0,
                 DeliveryOrderNote = ReportUltity.ReplaceHtmlBaseForPreviewReport(detail.Dofooter), // (Không Upper Case)
                 FirstDestination = detail.DosentTo1?.ToUpper(),
