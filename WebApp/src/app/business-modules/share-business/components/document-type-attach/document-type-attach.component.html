@@ -59,16 +59,21 @@
                                                 <td class="">
                                                     <div class="form-group"
                                                         [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.docType) }">
-                                                        <select class="form-control" [(ngModel)]="file.docType"
+                                                        <!-- <select class="form-control" [(ngModel)]="file.docType"
                                                             (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
                                                             <option *ngFor="let docType of documentTypes"
                                                                 [ngValue]="docType">
                                                                 {{docType.nameEn}}
                                                             </option>
-                                                        </select>
-                                                        <!-- <ng-select [multiple]="false" class="custom" [items]="documentTypes"
-                                                            placeholder="Select Document Type" (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
-                                                        </ng-select> -->
+                                                        </select> -->
+                                                        <div class="list-master">
+                                                            <app-combo-grid-virtual-scroll [height]="150"
+                                                                (itemSelected)="onSelectDataFormInfo($event,i, 'docType')"
+                                                                [dataSources]="configDocType.dataSource"
+                                                                [displayFields]="configDocType.displayFields" [selectedDisplayFields]="configDocType.selectedDisplayFields"
+                                                                (remove)="removeDocType(i)">
+                                                            </app-combo-grid-virtual-scroll>
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td class="disabled" *ngIf="typeFrom==='Shipment'">
@@ -84,11 +89,11 @@
                                                                 {{job.jobNo}}
                                                             </option>
                                                         </select> -->
-                                                    <div class="list-master-charge">
+                                                    <div class="list-master">
                                                         <app-combo-grid-virtual-scroll [height]="150"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'job')"
-                                                            [dataSources]="configJob.dataSource"
-                                                            [displayFields]="configJob.displayFields"
+                                                            [dataSources]="jobDatSource"
+                                                            [displayFields]="configJob.displayFields" [selectedDisplayFields]="configJob.selectedDisplayFields"
                                                             (remove)="removeJob(i)">
                                                         </app-combo-grid-virtual-scroll>
                                                     </div>

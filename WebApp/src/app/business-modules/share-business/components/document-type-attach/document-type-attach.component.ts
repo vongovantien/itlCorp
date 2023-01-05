@@ -38,6 +38,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     documentTypes: any[] = [];
     isSubmitted: boolean = false;
     configJob: CommonInterface.IComboGirdConfig | any = {};
+    jobDatSource: any[] = [];
+    configDocType: CommonInterface.IComboGirdConfig | any = {};
 
     constructor(
         private _toastService: ToastrService,
@@ -51,6 +53,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     ngOnInit(): void {
         this.getJobList();
+        this.getDocumentType();
         this.transactionType = this.typeFrom;
         this.configJob = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -59,7 +62,13 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 { field: 'hbl', label: 'House Bill' },
                 { field: 'mbl', label: 'Master Bill' },
             ]
-        }, { selectedDisplayFields: ['jobNo'], });
+        }, { selectedDisplayFields: ['jobId'], });
+        this.configDocType = Object.assign({}, this.configComoBoGrid, {
+            displayFields: [
+                { field: 'id', label: 'Code' },
+                { field: 'nameEn', label: 'Name EN' },
+            ]
+        }, { selectedDisplayFields: ['nameEn'], });
     }
 
     chooseFile(event: any) {
@@ -96,8 +105,23 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         event.target.value = ''
 
     }
+
+    getDocumentType() {
+        this._systemFileManagerRepo.getDocumentType(this.transactionType, this.billingId)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: any[]) => {
+                    this.documentTypes = res;
+                    this.configDocType.dataSource = res;
+                },
+            );
+    }
+
+
     getJobList() {
-        let partners: any[] = [];
+        //let jobs: any[] = [];
         if (this.typeFrom === 'Settlement') {
             this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -114,10 +138,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                                     mbl: element.mbl
 
                                 })
-                                partners.push(item);
+                                this.jobDatSource.push(item);
                             }
                             );
-                            this.configJob.dataSource = partners;
                         }
                     }
                 );
@@ -128,13 +151,18 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            for (let element of data) {
-                                console.log(element);
+                            _uniqBy(data, 'hbl').forEach(element => {
+                                let item = ({
+                                    jobId: element.jobId,
+                                    id: element.shipmentId,
+                                    customNo: element.customNo,
+                                    hbl: element.hbl,
+                                    mbl: element.mbl
 
-                                partners.push(element);
+                                })
+                                this.jobDatSource.push(item);
                             }
-
-                            this.configJob.dataSource = partners;
+                            );
                         }
                     }
                 );
@@ -145,11 +173,18 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            for (let element of data.groupShipments) {
-                                console.log(element);
-                                partners.push({ jobNo: element.jobId, id: element.shipmentId })
+                            _uniqBy(data.chargeShipments, 'hbl').forEach(element => {
+                                let item = ({
+                                    jobId: element.jobId,
+                                    id: element.shipmentId,
+                                    customNo: element.clearanceNo,
+                                    hbl: element.hbl,
+                                    mbl: element.mbl
+
+                                })
+                                this.jobDatSource.push(item);
                             }
-                            this.configJob.dataSource = partners;
+                            );
                         }
                     }
                 );
@@ -264,9 +299,17 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 );
         }
     }
+
     removeJob(index: number) {
         this.listFile[index].jobNo = null;
         this.listFile[index].jobId = null;
+    }
+
+    removeDocType(index: number) {
+        this.listFile[index].Code = null;
+        this.listFile[index].DocumentId = null;
+        this.listFile[index].aliasName = null;
+        this.selectedtDocType = null;
     }
 }
 export interface IEDocUploadFile {
