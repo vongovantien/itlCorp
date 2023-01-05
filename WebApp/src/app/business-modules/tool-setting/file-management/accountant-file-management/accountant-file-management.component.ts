@@ -33,11 +33,9 @@ export class AccountantFileManagementComponent extends AppList implements OnInit
     }
 
     onSearchFile(body: any) {
-        body.Size = this.pageSize;
-        body.Page = this.page;
         this.dataSearch = body;
         body.isAcc = true;
-        this._settingRepo.getEdocManagement(Object.assign({}, body))
+        this._settingRepo.getEdocManagement(Object.assign({}, body), this.page, this.pageSize)
             .pipe(
                 catchError(this.catchError),
             ).subscribe(

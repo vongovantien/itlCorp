@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { ConfirmPopupComponent } from '@common';
 import { SystemConstants } from '@constants';
-import { InjectViewContainerRefDirective } from '@directives';
+import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { ExportRepo, SystemFileManageRepo } from '@repositories';
 import { AppList } from 'src/app/app.list';
 import { fileManagePaging } from '../../general-file-management/general-file-management.component';
@@ -12,7 +12,7 @@ import { SortService } from './../../../../../shared/services/sort.service';
     templateUrl: './list-file-management.component.html'
 })
 export class ListFileManagementComponent extends AppList implements OnInit {
-
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
     @Output() changePage: EventEmitter<any> = new EventEmitter<any>();
     @Input() tabType: string;
     @Input() listEdocFile: fileManagePaging;
@@ -92,6 +92,7 @@ export class ListFileManagementComponent extends AppList implements OnInit {
     }
 
     onSelectFile(edoc: any) {
+        this.clearMenuContext(this.queryListMenuContext);
         this.selectedFile = edoc;
         this.isView = true;
         const extension = this.selectedFile.imageUrl.split('.').pop();

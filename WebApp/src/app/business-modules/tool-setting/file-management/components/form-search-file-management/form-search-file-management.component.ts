@@ -42,6 +42,8 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     ruleName: AbstractControl;
     serviceBuying: AbstractControl;
     serviceSelling: AbstractControl;
+    //accTypeSelected: number[] = [];
+
 
     constructor(
         protected _dataService: DataService,
@@ -63,7 +65,6 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
     }
 
     initFormSearch() {
-
         if (this.tabType === 'fileAccManage') {
             this.referenceTypes = [
                 { title: 'Accountant No', value: 3 },
@@ -89,19 +90,20 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         this.searchType = this.formSearchFile.controls["searchType"];
         this.referenceNo = this.formSearchFile.controls["referenceNo"];
         this.accountantType = this.formSearchFile.controls["accountantType"];
+
     }
 
     submitSearch(formSearch: any) {
-        if (this.isAcc) {
-            this.accountantType.setValue([this.accountantTypes[6].value]);
-        }
+        // if (this.isAcc) {
+        //     this.accountantType.setValue([this.accountantTypes[6].value]);
+        // }
         const bodySearch: Partial<IFileManageSearch> = {
             referenceNo: formSearch.referenceNo,
             referenceType: formSearch.searchType,
             fromDate: !!formSearch.date?.startDate ? formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en') : new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate),
             toDate: !!formSearch.date?.endDate ? formatDate(formSearch.date.endDate, "yyyy-MM-dd", 'en') : new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate),
             dateMode: formSearch.dateMode,
-            accountantTypes: this.isAcc ? [6] : null,
+            accountantTypes: this.isAcc ? this.accountantType.value : null,
         };
         this.onSearch.emit(bodySearch);
     }
@@ -134,6 +136,23 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             endDate: null
         });
         control.setValue(null);
+    }
+
+    selelectedSelect(event: any) {
+        const currTrans = this.accountantType.value;
+        console.log(currTrans);
+        console.log(event);
+        if (currTrans.filter(x => x === 6).length > 0 && event !== 6) {
+            currTrans.splice(0);
+            currTrans.push(event.value);
+            this.accountantType.setValue(currTrans);
+            console.log(currTrans);
+        }
+        console.log(currTrans);
+
+        if (event.value === 6) {
+            this.accountantType.setValue([6]);
+        }
     }
 
 }

@@ -215,9 +215,11 @@ export class SettingRepo {
         );;
     }
 
-    getEdocManagement(body: any) {
-        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/GetEdocManagement`, body
-        ).pipe(
+    getEdocManagement(body: any, page?: number, size?: number) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/vi/FileManagement/GetEdocManagement`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

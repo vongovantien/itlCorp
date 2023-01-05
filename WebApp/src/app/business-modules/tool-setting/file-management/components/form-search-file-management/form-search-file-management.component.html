@@ -40,7 +40,7 @@
                         <div class="col-lg-6" *ngIf="isAcc">
                             <div class="form-group">
                                 <label>Accountant Type</label>
-                                <ng-select formControlName="accountantType" [items]="accountantTypes" class="custom"
+                                <ng-select formControlName="accountantType" [items]="accountantTypes" class="custom" (add)="selelectedSelect($event)"
                                     bindLabel="title" [multiple]="true" bindValue="value" [clearable]="false">
                                 </ng-select>
                             </div>
