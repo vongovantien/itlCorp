@@ -12,6 +12,6 @@ namespace eFMS.API.Setting.DL.IService
     {
         IQueryable<SysImageViewModel> Get(FileManagementCriteria criteria, int page, int size, out int rowsCount);
         List<SysImageViewModel> GetDetail(string folderName, string objectId);
-        Task<FileManageResponse> GetEdocManagement(EDocManagementCriterial criterial);
+        Task<FileManageResponse> GetEdocManagement(EDocManagementCriterial criterial,int page,int size);
     }
 }

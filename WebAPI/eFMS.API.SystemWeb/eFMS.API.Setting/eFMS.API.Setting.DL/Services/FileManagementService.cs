@@ -222,7 +222,7 @@ namespace eFMS.API.Setting.DL.Services
             return criteria.ReferenceNo.Split(";").ToList();
         }
 
-        public async Task<FileManageResponse> GetEdocManagement(EDocManagementCriterial criterial)
+        public async Task<FileManageResponse> GetEdocManagement(EDocManagementCriterial criterial,int page,int size)
         {
             var data = await edocRepo.WhereAsync(await ExpressionQuery(criterial));
             List<EDocFile> eDocFiles = new List<EDocFile>();
@@ -231,25 +231,25 @@ namespace eFMS.API.Setting.DL.Services
             int totalData = 0;
             if (criterial.isAcc)
             {
-                var countData = criterial.Size - data.Count();
+                var countData = size - data.Count();
                 if (countData > 0)
                 {
                     var query = QueryOther(criterial).Result;
                     var otherData = await DataContext.WhereAsync(query);
                     other = ConvertToEDocOther(otherData);
                     totalData = other.Count() + data.Count();
-                    result = data.Concat(other).AsQueryable().OrderBy(x=>x.BillingNo).Skip((criterial.Page - 1) * (criterial.Size + other.Count())).Take(criterial.Size).ToList();
+                    result = data.Concat(other).AsQueryable().OrderBy(x=>x.BillingNo).Skip((page - 1) * (size + other.Count())).Take(size).ToList();
                 }
                 else
                 {
                     totalData = data.Count();
-                    result = data.AsQueryable().Skip((criterial.Page - 1) * (criterial.Size + other.Count())).Take(criterial.Size).ToList();
+                    result = data.AsQueryable().Skip((page - 1) * (size + other.Count())).Take(size).ToList();
                 }
             }
             else
             {
                 totalData = data.Count();
-                result = data.AsQueryable().Skip((criterial.Page - 1) * criterial.Size).Take(criterial.Size).ToList();
+                result = data.AsQueryable().Skip((page - 1) * size).Take(size).ToList();
             }
             bool isAcc = criterial.AccountantTypes != null;
             result.ToList().ForEach(x =>

@@ -12,8 +12,6 @@ namespace eFMS.API.Setting.DL.Models.Criteria
         public DateMode? DateMode { get; set; }
         public List<AccountantType> AccountantTypes { get; set; }
         public ReferenceType? ReferenceType { get; set; }
-        public int Page { get; set; } = 0;
-        public int Size { get; set; } = 15;
         public bool isAcc { get; set; }
     }
     public enum ReferenceType

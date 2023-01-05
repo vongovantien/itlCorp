@@ -62,9 +62,9 @@ namespace eFMS.API.Setting.Controllers
         [HttpPost]
         [Route("GetEdocManagement")]
         [Authorize]
-        public IActionResult GetEdocManagement(EDocManagementCriterial criteria)
+        public IActionResult GetEdocManagement(EDocManagementCriterial criteria, int pageNumber, int pageSize)
         {
-            var data = fileManagementService.GetEdocManagement(criteria).Result;
+            var data = fileManagementService.GetEdocManagement(criteria,pageNumber,pageSize).Result;
             if (data == null)
             {
                 return BadRequest();
@@ -72,8 +72,8 @@ namespace eFMS.API.Setting.Controllers
             var result = new ResponsePagingModel<EDocFile>()
             {
                 Data = data.Data,
-                Page = criteria.Page,
-                Size = criteria.Size,
+                Page = pageNumber,
+                Size = pageSize,
                 TotalItems = data.TotalItem
             };
             return Ok(result);
