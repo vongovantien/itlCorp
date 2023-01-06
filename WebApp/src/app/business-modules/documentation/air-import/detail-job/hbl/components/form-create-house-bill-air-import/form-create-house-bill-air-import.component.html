@@ -140,7 +140,7 @@
                         <app-combo-grid-virtual-scroll allowFreeText
                             (itemSelected)="onSelectDataFormInfo($event, 'pol')" [selectedDisplayFields]="['nameEn']"
                             [dataSources]="ports | async" placeholder="Select Departure Airport"
-                            [loading]="isLoadingPort | async" (remove)="resetFormControl(pol)"
+                            [loading]="isLoadingPort | async" (remove)="resetFormControl(pol); resetFormControl(polDescription)"
                             [displayFields]="displayFieldPort" formControlName="polDescription">
                         </app-combo-grid-virtual-scroll>
                     </div>
