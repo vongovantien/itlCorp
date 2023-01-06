@@ -101,6 +101,10 @@ export class AutoFormatCurrencyDirective {
             this.isReadyClear = false;
             this.onInput(v);
         }
+        if(v.key === ',')
+        {
+            v.preventDefault();
+        }
     }
 
     @HostListener('input', ['$event'])
