@@ -1,22 +1,22 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { AppPage } from '@app';
-import { Surcharge } from '@models';
-import { AccountingRepo } from '@repositories';
-import { ToastrService } from 'ngx-toastr';
 import { RoutingConstants } from '@constants';
+import { Surcharge } from '@models';
+import { AccountingRepo, SystemFileManageRepo } from '@repositories';
 import { DataService } from '@services';
+import { ToastrService } from 'ngx-toastr';
 
-import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
+import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 
-import { catchError, concatMap, finalize } from 'rxjs/operators';
 import { InfoPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { EMPTY } from 'rxjs';
+import { catchError, concatMap, finalize } from 'rxjs/operators';
 @Component({
     selector: 'app-settle-payment-new',
     templateUrl: './add-settle-payment.component.html'
@@ -33,7 +33,8 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         private _toastService: ToastrService,
         private _router: Router,
         private cdRef: ChangeDetectorRef,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _systemFileRepo: SystemFileManageRepo
     ) {
         super();
     }
@@ -141,6 +142,18 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             );
     }
 
+    checkValidAttachEdoc(smId: string) {
+        this._systemFileRepo.CheckAllowSettleEdocSendRequest(smId)
+            .subscribe(
+                (res: any) => {
+                    if (!res) {
+                        return false;
+                    }
+                }
+            );
+        return true;
+    }
+
     saveAndSendRequest() {
         // if (!this.requestSurchargeListComponent.surcharges.length) {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
@@ -149,14 +162,30 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         if (!this.checkValidSettle()) {
             return;
         }
-
         this.formatInvoiceDateSurcharge();
         const body: IDataSettlement = {
             settlement: this.getDataForm(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
+        if (!this.checkValidAttachEdoc(body.settlement.id)) {
+            this._toastService.error("Please check your Document Type !");
+            return;
+        }
+
+        // this._systemFileRepo.CheckAllowSettleEdocSendRequest(body.settlement.id)
+        //     .subscribe(
+        //         (res: any) => {
+        //             console.log(res);
+        //             if (!res) {
+        //                 this._toastService.error("Please check your Document Type !");
+        //                 return;
+        //             }
+        //         }
+        //     );
+
         let settlementResult: any = {};
+
         this._accountingRepo.checkValidToSendRequestSettle(body)
             .pipe(catchError(this.catchError), finalize(() => this.isLoading = false),
                 concatMap((res: CommonInterface.IResult) => {

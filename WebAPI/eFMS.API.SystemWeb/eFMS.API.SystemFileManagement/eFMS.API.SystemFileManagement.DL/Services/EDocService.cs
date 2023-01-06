@@ -2014,5 +2014,20 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             return false;
         }
+        public bool CheckAllowSettleEdocSendRequest(Guid settleId)
+        {
+            var settleNo = _setleRepo.Get(x => settleId == x.Id).FirstOrDefault().SettlementNo;
+            var docTypeId = _sysImageDetailRepo.Get(x => x.BillingNo == settleNo && x.BillingType == "Settlement").Select(x => x.DocumentTypeId).ToList();
+            var attAdvSm = _attachFileTemplateRepo.Get(x => x.Type == "Accountant" && (x.AccountingType == "ADV-Settlement")).Select(x => (int?)x.Id).ToList();
+            if (attAdvSm.Intersect(docTypeId).Any())
+            {
+                var attSm = _attachFileTemplateRepo.Get(x => x.Type == "Accountant" && (x.AccountingType == "Settlement")).Select(x => (int?)x.Id).ToList();
+                if (attSm.Intersect(docTypeId).Any())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

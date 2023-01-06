@@ -13,7 +13,7 @@ import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';
 import { Surcharge } from '@models';
-import { AccountingRepo, ExportRepo } from '@repositories';
+import { AccountingRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { DataService } from '@services';
 
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
@@ -23,6 +23,7 @@ import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import { EMPTY, Observable } from 'rxjs';
 import { catchError, concatMap, finalize, pluck } from 'rxjs/operators';
+import { ShareBussinessAttachFileV2Component } from 'src/app/business-modules/share-business/components/files-attach-v2/files-attach-v2.component';
 import isUUID from 'validator/lib/isUUID';
 import { LoadDetailSettlePayment, LoadDetailSettlePaymentFail, LoadDetailSettlePaymentSuccess } from '../components/store';
 @Component({
@@ -36,7 +37,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
-    //@ViewChild(ShareBussinessAttachFileV2Component) public attachList: ShareBussinessAttachFileV2Component;
+    @ViewChild(ShareBussinessAttachFileV2Component) public attachRef: ShareBussinessAttachFileV2Component;
 
     settlementId: string = '';
     settlementCode: string = '';
@@ -53,6 +54,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         private _router: Router,
         private _exportRepo: ExportRepo,
         private _dataService: DataService,
+        private _systemFileRepo: SystemFileManageRepo,
         private _store: Store<ISettlementPaymentState>
     ) {
         super();
@@ -149,6 +151,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         // this.attachRef.getHblList();
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId, 'LIST');
+                        this.attachRef.getDocumentType('Settlement', this.settlementId);
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
@@ -259,6 +262,18 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         return true;
     }
 
+    checkValidAttachEdoc(smId: string) {
+        this._systemFileRepo.CheckAllowSettleEdocSendRequest(smId)
+            .subscribe(
+                (res: any) => {
+                    if (!res) {
+                        return false;
+                    }
+                }
+            );
+        return false;
+    }
+
     saveAndSendRequest() {
         // if (!this.requestSurchargeListComponent.surcharges.length) {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
@@ -273,6 +288,11 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             settlement: this.getBodySettlement(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
+
+        if (!this.checkValidAttachEdoc(body.settlement.id)) {
+            this._toastService.error("Please check your Document Type !");
+            return;
+        }
 
         let settlementResult: any = {};
         this._accoutingRepo.checkValidToSendRequestSettle(body)

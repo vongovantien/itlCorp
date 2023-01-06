@@ -72,7 +72,19 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         TransactionType = "SOA",
                     }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 case "Settlement":
-                    var SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement"));
+                    IQueryable<SysAttachFileTemplate> SMCode;
+                    var advAmount = _settleRepo.Get(x => x.Id.ToString() == billingId).FirstOrDefault().AdvanceAmount;
+                    if (advAmount > 0)
+                    {
+                         SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "ADV-Settlement"));
+                    }
+                    else if(advAmount==0|| advAmount == null)
+                    {
+                         SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement"));
+                    }
+                    else {
+                        SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "ADV-Settlement"|| x.AccountingType == "Settlement"));
+                    }
                     return SMCode.GroupBy(x => new { x.Code, x.AccountingType, x.NameEn }).Select(x => new DocumentTypeModel()
                     {
                         Id = x.FirstOrDefault().Id,
