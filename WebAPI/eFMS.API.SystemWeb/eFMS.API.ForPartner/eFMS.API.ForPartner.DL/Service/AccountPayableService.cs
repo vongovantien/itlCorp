@@ -358,7 +358,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         // Get detail to update Credit AR
                         var acctCredit = new AcctCreditManagementAr();
                         var chargeIds = item.Select(x => x.ChargeId).ToList();
-                        var surcharges = surchargeRepository.Where(x => x.JobNo == item.Key.JobNo && x.Mblno == item.Key.MblNo && x.Hblno == item.Key.Hblno && chargeIds.Contains(x.Id));
+                        var surcharges = surchargeRepository.Where(x => x.JobNo == item.Key.JobNo && chargeIds.Contains(x.Id));
                         var detailBilling = surcharges.FirstOrDefault();
                         var syncFrom = string.Empty;
                         if (string.IsNullOrEmpty(_code))
@@ -382,13 +382,13 @@ namespace eFMS.API.ForPartner.DL.Service
                         acctCredit.Type = _type;
                         acctCredit.PartnerId = partner.Id;
                         acctCredit.JobNo = item.Key.JobNo;
-                        acctCredit.Mblno = item.Key.MblNo;
-                        acctCredit.Hblno = item.Key.Hblno;
+                        acctCredit.Mblno = detailBilling.Mblno;
+                        acctCredit.Hblno = detailBilling.Hblno;
                         acctCredit.Hblid = detailBilling.Hblid;
                         acctCredit.SurchargeId = string.Join(';', chargeIds);
                         acctCredit.Currency = item.FirstOrDefault().Currency;
                         acctCredit.ExchangeRate = item.FirstOrDefault().ExchangeRate;
-                        if(exchangeRateUsd == 0 && acctCredit.Currency == ForPartnerConstants.CURRENCY_USD)
+                        if(exchangeRateUsd == 0)
                         {
                             exchangeRateUsd = currencyExchangeService.CurrencyExchangeRateConvert(null, detailBilling.ExchangeDate, ForPartnerConstants.CURRENCY_USD, ForPartnerConstants.CURRENCY_LOCAL);
                         }
@@ -416,7 +416,16 @@ namespace eFMS.API.ForPartner.DL.Service
                         acctCredit.VoucherDate = item.FirstOrDefault().VoucherDate;
                         acctCredit.TransactionType = item.FirstOrDefault().TransactionType.ToLower().Contains("credit") ? "CREDIT" : item.FirstOrDefault().TransactionType;
 
-                        hsUpdate = await creditManagementArRepository.AddAsync(acctCredit);
+                        var existedCreditAR = creditManagementArRepository.Get(x => x.VoucherNo == acctCredit.VoucherNo && x.Code == _code && x.Type == _type && x.PartnerId == acctCredit.PartnerId && x.Hblid == acctCredit.Hblid && x.ReferenceNo == acctCredit.ReferenceNo).FirstOrDefault();
+                        if (existedCreditAR != null)
+                        {
+                            acctCredit.Id = existedCreditAR.Id;
+                            hsUpdate = await creditManagementArRepository.UpdateAsync(acctCredit, x => x.Id == acctCredit.Id);
+                        }
+                        else
+                        {
+                            hsUpdate = await creditManagementArRepository.AddAsync(acctCredit);
+                        }
                         if (!hsUpdate.Success)
                         {
                             new LogHelper("AddCreditMangagement_Fail", hsUpdate.Message?.ToString() + JsonConvert.SerializeObject(acctCredit));
