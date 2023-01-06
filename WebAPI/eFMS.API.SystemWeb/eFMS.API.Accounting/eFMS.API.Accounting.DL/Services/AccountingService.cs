@@ -3550,23 +3550,24 @@ namespace eFMS.API.Accounting.DL.Services
         {
             List<BravoAttachDoc> results = new List<BravoAttachDoc>();
 
-            var fileOrigins = sysFileRepository.Get(x => x.Folder == folder && x.ObjectId == objectId);
-            var files = from f in fileOrigins
-                        join e in sysFileDetailRepository.Get() on f.Id equals e.SysImageId into fGrps
-                        select new { fileOrigin = f, edoc = fGrps.DefaultIfEmpty() };
-            if (files.Count() > 0)
-            {
-                foreach (var file in files)
-                {
-                    results.Add(new BravoAttachDoc
-                    {
-                        AttachDocRowId = file.fileOrigin.Id.ToString(),
-                        AttachDocName = file.edoc.FirstOrDefault().SystemFileName,
-                        AttachDocPath = file.fileOrigin.Url,
-                        AttachDocDate = file.fileOrigin.DateTimeCreated
-                    });
-                }
-            }
+            //var fileOrigins = sysFileRepository.Get(x => x.Folder == folder && x.ObjectId == objectId);
+            //var files = from f in fileOrigins
+            //            join e in sysFileDetailRepository.Get() on f.Id equals e.SysImageId into fGrps
+            //            select new { fileOrigin = f, edoc = fGrps.DefaultIfEmpty() };
+            //if (files.Count() > 0)
+            //{
+            //    foreach (var file in files)
+            //    {
+            //        results.Add(new BravoAttachDoc
+            //        {
+            //            AttachDocRowId = file.fileOrigin.Id.ToString(),
+            //            AttachDocName = file.edoc.FirstOrDefault().SystemFileName,
+            //            AttachDocPath = file.fileOrigin.Url,
+            //            AttachDocDate = file.fileOrigin.DateTimeCreated
+            //        });
+            //    }
+            //}
+            
             string queryParamUrlAttachFile = string.Format(@"/en/#/home/tool/file-management/user-attach-file?module={0}&folder={1}&objectId={2}&billingNo={3}", "Accounting", folder, objectId, billingNo);
             results.Add(new BravoAttachDoc
             {

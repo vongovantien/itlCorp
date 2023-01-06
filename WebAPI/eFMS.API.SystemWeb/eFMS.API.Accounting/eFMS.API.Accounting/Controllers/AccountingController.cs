@@ -342,7 +342,6 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listAdd.Count > 0)
                     {
-xc
                         resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSAdvanceSyncAdd", listAdd, loginResponse.TokenKey);
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
 

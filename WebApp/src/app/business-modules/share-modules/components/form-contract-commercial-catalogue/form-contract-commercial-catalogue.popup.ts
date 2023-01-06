@@ -1,5 +1,3 @@
-import { X } from '@angular/cdk/keycodes';
-import { C } from '@angular/cdk/keycodes';
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
@@ -12,7 +10,6 @@ import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemFileManageRepo, SystemRepo } from '@repositories';
 import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, getCurrentUserState, getMenuUserSpecialPermissionState, IAppState } from '@store';
-import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { catchError, distinctUntilChanged, finalize, map, takeUntil } from 'rxjs/operators';
@@ -483,7 +480,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             (this.contractType.value !== 'Cash' && this.contractType.value !== 'Guarantee' && this.contractType.value !== 'Prepaid' && (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null)))) {
             return false;
         }
-        if (this.contractTypeDetail=='Prepaid' && this.contractType.value!=this.contractTypeDetail || this.selectedContract.debitAmount>0 && this.contractTypeDetail!='Prepaid'&& this.contractType.value=='Prepaid'){    
+        if (this.contractTypeDetail == 'Prepaid' && this.contractType.value != this.contractTypeDetail || this.selectedContract.debitAmount > 0 && this.contractTypeDetail != 'Prepaid' && this.contractType.value == 'Prepaid') {
             this._toastService.error('Cannot change agreement type!');
             this.contractType.setValue(this.contractTypeDetail);
             return false;
@@ -652,7 +649,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             }, () => {
                                 return;
                             })
-                        }else{
+                        } else {
                             this._toastService.error(res.message);
                         }
                     }
@@ -1013,8 +1010,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     this.expiredDate.setValue({
                         startDate: new Date(new Date(this.effectiveDate.value.startDate).setDate(new Date(this.effectiveDate.value.startDate).getDate() + 30)),
                         endDate: new Date(new Date(this.effectiveDate.value.endDate).setDate(new Date(this.effectiveDate.value.endDate).getDate() + 30)),
-                    });                
-                }              
+                    });
+                }
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['paymentTerm'].setValue(30);
                 this.formGroup.get('expiredDate').setValidators([
@@ -1045,7 +1042,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 break;
             case 'Prepaid':
             case 'Parent Contract':
-                this.formGroup.controls['paymentTerm'].setValue(1); 
+                this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.get('expiredDate').clearValidators();
                 break;
             case 'Official':
@@ -1055,7 +1052,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.formGroup.controls['paymentTerm'].setValue(1);
                 break;
             case 'Parent Contract':
-                this.formGroup.controls['paymentTerm'].setValue(1); 
+                this.formGroup.controls['paymentTerm'].setValue(1);
                 break;
             default:
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
