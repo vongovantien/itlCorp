@@ -499,7 +499,7 @@ export class AdvancePaymentComponent extends AppList {
                         const mapV: { lang: string, id: string }[] = Array(advanceSyncList.length).fill(value).map((value, i) => {
                             return { lang: value === 1 ? 'VN' : 'ENG', id: advSyncIds[i] }
                         })
-                        const source = mapV.map(x => this._exportRepo.exportAdvancePaymentDetail(x.id, x.lang))
+                        const source = mapV.map(x => this._exportRepo.exportAdvancePaymentDetail(x.id, x.lang, 'eDOC'))
                         return forkJoin(source);
                     }
                     return of(false);
@@ -638,7 +638,8 @@ export class AdvancePaymentComponent extends AppList {
                 concatMap((value: any) => {
                     if (!!value) {
                         const lang: string = value === 1 ? 'VN' : 'ENG';
-                        return this._exportRepo.exportAdvancePaymentDetail(adv.id, lang);
+                        return this._exportRepo.exportAdvancePaymentDetail(adv.id, lang, 'eDOC');
+
                     }
                     return of(false);
                 }),
