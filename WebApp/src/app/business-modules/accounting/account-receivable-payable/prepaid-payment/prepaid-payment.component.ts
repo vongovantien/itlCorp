@@ -24,6 +24,10 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
     debitNotes: Partial<IPrepaidPayment[]> = [];
     selectedCd: IPrepaidPayment = null;
     totalSelectedItem: number;
+
+    sumAmountVND: number = 0;
+    sumAmountUSD: number = 0;
+
     constructor(
         private readonly _accountingRepo: AccountingRepo,
         private readonly _sortService: SortService,
@@ -102,14 +106,27 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
                 x.isSelected = false;
             });
         }
+        const itemSelecteds = this.debitNotes.filter(x => x.isSelected === true);
+        this.totalSelectedItem = itemSelecteds.length;
 
-        this.totalSelectedItem = this.debitNotes.filter(x => x.isSelected === true).length;
+        this.calculateTotalAmountAfterSelectItems(itemSelecteds);
     }
 
     onChangeSelectedCd() {
         const selectedItems = this.debitNotes.filter(x => x.status === 'Unpaid');
         this.isCheckAll = selectedItems.every(x => x.isSelected === true);
-        this.totalSelectedItem = selectedItems.filter(x => x.isSelected === true).length;
+
+        const itemSelecteds = selectedItems.filter(x => x.isSelected === true);
+        this.totalSelectedItem = itemSelecteds.length;
+
+        this.calculateTotalAmountAfterSelectItems(itemSelecteds);
+    }
+
+    calculateTotalAmountAfterSelectItems(itemSelecteds: IPrepaidPayment[]) {
+        this.sumAmountVND = 0;
+        this.sumAmountUSD = 0;
+        itemSelecteds.reduce((acc, curr) => this.sumAmountVND += curr.totalAmountVND, 0);
+        itemSelecteds.reduce((acc, curr) => this.sumAmountUSD += curr.totalAmountUSD, 0);
     }
 
     onSelectCd(cd: IPrepaidPayment) {
@@ -335,6 +352,8 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
         });
         console.log(results);
         this.confirmPrepaidPopup.groupData = [...results];
+        this.confirmPrepaidPopup.sumAmountVND = this.sumAmountVND;
+        this.confirmPrepaidPopup.sumAmountUSD = this.sumAmountUSD;
         this.confirmPrepaidPopup.show();
 
     }
