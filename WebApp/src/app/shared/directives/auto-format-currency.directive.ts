@@ -101,8 +101,9 @@ export class AutoFormatCurrencyDirective {
             this.isReadyClear = false;
             this.onInput(v);
         }
-        if(v.key === ',')
-        {
+        const value: string = this.el.value;
+        const next: string = value.concat(v.key);
+        if (v.key !== '-' && next && !this.check(next)) {
             v.preventDefault();
         }
     }
@@ -127,5 +128,9 @@ export class AutoFormatCurrencyDirective {
             .replace(/[^0-9.]+/g, '');
         this.el.value = '';
         document.execCommand('insertText', false, pastedInput);
+    }
+    private check(value: string) {
+        const regExpString = "^\-?((\\d+(\\.\\d{0,5})?)|((\\d*(\\.\\d{1,5}))))\\s*$";
+        return String(value).match(new RegExp(regExpString));
     }
 }
