@@ -2106,7 +2106,6 @@ namespace eFMS.API.Documentation.DL.Services
                     FlightNo = data.FlightNo?.ToUpper(),
                     FlightDate = data.FlightDate,
                     DatePackage = data.Eta,
-                    DepartureAirport = data.Route,//data.PODName?.ToUpper(), (change: tuyến sẽ lấy Route)
                     NoPieces = data.PackageQty?.ToString() + " " + catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.UnitNameEn?.ToUpper(),
                     Description = data.DesOfGoods?.ToUpper() ?? data.GoodsDeliveryDescription?.ToUpper(),
                     WChargeable = data.GrossWeight,//data.ChargeWeight, (change: trọng lượng sẽ lấy Gross Weight)
@@ -2114,7 +2113,9 @@ namespace eFMS.API.Documentation.DL.Services
                     FirstDestination = data.DosentTo1?.ToUpper(),//data.FirstCarrierTo?.ToUpper(),
                     SecondDestination = data.SubAbbr?.ToUpper(),//data.TransitPlaceTo1?.ToUpper(),
                     Notify = data.NotifyPartyDescription?.ToUpper(),
-                    SignPath = printSign ? "Department" : string.Empty
+                    SignPath = printSign ? "Department" : string.Empty,
+                    LastDestination = data.PodDescription?.ToUpper(),
+                    DepartureAirport = data.PolDescription?.ToUpper(),
                 };
                 authorizeLetters.Add(authorizeLetter);
             }
