@@ -2343,12 +2343,11 @@ namespace eFMS.API.ForPartner.DL.Service
                 return new ResultHandle() { Status = false, Message = "Đối tượng " + model.OfficeCode + " không tồn tại" };
             }
             // gom các detail cùng voucherNo, voucherDate, 
-            // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV), bỏ qua dòng BALANCE do dính các phiếu hoàn ứng.
+            // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV)
             var grpVoucherDetail = model.Details
                 .Where(x => x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV
                     && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE
-                    && x.TransactionType != ForPartnerConstants.TYPE_DEBIT
-                    && x.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE)
+                    )
                 .GroupBy(x => new { x.AcctID })
                 .Select(s => new
                 {
@@ -2380,7 +2379,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
                     var surchargesIds = item.surcharges.Select(x => x.ChargeId).ToList();
                     var surcharges = surchargeRepo.Get(x => surchargesIds.Contains(x.Id)).ToList();
-                    if(surcharges.Count == 0)
+                    if(item.voucherData.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE && surcharges.Count == 0)
                     {
                         return new ResultHandle() { Status = false, Message = string.Format("Không tìm thấy ds charge {0}", string.Join(",", surchargesIds)) };
                     }
@@ -2413,7 +2412,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         Id = Guid.NewGuid(),
                         Type = ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE,
                         VoucherId = itemGroup.VoucherNo,
-                        VoucherType = itemGroup.VoucherType,
+                        VoucherType = string.IsNullOrEmpty(itemGroup.VoucherType) ? ForPartnerConstants.ACCOUNTING_PAYMENT_TYPE_NET_OFF : itemGroup.VoucherType,
                         AccountNo = itemGroup.AccountNo,
                         Currency = itemGroup.Currency,
                         Date = itemGroup.VoucherDate,
@@ -2501,7 +2500,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                                 surcharge.UserModified = currentUser.UserID;
                                                 // [CR:20062022 => refNo dành để lưu khi issue HĐ]
                                                 //surcharge.ReferenceNo = surChargeBravo.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
-                                                                                               
+
                                                 if (surcharge.Type != ForPartnerConstants.TYPE_CHARGE_OBH)
                                                 {
 
@@ -2511,7 +2510,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                                     surcharge.AmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.AmountUsd : surcharge.AmountUsd;
 
                                                     // CR: 17688
-                                                    surcharge.VatAmountVnd =  surChargeBravo.VatAmountVnd;
+                                                    surcharge.VatAmountVnd = surChargeBravo.VatAmountVnd;
                                                     surcharge.AmountVnd = surChargeBravo.AmountVnd;
                                                     // surcharge.VatAmountUsd =  surChargeBravo.VatAmountUsd;
                                                     // surcharge.AmountUsd = surChargeBravo.AmountUsd;
@@ -2628,8 +2627,11 @@ namespace eFMS.API.ForPartner.DL.Service
                         return new ResultHandle() { Status = false, Message = updateSurchargeVoucher.Message };
                     }
                 }
+            } else
+            {
+                rs.Message = "Dữ liệu động bộ không có thông tin để tạo voucher.";
             }
-
+            
             return rs;
         }
 
