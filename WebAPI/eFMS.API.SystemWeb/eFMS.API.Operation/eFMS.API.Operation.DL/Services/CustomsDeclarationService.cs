@@ -466,12 +466,12 @@ namespace eFMS.API.Operation.DL.Services
             return results;
         }
 
-        public HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
+        public async Task<HandleState> UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
             var result = new HandleState();
             try
             {
-                var clearanceAdd = clearances.OrderBy(x => x.ClearanceDate);
+                var clearanceAdd = clearances.OrderBy(x => x.ClearanceDate).ThenByDescending(x => x.DatetimeModified);
                 foreach (var item in clearanceAdd)
                 {
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
@@ -482,9 +482,22 @@ namespace eFMS.API.Operation.DL.Services
                         clearance.DatetimeModified = DateTime.Now;
                         clearance.UserModified = currentUser.UserID;
                     }
-                    DataContext.Update(clearance, x => x.Id == item.Id, false);
+                    result = DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
-                DataContext.SubmitChanges();
+
+                var jobNo = clearanceAdd.FirstOrDefault()?.JobNo;
+                if (result.Success && jobNo != null)
+                {
+                    var query = from advRequest in accAdvanceRequestRepository.Get(x => x.JobId == jobNo)
+                                join advPayment in accAdvancePaymentRepository.Get()
+                                on advRequest.AdvanceNo equals advPayment.AdvanceNo
+                                where advPayment.SyncStatus == null
+                                select advRequest;
+
+                    await query.ForEachAsync(x => x.CustomNo = clearanceAdd.FirstOrDefault()?.ClearanceNo);
+                    result = accAdvanceRequestRepository.SubmitChanges();
+                }
+                result = DataContext.SubmitChanges();
             }
             catch (Exception ex)
             {
@@ -1636,9 +1649,18 @@ namespace eFMS.API.Operation.DL.Services
                             where advances.SyncStatus == null
                             select surcharge;
 
+                //update custom clearance for advRequest
+                var query2 = from advRequest in accAdvanceRequestRepository.Get(x => x.JobId == model.JobNo)
+                             join advPayment in accAdvancePaymentRepository.Get()
+                             on advRequest.AdvanceNo equals advPayment.AdvanceNo
+                             where advPayment.SyncStatus == null
+                             select advRequest;
+                await query2.ForEachAsync(x => x.CustomNo = model.ClearanceNo);
+                hs = accAdvanceRequestRepository.SubmitChanges();
+
+                //update custom surcharge
                 var listUpdateItem = listSurcharge.Where(x => string.IsNullOrEmpty(x.AdvanceNoFor)).Union(query);
                 await listUpdateItem.ForEachAsync(x => x.ClearanceNo = model.ClearanceNo);
-
                 hs = csShipmentSurchargeRepo.SubmitChanges();
             }
             DataContext.SubmitChanges();
