@@ -103,8 +103,11 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             fromDate: !!formSearch.date?.startDate ? formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en') : new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate),
             toDate: !!formSearch.date?.endDate ? formatDate(formSearch.date.endDate, "yyyy-MM-dd", 'en') : new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate),
             dateMode: formSearch.dateMode,
-            accountantTypes: this.isAcc ? this.accountantType.value : null,
+            accountantTypes: this.isAcc ? this.accountantType.value.length > 1 ? this.accountantType.value : [6] : null,
         };
+        if (this.isAcc && this.accountantType.value.length === 0) {
+            this.accountantType.setValue([this.accountantTypes[6].value]);
+        }
         this.onSearch.emit(bodySearch);
     }
 
@@ -112,15 +115,15 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
         const bodySearch: Partial<IFileManageSearch> = {
             referenceNo: null,
             referenceType: this.referenceTypes[0].value,
-            fromDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            fromDate: new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate),
             toDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
             dateMode: this.accountantTypes[0].value,
             accountantTypes: this.isAcc ? [6] : null,
         };
         this.referenceNo.setValue(null)
         this.date.setValue({
-            startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-            endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+            startDate: new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate),
+            endDate: new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate)
         });
         this.searchType.setValue(this.referenceTypes[0].value);
         this.dateMode.setValue(this.dateModes[0].value);
