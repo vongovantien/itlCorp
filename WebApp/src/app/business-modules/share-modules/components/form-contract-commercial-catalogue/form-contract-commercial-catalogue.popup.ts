@@ -944,7 +944,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
         const date2: any = new Date(expDateValid).valueOf();
         const date1: any = new Date(expDate1).valueOf();
-        if (!!expDateValid) {
+        if (!!expDateValid && this.contractType.value === 'Trial') {
             if (date1 > date2)
                 checkError = true;
         }
