@@ -224,7 +224,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             contractNo: [null, Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
             expiredDate: [null, Validators.compose([
-                Validators.required,
+                Validators.required, 
                 this.checkExpiredDate
             ])],
             contractType: [null, Validators.required],
@@ -933,22 +933,25 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
     }
     checkExpiredDate: ValidatorFn = (): { [key: string]: any; } | null => {
-        let effDate = this.formGroup && this.formGroup.get('effectiveDate').value;
-        let expDate = this.formGroup && this.formGroup.get('expiredDate').value;
-        let expDateValid = null;
-        let expDate1 = null;
-        let checkError = false;
-        if (!!effDate) {
-            expDateValid = new Date(new Date(effDate.startDate).setDate(new Date(effDate.startDate)?.getDate() + 30));
-            expDate1 = new Date(new Date(expDate.startDate));
+        if (this.contractType?.value === 'Trial') {
+            let effDate = this.formGroup && this.formGroup.get('effectiveDate').value;
+            let expDate = this.formGroup && this.formGroup.get('expiredDate').value;
+            let expDateValid = null;
+            let expDate1 = null;
+            let checkError = false;
+            if (!!effDate) {
+                expDateValid = new Date(new Date(effDate.startDate).setDate(new Date(effDate.startDate)?.getDate() + 30));
+                expDate1 = new Date(new Date(expDate.startDate));
+            }
+            const date2: any = new Date(expDateValid).valueOf();
+            const date1: any = new Date(expDate1).valueOf();
+            if (!!expDateValid) {
+                if (date1 > date2)
+                    checkError = true;
+            }
+            return checkError ? { invalidRange: { effDate, expDate } } : null;
         }
-        const date2: any = new Date(expDateValid).valueOf();
-        const date1: any = new Date(expDate1).valueOf();
-        if (!!expDateValid && this.contractType.value === 'Trial') {
-            if (date1 > date2)
-                checkError = true;
-        }
-        return checkError ? { invalidRange: { effDate, expDate } } : null;
+        return null;
     }
 
     selectedService($event: any) {
