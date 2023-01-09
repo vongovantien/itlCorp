@@ -1611,7 +1611,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.IsValid = false;
 
                     }
-                    else if(!opsTransaction.Any(x => x.Mblno == item.Mblno && x.Hwbno == item.Hblno && x.OfficeId == currentUser.OfficeID))
+                    else if(!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
                     {
                         item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST_OFFICE], item.Hblno, currentUser.OfficeCode);
                         item.IsValid = false;
@@ -1631,7 +1631,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else if (!string.IsNullOrEmpty(item.Hblno) && !string.IsNullOrEmpty(item.Mblno))
                     {
-                        if (!opsTransaction.Any(x => x.Mblno == item.Mblno && x.Hwbno == item.Hblno && x.OfficeId == currentUser.OfficeID))
+                        if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
                         {
                             item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST_OFFICE], item.Mblno, currentUser.OfficeCode);
                             item.IsValid = false;
