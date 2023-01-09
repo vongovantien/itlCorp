@@ -1642,15 +1642,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     case "Advance":
                         var chargeSM = _surRepo.Get(x => x.SettlementCode == billingNo && x.AdvanceNo != null);
-                        var jobSettle = chargeSM.GroupBy(x=>x.AdvanceNo).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType, advNo = x.FirstOrDefault().AdvanceNo });
+                        var jobSettle = chargeSM.Select(x => new { jobNo = x.JobNo, tranType = x.TransactionType, advNo = x.AdvanceNo });
                         jobSettle.ToList().ForEach(x =>
                         {
                             var adv = _advRepo.Get(z => z.AdvanceNo == x.advNo);
                             var advId = adv.Select(z => z.Id.ToString()).ToList();
                             var images = _sysImageRepo.Get(z => advId.Contains(z.ObjectId) && z.SyncStatus == "Synced" && z.Folder == "Advance").OrderByDescending(z=>z.DateTimeCreated);
-                            //images.ToList().ForEach(img =>
-                            //{
-                                var img = images.FirstOrDefault();
+                            images.ToList().ForEach(img =>
+                            {
+                                //var img = images.FirstOrDefault();
                                 if(img != null)
                                 {
                                     var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "AD-SM");
@@ -1683,7 +1683,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         edocs.Add(edoc);
                                     }
                                 }
-                            //});
+                            });
                         });
                         break;
                     //case "SOA":
