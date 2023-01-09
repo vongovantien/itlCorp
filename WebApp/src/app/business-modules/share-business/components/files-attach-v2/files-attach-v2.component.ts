@@ -532,17 +532,17 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
 
-    genFileSOAToSM() {
-        this._systemFileRepo.genEdocFromBilling(this.billingNo, "SOA")
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    if (res.status) {
-                        this.getEDoc(this.transactionType);
-                    }
-                },
-            );
-    }
+    // genFileSOAToSM() {
+    //     this._systemFileRepo.genEdocFromBilling(this.billingNo, "SOA")
+    //         .pipe(catchError(this.catchError))
+    //         .subscribe(
+    //             (res: any) => {
+    //                 if (res.status) {
+    //                     this.getEDoc(this.transactionType);
+    //                 }
+    //             },
+    //         );
+    // }
 }
 interface IEDocItem {
     billingNo: string;

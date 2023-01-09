@@ -23,7 +23,6 @@ import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import { EMPTY, Observable } from 'rxjs';
 import { catchError, concatMap, finalize, pluck } from 'rxjs/operators';
-import { ShareBussinessAttachFileV2Component } from 'src/app/business-modules/share-business/components/files-attach-v2/files-attach-v2.component';
 import isUUID from 'validator/lib/isUUID';
 import { LoadDetailSettlePayment, LoadDetailSettlePaymentFail, LoadDetailSettlePaymentSuccess } from '../components/store';
 @Component({
@@ -37,7 +36,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
-    @ViewChild(ShareBussinessAttachFileV2Component) public attachList: ShareBussinessAttachFileV2Component;
+    //@ViewChild(ShareBussinessAttachFileV2Component) public attachList: ShareBussinessAttachFileV2Component;
 
     settlementId: string = '';
     settlementCode: string = '';
@@ -436,11 +435,11 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         this.componentRef.instance.ShowWithDelay(); // Gọi method có delay này để ViewChild Popup nó get đc
     }
 
-    regetEdoc(event: boolean) {
-        if (event) {
-            this.attachList.getEDoc("Settlement");
-        }
-    }
+    // regetEdoc(event: boolean) {
+    //     if (event) {
+    //         this.attachList.getEDoc("Settlement");
+    //     }
+    // }
 }
 
 export interface ISettlementPaymentData {

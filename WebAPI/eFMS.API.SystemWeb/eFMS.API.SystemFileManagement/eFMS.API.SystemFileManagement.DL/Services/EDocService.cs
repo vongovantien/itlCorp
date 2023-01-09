@@ -1642,7 +1642,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     case "Advance":
                         var chargeSM = _surRepo.Get(x => x.SettlementCode == billingNo && x.AdvanceNo != null);
-                        var jobSettle = chargeSM.Select(x => new { jobNo = x.JobNo, tranType = x.TransactionType, advNo = x.AdvanceNo });
+                        var jobSettle = chargeSM.GroupBy(x=>x.AdvanceNo).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType, advNo = x.FirstOrDefault().AdvanceNo });
                         jobSettle.ToList().ForEach(x =>
                         {
                             var adv = _advRepo.Get(z => z.AdvanceNo == x.advNo);
@@ -1676,7 +1676,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                             UserCreated = currentUser.UserName,
                                             UserModified = currentUser.UserName,
                                             OfficeId = currentUser.OfficeID,
-                                            Source = billingType,
+                                            Source = "Settlement",
                                             Hblid = null,
                                             Note = null
                                         };
