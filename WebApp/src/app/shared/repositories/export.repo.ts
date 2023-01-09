@@ -186,8 +186,8 @@ export class ExportRepo {
         );
     }
 
-    exportAdvancePaymentDetail(advanceId: string, language: string) {
-        return this._api.get(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}`).pipe(
+    exportAdvancePaymentDetail(advanceId: string, language: string, action: string = "Preview") {
+        return this._api.get(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}&action=${action}`).pipe(
             map((data: any) => data)
         );
     }

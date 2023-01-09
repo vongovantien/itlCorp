@@ -2293,12 +2293,12 @@ namespace eFMS.API.ForPartner.DL.Service
             return result.FirstOrDefault();
         }
 
-        public async Task<HandleState> InsertVoucher(VoucherSyncCreateModel model, string apiKey)
+        public async Task<ResultHandle> InsertVoucher(VoucherSyncCreateModel model, string apiKey)
         {
             SysOffice office = officeRepository.Get(x => x.Code == model.OfficeCode)?.FirstOrDefault();
             if (office == null)
             {
-                return new HandleState((object)model.OfficeCode + " không tồn tại");
+                return new ResultHandle() { Status = false, Message = model.OfficeCode + " không tồn tại" };
             }
             var refNos = model.Details.Select(x => x.AcctID).ToList();
             // Có case nào không có ghi nhận công nợ AP k?
@@ -2310,13 +2310,13 @@ namespace eFMS.API.ForPartner.DL.Service
 
             if (voucherExistedRefNo != null && voucherExistedRefNo.Count() > 0)
             {
-                return new HandleState((object)string.Format("Số {0} đã tồn tại", string.Join(",", voucherExistedRefNo.Select(x => x.VoucherId))));
+                return new ResultHandle() { Status = false, Message = string.Format("Số {0} đã tồn tại", string.Join(",", voucherExistedRefNo.Select(x => x.VoucherId))) };
             }
             string _messageInvalidDoc = IsValidDoc(model.DocID, model.DocCode, model.DocType);
 
             if (!string.IsNullOrEmpty(_messageInvalidDoc))
             {
-                return new HandleState((object)_messageInvalidDoc);
+                return new ResultHandle() { Status = false, Message = _messageInvalidDoc };
             }
 
 
@@ -2328,27 +2328,26 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.CompanyID = _currentUser.CompanyID;
             currentUser.Action = "InsertVoucher";
 
-            HandleState hsInsertVoucher = await InsertVoucher(model);
+            ResultHandle hsInsertVoucher = await InsertVoucher(model);
 
             return hsInsertVoucher;
         }
 
-        private async Task<HandleState> InsertVoucher(VoucherSyncCreateModel model)
+        private async Task<ResultHandle> InsertVoucher(VoucherSyncCreateModel model)
         {
-            HandleState rs = new HandleState();
+            ResultHandle rs = new ResultHandle();
 
             var customer = partnerRepo.Get(x => x.AccountNo == model.CustomerCode)?.FirstOrDefault();
             if (customer == null)
             {
-                return new HandleState((object)"Đối tượng " + model.OfficeCode + " không tồn tại");
+                return new ResultHandle() { Status = false, Message = "Đối tượng " + model.OfficeCode + " không tồn tại" };
             }
             // gom các detail cùng voucherNo, voucherDate, 
-            // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV), bỏ qua dòng BALANCE do dính các phiếu hoàn ứng.
+            // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV)
             var grpVoucherDetail = model.Details
                 .Where(x => x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV
                     && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE
-                    && x.TransactionType != ForPartnerConstants.TYPE_DEBIT
-                    && x.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE)
+                    )
                 .GroupBy(x => new { x.AcctID })
                 .Select(s => new
                 {
@@ -2371,7 +2370,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                                            && x.ReferenceNo == item.voucherData.AcctID);
                     if (isVoucherExisted)
                     {
-                        return new HandleState((object)string.Format("Voucher {0} - {1} đã tồn tại", item.voucherData.VoucherNo, item.voucherData.AcctID));
+                        return new ResultHandle() { Status = false, Message = string.Format("Voucher {0} - {1} đã tồn tại", item.voucherData.VoucherNo, item.voucherData.AcctID) };
                     }
 
                     VoucherCreateRowModel itemGroup = item.voucherData;
@@ -2380,9 +2379,9 @@ namespace eFMS.API.ForPartner.DL.Service
 
                     var surchargesIds = item.surcharges.Select(x => x.ChargeId).ToList();
                     var surcharges = surchargeRepo.Get(x => surchargesIds.Contains(x.Id)).ToList();
-                    if(surcharges.Count == 0)
+                    if(item.voucherData.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE && surcharges.Count == 0)
                     {
-                        return new HandleState((object)string.Format("Không tìm thấy ds charge {0}", string.Join(",", surchargesIds)));
+                        return new ResultHandle() { Status = false, Message = string.Format("Không tìm thấy ds charge {0}", string.Join(",", surchargesIds)) };
                     }
                     if(itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL)
                     {
@@ -2413,7 +2412,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         Id = Guid.NewGuid(),
                         Type = ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE,
                         VoucherId = itemGroup.VoucherNo,
-                        VoucherType = itemGroup.VoucherType,
+                        VoucherType = string.IsNullOrEmpty(itemGroup.VoucherType) ? ForPartnerConstants.ACCOUNTING_PAYMENT_TYPE_NET_OFF : itemGroup.VoucherType,
                         AccountNo = itemGroup.AccountNo,
                         Currency = itemGroup.Currency,
                         Date = itemGroup.VoucherDate,
@@ -2465,6 +2464,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         HandleState hs = await DataContext.AddAsync(vouchers);
                         if (hs.Success)
                         {
+                            rs = new ResultHandle() { Status = hs.Success, Data = vouchers };
                             //using (var transSurcharge = surchargeRepo.DC.Database.BeginTransaction())
                             {
                                 try
@@ -2500,7 +2500,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                                 surcharge.UserModified = currentUser.UserID;
                                                 // [CR:20062022 => refNo dành để lưu khi issue HĐ]
                                                 //surcharge.ReferenceNo = surChargeBravo.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
-                                                                                               
+
                                                 if (surcharge.Type != ForPartnerConstants.TYPE_CHARGE_OBH)
                                                 {
 
@@ -2510,7 +2510,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                                     surcharge.AmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.AmountUsd : surcharge.AmountUsd;
 
                                                     // CR: 17688
-                                                    surcharge.VatAmountVnd =  surChargeBravo.VatAmountVnd;
+                                                    surcharge.VatAmountVnd = surChargeBravo.VatAmountVnd;
                                                     surcharge.AmountVnd = surChargeBravo.AmountVnd;
                                                     // surcharge.VatAmountUsd =  surChargeBravo.VatAmountUsd;
                                                     // surcharge.AmountUsd = surChargeBravo.AmountUsd;
@@ -2608,7 +2608,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     catch (Exception ex)
                     {
                         transVoucher.Rollback();
-                        return new HandleState((object)ex.Message);
+                        return new ResultHandle() { Status = false, Message = ex.Message };
                     }
                     finally
                     {
@@ -2624,11 +2624,14 @@ namespace eFMS.API.ForPartner.DL.Service
                     {
                         var voucherNos = string.Join(";", vouchers.Select(x => x.VoucherId));
                         WriteLogInsertVoucher(updateSurchargeVoucher.Status, voucherNos, vouchers, surchargesVoucher, updateSurchargeVoucher.Message.ToString());
-                        return new HandleState((object)updateSurchargeVoucher.Message);
+                        return new ResultHandle() { Status = false, Message = updateSurchargeVoucher.Message };
                     }
                 }
+            } else
+            {
+                rs.Message = "Dữ liệu động bộ không có thông tin để tạo voucher.";
             }
-
+            
             return rs;
         }
 

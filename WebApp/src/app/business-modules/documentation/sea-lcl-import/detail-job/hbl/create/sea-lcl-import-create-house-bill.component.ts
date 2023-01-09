@@ -17,6 +17,8 @@ import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBussinessHBLGoodSummaryLCLComponent,
     getTransactionPermission,
+    getTransactionState,
+    ITransactionState,
 } from '@share-bussiness';
 
 import { ShareSeaServiceFormCreateHouseBillSeaImportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-import/form-create-hbl-sea-import.component';
@@ -56,6 +58,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     selectedHbl: any = {}; // TODO model.
     containers: Container[] = [];
     selectedTab: string = HBL_TAB.DETAIL;
+    shipmentType: string;
 
     constructor(
         protected _documentationRepo: DocumentationRepo,
@@ -297,6 +300,13 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     }
 
     onsubmitData() {
+        this._store.select(getTransactionState)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
+            (res: ITransactionState) => {
+                this.shipmentType = res.cstransaction.shipmentType;
+            }
+        );
         const body = {
             id: SystemConstants.EMPTY_GUID,
             jobId: this.jobId,
@@ -359,6 +369,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             dofooter: null,
             dosentTo1: null,
             dosentTo2: null,
+            shipmentType: this.shipmentType,
         };
         return body;
     }

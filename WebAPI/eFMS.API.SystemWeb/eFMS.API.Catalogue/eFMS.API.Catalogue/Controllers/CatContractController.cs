@@ -190,10 +190,19 @@ namespace eFMS.API.Catalogue.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             string messageExisted = catContractService.CheckExistedContract(model);
+
             if (!string.IsNullOrEmpty(messageExisted))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = messageExisted });
             }
+
+            var listExistContract = catContractService.CheckDuplicatedContract(model, false);
+
+            if (listExistContract != null)
+            {
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE], Data = new { errorCode = 400 } });
+            }
+
             if (model.isChangeAgrmentType == true)
             {
                 model.Active = false;
@@ -410,7 +419,10 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("CheckExistedContract")]
         public IActionResult CheckExistedContract(Guid id, string partnerId)
         {
-            var result = catContractService.CheckExistedContractActive(id, partnerId);
+            var catContractModel = new CatContractModel();
+            catContractModel.Id = id;
+            catContractModel.PartnerId = partnerId;
+            var result = catContractService.CheckDuplicatedContract(catContractModel, true);
             bool IsExisted = result != null && result.Count() > 0 ? true : false;
             return Ok(IsExisted);
         }
@@ -604,7 +616,6 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(result);
         }
-
         private string CheckUpdateContract(CatContractModel model)
         {
             string errorMsg = string.Empty;

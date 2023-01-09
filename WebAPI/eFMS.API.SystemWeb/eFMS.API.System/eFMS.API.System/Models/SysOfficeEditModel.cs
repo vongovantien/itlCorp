@@ -41,5 +41,6 @@ namespace eFMS.API.System.Models
         public string BankNameLocal { get; set; }
         public string OfficeType { get; set; }
         public string InternalCode { get; set; }
+        public Guid PartnerMapping { get; set; }
     }
 }

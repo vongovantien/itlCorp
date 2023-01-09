@@ -226,6 +226,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
+                entity.Property(e => e.Offices).HasMaxLength(250);
+
                 entity.Property(e => e.ProductDept)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1399,8 +1401,9 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.ChargeId).HasColumnName("ChargeID");
 
                 entity.Property(e => e.CurrencyId)
-                .HasMaxLength(30)
-                .IsUnicode(false);;
+                    .HasColumnName("CurrencyID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
@@ -1416,6 +1419,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Quantity).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.QuantityType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Service).HasMaxLength(50);
 
                 entity.Property(e => e.ServiceType).HasMaxLength(50);
@@ -1425,6 +1432,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.Type)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.UnitId).HasColumnName("UnitID");
 
                 entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 4)");
 
@@ -1436,11 +1445,9 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Vatrate).HasColumnType("decimal(18, 4)");
-                entity.Property(e => e.UnitId).HasColumnName("UnitID");
-                entity.Property(e => e.QuantityType)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.Vatrate)
+                    .HasColumnName("VATRate")
+                    .HasColumnType("decimal(18, 4)");
             });
 
             modelBuilder.Entity<CatTransportationMode>(entity =>
@@ -2518,6 +2525,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
+
                 entity.Property(e => e.ExportCountryCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2625,6 +2636,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
+                entity.Property(e => e.Hblno)
+                    .HasColumnName("HBLNo")
+                    .HasMaxLength(20);
+
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
                 entity.Property(e => e.MainPersonInCharge)
@@ -2672,6 +2687,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ClearanceDate).HasColumnType("datetime");
+
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
@@ -2699,7 +2716,13 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DeliveryDate).HasColumnType("datetime");
+
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
 
                 entity.Property(e => e.FieldOpsId)
                     .HasColumnName("FieldOpsID")
@@ -2822,6 +2845,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("SupplierID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SuspendTime).HasMaxLength(150);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

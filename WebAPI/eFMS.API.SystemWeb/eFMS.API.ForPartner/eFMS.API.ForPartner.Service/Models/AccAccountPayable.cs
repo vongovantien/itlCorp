@@ -41,5 +41,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public decimal? Over16To30Day { get; set; }
         public decimal? Over30Day { get; set; }
         public string Description { get; set; }
+        public string AcctManagementId { get; set; }
     }
 }

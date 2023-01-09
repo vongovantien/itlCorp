@@ -29,6 +29,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string VoyNo { get; set; }
         public string ContainerSealNo { get; set; }
         public string GoodsDescription { get; set; }
+        public string ShippingMark { get; set; }
         public string ContainerNote { get; set; }
         public string PackagesNote { get; set; }
         public decimal? GrossWeight { get; set; }
@@ -40,6 +41,5 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public string PackagesType { get; set; }
-        public string ShippingMark { get; set; }
     }
 }

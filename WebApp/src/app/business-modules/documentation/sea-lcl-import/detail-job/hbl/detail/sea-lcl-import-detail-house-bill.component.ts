@@ -16,6 +16,7 @@ import isUUID from 'validator/lib/isUUID';
 import { InfoPopupComponent } from '@common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
+import { getTransactionDetailCsTransactionState, getTransactionState, ITransactionState } from '../../../../../share-business/store';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -33,7 +34,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
     hblId: string;
     containers: Container[] = [];
     hblDetail: any; // TODO model here!!
-
+    shipmentType: string;
     selectedTab: string = HBL_TAB.DETAIL;
 
     constructor(
@@ -77,6 +78,13 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 this.combackToHBLList();
             }
         });
+        this._store.select(getTransactionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: ITransactionState) => {
+                    this.shipmentType = res.cstransaction.shipmentType;
+                }
+            );
     }
 
     getListContainer() {
@@ -144,7 +152,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         }
 
         const modelUpdate: any = this.onsubmitData();
-
+        modelUpdate.shipmentType = this.shipmentType;
         modelUpdate.jobId = this.hblDetail.jobId;
         modelUpdate.id = this.hblDetail.id;
         modelUpdate.consigneeDescription = this.formHouseBill.consigneeDescription.value;

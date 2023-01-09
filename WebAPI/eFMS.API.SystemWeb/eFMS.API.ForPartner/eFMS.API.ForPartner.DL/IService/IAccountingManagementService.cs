@@ -1,4 +1,5 @@
-﻿using eFMS.API.ForPartner.DL.Models;
+﻿using eFMS.API.Common;
+using eFMS.API.ForPartner.DL.Models;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.ForPartner.Service.Models;
 using ITL.NetCore.Common;
@@ -23,7 +24,7 @@ namespace eFMS.API.ForPartner.DL.IService
         List<Guid> GetSurchargeIdsByRefNoInvoice(string referenceNo);
         HandleState UpdateVoucherExpense(VoucherExpense voucherExpense, string apiKey);       
         void CalculatorInvoiceReceivable(AccAccountingManagement invoice);
-        Task<HandleState> InsertVoucher(VoucherSyncCreateModel model, string apiKey);
+        Task<ResultHandle> InsertVoucher(VoucherSyncCreateModel model, string apiKey);
         Task<HandleState> UpdateVoucher(VoucherSyncUpdateModel model, string apiKey);
         Task<HandleState> DeleteVoucher(VoucherSyncDeleteModel model, string apiKey);
     }

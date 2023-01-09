@@ -1,15 +1,16 @@
-import { G, T } from '@angular/cdk/keycodes';
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmPopupComponent, ReportPreviewComponent } from '@common';
 import { AccountingConstants } from '@constants';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';
+import { Store } from '@ngrx/store';
 import { AccountingRepo, DocumentationRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
+import { getCurrentUserState, IAppState } from '@store';
 import _groupBy from 'lodash/groupBy';
 import { ToastrService } from 'ngx-toastr';
-import { concatMap, finalize, switchMap } from 'rxjs/operators';
+import { concatMap, finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { ARPrePaidPaymentConfirmPopupComponent } from './components/popup-confirm-prepaid/confirm-prepaid.popup';
 
@@ -24,14 +25,17 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
     debitNotes: Partial<IPrepaidPayment[]> = [];
     selectedCd: IPrepaidPayment = null;
     totalSelectedItem: number;
+
+    sumAmountVND: number = 0;
+    sumAmountUSD: number = 0;
+
     constructor(
         private readonly _accountingRepo: AccountingRepo,
         private readonly _sortService: SortService,
         private readonly _toast: ToastrService,
         private readonly _documentationRepo: DocumentationRepo,
         private readonly _export: ExportRepo,
-        private readonly _cd: ChangeDetectorRef
-
+        private readonly _store: Store<IAppState>
 
     ) {
         super();
@@ -55,10 +59,20 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
             { title: 'Issue Date', field: 'datetimeCreated', sortable: true },
             { title: 'Salesman', field: 'salesmanName', sortable: true },
         ];
-        this.dataSearch = {
-            keywords: []
-        }
-        this.getPaging();
+        this._store.select(getCurrentUserState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (data: SystemInterface.IClaimUser) => {
+                    if (!!data.userName) {
+                        this.dataSearch = {
+                            keywords: [],
+                            officeIds: [data.officeId]
+                        };
+                        this.getPaging();
+                    }
+                }
+            )
+
     }
 
     getPaging() {
@@ -102,14 +116,27 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
                 x.isSelected = false;
             });
         }
+        const itemSelecteds = this.debitNotes.filter(x => x.isSelected === true);
+        this.totalSelectedItem = itemSelecteds.length;
 
-        this.totalSelectedItem = this.debitNotes.filter(x => x.isSelected === true).length;
+        this.calculateTotalAmountAfterSelectItems(itemSelecteds);
     }
 
     onChangeSelectedCd() {
         const selectedItems = this.debitNotes.filter(x => x.status === 'Unpaid');
         this.isCheckAll = selectedItems.every(x => x.isSelected === true);
-        this.totalSelectedItem = selectedItems.filter(x => x.isSelected === true).length;
+
+        const itemSelecteds = selectedItems.filter(x => x.isSelected === true);
+        this.totalSelectedItem = itemSelecteds.length;
+
+        this.calculateTotalAmountAfterSelectItems(itemSelecteds);
+    }
+
+    calculateTotalAmountAfterSelectItems(itemSelecteds: IPrepaidPayment[]) {
+        this.sumAmountVND = 0;
+        this.sumAmountUSD = 0;
+        itemSelecteds.reduce((acc, curr) => this.sumAmountVND += curr.totalAmountVND, 0);
+        itemSelecteds.reduce((acc, curr) => this.sumAmountUSD += curr.totalAmountUSD, 0);
     }
 
     onSelectCd(cd: IPrepaidPayment) {
@@ -335,6 +362,8 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
         });
         console.log(results);
         this.confirmPrepaidPopup.groupData = [...results];
+        this.confirmPrepaidPopup.sumAmountVND = this.sumAmountVND;
+        this.confirmPrepaidPopup.sumAmountUSD = this.sumAmountUSD;
         this.confirmPrepaidPopup.show();
 
     }

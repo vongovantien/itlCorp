@@ -320,8 +320,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         public SysAttachFileTemplate GetAttTepmlateByJob(string Code, int docId, string transationType)
         {
-            var nameEn = _attachFileTemplateRepo.Get(x => x.Id == docId).FirstOrDefault()?.NameEn;
-            return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.NameEn == nameEn && x.TransactionType == transationType).FirstOrDefault();
+            //var nameEn = _attachFileTemplateRepo.Get(x => x.Id == docId).FirstOrDefault()?.NameEn;
+            return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.TransactionType == transationType).FirstOrDefault();
         }
         public async Task<List<EDocGroupByType>> GetEDocByJob(Guid jobID, string transactionType)
         {
@@ -979,8 +979,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 prefixs = _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType).Select(x => x.Code).OrderBy(x => x.Length).ToList(); prefixs = _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType).Select(x => x.Code).OrderBy(x => x.Length).ToList();
             }
             string code = null;
+            bool clearLastChar = false;
             if (fileName.Split('_').Count() > 0)
             {
+                if(fileName.ToList().Last() == '_')
+                {
+                    fileName=fileName.Remove(fileName.Length - 1);
+                    clearLastChar = true;
+                }
                 var fileNameSplit = fileName.Split('_').ToList().Last();
                 var preFixFileName = fileName.Replace(fileNameSplit, "");
                 for (int i = 0; i < prefixs.Count; i++)
@@ -994,6 +1000,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             else
             {
                 return '_' + fileName;
+            }
+            if (clearLastChar)
+            {
+                fileName = fileName + '_';
             }
             //prefixs.ForEach(x =>
             //{
