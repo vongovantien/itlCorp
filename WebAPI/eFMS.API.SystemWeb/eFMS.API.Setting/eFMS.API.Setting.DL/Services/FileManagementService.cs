@@ -754,22 +754,7 @@ namespace eFMS.API.Setting.DL.Services
                             Acctype.AddRange(edocALLs.Select(x => x.Id).ToList());
                         //}
                         break;
-                    case AccountantType.All:
-                        if (accManage == null)
-                        {
-                            var voucherRCIds = await accManageRepo.WhereAsync(x => x.VoucherId != null);
-                            var billingNo = voucherRCIds.Select(x => x.AttachDocInfo);
-                            var edocRCs = await edocRepo.GetAsync(x => billingNo.Contains(x.BillingNo));
-                            Acctype.AddRange(edocRCs.Select(x => x.Id).ToList());
-                        }
-                        else
-                        {
-                            var voucherRCIds = accManage.Where(x =>x.VoucherId != null);
-                            var billingNo = voucherRCIds.Select(x => x.AttachDocInfo);
-                            var edocRCs = edocRepo.Get(x => billingNo.Contains(x.BillingNo));
-                            Acctype.AddRange(edocRCs.Select(x => x.Id).ToList());
-                        }
-                        break;
+                   
                 }
                 if (Acctype.Count() > 0)
                 {
