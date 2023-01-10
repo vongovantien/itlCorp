@@ -568,10 +568,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             UserFileName = x.FirstOrDefault().UserFileName,
                             UserModified = x.FirstOrDefault().UserModified,
                             Note = x.FirstOrDefault().Note,
-                            HBLNo = x.Count() > 1 ? jobDetail.HBLNo : null,
-                            JobNo = x.Count() > 1 ? jobDetail.JobNo : null,
-                            Hblid = x.Count() > 1 ? jobDetail.HBLId : Guid.Empty,
-                            JobId = x.Count() > 1 ? jobDetail.JobId : Guid.Empty,
+                            HBLNo = x.Count() > 1 ? null : jobDetail.HBLNo,
+                            JobNo = x.Count() > 1 ? null : jobDetail.JobNo,
+                            Hblid = x.Count() > 1 ? Guid.Empty : jobDetail.HBLId,
+                            JobId = x.Count() > 1 ? Guid.Empty : jobDetail.JobId,
                             DocumentTypeName = _attachFileTemplateRepo.Get(y => y.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().NameEn,
                             TransactionType = jobDetail?.TransactionType
                         };
