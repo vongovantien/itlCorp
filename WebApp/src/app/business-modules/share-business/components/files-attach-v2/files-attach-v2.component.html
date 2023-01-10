@@ -140,8 +140,20 @@
                                 </span>
                             </button>
                             <app-dropdown #dropdownMenu>
-                                <a class="dropdown-item pointer" (click)="genFileAdvToSM()">
+                                <a class="dropdown-item pointer" (click)="genFileToSM('Advance')">
                                     <span>Get Files Advance</span>
+                                </a>
+                                <a class="dropdown-item pointer" (click)="genFileToSM('SOA')">
+                                    <span>Get Files SOA</span>
+                                </a>
+                                <a class="dropdown-item pointer" (click)="genFileToSM('MBL')">
+                                    <span>Get Files MasterBill</span>
+                                </a>
+                                <a class="dropdown-item pointer" (click)="genFileToSM('HBL')">
+                                    <span>Get Files HouseBill</span>
+                                </a>
+                                <a class="dropdown-item pointer" (click)="genFileToSM('INV')">
+                                    <span>Get Files Invoice</span>
                                 </a>
                                 <!-- <a class="dropdown-item pointer" (click)="genFileSOAToSM()">
                                     <span>Get Files SOA</span>
