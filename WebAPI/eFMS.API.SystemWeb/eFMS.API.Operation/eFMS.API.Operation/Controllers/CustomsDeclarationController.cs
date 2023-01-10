@@ -295,7 +295,7 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost("UpdateJobToClearances")]
-        public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
+        public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances, Guid hblId)
         {
             if (clearances.Any(x => x.isDelete == true))
             {

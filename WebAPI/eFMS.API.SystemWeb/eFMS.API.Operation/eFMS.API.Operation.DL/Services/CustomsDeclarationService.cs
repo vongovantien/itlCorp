@@ -471,6 +471,9 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
+                var jobNo = clearances?.FirstOrDefault()?.JobNo;
+                var listExist = DataContext.Get(x => x.JobNo == jobNo).AsNoTracking();
+                bool isUpdateCharge = listExist?.Count() > 0 ? false : true;
                 var clearanceAdd = clearances.OrderBy(x => x.ClearanceDate).ThenByDescending(x => x.DatetimeModified);
                 foreach (var item in clearanceAdd)
                 {
@@ -484,18 +487,9 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     result = DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
-
-                var jobNo = clearanceAdd.FirstOrDefault()?.JobNo;
-                if (result.Success && jobNo != null)
+                if (isUpdateCharge == true && result.Success && jobNo != null)
                 {
-                    var query = from advRequest in accAdvanceRequestRepository.Get(x => x.JobId == jobNo)
-                                join advPayment in accAdvancePaymentRepository.Get()
-                                on advRequest.AdvanceNo equals advPayment.AdvanceNo
-                                where advPayment.SyncStatus == null
-                                select advRequest;
-
-                    await query.ForEachAsync(x => x.CustomNo = clearanceAdd.FirstOrDefault()?.ClearanceNo);
-                    result = accAdvanceRequestRepository.SubmitChanges();
+                    result = await UpdateCustomNoFromCus(clearances, jobNo);
                 }
                 result = DataContext.SubmitChanges();
             }
@@ -1631,37 +1625,53 @@ namespace eFMS.API.Operation.DL.Services
             return hs;
         }
 
+        private async Task<HandleState> UpdateCustomNoFromCus(List<CustomsDeclarationModel> lstCus, string jobNo)
+        {
+            var hs = new HandleState();
+            var clearanceNo = lstCus?.FirstOrDefault()?.ClearanceNo;
+
+            //Update tất cả charge
+            var listSurcharge = csShipmentSurchargeRepo.Get(x => x.JobNo == jobNo
+                && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom)
+            );
+
+            //Update những charge chưa ghi nhận vô phí
+            var query = from advRequest in accAdvanceRequestRepository.Get(x => x.JobId == jobNo)
+                        join advPayment in accAdvancePaymentRepository.Get()
+                        on advRequest.AdvanceNo equals advPayment.AdvanceNo
+                        where advPayment.SyncStatus == null
+                        select advRequest;
+
+            await query.ForEachAsync(x => x.CustomNo = clearanceNo);
+            hs = accAdvanceRequestRepository.SubmitChanges();
+
+            await listSurcharge.ForEachAsync(x => x.ClearanceNo = clearanceNo);
+            hs = csShipmentSurchargeRepo.SubmitChanges();
+
+            return hs;
+        }
+
         public async Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model)
         {
+            //Lô hàng có charge/adv/sm - nhưng chưa có tờ khai
             bool isUpdateCharge = false;
-            var listCustom = await DataContext.Get(x => x.JobNo == model.JobNo).OrderBy(x => x.ClearanceDate).ThenByDescending(x => x.DatetimeModified)?.FirstOrDefaultAsync();
-            if (listCustom == null)
+            var listCusUpdated = new List<CustomsDeclarationModel>();
+            var listCustom = DataContext.Get(x => x.JobNo == model.JobNo).OrderBy(x => x.ClearanceDate).ThenByDescending(x => x.DatetimeModified).AsQueryable();
+
+            if (listCustom.Count() > 0) //Đã có tờ khai chính
+            {
+                isUpdateCharge = false;
+            }
+            else
             {
                 isUpdateCharge = true;
+                listCusUpdated.Add(model);
             }
+
             var hs = DataContext.Add(model, false);
             if (isUpdateCharge && hs.Success)
             {
-                var listSurcharge = csShipmentSurchargeRepo.Get(x => x.JobNo == model.JobNo && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom));
-                var query = from surcharge in listSurcharge.Where(x => x.AdvanceNoFor != null)
-                            join advances in accAdvancePaymentRepository.Get()
-                            on surcharge.AdvanceNoFor equals advances.AdvanceNo
-                            where advances.SyncStatus == null
-                            select surcharge;
-
-                //update custom clearance for advRequest
-                var query2 = from advRequest in accAdvanceRequestRepository.Get(x => x.JobId == model.JobNo)
-                             join advPayment in accAdvancePaymentRepository.Get()
-                             on advRequest.AdvanceNo equals advPayment.AdvanceNo
-                             where advPayment.SyncStatus == null
-                             select advRequest;
-                await query2.ForEachAsync(x => x.CustomNo = model.ClearanceNo);
-                hs = accAdvanceRequestRepository.SubmitChanges();
-
-                //update custom surcharge
-                var listUpdateItem = listSurcharge.Where(x => string.IsNullOrEmpty(x.AdvanceNoFor)).Union(query);
-                await listUpdateItem.ForEachAsync(x => x.ClearanceNo = model.ClearanceNo);
-                hs = csShipmentSurchargeRepo.SubmitChanges();
+                hs = await UpdateCustomNoFromCus(listCusUpdated, model.JobNo);
             }
             DataContext.SubmitChanges();
             return hs;
