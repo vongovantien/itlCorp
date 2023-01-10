@@ -47,6 +47,7 @@ export class AccountantFileManagementComponent extends AppList implements OnInit
                     this.listFile.pageSize = res.size;
                 }
             );
+        this.page = 1;
     }
 
     reset(event: any) {

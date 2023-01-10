@@ -1,6 +1,6 @@
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { JobConstants } from '@constants';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { DataService } from '@services';
@@ -103,7 +103,7 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             fromDate: !!formSearch.date?.startDate ? formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en') : new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate),
             toDate: !!formSearch.date?.endDate ? formatDate(formSearch.date.endDate, "yyyy-MM-dd", 'en') : new Date(JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate),
             dateMode: formSearch.dateMode,
-            accountantTypes: this.isAcc ? this.accountantType.value.length > 1 ? this.accountantType.value : [6] : null,
+            accountantTypes: this.isAcc ? this.accountantType.value.length > 0 ? this.accountantType.value : [6] : null,
         };
         if (this.isAcc && this.accountantType.value.length === 0) {
             this.accountantType.setValue([this.accountantTypes[6].value]);
@@ -131,14 +131,6 @@ export class FormSearchFileManagementComponent extends AppForm implements OnInit
             this.accountantType.setValue([this.accountantTypes[6].value]);
         }
         this.onReset.emit(bodySearch);
-    }
-
-    resetDate(control: FormControl | AbstractControl) {
-        this.date.setValue({
-            startDate: null,
-            endDate: null
-        });
-        control.setValue(null);
     }
 
     selelectedSelect(event: any) {

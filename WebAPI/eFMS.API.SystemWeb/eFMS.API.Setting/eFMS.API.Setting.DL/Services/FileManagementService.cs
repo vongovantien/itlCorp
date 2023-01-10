@@ -754,6 +754,7 @@ namespace eFMS.API.Setting.DL.Services
                             Acctype.AddRange(edocALLs.Select(x => x.Id).ToList());
                         //}
                         break;
+                   
                 }
                 if (Acctype.Count() > 0)
                 {

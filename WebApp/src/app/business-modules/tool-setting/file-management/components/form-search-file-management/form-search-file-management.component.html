@@ -20,7 +20,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date"
-                                        formControlName="date" [allowRemove]="false" (remove)="resetDate(date)" />
+                                        formControlName="date" [allowRemove]="false" />
                                     <span class="m-input-icon__icon m-input-icon__icon--right">
                                         <span>
                                             <i class="la la-calendar"></i>
@@ -40,8 +40,9 @@
                         <div class="col-lg-6" *ngIf="isAcc">
                             <div class="form-group">
                                 <label>Accountant Type</label>
-                                <ng-select formControlName="accountantType" [items]="accountantTypes" class="custom" (add)="selelectedSelect($event)"
-                                    bindLabel="title" [multiple]="true" bindValue="value" [clearable]="false">
+                                <ng-select formControlName="accountantType" [items]="accountantTypes" class="custom"
+                                    (add)="selelectedSelect($event)" bindLabel="title" [multiple]="true"
+                                    bindValue="value" [clearable]="false">
                                 </ng-select>
                             </div>
                         </div>
