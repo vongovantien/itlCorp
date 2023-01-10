@@ -10,6 +10,7 @@ import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-se
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { SearchMultipleComponent } from '../components/search-multiple/search-multiple.component';
 import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-add-more-modal',
@@ -45,6 +46,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
         private _fb: FormBuilder,
         private _sortService: SortService,
         private _documentationRepo: DocumentationRepo,
+        private _toastService: ToastrService,
         private _operationRepo: OperationRepo) {
         super();
         this.requestSort = this.sortLocal;
@@ -137,7 +139,8 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
                 .pipe(finalize(() => this.hide()))
                 .subscribe(
                     (responses: CommonInterface.IResult | any) => {
-                        if (responses.success === true) {
+                        if (responses.status === true) {
+                            this._toastService.success(responses.message);
                             this.updateShipmentVolumn(dataToUpdate);
                             this.isCloseModal.emit(true);
                         }
@@ -183,6 +186,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
                     this.currentJob.sumNetWeight = this.currentJob.sumNetWeight + importedData[i].netWeight == null ? 0 : importedData[i].netWeight;
                     this.currentJob.sumCbm = this.currentJob.sumCbm + importedData[i].cbm == null ? 0 : importedData[i].cbm;
                 }
+
             }
             if (this.currentJob.sumGrossWeight === 0) {
                 this.currentJob.sumGrossWeight = null;

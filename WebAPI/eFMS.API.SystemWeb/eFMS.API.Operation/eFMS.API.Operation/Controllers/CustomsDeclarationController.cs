@@ -295,7 +295,7 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost("UpdateJobToClearances")]
-        public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances, Guid hblId)
+        public async Task<IActionResult> UpdateJobToClearances(List<CustomsDeclarationModel> clearances, Guid hblId)
         {
             if (clearances.Any(x => x.isDelete == true))
             {
@@ -305,7 +305,10 @@ namespace eFMS.API.Operation.Controllers
                 }
             }
 
-            var result = customsDeclarationService.UpdateJobToClearances(clearances);
+            var hs = await customsDeclarationService.UpdateJobToClearances(clearances);
+            string message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
             return Ok(result);
         }
 
