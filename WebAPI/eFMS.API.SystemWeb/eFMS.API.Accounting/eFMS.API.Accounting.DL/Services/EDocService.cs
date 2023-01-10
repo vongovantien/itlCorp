@@ -220,50 +220,6 @@ namespace eFMS.API.Accounting.DL.Services
             return jobCs.FirstOrDefault().Id;
         }
 
-        //public async Task<HandleState> GenerateEdocFromAdvacneToSettle(string SettleNo)
-        //{
-        //    HandleState result = new HandleState();
-        //    var surcharge = await surchargetRepo.WhereAsync(x => x.SettlementCode == SettleNo);
-        //    var charges = surcharge.Select(x => new { advanceNo = x.AdvanceNo, transtype = x.TransactionType, jobNo = x.JobNo });
-        //    try
-        //    {
-        //        charges.ToList().ForEach(async x =>
-        //        {
-        //            if (advRepo.GetAsync(z => z.SyncStatus == "Synced" && z.AdvanceNo == x.advanceNo) != null)
-        //            {
-        //                var edocSMDefault = await DataContext.GetAsync(z => z.BillingNo == SettleNo);
-        //                var edocSMIds = edocSMDefault.Select(z => z.SysImageId);
-        //                var edocADV =  DataContext.Get(z => x.advanceNo == z.BillingNo && z.BillingType == "Advance"&& !edocSMIds.Contains(z.SysImageId));
-        //                var docType = attachRepo.Get(y => y.Code == "AD-SM" && y.TransactionType == x.transtype);
-        //                var edocSMs = new List<SysImageDetail>();
-        //                edocADV.ToList().ForEach(async edocAD =>
-        //                {
-        //                    var edocSM = edocAD;
-        //                    edocSM.Id = Guid.NewGuid();
-        //                    edocSM.Source = "Settlement";
-        //                    edocSM.BillingNo = SettleNo;
-        //                    edocSM.BillingType = "Settlement";
-        //                    edocSM.SystemFileName = edocSM.SystemFileName.Replace("AD_", "SM_");
-        //                    edocSM.DocumentTypeId = docType.FirstOrDefault().Id;
-        //                    edocSM.JobId = GetJobId(x.jobNo, x.transtype);
-        //                    edocSMs.Add(edocSM);
-        //                });
-        //                await DataContext.AddAsync(edocSMs, false);
-        //            }
-        //        });
-
-        //        HandleState hs = DataContext.SubmitChanges();
-        //        if (hs.Success)
-        //        {
-        //            return hs;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new HandleState((object)ex.Message);
-        //    }
-        //    return result;
-        //}
-
+        
     }
 }
