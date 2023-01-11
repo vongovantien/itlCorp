@@ -1646,9 +1646,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         var jobSettleAD = chargeSMAD.GroupBy(x=>new { x.JobNo,x.AdvanceNo }).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType, advNo = x.FirstOrDefault().AdvanceNo });
                         jobSettleAD.ToList().ForEach(x =>
                         {
-                            var adv = _advRepo.Get(z => z.AdvanceNo == x.advNo);
-                            var advId = adv.Select(z => z.Id.ToString()).ToList();
-                            var image = _sysImageRepo.Get(z => advId.Contains(z.ObjectId) && z.SyncStatus == "Synced" && z.Folder == "Advance").OrderByDescending(z => z.DateTimeCreated).FirstOrDefault();
+                            var advId = _advRepo.Get(z => z.AdvanceNo == x.advNo).FirstOrDefault().Id;
+                            var image = _sysImageRepo.Get(z => advId.ToString()==z.ObjectId && z.SyncStatus == "Synced" && z.Folder == "Advance").OrderByDescending(z => z.DateTimeCreated).FirstOrDefault();
                             //images.ToList().ForEach(img =>
                             //{
                                 //var img = images.FirstOrDefault();
