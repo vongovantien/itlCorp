@@ -40,24 +40,24 @@
                         <div class="m-portlet__head-caption">
                             <div class="m-portlet__head-title d-flex justify-content-between align-items-center
                                 btn-toggle-collapse collapse-toggle" data-toggle="collapse"
-                                [attr.data-target]="'#' + docType.documentType.code">
+                                [attr.data-target]="'#' + docType.documentType?.code">
                                 <h4 class=" m-portlet__head-text font-14">
-                                    <i class="la la-angle-up margin-right-5"></i> {{docType.documentType.nameEn}}
+                                    <i class="la la-angle-up margin-right-5"></i> {{docType.documentType?.nameEn}}
                                 </h4>
                             </div>
                         </div>
                         <div class="c-button-actions">
                             <div class="form-group float-right">
                                 <button class="btn btn-sm m-btn--pill m-btn--icon m-btn--icon-only"
-                                    *ngIf="docType.documentType.required"
-                                    [ngClass]="((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length)  ? 'btn-success': 'btn-danger'">
+                                    *ngIf="docType.documentType?.required"
+                                    [ngClass]="((docType.documentType?.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length)  ? 'btn-success': 'btn-danger'">
                                     <i
-                                        class="la la-{{((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length) ? 'check' : 'exclamation'}}"></i>
+                                        class="la la-{{((docType.documentType?.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length) ? 'check' : 'exclamation'}}"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="m-portlet__body p-0" id={{docType.documentType.code}}
+                    <div class="m-portlet__body p-0" id={{docType.documentType?.code}}
                         [class]="!!(docType?.eDocs?.length) ? 'collapse show':'collapse'">
                         <div class="table-wrapper table-scrollable">
                             <table class="table table-hover table-editable dataTable-edit table-summary ">
@@ -237,8 +237,8 @@
                         <div class="m-portlet__head-caption">
                             <div class="m-portlet__head-title d-flex justify-content-between align-items-center">
                                 <h4 class="m-portlet__head-text collapse-toggle" data-toggle="collapse"
-                                    [attr.data-target]="'#' + docType.documentType.code + i">
-                                    <i class="la la-angle-up m--margin-right-5"></i> {{docType.documentType.nameEn}}
+                                    [attr.data-target]="'#' + docType.documentType?.code + i">
+                                    <i class="la la-angle-up m--margin-right-5"></i> {{docType.documentType?.nameEn}}
                                 </h4>
                                 <div class="text-right" *ngIf="!!docType?.eDocs?.length">
                                     <button class="btn btn-sm m-btn--pill m-btn--icon m-btn--icon-only btn-success">
@@ -250,7 +250,7 @@
                     </div>
                     <div class="m-portlet__body p-0">
                         <div [class]="docType?.eDocs?.length>0? 'collapse show':'collapse'"
-                            [id]="docType.documentType.code + i">
+                            [id]="docType.documentType?.code + i">
                             <div class="table-wrapper table-scrollable">
                                 <table class="table table-hover table-editable dataTable table-summary ">
                                     <thead app-table-header [headers]="headers"
