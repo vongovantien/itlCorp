@@ -38,6 +38,11 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
     proofOfDelievey: ProofOfDelivery = new ProofOfDelivery();
 
     ngOnInit() {
+        this.headers = [
+            { title: 'HAWB No', field: 'hawbNo', sortable: true },
+            { title: 'Delivery Person', field: 'deliveryPerson', sortable: true },
+            { title: 'Delivery Date', field: 'deliveryDate', sortable: true },
+        ]
         this.getHouseBills();
         this.formGroup = this._fb.group({
             deliveryPerson: [null, Validators.compose([
