@@ -471,11 +471,9 @@ namespace eFMS.API.Operation.DL.Services
             var result = new HandleState();
             try
             {
-                var jobNo = clearances?.FirstOrDefault()?.JobNo;
-                var listExist = DataContext.Get(x => x.JobNo == jobNo).AsNoTracking();
-                bool isUpdateCharge = listExist?.Count() > 0 ? false : true;
-                var clearanceAdd = clearances.OrderBy(x => x.ClearanceDate).ThenByDescending(x => x.DatetimeModified);
-                foreach (var item in clearanceAdd)
+                var jobOps = opsTransactionRepo.First(x => x.Id == clearances.FirstOrDefault().jobId);
+                var existedItem = DataContext.Any(x => x.Hblid == jobOps.Hblid.ToString());
+                foreach (var item in clearances)
                 {
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
                     if (clearance != null)
@@ -487,11 +485,12 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     result = DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
-                if (isUpdateCharge == true && result.Success && jobNo != null)
-                {
-                    result = await UpdateCustomNoFromCus(clearances, jobNo);
-                }
                 result = DataContext.SubmitChanges();
+                if (existedItem == false && result.Success)
+                {
+                    string customNo = await GetOldestClearanceNo(jobOps.JobNo);
+                    result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
+                }
             }
             catch (Exception ex)
             {
@@ -1624,56 +1623,51 @@ namespace eFMS.API.Operation.DL.Services
 
             return hs;
         }
-
-        private async Task<HandleState> UpdateCustomNoFromCus(List<CustomsDeclarationModel> lstCus, string jobNo)
+        private async Task<string> GetOldestClearanceNo(string jobNo)
         {
-            var hs = new HandleState();
-            var clearanceNo = lstCus?.FirstOrDefault()?.ClearanceNo;
+            var mainCus = await DataContext.Get(x => x.JobNo == jobNo)
+                .OrderBy(x => x.ClearanceDate).ThenByDescending(x => x.DatetimeModified).FirstOrDefaultAsync();
 
-            //Update tất cả charge
-            var listSurcharge = csShipmentSurchargeRepo.Get(x => x.JobNo == jobNo
-                && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom)
-            );
-
-            //Update những charge chưa ghi nhận vô phí
-            var query = from advRequest in accAdvanceRequestRepository.Get(x => x.JobId == jobNo)
-                        join advPayment in accAdvancePaymentRepository.Get()
-                        on advRequest.AdvanceNo equals advPayment.AdvanceNo
-                        where advPayment.SyncStatus == null
-                        select advRequest;
-
-            await query.ForEachAsync(x => x.CustomNo = clearanceNo);
-            hs = accAdvanceRequestRepository.SubmitChanges();
-
-            await listSurcharge.ForEachAsync(x => x.ClearanceNo = clearanceNo);
-            hs = csShipmentSurchargeRepo.SubmitChanges();
-
-            return hs;
+            return mainCus?.ClearanceNo ?? string.Empty;
         }
 
         public async Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model)
         {
             //Lô hàng có charge/adv/sm - nhưng chưa có tờ khai
-            bool isUpdateCharge = false;
-            var listCusUpdated = new List<CustomsDeclarationModel>();
-            var listCustom = DataContext.Get(x => x.JobNo == model.JobNo).OrderBy(x => x.ClearanceDate).ThenByDescending(x => x.DatetimeModified).AsQueryable();
-
-            if (listCustom.Count() > 0) //Đã có tờ khai chính
+            var jobOps = opsTransactionRepo.First(x => x.Id == model.jobId);
+            var existedItem = DataContext.Any(x => x.Hblid == jobOps.Hblid.ToString());
+            HandleState hs = DataContext.Add(model);
+            if (existedItem == false && hs.Success)
             {
-                isUpdateCharge = false;
-            }
-            else
-            {
-                isUpdateCharge = true;
-                listCusUpdated.Add(model);
+                string customNo = await GetOldestClearanceNo(model.JobNo);
+                hs = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
             }
 
-            var hs = DataContext.Add(model, false);
-            if (isUpdateCharge && hs.Success)
-            {
-                hs = await UpdateCustomNoFromCus(listCusUpdated, model.JobNo);
-            }
-            DataContext.SubmitChanges();
+            return hs;
+        }
+
+        private async Task<HandleState> UpdateCustomNoFromCus(string customNo, Guid hblId)
+        {
+            var hs = new HandleState();
+
+            //Update tất cả charge
+            var listSurcharge = csShipmentSurchargeRepo.Get(x => x.Hblid == hblId
+                && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom)
+            );
+
+            //Update những charge chưa ghi nhận vô phí
+            var query = from advRequest in accAdvanceRequestRepository.Get(x => x.Hblid == hblId)
+                        join advPayment in accAdvancePaymentRepository.Get()
+                        on advRequest.AdvanceNo equals advPayment.AdvanceNo
+                        where advPayment.SyncStatus == null
+                        select advRequest;
+
+            await query.ForEachAsync(x => x.CustomNo = customNo);
+            hs = accAdvanceRequestRepository.SubmitChanges();
+
+            await listSurcharge.ForEachAsync(x => x.ClearanceNo = customNo);
+            hs = csShipmentSurchargeRepo.SubmitChanges();
+
             return hs;
         }
     }
