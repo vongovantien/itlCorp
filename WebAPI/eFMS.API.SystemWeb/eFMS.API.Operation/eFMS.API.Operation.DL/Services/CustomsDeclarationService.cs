@@ -469,10 +469,10 @@ namespace eFMS.API.Operation.DL.Services
         public async Task<HandleState> UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
             var result = new HandleState();
+            var jobOps = opsTransactionRepo.First(x => x.Id == clearances.FirstOrDefault().jobId);
+            var jobNo = clearances.FirstOrDefault()?.JobNo;
             try
             {
-                var jobOps = opsTransactionRepo.First(x => x.Id == clearances.FirstOrDefault().jobId);
-                var existedItem = DataContext.Any(x => x.Hblid == jobOps.Hblid.ToString());
                 foreach (var item in clearances)
                 {
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
@@ -486,9 +486,9 @@ namespace eFMS.API.Operation.DL.Services
                     result = DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
                 result = DataContext.SubmitChanges();
-                if (existedItem == false && result.Success)
+                if (!string.IsNullOrEmpty(jobNo) && result.Success)
                 {
-                    string customNo = await GetOldestClearanceNo(jobOps.JobNo);
+                    string customNo = await GetOldestClearanceNo(jobNo);
                     result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
                 }
             }
@@ -1626,7 +1626,7 @@ namespace eFMS.API.Operation.DL.Services
         private async Task<string> GetOldestClearanceNo(string jobNo)
         {
             var mainCus = await DataContext.Get(x => x.JobNo == jobNo)
-                .OrderBy(x => x.ClearanceDate).ThenByDescending(x => x.DatetimeModified).FirstOrDefaultAsync();
+                .OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).FirstOrDefaultAsync();
 
             return mainCus?.ClearanceNo ?? string.Empty;
         }
@@ -1635,9 +1635,8 @@ namespace eFMS.API.Operation.DL.Services
         {
             //Lô hàng có charge/adv/sm - nhưng chưa có tờ khai
             var jobOps = opsTransactionRepo.First(x => x.Id == model.jobId);
-            var existedItem = DataContext.Any(x => x.Hblid == jobOps.Hblid.ToString());
             HandleState hs = DataContext.Add(model);
-            if (existedItem == false && hs.Success)
+            if (!string.IsNullOrEmpty(model.JobNo) && hs.Success)
             {
                 string customNo = await GetOldestClearanceNo(model.JobNo);
                 hs = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
