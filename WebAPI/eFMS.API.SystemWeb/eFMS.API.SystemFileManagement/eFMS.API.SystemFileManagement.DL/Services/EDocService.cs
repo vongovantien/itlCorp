@@ -1700,7 +1700,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                     var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement");
                                     if (edocExist.Count() == 0)
                                     {
-                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL")).FirstOrDefault();
+                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type== "Accountant")).FirstOrDefault();
                                         var edoc = new SysImageDetail()
                                         {
                                             Id = Guid.NewGuid(),
@@ -1744,7 +1744,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                     var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement");
                                     if (edocExist.Count() == 0)
                                     {
-                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL")).FirstOrDefault();
+                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type == "Accountant")).FirstOrDefault();
                                         var edoc = new SysImageDetail()
                                         {
                                             Id = Guid.NewGuid(),
@@ -1788,7 +1788,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                     var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement");
                                     if (edocExist.Count() == 0)
                                     {
-                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "INV" && z.Type == "General").FirstOrDefault();
+                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "INV" && z.Type == "Accountant" && z.PartnerType== "Supplier" && z.AccountingType== "Settlement").FirstOrDefault();
                                         var edoc = new SysImageDetail()
                                         {
                                             Id = Guid.NewGuid(),
