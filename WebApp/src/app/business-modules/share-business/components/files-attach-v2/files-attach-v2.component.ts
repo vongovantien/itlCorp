@@ -6,7 +6,7 @@ import { SystemConstants } from '@constants';
 import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
-import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
+import { AccountingRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { getCurrentUserState, IAppState } from '@store';
 import _uniqBy from 'lodash/uniqBy';
@@ -101,6 +101,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         private readonly _toast: ToastrService,
         private readonly _exportRepo: ExportRepo,
         private readonly _sortService: SortService,
+        private readonly _accoutingRepo: AccountingRepo,
         private _documentationRepo: DocumentationRepo,
     ) {
         super();
@@ -546,6 +547,30 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 }
             );
     }
+
+    genFileToSM(billingType: string) {
+        this._systemFileRepo.genEdocFromBilling(this.billingNo, billingType)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this.getEDoc(this.transactionType);
+                    }
+                },
+            );
+    }
+
+    // genFileSOAToSM() {
+    //     this._systemFileRepo.genEdocFromBilling(this.billingNo, "SOA")
+    //         .pipe(catchError(this.catchError))
+    //         .subscribe(
+    //             (res: any) => {
+    //                 if (res.status) {
+    //                     this.getEDoc(this.transactionType);
+    //                 }
+    //             },
+    //         );
+    // }
 }
 interface IEDocItem {
     billingNo: string;

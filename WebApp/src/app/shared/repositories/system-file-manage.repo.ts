@@ -120,5 +120,12 @@ export class SystemFileManageRepo {
         return this._api.getTextFile(url, null, null, 'response').pipe(
             map((data: any) => data)
         );
+
+    }
+
+    genEdocFromBilling(billingNo: string, billingType) {
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GenEdocFromBilling`, { billingNo: billingNo, billingType: billingType }).pipe(
+            map((data: any) => data)
+        );
     }
 }

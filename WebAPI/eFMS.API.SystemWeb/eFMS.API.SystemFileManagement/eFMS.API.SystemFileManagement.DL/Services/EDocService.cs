@@ -21,6 +21,7 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
 using static eFMS.API.Common.Helpers.FileHelper;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
 {
@@ -41,6 +42,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private IContextBase<AcctAdvancePayment> _advRepo;
         private IContextBase<AcctSoa> _soaRepo;
         private IContextBase<SysUser> _userRepo;
+        private IContextBase<CsShipmentSurcharge> _surRepo;
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)_sysImageDetailRepo.DC;
         private readonly Dictionary<string, string> PreviewTemplateCodeMappingAttachTemplateCode = new Dictionary<string, string>();
         public EDocService(IContextBase<SysImage> SysImageRepo,
@@ -55,6 +57,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             IContextBase<AcctAdvancePayment> advRepo,
             IContextBase<SysUser> userRepo,
             IContextBase<AcctSoa> soaRepo,
+             IContextBase<CsShipmentSurcharge> surRepo,
         IContextBase<CsTransactionDetail> tranDeRepo)
         {
             this.currentUser = currentUser;
@@ -72,6 +75,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _advRepo = advRepo;
             _userRepo = userRepo;
             _soaRepo = soaRepo;
+            _surRepo = surRepo;
             PreviewTemplateCodeMappingAttachTemplateCode.Add("HBL", "HBL");
             PreviewTemplateCodeMappingAttachTemplateCode.Add("MBL", "MBL");
             PreviewTemplateCodeMappingAttachTemplateCode.Add("DEBIT", "INV");
@@ -1204,7 +1208,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return template;
         }
 
-        private async Task<List<SysImage>> UpLoadS3(FileUploadModel model)
+        private async Task<List<SysImage>> UpLoadS3(FileUploadModel model,bool isSync)
         {
             var urlImage = "";
             List<SysImage> list = new List<SysImage>();
@@ -1243,7 +1247,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         DateTimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now,
                         ChildId = model.Child,
-                        KeyS3 = key
+                        KeyS3 = key,
+                        SyncStatus=isSync==true?"Synced":""
                     };
                     list.Add(sysImage);
                 }
@@ -1256,7 +1261,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             try
             {
-                List<SysImage> imageList = await UpLoadS3(model);
+                List<SysImage> imageList = await UpLoadS3(model,false);
                 HandleState result = new HandleState();
                 if (imageList.Count > 0)
                 {
@@ -1331,7 +1336,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         public async Task<string> PostAttachFileTemplateToEDoc(FileUploadModel model)
         {
             var urlImage = "";
-            List<SysImage> imageList = await UpLoadS3(model);
+            List<SysImage> imageList = await UpLoadS3(model,true);
             urlImage = imageList.FirstOrDefault()?.Url;
             if (imageList.Count > 0)
             {
@@ -1375,7 +1380,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Id = model.ObjectId,
                         ModuleName = model.Module
                     };
-                    List<SysImage> imageList = await UpLoadS3(UploadModel);
+                    List<SysImage> imageList = await UpLoadS3(UploadModel,false);
 
                     if (imageList.Count > 0)
                     {
@@ -1636,6 +1641,262 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return "OT_" + image.Name;
             }
             return _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).FirstOrDefault()?.SystemFileName + Path.GetExtension(image.Url);
+        }
+
+        public async Task<HandleState> GenEdocByBilling(string billingNo, string billingType)
+        {
+            HandleState result = new HandleState();
+            try
+            {
+                var edocs = new List<SysImageDetail>();
+                switch (billingType)
+                {
+                    case "Advance":
+                        var chargeSMAD = _surRepo.Get(x => x.SettlementCode == billingNo && x.AdvanceNo != null);
+                        var jobSettleAD = chargeSMAD.GroupBy(x=>new { x.JobNo,x.AdvanceNo }).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType, advNo = x.FirstOrDefault().AdvanceNo });
+                        jobSettleAD.ToList().ForEach(x =>
+                        {
+                            var advId = _advRepo.Get(z => z.AdvanceNo == x.advNo).FirstOrDefault().Id;
+                            var image = _sysImageRepo.Get(z => advId.ToString()==z.ObjectId && z.SyncStatus == "Synced" && z.Folder == "Advance").OrderByDescending(z => z.DateTimeCreated).FirstOrDefault();
+                            //images.ToList().ForEach(img =>
+                            //{
+                                //var img = images.FirstOrDefault();
+                                if (image != null)
+                                {
+                                    var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == image.Id && z.BillingNo == billingNo && z.Source == "Settlement");
+                                    if (edocExist.Count() == 0)
+                                    {
+                                    var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "AD-SM").FirstOrDefault();
+                                    var edoc = new SysImageDetail()
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            BillingNo = billingNo,
+                                            BillingType = billingType,
+                                            DatetimeCreated = DateTime.Now,
+                                            DatetimeModified = DateTime.Now,
+                                            DepartmentId = currentUser.DepartmentId,
+                                            ExpiredDate = null,
+                                            GroupId = currentUser.GroupId,
+                                            DocumentTypeId = tranType.Id,
+                                            JobId = getJobId(x.jobNo, x.tranType),
+                                            SysImageId = image.Id,
+                                            SystemFileName = tranType.Code+clearPrefix(x.tranType,image.Name),
+                                            UserFileName = image.Name,
+                                            UserCreated = currentUser.UserName,
+                                            UserModified = currentUser.UserName,
+                                            OfficeId = currentUser.OfficeID,
+                                            Source = "Settlement",
+                                            Hblid = null,
+                                            Note = null
+                                        };
+                                        edocs.Add(edoc);
+                                    }
+                                }
+                            });
+                        //});
+                        break;
+                    case "MBL":
+                        var chargeSMMBL = _surRepo.Get(x => x.SettlementCode == billingNo&&x.Mblno!=null);
+                        var jobSettleMBL = chargeSMMBL.GroupBy(x=>x.JobNo).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType });
+                        jobSettleMBL.ToList().ForEach(x =>
+                        {
+                            var jobId = getJobId(x.jobNo, x.tranType);
+                            var images = _sysImageRepo.Get(z => jobId.ToString() == z.ObjectId && z.Folder == "Shipment").OrderByDescending(z => z.DateTimeCreated);
+                            images.ToList().ForEach(img =>
+                            {
+                                //var img = images.FirstOrDefault();
+                                if (img != null)
+                                {
+                                    var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement");
+                                    if (edocExist.Count() == 0)
+                                    {
+                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type== "Accountant")).FirstOrDefault();
+                                        var edoc = new SysImageDetail()
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            BillingNo = billingNo,
+                                            BillingType = billingType,
+                                            DatetimeCreated = DateTime.Now,
+                                            DatetimeModified = DateTime.Now,
+                                            DepartmentId = currentUser.DepartmentId,
+                                            ExpiredDate = null,
+                                            GroupId = currentUser.GroupId,
+                                            DocumentTypeId = tranType.Id,
+                                            JobId = getJobId(x.jobNo, x.tranType),
+                                            SysImageId = img.Id,
+                                            SystemFileName = tranType.Code + clearPrefix(x.tranType, img.Name),
+                                            UserFileName = img.Name,
+                                            UserCreated = currentUser.UserName,
+                                            UserModified = currentUser.UserName,
+                                            OfficeId = currentUser.OfficeID,
+                                            Source = "Settlement",
+                                            Hblid = null,
+                                            Note = null
+                                        };
+                                        edocs.Add(edoc);
+                                    }
+                                }
+                            });
+                        });
+                        break;
+                    case "HBL":
+                        var chargeSMHBL = _surRepo.Get(x => x.SettlementCode == billingNo && x.Hblno != null);
+                        var jobSettleHBL = chargeSMHBL.GroupBy(x=>x.JobNo).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType });
+                        jobSettleHBL.ToList().ForEach(x =>
+                        {
+                            var jobId = getJobId(x.jobNo, x.tranType);
+                            var images = _sysImageRepo.Get(z => jobId.ToString() == z.ObjectId && z.Folder == "Shipment").OrderByDescending(z => z.DateTimeCreated);
+                            images.ToList().ForEach(img =>
+                            {
+                                //var img = images.FirstOrDefault();
+                                if (img != null)
+                                {
+                                    var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement");
+                                    if (edocExist.Count() == 0)
+                                    {
+                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type == "Accountant")).FirstOrDefault();
+                                        var edoc = new SysImageDetail()
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            BillingNo = billingNo,
+                                            BillingType = billingType,
+                                            DatetimeCreated = DateTime.Now,
+                                            DatetimeModified = DateTime.Now,
+                                            DepartmentId = currentUser.DepartmentId,
+                                            ExpiredDate = null,
+                                            GroupId = currentUser.GroupId,
+                                            DocumentTypeId = tranType.Id,
+                                            JobId = getJobId(x.jobNo, x.tranType),
+                                            SysImageId = img.Id,
+                                            SystemFileName = tranType.Code + clearPrefix(x.tranType, img.Name),
+                                            UserFileName = img.Name,
+                                            UserCreated = currentUser.UserName,
+                                            UserModified = currentUser.UserName,
+                                            OfficeId = currentUser.OfficeID,
+                                            Source = "Settlement",
+                                            Hblid = null,
+                                            Note = null
+                                        };
+                                        edocs.Add(edoc);
+                                    }
+                                }
+                            });
+                        });
+                        break;
+                    case "INV":
+                        var chargeSMINV = _surRepo.Get(x => x.SettlementCode == billingNo&&x.InvoiceNo!=null);
+                        var jobSettleINV = chargeSMINV.GroupBy(x=>x.JobNo).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType });
+                        jobSettleINV.ToList().ForEach(x =>
+                        {
+                            var jobId = getJobId(x.jobNo, x.tranType);
+                            var images = _sysImageRepo.Get(z => jobId.ToString() == z.ObjectId && z.Folder == "Shipment").OrderByDescending(z => z.DateTimeCreated);
+                            images.ToList().ForEach(img =>
+                            {
+                                //var img = images.FirstOrDefault();
+                                if (img != null)
+                                {
+                                    var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement");
+                                    if (edocExist.Count() == 0)
+                                    {
+                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "INV" && z.Type == "Accountant" && z.PartnerType== "Supplier" && z.AccountingType== "Settlement").FirstOrDefault();
+                                        var edoc = new SysImageDetail()
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            BillingNo = billingNo,
+                                            BillingType = billingType,
+                                            DatetimeCreated = DateTime.Now,
+                                            DatetimeModified = DateTime.Now,
+                                            DepartmentId = currentUser.DepartmentId,
+                                            ExpiredDate = null,
+                                            GroupId = currentUser.GroupId,
+                                            DocumentTypeId = tranType.Id,
+                                            JobId = getJobId(x.jobNo, x.tranType),
+                                            SysImageId = img.Id,
+                                            SystemFileName = tranType.Code + clearPrefix(x.tranType, img.Name),
+                                            UserFileName = img.Name,
+                                            UserCreated = currentUser.UserName,
+                                            UserModified = currentUser.UserName,
+                                            OfficeId = currentUser.OfficeID,
+                                            Source = "Settlement",
+                                            Hblid = null,
+                                            Note = null
+                                        };
+                                        edocs.Add(edoc);
+                                    }
+                                }
+                            });
+                        });
+                        break;
+                    case "SOA":
+                        var jobSMSOA = _surRepo.Get(x => x.SettlementCode == billingNo &&  x.PaySoano != null);
+                        var jobDetailSOA = jobSMSOA.GroupBy(x => new { x.JobNo,x.PaySoano }).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType, soaNo = x.FirstOrDefault().PaySoano });
+                        jobDetailSOA.ToList().ForEach(x =>
+                        {
+                            var soa = _soaRepo.Get(z => z.Soano == x.soaNo).FirstOrDefault();
+                            if(soa.SyncStatus!= "Synced")
+                            {
+                                var images = _sysImageRepo.Get(z =>z.ObjectId==soa.Id && z.Folder == "SOA");
+                                images.ToList().ForEach(img =>
+                                {
+                                    if (img != null)
+                                    {
+                                        var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement").FirstOrDefault();
+                                        if (edocExist == null)
+                                        {
+                                            var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "BK_DN").FirstOrDefault();
+                                            var edoc = new SysImageDetail()
+                                            {
+                                                Id = Guid.NewGuid(),
+                                                BillingNo = billingNo,
+                                                BillingType = billingType,
+                                                DatetimeCreated = DateTime.Now,
+                                                DatetimeModified = DateTime.Now,
+                                                DepartmentId = currentUser.DepartmentId,
+                                                ExpiredDate = null,
+                                                GroupId = currentUser.GroupId,
+                                                DocumentTypeId = tranType.Id,
+                                                JobId = getJobId(x.jobNo, x.tranType),
+                                                SysImageId = img.Id,
+                                                SystemFileName = tranType.Code + clearPrefix(x.tranType, img.Name),
+                                                UserFileName = img.Name,
+                                                UserCreated = currentUser.UserName,
+                                                UserModified = currentUser.UserName,
+                                                OfficeId = currentUser.OfficeID,
+                                                Source = "Settlement",
+                                                Hblid = null,
+                                                Note = null
+                                            };
+                                            edocs.Add(edoc);
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        break;
+                    default: break;
+                }
+                var hs= _sysImageDetailRepo.Add(edocs,false);
+                if (hs.Success)
+                {
+                    _sysImageDetailRepo.SubmitChanges();
+                    return new HandleState(hs.Success, hs.Message);
+                }
+                return new HandleState("Something Wrong");
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+        private Guid getJobId(string jobNo, string trantype)
+        {
+            if (trantype == "CL")
+            {
+                var ops =  _opsTranRepo.Get(x => x.JobNo == jobNo);
+                return ops.FirstOrDefault().Id;
+            }
+            var cs =  _cstranRepo.Get(x => x.JobNo == jobNo);
+            return cs.FirstOrDefault().Id;
         }
     }
 }
