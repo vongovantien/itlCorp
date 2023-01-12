@@ -478,7 +478,7 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.UserCreated = currentContract.UserCreated;
             if (entity.ExpiredDate != null)
             {
-                if (entity.Active == true && (entity.NoDue == false || entity.NoDue == null))
+                if (entity.Active == true)
                 {
                     var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate));
                     if (expiredCheck <= 0)
