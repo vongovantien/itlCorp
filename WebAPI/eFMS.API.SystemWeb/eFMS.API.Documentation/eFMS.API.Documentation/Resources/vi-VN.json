@@ -75,5 +75,5 @@
   "MSG_CLEARANCE_IS_OVERDUE": "{0} - {1} {2} Thỏa thuận của {3} có công nợ quá hạn, vui lòng kiểm tra lại!",
   "MSG_CLEARANCE_IS_OVERLIMIT": "{0} - {1} {2} Thỏa thuận của {3} vượt hạn mức tín dụng {4}% , vui lòng kiểm tra lại!",
   "MSG_CHARGE_CODE_WRONG_OFFICE": "Charge {0} không tồn tại ở office {1}",
-  "MSG_CUSTOM_NO_NOT_EXIST_JOB": "Declaration không tồn tại trong job"
+  "MSG_CUSTOM_NO_NOT_EXIST_JOB": "Custom No không tồn tại trong {0}"
 }

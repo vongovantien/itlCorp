@@ -1637,11 +1637,15 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (!string.IsNullOrEmpty(item.ClearanceNo))
                 {
-                    var customNo = customsDeclaration[item.ClearanceNo.Trim()].Any(x => x.JobNo != null);
-                    if (!customNo)
-                    {     
-                        item.ClearanceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CUSTOM_NO_NOT_EXIST_JOB]);
-                        item.IsValid = false;
+                    if (item.HBLNoError == null && item.MBLNoError == null)
+                    {
+                        var jobNoCurrent = opsTransaction.Where(job => job.Hwbno == item.Hblno.Trim() && job.Mblno == item.Mblno.Trim() && job.OfficeId == currentUser.OfficeID).FirstOrDefault().JobNo;
+                        var customNo = customsDeclaration[item.ClearanceNo.Trim()].Any(x => x.JobNo != null && x.JobNo == jobNoCurrent);
+                        if (!customNo)
+                        {
+                            item.ClearanceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CUSTOM_NO_NOT_EXIST_JOB], jobNoCurrent);
+                            item.IsValid = false;
+                        }
                     }
                 }    
                 if (string.IsNullOrEmpty(item.PartnerCode))
