@@ -145,6 +145,7 @@
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
+                                            <span>{{ expiredDate?.valid }}</span>
                                             <div class="m--font-danger" *ngIf="!expiredDate?.valid && contractType.value ==='Trial'">
                                                 The times is not valid
                                             </div>

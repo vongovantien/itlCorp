@@ -1029,30 +1029,21 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['creditCurrency'].setValue("VND");
                 this.formGroup.controls['currencyId'].setValue("VND");
-                this.formGroup.get('expiredDate').clearValidators();
+                this.formGroup.controls['expiredDate'].setErrors(null);
                 break;
             case 'Cash':
                 this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
-                this.formGroup.get('expiredDate').clearValidators();
+                this.formGroup.controls['expiredDate'].setErrors(null);
                 break;
             case 'Official':
                 this.formGroup.controls['paymentTerm'].setValue(30);
-                this.formGroup.get('expiredDate').clearValidators();
+                this.formGroup.controls['expiredDate'].setErrors(null);
                 break;
             case 'Prepaid':
             case 'Parent Contract':
                 this.formGroup.controls['paymentTerm'].setValue(1);
-                this.formGroup.get('expiredDate').clearValidators();
-                break;
-            case 'Official':
-                this.formGroup.controls['paymentTerm'].setValue(30);
-                break;
-            case 'Prepaid':
-                this.formGroup.controls['paymentTerm'].setValue(1);
-                break;
-            case 'Parent Contract':
-                this.formGroup.controls['paymentTerm'].setValue(1);
+                this.formGroup.controls['expiredDate'].setErrors(null);
                 break;
             default:
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
