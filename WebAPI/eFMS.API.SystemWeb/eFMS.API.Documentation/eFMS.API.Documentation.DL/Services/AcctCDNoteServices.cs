@@ -3117,7 +3117,11 @@ namespace eFMS.API.Documentation.DL.Services
                                  PayerId = chg.PayerId,
                                  DepartmentId = cdNote.DepartmentId,
                                  AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
-                                 SoaNo = chg.Soano
+                                 SoaNo = chg.Soano,
+                                 TotalAmountUsd= chg.AmountUsd,
+                                 VatAmountUsd = chg.VatAmountUsd,
+                                 ChargeGroup = chg.ChargeGroup,
+                                 Balance = acc.UnpaidAmountUsd == null ? null : acc.UnpaidAmountUsd
                              };
             var debitData = from cdNote in cdNoteData
                             join chg in charges on cdNote.Code equals chg.DebitNo
@@ -3157,8 +3161,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 ChargeType = chg.Type,
                                 PayerId = chg.PayerId,
                                 DepartmentId = cdNote.DepartmentId,
-                                AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
-                                SoaNo = chg.Soano
+                                AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo
                             };
             IEnumerable<InvoiceListModel> data = creditData.AsEnumerable();
             if (creditData == null || creditData.Count() == 0)
@@ -3204,20 +3207,166 @@ namespace eFMS.API.Documentation.DL.Services
                 PayerId = se.FirstOrDefault().PayerId,
                 DepartmentId = se.FirstOrDefault().DepartmentId,
                 AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
-                SoaNo = se.FirstOrDefault().SoaNo,
+                SoaNo = se.FirstOrDefault().SoaNo
+            }).AsQueryable();
+            return result;
+        }
+        private IQueryable<InvoiceListModel> GetDataCdNoteAgency(CDNoteCriteria criteria)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.accManagement);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None) return null;
+            Expression<Func<AcctCdnote, bool>> perQuery = GetQueryPermission(rangeSearch, _user);
+            Expression<Func<AcctCdnote, bool>> query = x => (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
+                                            && (x.UserCreated == criteria.CreatorId || string.IsNullOrEmpty(criteria.CreatorId))
+                                            && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type));
+            if (criteria.FromExportDate != null && criteria.ToExportDate != null)
+                query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromExportDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToExportDate.Value.Date);
+
+            if (perQuery != null)
+            {
+                query = query.And(perQuery);
+            }
+
+            var charges = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo));
+            if (!string.IsNullOrEmpty(criteria.ReferenceNos))
+            {
+                IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
+                var surchargesCdNote = charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.DebitNo)).Select(s => s.DebitNo).ToList();
+                surchargesCdNote.AddRange(charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.CreditNo)).Select(s => s.CreditNo).ToList());
+                if (surchargesCdNote.Count > 0)
+                {
+                    query = query.And(x => refNos.Any(a => a == x.Code) || surchargesCdNote.Any(a => a == x.Code));
+                }
+                else
+                {
+                    query = query.And(x => refNos.Any(a => a == x.Code));
+                }
+            }
+
+            if (string.IsNullOrEmpty(criteria.ReferenceNos)
+                && string.IsNullOrEmpty(criteria.PartnerId)
+                && criteria.IssuedDate == null
+                && string.IsNullOrEmpty(criteria.CreatorId)
+                && string.IsNullOrEmpty(criteria.Type)
+                && string.IsNullOrEmpty(criteria.Status)
+                && criteria.FromExportDate == null
+                && criteria.ToExportDate == null
+                )
+            {
+                var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
+                var minDate = maxDate.AddMonths(-1); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
+                query = query.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
+            }
+            var cdNoteData = DataContext.Get(query);
+            if (cdNoteData == null || cdNoteData.Count() == 0)
+            {
+                return null;
+            }
+            var accsoaData = acctSoaRepo.Get();
+            var partnerData = partnerRepositoty.Get();
+            var accMangData = accountingManagementRepository.Get(x => string.IsNullOrEmpty(criteria.PartnerId) || x.PartnerId == criteria.PartnerId);
+            var transactionDetailData = trandetailRepositoty.Get();
+            var opstransactionData = opstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+            var surchargeData = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo));
+            var creditData = from cd in cdNoteData
+                             join sc in surchargeData on cd.Code equals sc.CreditNo into scGrps
+                             from sc in scGrps.DefaultIfEmpty()
+                             join soa in accsoaData on sc.PaySoano equals soa.Soano into soaGrps
+                             from soa in soaGrps.DefaultIfEmpty()
+                             join partner in partnerData on sc.PaymentObjectId equals partner.Id
+                             join trans in transactionDetailData on sc.Hblid equals trans.Id into transGrps
+                             from trans in transGrps.DefaultIfEmpty()
+                             join acc in accMangData on sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId equals acc.Id
+                             where partner.PartnerType == "Agent" 
+                             select new InvoiceListModel
+                             {
+                                 JobNo = sc.JobNo,
+                                 IssuedDate = sc.DatetimeCreated,
+                                 Type = cd.Type,
+                                 CodeNo = sc.CreditNo,
+                                 HBLId = trans.Id,
+                                 MBLNo = sc.Mblno,
+                                 FlexID = cd.FlexId,
+                                 POL = trans.Pol,
+                                 POD = trans.Pod,
+                                 TotalAmountUsd = sc.AmountUsd,
+                                 ChargeWeight = trans.ChargeWeight,
+                                 ChargeGroup = sc.ChargeGroup,
+                                 VatVoucher = sc.InvoiceNo,
+                                 PaymentStatus = soa.PaymentStatus,
+                                 InvDueDay = acc.PaymentDueDate,
+                                 SoaNo = soa.Soano
+                             };
+            var debitData =  from cd in cdNoteData
+                             join sc in surchargeData on cd.Code equals sc.DebitNo into scGrps
+                             from sc in scGrps.DefaultIfEmpty()
+                             join soa in accsoaData on sc.Soano equals soa.Soano into soaGrps
+                             from soa in soaGrps.DefaultIfEmpty()
+                             join partner in partnerData on soa.Customer equals partner.Id
+                             join trans in transactionDetailData on sc.Hblid equals trans.Id into transGrps
+                             from trans in transGrps.DefaultIfEmpty()
+                             join acc in accMangData on sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId equals acc.Id
+                             where partner.PartnerType == "Agent"
+                             select new InvoiceListModel
+                             {
+                                 HBLId = trans.Id,
+                                 IssuedDate = sc.DatetimeCreated,
+                                 JobNo = sc.JobNo,
+                                 CodeNo = sc.DebitNo,
+                                 Type = cd.Type,
+                                 FlexID= cd.FlexId,
+                                 MBLNo = sc.Mblno,
+                                 POL = trans.Pol,
+                                 POD = trans.Pod,
+                                 PaymentStatus = soa.PaymentStatus,
+                                 ChargeWeight = trans.ChargeWeight,
+                                 TotalAmountUsd = sc.AmountUsd,
+                                 ChargeGroup = sc.ChargeGroup,
+                                 VatVoucher = sc.VoucherId,
+                                 InvDueDay =  acc.PaymentDueDate,
+                                 SoaNo = soa.Soano
+                             };
+            IEnumerable<InvoiceListModel> data = creditData.AsEnumerable();
+            data = data.Union(debitData.AsEnumerable());
+            
+            var result = data.GroupBy(cd => new
+            {
+                HblId = cd.HBLId,
+                CdNote = cd.CodeNo,
+                CdNoteType = cd.Type
+            }).Select(se => new InvoiceListModel
+            {
+                HBLId = se.FirstOrDefault().HBLId,
+                JobNo = se.FirstOrDefault().JobNo,
+                FlexID = se.FirstOrDefault().FlexID,
+                CodeNo = se.FirstOrDefault().CodeNo,
+                Type = se.FirstOrDefault().Type,
+                MBLNo = se.FirstOrDefault().MBLNo,
+                POL = se.FirstOrDefault().POL,
+                POD = se.FirstOrDefault().POD,
+                IssuedDate = se.FirstOrDefault().IssuedDate,
+                ChargeWeight = se.Sum(x => x.ChargeWeight),
+                TotalAmountUsd = se.FirstOrDefault().TotalAmountUsd,
+                VatAmountUsd = se.Sum(x => x.VatAmountUsd),
+                PaymentStatus = se.FirstOrDefault().PaymentStatus,
+                ChargeGroup = se.FirstOrDefault().ChargeGroup,
+                VatVoucher= se.FirstOrDefault().VatVoucher,
+                InvDueDay = se.FirstOrDefault().InvDueDay,
+                SoaNo = se.FirstOrDefault().SoaNo
             }).AsQueryable();
             return result;
         }
 
-        /// <summary>
-        /// Get invoice list with cdnote and soa data
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <param name="page"></param>
-        /// <param name="size"></param>
-        /// <param name="rowsCount"></param>
-        /// <returns></returns>
-        public List<InvoiceListModel> PagingInvoiceList(CDNoteCriteria criteria, int page, int size, out int rowsCount)
+            /// <summary>
+            /// Get invoice list with cdnote and soa data
+            /// </summary>
+            /// <param name="criteria"></param>
+            /// <param name="page"></param>
+            /// <param name="size"></param>
+            /// <param name="rowsCount"></param>
+            /// <returns></returns>
+            public List<InvoiceListModel> PagingInvoiceList(CDNoteCriteria criteria, int page, int size, out int rowsCount)
         {
             List<InvoiceListModel> results = null;
             var cdNoteData = GetDataCdNote(criteria);
@@ -3286,7 +3435,8 @@ namespace eFMS.API.Documentation.DL.Services
                                    LastSyncDate = cd.LastSyncDate,
                                    DatetimeModified = cd.DatetimeModified,
                                    VoucherIddate = cd.VoucherIddate,
-                                   PaymentStatus = cd.PaymentStatus
+                                   PaymentStatus = cd.PaymentStatus,
+                                   InvDueDay = cd.InvDueDay
                                };
 
                 results = joinData.ToList();
@@ -3855,23 +4005,18 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
 
-        public List<AccAccountingManagementResult> GetDataAcctMngtAgencyExport(CDNoteCriteria criteria)
+        public List<AccAccountingManagementAgencyResult> GetDataAcctMngtAgencyExport(CDNoteCriteria criteria)
         {
-            var cdNoteData = GetDataCdNote(criteria);
-            var soaData = GetDataSoaNotIssuedCdNote(criteria);
+            var cdNoteData = GetDataCdNoteAgency(criteria);
 
-            if (cdNoteData == null && soaData == null)
+            if (cdNoteData == null)
             {
-                return new List<AccAccountingManagementResult>();
+                return new List<AccAccountingManagementAgencyResult>();
             }
             var queryData = cdNoteData;
             if (queryData == null || queryData.Count() == 0)
             {
-                queryData = soaData;
-            }
-            else if (soaData?.Count() > 0)
-            {
-                queryData = queryData.Union(soaData);
+                return new List<AccAccountingManagementAgencyResult>();
             }
             // queryData
             queryData = GetStatusInvoiceList(criteria.Status, queryData);
@@ -3880,38 +4025,30 @@ namespace eFMS.API.Documentation.DL.Services
             var departments = departmentRepository.Get();
             var transaction = cstransRepository.Get();
             var opstransaction = opstransRepository.Get();
-            var acctCDNote = acctCdnoteRepository.Get();
-
-            var dataTrans = from cd in _resultDatas
-                            join trans in transaction on cd.JobId equals trans.Id into transGrp
-                            from trans in transGrp.DefaultIfEmpty()
-                            join ops in opstransaction on cd.JobId equals ops.Id into opsGrp
-                            join creator in sysUserRepo.Get() on cd.Creator equals creator.Id into creatorGrp
-                            from creator in creatorGrp.DefaultIfEmpty()
-                            join departs in departments on cd.DepartmentId equals departs.Id into departGrp
-                            from acctCd in transGrp.DefaultIfEmpty()
-                            join acctCds in acctCDNote on cd.JobId equals acctCds.JobId into acctCdGrp
-                            from departs in departGrp.DefaultIfEmpty()
-                            select new AccAccountingManagementResult
+            var places = placeRepository.Get();
+            var dataTrans = from rs in _resultDatas
+                            select new AccAccountingManagementAgencyResult
                             {
-                                InvoiceNo = cd.InvoiceNo,
-                                JobNo = cd.JobNo,
-                                Type = cd.CodeType,
-                                IssueDate = cd.IssuedDate,
-                                FlexId = cd.FlexID,
-                                Mbl = cd.MBLNo,
-                                VoucherId = cd.VoucherId,
-                                CdNoteNo = cd.CodeNo,
-                                ChargeType = cd.ChargeType,
-                                Amount = cd.Total,
-                                Destination = cd.FinalDestination,
-                                IssueBy = creator != null ? creator.Username : "",
-                                Bu = departs != null ? departs.DeptNameEn : "",
-                                VoucherIddate = cd.VoucherIddate,
-                                AccountNo = cd.AccountNo
+                                InvoiceNo = rs?.CodeNo == null ? rs?.SoaNo : rs.CodeNo,
+                                JobNo = rs.JobNo,
+                                CodeType = (rs.Type?.ToUpper() == "DEBIT"|| rs.Type?.ToUpper() == "INVOICE") ? "DN" : (rs.Type?.ToUpper() == "CREDIT" ? "CN" : null),
+                                IssueDate = rs?.IssuedDate,
+                                FlexId = rs?.FlexID,
+                                MAWB = rs?.Mawb != null ? rs.Mawb : rs?.MBLNo,
+                                CdNoteNo = rs?.CdNoteNo,
+                                ChargeWeight = rs?.ChargeWeight,
+                                OriginChargeAmount = (rs.ChargeGroup != null) ? (catchargegroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
+                                Destination = rs?.POD == null ? null : placeRepository.Get().FirstOrDefault(x => x.Id == rs.POD)?.Code,
+                                Origin = rs?.POL == null ? null : placeRepository.Get().FirstOrDefault(x => x.Id == rs.POL)?.Code,
+                                Status = rs?.PaymentStatus == null ? "Unpaid": rs.PaymentStatus,
+                                FreightAmount = (rs.ChargeGroup != null) ? (catchargegroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
+                                DebitUsd = rs.Type?.ToUpper() == "DEBIT" ? rs?.TotalAmountUsd + rs?.VatAmountUsd : 0,
+                                CreditUsd = rs.Type?.ToUpper() == "CREDIT" ? (rs?.TotalAmountUsd + rs?.VatAmountUsd) : 0,
+                                VatVoucher = rs.VatVoucher,
+                                InvDueDay = rs?.InvDueDay
                             };
 
-            var res = dataTrans.OrderByDescending(o => o.SoaNo).ToList<AccAccountingManagementResult>();
+            var res = dataTrans.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
             return res;
         }
     

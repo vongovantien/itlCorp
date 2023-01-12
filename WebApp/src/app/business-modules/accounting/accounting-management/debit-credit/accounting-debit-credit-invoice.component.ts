@@ -305,7 +305,6 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     }
     exportAgencyTemplate() {
         this._progressRef.start();
-        console.log('hello');
         this._exportRepo.exportAgencyTemplate(this.dataSearch)
             .pipe(
                 catchError(this.catchError),
@@ -317,7 +316,6 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no data to export', '');
-                        return;
                     }
                 },
             );

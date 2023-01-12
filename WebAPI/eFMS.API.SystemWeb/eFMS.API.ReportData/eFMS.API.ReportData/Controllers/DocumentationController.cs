@@ -801,10 +801,10 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
-            var stream = new AccountingHelper().GenerateAccountingManagementDebCreInvExcel(dataObjects.Result, criteria.TypeOfAcctManagement);
+            var stream = new AccountingHelper().GenerateAccountingManagementInvAgncyExcel(dataObjects.Result, criteria.TypeOfAcctManagement);
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, (criteria.TypeOfAcctManagement == "Invoice" ? "VAT INVOICE" : "INVOICE LIST") + " - eFMS");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "SOA" + " - eFMS");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }

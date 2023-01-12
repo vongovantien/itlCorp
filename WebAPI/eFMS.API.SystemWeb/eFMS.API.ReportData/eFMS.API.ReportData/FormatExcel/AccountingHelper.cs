@@ -638,6 +638,15 @@ namespace eFMS.API.ReportData.FormatExcel
             return null;
         }
 
+        public Stream GenerateAccountingManagementInvAgncyExcel(List<AccountingManagementExport> acctMngts, string typeOfAcctMngt, Stream stream = null)
+        {
+            if (acctMngts.Count == 0)
+            {
+                return null;
+            }
+            return BindingDataAccoutingManagementAgencyInvExcel(acctMngts);
+        }
+
         /// <summary>
         /// GenerateExportCutomerHistoryPayment
         /// </summary>
@@ -5220,6 +5229,67 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
             workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+        }
+
+        private Stream BindingDataAccoutingManagementAgencyInvExcel(List<AccountingManagementExport> acctMngts)
+        { 
+            try
+            {
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, ResourceConsts.AgencyTemplate));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                    return null;
+                var excel = new ExcelExport(path);
+                excel.StartDetailTable = 2;
+
+                excel.StartDetailTable = 2;
+                if (acctMngts.Count == 0)
+                {
+                    acctMngts.Add(new AccountingManagementExport());
+                }
+                //Set format amount
+                var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
+                var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
+                var rowStart = 2;
+                for (int i = 0; i < acctMngts.Count; i++)
+                {
+                    var item = acctMngts[i];
+                    var listKeyData = new Dictionary<string, object>();
+                    var listKeyFormat = new List<string>();
+                    excel.SetGroupsTable();
+                    listKeyData.Add("INVCreNo", item?.InvoiceNo);
+                    listKeyData.Add("JobNo", item.JobNo);
+                    listKeyData.Add("Type", item.CodeType);
+                    listKeyData.Add("IssueDate", item.IssueDate);
+                    excel.Worksheet.Cells[rowStart, 4].Style.Numberformat.Format = "MMM. dd,yyyy";
+                    listKeyData.Add("FlexId", item.FlexID);
+                    listKeyData.Add("MAWB", item?.Mawb);
+                    listKeyData.Add("Origin", item.Origin);
+                    listKeyData.Add("Destination", item.Destination);
+                    listKeyData.Add("CW", item.ChargeWeight);
+                    listKeyData.Add("OriginUSD", item.OriginChargeAmount);
+                    listKeyData.Add("FreightUSD", item.FreightAmount);
+                    listKeyData.Add("DebitUSD", item.DebitUsd);
+                    excel.Worksheet.Cells[rowStart, 12].Style.Numberformat.Format = formatAmountUSD;
+                    listKeyData.Add("CreditUSD", item.CreditUsd);
+                    excel.Worksheet.Cells[rowStart, 13].Style.Numberformat.Format = formatAmountUSD;
+                    listKeyData.Add("Balance", (item?.DebitUsd ==null && item?.CreditUsd==null) ? "Unpaid" : (Math.Abs((decimal)(item?.DebitUsd - item?.CreditUsd))).ToString());
+                    excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = formatAmountUSD;
+                    listKeyData.Add("InvDueDay", item.InvDueDay);
+                    excel.Worksheet.Cells[rowStart, 15].Style.Numberformat.Format = "MMM. dd,yyyy";
+                    listKeyData.Add("Status", item.Status);
+                    listKeyData.Add("Comments", "N/A");
+                    listKeyData.Add("VATVoucher", item.VatVoucher);
+
+                    excel.SetData(listKeyData);
+                    rowStart++;
+                }
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType,Stream stream = null)
