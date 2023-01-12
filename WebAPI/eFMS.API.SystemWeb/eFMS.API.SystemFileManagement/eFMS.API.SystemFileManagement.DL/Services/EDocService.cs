@@ -1648,19 +1648,22 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         var jobSettleAD = chargeSMAD.GroupBy(x=>new { x.JobNo,x.AdvanceNo }).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType, advNo = x.FirstOrDefault().AdvanceNo });
                         jobSettleAD.ToList().ForEach(x =>
                         {
-                            var advId = _advRepo.Get(z => z.AdvanceNo == x.advNo).FirstOrDefault().Id;
-                            var image = _sysImageRepo.Get(z => advId.ToString()==z.ObjectId && z.SyncStatus == "Synced" && z.Folder == "Advance").OrderByDescending(z => z.DateTimeCreated).FirstOrDefault();
-                            //images.ToList().ForEach(img =>
-                            //{
+                            var adv = _advRepo.Get(z => z.AdvanceNo == x.advNo && z.SyncStatus != "Rejected").FirstOrDefault();
+                            if (adv != null)
+                            {
+                                var advId = adv.Id;
+                                var image = _sysImageRepo.Get(z => advId.ToString() == z.ObjectId && z.SyncStatus == "Synced" && z.Folder == "Advance").OrderByDescending(z => z.DateTimeCreated).FirstOrDefault();
+                                //images.ToList().ForEach(img =>
+                                //{
                                 //var img = images.FirstOrDefault();
                                 if (image != null)
                                 {
                                     var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == image.Id && z.BillingNo == billingNo && z.Source == "Settlement");
                                     if (edocExist.Count() == 0)
                                     {
-                                    var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "AD-SM").FirstOrDefault();
-                                    var edocFrom = _sysImageDetailRepo.Get(z => z.SysImageId == image.Id).FirstOrDefault();
-                                    var edoc = new SysImageDetail()
+                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "AD-SM").FirstOrDefault();
+                                        var edocFrom = _sysImageDetailRepo.Get(z => z.SysImageId == image.Id).FirstOrDefault();
+                                        var edoc = new SysImageDetail()
                                         {
                                             Id = Guid.NewGuid(),
                                             BillingNo = billingNo,
@@ -1681,11 +1684,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                             Source = "Settlement",
                                             Hblid = null,
                                             Note = null,
-                                            GenEdocId=edocFrom.Id
+                                            GenEdocId = edocFrom.Id
                                         };
                                         edocs.Add(edoc);
                                     }
                                 }
+                            }
                             });
                         //});
                         break;
