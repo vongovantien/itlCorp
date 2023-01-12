@@ -108,6 +108,6 @@
         public static readonly string MSG_CLEARANCE_IS_OVERDUE = "MSG_CLEARANCE_IS_OVERDUE";
         public static readonly string MSG_CLEARANCE_IS_OVERLIMIT = "MSG_CLEARANCE_IS_OVERLIMIT";
         public static readonly string MSG_CHARGE_CODE_WRONG_OFFICE = "MSG_CHARGE_CODE_WRONG_OFFICE";
-
+        public static readonly string MSG_CUSTOM_NO_NOT_EXIST_JOB = "MSG_CUSTOM_NO_NOT_EXIST_JOB";
     }
 }

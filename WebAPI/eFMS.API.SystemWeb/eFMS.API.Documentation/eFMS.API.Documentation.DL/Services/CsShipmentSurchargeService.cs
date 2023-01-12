@@ -1595,6 +1595,7 @@ namespace eFMS.API.Documentation.DL.Services
             var listPartner = partnerRepository.Get(x => x.Active == true);
             var chargeData = catChargeRepository.Get(x => x.Active == true).ToLookup(x => x.Code);
             var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var customsDeclaration = customsDeclarationRepository.Get().ToLookup(x => x.ClearanceNo); ;
             string TypeCompare = string.Empty;
             list.ForEach(item =>
             {
@@ -1634,7 +1635,15 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     }
                 }
-
+                if (!string.IsNullOrEmpty(item.ClearanceNo))
+                {
+                    var customNo = customsDeclaration[item.ClearanceNo.Trim()].Any(x => x.JobNo != null);
+                    if (!customNo)
+                    {     
+                        item.ClearanceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CUSTOM_NO_NOT_EXIST_JOB]);
+                        item.IsValid = false;
+                    }
+                }    
                 if (string.IsNullOrEmpty(item.PartnerCode))
                 {
                     item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTNER_CODE_EMPTY]);
