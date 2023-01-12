@@ -2942,11 +2942,10 @@ namespace eFMS.API.Documentation.DL.Services
             return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
         }
 
-        public async Task<HandleState> SyncGoodInforToReplicateJob(string jobNo)
+        public async Task<HandleState> SyncGoodInforToReplicateJob(Guid jobId)
         {
             var hs = new HandleState();
-
-            var job = await DataContext.Get(x => x.JobNo == jobNo && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+            var job = await DataContext.Get(x => x.Id == jobId && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
             if (job != null)
             {
                 var repJob = await DataContext.Get(x => x.Id == job.ReplicatedId && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
@@ -2959,7 +2958,15 @@ namespace eFMS.API.Documentation.DL.Services
                     repJob.SumGrossWeight = job.SumGrossWeight;
                     repJob.PackageTypeId = job.PackageTypeId;
 
-                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id);
+                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id, false);
+                    if (hs.Success)
+                    {
+                        var listConOfJob = await csMawbcontainerRepository.GetAsync(x => x.Mblid == job.Id);
+                        var listCont = mapper.Map<List<CsMawbcontainerModel>>(listConOfJob);
+                        hs = mawbcontainerService.UpdateMasterBill(listCont, job.ReplicatedId ?? Guid.Empty);
+                    }
+                    hs = DataContext.SubmitChanges();
+
                     return hs;
                 }
             }

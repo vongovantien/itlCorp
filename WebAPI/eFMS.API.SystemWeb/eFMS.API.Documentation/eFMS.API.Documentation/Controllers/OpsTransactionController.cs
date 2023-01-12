@@ -545,9 +545,9 @@ namespace eFMS.API.Documentation.Controllers
 
         [Authorize]
         [HttpPut("SyncGoodInforToReplicateJob")]
-        public async Task<IActionResult> SyncGoodInforToReplicateJob(SyncGoodToReplicateModel model)
+        public async Task<IActionResult> SyncGoodInforToReplicateJob(Guid jobId)
         {
-            HandleState hs = await transactionService.SyncGoodInforToReplicateJob(model.JobNo);
+            HandleState hs = await transactionService.SyncGoodInforToReplicateJob(jobId);
 
             string message = HandleError.GetMessage(hs, Crud.Update);
 
