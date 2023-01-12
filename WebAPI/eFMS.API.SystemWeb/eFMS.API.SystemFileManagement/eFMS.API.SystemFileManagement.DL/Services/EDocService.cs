@@ -1865,6 +1865,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         break;
                     default: break;
                 }
+                if(edocs.Count == 0)
+                {
+                    return new HandleState("Not found file");
+                }
                 var hs= _sysImageDetailRepo.Add(edocs,false);
                 if (hs.Success)
                 {

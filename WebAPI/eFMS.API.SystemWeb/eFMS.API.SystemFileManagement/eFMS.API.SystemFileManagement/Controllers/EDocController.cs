@@ -186,7 +186,11 @@ namespace eFMS.API.SystemFileManagement.Controllers
         {
             HandleState hs = await _edocService.GenEdocByBilling(BillingNo, BillingType);
             if (hs.Success)
-                return Ok(new ResultHandle { Message = "Generate File Successfully", Status = true });
+                return Ok(new ResultHandle { Message = "Get File Successfully", Status = true });
+            if(hs.Exception.Message== "Not found file")
+            {
+                return Ok(new ResultHandle { Message = "Not found file", Status = false });
+            }
             return BadRequest(hs);
         }
     }

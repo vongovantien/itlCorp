@@ -541,6 +541,10 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 (res: any) => {
                     if (res.status) {
                         this.getEDoc(this.transactionType);
+                        this._toast.success(res.message);
+                    }
+                    else {
+                        this._toast.error(res.message)
                     }
                 },
             );
