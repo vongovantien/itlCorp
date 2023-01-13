@@ -833,24 +833,42 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return _attachFileTemplateRepo.Get(x => x.TransactionType == transationType && x.Code == "OTH").FirstOrDefault().Id;
         }
 
+        private DeleteObjectResponse deleteFile(string keyS3)
+        {
+            DeleteObjectRequest request = new DeleteObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = keyS3
+            };
+
+            DeleteObjectResponse rsDelete = _client.DeleteObjectAsync(request).Result;
+            return rsDelete;
+        }
+
         public async Task<HandleState> DeleteEdoc(Guid edocId)
         {
             HandleState result = new HandleState();
             try
             {
                 var edoc = _sysImageDetailRepo.Get(x => x.Id == edocId).FirstOrDefault();
+                if (edoc == null)
+                {
+                    var imageOther=_sysImageRepo.Get(x=>x.Id==edocId).FirstOrDefault();
+                    if (imageOther != null)
+                    {
+                        var rsDelete = deleteFile(imageOther.KeyS3);
+                        if (rsDelete != null)
+                            {
+                                result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
+                            }
+                    }
+                }
                 if (edoc != null)
                 {
                     if (edoc.Source == "Shipment")
                     {
                         var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                        DeleteObjectRequest request = new DeleteObjectRequest
-                        {
-                            BucketName = _bucketName,
-                            Key = image.KeyS3,
-                        };
-
-                        DeleteObjectResponse rsDelete = _client.DeleteObjectAsync(request).Result;
+                        var rsDelete = deleteFile(image.KeyS3);
                         if (rsDelete != null)
                             if (edoc.Id != Guid.Empty)
                             {
@@ -874,13 +892,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
                         var edocShipment = _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).ToList();
                         var edocIds = edocShipment.Select(x => x.Id);
-                        DeleteObjectRequest request = new DeleteObjectRequest
-                        {
-                            BucketName = _bucketName,
-                            Key = image.KeyS3,
-                        };
-
-                        DeleteObjectResponse rsDelete = _client.DeleteObjectAsync(request).Result;
+                        var rsDelete = deleteFile(image.KeyS3);
                         if (rsDelete != null)
                             if (edoc.Id != Guid.Empty)
                             {
