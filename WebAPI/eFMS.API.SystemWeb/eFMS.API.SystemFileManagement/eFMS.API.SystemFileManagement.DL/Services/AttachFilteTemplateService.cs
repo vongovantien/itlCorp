@@ -55,7 +55,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         public async Task<List<DocumentTypeModel>> GetDocumentType(string transactionType, string billingId)
         {
-            var data = Get();
+            var data = DataContext.Get();
             switch (transactionType)
             {
                 case "SOA":
@@ -77,7 +77,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         TransactionType = x.FirstOrDefault().TransactionType,
                     }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 case "Advance":
-                    var advs = data.Where(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
+                    var advs = data.ToList().Where(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
                     return advs.GroupBy(x => x.Code).Select(x => new DocumentTypeModel()
                     {
                         Id = x.FirstOrDefault().Id,

@@ -183,6 +183,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     getJobList() {
+        this.jobs = [];
         if (this.typeFrom === 'Settlement') {
             this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -544,7 +545,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                         this._toast.success(res.message);
                     }
                     else {
-                        this._toast.error(res.message)
+                        this._toast.warning(res.message)
                     }
                 },
             );
