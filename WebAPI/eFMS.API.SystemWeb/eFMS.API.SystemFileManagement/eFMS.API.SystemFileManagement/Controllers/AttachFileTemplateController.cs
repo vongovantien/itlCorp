@@ -94,5 +94,13 @@ namespace eFMS.API.SystemFileManagement.Controllers
             }
             return Ok(result);
         }
+
+
+        [HttpGet("ClearCache")]
+        public async Task<IActionResult> clearCache()
+        {
+            AttachFilteTemplateService.clearCache();
+            return Ok();
+        }
     }
 }

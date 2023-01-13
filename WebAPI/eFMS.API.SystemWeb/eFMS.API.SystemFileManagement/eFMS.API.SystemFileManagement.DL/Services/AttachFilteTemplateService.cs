@@ -52,6 +52,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             var d = Get();
             return d;
         }
+        public void clearCache()
+        {
+            ClearCache();
+        }
 
         public async Task<List<DocumentTypeModel>> GetDocumentType(string transactionType)
         {
