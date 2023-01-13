@@ -2957,12 +2957,14 @@ namespace eFMS.API.Documentation.DL.Services
                     repJob.SumContainers = job.SumContainers;
                     repJob.SumGrossWeight = job.SumGrossWeight;
                     repJob.PackageTypeId = job.PackageTypeId;
+                    repJob.ContainerDescription = job.ContainerDescription;
 
                     hs = DataContext.Update(repJob, x => x.Id == repJob.Id, false);
                     if (hs.Success)
                     {
                         var listConOfJob = await csMawbcontainerRepository.GetAsync(x => x.Mblid == job.Id);
                         var listCont = mapper.Map<List<CsMawbcontainerModel>>(listConOfJob);
+                        listCont.ForEach(x => x.Id = Guid.Empty);
                         hs = mawbcontainerService.UpdateMasterBill(listCont, job.ReplicatedId ?? Guid.Empty);
                     }
                     hs = DataContext.SubmitChanges();
@@ -2970,7 +2972,6 @@ namespace eFMS.API.Documentation.DL.Services
                     return hs;
                 }
             }
-
 
             return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_REPLICATE_NOT_EXISTS].Value);
         }

@@ -543,6 +543,11 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPut("SyncGoodInforToReplicateJob")]
         public async Task<IActionResult> SyncGoodInforToReplicateJob(Guid jobId)
