@@ -75,6 +75,7 @@ export class CustomClearanceAddNewModalComponent extends PopupBase implements On
             this.detailComponent.customDeclaration.mblid = this.detailComponent.customDeclaration.hblid;
         }
         this.detailComponent.customDeclaration.jobNo = this.currentJob.jobNo;
+        this.detailComponent.customDeclaration.jobId = this.currentJob.id;
         this._operationRepo.addCustomDeclaration(this.detailComponent.customDeclaration)
             .subscribe((res: CommonInterface.IResult) => {
                 if (!!res && res.status) {

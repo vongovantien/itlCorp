@@ -139,7 +139,8 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
                 .pipe(finalize(() => this.hide()))
                 .subscribe(
                     (responses: CommonInterface.IResult | any) => {
-                        if (responses.success === true) {
+                        if (responses.status === true) {
+                            this._toastService.success(responses.message);
                             this.updateShipmentVolumn(dataToUpdate);
                             this.isCloseModal.emit(true);
                         }
@@ -185,6 +186,7 @@ export class AddMoreModalComponent extends PopupBase implements OnInit {
                     this.currentJob.sumNetWeight = this.currentJob.sumNetWeight + importedData[i].netWeight == null ? 0 : importedData[i].netWeight;
                     this.currentJob.sumCbm = this.currentJob.sumCbm + importedData[i].cbm == null ? 0 : importedData[i].cbm;
                 }
+
             }
             if (this.currentJob.sumGrossWeight === 0) {
                 this.currentJob.sumGrossWeight = null;

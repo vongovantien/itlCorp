@@ -466,51 +466,14 @@ namespace eFMS.API.Operation.DL.Services
             return results;
         }
 
-        private string GetOldestCleranceNo(List<CustomsDeclarationModel> clearances, string JobNo, bool isDelete)
-        {
-            var cleranceLastGrp = clearances.OrderBy(x => x.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
-            var clearanceContextGrp = DataContext.Get(x => x.JobNo == JobNo).FirstOrDefault()!=null ? DataContext.Get(x => x.JobNo == JobNo).OrderBy(x => x.ClearanceDate).OrderBy(x => x.ClearanceDate).GroupBy(x=>x.ClearanceDate).FirstOrDefault():null;
-            var cleranceLastInput = new CustomsDeclarationModel();
-            var cleranceContextInput = new CustomsDeclaration();
-            if (clearanceContextGrp == null)
-            {
-                return null;
-            }
-            else if(isDelete)
-            {
-                if (clearanceContextGrp.Count() == 0)
-                {
-                    return null;
-                }
-                return clearanceContextGrp.Count()==1? clearanceContextGrp.FirstOrDefault().ClearanceNo:clearanceContextGrp.OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
-            }
-            else
-            {
-                cleranceLastInput = cleranceLastGrp.Count()==1? cleranceLastGrp.FirstOrDefault():cleranceLastGrp.OrderBy(x => x.DatetimeModified).FirstOrDefault();
-                cleranceContextInput = clearanceContextGrp.Count()==1? clearanceContextGrp.FirstOrDefault():clearanceContextGrp.OrderBy(x => x.DatetimeModified).FirstOrDefault();
-
-                if (cleranceLastInput.ClearanceDate > cleranceContextInput.ClearanceDate)
-                {
-                    return cleranceContextInput.ClearanceNo;
-                }
-                else if (cleranceLastInput.ClearanceDate == cleranceContextInput.ClearanceDate)
-                {
-                    if (cleranceLastInput.DatetimeModified > cleranceContextInput.DatetimeModified)
-                    {
-                        return cleranceContextInput.ClearanceNo;
-                    }
-                }
-                return cleranceLastInput.ClearanceNo;
-            }
-        }
-
-        public HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
+        public async Task<HandleState> UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
             var result = new HandleState();
+            var jobOps = opsTransactionRepo.First(x => x.Id == clearances.FirstOrDefault().jobId);
+            var jobNo = clearances.FirstOrDefault()?.JobNo;
             try
             {
-                var clearanceAdd = clearances.OrderBy(x => x.ClearanceDate);
-                foreach (var item in clearanceAdd)
+                foreach (var item in clearances)
                 {
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
                     if (clearance != null)
@@ -520,15 +483,14 @@ namespace eFMS.API.Operation.DL.Services
                         clearance.DatetimeModified = DateTime.Now;
                         clearance.UserModified = currentUser.UserID;
                     }
-                    DataContext.Update(clearance, x => x.Id == item.Id, false);
+                    result = DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
-                DataContext.SubmitChanges();
-                if (opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault() == null)
+                result = DataContext.SubmitChanges();
+                if (!string.IsNullOrEmpty(jobNo) && result.Success)
                 {
-                    return result;
+                    string customNo = await GetOldestClearanceNo(jobNo);
+                    result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
                 }
-                var jobNo = opsTransactionRepo.Get(x => x.Id == clearances.FirstOrDefault().jobId).FirstOrDefault().JobNo;
-                UpdateChargeAndAdvReq(jobNo);
             }
             catch (Exception ex)
             {
@@ -1707,31 +1669,50 @@ namespace eFMS.API.Operation.DL.Services
 
             return hs;
         }
+        private async Task<string> GetOldestClearanceNo(string jobNo)
+        {
+            var mainCus = await DataContext.Get(x => x.JobNo == jobNo)
+                .OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).FirstOrDefaultAsync();
+
+            return mainCus?.ClearanceNo ?? string.Empty;
+        }
 
         public async Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model)
         {
-            bool isUpdateCharge = false;
-            var listCustom = await DataContext.Get(x => x.JobNo == model.JobNo).OrderBy(x => x.ClearanceDate).ThenByDescending(x => x.DatetimeModified)?.FirstOrDefaultAsync();
-            if (listCustom == null)
+            //Lô hàng có charge/adv/sm - nhưng chưa có tờ khai
+            var jobOps = opsTransactionRepo.First(x => x.Id == model.jobId);
+            HandleState hs = DataContext.Add(model);
+            if (!string.IsNullOrEmpty(model.JobNo) && hs.Success)
             {
-                isUpdateCharge = true;
+                string customNo = await GetOldestClearanceNo(model.JobNo);
+                hs = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
             }
-            var hs = DataContext.Add(model, false);
-            if (isUpdateCharge && hs.Success)
-            {
-                var listSurcharge = csShipmentSurchargeRepo.Get(x => x.JobNo == model.JobNo && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom));
-                var query = from surcharge in listSurcharge.Where(x => x.AdvanceNoFor != null)
-                            join advances in accAdvancePaymentRepository.Get()
-                            on surcharge.AdvanceNoFor equals advances.AdvanceNo
-                            where advances.SyncStatus == null
-                            select surcharge;
 
-                var listUpdateItem = listSurcharge.Where(x => string.IsNullOrEmpty(x.AdvanceNoFor)).Union(query);
-                await listUpdateItem.ForEachAsync(x => x.ClearanceNo = model.ClearanceNo);
+            return hs;
+        }
 
-                hs = csShipmentSurchargeRepo.SubmitChanges();
-            }
-            DataContext.SubmitChanges();
+        private async Task<HandleState> UpdateCustomNoFromCus(string customNo, Guid hblId)
+        {
+            var hs = new HandleState();
+
+            //Update tất cả charge
+            var listSurcharge = csShipmentSurchargeRepo.Get(x => x.Hblid == hblId
+                && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom)
+            );
+
+            //Update những charge chưa ghi nhận vô phí
+            var query = from advRequest in accAdvanceRequestRepository.Get(x => x.Hblid == hblId)
+                        join advPayment in accAdvancePaymentRepository.Get()
+                        on advRequest.AdvanceNo equals advPayment.AdvanceNo
+                        where advPayment.SyncStatus == null
+                        select advRequest;
+
+            await query.ForEachAsync(x => x.CustomNo = customNo);
+            hs = accAdvanceRequestRepository.SubmitChanges();
+
+            await listSurcharge.ForEachAsync(x => x.ClearanceNo = customNo);
+            hs = csShipmentSurchargeRepo.SubmitChanges();
+
             return hs;
         }
     }

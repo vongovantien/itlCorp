@@ -47,7 +47,7 @@ export class CustomClearance {
     eta: any = null;
 
     permission: PermissionShipment = new PermissionShipment();
-
+    jobId: string;
     isReplicate: boolean;
     customerId: string
 }

@@ -48,7 +48,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
   initShipments: OperationInteface.IShipment[];
   listCurrency: Observable<Currency[]>;
   listChargeGroup: Observable<ChargeGroup[]>;
-  
+
   currency: string = 'VND';
   isUpdate: boolean = false;
   isSubmitted: boolean = false;
@@ -328,7 +328,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
   setListAdvRequest(listRequest: AdvancePaymentRequest[]) {
     this.listAdvanceCarrier = [];
     listRequest.forEach((item: AdvancePaymentRequest) => {
-      item.surcharge.forEach((it: Surcharge) => this.listAdvanceCarrier.push({
+      item.surcharge?.forEach((it: Surcharge) => this.listAdvanceCarrier.push({
         id: it.id,
         chargeId: it.chargeId,
         // chargeCode: null,
