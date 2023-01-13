@@ -10,6 +10,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver.Linq;
@@ -875,6 +876,18 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         if (checkHaveGenEdoc(edocId))
                         {
                             await _sysImageDetailRepo.DeleteAsync(x => x.Id == edoc.Id);
+                            await _sysImageDetailRepo.DeleteAsync(x => x.GenEdocId == edoc.Id);
+                            var image=_sysImageRepo.Get(x=>x.Id== edoc.SysImageId).FirstOrDefault();
+                            var rsDelete = deleteFile(image.KeyS3);
+                            if (rsDelete != null)
+                                if (edoc.Id != Guid.Empty)
+                                {
+                                    result = await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
+                                }
+                                else
+                                {
+                                    result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
+                                }
                         }
                         else
                         {
@@ -899,6 +912,19 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     else if (edoc.GenEdocId != null)
                     {
                         await _sysImageDetailRepo.DeleteAsync(x => x.Id==edoc.Id);
+                        var edocExist = _sysImageDetailRepo.Get(x => x.SysImageId == edoc.SysImageId).FirstOrDefault();
+                        if (edocExist == null)
+                        {
+                            var image=_sysImageRepo.Get(x=>x.Id== edoc.SysImageId).FirstOrDefault();
+                            if (image != null)
+                            {
+                                var rsDelete = deleteFile(image.KeyS3);
+                                if (rsDelete != null)
+                                {
+                                    result = await _sysImageRepo.DeleteAsync(x => x.Id == image.Id);
+                                }
+                            }
+                        }
                     }
                     else
                     {
@@ -938,6 +964,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             return _attachFileTemplateRepo.Get(x => x.NameEn == doctype.NameEn && x.TransactionType == transactionType && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement")).FirstOrDefault().Id;
         }
+
         public async Task<HandleState> UpdateEDoc(SysImageDetailModel edocUpdate)
         {
             var edoc = _sysImageDetailRepo.Get(x => x.Id == edocUpdate.Id).FirstOrDefault();
@@ -945,6 +972,19 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 if (edoc != null)
                 {
+                    if (edoc.DocumentTypeId != edocUpdate.DocumentTypeId)
+                    {
+                        await _sysImageDetailRepo.DeleteAsync(x => x.GenEdocId == edoc.Id);
+                    }
+                    else if (edoc.SystemFileName != edocUpdate.SystemFileName)
+                    {
+                        var edocgen = _sysImageDetailRepo.Get(x => x.GenEdocId == edoc.Id).FirstOrDefault();
+                        if (edocgen != null)
+                        {
+                            edocgen.SystemFileName = edocUpdate.SystemFileName;
+                            await _sysImageDetailRepo.UpdateAsync(edocgen, x => x.GenEdocId == edoc.Id);
+                        }
+                    }
                     var attachCode = _attachFileTemplateRepo.Get(x => x.Id == edocUpdate.DocumentTypeId).FirstOrDefault().Code;
                     edoc.SystemFileName = attachCode + clearPrefix(null, edocUpdate.SystemFileName);
                     //edoc.UserFileName = clearPrefix(null,edocUpdate.SystemFileName);
@@ -1660,7 +1700,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     case "Advance":
                         var chargeSMAD = _surRepo.Get(x => x.SettlementCode == billingNo && x.AdvanceNo != null);
-                        var jobSettleAD = chargeSMAD.GroupBy(x=>new { x.JobNo,x.AdvanceNo }).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType, advNo = x.FirstOrDefault().AdvanceNo });
+                        var jobSettleAD = chargeSMAD.GroupBy(x => new { x.JobNo, x.AdvanceNo }).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType, advNo = x.FirstOrDefault().AdvanceNo });
                         jobSettleAD.ToList().ForEach(x =>
                         {
                             var adv = _advRepo.Get(z => z.AdvanceNo == x.advNo && z.SyncStatus != "Rejected").FirstOrDefault();
@@ -1691,7 +1731,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                             DocumentTypeId = tranType.Id,
                                             JobId = getJobId(x.jobNo, x.tranType),
                                             SysImageId = image.Id,
-                                            SystemFileName = tranType.Code+'_'+ edocFrom.SystemFileName,
+                                            SystemFileName = edocFrom != null ? edocFrom.SystemFileName : tranType.Code+"_"+image.Name,
                                             UserFileName = image.Name,
                                             UserCreated = currentUser.UserName,
                                             UserModified = currentUser.UserName,
@@ -1699,13 +1739,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                             Source = "Settlement",
                                             Hblid = null,
                                             Note = null,
-                                            GenEdocId = edocFrom.Id
+                                            GenEdocId = edocFrom != null ? edocFrom.Id : Guid.Empty
                                         };
                                         edocs.Add(edoc);
+
                                     }
                                 }
                             }
-                            });
+                        });
                         //});
                         break;
                     case "MBL":
@@ -1743,7 +1784,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                     DocumentTypeId = tranType.Id,
                                                     JobId = getJobId(x.jobNo, x.tranType),
                                                     SysImageId = img.Id,
-                                                    SystemFileName = tranType.Code + '_' + edocFrom.SystemFileName,
+                                                    SystemFileName = edocFrom.SystemFileName,
                                                     UserFileName = img.Name,
                                                     UserCreated = currentUser.UserName,
                                                     UserModified = currentUser.UserName,
@@ -1796,7 +1837,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                     DocumentTypeId = tranType.Id,
                                                     JobId = getJobId(x.jobNo, x.tranType),
                                                     SysImageId = img.Id,
-                                                    SystemFileName = tranType.Code + '_' + edocFrom.SystemFileName,
+                                                    SystemFileName = edocFrom.SystemFileName,
                                                     UserFileName = img.Name,
                                                     UserCreated = currentUser.UserName,
                                                     UserModified = currentUser.UserName,
@@ -1851,7 +1892,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                         DocumentTypeId = tranType.Id,
                                                         JobId = getJobId(x.jobNo, x.tranType),
                                                         SysImageId = img.Id,
-                                                        SystemFileName = tranType.Code + '_' + edocFrom.SystemFileName,
+                                                        SystemFileName = edocFrom.SystemFileName,
                                                         UserFileName = img.Name,
                                                         UserCreated = currentUser.UserName,
                                                         UserModified = currentUser.UserName,
@@ -1876,45 +1917,48 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         jobDetailSOA.ToList().ForEach(x =>
                         {
                             var soa = _soaRepo.Get(z => z.Soano == x.soaNo).FirstOrDefault();
-                            if(soa.SyncStatus!= "Synced")
+                            if (soa != null)
                             {
-                                var images = _sysImageRepo.Get(z =>z.ObjectId==soa.Id && z.Folder == "SOA");
-                                images.ToList().ForEach(img =>
+                                if (soa.SyncStatus != "Synced")
                                 {
-                                    if (img != null)
+                                    var images = _sysImageRepo.Get(z => z.ObjectId == soa.Id && z.Folder == "SOA");
+                                    images.ToList().ForEach(img =>
                                     {
-                                        var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement").FirstOrDefault();
-                                        if (edocExist == null)
+                                        if (img != null)
                                         {
-                                            var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "BK_DN").FirstOrDefault();
-                                            var edocFrom = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id).FirstOrDefault();
-                                            var edoc = new SysImageDetail()
+                                            var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement").FirstOrDefault();
+                                            if (edocExist == null)
                                             {
-                                                Id = Guid.NewGuid(),
-                                                BillingNo = billingNo,
-                                                BillingType = "Settlement",
-                                                DatetimeCreated = DateTime.Now,
-                                                DatetimeModified = DateTime.Now,
-                                                DepartmentId = currentUser.DepartmentId,
-                                                ExpiredDate = null,
-                                                GroupId = currentUser.GroupId,
-                                                DocumentTypeId = tranType.Id,
-                                                JobId = getJobId(x.jobNo, x.tranType),
-                                                SysImageId = img.Id,
-                                                SystemFileName = tranType.Code + '_' + edocFrom.SystemFileName,
-                                                UserFileName = img.Name,
-                                                UserCreated = currentUser.UserName,
-                                                UserModified = currentUser.UserName,
-                                                OfficeId = currentUser.OfficeID,
-                                                Source = "Settlement",
-                                                Hblid = null,
-                                                Note = null,
-                                                GenEdocId=edocFrom.Id
-                                            };
-                                            edocs.Add(edoc);
+                                                var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "BK_DN").FirstOrDefault();
+                                                var edocFrom = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id).FirstOrDefault();
+                                                var edoc = new SysImageDetail()
+                                                {
+                                                    Id = Guid.NewGuid(),
+                                                    BillingNo = billingNo,
+                                                    BillingType = "Settlement",
+                                                    DatetimeCreated = DateTime.Now,
+                                                    DatetimeModified = DateTime.Now,
+                                                    DepartmentId = currentUser.DepartmentId,
+                                                    ExpiredDate = null,
+                                                    GroupId = currentUser.GroupId,
+                                                    DocumentTypeId = tranType.Id,
+                                                    JobId = getJobId(x.jobNo, x.tranType),
+                                                    SysImageId = img.Id,
+                                                    SystemFileName = edocFrom != null ? edocFrom.SystemFileName : tranType.Code + "_" + img.Name,
+                                                    UserFileName = img.Name,
+                                                    UserCreated = currentUser.UserName,
+                                                    UserModified = currentUser.UserName,
+                                                    OfficeId = currentUser.OfficeID,
+                                                    Source = "Settlement",
+                                                    Hblid = null,
+                                                    Note = null,
+                                                    GenEdocId = edocFrom != null ? edocFrom.Id : Guid.Empty
+                                                };
+                                                edocs.Add(edoc);
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }
                             }
                         });
                         break;
