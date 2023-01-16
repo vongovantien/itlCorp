@@ -189,7 +189,7 @@ export class SettlementFormCreateComponent extends AppForm {
 
     getBeneficiaryInfo() {
         if (!!this.payee.value) {
-            if (this.paymentMethod.value === this.methods[1] || this.paymentMethod.value === this.methods[3]) {
+            if (this.paymentMethod.value === this.methods[1] || this.paymentMethod.value === this.methods[2] || this.paymentMethod.value === this.methods[3]) {
                 const beneficiary = this.getPartnerById(this.payee.value);
                 if (!!beneficiary) {
                     this.beneficiaryName.setValue(beneficiary.partnerNameVn);
@@ -202,7 +202,7 @@ export class SettlementFormCreateComponent extends AppForm {
             }
         } else {
             this.resetBankInfo();
-            if (this.paymentMethod.value === this.methods[1]) {
+            if (this.paymentMethod.value === this.methods[1] || this.paymentMethod.value === this.methods[2]) {
                 if (!!this.userLogged) {
                     this.beneficiaryName.setValue(this.userLogged.nameVn);
                     this.bankAccountNo.setValue(this.userLogged.bankAccountNo);
@@ -254,9 +254,7 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getBankAccountPayee(isSetBank: Boolean) {
-        console.log("abc")
-        console.log(!!this.payee.value && (this.paymentMethod.value.value === 'Bank' || this.paymentMethod.value.value === 'Other'))
-        if (!!this.payee.value && (this.paymentMethod.value.value === 'Bank' || this.paymentMethod.value.value === 'Other')) {
+        if (!!this.payee.value && (this.paymentMethod.value.value === 'Bank' || this.paymentMethod.value.value === 'NETOFF_SHPT' || this.paymentMethod.value.value === 'Other')) {
             this._catalogueRepo.getListBankByPartnerById(this.payee.value)
                 .pipe(catchError(this.catchError), finalize(() => {
                     this.isLoading = false;
