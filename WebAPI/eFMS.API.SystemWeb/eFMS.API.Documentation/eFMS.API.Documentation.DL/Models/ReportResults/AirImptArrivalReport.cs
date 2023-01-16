@@ -56,5 +56,6 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Contact { get; set; }
         public decimal DecimalNo { get; set; }
         public decimal CurrDecimalNo { get; set; }
+        public string OfficeLocation { get; set; }
     }
 }

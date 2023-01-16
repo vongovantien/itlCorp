@@ -6,5 +6,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
     {
         public Guid HblId { get; set; }
         public string Currency { get; set; }
+
+        public string Language { get; set; }
     }
 }
