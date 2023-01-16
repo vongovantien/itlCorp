@@ -2806,7 +2806,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (!string.IsNullOrEmpty(approve.Requester))
                             {
                                 settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED;
-                                approve.LeaderApr = userCurrent;
+                                approve.LeaderApr = approve.Leader = userCurrent;
                                 approve.LeaderAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_LEADER;
                                 userApproveNext = managerLevel.UserId;
@@ -2881,7 +2881,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if ((!string.IsNullOrEmpty(approve.Leader) && !string.IsNullOrEmpty(approve.LeaderApr)) || string.IsNullOrEmpty(approve.Leader) || leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO)
                             {
                                 settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
-                                approve.ManagerApr = userCurrent;
+                                approve.ManagerApr = approve.Manager = userCurrent;
                                 approve.ManagerAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_MANAGER;
                                 userApproveNext = accountantLevel.UserId;
@@ -2947,7 +2947,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if ((!string.IsNullOrEmpty(approve.Manager) && !string.IsNullOrEmpty(approve.ManagerApr)) || string.IsNullOrEmpty(approve.Manager) || managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO)
                             {
                                 settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
-                                approve.AccountantApr = userCurrent;
+                                approve.AccountantApr = approve.Accountant = userCurrent;
                                 approve.AccountantAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
                                 userApproveNext = buHeadLevel.UserId;
@@ -3008,17 +3008,17 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
                             {
-                                approve.LeaderApr = userCurrent;
+                                approve.LeaderApr = approve.Leader = userCurrent;
                                 approve.LeaderAprDate = DateTime.Now;
                             }
                             if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
                             {
-                                approve.ManagerApr = userCurrent;
+                                approve.ManagerApr = approve.Manager = userCurrent;
                                 approve.ManagerAprDate = DateTime.Now;
                             }
                             if (!string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
                             {
-                                approve.AccountantApr = userCurrent;
+                                approve.AccountantApr = approve.Accountant = userCurrent;
                                 approve.AccountantAprDate = DateTime.Now;
                             }
                         }
@@ -3027,7 +3027,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if ((!string.IsNullOrEmpty(approve.Accountant) && !string.IsNullOrEmpty(approve.AccountantApr)) || string.IsNullOrEmpty(approve.Accountant) || accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
                             {
                                 settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
-                                approve.BuheadApr = userCurrent;
+                                approve.BuheadApr = approve.Buhead = userCurrent;
                                 approve.BuheadAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_BOD;
                             }
