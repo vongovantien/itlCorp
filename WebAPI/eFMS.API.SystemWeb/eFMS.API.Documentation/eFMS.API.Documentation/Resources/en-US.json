@@ -82,6 +82,8 @@
   "MSG_TYPE_EMPTY": "Type not allow empty!",
   "MSG_HBLNO_NOT_EXIST": "hbl no '{0}' not exist!",
   "MSG_MBLNO_NOT_EXIST": "mbl no '{0}' not exist!",
+  "MSG_HBLNO_NOT_EXIST_OFFICE": "hbl no '{0}' not exist in office {1}!",
+  "MSG_MBLNO_NOT_EXIST_OFFICE": "mbl no '{0}' not exist in office {1}!",
   "MSG_PARTER_CODE_NOT_EXIST": "Partner code '{0}' not exist",
   "MSG_CHARGE_CODE_NOT_EXIST": "Charge code '{0}' not exist",
   "MSG_UNIT_NOT_EXIST": "Unit '{0}' not exist",
