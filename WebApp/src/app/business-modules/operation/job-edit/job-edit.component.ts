@@ -500,7 +500,9 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             eta: this.opsTransaction.eta,
                             deliveryDate: this.opsTransaction.deliveryDate,
                             suspendTime: this.opsTransaction.suspendTime,
-                            clearanceDate: this.opsTransaction.clearanceDate
+                            clearanceDate: this.opsTransaction.clearanceDate,
+                            serviceMode: this.opsTransaction.serviceMode,
+                            productService: this.opsTransaction.productService
                         }));
 
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(csTransation));
