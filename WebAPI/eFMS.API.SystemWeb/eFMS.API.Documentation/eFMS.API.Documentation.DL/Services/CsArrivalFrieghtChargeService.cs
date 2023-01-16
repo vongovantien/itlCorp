@@ -510,7 +510,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = arrival.ArrivalNo!=null? arrival.ArrivalNo + ".pdf": "SeaImportArrivalNotice_" + transactionRepository.Get(x => x.Id == houserBill.JobId).Select(x => x.JobNo).FirstOrDefault() + ".pdf";
+            var reportName = arrival.ArrivalNo != null ? arrival.ArrivalNo + ".pdf" : "SeaImportArrivalNotice_" + transactionRepository.Get(x => x.Id == houserBill.JobId).Select(x => x.JobNo).FirstOrDefault() + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -673,6 +673,9 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new AirImptArrivalReportParams();
             parameter.No = string.Empty;
             parameter.MAWB = houseBill != null ? (houseBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
+            var officeId = transactionRepository.First(x => x.Id == houseBill.JobId)?.OfficeId;
+            parameter.OfficeLocation = officeRepo.First(x => x.Id == officeId)?.Location ?? string.Empty;
+
             // Thông tin Company
 
             //[ADD][08/10/2021][Change company name -> branch name office ]
@@ -691,7 +694,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             result = new Crystal
             {
-                ReportName = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? "AirImptArrival.rpt" : "AirImptArrivalOG.rpt",
+                ReportName = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? "AirImptArrival.rpt" : criteria.Language == "EN" ? "AirImptArrivalEN.rpt" : "AirImptArrivalOG.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
@@ -699,7 +702,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = arrival.ArrivalNo!=null? arrival.ArrivalNo + ".pdf": "AirImportArrivalNotice_" + transactionRepository.Get(x => x.Id == houseBill.JobId).Select(x => x.JobNo).FirstOrDefault()+".pdf";
+            var reportName = arrival.ArrivalNo != null ? arrival.ArrivalNo + ".pdf" : "AirImportArrivalNotice_" + transactionRepository.Get(x => x.Id == houseBill.JobId).Select(x => x.JobNo).FirstOrDefault() + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -982,7 +985,7 @@ namespace eFMS.API.Documentation.DL.Services
         //}
 
 
-        public Crystal PreviewDeliveryOrder(Guid hblid)
+        public Crystal PreviewDeliveryOrder(Guid hblid, string language)
         {
             var detail = detailTransactionRepository.First(x => x.Id == hblid);
             if (detail.DeliveryOrderNo == null) return new Crystal();
@@ -997,9 +1000,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 Consignee = "s",
                 No = "s",
-                CompanyName = companyUser?.BunameVn, //Company Name En of user
+                CompanyName = language == "EN" ? companyUser?.BunameEn : companyUser?.BunameVn, //Company Name En of user
                 CompanyDescription = "Company Description",
-                CompanyAddress1 = officeUser?.AddressVn, //Office Address En of user
+                CompanyAddress1 = language == "EN" ? officeUser?.AddressEn : officeUser?.AddressVn, //Office Address En of user
                 CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty), //Tel & Fax of Office user
                 Website = companyUser?.Website, //Website Company of user
                 MAWB = detail.Mawb?.ToUpper(),
@@ -1054,6 +1057,7 @@ namespace eFMS.API.Documentation.DL.Services
                 NoPieces = nopieces,
                 GrossWeight = detail.GrossWeight,
                 Unit = unitOfMeasures,
+                DateConfirm = detail.DeliveryOrderPrintedDate ?? DateTime.Now,
                 CBM = detail.Cbm ?? 0,
                 DeliveryOrderNote = ReportUltity.ReplaceHtmlBaseForPreviewReport(detail.Dofooter), // (Không Upper Case)
                 FirstDestination = detail.DosentTo1?.ToUpper(),
@@ -1066,7 +1070,7 @@ namespace eFMS.API.Documentation.DL.Services
             dataSources.Add(item);
             var result = new Crystal
             {
-                ReportName = "SeaDeliveryCommand.rpt",
+                ReportName = language == "EN" ? "SeaDeliveryCommandEN.rpt" : "SeaDeliveryCommand.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
@@ -1074,7 +1078,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = detail.DeliveryOrderNo != null? detail.DeliveryOrderNo + ".pdf": "SeaDeliveryCommand_"+ transactionRepository.Get(x => x.Id == detail.JobId).Select(x => x.JobNo).FirstOrDefault()+".pdf" ;
+            var reportName = detail.DeliveryOrderNo != null ? detail.DeliveryOrderNo + ".pdf" : "SeaDeliveryCommand_" + transactionRepository.Get(x => x.Id == detail.JobId).Select(x => x.JobNo).FirstOrDefault() + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 

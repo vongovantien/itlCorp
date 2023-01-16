@@ -523,9 +523,9 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpGet("PreviewAirImptAuthorisedLetter")]
-        public IActionResult PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign)
+        public IActionResult PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign, string language)
         {
-            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetter(housbillId, printSign);
+            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetter(housbillId, printSign, language);
             return Ok(result);
         }
 
