@@ -15,6 +15,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.ForPartner.DL.Models.Receivable;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -46,7 +47,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICheckPointService checkPointService;
-
+        private readonly IRabbitBus _busControl;
         /// <summary>
         /// constructor
         /// </summary>
@@ -56,6 +57,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="hostingEnvironment"></param>
         /// <param name="currencyExchange"></param>
         /// <param name="_mapper"></param>
+        /// <param name="accAccountReceivable"></param>
+        /// <param name="checkPoint"></param>
+        /// <param name="_bus"></param>
         /// <param name="serviceUrl"></param>
         public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer, ICsShipmentSurchargeService service, 
             ICurrentUser user, IHostingEnvironment hostingEnvironment, 
@@ -63,6 +67,7 @@ namespace eFMS.API.Documentation.Controllers
             IMapper _mapper,
             IAccAccountReceivableService accAccountReceivable,
             ICheckPointService checkPoint,
+            IRabbitBus _bus,
             IOptions<ApiServiceUrl> serviceUrl)
         {
             stringLocalizer = localizer;
@@ -74,6 +79,7 @@ namespace eFMS.API.Documentation.Controllers
             accAccountReceivableService = accAccountReceivable;
             apiServiceUrl = serviceUrl;
             checkPointService = checkPoint;
+            _busControl = _bus;
 
         }
 
@@ -277,12 +283,9 @@ namespace eFMS.API.Documentation.Controllers
 
         private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
         {
-            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
-            string accessToken = Request.Headers["Authorization"].ToString();
+            await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, model);
 
-            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, accessToken);
-            var response = await resquest.Content.ReadAsAsync<HandleState>();
-            return response;
+            return new HandleState();
         }
 
 

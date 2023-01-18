@@ -14,6 +14,8 @@ using eFMS.API.Shipment.Infrastructure.Filters;
 using System.Reflection;
 using System.IO;
 using System;
+using eFMS.API.Infrastructure.RabbitMQ;
+using Microsoft.Extensions.Configuration;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -97,6 +99,18 @@ namespace eFMS.API.Shipment.Infrastructure
                 });
             return services;
         }
-        
+
+        public static IServiceCollection SetUpRabbitMq(this IServiceCollection services, IConfiguration Configuration)
+        {
+            string _host = Configuration.GetSection("Rabbit:HostName")?.Value;
+            var _port = int.Parse(Configuration.GetSection("Rabbit:Port")?.Value);
+            string _password = Configuration.GetSection("Rabbit:Password")?.Value;
+            string _username = Configuration.GetSection("Rabbit:Username")?.Value;
+            string _vitualHost = Configuration.GetSection("Rabbit:VirtualHost")?.Value;
+
+            services.AddSingleton(sp => RabbitMQHelper.CreateBus(_host, _port, _vitualHost, _username, _password));
+            return services;
+        }
+
     }
 }
