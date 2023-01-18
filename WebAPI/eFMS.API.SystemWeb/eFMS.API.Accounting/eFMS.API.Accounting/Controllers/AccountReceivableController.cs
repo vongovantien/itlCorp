@@ -9,6 +9,7 @@ using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.RabbitMQ;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,17 +28,19 @@ namespace eFMS.API.Accounting.Controllers
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAccAccountReceivableService accountReceivableService;
-
+        private readonly IRabbitBus _busControl;
         /// <summary>
         /// Contructor
         /// </summary>
         /// <param name="localizer"></param>
         /// <param name="accountReceivable"></param>
         public AccountReceivableController(IStringLocalizer<LanguageSub> localizer,
+            IRabbitBus busControl,
             IAccAccountReceivableService accountReceivable)
         {
             stringLocalizer = localizer;
             accountReceivableService = accountReceivable;
+            _busControl = busControl;
         }
 
         /// <summary>
@@ -221,15 +224,18 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("CalculateDebitAmount")]
         public async Task<IActionResult> CalculateDebitAmount(List<ObjectReceivableModel> models)
         {
-            var hs = await accountReceivableService.CalculatorReceivableDebitAmountAsync(models);
+            // var hs = await accountReceivableService.CalculatorReceivableDebitAmountAsync(models);
+            //var message = HandleError.GetMessage(hs, Crud.Update);
+            //if (hs.Success)
+            //{
+            //    ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            //    return Ok(result);
+            //}
+            //return BadRequest(message);
 
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            if (hs.Success)
-            {
-                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-                return Ok(result);
-            }
-            return BadRequest(message);
+            await _busControl.SendAsync(RabbitConstants.CalculatingReceivableDataPartnerQueue, models);
+            ResultHandle result = new ResultHandle { Status = true, Message = stringLocalizer[LanguageSub.MSG_UPDATE_SUCCESS].Value };
+            return Ok(result);
         }
 
         [HttpPut("MoveSalesmanReceivableData")]
