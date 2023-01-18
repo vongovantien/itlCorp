@@ -66,7 +66,7 @@
                         <label>Payee:</label>
                         <ng-container *ngIf="!readonlyForm else tplPayeeReadOnly">
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:payee.value}"
-                                (itemSelected)="payee.setValue($event.id); getBeneficiaryInfo();onSelectDataFormInfo($event, 'payee')"
+                                (itemSelected)="payee.setValue($event.id);getBeneficiaryInfo()"
                                 [dataSources]="customers" [displayFields]="[
                             { field: 'shortName', label: 'Name ABBR' },
                             { field: 'partnerNameEn', label: 'Name EN' },
