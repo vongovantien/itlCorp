@@ -3598,7 +3598,7 @@ namespace eFMS.API.Accounting.DL.Services
             return joinData;
         }
 
-        public async Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId)
+        public List<ObjectReceivableModel> GetListReceivableReceipt(Guid receiptId)
         {
             var payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId);
             var invoiceIds = payments.Where(x => x.Type == "DEBIT" || x.Type == "OBH").Select(s => Guid.Parse(s.RefId)).Distinct().ToList();
@@ -3628,8 +3628,8 @@ namespace eFMS.API.Accounting.DL.Services
             if (surcharges == null) return hs;
 
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
-            hs = await accAccountReceivableService.CalculatorReceivableDebitAmountAsync(objectReceivablesModel);           
-            return hs;
+
+            return objectReceivablesModel;
         }
 
         public bool CheckPaymentPaid(List<ReceiptInvoiceModel> Payments)

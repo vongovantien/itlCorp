@@ -145,7 +145,7 @@ namespace eFMS.API.Accounting.Controllers
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
                     // await _edocService.GenerateEdocSOA(model);
                 });
@@ -214,7 +214,7 @@ namespace eFMS.API.Accounting.Controllers
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(soaNo, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
                     await _edocService.DeleteEdocByBillingNo(soaNo);
                 });
@@ -526,7 +526,7 @@ namespace eFMS.API.Accounting.Controllers
                     modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.CODE, model.Action);
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
                 });
             }
