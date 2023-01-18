@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Infrastructure.RabbitMQ;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,6 +35,12 @@ namespace eFMS.API.Accounting.DL.Services
                 Console.WriteLine("==================== ReceivableCalculatingBackgroundService ============================");
 
             });
+        }
+
+        public override async Task StopAsync(CancellationToken stoppingToken)
+        {
+            new LogHelper("ReceivableCalculatingBackgroundService", "STOPPED\n");
+            await base.StopAsync(stoppingToken);
         }
     }
     
