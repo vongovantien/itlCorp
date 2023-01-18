@@ -14,6 +14,8 @@ using System;
 using eFMS.API.Accounting.Service.Contexts;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Services;
+using Microsoft.Extensions.Configuration;
+using eFMS.API.Infrastructure.RabbitMQ;
 
 namespace eFMS.API.Accounting.Infrastructure
 {
@@ -44,10 +46,11 @@ namespace eFMS.API.Accounting.Infrastructure
             services.AddTransient<IAcctCombineBillingService, AcctCombineBillingService>();
             services.AddTransient<IAcctPayableService, AcctPayableService>();
             services.AddTransient<IDatabaseUpdateService, DatabaseUpdateService>();
-            services.AddHostedService<eFMSQueueBackgroundService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddTransient<IAccountingPrePaidPaymentService, AccountingPrePaidPaymentService>();
             services.AddTransient<IEDocService, EDocService>();
+            services.AddScoped<IAccAccountReceivableHostedService, AccAccountReceivableHostedService>();
+            services.AddHostedService<ReceivableCalculatingBackgroundService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
@@ -91,6 +94,17 @@ namespace eFMS.API.Accounting.Infrastructure
                     });
                     options.OperationFilter<AuthorizeCheckOperationFilter>(); // Required to use access token
                 });
+            return services;
+        }
+        public static IServiceCollection SetUpRabbitMq(this IServiceCollection services, IConfiguration Configuration)
+        {
+            string _host = Configuration.GetSection("Rabbit:HostName")?.Value;
+            var _port = int.Parse(Configuration.GetSection("Rabbit:Port")?.Value);
+            string _password = Configuration.GetSection("Rabbit:Password")?.Value;
+            string _username = Configuration.GetSection("Rabbit:Username")?.Value;
+            string _vitualHost = Configuration.GetSection("Rabbit:VirtualHost")?.Value;
+
+            services.AddSingleton(sp => RabbitMQHelper.CreateBus(_host, _port, _vitualHost, _username, _password));
             return services;
         }
     }
