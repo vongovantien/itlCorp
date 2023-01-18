@@ -89,17 +89,16 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group"
-                    [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAccountNo.dirty)  && !bankAccountNo.valid}">
+                <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted  && !bankAccountNo.valid}">
                     <label class="form-control-label">
                         Bank Account No:
                     </label>
                     <ng-container *ngIf="paymentMethod.value === 'Bank'; else bankTpl">
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event)"
-                            [selectedDisplayFields]="['bankAccountNo']" [dataSources]="bankAccount"
-                            [displayFields]="displayFieldBankAccount" (remove)="resetFormControl(bankAccountNo)"
-                            (showedDropdown)="getBankAccountPayee(false)" placeholder="Please Select Bank Account No"
-                            allowFreeText formControlName="bankAccountNo">
+                        <app-combo-grid-virtual-scroll [tooltip]="bankAccountNo.value"
+                            (itemSelected)="onSelectDataBankInfo($event)" [selectedDisplayFields]="['bankAccountNo']"
+                            [dataSources]="bankAccount" [displayFields]="displayFieldBankAccount"
+                            (remove)="resetFormControl(bankAccountNo)" (showedDropdown)="getBankAccountPayee(false)"
+                            placeholder="Please Select Bank Account No" allowFreeText formControlName="bankAccountNo">
                         </app-combo-grid-virtual-scroll>
                     </ng-container>
                     <ng-template #bankTpl>
