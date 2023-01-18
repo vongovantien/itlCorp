@@ -224,16 +224,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("CalculateDebitAmount")]
         public async Task<IActionResult> CalculateDebitAmount(List<ObjectReceivableModel> models)
         {
-            // var hs = await accountReceivableService.CalculatorReceivableDebitAmountAsync(models);
-            //var message = HandleError.GetMessage(hs, Crud.Update);
-            //if (hs.Success)
-            //{
-            //    ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            //    return Ok(result);
-            //}
-            //return BadRequest(message);
-
-            await _busControl.SendAsync(RabbitConstants.CalculatingReceivableDataPartnerQueue, models);
+            await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, models);
             ResultHandle result = new ResultHandle { Status = true, Message = stringLocalizer[LanguageSub.MSG_UPDATE_SUCCESS].Value };
             return Ok(result);
         }
