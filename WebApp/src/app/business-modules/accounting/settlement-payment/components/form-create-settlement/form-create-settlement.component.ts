@@ -245,7 +245,7 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getBankAccountPayee(isSetBank: Boolean) {
-        if (!!this.payee.value && (this.paymentMethod.value.value !== 'Bank')) {
+        if (!!this.payee.value && (this.paymentMethod.value.value !== 'Cash')) {
             this._catalogueRepo.getListBankByPartnerById(this.payee.value)
                 .pipe(catchError(this.catchError), finalize(() => {
                     this.isLoading = false;
