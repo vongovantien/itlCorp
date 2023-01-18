@@ -199,14 +199,13 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     onChangePaymentMethod(method: string) {
-        if (method === 'Bank') {
+        if (method !== 'Cash') {
             if (!this.payee.value) {
                 this.bankAccountName.setValue(this.userLogged.nameVn || null);
                 this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
                 this.bankName.setValue(this.userLogged.bankName || null);
                 this.bankCode.setValue(this.userLogged.bankCode || null);
             } else if (!!this.selectedPayee) {
-                this.setBankInfoForPayee(this.selectedPayee);
                 this.getBankAccountPayee(true);
             }
         }
@@ -227,27 +226,31 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
     onSelectPayee(payee: Partner) {
         this.selectedPayee = payee;
-        if (this.paymentMethod.value === 'Bank') {
-            this.setBankInfoForPayee(payee);
+        if (this.paymentMethod.value !== 'Cash') {
             this.getBankAccountPayee(true);
         }
     }
 
     getBankAccountPayee(isSetBank: Boolean) {
-        if (!!this.payee.value && this.paymentMethod.value === 'Bank') {
+        if (!!this.payee.value && this.paymentMethod.value !== 'Cash') {
             this._catalogueRepo.getListBankByPartnerById(this.payee.value)
                 .pipe(catchError(this.catchError), finalize(() => {
                     this.isLoading = false;
                 })).subscribe(
                     (res: any[]) => {
-                        this.bankAccount = res;
-                        if (isSetBank === true && !!res && res.length > 0) {
-                            this.bankAccountNo.setValue(res[0].bankAccountNo);
-                            this.bankAccountName.setValue(res[0].bankAccountName);
-                            this.bankName.setValue(res[0].bankNameEn);
-                            this.mapBankCode(res[0].code);
+                        if (!!res && res.length > 0) {
+                            this.bankAccount = res;
+                            if (isSetBank === true) {
+                                this.bankAccountNo.setValue(res[0].bankAccountNo);
+                                this.bankAccountName.setValue(res[0].bankAccountName);
+                                this.bankName.setValue(res[0].bankNameEn);
+                                this.mapBankCode(res[0].code);
+                            }
                         }
-                    });
+                        else {
+                            this.setBankInfoForPayee(this.selectedPayee);
+                        }
+                    })
         }
     }
 
