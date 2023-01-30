@@ -62,6 +62,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<AcctCdnote> acctCdnoteRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
         IContextBase<AcctSoa> acctSoaRepo;
+        IContextBase<CatChargeGroup> catchargeGroupRepository;
         private readonly IContextBase<AcctCombineBilling> acctCombineBillingRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
@@ -96,6 +97,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCommodityGroup> catCommodityGroupRepo,
             IContextBase<AccAccountingManagement> accountingManagementRepo,
             IContextBase<CatDepartment> catDepManagementRepo,
+            IContextBase<CatChargeGroup> catChargeGroupRepository,
             IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo,
             IContextBase<AcctSoa> acctSoa,
             IContextBase<AcctCombineBilling> acctCombineBillingRepo,
@@ -136,6 +138,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctCombineBillingRepository = acctCombineBillingRepo;
             apiUrl = aUrl;
             checkPointService = checkPoint;
+            catchargeGroupRepository = catChargeGroupRepository;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -4037,11 +4040,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 MAWB = rs?.Mawb != null ? rs.Mawb : rs?.MBLNo,
                                 CdNoteNo = rs?.CdNoteNo,
                                 ChargeWeight = rs?.ChargeWeight,
-                                OriginChargeAmount = (rs.ChargeGroup != null) ? (catchargegroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
+                                OriginChargeAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
                                 Destination = rs?.POD == null ? null : placeRepository.Get().FirstOrDefault(x => x.Id == rs.POD)?.Code,
                                 Origin = rs?.POL == null ? null : placeRepository.Get().FirstOrDefault(x => x.Id == rs.POL)?.Code,
                                 Status = rs?.PaymentStatus == null ? "Unpaid": rs.PaymentStatus,
-                                FreightAmount = (rs.ChargeGroup != null) ? (catchargegroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
+                                FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
                                 DebitUsd = rs.Type?.ToUpper() == "DEBIT" ? rs?.TotalAmountUsd + rs?.VatAmountUsd : 0,
                                 CreditUsd = rs.Type?.ToUpper() == "CREDIT" ? (rs?.TotalAmountUsd + rs?.VatAmountUsd) : 0,
                                 VatVoucher = rs.VatVoucher,

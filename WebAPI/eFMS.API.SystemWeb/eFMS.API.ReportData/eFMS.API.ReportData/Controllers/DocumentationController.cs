@@ -799,7 +799,7 @@ namespace eFMS.API.ReportData.Controllers
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataExportAgencyInvUrl, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
-            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
+            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return null;
 
             var stream = new AccountingHelper().GenerateAccountingManagementInvAgncyExcel(dataObjects.Result, criteria.TypeOfAcctManagement);
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
