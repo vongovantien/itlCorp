@@ -204,7 +204,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.selectedIndexSurcharge = -1;
 
             const surchargeFromShipment = this.surcharges.filter(x => x.isFromShipment);
-            const surchargeHasSynced = this.surcharges.filter(x => (!x.hasNotSynce || x.hadIssued || x.chargeAutoRated || x.linkChargeId));
+            const surchargeHasSynced = this.surcharges.filter(x => (x.hasNotSynce === false || x.hadIssued || x.chargeAutoRated || x.linkChargeId));
             const hblIds: string[] = charges.map(x => x.hblid);
             if (charges[0].isChangeShipment) {
                 const chargeMarkedChangeShipment = this.surcharges.filter(x => x.isChangeShipment === false && !x.isFromShipment && x.hasNotSynce);
@@ -251,7 +251,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 this._toastService.warning('Charge already linked charge');
                 return;
             }
-            if (!surcharge.hasNotSynce) {
+            if (surcharge.hasNotSynce === false) {
                 this._toastService.warning('Charge already synced');
                 return;
             }
@@ -488,7 +488,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this._toastService.warning('Charge already linked charge');
             return;
         }
-        if (!charge.hasNotSynce) {
+        if (charge.hasNotSynce === false) {
             this._toastService.warning('Charge already synced');
             return;
         }
