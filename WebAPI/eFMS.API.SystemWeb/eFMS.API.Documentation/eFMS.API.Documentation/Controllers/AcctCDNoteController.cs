@@ -348,5 +348,19 @@ namespace eFMS.API.Documentation.Controllers
             var result = cdNoteServices.GetDataAcctMngtDebCretInvExport(criteria);
             return Ok(result);
         }
+
+        /// <summary>
+        /// get invoice - cd note by agency template
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetDataAcctMngtAgencyExport")]
+        [Authorize]
+        public IActionResult GetDataAcctMngtAgencyExport(CDNoteCriteria criteria)
+        {
+            var result = cdNoteServices.GetDataAcctMngtAgencyExport(criteria);
+            return Ok(result);
+        }
     }
 }
