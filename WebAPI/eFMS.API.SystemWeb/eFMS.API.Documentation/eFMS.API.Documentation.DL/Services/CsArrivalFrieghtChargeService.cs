@@ -510,7 +510,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = arrival.ArrivalNo!=null? arrival.ArrivalNo + ".pdf": "SeaImportArrivalNotice_" + transactionRepository.Get(x => x.Id == houserBill.JobId).Select(x => x.JobNo).FirstOrDefault() + ".pdf";
+            var reportName = arrival.ArrivalNo != null ? arrival.ArrivalNo + ".pdf" : "SeaImportArrivalNotice_" + transactionRepository.Get(x => x.Id == houserBill.JobId).Select(x => x.JobNo).FirstOrDefault() + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -699,7 +699,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = arrival.ArrivalNo!=null? arrival.ArrivalNo + ".pdf": "AirImportArrivalNotice_" + transactionRepository.Get(x => x.Id == houseBill.JobId).Select(x => x.JobNo).FirstOrDefault()+".pdf";
+            var reportName = arrival.ArrivalNo != null ? arrival.ArrivalNo + ".pdf" : "AirImportArrivalNotice_" + transactionRepository.Get(x => x.Id == houseBill.JobId).Select(x => x.JobNo).FirstOrDefault() + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -842,19 +842,18 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public async Task<HandleState> UpdateMultipleProofOfDelivery(ProofOfDeliveryModel model)
+        public async Task<HandleState> UpdateMultipleProofOfDelivery(List<ProofOfDeliveryModel> listModel)
         {
             var listHBL = new List<CsTransactionDetail>();
 
-            foreach (var hblId in model.HouseBills)
+            foreach (var hbl in listModel)
             {
-                var detailTransaction = detailTransactionRepository.First(x => x.Id == hblId);
-                if (detailTransaction == null) return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND].Value);
-                detailTransaction.ReferenceNoProof = model.ReferenceNo;
-                detailTransaction.DeliveryDate = model.DeliveryDate;
-                detailTransaction.DeliveryPerson = model.DeliveryPerson;
-                detailTransaction.DeliveryPerson = model.DeliveryPerson;
-                detailTransaction.Note = model.Note;
+                var detailTransaction = detailTransactionRepository.First(x => x.Id == hbl.hblId);
+                detailTransaction.ReferenceNoProof = hbl.ReferenceNo;
+                detailTransaction.DeliveryDate = hbl.DeliveryDate;
+                detailTransaction.DeliveryPerson = hbl.DeliveryPerson;
+                detailTransaction.DeliveryPerson = hbl.DeliveryPerson;
+                detailTransaction.Note = hbl.Note;
                 listHBL.Add(detailTransaction);
             }
 
@@ -1074,7 +1073,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = detail.DeliveryOrderNo != null? detail.DeliveryOrderNo + ".pdf": "SeaDeliveryCommand_"+ transactionRepository.Get(x => x.Id == detail.JobId).Select(x => x.JobNo).FirstOrDefault()+".pdf" ;
+            var reportName = detail.DeliveryOrderNo != null ? detail.DeliveryOrderNo + ".pdf" : "SeaDeliveryCommand_" + transactionRepository.Get(x => x.Id == detail.JobId).Select(x => x.JobNo).FirstOrDefault() + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 

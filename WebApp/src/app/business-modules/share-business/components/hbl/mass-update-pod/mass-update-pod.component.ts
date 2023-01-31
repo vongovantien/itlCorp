@@ -7,13 +7,14 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { DocumentationRepo } from '@repositories';
 import { getHBLSState, IShareBussinessState } from '@share-bussiness';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
 import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
 
 @Component({
     selector: 'app-mass-update-pod',
     templateUrl: './mass-update-pod.component.html',
+    styleUrls: ['./mass-update-pod.scss']
 })
 export class ShareBussinessMassUpdatePodComponent extends PopupBase implements OnInit {
 
@@ -25,6 +26,9 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
     deliveryPerson: AbstractControl;
     HAWBNo: AbstractControl;
     houseBillList: HouseBill[] = [];
+    deliveryDateAll: AbstractControl;
+    deliveryPersonAll: string = null;
+
     constructor(
         private _fb: FormBuilder,
         private _toast: ToastrService,
@@ -57,6 +61,7 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
         this.deliveryPerson = this.formGroup.controls['deliveryPerson'];
         this.deliveryDate = this.formGroup.controls['deliveryDate'];
         this.HAWBNo = this.formGroup.controls['HAWBNo'];
+        this.deliveryDateAll = this.formGroup.controls['deliveryDateAll'];
     }
 
     getHouseBills() {
@@ -65,8 +70,7 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
             .subscribe(
                 (hbls: any[]) => {
                     if (hbls?.length >= 1) {
-                        this.houseBillList = [new HouseBill({ id: 'All', hwbno: 'All' })];
-                        this.houseBillList = this.houseBillList.concat(hbls) || [];
+                        this.houseBillList = hbls;
                     }
                 }
             );
@@ -86,35 +90,41 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
         }
     }
 
-    updatePOD() {
-        this.isSubmitted = true;
-        const deliveryDateInput = !!this.deliveryDate.value?.startDate ? formatDate(this.deliveryDate.value?.startDate, 'yyyy-MM-dd', 'en') : null;
-        if (this.formGroup.invalid || deliveryDateInput === null) {
-            return;
-        }
-        const listHbl = !!this.HAWBNo.value && this.HAWBNo.value[0].id === 'All' ?
-            this.houseBillList.filter(x => x.id !== 'All').map((x: any) => x.id) :
-            this.HAWBNo.value.map((x: any) => x.id)
-        const body = {
-            deliveryDate: deliveryDateInput,
-            deliveryPerson: this.deliveryPerson.value,
-            houseBills: listHbl,
-        }
-        this._documentRepo.updateMultipleProofOfDelivery(body).pipe(catchError(this.catchError)).subscribe(
-            (res: CommonInterface.IResult) => {
-                if (res.status) {
-                    this._toast.success(res.message);
-                    this.isUpdated.emit(true);
-                    this.isSubmitted = false;
-                    this.formGroup.reset();
-                    this.hide();
-                } else {
-                    this._toast.error(res.message);
-                }
-            }
-
-        )
+    onChangeAllValuePOD() {
+        this.houseBillList.map(x => {
+            x.deliveryDate = !!this.deliveryDate.value?.startDate ? formatDate(this.deliveryDate.value?.startDate, 'yyyy-MM-dd', 'en') : null,
+            x.deliveryPerson = this.deliveryPerson.value
+        })
     }
+    // updatePOD() {
+    //     this.isSubmitted = true;
+    //     const deliveryDateInput = !!this.deliveryDate.value?.startDate ? formatDate(this.deliveryDate.value?.startDate, 'yyyy-MM-dd', 'en') : null;
+    //     if (this.formGroup.invalid || deliveryDateInput === null) {
+    //         return;
+    //     }
+    //     const listHbl = !!this.HAWBNo.value && this.HAWBNo.value[0].id === 'All' ?
+    //         this.houseBillList.filter(x => x.id !== 'All').map((x: any) => x.id) :
+    //         this.HAWBNo.value.map((x: any) => x.id)
+    //     const body = {
+    //         deliveryDate: deliveryDateInput,
+    //         deliveryPerson: this.deliveryPerson.value,
+    //         houseBills: listHbl,
+    //     }
+    //     this._documentRepo.updateMultipleProofOfDelivery(body).pipe(catchError(this.catchError)).subscribe(
+    //         (res: CommonInterface.IResult) => {
+    //             if (res.status) {
+    //                 this._toast.success(res.message);
+    //                 this.isUpdated.emit(true);
+    //                 this.isSubmitted = false;
+    //                 this.formGroup.reset();
+    //                 this.hide();
+    //             } else {
+    //                 this._toast.error(res.message);
+    //             }
+    //         }
+
+    //     )
+    // }
 
     resetDeliveryDate() {
         this.deliveryDate.setValue(null);

@@ -5,6 +5,7 @@ using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
@@ -25,7 +26,7 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewArrivalNoticeAir(PreviewArrivalNoticeCriteria criteria);
         ProofOfDeliveryViewModel GetProofOfDelivery(Guid hblid);
         HandleState UpdateProofOfDelivery(ProofOfDeliveryViewModel model);
-        Task<HandleState> UpdateMultipleProofOfDelivery(ProofOfDeliveryModel listItem);
+        Task<HandleState> UpdateMultipleProofOfDelivery(List<ProofOfDeliveryModel> listModel);
 
         //Task<ResultHandle> UploadProofOfDeliveryFile(ProofDeliveryFileUploadModel model);
         //SysImage GetFileProofOfDelivery(Guid hblId);

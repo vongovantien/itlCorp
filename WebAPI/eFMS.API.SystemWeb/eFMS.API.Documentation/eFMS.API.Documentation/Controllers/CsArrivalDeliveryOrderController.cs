@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
@@ -146,9 +147,9 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPut("UpdateMultipleProofOfDelivery")]
         [Authorize]
-        public async Task<IActionResult> UpdateMultipleProofOfDelivery(ProofOfDeliveryModel model)
+        public async Task<IActionResult> UpdateMultipleProofOfDelivery(List<ProofOfDeliveryModel> listModel)
         {
-            var handleStatus = await arrivalFreightChargeServices.UpdateMultipleProofOfDelivery(model);
+            var handleStatus = await arrivalFreightChargeServices.UpdateMultipleProofOfDelivery(listModel);
             var message = HandleError.GetMessage(handleStatus, Crud.Update);
             ResultHandle result = new ResultHandle { Status = handleStatus.Success, Message = stringLocalizer[message].Value };
             if (!handleStatus.Success)
