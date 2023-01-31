@@ -1679,12 +1679,16 @@ namespace eFMS.API.Operation.DL.Services
 
         public async Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model)
         {
-            //Lô hàng có charge/adv/sm - nhưng chưa có tờ khai
             var jobOps = opsTransactionRepo.First(x => x.Id == model.jobId);
+            string customNo = await GetOldestClearanceNo(model.JobNo);
             HandleState hs = DataContext.Add(model);
-            if (!string.IsNullOrEmpty(model.JobNo) && hs.Success)
+
+            if (string.IsNullOrEmpty(customNo) && hs.Success)
             {
-                string customNo = await GetOldestClearanceNo(model.JobNo);
+                customNo = await GetOldestClearanceNo(model.JobNo);
+            }
+            if (!string.IsNullOrEmpty(model.JobNo))
+            {
                 hs = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
             }
 
