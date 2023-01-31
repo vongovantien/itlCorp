@@ -3916,7 +3916,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Custom No.", //10
                 "H-BL No.\n(HAWB):", //11
                 "M-BL No.\n(MAWB):", //12
-                "Amount (VND)",//13
+                "Amount ({0})",//13
                 "OBH",//14
                 "Credit",//15
                 "Total Amount",//16
@@ -4626,7 +4626,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["E18:E19"].Value = headers[12]; // MBL No
 
             workSheet.Cells["F18:G18"].Merge = true;
-            workSheet.Cells["F18:G18"].Value = headers[13]; // Amount
+            workSheet.Cells["F18:G18"].Value = string.Format(headers[13], settlementExport.InfoSettlement.SettlementCurrency); // Amount
             workSheet.Cells["F18:G18"].Style.Numberformat.Format = numberFormat2;
 
             workSheet.Cells["F19"].Merge = true;
