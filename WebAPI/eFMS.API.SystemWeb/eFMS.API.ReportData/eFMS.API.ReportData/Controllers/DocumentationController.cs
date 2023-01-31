@@ -802,7 +802,10 @@ namespace eFMS.API.ReportData.Controllers
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return null;
 
             var stream = new AccountingHelper().GenerateAccountingManagementInvAgncyExcel(dataObjects.Result, criteria.TypeOfAcctManagement);
-            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+            if (stream == null)
+            {
+                return BadRequest();
+            }
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "SOA" + " - eFMS");
             HeaderResponse(fileContent.FileDownloadName);
