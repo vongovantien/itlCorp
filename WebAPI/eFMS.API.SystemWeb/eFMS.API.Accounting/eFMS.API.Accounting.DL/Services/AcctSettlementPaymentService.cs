@@ -4752,13 +4752,13 @@ namespace eFMS.API.Accounting.DL.Services
                 //Quy đổi theo currency của Settlement
                 if (settlementCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
-                    infoShipmentCharge.ChargeNetAmount = sur.NetAmount;
+                    infoShipmentCharge.ChargeNetAmount = sur.AmountVnd;
                     infoShipmentCharge.ChargeVatAmount = (sur.VatAmountVnd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0);
                 }
                 else
                 {
-                    infoShipmentCharge.ChargeNetAmount = sur.NetAmount;
+                    infoShipmentCharge.ChargeNetAmount = sur.AmountUsd;
                     infoShipmentCharge.ChargeVatAmount = (sur.VatAmountUsd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0);
                 }
