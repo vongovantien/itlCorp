@@ -3280,7 +3280,7 @@ namespace eFMS.API.Documentation.DL.Services
                              join partner in partnerData on sc.PaymentObjectId equals partner.Id
                              join trans in transactionDetailData on sc.Hblid equals trans.Id into transGrps
                              from trans in transGrps.DefaultIfEmpty()
-                             join acc in accMangData on sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId equals acc.Id
+                             join acc in accMangData on sc.AcctManagementId equals acc.Id
                              where partner.PartnerType == "Agent" 
                              select new InvoiceListModel
                              {
@@ -3309,7 +3309,7 @@ namespace eFMS.API.Documentation.DL.Services
                              join partner in partnerData on soa.Customer equals partner.Id
                              join trans in transactionDetailData on sc.Hblid equals trans.Id into transGrps
                              from trans in transGrps.DefaultIfEmpty()
-                             join acc in accMangData on sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId equals acc.Id
+                             join acc in accMangData on sc.AcctManagementId equals acc.Id
                              where partner.PartnerType == "Agent"
                              select new InvoiceListModel
                              {
