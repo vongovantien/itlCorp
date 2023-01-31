@@ -798,16 +798,21 @@ namespace eFMS.API.ReportData.Controllers
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataExportAgencyInvUrl, accessToken);
-            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
-            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return null;
+            var dataObjects = await responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
 
-            var stream = new AccountingHelper().GenerateAccountingManagementInvAgncyExcel(dataObjects.Result, criteria.TypeOfAcctManagement);
+            if (dataObjects == null || dataObjects.Count == 0)
+            {
+                return BadRequest();
+            }
+
+            var stream = new AccountingHelper().GenerateAccountingManagementInvAgncyExcel(dataObjects, criteria.TypeOfAcctManagement);
+
             if (stream == null)
             {
                 return BadRequest();
             }
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "SOA" + " - eFMS");
+            var fileContent = new FileHelper().ExportExcel(null, stream, "SOA" + " - eFMS");
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
