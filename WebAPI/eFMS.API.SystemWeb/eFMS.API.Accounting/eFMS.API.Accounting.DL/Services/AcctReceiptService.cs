@@ -3625,7 +3625,7 @@ namespace eFMS.API.Accounting.DL.Services
                 surcharges = surchargeRepository.Get(query);
             }
             var hs = new HandleState();
-            if (surcharges == null) return hs;
+            if (surcharges == null) return new List<ObjectReceivableModel>();
 
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
 
