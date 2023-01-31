@@ -28,7 +28,8 @@ namespace eFMS.API.Accounting.DL.IService
         ProcessClearInvoiceModel ProcessReceiptInvoice(ProcessReceiptInvoice criteria);
         IQueryable<CustomerDebitCreditModel> GetDataIssueCustomerPayment(CustomerDebitCreditCriteria criteria);
         AgencyDebitCreditDetailModel GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria);
-        Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId);
+        // Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId);
+        List<ObjectReceivableModel> GetListReceivableReceipt(Guid receiptId);
         bool CheckPaymentPaid(List<ReceiptInvoiceModel> Payments);
         void AlertReceiptToDeppartment(List<int> Ids, AcctReceiptModel receiptModel);
         Task<AcctReceiptAdvanceModelExport> GetDataExportReceiptAdvance(AcctReceiptCriteria criteria);
