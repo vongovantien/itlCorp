@@ -5643,12 +5643,12 @@ namespace eFMS.API.Accounting.DL.Services
                     jobDetail.MBL = item.Key.MBL;
                     jobDetail.HBL = item.Key.HBL;
                     jobDetail.CustomNo = customNo;
-                    jobDetail.AdvanceNo = item.FirstOrDefault().AdvanceNo;
+                    jobDetail.AdvanceNo = string.Join(";", item.Select(x => x.AdvanceNo).Distinct());
                     jobDetail.NetAmount = item.Sum(x => x.NetAmount ?? 0);
                     jobDetail.VatAmount = item.Sum(x => x.VatAmount ?? 0);
                     jobDetail.TotalAmount = item.Sum(x => x.TotalAmount ?? 0);
                     jobDetail.TotalAmountVnd = item.Sum(x => x.TotalAmountVnd ?? 0);
-                    jobDetail.AdvanceAmount = item.FirstOrDefault().AdvanceAmount ?? 0;
+                    jobDetail.AdvanceAmount = item.GroupBy(x => x.AdvanceNo).Sum(x => x.FirstOrDefault().AdvanceAmount ?? 0);
                     jobDetail.Balance = jobDetail.AdvanceAmount - totalShipment;
 
                     settle.TotalNetAmount += jobDetail.NetAmount;
