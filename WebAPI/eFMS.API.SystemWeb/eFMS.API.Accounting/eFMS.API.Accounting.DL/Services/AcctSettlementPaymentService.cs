@@ -5643,7 +5643,7 @@ namespace eFMS.API.Accounting.DL.Services
                     jobDetail.MBL = item.Key.MBL;
                     jobDetail.HBL = item.Key.HBL;
                     jobDetail.CustomNo = customNo;
-                    jobDetail.AdvanceNo = string.Join(";", item.Select(x => x.AdvanceNo).Distinct());
+                    jobDetail.AdvanceNo = string.Join(";", item.GroupBy(x => x.AdvanceNo).Select(x => x.Key));
                     jobDetail.NetAmount = item.Sum(x => x.NetAmount ?? 0);
                     jobDetail.VatAmount = item.Sum(x => x.VatAmount ?? 0);
                     jobDetail.TotalAmount = item.Sum(x => x.TotalAmount ?? 0);
