@@ -29,6 +29,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
@@ -347,45 +348,56 @@ namespace eFMS.API.Accounting.DL.Services
             List<string> refNo = new List<string>();
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
-                refNo = (from set in settlementPayments
-                         join sur in surcharge on set.SettlementNo equals sur.SettlementCode into grpSur
-                         from sur in grpSur.DefaultIfEmpty()
-                         join ops in opst on sur.Hblid equals ops.Hblid into grpOps
-                         from ops in grpOps.DefaultIfEmpty()
-                         join cus in custom on ops.JobNo equals cus.JobNo into grpCus
-                         from cus in grpCus.DefaultIfEmpty()
-                         where
-                         (
-                              criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
-                              (
+                Regex regex = new Regex("SM");
+                if (criteria.ReferenceNos.Any(x => regex.IsMatch(x)))
+                {
+                    refNo = criteria.ReferenceNos.Where(x => regex.IsMatch(x)).ToList();
+
+                    settlementPayments = settlementPayments.Where(x => refNo.Contains(x.SettlementNo));
+                } else
+                {
+                    refNo = (from set in settlementPayments
+                             join sur in surcharge on set.SettlementNo equals sur.SettlementCode into grpSur
+                             from sur in grpSur.DefaultIfEmpty()
+                             join ops in opst.AsParallel() on sur.Hblid equals ops.Hblid into grpOps
+                             from ops in grpOps.DefaultIfEmpty()
+                             join cus in custom.AsParallel() on ops.JobNo equals cus.JobNo into grpCus
+                             from cus in grpCus.DefaultIfEmpty()
+                             where
+                             (
+                                  criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
                                   (
-                                         (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Hblno, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Mblno, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.JobNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.AdvanceNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      (
+                                             (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo, StringComparer.OrdinalIgnoreCase) : true)
+                                          || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Hblno, StringComparer.OrdinalIgnoreCase) : true)
+                                          || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Mblno, StringComparer.OrdinalIgnoreCase) : true)
+                                          || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.JobNo, StringComparer.OrdinalIgnoreCase) : true)
+                                          || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true)
+                                          || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.AdvanceNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      )
                                   )
-                              )
-                              :
-                              (
-                                  true
-                              )
-                         )
-                         select set.SettlementNo).ToList();
+                                  :
+                                  (
+                                      true
+                                  )
+                             )
+                             select set.SettlementNo).ToList();
+
+                    if (refNo.Count() > 0)
+                    {
+                        settlementPayments = settlementPayments.Where(x => refNo.Contains(x.SettlementNo));
+                    }
+                    else
+                    {
+                        if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+                        {
+                            settlementPayments = null;
+                        }
+                    }
+                }
+                
             }
 
-            if (refNo.Count() > 0)
-            {
-                settlementPayments = settlementPayments.Where(x => refNo.Contains(x.SettlementNo));
-            }
-            else
-            {
-                if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
-                {
-                    settlementPayments = null;
-                }
-            }
             return settlementPayments;
         }
 
