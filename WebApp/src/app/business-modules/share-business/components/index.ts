@@ -38,7 +38,7 @@ export * from './hbl/delivery-order/delivery-order.component';
 export * from './hbl/import-detail/import-house-bill-detail.component';
 export * from './hbl/form-search-house-bill/form-search-house-bill.component';
 export * from './hbl/mass-update-pod/mass-update-pod.component';
-export * from './hbl/hbl.base';
+// export * from './hbl/hbl.base';
 
 
 export * from './cd-note-air/add-cd-note/add-cd-note.popup';

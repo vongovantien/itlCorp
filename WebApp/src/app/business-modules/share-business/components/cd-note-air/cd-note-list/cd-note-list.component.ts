@@ -1,24 +1,24 @@
+import { HttpResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map, take, takeUntil } from 'rxjs/operators';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from 'src/app/shared/repositories';
+import { catchError, concatMap, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from 'src/app/shared/services';
-import { combineLatest } from 'rxjs';
+import { combineLatest, of } from 'rxjs';
 import _uniq from 'lodash/uniq';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
 import { ShareBussinessCdNoteAddAirPopupComponent } from '../add-cd-note/add-cd-note.popup';
 import { ShareBussinessCdNoteDetailAirPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
 import { ActivatedRoute } from '@angular/router';
-import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
-import { delayTime } from '@decorators';
 import { ReportPreviewComponent } from '@common';
+import { ChargeConstants, SystemConstants } from '@constants';
+import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { Crystal } from '@models';
-import { ChargeConstants } from '@constants';
-
+import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 @Component({
     selector: 'cd-note-list-air',
     templateUrl: './cd-note-list.component.html',
@@ -39,16 +39,19 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
-
+    selectedCdNote: any = null;
     isDesc = true;
     sortKey: string = '';
+    comfirmEdoc = false;
 
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
         private _sortService: SortService,
-        private _activedRoute: ActivatedRoute
+        private _activedRoute: ActivatedRoute,
+        private _exportRepo: ExportRepo,
+        private _fileMngtRepo: SystemFileManageRepo
 
     ) {
         super();
@@ -235,8 +238,12 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
         this.componentRef.instance.frm.nativeElement.submit();
         this.componentRef.instance.show();
     }
+    // closeReport(): void {
+    //     //this.componentRef.instance.clear();
+    //     this.componentRef.instance.hide();
+    // }
 
-    renderAndShowReport() {
+    renderAndShowReport(templateCode: string, jobId: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -248,6 +255,42 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                 this.subscription.unsubscribe();
                 this.reportContainerRef.viewContainerRef.clear();
             });
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: jobId,
+                            hblId: SystemConstants.EMPTY_GUID,
+                            templateCode: templateCode,
+                            transactionType: this.utility.getTransationTypeByEnum(this.transactionType)
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 
     checkValidCDNote() {
@@ -310,6 +353,7 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
             );
     }
 
+
     previewCdNote(data: string) {
         if (!this.checkValidCDNote()) {
             return;
@@ -328,11 +372,126 @@ export class ShareBussinessCdNoteListAirComponent extends AppList {
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport(this.cdNotePrint[0].type, this.cdNotePrint[0].jobId);
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
                 },
             );
     }
+    previewCdNoteItem(jobId: string, cdNote: string, data: string) {
+        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
+            this.previewAirCdNote(jobId, cdNote, data);
+        }
+    }
+
+    previewAirCdNote(jobId: string, cdNote: string, data: string) {
+        let typeCdNote = this.selectedCdNote.type;
+        let hblidCdNote = this.selectedCdNote.hblid;
+        let sourcePreview$;
+        if (this.selectedCdNote.type === "DEBIT") {
+            this.cdNoteDetailPopupComponent.getDetailCdNote(jobId, cdNote);
+            sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
+                partnerId: this.selectedCdNote.partnerId,
+                hblId: hblidCdNote,
+                transactionType: 'DOC',
+                type: 3
+            }).pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: data });
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+
+            )
+        } else {
+            sourcePreview$ = this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: data });
+        }
+        sourcePreview$
+            .subscribe(
+                (res: Crystal | any) => {
+                    if (res !== false) {
+                        if (res != null && res.dataSource.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport(typeCdNote, jobId);
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
+                },
+            );
+    }
+    onSelectCdNote(cd: AcctCDNote) {
+        this.selectedCdNote = cd;
+    }
+    exportItem(jobId: string, cdNote: string, format: string) {
+        let url: string;
+        let _format = 0;
+        switch (format) {
+            case 'PDF':
+                _format = 5;
+                break;
+            case 'WORD':
+                _format = 3;
+                break;
+            case 'EXCEL':
+                _format = 4;
+                break;
+            default:
+                _format = 5;
+                break;
+        }
+        let sourcePreview$;
+        if (this.selectedCdNote.type === "DEBIT") {
+            sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
+                partnerId: this.selectedCdNote.partnerId,
+                hblId: this.selectedCdNote.hblid,
+                transactionType: 'DOC',
+                type: 3
+            }).pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+                            .pipe(
+                                switchMap(() => {
+                                    return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                                }),
+                                concatMap((x) => {
+                                    url = x.pathReportGenerate;
+                                    return this._exportRepo.exportCrystalReportPDF(x);
+                                }), takeUntil(this.ngUnsubscribe)
+                            )
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                }))
+        } else {
+            sourcePreview$ = this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+                .pipe(
+                    switchMap(() => {
+                        return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                    }),
+                    concatMap((x) => {
+                        url = x.pathReportGenerate;
+                        return this._exportRepo.exportCrystalReportPDF(x);
+                    }), takeUntil(this.ngUnsubscribe))
+        }
+        sourcePreview$.subscribe(
+            (res: any) => {
+
+            },
+            (error) => {
+                if (error.status === 200) {
+                    this._exportRepo.downloadExport(url);
+                }
+            },
+            () => {
+                console.log(url);
+            }
+        );
+
+    }
+
 }

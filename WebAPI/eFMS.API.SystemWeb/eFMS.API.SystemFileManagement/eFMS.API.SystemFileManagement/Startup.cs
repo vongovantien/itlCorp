@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using eFMS.API.SystemFileManagement.Infrastructure;
-using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.Common.Globals;
 using eFMS.API.Infrastructure;
+using eFMS.API.SystemFileManagement.Infrastructure;
+using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using eFMS.API.SystemFileManagement.Service.Common;
 
 namespace eFMS.API.SystemFileManagement
 {
@@ -29,7 +28,7 @@ namespace eFMS.API.SystemFileManagement
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
-            
+
 
             Configuration = builder.Build();
         }
@@ -45,7 +44,7 @@ namespace eFMS.API.SystemFileManagement
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
             services.AddMemoryCache();
             services.AddInfrastructure<LanguageSub>(Configuration);
-            ServiceRegister.Register(services);
+            ServiceRegister.Register(services, Configuration);
             services.AddCustomSwagger();
             DbHelper.DbHelper.AWSS3BucketName = Configuration.GetSection("AWSS3:BucketName")?.Value;
             DbHelper.DbHelper.AWSS3AccessKeyId = Configuration.GetSection("AWSS3:AccessKeyId")?.Value;

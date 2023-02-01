@@ -1,12 +1,12 @@
 ﻿using eFMS.IdentityServer.DL.IService;
+using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Linq;
-using IdentityModel;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace eFMS.API.Infrastructure.Authorizations
 {

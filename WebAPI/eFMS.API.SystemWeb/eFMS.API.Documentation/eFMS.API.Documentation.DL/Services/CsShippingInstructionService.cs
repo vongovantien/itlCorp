@@ -193,6 +193,14 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "SeaShippingInstructionNew_" + jobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
+
+            result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(instructions);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -297,8 +305,8 @@ namespace eFMS.API.Documentation.DL.Services
                 // Get path link to report
                 CrystalEx._apiUrl = apiUrl.Value.Url;
                 string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-                var reportName = "SeaShippingInstructionFCLCont" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
-                var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+                var reportName = "SeaShippingInstructionCont_" + jobNo + ".pdf";
+                var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
                 result.PathReportGenerate = _pathReportGenerate;
 
                 result.AddDataSource(instructions);
@@ -406,8 +414,8 @@ namespace eFMS.API.Documentation.DL.Services
                 // Get path link to report
                 CrystalEx._apiUrl = apiUrl.Value.Url;
                 string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-                var reportName = "SeaShippingInstructionLCLCont" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
-                var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+                var reportName = "SeaShippingInstructionCont_" + jobNo+ ".pdf";
+                var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
                 result.PathReportGenerate = _pathReportGenerate;
 
                 result.AddDataSource(instructions);
@@ -505,6 +513,14 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "SeaOnboardContainerList_" + opsTrans.JobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(shippingInstructions);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -613,8 +629,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaShippingInstruction" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = "SeaShippingInstruction_" + opsTrans.JobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(instructions);
@@ -702,6 +718,13 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "SeaShippingInstructionSummary_" + jobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
+
+            result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(instructions);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -797,8 +820,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaShippingInstructionSummary" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = "SeaShippingInstructionSummary_" + jobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(instructions);

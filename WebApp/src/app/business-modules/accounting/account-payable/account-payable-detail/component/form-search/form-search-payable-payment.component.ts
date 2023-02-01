@@ -1,19 +1,19 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 
-import { CatalogueRepo, SystemRepo } from '@repositories';
-import { Office, Partner } from '@models';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
+import { Office, Partner } from '@models';
+import { CatalogueRepo, SystemRepo } from '@repositories';
 
 import { AppForm } from 'src/app/app.form';
 
-import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { getAccountPayablePaymentSearchState, IAccountPayablePaymentState } from '../../store/reducers';
 import { SearchListAccountPayableDetail } from '../../store/actions';
+import { getAccountPayablePaymentSearchState, IAccountPayablePaymentState } from '../../store/reducers';
 
 
 @Component({
@@ -54,7 +54,7 @@ export class FormSearchPayablePaymentComponent extends AppForm implements OnInit
     ];
 
     loginData: SystemInterface.IClaimUser;
-    
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -69,7 +69,7 @@ export class FormSearchPayablePaymentComponent extends AppForm implements OnInit
     ngOnInit(): void {
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
         this.loginData = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        
+
         this.initForm();
         this.subscriptionSearchParamState();
         this.getOffices();
@@ -80,8 +80,10 @@ export class FormSearchPayablePaymentComponent extends AppForm implements OnInit
             searchType: [this.referenceTypes[0].value],
             referenceNo: [null],
             partnerId: [],
-            paymentDate: [{ startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-                            endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0) }],
+            paymentDate: [{
+                startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+            }],
             paymentStatus: [[this.paymentStatusList[1], this.paymentStatusList[2]]],
             office: [[this.loginData.officeId]],
             transactionType: [['All']]
@@ -122,7 +124,7 @@ export class FormSearchPayablePaymentComponent extends AppForm implements OnInit
             fromPaymentDate: (!!dataForm.paymentDate && !!dataForm.paymentDate.startDate) ? formatDate(dataForm.paymentDate.startDate, 'yyyy-MM-dd', 'en') : null,
             toPaymentDate: (!!dataForm.paymentDate && !!dataForm.paymentDate.endDate) ? formatDate(dataForm.paymentDate.endDate, 'yyyy-MM-dd', 'en') : null,
             office: !!dataForm.office ? this.getOfficeSearch(dataForm.office) : null,
-            transactionType : transaction
+            transactionType: transaction
         };
         this._store.dispatch(SearchListAccountPayableDetail(body));
         this.onSearch.emit(body);
@@ -144,14 +146,14 @@ export class FormSearchPayablePaymentComponent extends AppForm implements OnInit
         return strStatus;
     }
 
-    getOfficeSearch(office: []){
+    getOfficeSearch(office: []) {
         let strOffice = [];
         if (office.length > 0) {
             office.forEach(element => {
                 strOffice.push(element);
             });
-        }else{
-            this.offices.forEach((item: Office)=> strOffice.push(item.id));
+        } else {
+            this.offices.forEach((item: Office) => strOffice.push(item.id));
         }
         return strOffice;
     }
@@ -176,15 +178,19 @@ export class FormSearchPayablePaymentComponent extends AppForm implements OnInit
         this.paymentStatus.setValue([this.paymentStatusList[1], this.paymentStatusList[2]]);
         this.transactionType.setValue(['All']);
         this.office.setValue([this.loginData.officeId]);
-        this.paymentDate.setValue([{ startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
-            endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0) }]);
+        this.paymentDate.setValue([{
+            startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+        }]);
 
         this.getOffices();
-        this._store.dispatch(SearchListAccountPayableDetail({ searchType : this.referenceTypes[0].value, paymentStatus: this.getSearchStatus(this.paymentStatus.value)
+        this._store.dispatch(SearchListAccountPayableDetail({
+            searchType: this.referenceTypes[0].value, paymentStatus: this.getSearchStatus(this.paymentStatus.value)
             , fromPaymentDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth(), 1), 'yyyy-MM-dd', 'en')
             , toPaymentDate: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0), 'yyyy-MM-dd', 'en')
             , transactionType: ''
-            , office: this.getSearchStatus(this.office.value) }));
+            , office: this.getSearchStatus(this.office.value)
+        }));
     }
 
     selelectedSelect(event: string, type: string) {

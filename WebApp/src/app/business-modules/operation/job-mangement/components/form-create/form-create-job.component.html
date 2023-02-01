@@ -58,6 +58,51 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                        ETA
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
+                                            placeholder="DD/MM/YYYY" readonly formControlName="eta"
+                                            (remove)="resetFormControl(eta)" calendar
+                                            [allowRemove]="!!eta.value && !!eta.value.startDate" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Delivery Date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
+                                            readonly placeholder="DD/MM/YYYY" formControlName="deliveryDate" calendar
+                                            [allowRemove]="!!deliveryDate.value && !!deliveryDate.value.startDate"
+                                            (remove)="resetFormControl(deliveryDate)" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Clearance Date
+                                    </label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
+                                            readonly placeholder="DD/MM/YYYY" formControlName="clearanceDate" calendar
+                                            [allowRemove]="!!clearanceDate.value && !!clearanceDate.value.startDate"
+                                            (remove)="resetFormControl(clearanceDate)" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger':(productService.dirty && !productService.valid) || (isSubmitted && !productService.valid)}">
                                     <label class="form-control-label" required>
@@ -175,7 +220,7 @@
                                         [currentActiveItemId]="{ field: 'id', value: supplierId.value}"
                                         [selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
                                         [displayFields]="displayFieldsCustomer" placeholder="Select supplier"
-                                        (remove)="resetFormControl(supplierId)">
+                                        (remove)="resetFormControl(supplierId)" [clearable]="false">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
@@ -212,7 +257,8 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !billingOpsId.value}">
                                     <label class="form-control-label" required>
                                         Billing OPS
                                     </label>
@@ -221,7 +267,8 @@
                                         [currentActiveItemId]="{ field: 'id', value: billingOpsId.value}"
                                         [selectedDisplayFields]="['username']" [dataSources]="users | async"
                                         [displayFields]="[{field:'username',label:'User Name'}, {field:'employeeNameEn',label:'Full Name'}]"
-                                        placeholder="Select billing ops" (remove)="resetFormControl(billingOpsId)">
+                                        placeholder="Select billing ops" (remove)="resetFormControl(billingOpsId)"
+                                        [clearable]="false">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
@@ -247,22 +294,38 @@
                                         (itemSelected)="onSelectDataFormInfo($event, 'salesman')"
                                         [selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans" size="15"
                                         [displayFields]="displayFieldSalesman" placeholder="Please select"
-                                        (remove)="resetFormControl(salemansId)">
+                                        (remove)="resetFormControl(salemansId)" [clearable]="false">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="row">
-                                    <div class="col-lg-3">
-                                        <div class="form-group">
-                                            <label class="form-control-label">
-                                                Replicate
-                                            </label>
-                                            <app-switch size="md" formControlName="isReplicate"></app-switch>
-                                        </div>
+                                <div class="form-group"
+                                    [ngClass]="{ 'm-form__group has-danger': (suspendTime.dirty && !suspendTime.valid) || (isSubmitted && !suspendTime.valid) }">
+                                    <label class="form-control-label" for="">
+                                        Suspend Time
+                                    </label>
+                                    <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                                        name="suspendTime" formControlName="suspendTime" placeholder="Enter text">
+                                    <div class="form-control-feedback"
+                                        *ngIf="suspendTime.errors | equalError: 'maxlength'">
+                                        You cannot input more than 150 characters!
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="row">
+                                    <ng-container *ngIf="userLogged?.officeType === 'Head' || userLogged?.officeType === 'Branch'">
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label class="form-control-label">
+                                                    Replicate
+                                                </label>
+                                                <app-switch size="md" formControlName="isReplicate"></app-switch>
+                                            </div>
+                                        </div>
+                                    </ng-container>
                                     <div class="col-lg-3">
-                                        <div class="form-group">
+                                        <div class="form-group"*ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                                             <label class="form-control-label">
                                                 No Profit
                                             </label>

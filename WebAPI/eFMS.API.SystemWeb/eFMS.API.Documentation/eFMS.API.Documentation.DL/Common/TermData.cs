@@ -1,8 +1,6 @@
 ﻿using eFMS.API.Documentation.DL.Models;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 
 namespace eFMS.API.Documentation.DL.Common
 {
@@ -55,7 +53,6 @@ namespace eFMS.API.Documentation.DL.Common
     }
     public static class TermData
     {
-
         public const string OpsTransaction = "OpsTransaction";
         public const string CsTransaction = "CsTransaction";
 

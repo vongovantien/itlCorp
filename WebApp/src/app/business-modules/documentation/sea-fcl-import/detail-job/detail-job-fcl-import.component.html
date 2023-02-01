@@ -1,6 +1,6 @@
 <div class="sea-fcl-import-create-job-page">
     <app-sub-header>
-        <job-detail-button-list [shipmentDetail]="fclImportDetail" [isDuplicate]="isDuplicate"
+        <job-detail-button-list [shipmentDetail]="shipmentDetail" [isDuplicate]="isDuplicate"
             [selectedTab]="selectedTab" (onCancel)="handleCancelForm()" (onDelete)="prepareDeleteJob()"
             (onDuplicate)="showDuplicateConfirm()" (onSave)="onUpdateShipmentDetail()"
             (onPreviewPL)="previewPLsheet($event)" (onLock)="lockShipment()" (onFinish)="onFinishJob()"
@@ -13,14 +13,14 @@
                 <tab heading="Shipment Detail" [active]="selectedTab === 'SHIPMENT'"
                     (selectTab)="onSelectTab('shipment')">
                     <app-form-create-sea-import service='SFI' [isDetail]="true">
-                        <ng-container *ngIf="!!fclImportDetail">
-                            <date-time-modified [timeCreated]="fclImportDetail.datetimeCreated"
-                                [userCreated]="fclImportDetail.userNameCreated"
-                                [timeModified]="fclImportDetail.datetimeModified"
-                                [userModified]="fclImportDetail.userNameModified">
+                        <ng-container *ngIf="!!shipmentDetail">
+                            <date-time-modified [timeCreated]="shipmentDetail.datetimeCreated"
+                                [userCreated]="shipmentDetail.userNameCreated"
+                                [timeModified]="shipmentDetail.datetimeModified"
+                                [userModified]="shipmentDetail.userNameModified">
 
-                                <ng-container *ngIf="!fclImportDetail.isLocked">
-                                    <div class="col-md-4 text-right" *ngIf="fclImportDetail.permission.allowUpdate">
+                                <ng-container *ngIf="!shipmentDetail.isLocked">
+                                    <div class="col-md-4 text-right" *ngIf="shipmentDetail.permission.allowUpdate">
                                         <button class="btn btn-info  m-btn--icon m-btn--uppercase" type="button"
                                             (click)="showSyncHBL()">
                                             <span><i class="la la-refresh"></i>

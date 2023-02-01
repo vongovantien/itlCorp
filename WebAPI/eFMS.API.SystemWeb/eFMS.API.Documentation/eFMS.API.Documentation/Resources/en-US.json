@@ -82,6 +82,8 @@
   "MSG_TYPE_EMPTY": "Type not allow empty!",
   "MSG_HBLNO_NOT_EXIST": "hbl no '{0}' not exist!",
   "MSG_MBLNO_NOT_EXIST": "mbl no '{0}' not exist!",
+  "MSG_HBLNO_NOT_EXIST_OFFICE": "hbl no '{0}' not exist in office {1}!",
+  "MSG_MBLNO_NOT_EXIST_OFFICE": "mbl no '{0}' not exist in office {1}!",
   "MSG_PARTER_CODE_NOT_EXIST": "Partner code '{0}' not exist",
   "MSG_CHARGE_CODE_NOT_EXIST": "Charge code '{0}' not exist",
   "MSG_UNIT_NOT_EXIST": "Unit '{0}' not exist",
@@ -98,6 +100,12 @@
   "MSG_CDNOTE_ISSUED_COMBINE": "CD Note have issued combine billing {0}. Please remove CD Note from combine billing before update CD Note.",
   "MSG_TOTAL_OVER_LIMIT": "Amount is too large with currency {0}",
   "MSG_REFUND_FEE_EXISTED": "Cannot update, Refund fee has existed in selling charge!",
-  "MSG_SHIPMENT_INVALID_NO_PROFIT":  "{0} with check No Profit have Profit > 0"
-
+  "MSG_SHIPMENT_INVALID_NO_PROFIT": "{0} with check No Profit have Profit > 0",
+  "MSG_REPLICATE_NOT_EXISTS": "Cannot Sync To Replicate because it has not job replicate",
+  "MSG_CLEARANCE_CONTRACT_NULL": "Customer {0} not have any agreements for service in office {1}!",
+  "MSG_CLEARANCE_IS_EXPIRED": "{0} - {1} {2} agreement of {3} is Expired, please check it again!",
+  "MSG_CLEARANCE_IS_OVERDUE": "{0} - {1} {2} agreement of {3} has Overdued, please check it again!",
+  "MSG_CLEARANCE_IS_OVERLIMIT": "{0} - {1} {2} agreement of {3} is Over Credit Limit {4}% , please check it again!",
+  "MSG_CHARGE_CODE_WRONG_OFFICE": "Charge {0} not exist in office {1}",
+  "MSG_CUSTOM_NO_NOT_EXIST_JOB": "Custom No does not exist in {0}"
 }

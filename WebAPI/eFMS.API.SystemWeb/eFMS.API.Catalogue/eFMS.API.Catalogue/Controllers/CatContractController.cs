@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using eFMS.API.Catalogue.Authorize;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
@@ -13,8 +6,6 @@ using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Catalogue.Models;
-using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
@@ -27,6 +18,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -152,7 +149,7 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
-       
+
         /// <summary>
         /// add new saleman
         /// </summary>
@@ -193,23 +190,31 @@ namespace eFMS.API.Catalogue.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             string messageExisted = catContractService.CheckExistedContract(model);
+
             if (!string.IsNullOrEmpty(messageExisted))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = messageExisted });
             }
+
+            var listExistContract = catContractService.CheckDuplicatedContract(model, false);
+
+            if (listExistContract != null)
+            {
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE], Data = new { errorCode = 400 } });
+            }
+
             if (model.isChangeAgrmentType == true)
             {
                 model.Active = false;
             }
-         
+
             string msgCheckUpdateSalesman = CheckUpdateContract(model);
             if (!string.IsNullOrEmpty(msgCheckUpdateSalesman))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateSalesman, Data = new { errorCode = 403 } });
             }
-            
-            var isChangeAgrmentType = false;
-            var hs = catContractService.Update(model, out isChangeAgrmentType);
+
+            var hs = catContractService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -218,7 +223,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             else
             {
-                if (isChangeAgrmentType == true)
+                if (!string.IsNullOrEmpty(model.PaymentTermChanged))
                 {
                     Response.OnCompleted(async () =>
                     {
@@ -281,7 +286,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="files"></param>
         /// <param name="partnerId"></param>
         /// <param name="contractId"></param>
-        /// 
+        ///
         /// <returns></returns>
         //[HttpPut("UploadFile/{PartnerId}/{contractId}")]
         //[Authorize]
@@ -304,7 +309,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="files"></param>
         /// <param name="partnerId"></param>
         /// <param name="contractIds"></param>
-        /// 
+        ///
         /// <returns></returns>
         //[HttpPut("UploadFileMoreContract/{PartnerId}/{contractIds}")]
         //[Authorize]
@@ -368,7 +373,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [Authorize]
         [HttpPut("ActiveInactiveContract/{Id}/{partnerId}")]
-        public IActionResult ActiveInactiveContract(Guid Id, string partnerId, [FromBody]SalesmanCreditModel credit)
+        public IActionResult ActiveInactiveContract(Guid Id, string partnerId, [FromBody] SalesmanCreditModel credit)
         {
             var hs = catContractService.ActiveInActiveContract(Id, partnerId, credit, out bool active);
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -381,7 +386,7 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 Response.OnCompleted(async () =>
                 {
-                    if(active == true)
+                    if (active == true)
                     {
                         var existedContract = catContractService.CheckExistedContractInActive(Id, partnerId, out List<ServiceOfficeGroup> serviceOfficeGrps);
                         if (existedContract != null && existedContract != null)
@@ -414,8 +419,11 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpGet("CheckExistedContract")]
         public IActionResult CheckExistedContract(Guid id, string partnerId)
         {
-            var result = catContractService.CheckExistedContractActive(id, partnerId);
-            bool IsExisted = result != null && result.Count() > 0  ? true : false;
+            var catContractModel = new CatContractModel();
+            catContractModel.Id = id;
+            catContractModel.PartnerId = partnerId;
+            var result = catContractService.CheckDuplicatedContract(catContractModel, true);
+            bool IsExisted = result != null && result.Count() > 0 ? true : false;
             return Ok(IsExisted);
         }
 
@@ -551,7 +559,7 @@ namespace eFMS.API.Catalogue.Controllers
                             dateToPaseExpired = DateTime.Parse(dateExpired, culture);
                         }
                     }
-
+                    string contractType = worksheet.Cells[row, 6].Value?.ToString().Trim();
 
                     var contract = new CatContractImportModel
                     {
@@ -561,12 +569,12 @@ namespace eFMS.API.Catalogue.Controllers
                         Company = worksheet.Cells[row, 3].Value?.ToString().Trim(),
                         Office = worksheet.Cells[row, 4].Value?.ToString().Trim(),
                         ContractNo = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                        ContractType = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        ContractType = contractType,
                         SaleService = worksheet.Cells[row, 7].Value?.ToString().Trim(),
                         EffectDate = !string.IsNullOrEmpty(dateEffect) ? dateToPase : (DateTime?)null,
                         ExpireDate = !string.IsNullOrEmpty(dateExpired) ? dateToPaseExpired : (DateTime?)null,
                         PaymentMethod = worksheet.Cells[row, 10].Value?.ToString().Trim(),
-                        CurrencyId = worksheet.Cells[row, 11].Value?.ToString().Trim(),
+                        CurrencyId = contractType != "Guarantee" ? worksheet.Cells[row, 11].Value?.ToString().Trim() : "VND",
                         Vas = worksheet.Cells[row, 12].Value?.ToString().Trim(),
                         PaymentTermTrialDay = worksheet.Cells[row, 13].Value?.ToString().Trim(),
                         BaseOn = worksheet.Cells[row, 14].Value?.ToString().Trim(),
@@ -596,23 +604,35 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(result);
         }
 
+        [HttpPut("UpdateEmailContract")]
+        public async Task<IActionResult> UpdateEmailContract(Guid id, string email)
+        {
+            var hs = await catContractService.UpdateEmailContract(id, email);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
         private string CheckUpdateContract(CatContractModel model)
         {
             string errorMsg = string.Empty;
             var currentContract = catContractService.GetContractById(model.Id);
-            if(currentContract.ContractType == "Guarantee")
+            if (currentContract.ContractType == "Guarantee")
             {
-                if(currentContract.SaleManId != model.SaleManId)
+                if (currentContract.SaleManId != model.SaleManId)
                 {
                     return "Cannot change salesman from Guarantee contract";
                 }
 
-                if(model.CurrencyId != "VND" || model.CreditCurrency != "VND")
+                if (model.CurrencyId != "VND" || model.CreditCurrency != "VND")
                 {
                     return "Cannot change currency from Guarantee contract";
                 }
             }
-            if ((model.ContractType == "Guarantee" && currentContract.ContractType != "Guarantee") 
+            if ((model.ContractType == "Guarantee" && currentContract.ContractType != "Guarantee")
                 || (currentContract.ContractType == "Guarantee" && model.ContractType != "Guarantee"))
             {
                 return string.Format("Cannot change contract type");

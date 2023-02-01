@@ -413,8 +413,6 @@ namespace eFMS.API.Accounting.DL.Services
                        from parent in parents.DefaultIfEmpty()
                        join user in users on contract.AgreementSalesmanId equals user.Id into users2
                        from user in users2.DefaultIfEmpty()
-                       join employee in employees on user.EmployeeId equals employee.Id into employees2
-                       from employee in employees2.DefaultIfEmpty()
                        select new AccountReceivableResult
                        {
                            AgreementId = contract.AgreementId,
@@ -430,7 +428,7 @@ namespace eFMS.API.Accounting.DL.Services
                            AgreementType = contract.AgreementType,
                            AgreementStatus = contract.AgreementStatus,
                            AgreementSalesmanId = contract.AgreementSalesmanId,
-                           AgreementSalesmanName = employee.EmployeeNameVn,
+                           AgreementSalesmanName = user.Username,
                            AgreementCurrency = contract.AgreementCurrency,
                            OfficeId = contract.OfficeId,
                            ArServiceCode = contract.ArServiceCode,
@@ -1370,47 +1368,55 @@ namespace eFMS.API.Accounting.DL.Services
                 try
                 {
                     currentUser.Action = "UpdateDueDateAcctMngAfterChangePaymentTerm";
-                    var invoiceData = accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId &&
+                    var invoiceData = contractModel.PaymentTermChanged.Contains("DEBIT") ? accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId &&
                                              (!string.IsNullOrEmpty(x.ServiceType) && contractModel.SaleService.Contains(x.ServiceType.ToLower())) &&
                                             (x.OfficeId != null && contractModel.OfficeId.Contains(x.OfficeId.ToString().ToLower())) &&
-                                            x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).ToList();
-                    var acctOBH = accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId && contractModel.SaleService.Contains(x.ServiceType.ToLower()) &&
-                                             contractModel.OfficeId.ToLower().Contains(x.OfficeId.ToString().ToLower()) &&
-                                             x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
-                    if (acctOBH.Count() > 0)
+                                            x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
+                                            && x.SalesmanId == contractModel.SaleManId).ToList()
+                                            : new List<AccAccountingManagement>();
+                    if (contractModel.PaymentTermChanged.Contains("OBH"))
                     {
-                        var surcharges = surchargeRepo.Get(x => x.AcctManagementId != null && x.PaymentObjectId == contractModel.PartnerId);
-                        var invOBHsurcharges = from acc in acctOBH
-                                               join surcharge in surcharges on acc.Id equals surcharge.AcctManagementId
-                                               select new
-                                               {
-                                                   acc,
-                                                   BillingNo = string.IsNullOrEmpty(surcharge.Soano) ? surcharge.DebitNo : surcharge.Soano
-                                               };
-                        var invOBHGrp = invOBHsurcharges.GroupBy(x => x.BillingNo);
-                        foreach(var item in invOBHGrp)
+                        var acctOBH = accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId && contractModel.SaleService.Contains(x.ServiceType.ToLower()) &&
+                                                 contractModel.OfficeId.ToLower().Contains(x.OfficeId.ToString().ToLower()) &&
+                                                 x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && x.SalesmanId == contractModel.SaleManId);
+                        if (acctOBH.Count() > 0)
                         {
-                            if(item.Any(x=>x.acc.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
+                            var surcharges = surchargeRepo.Get(x => x.AcctManagementId != null && x.PaymentObjectId == contractModel.PartnerId);
+                            var invOBHsurcharges = from acc in acctOBH
+                                                   join surcharge in surcharges on acc.Id equals surcharge.AcctManagementId
+                                                   select new
+                                                   {
+                                                       acc,
+                                                       BillingNo = surcharge.SyncedFrom == "CDNOTE" ? surcharge.DebitNo : (surcharge.SyncedFrom == "SOA" ? surcharge.Soano : string.Empty)
+                                                   };
+                            var invOBHGrp = invOBHsurcharges.GroupBy(x => x.BillingNo);
+                            foreach (var item in invOBHGrp)
                             {
-                                invoiceData.AddRange(item.Select(x => x.acc));
+                                if (item.All(x => x.acc.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
+                                {
+                                    invoiceData.AddRange(item.Select(x => x.acc));
+                                }
                             }
                         }
                     }
                     if (invoiceData.Count > 0)
                     {
+                        int paymentTerm = 1, paymentTermOBH = 1;
+                        paymentTerm = contractModel.PaymentTerm ?? 1;
+                        paymentTermOBH = contractModel.PaymentTermObh ?? paymentTerm;
                         foreach (var invoice in invoiceData)
                         {
                             //Nếu Base On là Invoice Date: Due Date = Invoice Date + Payment Term
                             if (contractModel.BaseOn == "Invoice Date")
                             {
-                                invoice.PaymentTerm = contractModel.PaymentTerm;
-                                invoice.PaymentDueDate = invoice.Date.HasValue ? invoice.Date.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
+                                invoice.PaymentTerm = invoice.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? paymentTerm : paymentTermOBH;
+                                invoice.PaymentDueDate = invoice.Date.HasValue ? invoice.Date.Value.AddDays((double)(invoice.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
                             }
                             //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
                             if (contractModel.BaseOn == "Confirmed Billing")
                             {
-                                invoice.PaymentTerm = contractModel.PaymentTerm;
-                                invoice.PaymentDueDate = invoice.ConfirmBillingDate.HasValue ? invoice.ConfirmBillingDate.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
+                                invoice.PaymentTerm = invoice.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? paymentTerm : paymentTermOBH;
+                                invoice.PaymentDueDate = invoice.ConfirmBillingDate.HasValue ? invoice.ConfirmBillingDate.Value.AddDays((double)(invoice.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
                             }
                             var hsPaymentMgn = accountingManagementRepo.Update(invoice, x => x.Id == invoice.Id, false);
                         }

@@ -1020,6 +1020,7 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<AccAccountingManagement, bool>> perQuery = GetQueryInvoicePermission(rangeSearch, _user);
             Expression<Func<AccAccountingManagement, bool>> query = x => x.InvoiceNoReal != null && (x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE)
                                                                       && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId)); // TH synce inv từ bravo && x.Status != "New"
+
             var acctManagementIds = new List<Guid?>();
             if (criteria.ReferenceNos?.Count(x => !string.IsNullOrEmpty(x)) > 0)
             {
@@ -1715,7 +1716,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.BillingRefNoType
             }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno, z.CombineNo, z.Hblid }), payment = x.Select(z => new { z.payment?.Id, z.payment?.ReceiptId, z.payment?.PaymentType, z.PaymentRefNo, invoicePayment = z.payment?.InvoiceNo, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.payment?.PaymentAmountVnd, z.payment?.PaymentAmountUsd, z.payment?.UnpaidPaymentAmountVnd, z.payment?.UnpaidPaymentAmountUsd, z.Type }) });
             var results = new List<AccountingCustomerPaymentExport>();
-            var soaLst = soaRepository.Get().Select(x => new { x.Soano, x.UserCreated, x.SalemanId }).ToLookup(x => x.Soano);
+            var soaLst = soaRepository.Get().Select(x => new { x.Soano, x.UserCreated, x.SalemanId, x.Note }).ToLookup(x => x.Soano);
             var cdNoteLst = cdNoteRepository.Get().ToLookup(x => x.Code);
             var opsLookup = opsTransactionRepository.Get(x => x.CurrentStatus != "Canceled").Select(x => new { x.Id, x.JobNo, x.Hblid, x.SalemanId }).ToLookup(x => x.Id);
             //var userLst = userRepository.Get().Select(x => new { x.Id, x.EmployeeId }).ToLookup(x => x.Id);
@@ -1920,9 +1921,9 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.InvoiceDate = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.IssuedDate;
                         payment.BillingRefNo = item.grp.BillingRefNo;
                         payment.BillingDate = null;
-                        payment.DueDate = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.DueDate;
-                        payment.OverdueDays = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.OverdueDays;
-                        payment.PaymentTerm = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.PaymentTerm;
+                        payment.DueDateOBH = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.DueDate;
+                        payment.OverdueDaysOBH = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.OverdueDays;
+                        payment.PaymentTermOBH = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.PaymentTerm;
                         payment.CombineNo = item.surcharge.Where(x => !string.IsNullOrEmpty(x.CombineNo)).FirstOrDefault()?.CombineNo;
                         if (invoiceObhGroup?.Count() > 0)
                         {
@@ -1980,11 +1981,13 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             var creatorId = cdNoteDetail?.UserCreated;
                             payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
+                            payment.BillingNote = cdNoteDetail?.Note;
                         }
                         else // Billing là soa
                         {
                             var creatorId = soaDetail?.UserCreated;
                             payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
+                            payment.BillingNote = soaDetail?.Note;
                         }
 
                         results.Add(payment);
@@ -2002,6 +2005,13 @@ namespace eFMS.API.Accounting.DL.Services
                 for (var i = 0; i < invoiceDebitGroupLst.Count(); i++)
                 {
                     var invoiceDe = invoiceDebitGroupLst[i];
+                    if (invoiceDe?.invc.Count() > 0)
+                    {
+                        if (invoiceDe.invc.FirstOrDefault()?.AccountNo == "1313")
+                        {
+                            continue;
+                        }
+                    }
                     var payment = new AccountingCustomerPaymentExport();
                     var statusOBH = string.Empty;
                     var statusDebit = "Unpaid";
@@ -2249,9 +2259,19 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.InvoiceDate = invoiceDe?.invc.Count() > 0 ? invoiceDe.invc.FirstOrDefault()?.IssuedDate : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.IssuedDate;
                     payment.BillingRefNo = item.grp.BillingRefNo;
                     payment.BillingDate = invoiceDe?.invc.FirstOrDefault()?.ConfirmBillingDate;
-                    payment.DueDate = invoiceDe?.invc.Count() > 0 ? invoiceDe?.invc.FirstOrDefault()?.DueDate : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.DueDate;
-                    payment.OverdueDays = invoiceDe?.invc.Count() > 0 ? invoiceDe?.invc.FirstOrDefault()?.OverdueDays : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.OverdueDays;
-                    payment.PaymentTerm = invoiceDe?.invc.Count() > 0 ? invoiceDe?.invc.FirstOrDefault()?.PaymentTerm : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.PaymentTerm;
+                    if (invoiceDe?.invc.Count() > 0)
+                    {
+                        payment.DueDate = invoiceDe?.invc.FirstOrDefault()?.DueDate ;
+                        payment.OverdueDays = invoiceDe?.invc.FirstOrDefault()?.OverdueDays ;
+                        payment.PaymentTerm =  invoiceDe?.invc.FirstOrDefault()?.PaymentTerm;
+                    }
+                    if (invoiceObhGroup != null && invoiceObhGroup.FirstOrDefault()?.invc.Count() > 0)
+                    {
+                        payment.DueDateOBH = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.DueDate;
+                        payment.OverdueDaysOBH = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.OverdueDays;
+                        payment.PaymentTermOBH = invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.PaymentTerm;
+                    }
+
                     if (invoiceDe?.invc.Count() > 0)
                     {
                         payment.AccountNo = invoiceDe.invc.FirstOrDefault()?.AccountNo;
@@ -2311,11 +2331,13 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         var creatorId = cdNoteDetail?.UserCreated;
                         payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
+                        payment.BillingNote = cdNoteDetail?.Note;
                     }
                     else // Billing là soa
                     {
                         var creatorId = soaDetail?.UserCreated;
                         payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst.Where(x => x.Id == creatorId).FirstOrDefault()?.EmployeeNameEn;
+                        payment.BillingNote = soaDetail?.Note;
                     }
 
                     results.Add(payment);

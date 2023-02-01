@@ -678,7 +678,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="hash">Hash Value</param>s
         /// <returns></returns>
         [HttpPost("InsertPayablePayment")]
-        public IActionResult InsertPayablePayment(List<AccAccountPayableModel> model, [Required] string apiKey, [Required] string hash)
+        public async Task<IActionResult> InsertPayablePayment(List<AccAccountPayableModel> model, [Required] string apiKey, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
             if (!accountingManagementService.ValidateApiKey(apiKey))
@@ -697,7 +697,7 @@ namespace eFMS.API.ForPartner.Controllers
                 return Ok(_result);
             }
 
-            var hs = accPayableService.InsertAccountPayablePayment(model, apiKey);
+            var hs = await accPayableService.InsertAccountPayablePayment(model, apiKey);
 
             string _message = hs.Success ? "Ghi nhận giảm trừ công nợ thành công" : string.Format("{0}. Ghi nhận giảm trừ công nợ thất bại", hs.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
@@ -816,11 +816,15 @@ namespace eFMS.API.ForPartner.Controllers
             }
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
-            HandleState hs = await accountingManagementService.InsertVoucher(model, apiKey);
+            ResultHandle hs = await accountingManagementService.InsertVoucher(model, apiKey);
 
-            string _message = hs.Success ? "Tạo mới voucher thành công" : string.Format("{0}. Tạo mới voucher thất bại", hs.Message.ToString());
+            string _message = "Tạo mới voucher thành công";
+            if (!hs.Status)
+            {
+                _message = string.Format("{0}. Tạo mới voucher thất bại", hs.Message?.ToString());
+            }
 
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+            ResultHandle result = new ResultHandle { Status = hs.Status, Message = _message, Data = model };
 
             var _endDateProgress = DateTime.Now;
             #region -- Ghi Log --
@@ -829,16 +833,18 @@ namespace eFMS.API.ForPartner.Controllers
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion
 
-            if (hs.Success)
+            if (hs.Status)
             {
                 Response.OnCompleted(async () =>
                 {
-                    HandleState payableHandle = await accPayableService.InsertAccPayable(model);
+                    HandleState payableHandle = await accPayableService.InsertAccPayable(model, (List<AccAccountingManagement>)hs.Data);
+
+                    HandleState hsCredit = await accPayableService.AddCreditMangagement(model);
                 });
             }
-           
+
             return Ok(result);
-          
+
         }
 
         /// <summary>

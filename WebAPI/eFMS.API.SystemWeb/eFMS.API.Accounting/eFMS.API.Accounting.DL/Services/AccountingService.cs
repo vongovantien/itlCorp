@@ -61,6 +61,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmailSetting> emailSettingRepository;
         private readonly IUserBaseService userBaseService;
         private readonly IContextBase<SysImage> sysFileRepository;
+        private readonly IContextBase<SysImageDetail> sysFileDetailRepository;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
@@ -116,6 +117,7 @@ namespace eFMS.API.Accounting.DL.Services
             ICurrentUser cUser,
             IAcctSettlementPaymentService settlementService,
             IContextBase<SysImage> sysFileRepo,
+            IContextBase<SysImageDetail> sysFileDetail,
             IDatabaseUpdateService _databaseUpdateService,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<CsTransaction> csTransactionRepo,
@@ -157,6 +159,7 @@ namespace eFMS.API.Accounting.DL.Services
             emailSettingRepository = emailSettingRepo;
 
             sysFileRepository = sysFileRepo;
+            sysFileDetailRepository = sysFileDetail;
             settlementPaymentService = settlementService;
             databaseUpdateService = _databaseUpdateService;
             sysEmailTemplateRepository = sysEmailTemplateRepo;
@@ -227,7 +230,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (advRGrps.Count > 0)
                     {
                         item.Details = advRGrps;
-                        item.AtchDocInfo = GetAtchDocInfo("Advance", item.Stt.ToString());
+                        item.AtchDocInfo = GetAtchDocInfo("Advance", item.Stt.ToString(), item.ReferenceNo);
                     }
                 }
                 result = data;
@@ -361,7 +364,7 @@ namespace eFMS.API.Accounting.DL.Services
                             // CustomerCode = partner != null ? partner.AccountNo : (!string.IsNullOrEmpty(employee.PersonalId) ? employee.PersonalId : employee.StaffCode),
                             item.CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode; //[06/01/2021]
                             item.PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod;
-                            item.CustomerMode = partner != null ? partner.PartnerMode : "External";
+                            item.CustomerMode = partner != null ? (partner.Public == true ? "External" : partner.PartnerMode) : "External";
                             item.LocalBranchCode = partner != null ? (partner.PartnerMode == "Internal" ? partner.InternalCode : null) : null; //Parnter mode là internal => Internal Code
                             item.Payee = settle.Payee;
                             item.CurrencyCode = settle.SettlementCurrency;
@@ -431,7 +434,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (querySettlementReq.Count() > 0)
                             {
                                 item.Details = querySettlementReq.ToList();
-                                item.AtchDocInfo = GetAtchDocInfo("Settlement", item.Stt.ToString());
+                                item.AtchDocInfo = GetAtchDocInfo("Settlement", item.Stt.ToString(), item.ReferenceNo);
 
                                 // Trong phiếu thanh toán có tồn tại lô nào có hoàn ứng hay không?
                                 bool hasAdvancePayment = item.Details.Any(x => !string.IsNullOrEmpty(x.AdvanceNo));
@@ -592,7 +595,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var cdNotePartner = partners.Where(x => x.Id == cdNote.PartnerId).FirstOrDefault();
                 sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
                 sync.CustomerName = cdNotePartner?.PartnerNameVn; //Partner Local Name
-                sync.CustomerMode = cdNotePartner?.PartnerMode;
+                sync.CustomerMode = cdNotePartner.Public == true ? "External" : cdNotePartner?.PartnerMode;
                 sync.LocalBranchCode = cdNotePartner?.PartnerMode == "Internal" ? cdNotePartner.InternalCode : null; //Parnter mode là internal => Internal Code
                 sync.CurrencyCode0 = cdNote.CurrencyId;
                 sync.ExchangeRate0 = cdNote.ExchangeRate ?? 1;
@@ -611,7 +614,27 @@ namespace eFMS.API.Accounting.DL.Services
                 //var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
                 var surcharges = GetShipmentSurchargesData(cdNote.Code, "CDNOTE");
                 var servicesOfDebitNote = new List<string> { surcharges.Select(s => s.TransactionType).FirstOrDefault() };
-                var _dueDate = GetDueDate(cdNotePartner, servicesOfDebitNote);
+                decimal? _dueDate = 1, _dueDateOBH = 1;//GetDueDate(cdNotePartner, servicesOfDebitNote);
+                if (cdNotePartner != null)
+                {
+                    var _partnerId = (cdNotePartner.Id == cdNotePartner.ParentId || string.IsNullOrEmpty(cdNotePartner.ParentId)) ? cdNotePartner.Id : cdNotePartner.ParentId;
+                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.SaleManId == cdNote.SalemanId && servicesOfDebitNote.Any(z => x.SaleService.Contains(z)));
+                    var contractWithSaleman = contracts.Where(x => x.Active == true && x.ContractType != "Cash").FirstOrDefault();
+                    if (contractWithSaleman != null)
+                    {
+                        _dueDate = contractWithSaleman.PaymentTerm ?? 1; //PaymentTerm không có value sẽ default là 1[CR 081222=> null => default 1]
+                        _dueDateOBH = contractWithSaleman.PaymentTermObh ?? _dueDate; //PaymentTermOBH không có value sẽ default là PaymentTerm
+                    }
+                    else // Các trường hợp khác lấy payment term = 1
+                    {
+                        var contractInactive = contracts.Where(x => x.Active != true).FirstOrDefault(); // TH hđ inactive thì xem như no contract => payment term = 1
+                        if (contractInactive != null)
+                        {
+                            _dueDate = 1;
+                            _dueDateOBH = 1;
+                        }
+                    }
+                }
 
                 var hblId = string.Empty;
                 foreach (var surcharge in surcharges)
@@ -682,6 +705,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                         charge.OriginalAmount = _netAmount; //Thành tiến chưa thuế
                         charge.OriginalAmount3 = _taxMoney; //Tiền thuế
+
+                        charge.DueDate = _dueDate;
                     }
 
                     //Đối với phí OBH - Giữ nguyên giá trị, không cần quy đổi
@@ -728,9 +753,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                         charge.AtchDocNo = surcharge.InvoiceNo; //Số Invoice trên phiếu OBH
                         charge.AtchDocSerialNo = surcharge.SeriesNo; //Số Serie trên phiếu OBH
-                    }
 
-                    charge.DueDate = _dueDate;
+                        charge.DueDate = _dueDateOBH;
+                    }
 
                     charges.Add(charge);
 
@@ -787,7 +812,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var cdNotePartner = partners.Where(x => x.Id == cdNote.PartnerId).FirstOrDefault();
                     sync.CustomerCode = cdNotePartner?.AccountNo; //Partner Code
                     sync.CustomerName = cdNotePartner?.PartnerNameVn; //Partner Local Name
-                    sync.CustomerMode = cdNotePartner?.PartnerMode;
+                    sync.CustomerMode = (cdNotePartner.Public == true ? "External" : cdNotePartner?.PartnerMode);
                     sync.LocalBranchCode = cdNotePartner?.PartnerMode == "Internal" ? cdNotePartner?.InternalCode : null; //Parnter mode là internal => Internal Code
                     sync.CurrencyCode = cdNote.CurrencyId;
                     sync.ExchangeRate = cdNote.ExchangeRate ?? 1;
@@ -942,7 +967,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
                 sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
                 sync.CustomerName = soaPartner?.PartnerNameVn; //Partner Local Name
-                sync.CustomerMode = soaPartner?.PartnerMode;
+                sync.CustomerMode = soaPartner.Public == true ? "External" : soaPartner?.PartnerMode;
                 sync.LocalBranchCode = soaPartner?.PartnerMode == "Internal" ? soaPartner?.InternalCode : null; //Parnter mode là internal => Internal Code
                 sync.CurrencyCode0 = soa.Currency;
                 sync.ExchangeRate0 = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
@@ -961,7 +986,28 @@ namespace eFMS.API.Accounting.DL.Services
                 //var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
                 var surcharges = GetShipmentSurchargesData(soa.Soano, "SOA");
                 var servicesOfSoaDebit = surcharges.Select(s => s.TransactionType).Distinct().ToList();
-                var _dueDate = GetDueDate(soaPartner, servicesOfSoaDebit);
+                //var _dueDate = GetDueDate(soaPartner, servicesOfSoaDebit);
+                decimal? _dueDate = 1, _dueDateOBH = 1;
+                if (soaPartner != null)
+                {
+                    var _partnerId = (soaPartner.Id == soaPartner.ParentId || string.IsNullOrEmpty(soaPartner.ParentId)) ? soaPartner.Id : soaPartner.ParentId;
+                    var contracts = contractRepository.Get(x => x.PartnerId == _partnerId && x.SaleManId == soa.SalemanId && servicesOfSoaDebit.Any(z => x.SaleService.Contains(z)));
+                    var contractWithSaleman = contracts.Where(x => x.Active == true && x.ContractType != "Cash").FirstOrDefault();
+                    if (contractWithSaleman != null)
+                    {
+                        _dueDate = contractWithSaleman.PaymentTerm ?? 1; //PaymentTerm không có value sẽ default là 1[CR 081222=> null => default 1]
+                        _dueDateOBH = contractWithSaleman.PaymentTermObh ?? _dueDate; //PaymentTermOBH không có value sẽ default là PaymentTerm
+                    }
+                    else // Các trường hợp khác lấy payment term = 1
+                    {
+                        var contractInactive = contracts.Where(x => x.Active != true).FirstOrDefault(); // TH hđ inactive thì xem như no contract => payment term = 1
+                        if (contractInactive != null)
+                        {
+                            _dueDate = 1;
+                            _dueDateOBH = 1;
+                        }
+                    }
+                }
 
                 foreach (var surcharge in surcharges)
                 {
@@ -1028,6 +1074,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                         charge.OriginalAmount = _netAmount; //Thành tiền chưa thuế
                         charge.OriginalAmount3 = _taxMoney; //Tiền thuế
+
+                        charge.DueDate = _dueDate;
                     }
 
                     //Đối với phí OBH - Giữ nguyên giá trị, không cần quy đổi
@@ -1074,14 +1122,14 @@ namespace eFMS.API.Accounting.DL.Services
 
                         charge.AtchDocNo = surcharge.InvoiceNo; //Số Invoice trên phiếu OBH
                         charge.AtchDocSerialNo = surcharge.SeriesNo; //Số Serie trên phiếu OBH
-                    }
 
-                    charge.DueDate = _dueDate;
+                        charge.DueDate = _dueDateOBH;
+                    }
 
                     charges.Add(charge);
                 }
                 sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList(); // Sắp xếp theo số job giảm dần
-                sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt);
+                sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt, sync.ReferenceNo);
                 data.Add(sync);
             }
             return data;
@@ -1113,7 +1161,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var soaPartner = partners.Where(x => x.Id == soa.Customer).FirstOrDefault();
                     sync.CustomerCode = soaPartner?.AccountNo; //Partner Code
                     sync.CustomerName = soaPartner?.PartnerNameVn; //Partner Local Name
-                    sync.CustomerMode = soaPartner?.PartnerMode;
+                    sync.CustomerMode = soaPartner?.Public == true ? "External" : soaPartner?.PartnerMode;
                     sync.LocalBranchCode = soaPartner?.PartnerMode == "Internal" ? soaPartner?.InternalCode : null; //Parnter mode là internal => Internal Code
                     sync.CurrencyCode = soa.Currency;
                     sync.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
@@ -1222,7 +1270,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charges.Add(charge);
                     }
                     sync.Details = charges.OrderByDescending(x => x.Ma_SpHt).ToList();  // Sắp xếp theo số job giảm dần
-                    sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt);
+                    sync.AtchDocInfo = GetAtchDocInfo("SOA", sync.Stt, sync.ReferenceNo);
                     data.Add(sync);
                 }
             }
@@ -3498,23 +3546,36 @@ namespace eFMS.API.Accounting.DL.Services
             return false;
         }
 
-        private List<BravoAttachDoc> GetAtchDocInfo(string folder, string objectId)
+        private List<BravoAttachDoc> GetAtchDocInfo(string folder, string objectId, string billingNo)
         {
             List<BravoAttachDoc> results = new List<BravoAttachDoc>();
 
-            var files = sysFileRepository.Get(x => x.Folder == folder && x.ObjectId == objectId).ToList();
-            if(files.Count > 0)
+            //var fileOrigins = sysFileRepository.Get(x => x.Folder == folder && x.ObjectId == objectId);
+            //var files = from f in fileOrigins
+            //            join e in sysFileDetailRepository.Get() on f.Id equals e.SysImageId into fGrps
+            //            select new { fileOrigin = f, edoc = fGrps.DefaultIfEmpty() };
+            //if (files.Count() > 0)
+            //{
+            //    foreach (var file in files)
+            //    {
+            //        results.Add(new BravoAttachDoc
+            //        {
+            //            AttachDocRowId = file.fileOrigin.Id.ToString(),
+            //            AttachDocName = file.edoc.FirstOrDefault().SystemFileName,
+            //            AttachDocPath = file.fileOrigin.Url,
+            //            AttachDocDate = file.fileOrigin.DateTimeCreated
+            //        });
+            //    }
+            //}
+            
+            string queryParamUrlAttachFile = string.Format(@"/en/#/home/tool/file-management/user-attach-file?module={0}&folder={1}&objectId={2}&billingNo={3}", "Accounting", folder, objectId, billingNo);
+            results.Add(new BravoAttachDoc
             {
-                files.ForEach(c =>
-                {
-                    results.Add(new BravoAttachDoc {
-                        AttachDocRowId = c.Id.ToString(),
-                        AttachDocName = c.Name,
-                        AttachDocPath = c.Url,
-                        AttachDocDate = c.DateTimeCreated
-                    });
-                });
-            }
+                AttachDocRowId = Guid.NewGuid().ToString(),
+                AttachDocName = "eFMS Attach Files eDoc",
+                AttachDocPath = webUrl.Value.Url.ToString() + queryParamUrlAttachFile,
+                AttachDocDate = DateTime.Now
+            });
 
             return results;
         }

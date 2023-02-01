@@ -1,7 +1,7 @@
 
+import { BaseModel } from "../base.model";
 import { Container } from "./container.model";
 import { PermissionShipment } from "./permissionShipment";
-import { BaseModel } from "../base.model";
 
 
 export class OpsTransaction extends BaseModel {
@@ -59,6 +59,10 @@ export class OpsTransaction extends BaseModel {
     linkSource: string = null;
     replicatedId: string = null;
     noProfit: boolean = false;
+    eta: any = null;
+    deliveryDate: any = null;
+    suspendTime: string = '';
+    clearanceDate: any = null;
 
     note: string = '';
     isLinkFee: boolean = false;

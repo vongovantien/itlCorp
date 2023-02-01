@@ -1,18 +1,19 @@
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ComponentFactoryResolver, ComponentRef, ViewContainerRef, Injector, ComponentFactory, } from "@angular/core";
-import { Observable, Subject, throwError, BehaviorSubject, Subscription } from "rxjs";
 import { HttpErrorResponse } from "@angular/common/http";
+import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ComponentFactory, ComponentFactoryResolver, ComponentRef, DoCheck, Injector, OnChanges, OnDestroy, OnInit, QueryList, ViewContainerRef } from "@angular/core";
+import { BehaviorSubject, Observable, Subject, Subscription, throwError } from "rxjs";
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 
-import { UtilityHelper } from "src/helper";
-import { NgProgressRef } from "@ngx-progressbar/core";
-import { ButtonModalSetting } from "./shared/models/layout/button-modal-setting.model";
-import { ButtonType } from "./shared/enums/type-button.enum";
-import { debounceTime, distinctUntilChanged, switchMap, takeUntil, skip } from "rxjs/operators";
-import moment from "moment/moment";
-import { PermissionShipment } from "./shared/models/document/permissionShipment";
-import { PermissionHouseBill } from "./shared/models/document/permissionHouseBill";
-import { environment } from 'src/environments/environment';
 import { SystemConstants } from '@constants';
+import { NgProgressRef } from "@ngx-progressbar/core";
+import moment from "moment/moment";
+import { debounceTime, distinctUntilChanged, skip, switchMap, takeUntil } from "rxjs/operators";
+import { environment } from 'src/environments/environment';
+import { UtilityHelper } from "src/helper";
+import { ButtonType } from "./shared/enums/type-button.enum";
+import { PermissionHouseBill } from "./shared/models/document/permissionHouseBill";
+import { PermissionShipment } from "./shared/models/document/permissionShipment";
+import { ButtonModalSetting } from "./shared/models/layout/button-modal-setting.model";
+import { ContextMenuDirective } from "@directives";
 
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
@@ -149,6 +150,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
     currentUser: any;
     currentUser$: Observable<Partial<SystemInterface.IClaimUser>>;
+
+    accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls,.docx,.msg,.html,.zip';
 
     ngOnInit(): void { }
 
@@ -307,6 +310,13 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
                 }
             }
         )
+    }
+
+    clearMenuContext(queryListMenuContext: QueryList<ContextMenuDirective>) {
+        const qContextMenuList = queryListMenuContext.toArray();
+        if (!!qContextMenuList.length) {
+            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
+        }
     }
 
 }

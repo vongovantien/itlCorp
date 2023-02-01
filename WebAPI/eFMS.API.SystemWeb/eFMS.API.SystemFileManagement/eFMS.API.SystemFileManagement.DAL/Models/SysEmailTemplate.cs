@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -15,5 +14,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public Guid? UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public string Content { get; set; }
     }
 }

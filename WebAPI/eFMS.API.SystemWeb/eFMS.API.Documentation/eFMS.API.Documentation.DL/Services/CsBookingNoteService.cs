@@ -384,8 +384,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "HLSeaBooingNote" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = "HLSeaBooingNote_" + parameter.HBL + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(bookingNotes);

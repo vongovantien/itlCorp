@@ -37,7 +37,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
     @Input() showSyncFreight: boolean = true;
     @Input() showGetCharge: boolean = true;
-    @Input() showSyncStandard: boolean = true;
     @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
     @Input() allowLinkFee: boolean = false;
     @Input() isDuplicateJob: boolean = false;
@@ -148,15 +147,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'Paid Date', field: 'paidDate', sortable: true },
             { title: 'Refund Fee', field: 'isRefundFee', sortable: true },
         ];
-    }
-
-    getCharge() {
-        this.listCharges$ = this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceTypeId, type: CommonEnum.CHARGE_TYPE.DEBIT })
-        // .subscribe(
-        //     (charges: Charge[]) => {
-        //         this.listCharges = charges;
-        //     }
-        // );
     }
 
     saveSellingSurCharge() {

@@ -7,27 +7,29 @@ import { ToastrService } from 'ngx-toastr';
 
 import { CommonEnum } from '@enums';
 import { ConfirmPopupComponent, ReportPreviewComponent } from '@common';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 
 import { SortService } from '@services';
 import { TransactionGetDetailAction, getTransactionLocked, getTransactionPermission } from '@share-bussiness';
 
-import { AppList } from 'src/app/app.list';
 import { ShareBusinessFormManifestComponent } from 'src/app/business-modules/share-business/components/manifest/form-manifest/components/form-manifest.component';
 import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules/share-business/components/manifest/popup/add-hbl-to-manifest.popup';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { RoutingConstants } from '@constants';
+import { catchError, concatMap, finalize, mergeMap, takeUntil } from 'rxjs/operators';
+import { RoutingConstants, SystemConstants } from '@constants';
+import { AppForm } from 'src/app/app.form';
+import { ICrystalReport } from '@interfaces';
+import { delayTime } from '@decorators';
+import { HttpResponse } from '@angular/common/http';
+import { Crystal } from '@models';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-sea-consol-export-manifest',
     templateUrl: './sea-consol-manifest.component.html'
 })
-export class SeaConsolExportManifestComponent extends AppList {
-    @ViewChild(ConfirmPopupComponent) confirmCreatePopup: ConfirmPopupComponent;
-
+export class SeaConsolExportManifestComponent extends AppForm implements ICrystalReport {
     @ViewChild(ShareBusinessFormManifestComponent) formManifest: ShareBusinessFormManifestComponent;
-    @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
     @ViewChild(ShareBusinessAddHblToManifestComponent) AddHblToManifestPopup: ShareBusinessAddHblToManifestComponent;
 
     portType: CommonEnum.PORT_TYPE = CommonEnum.PORT_TYPE.SEA;
@@ -40,6 +42,7 @@ export class SeaConsolExportManifestComponent extends AppList {
     checkAll = false;
     totalGW = 0;
     totalCBM = 0;
+    headers: CommonInterface.IHeaderTable[] = [];
 
     constructor(
         protected _store: Store<any>,
@@ -49,7 +52,10 @@ export class SeaConsolExportManifestComponent extends AppList {
         private _toastService: ToastrService,
         protected _router: Router,
         private cdRef: ChangeDetectorRef,
-        private _activedRouter: ActivatedRoute
+        private _activedRouter: ActivatedRoute,
+        private _exportRepo: ExportRepo,
+        private _fileMngtRepo: SystemFileManageRepo
+
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -104,12 +110,14 @@ export class SeaConsolExportManifestComponent extends AppList {
     }
 
     onRefresh() {
-        this.confirmCreatePopup.hide();
         this.refreshManifest();
     }
 
     showRefreshPopup() {
-        this.confirmCreatePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'All manually entered data will be refresh. Are you sure you want to perform this action?',
+            labelCancelL: 'No'
+        }, () => { this.onRefresh(); });
     }
 
     combackToHBLList() {
@@ -305,15 +313,69 @@ export class SeaConsolExportManifestComponent extends AppList {
                     if (res != null) {
                         this.dataReport = res;
                         if (this.dataReport != null && res.dataSource.length > 0) {
-                            setTimeout(() => {
-                                this.reportPopup.frm.nativeElement.submit();
-                                this.reportPopup.show();
-                            }, 1000);
+                            this.renderAndShowReport();
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
                     }
                 },
+            );
+    }
+
+    @delayTime(1000)
+    showReport(): void {
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
+    }
+
+    renderAndShowReport() {
+        // * Render dynamic
+        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
+        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
+
+        this.showReport();
+
+        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+            (v: any) => {
+                this.subscription.unsubscribe();
+                this.viewContainerRef.viewContainerRef.clear();
+            });
+
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.jobId,
+                            hblId: SystemConstants.EMPTY_GUID,
+                            templateCode: 'MNF',
+                            transactionType: 'SCE'
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
             );
     }
 }

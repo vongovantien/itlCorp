@@ -18,7 +18,8 @@
                         </label>
                         <ng-container *ngIf="!readonlyForm; else userTpl">
                             <select class="form-control" formControlName="requester">
-                                <option *ngFor="let user of (users | async)" [ngValue]="user.id">{{user.username}}</option>
+                                <option *ngFor="let user of (users | async)" [ngValue]="user.id">{{user.username}}
+                                </option>
                             </select>
                         </ng-container>
                         <ng-template #userTpl>
@@ -37,7 +38,8 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                                         name="daterange" placeholder="Select request date" [autoApply]="true"
-                                        formControlName="requestDate" (datesUpdated)="onUpdateRequestDate($event)" [attr.disabled]="isDisabled" calendar />
+                                        formControlName="requestDate" (datesUpdated)="onUpdateRequestDate($event)"
+                                        [attr.disabled]="isDisabled" calendar />
                                 </div>
                             </div>
                         </div>
@@ -62,15 +64,20 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label>Payee:</label>
-                        <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:payee.value}"
-                            (itemSelected)="payee.setValue($event.id); getBeneficiaryInfo()" [dataSources]="customers"
-                            [displayFields]="[
+                        <ng-container *ngIf="!readonlyForm else tplPayeeReadOnly">
+                            <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:payee.value}"
+                                (itemSelected)="payee.setValue($event.id); getBeneficiaryInfo();onSelectDataFormInfo($event, 'payee')"
+                                [dataSources]="customers" [displayFields]="[
                             { field: 'shortName', label: 'Name ABBR' },
                             { field: 'partnerNameEn', label: 'Name EN' },
                             { field: 'taxCode', label: 'Tax Code' }]" [selectedDisplayFields]="['shortName']"
-                            [disabled]="isDisabled" placeholder="Select partner"
-                            (remove)="resetFormControl(payee);getBeneficiaryInfo();">
-                        </app-combo-grid-virtual-scroll>
+                                [disabled]="isDisabled" placeholder="Select partner"
+                                (remove)="resetFormControl(payee);getBeneficiaryInfo()">
+                            </app-combo-grid-virtual-scroll>
+                        </ng-container>
+                        <ng-template #tplPayeeReadOnly>
+                            <input class="form-control" [value]="payeeName" readonly>
+                        </ng-template>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -78,8 +85,8 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Settlement Amount:</label>
-                                <input type="text" formControlName="amount" class="form-control" formatDecimalFormControl
-                                    disabled>
+                                <input type="text" formControlName="amount" class="form-control"
+                                    formatDecimalFormControl disabled>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -104,7 +111,8 @@
                             <div class="form-group">
                                 <label>Currency:</label>
                                 <select formControlName="currency" class="form-control">
-                                    <option *ngFor="let currency of currencyList" [ngValue]="currency.id">{{currency.id}}
+                                    <option *ngFor="let currency of currencyList" [ngValue]="currency.id">
+                                        {{currency.id}}
                                     </option>
                                 </select>
                             </div>
@@ -139,7 +147,7 @@
                                 </div>
                             </div>
                         </div>
-    
+
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label class="form-control-label">
@@ -181,13 +189,25 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
-                                    <div class="form-group">
-                                        <label class="form-control-label">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAccountNo.dirty)  && !bankAccountNo.valid}">
+                                        <label class=" form-control-label">
                                             Bank Account No:
                                         </label>
-                                        <input type="text" class="form-control m-input m-input--square text-success"
-                                            placeholder="" name="bankAccountNo" autocomplete="nope"
-                                            formControlName="bankAccountNo">
+                                        <ng-container
+                                            *ngIf="paymentMethod.value.value === 'Bank' || paymentMethod.value.value === 'NETOFF_SHPT'|| paymentMethod.value.value === 'Other'; else bankTemplate">
+                                            <app-combo-grid-virtual-scroll (showedDropdown)="getBankAccountPayee(false)"
+                                                (itemSelected)="onSelectDataFormInfo($event, 'bankAccountNo')"
+                                                [selectedDisplayFields]="['bankAccountNo']" [dataSources]="bankAccount"
+                                                [displayFields]="displayFieldBankAccount"
+                                                (remove)="resetFormControl(bankAccountNo)"
+                                                placeholder="Please Select Bank Account No" allowFreeText
+                                                formControlName="bankAccountNo">
+                                            </app-combo-grid-virtual-scroll>
+                                        </ng-container>
+                                        <ng-template #bankTemplate>
+                                            <input type="text" class="form-control" formControlName="bankAccountNo">
+                                        </ng-template>
                                     </div>
                                 </div>
                             </div>
@@ -197,7 +217,8 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label>General Reason:</label>
-                        <textarea class="form-control" name="" id="" cols="30" rows="5" formControlName="note"></textarea>
+                        <textarea class="form-control" name="" id="" cols="30" rows="5"
+                            formControlName="note"></textarea>
                     </div>
                 </div>
             </div>

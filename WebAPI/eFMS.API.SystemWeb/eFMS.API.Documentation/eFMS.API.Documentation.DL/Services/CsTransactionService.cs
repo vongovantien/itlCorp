@@ -24,7 +24,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -224,46 +223,42 @@ namespace eFMS.API.Documentation.DL.Services
         private CsTransaction GetTransactionToGenerateJobNo(SysOffice office, string transactionType)
         {
             CsTransaction currentShipment = null;
-            if (office != null)
+            switch (office.Code)
             {
-                if (office.Code == "ITLHAN")
-                {
+                case "ITLHAN":
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
-                                                    && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                    && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                    && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
-                                                    .OrderByDescending(x => x.JobNo)
-                                                    .FirstOrDefault(); //CR: HAN -> H [15202]
-                }
-                else if (office.Code == "ITLDAD")
-                {
+                                                   && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                   && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                   && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
+                                                   .OrderByDescending(x => x.JobNo)
+                                                   .FirstOrDefault(); //CR: HAN -> H [15202]
+                    break;
+                case "ITLDAD":
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                         && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault(); //CR: DAD -> D [15202]
-                }
-                else
-                {
+                    break;
+                case "ITLCAM":
                     currentShipment = DataContext.Get(x => x.TransactionType == transactionType
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
-                                                        && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
+                                                        && x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("DAD-"))
                                                     .OrderByDescending(x => x.JobNo)
                                                     .FirstOrDefault();
-                }
-            }
-            else
-            {
-                currentShipment = DataContext.Get(x => x.TransactionType == transactionType
-                                                    && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                    && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                    && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
-                                                    && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
-                                                    .OrderByDescending(x => x.JobNo)
-                                                    .FirstOrDefault();
+                    break;
+                default:
+                    currentShipment = DataContext.Get(x => x.TransactionType == transactionType
+                                                   && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                   && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                   && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                   && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-")
+                                                   && !x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-"))
+                                                   .OrderByDescending(x => x.JobNo)
+                                                   .FirstOrDefault();
+                    break;
             }
             return currentShipment;
         }
@@ -271,16 +266,19 @@ namespace eFMS.API.Documentation.DL.Services
         private string SetPrefixJobIdByOfficeCode(string officeCode)
         {
             string prefixCode = string.Empty;
-            if (!string.IsNullOrEmpty(officeCode))
+            switch (officeCode)
             {
-                if (officeCode == "ITLHAN")
-                {
-                    prefixCode = "H"; //HAN- >> H
-                }
-                else if (officeCode == "ITLDAD")
-                {
-                    prefixCode = "D"; //DAD- >> D
-                }
+                case "ITLHAN":
+                    prefixCode = "H";
+                    break;
+                case "ITLDAD":
+                    prefixCode = "D";
+                    break;
+                case "ITLCAM":
+                    prefixCode = "C";
+                    break;
+                default:
+                    break;
             }
             return prefixCode;
         }
@@ -1072,7 +1070,7 @@ namespace eFMS.API.Documentation.DL.Services
                     result.Containers = containers;
                 }
             }
-            if(result != null && result.JobNo != null && result.HblId == null)
+            if (result != null && result.JobNo != null && result.HblId == null)
             {
                 var surchargesOrg = csShipmentSurchargeRepo.Get(x => x.JobNo == jobOps);
                 var surchargesLink = csShipmentSurchargeRepo.Get(x => x.JobNo == result.JobNo);
@@ -1095,6 +1093,7 @@ namespace eFMS.API.Documentation.DL.Services
             switch (serviceName)
             {
                 case "Sea":
+                case "Sea Consol":
                     if (serviceMode == "Import")
                     {
                         type = TermData.SeaConsolImport;
@@ -2763,6 +2762,7 @@ namespace eFMS.API.Documentation.DL.Services
                     item.PaySyncedFrom = null;
                     item.ReferenceNo = null;
                     item.ExchangeDate = DateTime.Now;
+                    item.AdvanceNoFor = null;
 
                     #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                     //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
@@ -2969,9 +2969,9 @@ namespace eFMS.API.Documentation.DL.Services
                             revenue = surcharge.Total;
                         }
                         string _paymentStatus = string.Empty;
-                        if(surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE || surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                        if (surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE || surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                         {
-                            if(surcharge.AcctManagementId != null && surcharge.AcctManagementId != Guid.Empty)
+                            if (surcharge.AcctManagementId != null && surcharge.AcctManagementId != Guid.Empty)
                             {
                                 var acct = accMngtRepo.Get(x => x.Id == surcharge.AcctManagementId)?.FirstOrDefault();
                                 _paymentStatus = acct?.PaymentStatus;
@@ -3125,8 +3125,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "PLSheet" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = "PLSheet_" + shipment.JobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
@@ -3523,6 +3523,13 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "ShipmentCoverPage_" + dataShipment.JobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
+
+            result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(listShipment);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -3670,9 +3677,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             return catContractRepo.Any(y => y.PartnerId == tranDes.CustomerId
                            && y.SaleManId == tranDes.SaleManId && y.Active == true
-                           && y.SaleService.Contains(transactionType) && (y.ShipmentType == "Nominated"||y.ShipmentType== "Freehand & Nominated"));
+                           && y.SaleService.Contains(transactionType) && (y.ShipmentType == "Nominated" || y.ShipmentType == "Freehand & Nominated"));
         }
-        
+
         public HandleState UpdateJobStatus(ChargeShipmentStatusModel model)
         {
             CatStage stage = null;
@@ -3738,7 +3745,8 @@ namespace eFMS.API.Documentation.DL.Services
                         CsStageAssignedModel newStage = new CsStageAssignedModel();
                         newStage.Id = Guid.NewGuid();
                         newStage.StageId = stage.Id;
-                        newStage.Status = TermData.Done; ;
+                        newStage.Status = TermData.Done;
+                        newStage.Type = DocumentConstants.FROM_SYSTEM;
                         newStage.DatetimeCreated = newStage.DatetimeModified = newStage.Deadline = DateTime.Now;
                         newStage.MainPersonInCharge = newStage.RealPersonInCharge = currentUser.UserID;
                         if (model.TransactionType == TermData.CsTransaction)

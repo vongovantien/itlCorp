@@ -12,7 +12,7 @@ import { DataService } from '@services';
 import { RoutingConstants, SystemConstants } from '@constants';
 
 import { AirImportHBLFormCreateComponent } from '../components/form-create-house-bill-air-import/form-create-house-bill-air-import.component';
-import { ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBusinessArrivalNoteAirComponent, getTransactionPermission, IShareBussinessState, TransactionGetDetailAction } from '@share-bussiness';
+import { ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBusinessArrivalNoteAirComponent, getTransactionPermission, IShareBussinessState, TransactionGetDetailAction, getTransactionState, ITransactionState } from '@share-bussiness';
 
 import { forkJoin, merge, of } from 'rxjs';
 import _merge from 'lodash/merge';
@@ -40,6 +40,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     isImport: boolean = false;
 
     activeTab: string = 'hawb';
+    shipmentType: string;
 
     constructor(
         protected _activedRoute: ActivatedRoute,
@@ -67,7 +68,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                     this.gotoList();
                 }
             });
-
         this.listenShortcutSaveHawb();
     }
 
@@ -107,6 +107,13 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
+        this._store.select(getTransactionState)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
+            (res: ITransactionState) => {
+                this.shipmentType = res.cstransaction.shipmentType;
+            }
+        );
         const formData = {
             customerId: form.customer,
             notifyPartyId: form.notifyId,
@@ -122,6 +129,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
             grossWeight: form.gw,
             finalPOD: form.finalPod,
+            shipmentType: this.shipmentType,
         };
 
         const houseBill = new HouseBill(_merge(form, formData));

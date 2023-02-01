@@ -1,12 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
-import { CatalogueRepo } from 'src/app/shared/repositories';
+import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { CatChargeToAddOrUpdate } from 'src/app/shared/models/catalogue/catChargeToAddOrUpdate.model';
 import { Observable } from 'rxjs';
-import { Charge, ChartOfAccounts } from '@models';
+import { Charge, ChartOfAccounts, Office } from '@models';
 import { CommonEnum } from '@enums';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'form-add-charge',
@@ -34,6 +35,7 @@ export class FormAddChargeComponent extends AppForm {
     active: AbstractControl;
     generateSelling: AbstractControl;
     mode: AbstractControl;
+    offices: AbstractControl;
 
     ngDataUnit: any = [];
     ngDataCurrentcyUnit: any = [];
@@ -66,6 +68,7 @@ export class FormAddChargeComponent extends AppForm {
 
     debitCharges: Observable<Charge[]>;
     creditCharges: Observable<Charge[]>;
+    listOffices: Observable<Office[]>;
 
     modes: string[] = [
         "INTERNAL", "N.INV"
@@ -73,7 +76,8 @@ export class FormAddChargeComponent extends AppForm {
 
     constructor(
         private _fb: FormBuilder,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _systemRepo: SystemRepo
     ) {
         super();
     }
@@ -85,6 +89,7 @@ export class FormAddChargeComponent extends AppForm {
         this.initForm();
         this.debitCharges = this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.DEBIT });
         this.creditCharges = this._catalogueRepo.getCharges({ active: true, type: CommonEnum.CHARGE_TYPE.CREDIT });
+        this.listOffices = this._systemRepo.queryOffices({ active: true });
     }
 
     initForm() {
@@ -105,6 +110,7 @@ export class FormAddChargeComponent extends AppForm {
             productDept: [],
             mode: [],
             creditCharge: [],
+            offices: [],
 
         });
 
@@ -123,9 +129,12 @@ export class FormAddChargeComponent extends AppForm {
         this.generateSelling = this.formGroup.controls["generateSelling"];
         this.mode = this.formGroup.controls["mode"];
         this.creditCharge = this.formGroup.controls["creditCharge"];
+        this.offices = this.formGroup.controls["offices"];
 
         this.type.valueChanges
-            .subscribe(
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            ).subscribe(
                 (value: any) => {
                     if (!!value && !!value.length) {
                         if (value.toLowerCase() === CommonEnum.CHARGE_TYPE.CREDIT.toLowerCase()) {
@@ -201,7 +210,7 @@ export class FormAddChargeComponent extends AppForm {
             }
         });
         console.log(activeServiceList);
-        
+
         return activeServiceList;
     }
 
@@ -229,7 +238,7 @@ export class FormAddChargeComponent extends AppForm {
             unit: res.charge.unitId,
             mode: res.charge.mode,
             creditCharge: res.charge.creditCharge,
+            offices: res?.charge?.offices?.toLowerCase()?.split(",") || []
         });
-        console.log(this.service);
     }
 }

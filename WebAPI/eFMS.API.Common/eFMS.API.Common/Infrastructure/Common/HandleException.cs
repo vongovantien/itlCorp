@@ -30,7 +30,7 @@ namespace eFMS.API.Common.Infrastructure.Common
             string _username = string.Empty;
             string _token = string.Empty;
 
-            if(context.User.Claims != null && context.User.Claims.Count() > 0)
+            if (context.User.Claims != null && context.User.Claims.Count() > 0)
             {
                 _username = context.User.Claims.Where(x => x.Type == "userName")?.FirstOrDefault().Value;
             }
@@ -56,7 +56,7 @@ namespace eFMS.API.Common.Infrastructure.Common
             LogHelper LogWebHook = new LogHelper();
             LogWebHook.LogWrite("eFMS_Log_Ex", JsonConvert.SerializeObject(log));
 
-            if(!string.IsNullOrEmpty(_webHookUrl))
+            if (!string.IsNullOrEmpty(_webHookUrl))
             {
                 await LogWebHook.PushWebhook(_webHookUrl, log);
             }

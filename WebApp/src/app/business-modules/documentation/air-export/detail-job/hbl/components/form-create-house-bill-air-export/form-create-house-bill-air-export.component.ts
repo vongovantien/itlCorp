@@ -1,33 +1,30 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, FormArray, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
 import { formatCurrency, formatDate } from '@angular/common';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Store } from '@ngrx/store';
 
-import { Customer, User, PortIndex, Currency, CsTransaction, DIM, HouseBill, Warehouse, CsOtherCharge, AirwayBill, CountryModel, Incoterm } from '@models';
-import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
-import { CommonEnum } from '@enums';
-import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
-import { DataService } from '@services';
 import { AppForm } from '@app';
+import { InfoPopupComponent } from '@common';
+import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { AirwayBill, CountryModel, CsOtherCharge, CsTransaction, Currency, Customer, DIM, HouseBill, Incoterm, PortIndex, User, Warehouse } from '@models';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
+import { DataService } from '@services';
 import {
-    IShareBussinessState,
-    getTransactionDetailCsTransactionState,
     getDetailHBlState,
-    getDimensionVolumesState,
-    InitShipmentOtherChargeAction
+    getDimensionVolumesState, getTransactionDetailCsTransactionState, InitShipmentOtherChargeAction, IShareBussinessState
 } from '@share-bussiness';
 import { getCataloguePortLoadingState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
-import { InfoPopupComponent } from '@common';
 import { FormValidators } from '@validators';
 
 import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other-charge/air-export-other-charge.popup';
 
-import { map, tap, takeUntil, catchError, skip, debounceTime, distinctUntilChanged, mergeMap, startWith, shareReplay } from 'rxjs/operators';
-import { Observable, forkJoin } from 'rxjs';
-import _merge from 'lodash/merge';
-import _cloneDeep from 'lodash/cloneDeep';
-import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
+import _cloneDeep from 'lodash/cloneDeep';
+import _merge from 'lodash/merge';
+import { ToastrService } from 'ngx-toastr';
+import { forkJoin, Observable } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, mergeMap, shareReplay, skip, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 
 @Component({
@@ -115,7 +112,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     shipmentDetail: CsTransaction;
     customerName: string;
-
     AA: string = 'As Arranged';
 
     dims: DIM[] = []; // * Dimension details.
@@ -131,7 +127,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     dateTimeModified: string;
     userCreated: string;
     userModified: string;
-
+    hwbnoSeparate: string;
+    shipmentType: string;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -191,8 +188,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 incotermId: shipment.incotermId,
                                 polDescription: shipment.polDescription,
                                 podDescription: shipment.podDescription,
+                                shipmenttype: shipment.shipmentType,
+                                shipmentType: shipment.shipmentType
                             });
-
                             // *  CR 14501
                             if (shipment.isHawb) {
                                 const valueDefaultFromShipment = {
@@ -393,7 +391,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             originBlnumber: [],
             wtorValpayment: [this.wts[0]],
             otherPayment: [this.wts[0]],
-            shipmenttype: ['Freehand'],
+            shipmenttype: [],
             // * Date
             etd: [],
             eta: [],
@@ -442,6 +440,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.incotermId = this.formCreate.controls["incotermId"];
         this.polDescription = this.formCreate.controls["polDescription"];
         this.podDescription = this.formCreate.controls["podDescription"];
+        // this.shipmentType = this.shipmenttype.value;
 
         // this.formCreate.get('dimensionDetails')
         //     .valueChanges
@@ -454,20 +453,20 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         //     });
 
         this.freightPayment.valueChanges
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (c: string) => {
-                if (!!c) {
-                    if (c === "Prepaid") {
-                        this.wtorValpayment.setValue(this.wts[0]);
-                    } else if (c === "Collect") {
-                        this.wtorValpayment.setValue(this.wts[1]);
-                    } else {
-                        this.wtorValpayment.setValue(this.wts[0]);
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (c: string) => {
+                    if (!!c) {
+                        if (c === "Prepaid") {
+                            this.wtorValpayment.setValue(this.wts[0]);
+                        } else if (c === "Collect") {
+                            this.wtorValpayment.setValue(this.wts[1]);
+                        } else {
+                            this.wtorValpayment.setValue(this.wts[0]);
+                        }
                     }
                 }
-            }
-        );
+            );
         this.onWTVALChange();
         this.otherPaymentChange();
         this.onRateChargeChange();
@@ -493,7 +492,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
             etd: !!data.etd ? { startDate: new Date(data.etd), endDate: new Date(data.etd) } : null,
             flightDate: !!data.flightDate ? { startDate: new Date(data.flightDate), endDate: new Date(data.flightDate) } : new Date(),
-            hwbno: !!data.hwbno ? data.hwbno : null,
+            hwbno: !!this.hwbnoSeparate ? this.hwbnoSeparate : (!!data.hwbno ? data.hwbno : null),
             shipmenttype: data.shipmentType,
             hbltype: data.hbltype,
             freightPayment: data.freightPayment,
@@ -503,7 +502,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             currencyId: data.currencyId,
             flightNo: data.flightNo,
             rclass: data.rclass,
-
             dimensionDetails: []
         };
         if (isImport) {
@@ -635,7 +633,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             this.totalHeightWeight = this.updateTotalHeightWeight(dims);
             this.totalCBM = this.updateCBM(dims);
             this.totalPCS = this.updatePCS(dims);
-        }else{
+        } else {
             this.totalCBM = null;
             this.totalPCS = null;
         }
@@ -813,9 +811,9 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.otherCharges = data.charges;
     }
 
-    getSalesmanList(selectedShipmentType: any){
-        this.shipmenttype.setValue(selectedShipmentType); 
-        if(!!this.customerId.value){
+    getSalesmanList(selectedShipmentType: any) {
+        this.shipmenttype.setValue(selectedShipmentType);
+        if (!!this.customerId.value) {
             this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.AE_CODE, this.shipmenttype.value)
                 .subscribe(
                     (res: any) => {
@@ -835,6 +833,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                         }
                     }
                 );
-        }           
+        }
     }
 }

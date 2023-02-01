@@ -40,8 +40,6 @@ export abstract class AppForm extends AppPage {
         typeButton: ButtonType.save,
     };
 
-    accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
-
     digitDecimal: number = 5;
 
     confirmCancelFormText: string = "All entered data will be discarded, <br>Are you sure you want to leave?";

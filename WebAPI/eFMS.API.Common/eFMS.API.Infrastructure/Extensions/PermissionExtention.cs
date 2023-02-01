@@ -57,24 +57,24 @@ namespace eFMS.API.Infrastructure.Extensions
                     }
                     break;
                 case PermissionRange.Group:
-                    if (model.GroupId == currentUser.GroupId 
-                        && model.DepartmentId == currentUser.DepartmentId 
-                        && model.OfficeId == currentUser.OfficeID 
+                    if (model.GroupId == currentUser.GroupId
+                        && model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
                         && model.CompanyId == currentUser.CompanyID)
                     {
                         code = 200;
                     }
                     break;
                 case PermissionRange.Department:
-                    if (model.DepartmentId == currentUser.DepartmentId 
-                        && model.OfficeId == currentUser.OfficeID 
+                    if (model.DepartmentId == currentUser.DepartmentId
+                        && model.OfficeId == currentUser.OfficeID
                         && model.CompanyId == currentUser.CompanyID)
                     {
                         code = 200;
                     }
                     break;
                 case PermissionRange.Office:
-                    if (model.OfficeId == currentUser.OfficeID 
+                    if (model.OfficeId == currentUser.OfficeID
                         && model.CompanyId == currentUser.CompanyID)
                     {
                         code = 200;
@@ -85,7 +85,7 @@ namespace eFMS.API.Infrastructure.Extensions
                     {
                         code = 200;
                     }
-                    break;                
+                    break;
             }
             return code;
         }

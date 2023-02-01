@@ -3,12 +3,13 @@ import { AppPage } from '@app';
 import { ReportPreviewComponent } from '@common';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
-import { CsTransactionDetail } from '@models';
-import { DocumentationRepo, ExportRepo } from '@repositories';
+import { Crystal, CsTransactionDetail } from '@models';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { concatMap, mergeMap, catchError, switchMap, takeUntil } from 'rxjs/operators';
 import { SystemConstants } from '@constants';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-menu-preview-hbl-sea-import',
@@ -25,13 +26,14 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
     constructor(private readonly _toastService: ToastrService,
         private readonly _cd: ChangeDetectorRef,
         private readonly _documentationRepo: DocumentationRepo,
-        private readonly _exportRepository: ExportRepo) {
+        private readonly _exportRepository: ExportRepo,
+        private _fileMngtRepo: SystemFileManageRepo) {
         super();
     }
 
     ngOnInit(): void { }
 
-    renderAndShowReport() {
+    renderAndShowReport(templateCode: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -43,6 +45,42 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
             });
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepository.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.hblDetail.jobId,
+                            hblId: this.hblDetail.id,
+                            templateCode: templateCode,
+                            transactionType: this.hblDetail.transactionType
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 
     @delayTime(1000)
@@ -57,8 +95,9 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
         this.isClickSubMenu = false;
         this._toastService.clear();
         // Preview Delivery Order
-        if (type === 'DELIVERY_ORDER') {
-            this.previewDeliveryOrder();
+        if (type === 'DELIVERY_ORDER' || type === 'DELIVERY_ORDER_EN') {
+            const language = type === 'DELIVERY_ORDER_EN' ? 'EN': ''
+            this.previewDeliveryOrder(this.hblDetail.id, language);
         }
 
         // Preview Arrival Notice
@@ -103,7 +142,7 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                 (res: any) => {
                     if (!!res) {
                         this.dataReport = res;
-                        this.renderAndShowReport();
+                        this.renderAndShowReport("POD");
                     }
                 },
             );
@@ -130,7 +169,7 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                     if (!!res) {
                         this.dataReport = res;
                         if (this.dataReport.dataSource?.length > 0) {
-                            this.renderAndShowReport();
+                            this.renderAndShowReport("AN");
                         } else {
                             this._toastService.warning('There is no data charge to display preview');
                         }
@@ -139,10 +178,10 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
             );
     }
 
-    previewDeliveryOrder() {
+    previewDeliveryOrder(hblId: string, language: string) {
         this._documentationRepo.validateCheckPointContractPartner({
             partnerId: this.hblDetail.customerId,
-            hblId: this.hblDetail.id,
+            hblId: hblId,
             salesmanId: this.hblDetail.saleManId,
             settlementCode: null,
             transactionType: 'DOC',
@@ -151,7 +190,7 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
-                        return this._documentationRepo.previewDeliveryOrder(this.hblDetail.id);
+                        return this._documentationRepo.previewDeliveryOrder(hblId, language);
                     }
                     this._toastService.warning(res.message);
                     return of(false);
@@ -161,7 +200,7 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                     if (!!res) {
                         this.dataReport = res;
                         if (this.dataReport.dataSource?.length > 0) {
-                            this.renderAndShowReport();
+                            this.renderAndShowReport("DO");
                         } else {
                             this._toastService.warning('There is no container data to display preview');
                         }
@@ -184,15 +223,22 @@ export class ShareSeaServiceMenuPreviewHBLSeaImportComponent extends AppPage imp
                     if (res.status) {
                         return this._exportRepository.exportDangerousGoods(this.hblDetail.id);
                     }
-                    this._toastService.warning(res.message);
-                    return of(false);
-                })
+                    return of(res);
+                }),
+                catchError((res) => {
+                    return of(null);
+                }),
             ).subscribe(
                 (res: any) => {
-                    if (!!res) {
+                    if (!!res && res.status === 204) {
+                        this._toastService.error("Shipment has no container list, cannot preview Dangerous Goods template!");
+                        return;
+                    } else if ((res as HttpResponse<any>).status && !!res.message) {
+                        this._toastService.warning(res.message);
+                    } else {
                         this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                     }
-                },
+                }
             );
     }
 

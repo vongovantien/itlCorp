@@ -155,10 +155,8 @@
 
 <add-hbl-to-manifest-popup-share (onAdd)="onAdd()"></add-hbl-to-manifest-popup-share>
 
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
-
 <confirm-popup [body]="'All manually entered data will be refresh. Are you sure you want to perform this action?'"
     [labelCancel]="'No'" (onSubmit)="onRefresh()">
 </confirm-popup>
+
+<ng-container inject></ng-container>

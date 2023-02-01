@@ -1,16 +1,18 @@
-import { style } from '@angular/animations';
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { AppList } from 'src/app/app.list';
-import { OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { SortService } from 'src/app/shared/services';
+import { ConfirmPopupComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
+import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
+import { getCurrentUserState, IAppState } from '@store';
+import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { AppList } from 'src/app/app.list';
 import { Stage } from 'src/app/shared/models';
+import { DocumentationRepo, OperationRepo } from 'src/app/shared/repositories';
+import { SortService } from 'src/app/shared/services';
 import { ShareBusinessAssignStagePopupComponent } from '../stage-management/assign-stage/assign-stage.popup';
 import { ShareBusinessStageManagementDetailComponent } from '../stage-management/detail/detail-stage-popup.component';
-import { ToastrService } from 'ngx-toastr';
-import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 @Component({
     selector: 'share-assignment',
@@ -20,16 +22,17 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 
 export class ShareBusinessAsignmentComponent extends AppList {
 
-    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(ShareBusinessStageManagementDetailComponent) popupDetail: ShareBusinessStageManagementDetailComponent;
     @ViewChild(ShareBusinessAssignStagePopupComponent) assignStagePopup: ShareBusinessAssignStagePopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) confirmContainerRef: InjectViewContainerRefDirective;
+
     data: any = null;
     jobId: string = '';
     stages: Stage[] = [];
     stageAvailable: any[] = [];
     selectedStage: Stage = null;
     currentStages: Stage[] = [];
-
+    currentUser: any;
 
     timeOutSearch: any;
     headers: CommonInterface.IHeaderTable[];
@@ -40,22 +43,22 @@ export class ShareBusinessAsignmentComponent extends AppList {
         private _sortService: SortService,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _store: Store<IAppState>
 
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
         this.headers = [
-            { title: 'Action', field: 'status' },
-            { title: 'No', field: 'orderNumberProcessed' },
+            { title: 'Action', field: 'status', width: 10 },
+            { title: 'No', field: 'orderNumberProcessed', width: 20 },
             { title: 'Person Incharge', field: 'mainPersonInCharge', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
             { title: 'Code', field: 'stageCode', sortable: true },
             { title: 'Name', field: 'stageNameEN', sortable: true },
             { title: 'Description', field: 'description', sortable: true },
+            { title: 'House Bill', field: 'hblno', sortable: true },
             { title: 'Role', field: 'departmentName', sortable: true },
-
-            { title: 'Process Time', field: 'processTime', sortable: true },
             { title: 'Deadline Date', field: 'deadline', sortable: true },
             { title: 'Finish Date', field: 'doneDate', sortable: true },
         ];
@@ -74,8 +77,15 @@ export class ShareBusinessAsignmentComponent extends AppList {
 
             }
         });
-    }
 
+        this._store.select(getCurrentUserState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((res) => {
+                this.currentUser = res
+            })
+    }
 
     getCSTransactionDetails(id: any) {
         this._progressRef.start();
@@ -92,7 +102,7 @@ export class ShareBusinessAsignmentComponent extends AppList {
 
     openPopUpAssignStage() {
         this.assignStagePopup.jobId = this.jobId;
-        this.assignStagePopup.isAsignment = true;
+        this.assignStagePopup.isAssignment = true;
         this.assignStagePopup.show();
     }
 
@@ -111,7 +121,6 @@ export class ShareBusinessAsignmentComponent extends AppList {
                 } else {
                     this.stages = this._sortService.sort(res.map((item: any) => new Stage(item)), 'orderNumberProcessed', true);
                     this.currentStages = this.stages;
-                    console.log(this.currentStages);
                 }
             },
         );
@@ -132,16 +141,15 @@ export class ShareBusinessAsignmentComponent extends AppList {
         );
     }
 
-    showDeletePopup(data: any) {
-        this.confirmDeletePopup.show();
+    onDeleteStage(data: any) {
         this.selectedStage = data;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+            body: 'Do you want to delete this stage ?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.deleteStageAssigned(this.selectedStage.id);
+        })
     }
-
-    onDeleteStage() {
-        this.confirmDeletePopup.hide();
-        this.deleteStageAssigned(this.selectedStage.id);
-    }
-
 
     deleteStageAssigned(id: string) {
         this.isLoading = true;
@@ -172,6 +180,7 @@ export class ShareBusinessAsignmentComponent extends AppList {
 
                 } else {
                     this.selectedStage = new Stage(res);
+                    this.popupDetail.getHblList(this.jobId);
                     this.openPopupDetail();
                 }
             },

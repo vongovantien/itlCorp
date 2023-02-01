@@ -212,7 +212,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 // this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
             } else {
                 const chargeIds: string[] = charges.map(x => x.id);
-                this.surcharges = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) === -1 && (x.id === SystemConstants.EMPTY_GUID || chargeIds.indexOf(x.id) === -1))  && !x.isFromShipment && x.hasNotSynce);
+                this.surcharges = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) === -1 && (x.id === SystemConstants.EMPTY_GUID || chargeIds.indexOf(x.id) === -1))
+                    && !x.isFromShipment && x.hasNotSynce && !x.hadIssued && !x.chargeAutoRated && !x.linkChargeId);
             }
 
             this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment, ...surchargeHasSynced];
@@ -254,12 +255,12 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 this._toastService.warning('Charge already synced');
                 return;
             }
-            if(!surcharge.isFromShipment && surcharge.hadIssued){
+            if (!surcharge.isFromShipment && surcharge.hadIssued) {
                 this._toastService.warning('Charge had issued Soa/CdNote');
                 return;
             }
 
-            if(surcharge.chargeAutoRated){
+            if (surcharge.chargeAutoRated) {
                 this._toastService.warning('Charge had autorate charge');
                 return;
             }
@@ -505,12 +506,12 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.existingChargePopup.settlementCode = this.settlementCode || null;
             this.existingChargePopup.show();
         } else {
-            if(charge.hadIssued){
+            if (charge.hadIssued) {
                 this._toastService.warning('Charge had issued Soa/CdNote');
                 return;
             }
 
-            if(charge.chargeAutoRated){
+            if (charge.chargeAutoRated) {
                 this._toastService.warning('Charge had autorate charge');
                 return;
             }
@@ -564,8 +565,9 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     } else {
                         this.tableListChargePopup.getAdvances(shipment.jobId, shipment.hblid, !!charge.advanceNo);
                     }
+                    this.tableListChargePopup.getMasterCharges(shipment.officeId, shipment.service);
 
-                    const selectedCD = this.tableListChargePopup.cds.find(x => x.clearanceNo === surcharges[0].clearanceNo);
+                    const selectedCD = (this.tableListChargePopup.cds || []).find(x => x.clearanceNo === surcharges[0].clearanceNo);
                     if (!!selectedCD) {
                         this.tableListChargePopup.selectedCD = selectedCD;
                     }

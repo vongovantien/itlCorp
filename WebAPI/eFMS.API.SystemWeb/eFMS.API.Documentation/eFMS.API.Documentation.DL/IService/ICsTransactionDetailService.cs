@@ -20,12 +20,13 @@ namespace eFMS.API.Documentation.DL.IService
 
         List<CsTransactionDetailModel> GetByJob(CsTransactionDetailCriteria criteria);
         HandleState AddTransactionDetail(CsTransactionDetailModel model);
-        HandleState UpdateTransactionDetail(CsTransactionDetailModel model);
+        Task<HandleState> UpdateTransactionDetail(CsTransactionDetailModel model);
         string GenerateHBLNo(TransactionTypeEnum transactionTypeEnum);
         HandleState DeleteTransactionDetail(Guid hbId, out List<ObjectReceivableModel> receivables);
         //CsTransactionDetailReport GetReportBy(Guid jobId);
         List<CsTransactionDetailModel> Query(CsTransactionDetailCriteria criteria);
-        
+        Task<IQueryable<CsTransactionDetailModel>> QueryData(CsTransactionDetailCriteria criteria);
+
         IQueryable<CsTransactionDetail> GetHouseBill(string transactionType, CsTransaction shipment = null);
 
         IQueryable<CsTransactionDetailModel> GetListHouseBillAscHBL(CsTransactionDetailCriteria criteria);
@@ -52,7 +53,9 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewHouseAirwayBillLastest(Guid hblId, string reportType);
 
         Crystal PreviewAirAttachList(Guid hblId);
-        Crystal PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign);
+
+        Crystal PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign, string language);
+        
         Crystal PreviewAirImptAuthorisedLetterConsign(Guid housbillId, bool printSign);
 
         CsTransactionDetailModel GetDetails(Guid id);
@@ -69,5 +72,6 @@ namespace eFMS.API.Documentation.DL.IService
         void SendEmailNewHouseToSales(CsTransactionDetail transDetail);
         Task<HandleState> UpdateFlightInfo(Guid Id);
         List<object> GetHAWBListOfShipment(Guid jobId, Guid? hblId);
+
     }
 }

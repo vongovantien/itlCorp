@@ -1,24 +1,24 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router, Params } from '@angular/router';
-import { Store, ActionsSubject } from '@ngrx/store';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { DocumentationRepo, CatalogueRepo } from '@repositories';
 import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent } from '@common';
-import { CsTransactionDetail, HouseBill } from '@models';
-import { ChargeConstants, RoutingConstants } from '@constants';
-import { DataService } from '@services';
-import { ICrystalReport } from '@interfaces';
+import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
 import { delayTime } from '@decorators';
+import { ICrystalReport } from '@interfaces';
+import { Crystal, CsTransactionDetail, HouseBill } from '@models';
+import { CatalogueRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
+import { DataService } from '@services';
 
-import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
+import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { skip, catchError, takeUntil, switchMap } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
-import { of, throwError } from 'rxjs';
 import { formatDate } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { of, throwError } from 'rxjs';
+import { catchError, concatMap, mergeMap, skip, switchMap, takeUntil } from 'rxjs/operators';
+import isUUID from 'validator/lib/isUUID';
 
 
 enum HBL_TAB {
@@ -36,7 +36,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     hblId: string;
     hblDetail: any;
-
+    shipmentType: string;
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
     checkPointPreview;
@@ -49,7 +49,9 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         protected _toastService: ToastrService,
         protected _actionStoreSubject: ActionsSubject,
         protected _router: Router,
-        protected _datService: DataService
+        protected _datService: DataService,
+        private _exportRepo: ExportRepo,
+        private _fileMngtRepo: SystemFileManageRepo
 
     ) {
         super(
@@ -124,7 +126,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 this.saveHBL();
                 break;
 
-            // * Update Arrival Note.    
+            // * Update Arrival Note.
             case HBL_TAB.ARRIVAL: {
                 this.arrivalNoteComponent.isSubmitted = true;
                 if (!this.arrivalNoteComponent.checkValidate()) {
@@ -258,43 +260,18 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             );
     }
 
-    preview(reportType: string) {
-        this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
-            .pipe(
-                switchMap((res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        return this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType);
-                    }
-                    this._toastService.warning(res.message);
-                    return of(false)
-                })
-            ).subscribe(
-                (res: any) => {
-                    if (res !== false) {
-                        if (res?.dataSource?.length > 0) {
-                            this.dataReport = res;
-                            this.renderAndShowReport();
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
-                        }
-                    }
-
-                },
-            );
-    }
-
     onSelectTab(tabName: HBL_TAB | string) {
         this.selectedTab = tabName;
         // TODO SHOULD DISPATCH HBL DETAIL ?.
         // this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
     }
 
-    previewArrivalNotice(_currency: string) {
+    previewArrivalNotice(_currency: string, _language: string) {
         this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
-                        return this._documentationRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: _currency });
+                        return this._documentationRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: _currency, language: _language });
                     }
                     this._toastService.warning(res.message);
                     return of(false)
@@ -304,7 +281,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport("AN");
                         } else {
                             this._toastService.warning('There is no data charge to display preview');
                         }
@@ -313,8 +290,12 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 },
             );
     }
+
     showPreviewSignature(type: string, withSign: boolean) {
         this.isClickSubMenu = false;
+        if (type === 'AUTHORIZE_LETTER_EN') {
+            this.previewAuthorizeLetter1(withSign, "EN");
+        }
         if (type === 'AUTHORIZE_LETTER1') {
             this.previewAuthorizeLetter1(withSign);
         }
@@ -325,9 +306,10 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     onPreview(type: string) {
         this.isClickSubMenu = false;
-        if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND') {
+        if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND' || type === 'ARRIVAL_ORIGINAL_EN') {
             const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
-            this.previewArrivalNotice(_currency);
+            const _language = type === 'ARRIVAL_ORIGINAL_EN' ? 'EN' : '';
+            this.previewArrivalNotice(_currency, _language);
         }
         if (type === 'PROOF_OF_DELIVERY') {
             this.previewProofOfDelivery();
@@ -359,7 +341,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport("AL");
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -367,12 +349,12 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 },
             );
     }
-    previewAuthorizeLetter1(withSign: boolean) {
+    previewAuthorizeLetter1(withSign: boolean, language: string = '') {
         this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
-                        return this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId, withSign);
+                        return this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId, withSign, language);
                     }
                     this._toastService.warning(res.message);
                     return of(false)
@@ -382,7 +364,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport("AL");
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -406,7 +388,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport("POD");
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -430,7 +412,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                     if (res !== false) {
                         if (res?.dataSource?.length > 0) {
                             this.dataReport = res;
-                            this.renderAndShowReport();
+                            this.renderAndShowReport('AirDocumentRelease');
                         } else {
                             this._toastService.warning('There is no data to display preview');
                         }
@@ -439,7 +421,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             );
     }
 
-    renderAndShowReport() {
+    renderAndShowReport(templateCode: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -451,6 +433,42 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
             });
+        let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
+            .pipe(
+                concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
+                mergeMap((res: any) => {
+                    if ((res as HttpResponse<any>).status == SystemConstants.HTTP_CODE.OK) {
+                        const body = {
+                            url: (this.dataReport as Crystal).pathReportGenerate || null,
+                            module: 'Document',
+                            folder: 'Shipment',
+                            objectId: this.hblDetail.jobId,
+                            hblId: this.hblDetail.id,
+                            templateCode: templateCode,
+                            transactionType: this.hblDetail.transactionType
+                        };
+                        return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
+                    }
+                    return of(false);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!res) return;
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.success(res.message || "Upload fail");
+                    }
+                },
+                (errors) => {
+                    console.log("error", errors);
+                },
+                () => {
+                    sub.unsubscribe();
+                }
+            );
     }
 
     showCreatepoup() {

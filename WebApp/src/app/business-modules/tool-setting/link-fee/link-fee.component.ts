@@ -1,15 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
+import { catchError, finalize, map } from 'rxjs/operators';
+import { AppList } from 'src/app/app.list';
+import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { RuleLinkFee } from 'src/app/shared/models/tool-setting/rule-link-fee';
 import { SettingRepo } from 'src/app/shared/repositories';
-import { map, catchError, finalize } from 'rxjs/operators';
-import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from 'src/app/shared/services';
-import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
-import { ToastrService } from 'ngx-toastr';
-import { AppList } from 'src/app/app.list';
 import { FormRuleComponent } from './components/form-rule/form-rule.component';
-import { ItemsList } from '@ng-select/ng-select/lib/items-list';
-import { I } from '@angular/cdk/keycodes';
 @Component({
   selector: 'app-link-fee',
   templateUrl: './link-fee.component.html',

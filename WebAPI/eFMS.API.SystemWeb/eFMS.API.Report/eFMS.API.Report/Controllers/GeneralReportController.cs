@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.IO;
 using System.Threading.Tasks;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Report.DL.Common;
 using eFMS.API.Report.DL.IService;
 using eFMS.API.Report.DL.Models;
+using eFMS.API.Report.Helpers;
 using eFMS.API.Report.Infrastructure.Middlewares;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace eFMS.API.Report.Controllers
 {
@@ -14,7 +16,7 @@ namespace eFMS.API.Report.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class GeneralReportController : ControllerBase
+    public class GeneralReportController : Controller
     {
         private IGeneralReportService generalReportService;
         public GeneralReportController(IGeneralReportService generalReport)
@@ -59,6 +61,118 @@ namespace eFMS.API.Report.Controllers
             var data = generalReportService.GetDataGeneralExportShipmentOverviewLCL(criteria);
             var result = data;
             return Ok(result);
+        }
+
+        [Route("ExportShipmentOverview")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportShipmentOverview(GeneralReportCriteria criteria)
+        {
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ReportConstants.Shipment_Overview,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ReportConstants.Export_Excel
+            };
+            #endregion -- Ghi Log Report --
+
+            var data = generalReportService.GetDataGeneralExportShipmentOverview(criteria);
+            if (data == null)
+            {
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
+            }
+
+            var stream = new ReportHelper().GenerateShipmentOverviewExcel(data, criteria, null);
+            if (stream == null)
+            {
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, "Shipment Overview");
+            HeaderResponse(fileContent.FileDownloadName);
+            return fileContent;
+        }
+
+        [Route("ExportShipmentOverviewWithType")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportShipmentOverviewWithType(GeneralReportCriteria criteria, string reportType)
+        {
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ReportConstants.Shipment_Overview,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ReportConstants.Export_Excel
+            };
+            #endregion -- Ghi Log Report --
+            
+            Stream stream;
+            if (reportType == "FCL")
+            {
+                var data = generalReportService.GetDataGeneralExportShipmentOverviewFCL(criteria);
+                if (data == null)
+                {
+                    return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
+                }
+
+                stream = new ReportHelper().GenerateShipmentOverviewFCLExcell(data, criteria);
+            }
+            else
+            {
+                var data = generalReportService.GetDataGeneralExportShipmentOverviewLCL(criteria);
+                if (data == null)
+                {
+                    return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
+                }
+                stream = new ReportHelper().BidingGeneralLCLExport(data, criteria, "ShipmentOverviewLCL");
+            }
+
+            if (stream == null)
+            {
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
+            }
+
+            var downloadName = reportType == "FCL" ? "Shipment Overview FCL" : "Shipment Overview-LCL";
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, downloadName);
+            HeaderResponse(fileContent.FileDownloadName);
+            return fileContent;
+        }
+
+        [Route("ExportStandardGeneralReport")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportStandardGeneralReport(GeneralReportCriteria criteria)
+        {
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ReportConstants.Standard_Report,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ReportConstants.Export_Excel
+            };
+            #endregion -- Ghi Log Report --
+
+            var data = generalReportService.QueryDataGeneralReport(criteria);
+            if (data == null)
+            {
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
+            }
+
+            var stream = new ReportHelper().GenerateStandardGeneralReportExcel(data, criteria, null);
+            if (stream == null)
+            {
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, "Standard Report" + criteria.Currency);
+            HeaderResponse(fileContent.FileDownloadName);
+            return fileContent;
+        }
+
+        private void HeaderResponse(string fileName)
+        {
+            Response.Headers.Add("efms-file-name", fileName);
+            Response.Headers.Add("Access-Control-Expose-Headers", "efms-file-name");
         }
     }
 }

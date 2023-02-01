@@ -196,7 +196,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
             }
             int count = 0;
-            var cdCode = GetCdNoteToGenerateCode(office, code)?.Code;
+            var cdCode = GetCdNoteToGenerateCode(office, code, typeCDNote)?.Code;
             if (cdCode != null)
             {
                 cdCode = cdCode.Substring(code.Length + 4, 5);
@@ -206,33 +206,30 @@ namespace eFMS.API.Documentation.DL.Services
             return code;
         }
 
-        private AcctCdnote GetCdNoteToGenerateCode(SysOffice office, string code)
+        private AcctCdnote GetCdNoteToGenerateCode(SysOffice office, string code, string type)
         {
             AcctCdnote currentCdNote = null;
             var currentCdNotes = DataContext.Get(x => x.Code.StartsWith(code)
+                                                    && x.Type == type
+                                                    && x.OfficeId == office.Id
                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                     && x.DatetimeCreated.Value.Year == DateTime.Now.Year)
                                                     .OrderByDescending(x => x.DatetimeCreated);
-            if (office != null)
+            switch (office.Code)
             {
-                if (office.Code == "ITLHAN")
-                {
+                case "ITLHAN":
                     currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault(); //CR: HAN -> H [15202]
-                }
-                else if (office.Code == "ITLDAD")
-                {
+                    break;
+                case "ITLDAD":
                     currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")).FirstOrDefault(); //CR: DAD -> D [15202]
-                }
-                else
-                {
+                    break;
+                case "ITLCAM":
+                    currentCdNote = currentCdNotes.Where(x => x.Code.StartsWith("C") && !x.Code.StartsWith("CAM-")).FirstOrDefault(); //CR: DAD -> D [15202]
+                    break;
+                default:
                     currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")
                                                            && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault();
-                }
-            }
-            else
-            {
-                currentCdNote = currentCdNotes.Where(x => !x.Code.StartsWith("D") && !x.Code.StartsWith("DAD-")
-                                                       && !x.Code.StartsWith("H") && !x.Code.StartsWith("HAN-")).FirstOrDefault();
+                    break;
             }
             return currentCdNote;
         }
@@ -240,16 +237,19 @@ namespace eFMS.API.Documentation.DL.Services
         private string SetPrefixJobIdByOfficeCode(string officeCode)
         {
             string prefixCode = string.Empty;
-            if (!string.IsNullOrEmpty(officeCode))
+            switch (officeCode)
             {
-                if (officeCode == "ITLHAN")
-                {
+                case "ITLHAN":
                     prefixCode = "H"; //HAN- >> H
-                }
-                else if (officeCode == "ITLDAD")
-                {
-                    prefixCode = "D"; //DAD- >> D
-                }
+                    break;
+                case "ITLDAD":
+                    prefixCode = "D"; //HAN- >> H
+                    break;
+                case "ITLCAM":
+                    prefixCode = "C"; //HAN- >> H
+                    break;
+                default:
+                    break;
             }
             return prefixCode;
         }
@@ -383,10 +383,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
 
-                        if (hasPrepaid)
-                        {
-                            model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
-                        } else
+                        if(!hasPrepaid)
                         {
                             foreach (var item in dataGrpPartners)
                             {
@@ -401,6 +398,11 @@ namespace eFMS.API.Documentation.DL.Services
                                     break;
                                 }
                             }
+                        }
+
+                        if (hasPrepaid)
+                        {
+                            model.Status = DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
                         }
                     }
                 }
@@ -502,10 +504,10 @@ namespace eFMS.API.Documentation.DL.Services
                         trans.Dispose();
                     }
                 }
-                if (model.Type == "CREDIT" && hsSc.Success) // Add new Credit AR
-                {
-                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Add");
-                }
+                //if (model.Type == "CREDIT" && hsSc.Success) // Add new Credit AR
+                //{
+                //    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Add");
+                //}
                 return hs;
             }
             catch (Exception ex)
@@ -761,14 +763,14 @@ namespace eFMS.API.Documentation.DL.Services
                     //    UpdateCombineBilling(cdNote.CombineBillingNo);
                     //}
                 }
-                if (model.Type == "CREDIT" && hsSurSc.Success) // Update Credit AR
-                {
-                    // Get all origin data and updated soano data
-                    var hblExcept = surchargesCDNote.Select(x => x.Id).ToList();
-                    surchargeUpdate = surchargeUpdate.Where(x => !hblExcept.Any(z => z == x.Id)).ToList();
-                    surchargesCDNote.AddRange(surchargeUpdate);
-                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Update");
-                }
+                //if (model.Type == "CREDIT" && hsSurSc.Success) // Update Credit AR
+                //{
+                //    // Get all origin data and updated soano data
+                //    var hblExcept = surchargesCDNote.Select(x => x.Id).ToList();
+                //    surchargeUpdate = surchargeUpdate.Where(x => !hblExcept.Any(z => z == x.Id)).ToList();
+                //    surchargesCDNote.AddRange(surchargeUpdate);
+                //    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Update");
+                //}
                 return hs;
             }
             catch (Exception ex)
@@ -859,6 +861,7 @@ namespace eFMS.API.Documentation.DL.Services
                         cdNote.SyncStatus = cdNote.SyncStatus;
                         cdNote.LastSyncDate = cdNote.LastSyncDate;
                         cdNote.TransactionTypeEnum = DataTypeEx.GetEnumType(listCharges.FirstOrDefault()?.TransactionType);
+                        cdNote.Hblid = chargesOfCDNote?.FirstOrDefault().Hblid;
                         listCDNote.Add(cdNote);
                     }
 
@@ -1225,7 +1228,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if (string.IsNullOrEmpty(cdNo))
             {
-                cdNoteDetails.CDNote.Code = string.Join(';', cdNoList);
+                cdNoteDetails.CDNote.Code = string.Join('-', cdNoList);
             }
             cdNoteDetails.ProductService = opsTransaction?.ProductService;
             cdNoteDetails.ServiceMode = opsTransaction?.ServiceMode;
@@ -1369,10 +1372,10 @@ namespace eFMS.API.Documentation.DL.Services
                         //    }
                         //}
                         // Delete credit AR
-                        if (cdNote.Type == "CREDIT" && hsSur.Success)
-                        {
-                            UpdateAcctCreditManagement(surchargeUpdate, cdNote.Code, cdNote.CurrencyId, cdNote.ExcRateUsdToLocal, cdNote.PartnerId, "Delete");
-                        }
+                        //if (cdNote.Type == "CREDIT" && hsSur.Success)
+                        //{
+                        //    //UpdateAcctCreditManagement(surchargeUpdate, cdNote.Code, cdNote.CurrencyId, cdNote.ExcRateUsdToLocal, cdNote.PartnerId, "Delete");
+                        //}
                     }
                 }
 
@@ -1396,7 +1399,7 @@ namespace eFMS.API.Documentation.DL.Services
             var firstAcctCDNote = acctCdNoteList.FirstOrDefault();
             var cdNoteDetail = DataContext.Get(x => x.Id == firstAcctCDNote.Id);
             model.CDNote = mapper.Map<AcctCdnote>(firstAcctCDNote);
-            model.CDNote.Code = string.Join(";", acctCdNoteList.Select(x => x.Code));
+            model.CDNote.Code = string.Join("-", acctCdNoteList.Select(x => x.Code));
             var opsTransaction = opstransRepository.Get(x => x.Id == firstAcctCDNote.JobId).FirstOrDefault();
             if (opsTransaction == null)
             {
@@ -1656,6 +1659,14 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = model.CDNote.Code + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(listSOA);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -1860,8 +1871,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "LogisticCDNotePreviewNew" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(criteria.ExportFormatType);
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = criteria.CreditDebitNo + CrystalEx.GetExtension(criteria.ExportFormatType);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
@@ -2175,8 +2186,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaDebitAgentsNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + CrystalEx.GetExtension(format);
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = data.CDNote.Code+ CrystalEx.GetExtension(format);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
@@ -2473,8 +2484,8 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirShipperDebitNewVND" + DateTime.Now.ToString("ddMMyyHHssmm") + StringHelper.RandomString(4) + CrystalEx.GetExtension(format);
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
+            var reportName = data.CDNote.Code + CrystalEx.GetExtension(format);
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);

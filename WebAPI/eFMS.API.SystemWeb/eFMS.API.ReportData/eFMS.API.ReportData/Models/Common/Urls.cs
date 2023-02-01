@@ -67,6 +67,7 @@
             public const string GetDataCombineOpsByPartnerUrl = "/api/v1/en-US/AcctCombineBilling/GetDataExportCombineOpsByPartner";
             public const string GetDataCombineShipmentByPartnerUrl = "/api/v1/en-US/AcctCombineBilling/GetDataCombineShipmentByPartner";
             public const string UploadFileExcel = "/api/v1/en-US/AWSS3/UploadFilePreview/Accounting/";
+            public const string UploadFileEdoc = "/api/v1/en-US/EDoc/PostAttachFileTemplateToEDoc/Accounting/";
 
             public const string APStandartReportUrl = "/api/v1/en-US/AcctPayable/GetDataExportAccountingPayable";
             public const string APAcctTemplateReportUrl = "/api/v1/en-US/AcctPayable/GetDataExportAccountingTemplate";
@@ -77,17 +78,8 @@
             public const string HouseBillDetailUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/GetById?Id=";
             public const string NeutralHawbExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/NeutralHawbExport";
             public const string AirwayBillExportUrl = "/Documentation/api/v1/en-US/CsAirWayBill/AirwayBillExport?jobId=";
-            public const string GetDataShipmentOverviewUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportShipmentOverview";
-            public const string GetDataShipmentOverviewFCLUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportShipmentOverviewFCL";
-            public const string GetDataShipmentOverviewLCLUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportShipmentOverviewLCL";
 
-            public const string GetDataSummaryOfCostsIncurredUrl = "/Documentation/api/v1/en-US/Shipment/GetDataSummaryOfCostsIncurred";
-            public const string GetDataSummaryOfRevenueIncurredUrl = "/Documentation/api/v1/en-US/Shipment/GetDataSummaryOfRevenueIncurred";
-            public const string GetDataSummaryOfCostsPartnerUrl = "/Documentation/api/v1/en-US/Shipment/GetDataCostsByPartner";
-
-            public const string GetDataAccountingPLSheetUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportAccountingPlSheet";
-            public const string GetDataStandardGeneralReportUrl = "/Documentation/api/v1/en-US/Shipment/QueryDataGeneralReport";
-            public const string GetDataJobProfitAnalysisUrl = "/Documentation/api/v1/en-US/Shipment/GetDataJobProfitAnalysis";
+          
             public const string GetDataHousebillDailyExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/GetHousebillsDailyExport?issuedDate=";
 
             public const string GetDataCDNoteExportUrl = "/Documentation/api/v1/en-US/AcctCDNote/ExportOpsCdNote?jobId=";
@@ -115,6 +107,12 @@
             public const string GetDataShipmentOverviewUrl = "/api/v1/en-US/GeneralReport/GetDataExportShipmentOverview";
             public const string GetDataShipmentOverviewFCLUrl = "/api/v1/en-US/GeneralReport/GetDataExportShipmentOverviewFCL";
             public const string GetDataShipmentOverviewLCLUrl = "/api/v1/en-US/GeneralReport/GetDataExportShipmentOverviewLCL";
+            public const string GetDataAccountingPLSheetUrl = "/api/v1/en-US/AccountingReport/GetDataExportAccountingPlSheet";
+            public const string GetDataJobProfitAnalysisUrl = "/api/v1/en-US/AccountingReport/GetDataJobProfitAnalysis";
+            public const string GetDataSummaryOfCostsIncurredUrl = "/api/v1/en-US/AccountingReport/AccountingReport/GetDataSummaryOfCostsIncurred";
+            public const string GetDataSummaryOfRevenueIncurredUrl = "/api/v1/en-US/AccountingReport/AccountingReport/GetDataSummaryOfRevenueIncurred";
+            public const string GetDataSummaryOfCostsPartnerUrl = "/api/v1/en-US/AccountingReport/AccountingReport/GetDataCostsByPartner";
+
         }
     }
 }

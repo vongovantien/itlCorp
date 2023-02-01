@@ -42,5 +42,6 @@ namespace eFMS.API.Operation.Service.ViewModels
         public string ExportCountryName { get; set; }
         public string GatewayName { get; set; }
         public string CustomerName { get; set; }
+        public int UnitCodeId { get; set; }
     }
 }

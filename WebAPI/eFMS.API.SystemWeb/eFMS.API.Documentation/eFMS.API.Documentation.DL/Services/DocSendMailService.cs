@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -17,6 +18,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -671,21 +673,21 @@ namespace eFMS.API.Documentation.DL.Services
                 numOrder += 1;
             }
 
-            if (_housebills == null || _housebills.Count() == 0)
-            {
-                var _content = template.Content;
-                _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                _content = _content.Replace("{{Hwbno}}", string.Empty);
-                _content = _content.Replace("{{FreightPayment}}", string.Empty);
-                _content = _content.Replace("{{Shipper}}", string.Empty);
-                _content = _content.Replace("{{Consignee}}", string.Empty);
-                _content = _content.Replace("{{Qty}}", string.Empty);
-                _content = _content.Replace("{{GW}}", string.Empty + "(KGS)");
-                _content = _content.Replace("{{CW}}", string.Empty + "(KGS)");
-                _content = _content.Replace("{{Incoterm}}", string.Empty);
-                _content = _content.Replace("{{NQGoods}}", string.Empty);
-                contenEmail += _content;
-            }
+            //if (_housebills == null || _housebills.Count() == 0)
+            //{
+            //    var _content = template.Content;
+            //    _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
+            //    _content = _content.Replace("{{Hwbno}}", string.Empty);
+            //    _content = _content.Replace("{{FreightPayment}}", string.Empty);
+            //    _content = _content.Replace("{{Shipper}}", string.Empty);
+            //    _content = _content.Replace("{{Consignee}}", string.Empty);
+            //    _content = _content.Replace("{{Qty}}", string.Empty);
+            //    _content = _content.Replace("{{GW}}", string.Empty + "(KGS)");
+            //    _content = _content.Replace("{{CW}}", string.Empty + "(KGS)");
+            //    _content = _content.Replace("{{Incoterm}}", string.Empty);
+            //    _content = _content.Replace("{{NQGoods}}", string.Empty);
+            //    contenEmail += _content;
+            //}
 
             _body = _body.Replace("{{Content}}", contenEmail);
             _body = _body.Replace("{{PO}}", string.Empty);
@@ -1422,20 +1424,20 @@ namespace eFMS.API.Documentation.DL.Services
                     numOrder += 1;
                 }
 
-                if (_housebills == null || _housebills.Count() == 0)
-                {
-                    var _content = emailTemplate.Content;
-                    _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                    _content = _content.Replace("{{ContainerDetail}}", string.Empty);
-                    _content = _content.Replace("{{Total}}", string.Empty);
-                    _content = _content.Replace("{{GW}}", string.Empty);
-                    _content = _content.Replace("{{CBM}}", string.Empty);
-                    _content = _content.Replace("{{HBL}}", string.Empty);
-                    _content = _content.Replace("{{Shipper}}", string.Empty);
-                    _content = _content.Replace("{{Cnee}}", string.Empty);
-                    _content = _content.Replace("{{Notify}}", string.Empty);
-                    contentEmail += _content;
-                }
+                //if (_housebills == null || _housebills.Count() == 0)
+                //{
+                //    var _content = emailTemplate.Content;
+                //    _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
+                //    _content = _content.Replace("{{ContainerDetail}}", string.Empty);
+                //    _content = _content.Replace("{{Total}}", string.Empty);
+                //    _content = _content.Replace("{{GW}}", string.Empty);
+                //    _content = _content.Replace("{{CBM}}", string.Empty);
+                //    _content = _content.Replace("{{HBL}}", string.Empty);
+                //    _content = _content.Replace("{{Shipper}}", string.Empty);
+                //    _content = _content.Replace("{{Cnee}}", string.Empty);
+                //    _content = _content.Replace("{{Notify}}", string.Empty);
+                //    contentEmail += _content;
+                //}
                 _body = _body.Replace("{{Content}}", contentEmail);
             }
             else
@@ -1499,20 +1501,20 @@ namespace eFMS.API.Documentation.DL.Services
                     contentEmail += _content;
                     numOrder += 1;
                 }
-                if (_housebills == null || _housebills.Count() == 0)
-                {
-                    var _content = emailTemplate.Content;
-                    _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                    _content = _content.Replace("{{ContainerDetail}}", string.Empty);
-                    _content = _content.Replace("{{Total}}", string.Empty);
-                    _content = _content.Replace("{{GW}}", string.Empty);
-                    _content = _content.Replace("{{CBM}}", string.Empty);
-                    _content = _content.Replace("{{HBL}}", string.Empty);
-                    _content = _content.Replace("{{Shipper}}", string.Empty);
-                    _content = _content.Replace("{{Cnee}}", string.Empty);
-                    _content = _content.Replace("{{Notify}}", string.Empty);
-                    contentEmail += _content;
-                }
+                //if (_housebills == null || _housebills.Count() == 0)
+                //{
+                //    var _content = emailTemplate.Content;
+                //    _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
+                //    _content = _content.Replace("{{ContainerDetail}}", string.Empty);
+                //    _content = _content.Replace("{{Total}}", string.Empty);
+                //    _content = _content.Replace("{{GW}}", string.Empty);
+                //    _content = _content.Replace("{{CBM}}", string.Empty);
+                //    _content = _content.Replace("{{HBL}}", string.Empty);
+                //    _content = _content.Replace("{{Shipper}}", string.Empty);
+                //    _content = _content.Replace("{{Cnee}}", string.Empty);
+                //    _content = _content.Replace("{{Notify}}", string.Empty);
+                //    contentEmail += _content;
+                //}
 
                 _body = _body.Replace("{{Content}}", contentEmail);
             }
@@ -1573,7 +1575,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var dtData = ((eFMSDataContext)DataContext.DC).GetViewData<vw_GetDataCustomerContractCashWithOutstandingDebit>();
                 var emailBcc = ((eFMSDataContext)DataContext.DC).ExecuteFuncScalar("[dbo].[fn_GetEmailBcc]");
                 new LogHelper("SendMailContractCashWithOutstandingDebit", "Data : " + JsonConvert.SerializeObject(dtData, Formatting.Indented));
-                var dtGrp = dtData.Where(x => !string.IsNullOrEmpty(x.SaleManId)).GroupBy(x => new
+                var dtGrp = dtData.Where(x => !string.IsNullOrEmpty(x.SaleManId) && x.SalemanName  == "Kenny.Thương").GroupBy(x => new
                 {
                     x.SaleManId
                 });
@@ -1586,7 +1588,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 foreach (var saleman in dtGrp)
                 {
-                    var attachFile = GetAttachExportShipmentOutstandingDebit(saleman.Key.SaleManId).Result;
+                    var fileContent = GetAttachExportShipmentOutstandingDebit(saleman.Key.SaleManId).Result;
                     string body = emailTemplate.Body;
                     body = body.Replace("{{SalemanName}}", saleman.FirstOrDefault().SalemanName);
 
@@ -1615,12 +1617,13 @@ namespace eFMS.API.Documentation.DL.Services
                     var mailTo = new List<string> { saleman.FirstOrDefault().SalemanEmail };
                     var mailCC = saleman.FirstOrDefault().EmailCC.Split(";").ToList();
                     // Bcc
-                    if (saleman.Count() > 0 && attachFile.Status)
+                    if (saleman.Count() > 0)
                     {
                         string email = body + footer;
-
-                        List<string> pathFile = new List<string>() { attachFile.Data.ToString() };
-                        var s = SendMail.Send(subject, email, mailTo, pathFile, mailCC, emailBCCs);
+                        List<EmailAttachment> attachments = new List<EmailAttachment>();
+                        string fileName = string.Format(@"{0} - OustandingDebit-{1}.xlsx", saleman.FirstOrDefault().SalemanName, DateTime.Now.ToString("ddMMyy"));
+                        attachments.Add(new EmailAttachment { Stream = new MemoryStream(fileContent), FileName = fileName });
+                        var s = SendMail.SendFile(subject, email, mailTo, attachments, mailCC, emailBCCs);
 
                         #region --- Ghi Log Send Mail ---
                         var logSendMail = new SysSentEmailHistory
@@ -1664,13 +1667,12 @@ namespace eFMS.API.Documentation.DL.Services
             return data;
         }
 
-        private async Task<ResultHandle> GetAttachExportShipmentOutstandingDebit(string salemanId)
+        private async Task<byte[]> GetAttachExportShipmentOutstandingDebit(string salemanId)
         {
             Uri urlExport = new Uri(apiServiceUrl.Value.ApiUrlExport);
 
-            HttpResponseMessage resquest = await HttpClientService.GetApi(urlExport + "/api/v1/en-US/Documentation/ExportShipmentOutstandingDebit?salemanId=" + salemanId, null);
-            var response = await resquest.Content.ReadAsAsync<ResultHandle>();
-            return response;
+            var resquest = await HttpClientService.GetByteArrayFromFile(urlExport + "/api/v1/en-US/Documentation/ExportShipmentOutstandingDebit?salemanId=" + salemanId, null);
+            return resquest;
         }
     }
 }

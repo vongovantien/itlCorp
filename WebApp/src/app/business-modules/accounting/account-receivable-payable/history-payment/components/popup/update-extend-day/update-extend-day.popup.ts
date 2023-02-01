@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
-
+import { AccountingConstants } from '@constants'
 @Component({
     selector: 'update-extend-day-popup',
     templateUrl: './update-extend-day.popup.html',
@@ -28,7 +28,12 @@ export class ARHistoryPaymentUpdateExtendDayPopupComponent extends PopupBase imp
 
     ngOnInit(): void {
         this.formUpdateExtenDate = this._fb.group({
-            numberDaysExtend: [null, Validators.required],
+            numberDaysExtend: [null, Validators.compose([
+                Validators.required,
+                Validators.max(365), 
+                Validators.maxLength(3)
+            ])],
+             
             note: []
         });
 
@@ -39,8 +44,8 @@ export class ARHistoryPaymentUpdateExtendDayPopupComponent extends PopupBase imp
     }
 
     updateExtendDate() {
-        // null , number <= 0 , float, double
-        if (!this.numberDaysExtend.value || this.numberDaysExtend.value <= 0 || this.numberDaysExtend.value % 1 !== 0) {
+        // null , number = 0 , float, double
+        if (!this.numberDaysExtend.value || this.numberDaysExtend.value === 0 || this.numberDaysExtend.value % 1 !== 0 || !this.numberDaysExtend.valid) {
             this.checkError = true;
             return;
         }

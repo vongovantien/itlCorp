@@ -13,7 +13,9 @@ import {
     ShareBusinessAttachListHouseBillComponent,
     getDimensionVolumesState, getDetailHBlState,
     GetDetailHBLSuccessAction,
-    getTransactionPermission
+    getTransactionPermission,
+    ITransactionState,
+    getTransactionState
 } from '@share-bussiness';
 import { SystemConstants, RoutingConstants } from '@constants';
 import { CommonEnum } from '@enums';
@@ -44,6 +46,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     jobId: string;
     selectedHbl: CsTransactionDetail;
     isImport: boolean = false;
+    shipmentType: string;
 
     constructor(
         protected _activedRoute: ActivatedRoute,
@@ -105,7 +108,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
             attachList: this.attachListComponent.attachList.replace(form.hwbno, '[[HBLNo]]').replace(formatDate(form.etd.startDate, 'dd/MM/yyyy', 'en'), '[[Date]]'),
             dimensionDetails: form.dimensionDetails,
             hwConstant: this.formCreateHBLComponent.hwconstant,
-
         };
 
         const houseBill = new HouseBill(_merge(form, formData));

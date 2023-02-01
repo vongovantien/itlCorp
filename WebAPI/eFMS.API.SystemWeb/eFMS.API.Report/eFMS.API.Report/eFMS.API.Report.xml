@@ -4,5 +4,134 @@
         <name>eFMS.API.Report</name>
     </assembly>
     <members>
+        <member name="P:eFMS.API.Report.FormatExcel.CellAddress.Address">
+            <summary> Address of cell </summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.CellAddress.Row">
+            <summary> Row address of cell </summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.CellAddress.Column">
+            <summary> Column address of cell </summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.CellAddress.ColumnLetter">
+            <summary> Column Letter address of cell </summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.Worksheet">
+            <summary>Excel Worksheet</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.PackageExcel">
+            <summary>Excel Package</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.StartRow">
+            <summary>Start of row in excel</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.EndRow">
+            <summary>End of row in excel</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.StartCol">
+            <summary>Start of column in excel</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.EndCol">
+            <summary>End of column in excel</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.IsWriteLnString">
+            <summary>Is Cell Need Writeline String</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.NumberOfGroup">
+            <summary>Number of group to copied</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.IndexOfGroup">
+            <summary>Index currenct of group</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.GroupRowCopy">
+            <summary>Row of group copied</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.GroupRowValue">
+            <summary>List values of group copied</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.DetailRowCopy">
+            <summary>Row of detail copied</summary>
+        </member>
+        <member name="P:eFMS.API.Report.FormatExcel.ExcelExport.StartDetailTable">
+            <summary>Start index of table</summary>
+        </member>
+        <member name="F:eFMS.API.Report.FormatExcel.ExcelExport._detailRowValue">
+            <summary>Values of detail copied</summary>
+        </member>
+        <member name="M:eFMS.API.Report.FormatExcel.ExcelExport.#ctor(System.String)">
+            <summary>
+            Init for excel file to export
+            </summary>
+            <param name="fileName"></param>
+        </member>
+        <member name="M:eFMS.API.Report.FormatExcel.ExcelExport.SetData(System.Collections.Generic.Dictionary{System.String,System.Object})">
+            <summary>
+            Set data for cell
+            </summary>
+            <param name="nameList">List name of cell to set value</param>
+        </member>
+        <member name="M:eFMS.API.Report.FormatExcel.ExcelExport.SetFormatCell(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Set string format for cell
+            </summary>
+            <param name="nameList"></param>
+            <param name="numberFormat"></param>
+        </member>
+        <member name="M:eFMS.API.Report.FormatExcel.ExcelExport.SetFormula(System.Collections.Generic.Dictionary{System.String,System.String},System.Nullable{System.Int32})">
+            <summary>
+            Set formula for one cell
+            </summary>
+            <param name="nameList">Licst name of cell to set value</param>
+        </member>
+        <member name="M:eFMS.API.Report.FormatExcel.ExcelExport.IsExistName(System.String)">
+            <summary>
+            Check if exist key on excel
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Report.FormatExcel.ExcelExport.AddressOfKey(System.String)">
+            <summary>
+            Get address of cell by name
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Report.FormatExcel.ExcelExport.SetGroupsTable">
+            <summary>
+            Set Group Headers/Footers Of Table (use if have multigroup)
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Report.FormatExcel.ExcelExport.SetDataTable">
+            <summary>
+            Set detail data for table
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Report.FormatExcel.ExcelExport.DeleteRow(System.Int32,System.Int32)">
+            <summary>
+            Delete row in excel file
+            </summary>
+            <param name="_row">row to delete</param>
+        </member>
+        <member name="M:eFMS.API.Report.FormatExcel.ExcelExport.SetPicture(System.Drawing.Image,System.String,System.Int32,System.Int32)">
+            <summary>
+            Set picture with position in excel
+            </summary>
+            <param name="image"></param>
+            <param name="picName"></param>
+            <param name="row"></param>
+            <param name="column"></param>
+        </member>
+        <member name="M:eFMS.API.Report.FormatExcel.ExcelExport.ExcelStream">
+            <summary>
+            Save excel and return file stream
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Report.Helpers.FileHelper">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
     </members>
 </doc>

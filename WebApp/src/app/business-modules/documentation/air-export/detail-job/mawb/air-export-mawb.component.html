@@ -624,9 +624,4 @@
 <confirm-popup #cf body="All entered data will be discarded.
 Are you sure you want to leave?" (onSubmit)="cf.hide(); back()"></confirm-popup>
 
-<info-popup body="Opps, It looks like you missed something, Please recheck the highlighted field below.'"
-    [title]="'Cannot Update HB'"></info-popup>
-
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
+<ng-template inject></ng-template>

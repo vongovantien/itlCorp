@@ -27,5 +27,6 @@ namespace eFMS.API.Accounting.Service.Models
         public bool? IsApplyContract { get; set; }
         public bool? ApprovalAdvance { get; set; }
         public bool? ApprovalSettlement { get; set; }
+        public bool? AlertAtd { get; set; }
     }
 }

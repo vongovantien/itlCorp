@@ -11,7 +11,7 @@ const routing: Routes = [
         data: { name: 'Accounting', title: 'Accounting' }
     },
     {
-        path:'accounting', redirectTo : '' , pathMatch : 'full'
+        path: 'accounting', redirectTo: '', pathMatch: 'full'
     },
     {
         path: 'document', loadChildren: () => import('./document-file-management/document-file-management.module').then(m => m.DocumentFileManagementModule),
@@ -24,6 +24,10 @@ const routing: Routes = [
     {
         path: 'system', loadChildren: () => import('./system-file-management/system-file-management.module').then(m => m.SystemFileManagementModule),
         data: { name: 'System', title: 'System' }
+    },
+    {
+        path: 'user-attach-file', loadChildren: () => import('./user-attach-file-management/user-attach-file-management.module').then(m => m.UserAttachFileManagementModule),
+        data: { name: 'Attach file', title: 'Attach file' }
     }
 ]
 

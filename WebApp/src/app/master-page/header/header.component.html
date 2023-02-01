@@ -123,7 +123,7 @@
                                 </ul>
                             </div>
                         </li>
-                        <li class="m-nav__item m-topbar__notifications">
+                        <li class="m-nav__item m-topbar__notifications" (click)="getListNotification()">
                             <a class="m-nav__link m-dropdown__toggle" href="javascript:void(0)" data-toggle="dropdown">
                                 <span class="m-nav__link-badge m-badge m-badge--danger"
                                     *ngIf="!!newMssUnread">{{newMssUnread > 99 ? '+99' : newMssUnread}}</span>

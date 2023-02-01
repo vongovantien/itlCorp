@@ -11,7 +11,6 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 
 import { OpsModuleBillingJobEditComponent } from './job-edit.component';
-import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { JobEditLazyLoadComponentModule } from './job-edit-lazy-load-component.module';
 import { ShareBussinessModule } from '../../share-business/share-bussines.module';
@@ -34,10 +33,6 @@ const LIB = [
     TabsModule.forRoot(),
     ModalModule.forRoot(),
     DragDropModule
-];
-
-const COMPONENTS = [
-    PlSheetPopupComponent,
 ];
 
 const customCurrencyMaskConfig = {
@@ -68,7 +63,6 @@ const customCurrencyMaskConfig = {
     declarations: [
         OpsModuleBillingJobEditComponent,
         JobManagementFormEditComponent,
-        ...COMPONENTS,
     ],
     providers: [
     ],

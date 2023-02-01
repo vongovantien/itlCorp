@@ -1,22 +1,20 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
 
-import { DocumentationRepo } from '@repositories';
-import { ReportPreviewComponent, SubHeaderComponent, ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
-import { DIM, CsTransaction } from '@models';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
+import { DIM } from '@models';
 import { AirImportCreateJobComponent } from '../create-job/create-job-air-import.component';
 import { ICanComponentDeactivate } from '@core';
-import { RoutingConstants, SystemConstants, JobConstants } from '@constants';
+import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
-import { delayTime } from '@decorators';
 
 import * as fromShareBussiness from '../../../share-business/store';
 
 import { combineLatest, of, Observable } from 'rxjs';
-import { tap, map, switchMap, catchError, takeUntil, finalize, concatMap } from 'rxjs/operators';
+import { tap, map, switchMap, catchError, takeUntil, concatMap } from 'rxjs/operators';
 
 import isUUID from 'validator/lib/isUUID';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -30,16 +28,12 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 export class AirImportDetailJobComponent extends AirImportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
-    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
     confirmUpdateFlightInfo: string = 'Do you want to sync Flight No, Flight Date, ETD, ETA to HAWB ?';
     params: any;
     tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'FILES', 'ADVANCE-SETTLE'];
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
-    ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
-
-    shipmentDetail: CsTransaction;
 
     dimensionDetails: DIM[];
     isCancelFormPopupSuccess: boolean = false;
@@ -53,14 +47,12 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         protected _router: Router,
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
-        private _ngProgressService: NgProgress
+        protected _exportRepo: ExportRepo,
+        protected _fileMngtRepo: SystemFileManageRepo
 
     ) {
-        super(_toastService, _documenRepo, _router, _store, _cd);
-        this._progressRef = this._ngProgressService.ref();
-
+        super(_toastService, _documenRepo, _router, _store, _cd, _exportRepo, _fileMngtRepo);
         this.requestCancel = this.handleCancelForm;
-
     }
 
     ngAfterViewInit() {
@@ -116,21 +108,6 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                         } else {
                             this.headerComponent.resetBreadcrumb("Job Detail");
                         }
-                    }
-                },
-            );
-    }
-
-    previewShipmentCoverPage() {
-        this._documenRepo.previewShipmentCoverPage(this.jobId)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
                     }
                 },
             );
@@ -197,11 +174,9 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     }
 
     saveJob(body: any) {
-        this._progressRef.start();
         this._documenRepo.updateCSTransaction(body)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
+                catchError(this.catchError)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -262,22 +237,6 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         }
     }
 
-    previewPLsheet(currency: string,) {
-        const hblid = "00000000-0000-0000-0000-000000000000";
-        this._documenRepo.previewSIFPLsheet(this.jobId, hblid, currency)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.dataReport = res;
-                    if (this.dataReport != null && res.dataSource.length > 0) {
-                        this.renderAndShowReport();
-                    } else {
-                        this._toastService.warning('There is no data to display preview');
-                    }
-                },
-            );
-    }
-
     prepareDeleteJob() {
         this._documenRepo.checkPermissionAllowDeleteShipment(this.jobId)
             .pipe(
@@ -316,13 +275,9 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     }
 
     onDeleteJob() {
-        this._progressRef.start();
         this._documenRepo.deleteMasterBill(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
                     if (respone.status) {
@@ -380,14 +335,9 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     }
 
     onLockShipment() {
-
-        this._progressRef.start();
         this._documenRepo.LockCsTransaction(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             )
             .subscribe(
                 (r: CommonInterface.IResult) => {
@@ -447,13 +397,9 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
 
         };
 
-        this._progressRef.start();
         this._documenRepo.syncHBL(this.jobId, bodySyncData)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (r: CommonInterface.IResult) => {
                     if (r.status) {
@@ -509,26 +455,6 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         return of(!isEdited);
     }
 
-    @delayTime(1000)
-    showReport(): void {
-        this.componentRef.instance.frm.nativeElement.submit();
-        this.componentRef.instance.show();
-    }
-
-    renderAndShowReport() {
-        // * Render dynamic
-        this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
-        (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
-
-        this.showReport();
-
-        this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
-            (v: any) => {
-                this.subscription.unsubscribe();
-                this.viewContainerRef.viewContainerRef.clear();
-            });
-    }
-
     showUpdateFlightInfo() {
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             title: 'Update Flight Infor',
@@ -542,10 +468,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     updateFlightInfor() {
         this._documenRepo.updateFlightInfo(this.jobId)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                })
+                catchError(this.catchError)
             ).subscribe(
                 (r: any) => {
                     if (r.status) {

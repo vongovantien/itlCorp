@@ -33,6 +33,7 @@
             margin-right: 5px;
         }
         &.disabled {
+            pointer-events: none;
             cursor: not-allowed;
             color: #999999;
             &:hover {

@@ -1,11 +1,19 @@
 <div class="modal fade" role="dialog" bsModal #popup="bs-modal" (onHide)="onHide()">
     <div class="modal-dialog" [ngClass]="!!data && data.isLandscape === true ? 'modal-xl' : 'modal-lg'" role="document">
         <div class="modal-content" [ngClass]="!!data && data.isLandscape === true ? '' : 'modal-lg__width'">
-            <div class="modal-header">
+            <div class="modal-header align-items-center">
                 <h5 class="modal-title">Preview</h5>
+
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="hide()">
                     <span aria-hidden="true">&times;</span>
                 </button>
+
+                <div class="modal-actions c-button-actions" (click)="onConfirmSaveEdoc()">
+                    <button class="btn btn-default" type="button">
+                        <i class="la la-save"></i>
+                        Save Attachment
+                    </button>
+                </div>
             </div>
             <div class="modal-body">
                 <form #formReport target="frame" method="POST" [action]="scr" (ngSubmit)="submitForm($event)">
@@ -27,3 +35,5 @@
         </div>
     </div>
 </div>
+
+<ng-template inject></ng-template>

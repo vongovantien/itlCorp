@@ -1,13 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Localization;
-using Microsoft.Extensions.Localization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace eFMS.API.Documentation.DL.Common
+﻿namespace eFMS.API.Documentation.DL.Common
 {
     public class DocumentationLanguageSub
     {
@@ -103,6 +94,8 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_SERIES_NO_REQUIRED = "MSG_SERIES_NO_REQUIRED";
         public static readonly string MSG_INVOICE_NO_REQUIRED = "MSG_INVOICE_NO_REQUIRED";
         public static readonly string MSG_SHIPMENT_INVALID_NO_PROFIT = "MSG_SHIPMENT_INVALID_NO_PROFIT";
+        public static readonly string MSG_HBLNO_NOT_EXIST_OFFICE = "MSG_HBLNO_NOT_EXIST_OFFICE";
+        public static readonly string MSG_MBLNO_NOT_EXIST_OFFICE = "MSG_MBLNO_NOT_EXIST_OFFICE";
 
         public static readonly string MSG_OBH_PARTNER_CODE_WRONG = "MSG_OBH_PARTNER_CODE_WRONG";
         public static readonly string MSG_OBH_PARTNER_CODE_EMPTY = "MSG_OBH_PARTNER_CODE_EMPTY";
@@ -111,5 +104,12 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_PARTNER_CODE_DUPLICATE = "MSG_PARTNER_CODE_DUPLICATE";
         public static readonly string MSG_CHARGE_CODE_WRONG_SERVICE = "MSG_CHARGE_CODE_WRONG_SERVICE";
         public static readonly string MSG_TOTAL_OVER_LIMIT = "MSG_TOTAL_OVER_LIMIT";
+        public static readonly string MSG_REPLICATE_NOT_EXISTS = "MSG_REPLICATE_NOT_EXISTS";
+        public static readonly string MSG_CLEARANCE_CONTRACT_NULL = "MSG_CLEARANCE_CONTRACT_NULL";
+        public static readonly string MSG_CLEARANCE_IS_EXPIRED = "MSG_CLEARANCE_IS_EXPIRED";
+        public static readonly string MSG_CLEARANCE_IS_OVERDUE = "MSG_CLEARANCE_IS_OVERDUE";
+        public static readonly string MSG_CLEARANCE_IS_OVERLIMIT = "MSG_CLEARANCE_IS_OVERLIMIT";
+        public static readonly string MSG_CHARGE_CODE_WRONG_OFFICE = "MSG_CHARGE_CODE_WRONG_OFFICE";
+        public static readonly string MSG_CUSTOM_NO_NOT_EXIST_JOB = "MSG_CUSTOM_NO_NOT_EXIST_JOB";
     }
 }

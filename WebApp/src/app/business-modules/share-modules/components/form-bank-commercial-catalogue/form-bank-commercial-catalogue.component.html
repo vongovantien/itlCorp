@@ -1,0 +1,122 @@
+<div class="modal fade form-contract-commercial-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center justify-content-between p-1">
+                    <h5 class="modal-title" style="margin-right:10px;">
+                        {{isUpdate ? "Update" : "Create"}} Partner Bank Information
+                    </h5>
+
+                    <button type="button" class="close" aria-label="Close" (click)="close()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form class="m-form m-form--state" [formGroup]="formGroup">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAccountNo.dirty)  && !bankAccountNo.valid}">
+                                <label required>Bank Account No</label>
+                                <input type="text" class="form-control" formControlName="bankAccountNo">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && (bankAccountNo.errors | equalError: 'required') || (bankAccountNo.errors | equalError: 'required') && bankAccountNo.dirty">
+                                    Bank Account No is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAccountName.dirty)  && !bankAccountName.valid}">
+                                <label required>Bank Account Name</label>
+                                <input type="text" class="form-control" formControlName="bankAccountName">
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && (bankAccountName.errors | equalError: 'required') || (bankAccountName.errors | equalError: 'required') && bankAccountName.dirty">
+                                    Bank Account Name is required
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAddress.dirty)  && !bankAddress.valid}">
+                                <label required>Bank Address</label>
+                                <input type="text" class="form-control" formControlName="bankAddress">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && bankAddress.invalid">
+                                    Bank Address is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Swift Code</label>
+                                <input type="text" class="form-control" formControlName="swiftCode">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankNameEn.valid || !bankNameEn.value)}">
+                                        <label required>Bank Name</label>
+                                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
+                                            [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
+                                            [displayFields]="displayFieldPort" (remove)="resetFormControl(bankCode)"
+                                            placeholder="Please Select Bank Name" formControlName="bankNameEn">
+                                        </app-combo-grid-virtual-scroll>
+                                        <div class="form-control-feedback" *ngIf="isSubmitted && bankNameEn.invalid">
+                                            Bank Name is required
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label required>Bank Code</label>
+                                        <input disabled type="text" class="form-control" formControlName="bankCode">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label>Note</label>
+                                <textarea class="form-control" cols="30" rows="10" formControlName="note"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="isUpdate && !!bankDetail">
+                        <div class="col-6">
+                            <div class="m--align-left">
+                                Created: {{bankDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                                &nbsp;
+                                By <span class="text-success">{{bankDetail.userCreatedName}}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="m--align-left">
+                                Modified: {{bankDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                                &nbsp;
+                                By <span class="text-success">{{bankDetail.userModifiedName}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onSubmit()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span> Save </span>
+                    </span>
+                </button>
+                <app-default-button [buttonSetting]="cancelButtonSetting" (click)="close()"></app-default-button>
+            </div>
+        </div>
+    </div>
+</div>

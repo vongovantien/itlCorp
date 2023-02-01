@@ -1,32 +1,30 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { Store, ActionsSubject } from '@ngrx/store';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params } from '@angular/router';
+import { ActionsSubject, Store } from '@ngrx/store';
 
-import { CommonEnum } from '@enums';
-import { User, Unit, Customer, PortIndex, DIM, CsTransaction, Commodity, Warehouse, Incoterm } from '@models';
-import { FormValidators } from '@validators';
 import { AppForm } from '@app';
-import {
-    getCataloguePortLoadingState, getCatalogueCarrierState, getCatalogueCarrierLoadingState, GetCatalogueCarrierAction, getCatalogueAgentState, getCatalogueAgentLoadingState, GetCatalogueAgentAction, GetCatalogueUnitAction, getCatalogueUnitState, GetCatalogueCommodityAction, getCatalogueCommodityState
-} from '@store';
+import { CommonEnum } from '@enums';
+import { Commodity, CsTransaction, Customer, DIM, Incoterm, PortIndex, Unit, User, Warehouse } from '@models';
+import { GetCatalogueAgentAction, getCatalogueAgentLoadingState, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierLoadingState, getCatalogueCarrierState, GetCatalogueCommodityAction, getCatalogueCommodityState, getCataloguePortLoadingState, GetCatalogueUnitAction, getCatalogueUnitState, getMenuUserSpecialPermissionState } from '@store';
+import { FormValidators } from '@validators';
 
-import { SystemConstants } from 'src/constants/system.const';
-import { SystemRepo, CatalogueRepo } from '@repositories';
 import { JobConstants } from '@constants';
+import { CatalogueRepo, SystemRepo } from '@repositories';
 import {
     DimensionActions,
     DimensionActionTypes,
     GetDimensionAction,
     getTransactionDetailCsTransactionState,
     InitDimensionAction,
-    IShareBussinessState,
+    IShareBussinessState
 } from '@share-bussiness';
-import { ShareAirServiceDIMVolumePopupComponent } from '../dim/dim-volume.popup';
-import { Observable } from 'rxjs';
-import { distinctUntilChanged, takeUntil, skip, shareReplay, catchError } from 'rxjs/operators';
 import cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
+import { Observable } from 'rxjs';
+import { catchError, distinctUntilChanged, shareReplay, skip, takeUntil } from 'rxjs/operators';
+import { SystemConstants } from 'src/constants/system.const';
+import { ShareAirServiceDIMVolumePopupComponent } from '../dim/dim-volume.popup';
 
 @Component({
     selector: 'app-form-create-air',
@@ -150,6 +148,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
         this._store.dispatch(new GetCatalogueUnitAction({ active: true }));
         this._store.dispatch(new GetCatalogueCommodityAction({ active: true }));
 
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        
         this.isLoadingPort = this._store.select(getCataloguePortLoadingState).pipe(
             takeUntil(this.ngUnsubscribe)
         );
@@ -253,10 +253,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             jobNo: [{ value: null, disabled: true }],
             notes: [],
             mawb: ['', Validators.compose([
-                // Validators.required,
-                // Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                // FormValidators.validateMAWB,
-                // FormValidators.validateSpecialChar
+                FormValidators.required,
+                Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                FormValidators.validateMAWB,
+                FormValidators.validateSpecialChar
             ])],
             flightVesselName: [],
             packageQty: [null, Validators.compose([
@@ -483,7 +483,6 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     }
 
     onBlurGetAirline(data: any) {
-
         const hawb: string = data.target.value.substring(0, 3);
         if (this.mawb.valid && !!hawb) {
             //
@@ -593,10 +592,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 else {
                     this.isCheckedActive = false;
                     this.formGroup.get('mawb').setValidators([
-                        // Validators.required,
-                        // Validators.pattern(SystemConstants.CPATTERN.MAWB),
-                        // FormValidators.validateMAWB,
-                        // FormValidators.validateSpecialChar
+                        FormValidators.required,
+                        Validators.pattern(SystemConstants.CPATTERN.MAWB),
+                        FormValidators.validateMAWB,
+                        FormValidators.validateSpecialChar
                     ]);
                 }
                 this.formGroup.get('mawb').updateValueAndValidity();

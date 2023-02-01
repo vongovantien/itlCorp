@@ -6,6 +6,7 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
@@ -19,5 +20,6 @@ namespace eFMS.API.Catalogue.DL.IService
         CatBankModel GetDetail(Guid id);
         List<CatBankImportModel> CheckValidImport(List<CatBankImportModel> list);
         HandleState Import(List<CatBankImportModel> data);
+        Task<IQueryable<CatBankModel>> GetBankByPartnerId(Guid id);
     }
 }

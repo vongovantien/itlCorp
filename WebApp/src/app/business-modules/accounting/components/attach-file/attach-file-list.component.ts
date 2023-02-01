@@ -1,13 +1,13 @@
-import { takeUntil } from 'rxjs/operators';
-import { ActivatedRoute, Params } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { Component, OnInit, ViewChild, Output, EventEmitter, Input, ChangeDetectionStrategy } from '@angular/core';
-import { AppForm } from '@app';
-import { AccountingRepo } from '@repositories';
-import { SysImage } from '@models';
-import { InjectViewContainerRefDirective } from '@directives';
-import { ConfirmPopupComponent } from '@common';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ActivatedRoute, Params } from '@angular/router';
+import { AppForm } from '@app';
+import { ConfirmPopupComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
+import { SysImage } from '@models';
+import { SystemFileManageRepo } from '@repositories';
+import { ToastrService } from 'ngx-toastr';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'accounting-attach-file-list',
@@ -37,8 +37,11 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
     files: SysImage[] = [];
     selectedFile: SysImage;
 
+    @Input() accType: string = '';
+    @Input() accId: string = '';
+
     constructor(
-        private _accountingRepo: AccountingRepo,
+        private _fileRepo: SystemFileManageRepo,
         private _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
     ) {
@@ -57,7 +60,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
     }
 
     getFiles(id: string) {
-        this._accountingRepo.getAttachedFiles(this.folderModuleName, id)
+        this._fileRepo.getAttachedFiles(this.folderModuleName, id)
             .subscribe(
                 (data: any) => {
                     this.files = data || [];
@@ -86,12 +89,12 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
                 this._toastService.warning("maximum file size < 100Mb");
                 return;
             }
-            this._accountingRepo.uploadAttachedFiles(this.folderModuleName, this._id, fileList)
+            this._fileRepo.uploadAttachedFileEdoc('Accounting', this.accType, this.accId, fileList)
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success("Upload file successfully!");
-                            this.getFiles(this._id);
+                            this.getFiles(this.accId);
                         }
                     }
                 );
@@ -103,6 +106,8 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
             return;
         }
         this.selectedFile = _file;
+        console.log(this.selectedFile);
+
         this.showPopupDynamicRender<ConfirmPopupComponent>(
             ConfirmPopupComponent,
             this.confirmPopupContainerRef.viewContainerRef, {
@@ -117,7 +122,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
     }
 
     onDeleteFile(id: string) {
-        this._accountingRepo.deleteAttachedFile(this.folderModuleName, id)
+        this._fileRepo.deleteEdoc(id)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -147,7 +152,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
                 chillId: this.chillId,
                 fileName: fileName
             }
-            this._accountingRepo.dowloadallAttach(model)
+            this._fileRepo.dowloadallAttach(model)
                 .subscribe(
                     (res: any) => {
                         this.downLoadFile(res, "application/zip", model.fileName);

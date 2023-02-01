@@ -17,8 +17,7 @@ export const initialState: AdvancePaymentListState = {
 };
 
 
-
-const advancePaymentReducer = createReducer(
+const AdvancePaymentListReducer = createReducer(
     initialState,
     on(Types.SearchListAdvancePayment, (state: AdvancePaymentListState, payload: any) => {
         return { ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 15 } }
@@ -35,6 +34,6 @@ const advancePaymentReducer = createReducer(
     )
 );
 
-export function reducer(state: any | undefined, action: Action) {
-    return advancePaymentReducer(state, action);
+export function advancePaymentListReducer(state: any | undefined, action: Action) {
+    return AdvancePaymentListReducer(state, action);
 };

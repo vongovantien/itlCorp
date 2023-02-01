@@ -125,7 +125,8 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted && !expiredDate.value.startDate && contractType.value !=='Cash' && contractType.value !=='Guarantee' && contractType.value !=='Prepaid'}">
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted && ((!expiredDate.value?.startDate && contractType.value !=='Cash' && contractType.value !=='Guarantee'
+                                         && contractType.value !=='Prepaid') || (contractType.value ==='Trial' && !expiredDate?.valid)) }">
                                         <label
                                             *ngIf="contractType.value !=='Cash' && contractType.value !== 'Guarantee' && contractType.value !== 'Prepaid'"
                                             required for=""><strong>Expired Date</strong></label>
@@ -137,13 +138,16 @@
                                                 ngxDaterangepickerMd
                                                 [attr.disabled]="!isDisabledExpiredDateField ?  null : 'disabled'"
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                                [singleDatePicker]="true" name="daterange" [autoApply]="true"
-                                                formControlName="expiredDate" readonly [minDate]="minDateExpired" />
-                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                [singleDatePicker]="true" name="daterange" [autoApply]="true"                                          
+                                                formControlName="expiredDate" readonly [minDate]="minDateExpired"/>
+                                            <span class="m-input-icon__icon m-input-icon__icon--right"> 
                                                 <span>
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
+                                            <div class="m--font-danger" *ngIf="!expiredDate?.valid && contractType.value ==='Trial'">
+                                                The times is not valid
+                                            </div>
                                             <ng-container
                                                 *ngIf="!!expiredDate.value && !!expiredDate.value.startDate && !isDisabledExpiredDateField">
                                                 <span class="m-input-icon_clear"
@@ -249,20 +253,27 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && !currencyId.value}">
                                 <label required>Invoice Currency</label>
-                                <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
-                                    class="custom" formControlName="currencyId" placeholder="Select Currency"
-                                    [clearable]="false">
+                                <ng-select *ngIf="contractType.value !== 'Guarantee'; else tmp"
+                                    [items]="listCurrency | async" [clearable]="true" bindLabel="id" class="custom"
+                                    formControlName="currencyId" placeholder="Select Currency" [clearable]="false">
                                 </ng-select>
+                                <ng-template #tmp>
+                                    <input disabled type="text" class="form-control" formControlName="creditCurrency">
+                                </ng-template>
                             </div>
                         </div>
                         <div class="col-lg-2">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && !creditCurrency.value}">
                                 <label required>AR Currency</label>
-                                <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
-                                    class="custom" formControlName="creditCurrency" placeholder="Select Credit Currency"
+                                <ng-select *ngIf="contractType.value !== 'Guarantee'; else tmp"
+                                    [items]="listCurrency | async" [clearable]="true" bindLabel="id" class="custom"
+                                    formControlName="creditCurrency" placeholder="Select Credit Currency"
                                     [clearable]="false">
                                 </ng-select>
+                                <ng-template #tmp>
+                                    <input disabled type="text" class="form-control" formControlName="creditCurrency">
+                                </ng-template>
                             </div>
                         </div>
                         <div class="col-lg-4">
@@ -279,8 +290,7 @@
                     </div>
                     <div class="row mb-5">
                         <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !emailAddress.valid}">
+                            <div class="form-group">
                                 <label>Email Address</label>
                                 <input type="text" class="form-control" formControlName="emailAddress">
                             </div>
@@ -326,12 +336,14 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':isSubmitted && !trialCreditDays.valid }">
                                         <label>Trial Credit Days
                                         </label>
-                                        <input type="number" min="0" (change)="onChageTrialCreditDays()"
+                                        <input type="number" (change)="onChageTrialCreditDays()"
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
                                             class="form-control" formControlName="trialCreditDays">
+                                            <p class="text-danger invalid" *ngIf="trialCreditDays.invalid">The value entered is not valid</p>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -381,11 +393,11 @@
                                 *ngIf=" isUpdate ||  (!isUpdate  && (contractType.value ==='Official' || contractType.value ==='Trial'))">
                                 <div class="col-lg-2">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger':isSubmitted  && !paymentTerm.valid }">
+                                        [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentTerm.valid }">
                                         <label>Payment Term</label>
-                                        <input type="number" min="0" numeric [decimals]="digitDecimal" [attr.disabled]="(menuSpecialPermission | async | specialPermission:
+                                        <input type="number" numeric [decimals]="digitDecimal" [attr.disabled]="(menuSpecialPermission | async | specialPermission:
                                         'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
-                                            class="form-control" formControlName="paymentTerm">
+                                            class="form-control" formControlName="paymentTerm" maxlength="3">
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -393,10 +405,10 @@
                                         [ngClass]="{'m-form__group has-danger':isSubmitted  && !paymentTermObh.valid }">
                                         <label>Payment Term OBH</label>
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                            <input type="number" min="0" numeric [decimals]="digitDecimal"
+                                            <input type="number" numeric [decimals]="digitDecimal"
                                                 [attr.disabled]="(menuSpecialPermission | async | specialPermission:
                                             'AccountReceivable') === true ? null : 'disabled'" autoFormatCurrency
-                                                class="form-control" formControlName="paymentTermObh">
+                                                class="form-control" formControlName="paymentTermObh" maxlength="3">
                                         </div>
                                     </div>
                                 </div>
@@ -410,11 +422,12 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger':isSubmitted  && !creditLimitRate?.valid }">
                                         <label>Credit Limited Rate</label>
-                                        <input min="0"
+                                        <input numeric [decimals]="digitDecimal"
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
-                                            type="number" class="form-control" formControlName="creditLimitRate">
+                                            type="number" class="form-control" formControlName="creditLimitRate" maxlength="10" autoFormatCurrency>
                                     </div>
                                 </div>
                                 <div class="col-lg-2">
@@ -593,7 +606,8 @@
                         </span>
                     </button>
                     <ng-container
-                        *ngIf="currentUser?.userType === 'Super Admin' || contractType.value ==='Cash' || contractType.value ==='Guarantee' || selectedContract?.arconfirmed === true">
+                        *ngIf="(contractType.value !=='Cash' && contractType.value !== 'Guarantee' && contractType.value !== 'Prepaid' && selectedContract?.arconfirmed === true)||
+                            (contractType.value === 'Cash' || contractType.value === 'Guarantee' || contractType.value === 'Prepaid') || currentUser?.userType === 'Super Admin'">
                         <button (click)="activeInactiveContract(selectedContract.id)"
                             *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
                             class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
@@ -602,16 +616,15 @@
                                 <span> Active </span>
                             </span>
                         </button>
-                        <button (click)="activeInactiveContract(selectedContract.id)"
-                            *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
-                            class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10">
-                            <span>
-                                <i class="la la-remove"></i>
-                                <span> Inactive </span>
-                            </span>
-                        </button>
                     </ng-container>
-
+                    <button (click)="activeInactiveContract(selectedContract.id)"
+                        *ngIf="(menuSpecialPermission | async | specialPermission: 'ActiveContract') === true && selectedContract.active === true && isUpdate && !isCreateNewCommercial"
+                        class="btn btn-danger m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <i class="la la-remove"></i>
+                            <span> Inactive </span>
+                        </span>
+                    </button>
                     <button
                         *ngIf="( (menuSpecialPermission | async | specialPermission: 'ActiveContract') === true || (menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true   ) && selectedContract.active === false && isUpdate && !isCreateNewCommercial"
                         type="button" class="btn btn-warning   m-btn--icon  m-btn--uppercase"
@@ -638,10 +651,4 @@
     (onSubmit)="onSubmitChangeAgreementType()">
 </confirm-popup>
 
-<confirm-popup #confirmActive
-    [body]="'There are Other Agreement that same service, If Agreement is actived, Those Agreement will be Inactive. Are You Sure Active this agreement?'"
-    [labelConfirm]="'OK'" (onSubmit)="onSubmitActiveContract()">
-</confirm-popup>
-
-<confirm-popup #confirmDelete body="Are you sure to delete this file ?" labelConfirm="Yes" labelCancel="No"
-    (onSubmit)="onDeleteFile()"></confirm-popup>
+<ng-template inject></ng-template>

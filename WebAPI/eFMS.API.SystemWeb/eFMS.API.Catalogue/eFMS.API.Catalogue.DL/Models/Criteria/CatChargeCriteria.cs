@@ -23,5 +23,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InActiveOn { get; set; }
+        public string OfficeId { get; set; }
     }
 }

@@ -70,22 +70,23 @@
                 <tbody class="tbody-group">
                     <tr *ngFor="let stage of stages; let i = index">
                         <td class="table-actions-col no-sorting">
-                            <span *ngIf="stage.type==='User'">
+                            <ng-container *ngIf="!!stage.type && stage.type !== 'System'">
                                 <button (click)="getDetail(stage.id)" type="button" appLoadingButton
                                     [state]="!!data && data.isLocked"
                                     class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only" title="Edit">
                                     <i class="la la-edit"></i>
                                 </button>
-                            </span>
-
-                            <!-- <button type="button" *ngIf="!!data && !data.isLocked"
-                                class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove"
-                                (click)="showDeletePopup(stage)">
-                                <i class="la la-trash"></i>
-                            </button> -->
+                            </ng-container>
+                            <ng-container
+                                *ngIf="!!data && !!stage.type && !data.isLocked && currentUser?.id === stage.userCreated && !!stage.type !== 'System'">
+                                <button type="button" class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
+                                    title="Remove" (click)="onDeleteStage(stage)">
+                                    <i class="la la-trash"></i>
+                                </button>
+                            </ng-container>
                         </td>
                         <td class="sorting" style="min-width: 10px">
-                            <span>{{((stage.orderNumberProcessed + 1) < 10) ? ('0' + (stage.orderNumberProcessed )) :
+                            <span>{{(stage.orderNumberProcessed < 10) ? ('0' + (stage.orderNumberProcessed )) :
                                     (stage.orderNumberProcessed)}}</span>
                         </td>
                         <td class="sorting">
@@ -140,6 +141,4 @@
 <!-- modal assign stage -->
 <asign-stage-popup (onAssign)="getListStageJob(jobId)"></asign-stage-popup>
 
-
-<confirm-popup [body]="'Do you want to delete this stage ?'" [labelCancel]="'No'" (onSubmit)="onDeleteStage()">
-</confirm-popup>
+<ng-template inject></ng-template>

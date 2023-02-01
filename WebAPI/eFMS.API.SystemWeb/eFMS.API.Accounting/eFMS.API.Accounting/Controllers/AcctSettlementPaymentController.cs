@@ -1,24 +1,25 @@
-﻿using eFMS.API.Common;
+﻿using AutoMapper;
+using eFMS.API.Accounting.DL.Common;
+using eFMS.API.Accounting.DL.IService;
+using eFMS.API.Accounting.DL.Models;
+using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.ExportResults;
+using eFMS.API.Accounting.DL.Models.SettlementPayment;
+using eFMS.API.Accounting.DL.Services;
+using eFMS.API.Accounting.Infrastructure.Middlewares;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using eFMS.API.Accounting.Infrastructure.Middlewares;
-using eFMS.API.Accounting.DL.IService;
-using eFMS.API.Accounting.DL.Models.Criteria;
-using eFMS.API.Accounting.DL.Common;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using AutoMapper;
 using System.Linq;
-using eFMS.API.Accounting.DL.Models.SettlementPayment;
-using eFMS.API.Accounting.DL.Models;
-using eFMS.API.Common.Infrastructure.Common;
-using eFMS.API.Accounting.DL.Models.ExportResults;
-using eFMS.API.Common.Helpers;
-using Newtonsoft.Json;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -37,6 +38,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IMapper mapper;
         private string typeApproval = "Settlement";
         private IAccAccountReceivableService accountReceivableService;
+        private readonly IEDocService _eDocService;
 
         /// <summary>
         /// Contructor
@@ -45,10 +47,11 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="service"></param>
         /// <param name="user"></param>
         public AcctSettlementPaymentController(
-            IStringLocalizer<LanguageSub> localizer, 
-            IAcctSettlementPaymentService service, 
+            IStringLocalizer<LanguageSub> localizer,
+            IAcctSettlementPaymentService service,
             ICurrentUser user, IMapper _mapper,
-            IAccAccountReceivableService accountReceivable
+            IAccAccountReceivableService accountReceivable,
+            IEDocService eDocService
             )
         {
             stringLocalizer = localizer;
@@ -56,6 +59,7 @@ namespace eFMS.API.Accounting.Controllers
             currentUser = user;
             mapper = _mapper;
             accountReceivableService = accountReceivable;
+            _eDocService = eDocService;
         }
 
         /// <summary>
@@ -172,18 +176,18 @@ namespace eFMS.API.Accounting.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = settlementNo + " has autorated charges. You can not delete." });
                 }
             }
-            
+
 
             if (!acctSettlementPaymentService.CheckValidateDeleteSettle(settlementNo))
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE,settlementNo].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE, settlementNo].Value });
             }
 
             HandleState hs = acctSettlementPaymentService.DeleteSettlementPayment(settlementNo);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }         
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -203,6 +207,7 @@ namespace eFMS.API.Accounting.Controllers
                     if (modelReceivableList.Count > 0)
                     {
                         await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _eDocService.DeleteEdocByBillingNo(settlementNo);
                     }
                 });
             }
@@ -230,10 +235,11 @@ namespace eFMS.API.Accounting.Controllers
             List<ShipmentChargeSettlement> chargeNoGrpSettlement = new List<ShipmentChargeSettlement>();
             if (settlement != null)
             {
-                if(view == "GROUP")
+                if (view == "GROUP")
                 {
                     chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
-                } else
+                }
+                else
                 {
                     chargeNoGrpSettlement = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlement.SettlementNo);
                 }
@@ -280,7 +286,7 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     currencies.Add(item.SettlementCurrency);
                 }
-                foreach(var sp in settlementPayment)
+                foreach (var sp in settlementPayment)
                 {
                     listChargeDetail.AddRange(sp.ChargeSettlementPaymentMngts);
                 }
@@ -387,8 +393,8 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPost("CheckDuplicateShipmentSettlement")]
         public IActionResult CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria)
         {
-            var data = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(criteria,out List<DuplicateShipmentSettlementResultModel> listDup);
-            ResultHandle result = new ResultHandle { Status = data.Status, Message = data.Message,Data = listDup };
+            var data = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(criteria, out List<DuplicateShipmentSettlementResultModel> listDup);
+            ResultHandle result = new ResultHandle { Status = data.Status, Message = data.Message, Data = listDup };
             return Ok(result);
         }
 
@@ -484,11 +490,18 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Settlement Payment don't have any charge in this period, Please check it again!" };
                 return BadRequest(_result);
             }
+
             var hs = acctSettlementPaymentService.UpdateSettlementPayment(model);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
+
+            //var hsGenEdoc = _eDocService.GenerateEdocSettlement(model);
+            //if (hsGenEdoc.Result.Code == 403)
+            //{
+            //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            //}
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -989,7 +1002,7 @@ namespace eFMS.API.Accounting.Controllers
                        !string.IsNullOrEmpty(x.ClearanceNo)
                     || !string.IsNullOrEmpty(x.ContNo)
                     || !string.IsNullOrEmpty(x.SeriesNo)
-                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.ChargeCode, x.ChargeId ,x.ClearanceNo, x.ContNo, x.InvoiceNo, x.SeriesNo, x.Notes}).ToList();
+                    || !string.IsNullOrEmpty(x.InvoiceNo)).GroupBy(x => new { x.JobId, x.MBL, x.HBL, x.ChargeCode, x.ChargeId, x.ClearanceNo, x.ContNo, x.InvoiceNo, x.SeriesNo, x.Notes }).ToList();
             foreach (var charge in duplicateCharges)
             {
                 if (charge.Count() > 1)
@@ -1018,7 +1031,7 @@ namespace eFMS.API.Accounting.Controllers
             var data = acctSettlementPaymentService.GetHistoryDeniedSettlement(settlementNo);
             return Ok(data);
         }
-        
+
         [HttpPost("PreviewMultipleSettlementBySettlementNos")]
         [Authorize]
         public IActionResult PreviewMultipleSettlementBySettlementNos(List<string> settlmentNos)
@@ -1029,9 +1042,9 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpPut("DenySettlePayments")]
         [Authorize]
-        public IActionResult DenySettlePayments(List<Guid> Ids,string comment)
+        public IActionResult DenySettlePayments(List<Guid> Ids, string comment)
         {
-            HandleState hs = acctSettlementPaymentService.DenySettlePayments(Ids,comment);
+            HandleState hs = acctSettlementPaymentService.DenySettlePayments(Ids, comment);
 
             string message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
@@ -1137,7 +1150,7 @@ namespace eFMS.API.Accounting.Controllers
 
             return Ok(data);
         }
-        
+
         [HttpPost("CheckAllowUpdateDirectCharges")]
         public IActionResult CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges)
         {

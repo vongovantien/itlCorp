@@ -1,17 +1,18 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
-import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { catchError, finalize } from 'rxjs/operators';
+import { Bank } from './../../../../../shared/models/catalogue/catBank.model';
 
 import { AppForm } from '@app';
-import { User, Currency, Partner } from '@models';
-import { CatalogueRepo, SystemRepo } from '@repositories';
-import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
+import { Currency, Partner, User } from '@models';
+import { CatalogueRepo, SystemRepo } from '@repositories';
 
-import { map, takeUntil } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState, IAppState } from '@store';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { Observable } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 @Component({
     selector: 'settle-payment-form-create',
     templateUrl: './form-create-settlement.component.html',
@@ -54,15 +55,24 @@ export class SettlementFormCreateComponent extends AppForm {
     bankCode: AbstractControl;
     dueDate: AbstractControl;
 
+    bankAccount: Bank[] = [];
+
     currencyList: any[] = [{ id: 'VND' }, { id: 'USD' }];
     displayFieldBank: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Bank Code' },
         { field: 'bankNameEn', label: 'Bank Name' }
     ];
+
+    displayFieldBankAccount: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'bankAccountNo', label: 'Bank Account No' },
+        { field: 'bankAccountName', label: 'Bank Account Name' },
+    ];
+
     methods: CommonInterface.ICommonTitleValue[];
 
     customers: any;
     banks: Observable<any[]>;
+    payeeName: string = '';
 
     constructor(
         private _fb: FormBuilder,
@@ -179,19 +189,20 @@ export class SettlementFormCreateComponent extends AppForm {
 
     getBeneficiaryInfo() {
         if (!!this.payee.value) {
-            if (this.paymentMethod.value === this.methods[1] || this.paymentMethod.value === this.methods[3]) {
+            if (this.paymentMethod.value === this.methods[1] || this.paymentMethod.value === this.methods[2] || this.paymentMethod.value === this.methods[3]) {
                 const beneficiary = this.getPartnerById(this.payee.value);
                 if (!!beneficiary) {
                     this.beneficiaryName.setValue(beneficiary.partnerNameVn);
                     this.bankAccountNo.setValue(beneficiary.bankAccountNo);
                     this.setBankInfo(beneficiary);
                 }
+                this.getBankAccountPayee(true);
             } else {
                 this.resetBankInfo();
             }
         } else {
             this.resetBankInfo();
-            if (this.paymentMethod.value === this.methods[1]) {
+            if (this.paymentMethod.value === this.methods[1] || this.paymentMethod.value === this.methods[2]) {
                 if (!!this.userLogged) {
                     this.beneficiaryName.setValue(this.userLogged.nameVn);
                     this.bankAccountNo.setValue(this.userLogged.bankAccountNo);
@@ -230,6 +241,33 @@ export class SettlementFormCreateComponent extends AppForm {
                 this.bankName.setValue(data.code);
                 this.bankNameDescription.setValue(data.bankNameEn);
                 break;
+            case 'bankAccountNo':
+                this.bankName.setValue(data.bankNameEn);
+                this.bankAccountNo.setValue(data.bankAccountNo);
+                this.bankNameDescription.setValue(data.bankNameEn)
+                this.mapBankCode(data.code)
+                break;
+            case 'payee':
+                this.getBankAccountPayee(true);
+                break;
+        }
+    }
+
+    getBankAccountPayee(isSetBank: Boolean) {
+        if (!!this.payee.value && (this.paymentMethod.value.value === 'Bank' || this.paymentMethod.value.value === 'NETOFF_SHPT' || this.paymentMethod.value.value === 'Other')) {
+            this._catalogueRepo.getListBankByPartnerById(this.payee.value)
+                .pipe(catchError(this.catchError), finalize(() => {
+                    this.isLoading = false;
+                })).subscribe(
+                    (res: any[]) => {
+                        this.bankAccount = res;
+                        if (isSetBank === true && !!res && res.length > 0) {
+                            this.bankAccountNo.setValue(res[0].bankAccountNo);
+                            this.bankNameDescription.setValue(res[0].bankNameEn);
+                            this.bankName.setValue(res[0].bankNameEn);
+                            this.mapBankCode(res[0].code);
+                        }
+                    });
         }
     }
 

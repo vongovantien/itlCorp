@@ -1,30 +1,30 @@
-import { SettlementPayment } from './../../../../shared/models/accouting/settlement-payment';
-import { ISettlementPaymentState } from './../components/store/reducers/index';
+import { formatDate } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { formatDate } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
+import { SettlementPayment } from './../../../../shared/models/accouting/settlement-payment';
+import { ISettlementPaymentState } from './../components/store/reducers/index';
 
 import { AppPage } from '@app';
-import { Surcharge, SysImage } from '@models';
-import { AccountingRepo, ExportRepo } from '@repositories';
 import { InfoPopupComponent, ReportPreviewComponent } from '@common';
-import { InjectViewContainerRefDirective } from '@directives';
 import { RoutingConstants } from '@constants';
-import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
+import { InjectViewContainerRefDirective } from '@directives';
+import { ICrystalReport } from '@interfaces';
+import { Surcharge } from '@models';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { DataService } from '@services';
 
-import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
+import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 
-import { catchError, concatMap, finalize, pluck, takeUntil } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
 import { Store } from '@ngrx/store';
-import { LoadDetailSettlePaymentSuccess, LoadDetailSettlePayment, LoadDetailSettlePaymentFail } from '../components/store';
-import { EMPTY, Observable } from 'rxjs';
 import { getCurrentUserState } from '@store';
+import { EMPTY, Observable } from 'rxjs';
+import { catchError, concatMap, finalize, pluck } from 'rxjs/operators';
+import isUUID from 'validator/lib/isUUID';
+import { LoadDetailSettlePayment, LoadDetailSettlePaymentFail, LoadDetailSettlePaymentSuccess } from '../components/store';
 @Component({
     selector: 'app-settlement-payment-detail',
     templateUrl: './detail-settlement-payment.component.html',
@@ -36,12 +36,13 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
+    //@ViewChild(ShareBussinessAttachFileV2Component) public attachList: ShareBussinessAttachFileV2Component;
 
     settlementId: string = '';
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
 
-    attachFiles: SysImage[] = [];
+    attachFiles: any[] = [];
     folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
 
@@ -134,7 +135,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     if (!res.status) {
                         this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
                             title: 'Warning',
-                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
                             class: 'bg-danger'
                         });
                         return EMPTY;
@@ -145,6 +146,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        // this.attachRef.getHblList();
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId, 'LIST');
                     } else {
@@ -174,8 +176,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         this._toastService.warning("Settlement not found");
                         return;
                     }
-                    this.settlementPayment = res;
-
+                    this.settlementPayment = res
                     // * Update store.
                     this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementPayment));
 
@@ -217,6 +218,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
 
                     this.requestSurchargeListComponent.settlementCode = this.settlementPayment.settlement.settlementNo;
+                    this.settlementCode = this.settlementPayment.settlement.settlementNo;
+
                     this.requestSurchargeListComponent.requester = this.settlementPayment.settlement.requester;
 
                     // *SWITCH UI TO GROUP LIST SHIPMENT
@@ -286,7 +289,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                                 if (!res.status) {
                                     this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
                                         title: 'Warning',
-                                        body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                                        body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
                                         class: 'bg-danger'
                                     });
                                     return EMPTY;
@@ -431,6 +434,12 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         this.componentRef.instance.frm.nativeElement.submit();
         this.componentRef.instance.ShowWithDelay(); // Gọi method có delay này để ViewChild Popup nó get đc
     }
+
+    // regetEdoc(event: boolean) {
+    //     if (event) {
+    //         this.attachList.getEDoc("Settlement");
+    //     }
+    // }
 }
 
 export interface ISettlementPaymentData {

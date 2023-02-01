@@ -22,7 +22,8 @@ namespace eFMS.API.ReportData.FormatExcel
         private static int StartCol { get; set; }
         /// <summary>End of column in excel</summary>
         private static int EndCol { get; set; }
-
+        /// <summary>Is Cell Need Writeline String</summary>
+        public bool IsWriteLnString { get; set; }
         #region -- Info of Group
         /// <summary>Number of group to copied</summary>
         public int NumberOfGroup { get; set; }
@@ -64,6 +65,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 EndCol = Worksheet.Dimension.End.Column;
                 NumberOfGroup = 1;
                 IndexOfGroup = 1;
+                IsWriteLnString = false;
                 #endregion
             }
             catch (Exception ex)
@@ -96,7 +98,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     {
                         if (value.ToString().Contains("\n"))
                         {
-                            if (Worksheet.Cells[address].Style.WrapText)
+                            if (Worksheet.Cells[address].Style.WrapText || !IsWriteLnString)
                             {
                                 Worksheet.Cells[address].Value = value;
                             }

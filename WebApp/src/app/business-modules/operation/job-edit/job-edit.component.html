@@ -21,7 +21,8 @@
         </button>
     </ng-container>
 
-    <ng-container *ngIf="!!opsTransaction && opsTransaction?.permission?.allowReopen && opsTransaction?.currentStatus === 'Finish' && !isDuplicate">
+    <ng-container
+        *ngIf="!!opsTransaction && opsTransaction?.permission?.allowReopen && opsTransaction?.currentStatus === 'Finish' && !isDuplicate">
         <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="onReopenJob()">
             <span>
@@ -33,15 +34,16 @@
         </button>
     </ng-container>
 
-    <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase m--margin-right-10"
-        (click)="onOpePLPrint()">
-        <span>
-            <i class="la la-print"></i>
-            <span>
-                P/L Sheet
-            </span>
-        </span>
-    </button>
+    <div class="dropdown m-dropdown m-dropdown--inline">
+        <button class="btn btn-default dropdown-toggle m--margin-right-10" type="button" data-toggle="dropdown">
+            <i class="la la-print"></i>P/L Sheet<span class="caret"></span>
+        </button>
+
+        <div class="dropdown-menu">
+            <a class="dropdown-item pointer" (click)="onOpenPLPrint('USD')">Preview with USD</a>
+            <a class="dropdown-item pointer" (click)="onOpenPLPrint('VND')">Preview with VND</a>
+        </div>
+    </div>
 
     <ng-container
         *ngIf="!!opsTransaction && opsTransaction.permission.allowUpdate && !isDuplicate && opsTransaction.linkSource !== 'Replicate'">
@@ -77,8 +79,8 @@
     </ng-container>
 
     <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10"
-        *ngIf="!!opsTransaction && opsTransaction?.permission?.allowUpdate && !isDuplicate"
-        (click)="saveShipment()" [disabled]="tab !== 'job-edit'">
+        *ngIf="!!opsTransaction && opsTransaction?.permission?.allowUpdate && !isDuplicate" (click)="saveShipment()"
+        [disabled]="tab !== 'job-edit'">
         <span>
             <i class="la la la-save"></i>
             <span>
@@ -116,8 +118,8 @@
                                         [active]="selectedTabSurcharge === 'BUY'">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <buying-charge [showGetChargeStandart]="false" service="logistic"
-                                                [allowSaving]="!isDuplicate" *ngIf="selectedTabSurcharge === 'BUY'">
+                                            <buying-charge service="logistic" [allowSaving]="!isDuplicate"
+                                                *ngIf="selectedTabSurcharge === 'BUY'">
                                             </buying-charge>
                                         </ng-container>
                                     </tab>
@@ -126,9 +128,8 @@
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <selling-charge service="logistic" [showSyncFreight]="false"
-                                                [showGetCharge]="true" [showSyncStandard]="false"
-                                                [allowLinkFee]="allowLinkFeeSell" [isDuplicateJob]="isDuplicate"
-                                                [noProfit]="opsTransaction.noProfit"
+                                                [showGetCharge]="true" [allowLinkFee]="allowLinkFeeSell"
+                                                [isDuplicateJob]="isDuplicate" [noProfit]="opsTransaction.noProfit"
                                                 *ngIf="selectedTabSurcharge === 'SELL'" [allowSaving]="!isDuplicate">
                                             </selling-charge>
                                         </ng-container>
@@ -181,8 +182,6 @@
 
 <container-list-popup></container-list-popup>
 
-<pl-sheet-popup [jobId]="jobId"></pl-sheet-popup>
-
 <ng-template #placeholder>
     <div class="no-data">
         <i class="flaticon-coins"></i>
@@ -200,6 +199,9 @@
 
 <app-dropdown #dropdownMenuDuplicate>
     <a class="dropdown-item pointer" (click)="confirmDuplicate()" title="Duplicate with current job">Current Job</a>
-    <a class="dropdown-item pointer" (click)="confirmDuplicate(true)" title="Duplicate with job replicate">With Job
-        Replicate</a>
+    <ng-container
+        *ngIf="(currentUser$ | async)?.officeType === 'Head' || (currentUser$ | async)?.officeType === 'Branch'">
+        <a class="dropdown-item pointer" (click)="confirmDuplicate(true)" title="Duplicate with job replicate">With Job
+            Replicate</a>
+    </ng-container>
 </app-dropdown>

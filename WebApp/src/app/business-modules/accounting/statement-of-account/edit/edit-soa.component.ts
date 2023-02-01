@@ -1,18 +1,21 @@
 import { Component, ViewChild } from '@angular/core';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { AccountingRepo, CatalogueRepo, SystemRepo } from '@repositories';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, concatMap, finalize, switchMap, takeUntil, tap, withLatestFrom } from 'rxjs/operators';
 import { SOA, SOASearchCharge, Charge, SoaCharge } from '@models';
 import { ToastrService } from 'ngx-toastr';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { AppList } from 'src/app/app.list';
 import { SortService, DataService } from '@services';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants } from '@constants';
-import { getMenuUserPermissionState, IAppState } from '@store';
+import { getCurrentUserState, getMenuUserPermissionState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
+import { getSOADetailState } from '../store/reducers';
+import { of } from 'rxjs';
+import groupBy from 'lodash/groupBy';
 @Component({
     selector: 'app-statement-of-account-edit',
     templateUrl: './edit-soa.component.html',
@@ -20,7 +23,7 @@ import { Store } from '@ngrx/store';
 export class StatementOfAccountEditComponent extends AppList {
     @ViewChild(StatementOfAccountAddChargeComponent) addChargePopup: StatementOfAccountAddChargeComponent;
 
-    currencyList: any[];
+    currencyList: any;
     selectedCurrency: any = null;
     excRateUsdToLocal: any = null;
 
@@ -54,6 +57,7 @@ export class StatementOfAccountEditComponent extends AppList {
         { value: 'Salesman', title: 'Salesman' },
         { value: 'Creator', title: 'Creator' }
     ];
+    isUseCommisionExchangeRate: boolean = false;
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -90,93 +94,129 @@ export class StatementOfAccountEditComponent extends AppList {
             { title: 'Services Date', field: 'serviceDate', sortable: true },
             { title: 'Note', field: 'note', sortable: true },
         ];
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this._activedRoute.queryParams.subscribe((params: any) => {
-            if (!!params.no && !!params.currency) {
-                this.soaNO = params.no;
-                this.currencyLocal = params.currency;
-                this.getCurrency();
-                this.getListCharge();
-                this.getDetailSOA(this.soaNO, this.currencyLocal);
-            }
-        });
+        this.currencyList = this._sysRepo.getListCurrency();
+        this.getListCharge();
+
+        this._store.select(getCurrentUserState)
+            .pipe(
+                tap((data) => {
+                    this.userLogged = data;
+                }),
+                switchMap((currentUser) => {
+                    if (!!currentUser.id) {
+                        return this._store.select(getMenuUserPermissionState);
+                    }
+                    return of(null);
+                }),
+                concatMap((menuPermission) => {
+                    if (menuPermission !== null && menuPermission !== undefined && Object.keys(menuPermission).length !== 0) {
+                        if (menuPermission.detail !== 'None') {
+                            let body = {};
+                            if (menuPermission.detail === 'All') {
+                                body = {};
+                            } else if (menuPermission.detail === 'Company') {
+                                body = { type: 'company', companyId: this.userLogged.companyId };
+                            } else if (menuPermission.detail === 'Office') {
+                                body = { type: 'office', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId };
+                            } else if (menuPermission.detail === 'Department') {
+                                body = { type: 'department', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId };
+                            } else if (menuPermission.detail === 'Group') {
+                                body = { type: 'group', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId };
+                            } else {
+                                body = { type: 'owner', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId, userId: this.userLogged.id };
+                            }
+                            return this._systemRepo.getUserLevelByType(body);
+                        }
+                    }
+                    return of(null);
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((dataUser) => {
+                if (!!dataUser) {
+                    this.getCurrentUser(dataUser);
+                }
+            })
+
+        this._activedRoute.queryParams
+            .pipe(
+                tap((params: Params) => {
+                    this.soaNO = params.no;
+                    this.currencyLocal = params.currency;
+                }),
+                withLatestFrom(
+                    this._store.select(getSOADetailState),
+                    (params, data) => ({ detail: data, param: params })
+                ),
+                switchMap((data) => {
+                    if (data?.detail.soano === data.param.no) {
+                        console.log("data in store redux", data);
+                        return of(data?.detail);
+                    }
+                    return this._accoutingRepo.getDetaiLSOAUpdateExUsd(this.soaNO, this.currencyLocal);
+                }),
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe((dataSoa: any) => {
+                this.soa = new SOA(dataSoa);
+                this.soa.shipment = Object.keys(groupBy(this.soa.groupShipments, 'jobId')).length || 0;
+
+                // * make all chargeshipment was selected
+                for (const item of this.soa.chargeShipments) {
+                    item.isSelected = this.isCheckAllCharge;
+                }
+
+                this.selectedCurrency = this.soa.currency;
+                console.log(this.selectedCurrency);
+
+                // * update range Date
+                this.selectedRange = { startDate: new Date(this.soa.soaformDate), endDate: new Date(this.soa.soatoDate) };
+
+                // this.excRateUsdToLocal = !!this.soa.excRateUsdToLocal ? this.formatNumberDecimal(this.soa.excRateUsdToLocal) : 0;
+                this.excRateUsdToLocal = this.soa.excRateUsdToLocal;
+
+                // * Update dataSearch for Add More Charge.
+                const datSearchMoreCharge: SOASearchCharge = {
+                    currency: this.soa.currency,
+                    currencyLocal: 'VND', // TODO get currency local from user,
+                    customerID: this.soa.customer,
+                    dateType: this.soa.dateType,
+                    toDate: this.soa.soatoDate,
+                    fromDate: this.soa.soaformDate,
+                    type: this.soa.type,
+                    isOBH: this.soa.obh,
+                    inSoa: false,
+                    strCharges: this.soa.surchargeIds,
+                    strCreators: this.soa.creatorShipment,
+                    serviceTypeId: this.soa.serviceTypeId,
+                    chargeShipments: this.soa.chargeShipments,
+                    note: this.soa.note,
+                    commodityGroupId: this.soa.commodityGroupId,
+                    strServices: this.soa.serviceTypeId.replace(new RegExp(";", 'g'), ","),
+                    jobIds: [],
+                    hbls: [],
+                    mbls: [],
+                    staffType: this.soa.staffType,
+                    customerShipmentId: '',
+                    salemanId: ''
+                };
+                this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
+                if (!!this.soa) {
+                    this.creatorShipment = this.soa.creatorShipment;
+                    this.staffTypeName = this.staffTypes.filter(item => item.value === this.soa.staffType)[0].title;
+
+                    const numOfCreator = this.creatorShipment.split(',').map((item: any) => item.trim()).length;
+                    if (numOfCreator === (this.users.length - 1)) {
+                        this.selectedUser = this.users.filter(item => item.id === 'All').map(x => x.id);
+                    } else {
+                        this.selectedUser = this.users.filter(i => this.creatorShipment.includes(i.id)).map(x => x.id);
+                    }
+                }
+            });
     }
 
     addCharge() {
         this.addChargePopup.show();
-    }
-
-    getDetailSOA(soaNO: string, currency: string) {
-        this._progressRef.start();
-        this.isLoading = true;
-        this._accoutingRepo.getDetaiLSOAUpdateExUsd(soaNO, currency)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); this.isLoading = false; })
-            ).subscribe(
-                (dataSoa: any) => {
-                    this.soa = new SOA(dataSoa);
-
-                    // * make all chargeshipment was selected
-                    for (const item of this.soa.chargeShipments) {
-                        item.isSelected = this.isCheckAllCharge;
-                    }
-
-                    // * update currency
-                    this.selectedCurrency = !!this.soa.currency ? this.currencyList.filter((currencyItem: any) => currencyItem.id === this.soa.currency.trim())[0] : this.currencyList[0];
-
-                    // * update range Date
-                    this.selectedRange = { startDate: new Date(this.soa.soaformDate), endDate: new Date(this.soa.soatoDate) };
-
-                    this.excRateUsdToLocal = !!this.soa.excRateUsdToLocal?this.formatNumberDecimal(this.soa.excRateUsdToLocal):0;
-
-                    // * Update dataSearch for Add More Charge.
-                    const datSearchMoreCharge: SOASearchCharge = {
-                        currency: this.soa.currency,
-                        currencyLocal: 'VND', // TODO get currency local from user,
-                        customerID: this.soa.customer,
-                        dateType: this.soa.dateType,
-                        toDate: this.soa.soatoDate,
-                        fromDate: this.soa.soaformDate,
-                        type: this.soa.type,
-                        isOBH: this.soa.obh,
-                        inSoa: false,
-                        strCharges: this.soa.surchargeIds,
-                        strCreators: this.soa.creatorShipment,
-                        serviceTypeId: this.soa.serviceTypeId,
-                        chargeShipments: this.soa.chargeShipments,
-                        note: this.soa.note,
-                        commodityGroupId: this.soa.commodityGroupId,
-                        strServices: this.soa.serviceTypeId.replace(new RegExp(";", 'g'), ","),
-                        jobIds: [],
-                        hbls: [],
-                        mbls: [],
-                        staffType: this.soa.staffType,
-                        customerShipmentId: '',
-                        salemanId: ''
-                    };
-                    this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
-                    if(!!this.soa){
-                        this.creatorShipment = this.soa.creatorShipment;
-                        this.staffTypeName = this.staffTypes.filter(item => item.value === this.soa.staffType)[0].title;
-                        this.getUserLevel();
-                    }
-                },
-            );
-    }
-
-    getCurrency() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY)) {
-            this.currencyList = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CURRENCY);
-        } else {
-            this._sysRepo.getListCurrency()
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (dataCurrency: any) => {
-                        this.currencyList = dataCurrency;
-                    },
-                );
-        }
     }
 
     getListCharge() {
@@ -205,44 +245,10 @@ export class StatementOfAccountEditComponent extends AppList {
         this.configCharge.selectedDisplayFields = ['code'];
     }
 
-    getUserLevel() {
-        this._store.select(getMenuUserPermissionState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((menuPermission: SystemInterface.IUserPermission) => {
-                if (menuPermission !== null && menuPermission !== undefined && Object.keys(menuPermission).length !== 0) {
-                    console.log(menuPermission);
-                    if (menuPermission.detail !== 'None') {
-                        if (menuPermission.detail === 'All') {
-                            this.getUserLevelByType({});
-                        } else if (menuPermission.detail === 'Company') {
-                            this.getUserLevelByType({ type: 'company', companyId: this.userLogged.companyId });
-                        } else if (menuPermission.detail === 'Office') {
-                            this.getUserLevelByType({ type: 'office', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId });
-                        } else if (menuPermission.detail === 'Department') {
-                            this.getUserLevelByType({ type: 'department', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId });
-                        } else if (menuPermission.detail === 'Group') {
-                            this.getUserLevelByType({ type: 'group', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId });
-                        } else {
-                            this.getUserLevelByType({ type: 'owner', companyId: this.userLogged.companyId, officeId: this.userLogged.officeId, departmentId: this.userLogged.departmentId, groupId: this.userLogged.groupId, userId: this.userLogged.id });
-                        }
-                    }
-                }
-            });
-    }
-
-    getUserLevelByType(body: any) {
-        this._systemRepo.getUserLevelByType(body).pipe(catchError(this.catchError))
-            .subscribe(
-                (dataUser: any) => {
-                    this.getCurrentUser(dataUser);
-                    console.log(dataUser)
-                },
-            );
-    }
-
     getCurrentUser(data: any) {
         this.users = (data || []).map((item: any) => ({ id: item.userId, text: item.userName })).filter((d, i, arr) => arr.findIndex(t => t.id === d.id) === i); // Distinct Users
         this.users.unshift({ id: 'All', text: 'All' });
+
         const numOfCreator = this.creatorShipment.split(',').map((item: any) => item.trim()).length;
         if (numOfCreator === (this.users.length - 1)) {
             this.selectedUser = this.users.filter(item => item.id === 'All').map(x => x.id);
@@ -250,7 +256,7 @@ export class StatementOfAccountEditComponent extends AppList {
             this.selectedUser = this.users.filter(i => this.creatorShipment.includes(i.id)).map(x => x.id);
         }
     }
-    
+
     onSelectDataFormInfo(data: { id: any; }, type: string) {
         switch (type) {
             case 'staffInfo':
@@ -316,14 +322,15 @@ export class StatementOfAccountEditComponent extends AppList {
                     * and
         * startDate must <= soaFromDate
         */
-        if (!this.excRateUsdToLocal) {
-            if (this.excRateUsdToLocal <=0) {
-                this._toastService.warning(`Required to enter Excel USD greater than 0`);
-                return;
-            } else {
-                this._toastService.warning(`Required to enter Excel USD`);
+        if (this.excRateUsdToLocal) {
+            if (this.excRateUsdToLocal <= 0) {
+                this._toastService.warning(`Required to enter Exc USD greater than 0`);
                 return;
             }
+        }
+        else {
+            this._toastService.warning(`Exc USD is required!`);
+            return;
         }
         if ((new Date(this.selectedRange.startDate).getDate() > new Date(this.soa.soaformDate).getDate()) || new Date(this.selectedRange.endDate).getDate() < new Date(this.soa.soatoDate).getDate()) {
             this._toastService.warning(`Range date invalid `);
@@ -342,7 +349,7 @@ export class StatementOfAccountEditComponent extends AppList {
                 soano: this.soaNO,
                 soaformDate: !!this.selectedRange.startDate ? formatDate(this.selectedRange.startDate, 'yyyy-MM-dd', 'en') : null,
                 soatoDate: !!this.selectedRange.endDate ? formatDate(this.selectedRange.endDate, 'yyyy-MM-dd', 'en') : null,
-                currency: this.selectedCurrency.id,
+                currency: this.selectedCurrency,
                 status: this.soa.status,
                 note: this.soa.note,
                 userCreated: this.soa.userCreated,
@@ -357,14 +364,11 @@ export class StatementOfAccountEditComponent extends AppList {
                 customer: this.soa.customer,
                 commodityGroupId: this.soa.commodityGroupId,
                 staffType: this.soa.staffType,
-                excRateUsdToLocal:this.excRateUsdToLocal
+                excRateUsdToLocal: this.excRateUsdToLocal,
+                isUseCommissionExRate: this.isUseCommisionExchangeRate
             };
-            this._progressRef.start();
+            console.log(body);
             this._accoutingRepo.updateSOA(body)
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => { this._progressRef.complete(); })
-                )
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {

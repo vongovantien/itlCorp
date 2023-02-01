@@ -1,12 +1,13 @@
 
 export class Stage {
     comment: string = '';
-    createdDate: string = '';
+    datetimeCreated: string = '';
     deadline: string = '';
     departmentName: string = '';
     description: string = '';
     id: string = '';
     jobId: string = '';
+    hblId: string = '';
     mainPersonInCharge: string = '';
     modifiedDate: string = '';
     name: string = '';
@@ -21,7 +22,7 @@ export class Stage {
     userModified: string = '';
     isSelected?: boolean = false;
     doneDate: string = '';
-    hblNo: string = '';
+    hblno: string = '';
     type: string = '';
 
     constructor(object?: any) {

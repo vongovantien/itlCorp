@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
@@ -20,6 +15,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -44,7 +44,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICsShipmentSurchargeService surchargeService;
         private readonly ICheckPointService checkPointService;
-
+        private readonly IEDocService _edocService;
         /// <summary>
         /// 
         /// </summary>
@@ -62,6 +62,7 @@ namespace eFMS.API.Documentation.Controllers
             IOptions<ApiServiceUrl> serviceUrl,
             ICsShipmentSurchargeService surchargeshipment,
             ICheckPointService checkPoint,
+            IEDocService edocService,
             Menu menu = Menu.opsJobManagement) : base(curUser, menu)
         {
             stringLocalizer = localizer;
@@ -72,6 +73,7 @@ namespace eFMS.API.Documentation.Controllers
             apiServiceUrl = serviceUrl;
             surchargeService = surchargeshipment;
             checkPointService = checkPoint;
+            _edocService = edocService;
         }
 
         /// <summary>
@@ -279,7 +281,7 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(surchargeIds);
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
@@ -325,10 +327,11 @@ namespace eFMS.API.Documentation.Controllers
             {
                 Response.OnCompleted(async () =>
                 {
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
+                    await _edocService.DeleteEdocByJobId(id);
                 });
             }
             return Ok(result);
@@ -347,7 +350,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPost("CheckAllowConvertJob")]
         [Authorize]
-        public IActionResult CheckAllowConvertJob([FromBody]List<CustomsDeclarationModel> list)
+        public IActionResult CheckAllowConvertJob([FromBody] List<CustomsDeclarationModel> list)
         {
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var result = transactionService.CheckAllowConvertJob(list);
@@ -387,7 +390,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost("ConvertExistedClearancesToJobs")]
         [Authorize]
-        public IActionResult ConvertExistedClearancesToJobs([FromBody]List<CustomsDeclarationModel> list)
+        public IActionResult ConvertExistedClearancesToJobs([FromBody] List<CustomsDeclarationModel> list)
         {
 
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
@@ -453,7 +456,7 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
@@ -538,6 +541,27 @@ namespace eFMS.API.Documentation.Controllers
         {
             var results = transactionService.GetOutsourcingRegcognising(criteria);
             return Ok(results);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPut("SyncGoodInforToReplicateJob")]
+        public async Task<IActionResult> SyncGoodInforToReplicateJob(Guid jobId)
+        {
+            HandleState hs = await transactionService.SyncGoodInforToReplicateJob(jobId);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

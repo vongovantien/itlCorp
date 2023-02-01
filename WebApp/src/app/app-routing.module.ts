@@ -3,7 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { MasterPageComponent } from './master-page/master-page.component';
 import { NotfoundPageComponent } from './404/404-page.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { ForbiddenPageComponent } from './403/403.component';
 import { MenuResolveGuard, AuthGuardService } from '@core';
 
@@ -31,9 +30,7 @@ const routes: Routes = [
         data: {
             name: "Home",
         },
-        resolve: {
-            checkMenu: MenuResolveGuard
-        },
+
         children: [
             {
                 path: '',
@@ -71,7 +68,7 @@ const routes: Routes = [
                 loadChildren: () => import('./business-modules/accounting/accounting.module').then(m => m.AccountingModule),
                 data: {
                     name: "Accounting",
-                }
+                },
             },
             {
                 path: 'documentation',
@@ -86,7 +83,6 @@ const routes: Routes = [
                 data: {
                     name: "Logistics",
                 },
-
             },
             {
                 path: 'report',
