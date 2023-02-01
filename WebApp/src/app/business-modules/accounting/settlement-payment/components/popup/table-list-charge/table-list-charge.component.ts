@@ -290,7 +290,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             if (selectedCharges[0].hblid !== data.hblid) {
                 selectedCharges.forEach((charge: Surcharge) => {
                     charge.isChangeShipment = true;
-                    charge.id = null;
+                    charge.id = SystemConstants.EMPTY_GUID;
                     if (charge.chargeId === SystemConstants.EMPTY_GUID) {
                         charge.chargeId = null;
                     }
