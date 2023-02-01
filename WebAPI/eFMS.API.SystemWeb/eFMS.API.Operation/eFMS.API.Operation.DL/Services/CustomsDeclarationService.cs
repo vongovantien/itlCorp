@@ -470,7 +470,9 @@ namespace eFMS.API.Operation.DL.Services
         {
             var result = new HandleState();
             var jobOps = opsTransactionRepo.First(x => x.Id == clearances.FirstOrDefault().jobId);
-            var jobNo = clearances.FirstOrDefault()?.JobNo;
+            var customNo = await GetOldestClearanceNo(jobOps.JobNo);
+            bool isExistCus = DataContext.Any(x => x.JobNo == jobOps.JobNo);
+
             try
             {
                 foreach (var item in clearances)
@@ -486,11 +488,23 @@ namespace eFMS.API.Operation.DL.Services
                     result = DataContext.Update(clearance, x => x.Id == item.Id, false);
                 }
                 result = DataContext.SubmitChanges();
-                if (!string.IsNullOrEmpty(jobNo) && result.Success)
+
+                if (clearances.All(x => x.isDelete == true) || clearances.Any(x => x.isDelete == true && x.ClearanceNo == customNo))
                 {
-                    string customNo = await GetOldestClearanceNo(jobNo);
-                    result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
+                    if (result.Success)
+                    {
+                        customNo = DataContext.Any(x => x.JobNo == jobOps.JobNo) ? await GetOldestClearanceNo(jobOps.JobNo) : String.Empty;
+                    }
                 }
+
+                if (!isExistCus && result.Success)
+                {
+                    if (string.IsNullOrEmpty(customNo))
+                    {
+                        customNo = await GetOldestClearanceNo(jobOps.JobNo);
+                    }
+                }
+                result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
             }
             catch (Exception ex)
             {
@@ -1680,16 +1694,12 @@ namespace eFMS.API.Operation.DL.Services
         public async Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model)
         {
             var jobOps = opsTransactionRepo.First(x => x.Id == model.jobId);
-            string customNo = await GetOldestClearanceNo(model.JobNo);
-            HandleState hs = DataContext.Add(model);
+            bool isExistFirstCus = jobOps != null ? DataContext.Any(x => x.JobNo == jobOps.JobNo) : true;
 
-            if (string.IsNullOrEmpty(customNo) && hs.Success)
+            HandleState hs = DataContext.Add(model);
+            if (!isExistFirstCus && hs.Success)
             {
-                customNo = await GetOldestClearanceNo(model.JobNo);
-            }
-            if (!string.IsNullOrEmpty(model.JobNo))
-            {
-                hs = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
+                hs = await UpdateCustomNoFromCus(model.ClearanceNo, jobOps.Hblid);
             }
 
             return hs;
