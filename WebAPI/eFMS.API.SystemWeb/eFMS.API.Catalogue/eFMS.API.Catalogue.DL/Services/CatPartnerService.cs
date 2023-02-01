@@ -2504,11 +2504,12 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             List<SysUserViewModel> salemans = new List<SysUserViewModel>();
             Expression<Func<CatContract, bool>> contractExp = x => x.PartnerId == partnerId
-            && x.Active == true
+             && x.Active == true
             && x.SaleService.Contains(transactionType)
-            && x.SaleService.Contains(transactionType)
+            && x.OfficeId.Contains(currentUser.OfficeID.ToString())
             && ((shipmentType == "Freehand") ? (x.ShipmentType != "Nominated") : true);
-            if(!string.IsNullOrEmpty(officeId))
+
+            if (!string.IsNullOrEmpty(officeId))
             {
                 var office = officeRepository.Get(x => x.Id.ToString() == officeId)?.FirstOrDefault();
                 if(office != null && office.OfficeType == "OutSource")
