@@ -58,5 +58,22 @@ namespace eFMS.API.Infrastructure.RabbitMQ
             await Task.Yield();
         }
 
+        public async Task ReceiveAsync<T>(string exchange, string queue, Action<T> onMessage)
+        {
+            _channel.ExchangeDeclare(exchange, "direct", true, false);
+            _channel.QueueDeclare(queue, true, false, false);
+            _channel.QueueBind(queue, exchange, queue);
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.Received += async (s, e) =>
+            {
+                var jsonSpecified = Encoding.UTF8.GetString(e.Body.Span);
+                var item = JsonConvert.DeserializeObject<T>(jsonSpecified);
+                onMessage(item);
+                await Task.Yield();
+            };
+            _channel.BasicConsume(queue, true, consumer);
+            await Task.Yield();
+        }
+
     }
 }
