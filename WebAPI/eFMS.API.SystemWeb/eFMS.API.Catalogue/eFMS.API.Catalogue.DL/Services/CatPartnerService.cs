@@ -2530,10 +2530,26 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
             } else
             {
-                var contracts = contractRepository.Get(contractExp);
-                if (contracts.Count() > 0)
+                var office = officeRepository.Get(x => x.Id.ToString() == currentUser.OfficeID.ToString())?.FirstOrDefault();
+                if (office != null && office.OfficeType == "OutSource")
                 {
-                    salemans = GetSysUserViewModelByContract(contracts);
+                    salemans.Add(new SysUserViewModel
+                    {
+                        Active = true,
+                        EmployeeNameVn = salemanBOD.Username,
+                        EmployeeNameEn = salemanBOD.Username,
+                        Id = salemanBOD.Id,
+                        Username = salemanBOD.Username,
+                    });
+
+                    return salemans;
+                } else
+                {
+                    var contracts = contractRepository.Get(contractExp);
+                    if (contracts.Count() > 0)
+                    {
+                        salemans = GetSysUserViewModelByContract(contracts);
+                    }
                 }
             }
             return salemans;
