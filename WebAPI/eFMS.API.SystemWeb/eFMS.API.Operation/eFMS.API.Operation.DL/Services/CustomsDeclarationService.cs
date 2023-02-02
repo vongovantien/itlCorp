@@ -470,7 +470,6 @@ namespace eFMS.API.Operation.DL.Services
         {
             var result = new HandleState();
             var jobOps = opsTransactionRepo.First(x => x.Id == clearances.FirstOrDefault().jobId);
-            bool isDeleteAll = await DataContext.CountAsync(x => x.JobNo == jobOps.JobNo) == clearances.Count();
 
             try
             {
@@ -490,7 +489,7 @@ namespace eFMS.API.Operation.DL.Services
 
                 //Xoa to khai khi chua issua chung tu
                 //Kiem tra to khai chinh co bi xoa hay khong -> neu co update lai to khai chinh
-                if (isDeleteAll == true || clearances.Any(x => x.isDelete == true && x.ClearanceNo == jobOps.ClearanceNo))
+                if (clearances.Any(x => x.isDelete == true && x.ClearanceNo == jobOps.ClearanceNo))
                 {
                     if (result.Success)
                     {
