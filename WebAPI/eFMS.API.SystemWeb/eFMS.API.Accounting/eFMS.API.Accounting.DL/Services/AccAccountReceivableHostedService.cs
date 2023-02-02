@@ -25,7 +25,6 @@ namespace eFMS.API.Accounting.DL.Services
 {
     public class AccAccountReceivableHostedService : RepositoryBase<AccAccountReceivable, AccAccountReceivableModel>, IAccAccountReceivableHostedService
     {
-        private readonly ICurrentUser currentUser;
         private readonly IContextBase<CatPartner> partnerRepo;
         private readonly IContextBase<CatContract> contractPartnerRepo;
         private readonly IContextBase<SysUser> userRepo;
@@ -36,7 +35,6 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         public AccAccountReceivableHostedService(IContextBase<AccAccountReceivable> repository, 
             IMapper mapper,
-            ICurrentUser currUser,
             ICurrencyExchangeService currencyExchange,
             IContextBase<CatPartner> partner,
             IContextBase<CatContract> contract,
@@ -47,7 +45,6 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CsShipmentSurcharge> surcharge
             ) : base(repository, mapper)
         {
-            currentUser = currUser;
             partnerRepo = partner;
             contractPartnerRepo = contract;
             userRepo = user;
@@ -1137,7 +1134,6 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 agreement.CreditRate = _creditRate;
                 agreement.DatetimeModified = DateTime.Now;
-                agreement.UserModified = currentUser.UserID;
 
                 if (agreement.CreditRate > AccountingConstants.MAX_CREDIT_LIMIT_RATE_CONTRACT)
                 {
@@ -1156,7 +1152,7 @@ namespace eFMS.API.Accounting.DL.Services
         private void WriteLogInsertOrUpdateReceivable(bool status, string message, List<AccAccountReceivableModel> receivables, List<ObjectReceivableModel> models = null)
         {
             string logMessage = string.Format("InsertOrUpdateReceivable by {0} at {1} \n ** models {2} \n ** Message: {3} \n ** Receivables: {4} \n\n---------------------------\n\n",
-                            currentUser.Action,
+                            "CalculateReceivable",
                             DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
                             models != null ? JsonConvert.SerializeObject(models) : "{}",
                             message,
