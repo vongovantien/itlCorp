@@ -3949,6 +3949,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ClearanceDate).HasColumnType("datetime");
 
+                entity.Property(e => e.ClearanceNo).HasMaxLength(50);
+
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");

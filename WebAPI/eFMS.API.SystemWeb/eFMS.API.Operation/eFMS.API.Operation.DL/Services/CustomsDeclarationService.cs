@@ -470,9 +470,6 @@ namespace eFMS.API.Operation.DL.Services
         {
             var result = new HandleState();
             var jobOps = opsTransactionRepo.First(x => x.Id == clearances.FirstOrDefault().jobId);
-            var customNo = await GetOldestClearanceNo(jobOps.JobNo);
-            bool isExistCus = DataContext.Any(x => x.JobNo == jobOps.JobNo);
-
             try
             {
                 foreach (var item in clearances)
@@ -489,22 +486,27 @@ namespace eFMS.API.Operation.DL.Services
                 }
                 result = DataContext.SubmitChanges();
 
-                if (clearances.All(x => x.isDelete == true) || clearances.Any(x => x.isDelete == true && x.ClearanceNo == customNo))
+                //Xoa to khai khi chua issua chung tu
+                //Kiem tra to khai chinh chinh co bi xoa hay khong -> neu co update lai to khai chinh
+                if (clearances.All(x => x.isDelete == true) || clearances.Any(x => x.isDelete == true && x.ClearanceNo == jobOps.ClearanceNo))
                 {
                     if (result.Success)
                     {
-                        customNo = DataContext.Any(x => x.JobNo == jobOps.JobNo) ? await GetOldestClearanceNo(jobOps.JobNo) : String.Empty;
+                        var customNo = DataContext.Any(x => x.JobNo == jobOps.JobNo) ? await GetOldestClearanceNo(jobOps.JobNo) : String.Empty;
+                        jobOps.ClearanceNo = customNo;
+                        var hs = await opsTransactionRepo.UpdateAsync(jobOps, x => x.Id == jobOps.Id);
+                        result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
                     }
                 }
 
-                if (!isExistCus && result.Success)
+                //Kiem tra chua co to khai chinh, lay lai to khai chinh
+                if (string.IsNullOrEmpty(jobOps.ClearanceNo) && DataContext.Any(x => x.JobNo == jobOps.JobNo))
                 {
-                    if (string.IsNullOrEmpty(customNo))
-                    {
-                        customNo = await GetOldestClearanceNo(jobOps.JobNo);
-                    }
+                    var customNo = await GetOldestClearanceNo(jobOps.JobNo);
+                    jobOps.ClearanceNo = customNo;
+                    var hs = await opsTransactionRepo.UpdateAsync(jobOps, x => x.Id == jobOps.Id);
+                    result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
                 }
-                result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
             }
             catch (Exception ex)
             {
@@ -1647,16 +1649,22 @@ namespace eFMS.API.Operation.DL.Services
 
         public async Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model)
         {
-            var jobOps = opsTransactionRepo.First(x => x.Id == model.jobId);
-            bool isExistFirstCus = jobOps != null ? DataContext.Any(x => x.JobNo == jobOps.JobNo) : true;
-
-            HandleState hs = DataContext.Add(model);
-            if (!isExistFirstCus && hs.Success)
+            bool isExistCus = true;
+            if (!string.IsNullOrEmpty(model.JobNo))
             {
-                hs = await UpdateCustomNoFromCus(model.ClearanceNo, jobOps.Hblid);
+                isExistCus = DataContext.Any(x => x.JobNo == model.JobNo);
+            }
+            HandleState result = DataContext.Add(model);
+
+            if (!isExistCus && result.Success)
+            {
+                var jobOps = opsTransactionRepo.First(x => x.Id == model.jobId);
+                jobOps.ClearanceNo = model.ClearanceNo;
+                var hs = await opsTransactionRepo.UpdateAsync(jobOps, x => x.Id == jobOps.Id);
+                result = await UpdateCustomNoFromCus(model.ClearanceNo, jobOps.Hblid);
             }
 
-            return hs;
+            return result;
         }
 
         private async Task<HandleState> UpdateCustomNoFromCus(string customNo, Guid hblId)

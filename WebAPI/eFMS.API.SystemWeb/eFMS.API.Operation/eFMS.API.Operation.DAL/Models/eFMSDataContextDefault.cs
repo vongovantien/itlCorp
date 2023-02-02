@@ -40,7 +40,7 @@ namespace eFMS.API.Operation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<AcctAdvancePayment>(entity =>
             {
@@ -1491,6 +1491,8 @@ namespace eFMS.API.Operation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.ClearanceDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ClearanceNo).HasMaxLength(50);
 
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 

@@ -569,8 +569,6 @@ namespace eFMS.API.Documentation.DL.Services
 
                 data.ToList().ForEach(x =>
                 {
-                    x.ClearanceNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).OrderBy(cus => cus.ClearanceDate).ThenBy(cus => cus.ClearanceNo)
-                    .Select(cus => cus.ClearanceNo).FirstOrDefault();
                     x.CustomerName = customers.FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName;
                     x.POLName = ports.FirstOrDefault(pol => pol.Id == x.Pol)?.NameEn;
                     x.PODName = ports.FirstOrDefault(pod => pod.Id == x.Pod)?.NameEn;
@@ -1722,6 +1720,8 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                model.ClearanceNo = detail.ClearanceNo;
+
                 var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
                 int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
                 if (code == 403) return new HandleState(403);
