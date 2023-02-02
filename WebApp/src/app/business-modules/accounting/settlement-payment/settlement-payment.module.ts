@@ -25,7 +25,6 @@ import { SettlementPaymentAddNewComponent } from './add/add-settlement-payment.c
 import { SettlementFormCreateComponent } from './components/form-create-settlement/form-create-settlement.component';
 import { SettlementFormSearchComponent } from './components/form-search-settlement/form-search-settlement.component';
 import { SettlementListChargeComponent } from './components/list-charge-settlement/list-charge-settlement.component';
-import { SettlementChargeFromShipmentPopupComponent } from './components/popup/charge-from-shipment/charge-form-shipment.popup';
 import { SettlementFormCopyPopupComponent } from './components/popup/copy-settlement/copy-settlement.popup';
 import { SettlementExistingChargePopupComponent } from './components/popup/existing-charge/existing-charge.popup';
 import { SettlementFormChargePopupComponent } from './components/popup/form-charge/form-charge.popup';
@@ -80,7 +79,6 @@ const COMPONENT = [
     SettlementTableSurchargeComponent,
     SettlementFormCopyPopupComponent,
     SettlementTableListChargePopupComponent,
-    SettlementChargeFromShipmentPopupComponent,
     SettlementPaymentsPopupComponent,
     SettlementShipmentAttachFilePopupComponent,
     SettlementDetailChargesPaymentComponent
