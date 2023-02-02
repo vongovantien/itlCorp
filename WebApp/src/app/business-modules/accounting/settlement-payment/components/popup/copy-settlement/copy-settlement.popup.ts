@@ -112,7 +112,7 @@ export class SettlementFormCopyPopupComponent extends PopupBase {
                             const checkPointCriterias: any[] = obhCharges.map(x => ({
                                 partnerId: x.paymentObjectId,
                                 hblId: x.hblid,
-                                transactionType: x.service,
+                                transactionType: x.typeService === 'OPS' ? "CL" : 'DOC',
                                 settlementCode: null
                             }));
                             const sourceValidate: Observable<any>[] = checkPointCriterias.map(criteria => this._documentRepo.validateCheckPointContractPartner(criteria));
