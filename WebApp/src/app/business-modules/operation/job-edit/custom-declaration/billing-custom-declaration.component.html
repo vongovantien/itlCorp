@@ -19,7 +19,7 @@
                 </div>
                 <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right"
                     *ngIf="!!currentJob && currentJob.permission.allowUpdate && currentJob.currentStatus !== 'Finish'">
-                    <button *ngIf="!!currentJob && !currentJob.isReplicate" type="button"
+                    <button *ngIf="!!currentJob && !currentJob.linkSource" type="button"
                         class="btn btn-info  m-btn--icon m-btn--uppercase" (click)="addNewCustomDeclaration()"
                         appLoadingButton [state]="!!currentJob && currentJob.isLocked">
                         <span>

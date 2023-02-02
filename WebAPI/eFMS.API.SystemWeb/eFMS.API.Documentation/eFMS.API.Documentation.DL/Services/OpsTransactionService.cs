@@ -1769,6 +1769,8 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                model.ClearanceNo = detail.ClearanceNo;
+
                 var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
                 int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
                 if (code == 403) return new HandleState(403);
