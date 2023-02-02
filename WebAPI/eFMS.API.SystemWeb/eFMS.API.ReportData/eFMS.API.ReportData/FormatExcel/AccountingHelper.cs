@@ -5672,7 +5672,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         sumBalanceVnd += balanceVnd;
                         listKeyData.Add("BalanceAmountUsd", balanceUsd);
                         listKeyData.Add("BalanceAmountVnd", balanceVnd);
-                        listKeyData.Add("InvoiceNo", item.InvoiceNo + (!string.IsNullOrEmpty(item.InvoiceNo) && !string.IsNullOrEmpty(item.VoucherNo) ? "/" : string.Empty) + item.VoucherNo);
+                        listKeyData.Add("InvoiceNo", item.InvoiceNo + (!string.IsNullOrEmpty(item.InvoiceNo) && !string.IsNullOrEmpty(item.VoucherNo) ? " / " : string.Empty) + item.VoucherNo);
                         listKeyData.Add("AccountNo", item.AccountNo);
                         listKeyData.Add("Branch", item.BranchName);
                         listKeyData.Add("ETD", item.EtdDate?.ToString("dd/MM/yyyy"));
@@ -5714,7 +5714,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                             listKeyData.Add("PaidAmountDebitDt", detail.PaidAmountUsd);
                             listKeyData.Add("PaidAmountOBHDt", detail.PaidAmountOBHUsd);
-                            listKeyData.Add("PaidDateDt", detail.PaidDate?.ToString("dd/MM/yy"));
+                            listKeyData.Add("PaidDateDt", detail.PaymentDate?.ToString("dd/MM/yy"));
                             listKeyData.Add("ReceiptNo", detail.PaymentRefNo);
 
                             //if (item.DebitAmountUsd != null)
