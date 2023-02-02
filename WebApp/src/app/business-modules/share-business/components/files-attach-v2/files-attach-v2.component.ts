@@ -8,7 +8,7 @@ import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
 import { AccountingRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
-import { getCurrentUserState, IAppState } from '@store';
+import { IAppState, getCurrentUserState } from '@store';
 import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
@@ -254,7 +254,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.documentAttach.selectedtDocType = edoc.documentTypeId;
         this.isView = true;
         const extension = this.selectedEdoc.imageUrl.split('.').pop();
-        if (extension === 'zip') {
+        if (!['xlsx', 'docx', 'doc', 'xls', 'html', 'htm', 'pdf', 'txt', 'png', 'jpeg', 'jpg'].includes(extension)) {
             this.isView = false;
         }
         this.clearMenuContext(this.queryListMenuContext);
@@ -431,7 +431,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 }
             )
         }
-        else {
+        else if (['pdf', 'txt', 'png', 'jpeg', 'jpg'].includes(extension.toLowerCase())) {
             this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
         }
     }

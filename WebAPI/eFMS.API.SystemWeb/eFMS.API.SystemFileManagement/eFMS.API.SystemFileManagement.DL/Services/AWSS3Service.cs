@@ -386,7 +386,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         image.Id = newId;
                         image.KeyS3 = filecCoppyConvert.destKey + image.Name;
                         image.ObjectId = filecCoppyModel.destKey.ToLower();
-                        image.Url = _apiUrl + "/file/api/v1/en-Us/AWSS3/OpenFile/" + filecCoppyConvert.destKey + image.Name;
+                        image.Url = _apiUrl.Value.Url.ToString() + "/file/api/v1/en-Us/AWSS3/OpenFile/" + filecCoppyConvert.destKey + image.Name;
                         var updateImg = _sysImageRepo.Add(image);
                         if (updateImg == null)
                         {
