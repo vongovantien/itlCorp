@@ -1054,12 +1054,11 @@ namespace eFMS.API.Accounting.DL.Services
                                     salesman.CreditRate = _creditRate;
                                     var hsUpdateUser = await userRepo.UpdateAsync(salesman, x => x.Id == salesman.Id, false);
                                 }
-                            }
-
-                            hs = contractPartnerRepo.SubmitChanges();
-                            if (hs.Success && agreementPartner.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
-                            {
-                                userRepo.SubmitChanges();
+                                hs = contractPartnerRepo.SubmitChanges();
+                                if (hs.Success && agreementPartner.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
+                                {
+                                    userRepo.SubmitChanges();
+                                }
                             }
                         }
                     }
