@@ -40,8 +40,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string PaymentStatus { get; set; }
         public string SoaNo { get; set; }
         public string FlexID { get; set; }
-        public Guid? POD { get; set; }
-        public Guid? POL { get; set; }
+        public string POD { get; set; }
+        public string POL { get; set; }
         public string Mawb { get; set; }
         public decimal? ChargeWeight { get; set; }
         public string CdNoteNo { get; set; }
@@ -54,5 +54,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string INVCreNo { get; set; }
         public string VatVoucher { get; set; }
         public DateTime? InvDueDay { get; set; }
+        public Guid? PolId { get; set; }
+        public Guid? PodId { get; set; }
     }
 }
