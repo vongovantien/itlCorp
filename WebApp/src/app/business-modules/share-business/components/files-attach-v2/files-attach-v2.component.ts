@@ -8,7 +8,7 @@ import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
-import { getCurrentUserState, IAppState } from '@store';
+import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
@@ -83,6 +83,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Alias Name', field: 'aliasName', width: 300 },
         { title: 'Real File Name', field: 'realFilename', width: 300 },
         { title: 'Document Type', field: 'docType', required: true },
+        { title: 'Payee', field: 'payee' },
+        { title: 'Invoice No', field: 'invoiceNo' },
+        { title: 'Series No', field: 'seriesNo' },
         { title: 'Job Ref', field: 'jobRef' },
         { title: 'Note', field: 'note' },
     ]
