@@ -4,12 +4,12 @@ import { SortService } from 'src/app/shared/services/sort.service';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
-import { NgProgress } from '@ngx-progressbar/core';
 import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { AppPage } from 'src/app/app.base';
-import { CatalogueRepo, DocumentationRepo } from 'src/app/shared/repositories';
+import { DocumentationRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
 import { finalize, catchError } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 @Component({
     selector: 'app-job-charge-import',
@@ -28,15 +28,12 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
     sortKey: string = 'code';
 
     constructor(
-        private _catalogueRepo: CatalogueRepo,
         private _documentRepo: DocumentationRepo,
         private pagingService: PagingService,
         private sortService: SortService,
-        private _progressService: NgProgress,
         private _toastService: ToastrService
     ) {
         super();
-        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -100,26 +97,62 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
             this._progressRef.complete();
         } else {
             const data = this.data.filter(x => x.isValid);
-            this._progressRef.start();
-            this._documentRepo.importCharge(data)
-                .pipe(
-                    finalize(() => {
-                        this._progressRef.complete();
-                    })
-                )
-                .subscribe(
-                    (res) => {
-                        if (res.status) {
-                            this._toastService.success(res.message);
-                            this.pager.totalItems = 0;
-                            this.reset(element);
-                        } else {
-                            this._toastService.error(res.message);
+            const sellObhs = data.filter(x => ['selling', 'sell', 'debit', 'obh'].includes((x.type || '').toLowerCase()));
+
+            const result = sellObhs.reduce((acc, curr) => {
+                const key = `${curr.paymentObjectId}_${curr.hblid}`; // * guid_guiid
+                if (!acc[key]) {
+                    acc[key] = [];
+                }
+                acc[key].push(curr);
+                return acc;
+            }, {} as { [key: string]: { hblid: string, paymentObjectId: string }[] });
+
+            const finalResult = Object.entries(result).map(([key]) => {
+                const [paymentObjectId, hblid] = key.split("_");
+                return {
+                    paymentObjectId,
+                    hblid,
+                };
+            });
+
+            if (!!finalResult.length) {
+                const criteriaCheckpointsObs = finalResult.map(x => ({
+                    partnerId: x.paymentObjectId,
+                    hblId: x.hblid,
+                    transactionType: 'CL',
+                })).map(y => this._documentRepo.validateCheckPointContractPartner(y));
+
+                forkJoin(criteriaCheckpointsObs)
+                    .subscribe(
+                        (res: CommonInterface.IResult | any) => {
+                            if (res.length === criteriaCheckpointsObs.length) {
+                                this.handleImportCharge(data);
+                                this.reset(element);
+                            }
                         }
-                    }
-                );
+                    )
+            } else {
+                this.handleImportCharge(data);
+                this.reset(element);
+            }
         }
     }
+
+    handleImportCharge(data) {
+        this._documentRepo.importCharge(data)
+            .subscribe(
+                (res) => {
+                    if (res.status) {
+                        this._toastService.success(res.message);
+                        this.pager.totalItems = 0;
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            );
+    }
+
     downloadSample() {
         this._documentRepo.downloadChargeExcel()
             .pipe(catchError(this.catchError))
