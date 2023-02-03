@@ -99,8 +99,9 @@
                                                     </ng-template>
                                                 </td>
                                                 <td>
-                                                    <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file
-                                                    .inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
+                                                    <div class="form-group"
+                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file
+                                                    .inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV')&&noINV===false }">
                                                         <app-combo-grid-virtual-scroll [height]="150"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'inv')"
                                                             [dataSources]="payFirst[i]===true?invDataSourceUpdate[i]:invDataSource"

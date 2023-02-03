@@ -48,6 +48,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     enablePayeeINV: boolean[] = [];
     payFirst: boolean[] = [];
     payFilled: boolean = true;
+    noINV: boolean = false;
     constructor(
         private _toastService: ToastrService,
         private _store: Store<IAppState>,
@@ -171,15 +172,22 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             );
 
                             _uniqBy(data, 'invoiceNo').forEach(element => {
-                                let item = ({
-                                    invoiceNo: element.invoiceNo,
-                                    payer: element.payer,
-                                    series: element.seriesNo,
-                                })
-                                this.invDataSource.push(item);
+                                if (element.invoiceNo !== '') {
+                                    let item = ({
+                                        invoiceNo: element.invoiceNo,
+                                        payer: element.payer,
+                                        series: element.seriesNo,
+                                    })
+                                    this.invDataSource.push(item);
+                                }
                             }
                             );
-
+                            if (this.invDataSource.length === 0) {
+                                this.noINV = true;
+                            } else {
+                                this.noINV = false;
+                            }
+                            console.log(this.noINV);
 
                         }
                     }
@@ -267,7 +275,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 } else {
                     this.payFirst[index] = false;
                 }
-                this.listFile[index].aliasName = this.listFile[index].Code + '_' + this.listFile[index].payee + '_' + this.listFile[index].inv !== null ? this.listFile[index].inv !== null : "";
+                this.listFile[index].aliasName = this.listFile[index].Code + '_' + this.listFile[index].payee + this.listFile[index].inv !== null ? '_' + this.listFile[index].inv !== null : "";
                 break;
             case 'inv':
                 this.listFile[index].aliasGenPay = true;
@@ -297,7 +305,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.isSubmitted = true;
         this.listFile.forEach(x => {
             if (x.Code === 'INV' || x.Code === 'OBH_INV') {
-                if (x.payee === null || x.inv === null || !x.payee || !x.inv) {
+                if ((x.payee === null || !x.payee) || ((!x.inv || x.inv === null) && this.noINV === false)) {
                     this._toastService.error("Please fill all field!");
                     this.payFilled = false;
                     return;
