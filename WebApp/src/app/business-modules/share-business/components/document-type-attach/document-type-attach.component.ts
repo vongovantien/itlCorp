@@ -125,7 +125,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     getDocumentType() {
-        this._systemFileManagerRepo.getDocumentType(this.transactionType, this.billingId)
+        this._systemFileManagerRepo.getDocumentType(this.transactionType)
             .pipe(
                 catchError(this.catchError),
             )
