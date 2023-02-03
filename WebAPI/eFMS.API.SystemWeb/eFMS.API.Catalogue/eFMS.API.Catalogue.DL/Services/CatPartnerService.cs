@@ -350,10 +350,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
 
                 var DataHeadOfficeAR = officeRepository.Get(x => x.OfficeType == "Head").FirstOrDefault();
+                var DataCamOfficeAR = officeRepository.Get(x => x.OfficeType == "Repo").FirstOrDefault();
                 if (DataHeadOfficeAR == null)
                 {
                     lstCCAR = null;
                 }
+                else if(DataCamOfficeAR.Id.ToString().ToUpper().Equals(OfficeId.ToUpper()))
+                {
+                    lstCCAR = null;
+                }    
                 else
                 {
                     var departmentHeadAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOfficeAR.Id).FirstOrDefault();
