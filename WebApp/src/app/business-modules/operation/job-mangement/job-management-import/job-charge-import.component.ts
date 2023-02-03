@@ -8,7 +8,7 @@ import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { AppPage } from 'src/app/app.base';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
-import { finalize, catchError } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -44,13 +44,7 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
     chooseFile(file: Event) {
         this.pager.totalItems = 0;
         if (file.target['files'] == null) { return; }
-        this._progressRef.start();
         this._documentRepo.upLoadChargeFile(file.target['files'])
-            .pipe(
-                finalize(() => {
-                    this._progressRef.complete();
-                })
-            )
             .subscribe((response: any) => {
                 this.data = response.data;
                 this.pager.currentPage = 1;
@@ -94,7 +88,6 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
         if (this.data == null) { return; }
         if (this.totalRows - this.totalValidRows > 0) {
             this.invaliDataAlert.show();
-            this._progressRef.complete();
         } else {
             const data = this.data.filter(x => x.isValid);
             const sellObhs = data.filter(x => ['selling', 'sell', 'debit', 'obh'].includes((x.type || '').toLowerCase()));
