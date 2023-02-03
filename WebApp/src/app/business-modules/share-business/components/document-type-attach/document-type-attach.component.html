@@ -1,5 +1,5 @@
 <div class="modal fade" role="dialog" bsModal #popup="bs-modal">
-    <div class="modal-dialog modal-dialog-scrollable  c-modal-fullscreen" role="document">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Attachments Files</h5>
@@ -29,7 +29,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <table class="table table-brand table-fixed table-editable">
+                        <table class="table table-brand table-editable table-fixed-err">
                             <thead app-table-header [headers]="headers">
                                 <th class="first">Action</th>
                             </thead>
@@ -58,16 +58,16 @@
                                             </td>
                                             <td>
                                                 <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.docType||file
-                                                    .docType===null)) }">
-                                                    <select class="form-control" [(ngModel)]="file.docType"
-                                                        (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
-                                                        <option *ngFor="let docType of documentTypes"
-                                                            [ngValue]="docType">
-                                                            {{docType.nameEn}}
-                                                        </option>
-                                                    </select>
+                                                        .docType===null)) }">
+                                                    <!-- <select class="form-control" [(ngModel)]="file.docType"
+                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
+                                                            <option *ngFor="let docType of documentTypes"
+                                                                [ngValue]="docType">
+                                                                {{docType.nameEn}}
+                                                            </option>
+                                                        </select> -->
                                                     <div class="list-master">
-                                                        <app-combo-grid-virtual-scroll [height]="150"
+                                                        <app-combo-grid-virtual-scroll class="index1" [height]="150"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'docType')"
                                                             [dataSources]="configDocType.dataSource"
                                                             [displayFields]="configDocType.displayFields"
@@ -79,7 +79,10 @@
                                             </td>
                                             <ng-container *ngIf="typeFrom==='Settlement'">
                                                 <td>
-                                                    <div class="form-group" *ngIf="!file.payeeName;else payeeName">
+                                                    <div class="form-group"
+                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.payee||file
+                                                        .payee===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }"
+                                                        *ngIf="!file.payeeName;else payeeName">
                                                         <app-combo-grid-virtual-scroll [height]="150"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'payee')"
                                                             [dataSources]="payeeDataSource"
@@ -91,13 +94,13 @@
                                                     <ng-template #payeeName>
                                                         <div class="form-group ">
                                                             <input type="text" class="form-control "
-                                                                placeholder="Series No" [ngModel]="file?.payeeName"
-                                                                disabled>
+                                                                [ngModel]="file?.payeeName" disabled>
                                                         </div>
                                                     </ng-template>
                                                 </td>
                                                 <td>
-                                                    <div class="form-group ">
+                                                    <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file
+                                                    .inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
                                                         <app-combo-grid-virtual-scroll [height]="150"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'inv')"
                                                             [dataSources]="payFirst[i]===true?invDataSourceUpdate[i]:invDataSource"
@@ -121,11 +124,11 @@
                                             </td>
                                             <td class="disabled" *ngIf="typeFrom!=='Shipment'">
                                                 <!-- <select class="form-control" [(ngModel)]="file.job"
-                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
-                                                            <option *ngFor="let job of jobs" [ngValue]="job">
-                                                                {{job.jobNo}}
-                                                            </option>
-                                                        </select> -->
+                                                                (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
+                                                                <option *ngFor="let job of jobs" [ngValue]="job">
+                                                                    {{job.jobNo}}
+                                                                </option>
+                                                            </select> -->
                                                 <div class="list-master">
                                                     <app-combo-grid-virtual-scroll [height]="150"
                                                         (itemSelected)="onSelectDataFormInfo($event,i, 'job')"
@@ -153,7 +156,6 @@
                                                         [ngModel]="file.note">
                                                 </div>
                                             </td>
-
                                         </tr>
                                     </ng-container>
                                     <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!listFile.length">

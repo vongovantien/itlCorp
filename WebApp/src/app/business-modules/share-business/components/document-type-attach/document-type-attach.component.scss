@@ -47,5 +47,28 @@
             }
         }
     }
-
+    .table-fixed-err {
+        .table-collapse-group {
+            thead,
+            tbody {
+                tr {
+                    th,
+                    td {
+                        width: 130px;
+                    }
+                }
+            }
+        }
+        &.table-editable {
+            .form-group {
+                .form-control {
+                }
+                &.has-danger {
+                    .form-control {
+                        border: 1px solid #f4516b !important;
+                    }
+                }
+            }
+        }
+    }
 }

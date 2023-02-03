@@ -80,8 +80,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     ]
 
     headerSettleAttach: any[] = [
-        { title: 'Alias Name', field: 'aliasName', width: 300 },
-        { title: 'Real File Name', field: 'realFilename', width: 300 },
+        { title: 'Alias Name', field: 'aliasName', width: 200 },
+        { title: 'Real File Name', field: 'realFilename' },
         { title: 'Document Type', field: 'docType', required: true },
         { title: 'Payee', field: 'payee' },
         { title: 'Invoice No', field: 'invoiceNo' },
