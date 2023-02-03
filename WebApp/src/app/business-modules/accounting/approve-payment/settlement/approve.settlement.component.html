@@ -3,54 +3,67 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <tabset class="custom-class-tab">
-                    <tab heading="Settlement Info" [active]="true">
-                        <settle-payment-form-create readOnly>
-                            <ng-container
-                                *ngIf="!!settlementPayment && !!settlementPayment.settlement && settlementPayment.settlement.syncStatus">
-                                <span
-                                    class="m-badge m-badge--{{settlementPayment.settlement.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">
-                                    {{settlementPayment.settlement.syncStatus}}{{settlementPayment.settlement.syncStatus
-                                    ===
-                                    'Rejected' &&
-                                    settlementPayment.settlement.reasonReject ? ' - ' +
-                                    settlementPayment.settlement.reasonReject : ''}}
-                                </span>
-                            </ng-container>
-                        </settle-payment-form-create>
-                        <div class="row" *ngIf="!!settlementPayment">
-                            <div class="col-lg-6">
-                                <div class="m--align-left">
-                                    Created:
-                                    {{settlementPayment.settlement.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
-                                    &nbsp;
-                                    By <span
-                                        class="text-success">{{settlementPayment.settlement.userNameCreated}}</span>
+               <div class="row">
+                <div class="col">
+                    <tabset class="custom-class-tab">
+                        <tab heading="Settlement Info" [active]="true">
+                            <settle-payment-form-create readOnly>
+                                <ng-container
+                                    *ngIf="!!settlementPayment && !!settlementPayment.settlement && settlementPayment.settlement.syncStatus">
+                                    <span
+                                        class="m-badge m-badge--{{settlementPayment.settlement.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">
+                                        {{settlementPayment.settlement.syncStatus}}{{settlementPayment.settlement.syncStatus
+                                        ===
+                                        'Rejected' &&
+                                        settlementPayment.settlement.reasonReject ? ' - ' +
+                                        settlementPayment.settlement.reasonReject : ''}}
+                                    </span>
+                                </ng-container>
+                            </settle-payment-form-create>
+                            <div class="row" *ngIf="!!settlementPayment">
+                                <div class="col-lg-6">
+                                    <div class="m--align-left">
+                                        Created:
+                                        {{settlementPayment.settlement.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                                        &nbsp;
+                                        By <span
+                                            class="text-success">{{settlementPayment.settlement.userNameCreated}}</span>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="m--align-left">
+                                        Modified:
+                                        {{settlementPayment.settlement.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                                        &nbsp;
+                                        By <span
+                                            class="text-success">{{settlementPayment.settlement.userNameModified}}</span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
-                                <div class="m--align-left">
-                                    Modified:
-                                    {{settlementPayment.settlement.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
-                                    &nbsp;
-                                    By <span
-                                        class="text-success">{{settlementPayment.settlement.userNameModified}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </tab>
-                    <tab>
-                        <ng-template tabHeading>
-                            <span class="m--margin-right-10">Attach files </span>
-                            <span class="badge badge-success"
-                                *ngIf="attachFiles.eDocs?.length > 0">{{attachFiles.eDocs?.length}}</span>
-                        </ng-template>
-                        <files-attach-v2 [typeFrom]="'Settlement'" [billingId]="settlementId" [billingNo]="settlementCode"
-                            (onChange)="attachFiles = $event" readOnly>
-                        </files-attach-v2>
-                    </tab>
-                </tabset>
-
+                        </tab>
+                        <tab>
+                            <ng-template tabHeading>
+                                <span class="m--margin-right-10">Attach files </span>
+                                <span class="badge badge-success"
+                                    *ngIf="attachFiles.eDocs?.length > 0">{{attachFiles.eDocs?.length}}</span>
+                            </ng-template>
+                            <files-attach-v2 [typeFrom]="'Settlement'" [billingId]="settlementId" [billingNo]="settlementCode"
+                                (onChange)="attachFiles = $event" readOnly>
+                            </files-attach-v2>
+                        </tab>
+                    </tabset>
+                </div>
+                <!-- <div class="col-3">
+                    <div class="float-left">
+                        <button type="button" class="btn btn-primary m-btn--icon m-btn--uppercase" (click)="getFilesAdvance()">
+                            <span>
+                                <i class="la la-download"></i>
+                                <span> Get Files Advance</span>
+                            </span>
+                        </button>
+                    </div>
+                </div> -->
+               </div>
             </div>
         </div>
     </div>

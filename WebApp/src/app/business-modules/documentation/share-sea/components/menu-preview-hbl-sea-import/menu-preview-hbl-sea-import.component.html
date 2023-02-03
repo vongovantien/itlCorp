@@ -14,9 +14,14 @@
             <a (click)="onPreview('ARRIVAL_VND')" class="dropdown-item pointer">VND
             </a>
         </app-dropdown>
-        <a class="dropdown-item pointer" (click)="onPreview('DELIVERY_ORDER')">
-            Delivery Order
+        <a [dpToggle]="dropdownMenuDeliveryOrder" class="dropdown-toggle dropdown-item pointer" position="leftTop"
+            trigger="hover">
+            Delivery Order<span class="caret"></span>
         </a>
+        <app-dropdown #dropdownMenuDeliveryOrder>
+            <a class="dropdown-item pointer" (click)="onPreview('DELIVERY_ORDER_EN')">Form En</a>
+            <a class="dropdown-item pointer" (click)="onPreview('DELIVERY_ORDER')">Form Vi</a>
+        </app-dropdown>
         <a class="dropdown-item pointer" (click)="onPreview('PROOF_OF_DELIVERY')">
             Proof Of Delivery
         </a>

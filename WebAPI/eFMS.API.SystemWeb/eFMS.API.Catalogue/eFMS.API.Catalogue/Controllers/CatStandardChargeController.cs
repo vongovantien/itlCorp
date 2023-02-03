@@ -2,6 +2,7 @@
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -61,10 +62,10 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="type">type=BUY/SELL/OBH</param>
         /// <param name="transactionType">transactionType=AI/AE/SFE/SFI/SLE/SLI/SCE/SCI</param>
         /// <returns></returns>
-        [HttpGet("GetBy")]
-        public IActionResult GetBy(string type, string transactionType)
+        [HttpPost("GetBy")]
+        public IActionResult GetBy(CatStandardChargeCriteria criteria)
         {
-            var data = catStandardChargeService.GetBy(type, transactionType);
+            var data = catStandardChargeService.GetBy(criteria);
             return Ok(data);
         }
         /// <summary>

@@ -5,9 +5,9 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
     public class SeaDeliveryCommandResult
     {
         public string DONo { get; set; }
-        public DateTime DateConfirm { get; set; }
+        public DateTime? DateConfirm { get; set; }
         public DateTime? FlightDate { get; set; }
-        public string  LocalVessel { get; set; }	
+        public string LocalVessel { get; set; }
         public string ContSealNo { get; set; }
         public string ForCarrier { get; set; }
         public string ATTN { get; set; }
@@ -15,7 +15,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string Notify { get; set; }
         public string HandlingInfo { get; set; }
         public string ExecutedOn { get; set; }
-        public string OceanVessel { get; set; }	
+        public string OceanVessel { get; set; }
         public string DepartureAirport { get; set; }
         public string PortofDischarge { get; set; }
         public string PlaceDelivery { get; set; }
@@ -26,7 +26,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string TotalPackages { get; set; }
         public string NoPieces { get; set; }
         public decimal? GrossWeight { get; set; }
-        public string Unit { get; set; }	
+        public string Unit { get; set; }
         public decimal? CBM { get; set; }
         public bool SeaLCL { get; set; }
         public DateTime DatePackage { get; set; }

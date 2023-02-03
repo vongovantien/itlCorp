@@ -1,7 +1,9 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
+using eFMS.API.SystemFileManagement.DL.Services;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
@@ -176,6 +178,19 @@ namespace eFMS.API.SystemFileManagement.Controllers
             HandleState hs = await _edocService.CreateEDocZip(m);
             if (hs.Success)
                 return File((byte[])hs.Message, "application/zip", m.FileName);
+            return BadRequest(hs);
+        }
+
+        [HttpGet("GenEdocFromBilling")]
+        public async Task<IActionResult> GenEdocFromBilling(string BillingNo,string BillingType)
+        {
+            HandleState hs = await _edocService.GenEdocByBilling(BillingNo, BillingType);
+            if (hs.Success)
+                return Ok(new ResultHandle { Message = "Get File Successfully", Status = true });
+            if(hs.Exception.Message== "Not found file")
+            {
+                return Ok(new ResultHandle { Message = "Not found file", Status = false });
+            }
             return BadRequest(hs);
         }
     }

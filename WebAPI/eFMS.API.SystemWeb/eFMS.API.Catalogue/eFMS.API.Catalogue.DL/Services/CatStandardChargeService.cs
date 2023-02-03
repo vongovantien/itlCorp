@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
 using eFMS.IdentityServer.DL.UserManager;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Services
@@ -40,10 +42,21 @@ namespace eFMS.API.Catalogue.DL.Services
             stringLocalizer = localizer;
             unitRepository = unitRepo;
         }        
-        public IQueryable<CatStandardChargeModel> GetBy(string type, string transactionType)
+        public IQueryable<CatStandardChargeModel> GetBy(CatStandardChargeCriteria criteria)
         {
-            IQueryable<CatStandardCharge> standCharge = DataContext.Get(x => (x.Type == type && x.TransactionType == transactionType));
+            Expression<Func<CatStandardCharge, bool>> query = x => x.Type == criteria.Type 
+                                                                   && x.TransactionType == criteria.TransactionType;
+            if(!string.IsNullOrEmpty(criteria.Service))
+            {
+                query = query.And(x => x.Service == criteria.Service);
+            }
+            if (!string.IsNullOrEmpty(criteria.ServiceType))
+            {
+                query = query.And(x => x.ServiceType == criteria.ServiceType);
+            }
+            IQueryable<CatStandardCharge> standCharge = DataContext.Get(query);
             if (standCharge == null) return null;
+
             IQueryable<CatStandardChargeModel> result = (
                from stcharge in standCharge
                join charge in catChargeReposity.Get() on stcharge.ChargeId equals charge.Id

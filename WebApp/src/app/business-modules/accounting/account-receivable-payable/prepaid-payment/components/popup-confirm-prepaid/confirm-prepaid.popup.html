@@ -22,8 +22,8 @@
                                                 <i class="la la-trash"></i>
                                             </button>
                                         </div>
-                                        <div class="d-flex flex-wrap m--margin-left-20">
-                                            <div class="m--margin-right-10 m--margin-bottom-20">
+                                        <div class="d-flex flex-wrap m--margin-left-20 align-items-center">
+                                            <div class="m--margin-right-10">
                                                 <span class="font-weight-bold font-14">Job: &nbsp;</span>
                                                 <span class="text-primary">{{groupItem.job}}</span>
                                             </div>
@@ -47,7 +47,8 @@
                                         <thead>
                                             <th></th>
                                             <th class="text-center">Debit Note</th>
-                                            <th class="text-center">Debit Amount</th>
+                                            <th class="text-center">Debit Amount VND</th>
+                                            <th class="text-center">Debit Amount USD</th>
                                             <th class="text-center">User Created</th>
                                         </thead>
                                         <tbody>
@@ -61,7 +62,10 @@
                                                         </button>
                                                     </td>
                                                     <td class="text-center text-primary">{{item.debitNote}}</td>
-                                                    <td class="text-center">{{item.totalAmount | number: '.0-3'}}</td>
+                                                    <td class="text-center">{{item.totalAmountVND | number: '.0-3'}}
+                                                    </td>
+                                                    <td class="text-center">{{item.totalAmountUSD | number: '.0-3'}}
+                                                    </td>
                                                     <td class="text-center text-success">{{item.userCreatedName}}</td>
                                                 </tr>
                                                 <tr app-table-none-record *ngIf="!groupItem.details.length"></tr>
@@ -72,8 +76,10 @@
                                             <tr class="font-weight-bold font-15">
                                                 <td></td>
                                                 <td ALIGN="center">TOTAL</td>
-                                                <td class="text-center">{{groupItem.details | sum:'totalAmount' |
-                                                    number: '.0-3'}} {{groupItem.currency}}</td>
+                                                <td class="text-center">{{groupItem.details | sum:'totalAmountVND' |
+                                                    number: '.0-3'}} VND</td>
+                                                <td class="text-center">{{groupItem.details | sum:'totalAmountUSD' |
+                                                    number: '.0-3'}} USD</td>
                                             </tr>
                                         </tfoot>
                                     </table>
@@ -85,6 +91,20 @@
                 </div>
             </div>
             <div class="modal-footer row">
+                <div class="col-lg-12 d-flex font-15">
+                    <div class="d-flex align-items-center">
+                        <span class="font-weight-bold m--margin-right-10">Total Amount: </span>
+                        <span class="m--margin-right-10 badge badge-info font-14">
+                            {{sumAmountVND | number: '.0-2'}}
+                        </span>
+                        VND
+                        <span class="m--margin-left-10 m--margin-right-10">-</span>
+                        <span class="m--margin-right-10 badge badge-info font-14">
+                            {{sumAmountUSD | number: '.0-3'}}
+                        </span>
+                        USD
+                    </div>
+                </div>
                 <div class="col-lg-12">
                     <div class="m--align-center m--margin-top-20">
                         <button class="btn btn-primary  m-btn--icon m-btn--uppercase m--margin-right-10" title="Save"

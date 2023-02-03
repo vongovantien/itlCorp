@@ -1,7 +1,6 @@
-import { X } from '@angular/cdk/keycodes';
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { JobConstants, SystemConstants } from '@constants';
@@ -222,7 +221,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             officeId: [null, Validators.required],
             contractNo: [null, Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
-            expiredDate: [null, Validators.required],
+            expiredDate: [null, Validators.compose([
+                Validators.required, 
+                this.checkExpiredDate
+            ])],
             contractType: [null, Validators.required],
             saleService: [null, Validators.required],
             paymentMethod: ['All'],
@@ -476,7 +478,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             (this.contractType.value !== 'Cash' && this.contractType.value !== 'Guarantee' && this.contractType.value !== 'Prepaid' && (this.expiredDate.value == null || (!this.expiredDate.value.startDate || this.expiredDate.value.startDate == null)))) {
             return false;
         }
-        if (this.contractTypeDetail=='Prepaid' && this.contractType.value!=this.contractTypeDetail || this.selectedContract.debitAmount>0 && this.contractTypeDetail!='Prepaid'&& this.contractType.value=='Prepaid'){    
+        if (this.contractTypeDetail == 'Prepaid' && this.contractType.value != this.contractTypeDetail || this.selectedContract.debitAmount > 0 && this.contractTypeDetail != 'Prepaid' && this.contractType.value == 'Prepaid') {
             this._toastService.error('Cannot change agreement type!');
             this.contractType.setValue(this.contractTypeDetail);
             return false;
@@ -645,7 +647,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             }, () => {
                                 return;
                             })
-                        }else{
+                        } else {
                             this._toastService.error(res.message);
                         }
                     }
@@ -945,6 +947,27 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             });
         }
     }
+    checkExpiredDate: ValidatorFn = (): { [key: string]: any; } | null => {
+        if (this.contractType?.value === 'Trial') {
+            let effDate = this.formGroup && this.formGroup.get('effectiveDate').value;
+            let expDate = this.formGroup && this.formGroup.get('expiredDate').value;
+            let expDateValid = null;
+            let expDate1 = null;
+            let checkError = false;
+            if (!!effDate) {
+                expDateValid = new Date(new Date(effDate.startDate).setDate(new Date(effDate.startDate)?.getDate() + 30));
+                expDate1 = new Date(new Date(expDate.startDate));
+            }
+            const date2: any = new Date(expDateValid).valueOf();
+            const date1: any = new Date(expDate1).valueOf();
+            if (!!expDateValid) {
+                if (date1 > date2)
+                    checkError = true;
+            }
+            return checkError ? { invalidRange: { effDate, expDate } } : null;
+        }
+        return null;
+    }
 
     selectedService($event: any) {
         if ($event.length > 0) {
@@ -991,6 +1014,9 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 }
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['paymentTerm'].setValue(30);
+                this.formGroup.get('expiredDate').setValidators([
+                    this.checkExpiredDate
+                ])
                 break;
             case 'Guarantee':
                 if (this.isCreateNewCommercial) {
@@ -1003,19 +1029,21 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');
                 this.formGroup.controls['creditCurrency'].setValue("VND");
                 this.formGroup.controls['currencyId'].setValue("VND");
+                this.formGroup.controls['expiredDate'].setErrors(null);
                 break;
             case 'Cash':
                 this.formGroup.controls['paymentTerm'].setValue(1);
                 this.formGroup.controls['shipmentType'].setValue(JobConstants.COMMON_DATA.SHIPMENTTYPES[1]);
+                this.formGroup.controls['expiredDate'].setErrors(null);
                 break;
             case 'Official':
                 this.formGroup.controls['paymentTerm'].setValue(30);
+                this.formGroup.controls['expiredDate'].setErrors(null);
                 break;
             case 'Prepaid':
-                this.formGroup.controls['paymentTerm'].setValue(1);
-                break;
             case 'Parent Contract':
-                this.formGroup.controls['paymentTerm'].setValue(1); 
+                this.formGroup.controls['paymentTerm'].setValue(1);
+                this.formGroup.controls['expiredDate'].setErrors(null);
                 break;
             default:
                 this.formGroup.controls['shipmentType'].setValue('Freehand & Nominated');

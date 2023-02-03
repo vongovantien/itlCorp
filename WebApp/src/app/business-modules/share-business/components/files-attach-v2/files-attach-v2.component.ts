@@ -6,7 +6,7 @@ import { SystemConstants } from '@constants';
 import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
-import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
+import { AccountingRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
@@ -42,7 +42,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     jobId: string = '';
     isOps: boolean = false;
     edocByJob: any[] = [];
-    edocByAcc: any[] = [];
+    //edocByAcc: any[] = [];
     selectedEdoc: IEDocItem;
     selectedEdoc1: IEDocItem;
     transactionType: string = '';
@@ -52,6 +52,11 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     private _readonly: boolean = false;
     isView: boolean = true;
     elementInput: HTMLElement = null;
+    edocByAcc: IEdocAcc[] = [({
+        documentType: null,
+        eDocs: [],
+    })];
+
 
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
@@ -62,13 +67,22 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Attach Person', field: 'userCreated', sortable: true },
     ];
 
-    headersAcc: CommonInterface.IHeaderTable[] = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
-    { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
-    { title: 'Job No', field: 'jobNo' },
-    { title: 'Note', field: 'note' },
-    { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
-    { title: 'Attach Person', field: 'userCreated', sortable: true },
+    // headersAcc: CommonInterface.IHeaderTable[] = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
+    // { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
+    // { title: 'Job No', field: 'jobNo' },
+    // { title: 'Note', field: 'note' },
+    // { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
+    // { title: 'Attach Person', field: 'userCreated', sortable: true },
+    // ];
+    headersAcc: CommonInterface.IHeaderTable[] = [
+        { title: 'Alias Name', field: 'systemFileName', sortable: true },
+        { title: 'Job No', field: 'jobNo' },
+        { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
+        { title: 'Note', field: 'note' },
+        { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
+        { title: 'Attach Person', field: 'userCreated', sortable: true },
     ];
+
 
     headerAttach: any[] = [
         { title: 'Alias Name', field: 'aliasName', width: 300 },
@@ -97,6 +111,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         private readonly _toast: ToastrService,
         private readonly _exportRepo: ExportRepo,
         private readonly _sortService: SortService,
+        private readonly _accoutingRepo: AccountingRepo,
         private _documentationRepo: DocumentationRepo,
     ) {
         super();
@@ -464,7 +479,41 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 }
             );
     }
+
+    genFileToSM(billingType: string) {
+        this._systemFileRepo.genEdocFromBilling(this.billingNo, billingType)
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this.getEDoc(this.transactionType);
+                        this._toast.success(res.message);
+                    }
+                    else {
+                        this._toast.warning(res.message)
+                    }
+                },
+            );
+    }
+
+    // genFileSOAToSM() {
+    //     this._systemFileRepo.genEdocFromBilling(this.billingNo, "SOA")
+    //         .pipe(catchError(this.catchError))
+    //         .subscribe(
+    //             (res: any) => {
+    //                 if (res.status) {
+    //                     this.getEDoc(this.transactionType);
+    //                 }
+    //             },
+    //         );
+    // }
 }
+
+interface IEdocAcc {
+    documentType: any;
+    eDocs: any[];
+}
+
 interface IEDocItem {
     billingNo: string;
     billingType: string;

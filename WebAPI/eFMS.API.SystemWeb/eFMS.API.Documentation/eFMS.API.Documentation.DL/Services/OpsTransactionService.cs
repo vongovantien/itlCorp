@@ -2711,7 +2711,7 @@ namespace eFMS.API.Documentation.DL.Services
             surcharge.ChargeId = chargeBuy.DebitCharge ?? Guid.Empty;
 
             surcharge.Quantity = 1;
-            surcharge.Vatrate = 8;
+            surcharge.Vatrate = chargeBuy.ServiceDate.Value < new DateTime(2023, 1, 1) ? 8 : 10; // [CR:18726] update 8 -> 10% from 1/1/2023
 
             surcharge.Soano = null;
             surcharge.PaySoano = null;
@@ -2871,11 +2871,10 @@ namespace eFMS.API.Documentation.DL.Services
             return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
         }
 
-        public async Task<HandleState> SyncGoodInforToReplicateJob(string jobNo)
+        public async Task<HandleState> SyncGoodInforToReplicateJob(Guid jobId)
         {
             var hs = new HandleState();
-
-            var job = await DataContext.Get(x => x.JobNo == jobNo && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+            var job = await DataContext.Get(x => x.Id == jobId && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
             if (job != null)
             {
                 var repJob = await DataContext.Get(x => x.Id == job.ReplicatedId && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
@@ -2887,12 +2886,21 @@ namespace eFMS.API.Documentation.DL.Services
                     repJob.SumContainers = job.SumContainers;
                     repJob.SumGrossWeight = job.SumGrossWeight;
                     repJob.PackageTypeId = job.PackageTypeId;
+                    repJob.ContainerDescription = job.ContainerDescription;
 
-                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id);
+                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id, false);
+                    if (hs.Success)
+                    {
+                        var listConOfJob = await csMawbcontainerRepository.GetAsync(x => x.Mblid == job.Id);
+                        var listCont = mapper.Map<List<CsMawbcontainerModel>>(listConOfJob);
+                        listCont.ForEach(x => x.Id = Guid.Empty);
+                        hs = mawbcontainerService.UpdateMasterBill(listCont, job.ReplicatedId ?? Guid.Empty);
+                    }
+                    hs = DataContext.SubmitChanges();
+
                     return hs;
                 }
             }
-
 
             return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_REPLICATE_NOT_EXISTS].Value);
         }

@@ -195,7 +195,7 @@
                                             Bank Account No:
                                         </label>
                                         <ng-container
-                                            *ngIf="paymentMethod.value.value === 'Bank' || paymentMethod.value.value === 'Other'; else bankTpl">
+                                            *ngIf="paymentMethod.value.value === 'Bank' || paymentMethod.value.value === 'NETOFF_SHPT'|| paymentMethod.value.value === 'Other'; else bankTemplate">
                                             <app-combo-grid-virtual-scroll (showedDropdown)="getBankAccountPayee(false)"
                                                 (itemSelected)="onSelectDataFormInfo($event, 'bankAccountNo')"
                                                 [selectedDisplayFields]="['bankAccountNo']" [dataSources]="bankAccount"
@@ -205,7 +205,7 @@
                                                 formControlName="bankAccountNo">
                                             </app-combo-grid-virtual-scroll>
                                         </ng-container>
-                                        <ng-template #bankTpl>
+                                        <ng-template #bankTemplate>
                                             <input type="text" class="form-control" formControlName="bankAccountNo">
                                         </ng-template>
                                     </div>

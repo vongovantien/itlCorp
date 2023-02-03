@@ -118,8 +118,8 @@
                                         [active]="selectedTabSurcharge === 'BUY'">
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
-                                            <buying-charge [showGetChargeStandart]="false" service="logistic"
-                                                [allowSaving]="!isDuplicate" *ngIf="selectedTabSurcharge === 'BUY'">
+                                            <buying-charge service="logistic" [allowSaving]="!isDuplicate"
+                                                *ngIf="selectedTabSurcharge === 'BUY'">
                                             </buying-charge>
                                         </ng-container>
                                     </tab>
@@ -128,9 +128,8 @@
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <selling-charge service="logistic" [showSyncFreight]="false"
-                                                [showGetCharge]="true" [showSyncStandard]="false"
-                                                [allowLinkFee]="allowLinkFeeSell" [isDuplicateJob]="isDuplicate"
-                                                [noProfit]="opsTransaction.noProfit"
+                                                [showGetCharge]="true" [allowLinkFee]="allowLinkFeeSell"
+                                                [isDuplicateJob]="isDuplicate" [noProfit]="opsTransaction.noProfit"
                                                 *ngIf="selectedTabSurcharge === 'SELL'" [allowSaving]="!isDuplicate">
                                             </selling-charge>
                                         </ng-container>
@@ -200,7 +199,8 @@
 
 <app-dropdown #dropdownMenuDuplicate>
     <a class="dropdown-item pointer" (click)="confirmDuplicate()" title="Duplicate with current job">Current Job</a>
-    <ng-container *ngIf="(currentUser$ | async)?.officeType === 'Head' || (currentUser$ | async)?.officeType === 'Branch'">
+    <ng-container
+        *ngIf="(currentUser$ | async)?.officeType === 'Head' || (currentUser$ | async)?.officeType === 'Branch'">
         <a class="dropdown-item pointer" (click)="confirmDuplicate(true)" title="Duplicate with job replicate">With Job
             Replicate</a>
     </ng-container>

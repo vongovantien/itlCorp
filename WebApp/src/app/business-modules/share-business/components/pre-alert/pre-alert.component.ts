@@ -1316,13 +1316,15 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     //     this.hawbDetails = [...res.map(v => ({ ...v, isCheckedHawb: true }))];
                     // } else {
                     //     this.hawbDetails = res.filter(x => x.id === this.hblId).map(v => ({ ...v, isCheckedHawb: true }));
-                    // }
-                    var invalidHawb = res.filter(x => !!x.errorMessage && !!x.errorMessage.length);
-                    if (this.hblId === SystemConstants.EMPTY_GUID && res.length === invalidHawb.length) {
-                        this._toastService.warning(invalidHawb[0].errorMessage);
-                        this.cancelPreAlert();
-                    } else {
-                        this.hawbDetails = res.filter(x => !x.errorMessage || !x.errorMessage.length).map(v => ({ ...v.hbl, isCheckedHawb: true }));
+                    // }      
+                    if (res.length > 0) {
+                        var invalidHawb = res.filter(x => !!x.errorMessage && !!x.errorMessage.length);
+                        if (this.hblId === SystemConstants.EMPTY_GUID && res.length === invalidHawb.length) {
+                            this._toastService.warning(invalidHawb[0].errorMessage);
+                            this.cancelPreAlert();
+                        } else {
+                            this.hawbDetails = res.filter(x => !x.errorMessage || !x.errorMessage.length).map(v => ({ ...v.hbl, isCheckedHawb: true }));
+                        }
                     }
                     this.exportFileCrystalToPdf(this.serviceId);
                     this.getContentMail(this.serviceId, this.hblId, this.jobId);

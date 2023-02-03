@@ -37,7 +37,6 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
 
     @Input() showSyncFreight: boolean = true;
     @Input() showGetCharge: boolean = true;
-    @Input() showSyncStandard: boolean = true;
     @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
     @Input() allowLinkFee: boolean = false;
     @Input() isDuplicateJob: boolean = false;
