@@ -733,7 +733,7 @@ namespace eFMS.API.Setting.DL.Services
                             var images = sysImageRepo.Get(x => x.ObjectId == advanceCurrent.Id.ToString().ToLower()).ToList();
                             foreach(var image in images)
                             {
-                                var delete = await client.DeleteAsync(DeleteFileS3Url + "Accounting/Settlement/" + image.Id);
+                                var delete = await client.DeleteAsync(DeleteFileS3Url + "Accounting/Advance/" + image.Id);
                                 if (!delete.IsSuccessStatusCode)
                                 {
                                     return new HandleState(false, "can't delete Folder");

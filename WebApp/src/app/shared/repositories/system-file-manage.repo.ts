@@ -68,7 +68,7 @@ export class SystemFileManageRepo {
     }
 
     getDocumentType(transactionType: string, billingId: string) {
-        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AttachFileTemplate/GetDocumentType?transactionType=${transactionType}&billingId=${billingId}`).pipe(
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AttachFileTemplate/GetDocumentType?transactionType=${transactionType}`).pipe(
             map((data: any) => data)
         );
     }

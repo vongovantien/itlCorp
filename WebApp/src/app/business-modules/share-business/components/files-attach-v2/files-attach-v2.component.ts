@@ -104,6 +104,14 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Note', field: 'note' },
     ]
 
+    headerAccAttach: any[] = [
+        { title: 'Alias Name', field: 'aliasName', width: 200 },
+        { title: 'Real File Name', field: 'realFilename' },
+        { title: 'Document Type', field: 'docType', required: true },
+        { title: 'Job Ref', field: 'jobRef' },
+        { title: 'Note', field: 'note' },
+    ]
+
     constructor(
         private readonly _systemFileRepo: SystemFileManageRepo,
         private readonly _activedRoute: ActivatedRoute,
@@ -196,7 +204,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
         this.selectedEdoc1 = edoc;
-        this.documentAttach.selectedtDocType = edoc.documentTypeId;
+        this.documentAttach.selectedDocType = edoc.documentTypeId;
         this.isView = true;
         const extension = this.selectedEdoc.imageUrl.split('.').pop();
         if (extension === 'zip') {
@@ -234,10 +242,14 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     editEdoc() {
-        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance' || this.typeFrom === 'SOA') {
+        if (this.typeFrom === 'Settlement') {
             this.documentAttach.headers = this.headerSettleAttach;
 
-        } else {
+        }
+        else if (this.typeFrom === 'Advance' || this.typeFrom === 'SOA') {
+            this.documentAttach.headers = this.headerAccAttach;
+        }
+        else {
             this.documentAttach.headers = this.headerAttach;
         }
         this.documentAttach.isUpdate = true;
@@ -335,9 +347,13 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     showDocumentAttach() {
-        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance' || this.typeFrom === 'SOA') {
+        if (this.typeFrom === 'Settlement') {
             this.documentAttach.headers = this.headerSettleAttach;
-        } else {
+        }
+        else if (this.typeFrom === 'Advance' || this.typeFrom === 'SOA') {
+            this.documentAttach.headers = this.headerAccAttach;
+        }
+        else {
             this.documentAttach.headers = this.headerAttach;
         }
         this.documentAttach.isUpdate = false;
