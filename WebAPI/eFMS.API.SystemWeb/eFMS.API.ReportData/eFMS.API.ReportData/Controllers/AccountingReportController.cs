@@ -595,7 +595,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.PostAPI(paymentCriteria, aPis.AccountingAPI + Urls.Accounting.AgencyPaymentUrl, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingAgencyPaymentExport>>();
-            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok(null);
+            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return NotFound();
 
             var stream = new AccountingHelper().GenerateExportAgencyHistoryPayment(dataObjects.Result, paymentCriteria);
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "Statement of Receivable Agency - eFMS");
