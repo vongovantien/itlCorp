@@ -106,8 +106,8 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             { title: 'Service', field: 'service', sortable: true },
             { title: 'Office', field: 'office', sortable: true },
             { title: 'Company', field: 'company', sortable: true },
-
             { title: 'Status', field: 'status', sortable: true },
+            { title: 'AR Confirmed', field: 'arconfirmed', sortable: true },
             { title: 'CreateDate', field: 'createDate', sortable: true }
         ];
         this.headers = [
