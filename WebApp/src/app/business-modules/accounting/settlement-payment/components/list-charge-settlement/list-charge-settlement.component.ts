@@ -19,7 +19,6 @@ import { SettlementTableSurchargeComponent } from '../table-surcharge/table-surc
 import { SettlementShipmentItemComponent, ISettlementShipmentGroup } from '../shipment-item/shipment-item.component';
 import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
 import { SettlementTableListChargePopupComponent } from '../popup/table-list-charge/table-list-charge.component';
-import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from-shipment/charge-form-shipment.popup';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -51,7 +50,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     @ViewChild(SettlementPaymentManagementPopupComponent) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
     @ViewChild(SettlementFormCopyPopupComponent) copyChargePopup: SettlementFormCopyPopupComponent;
     @ViewChild(SettlementTableListChargePopupComponent) tableListChargePopup: SettlementTableListChargePopupComponent;
-    @ViewChild(SettlementChargeFromShipmentPopupComponent) listChargeFromShipmentPopup: SettlementChargeFromShipmentPopupComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentFilePopup: SettlementShipmentAttachFilePopupComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
@@ -496,8 +494,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         if (charge.isFromShipment) {
             const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && surcharge.isFromShipment);
 
-            // this.listChargeFromShipmentPopup.charges = cloneDeep(surchargesFromShipment);
-            // this.listChargeFromShipmentPopup.show();
             this.existingChargePopup.requester = this.requester;
             this.existingChargePopup.getDetailShipmentOfSettle(cloneDeep(surchargesFromShipment));
             this.existingChargePopup.state = 'update';
