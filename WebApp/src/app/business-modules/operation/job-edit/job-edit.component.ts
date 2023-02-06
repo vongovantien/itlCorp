@@ -1,10 +1,10 @@
-import { formatDate } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { AbstractControl } from '@angular/forms';
-import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
-import { ActionsSubject, Store } from '@ngrx/store';
+import { Store, ActionsSubject } from '@ngrx/store';
+import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
+import { getCurrentUserState, getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
 
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent, SubHeaderComponent } from '@common';
@@ -13,6 +13,8 @@ import { InjectViewContainerRefDirective } from '@directives';
 import { RoutingConstants, JobConstants, SystemConstants } from '@constants';
 import { ICanComponentDeactivate } from '@core';
 import { AppForm } from '@app';
+
+
 import { Container, Crystal, CsTransaction, CsTransactionDetail, OpsTransaction } from '@models';
 import { ShareBussinessContainerListPopupComponent, ShareBussinessSellingChargeComponent } from '@share-bussiness';
 import { OPSTransactionGetDetailSuccessAction } from '../store';
@@ -79,6 +81,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.subscriptionParamURLChange();
         this.subscriptionSaveContainerChange();
+
+        this.currentUser$ = this._store.select(getCurrentUserState);
     }
 
     subscriptionParamURLChange() {
@@ -276,7 +280,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         [this.editForm.commodityGroupId,
         this.editForm.packageTypeId,
         ].forEach((control: AbstractControl) => this.setError(control));
-        console.log(this.editForm);
         let valid: boolean = true;
         if (!this.editForm.formEdit.valid
             || (!!this.editForm.serviceDate.value && !this.editForm.serviceDate.value.startDate)
@@ -291,7 +294,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     onSubmitData() {
         const form: any = this.editForm.formEdit.getRawValue();
-
         this.opsTransaction.serviceDate = !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null;
         this.opsTransaction.finishDate = !!form.finishDate && !!form.finishDate.startDate ? formatDate(form.finishDate.startDate, 'yyyy-MM-dd', 'en') : null;
 
@@ -316,6 +318,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.sumNetWeight = form.sumNetWeight === 0 ? null : form.sumNetWeight;
         this.opsTransaction.sumPackages = form.sumPackages === 0 ? null : form.sumPackages;
         this.opsTransaction.sumContainers = form.sumContainers === 0 ? null : form.sumContainers;
+        this.opsTransaction.sumChargeWeight = (this.lstMasterContainers || []).reduce((acc, curr) => acc += curr.chargeAbleWeight, 0);
         this.opsTransaction.sumCbm = form.sumCbm === 0 ? null : form.sumCbm;
         this.opsTransaction.containerDescription = form.containerDescription;
         this.opsTransaction.note = form.note;
@@ -331,6 +334,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.deliveryDate = !!form.deliveryDate && !!form.deliveryDate.startDate ? formatDate(form.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null;
         this.opsTransaction.clearanceDate = !!form.clearanceDate && !!form.clearanceDate.startDate ? formatDate(form.clearanceDate.startDate, 'yyyy-MM-dd', 'en') : null;
         this.opsTransaction.suspendTime = form.suspendTime;
+        this.opsTransaction.serviceNo = this.editForm.shipmentInfo;
 
         if ((!!this.editForm.shipmentNo || !!this.opsTransaction.serviceNo) && form.shipmentMode === 'Internal'
             && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
@@ -339,6 +343,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             // this.opsTransaction.serviceNo = null;
             // this.opsTransaction.serviceHblId = null;
         }
+
     }
 
     updateShipment() {
@@ -356,6 +361,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             this.opsTransaction.serviceHblId = null;
                             this.opsTransaction.isLinkJob = false;
                         }
+                        this.isSaveLink = false;
                         return this._documentRepo.updateShipment(this.opsTransaction);
                     })
                 ).subscribe(
@@ -497,7 +503,9 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             eta: this.opsTransaction.eta,
                             deliveryDate: this.opsTransaction.deliveryDate,
                             suspendTime: this.opsTransaction.suspendTime,
-                            clearanceDate: this.opsTransaction.clearanceDate
+                            clearanceDate: this.opsTransaction.clearanceDate,
+                            serviceMode: this.opsTransaction.serviceMode,
+                            productService: this.opsTransaction.productService
                         }));
 
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(csTransation));

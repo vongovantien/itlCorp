@@ -59,14 +59,12 @@ export class Contract {
     salesOfficeId: string = null;
     salesCompanyId: string = null;
     shipmentType: string = null;
-    emailAddress: string = null;
-    firstShipmentDate: any = null;
-    paymentTermObh: string = null;
     isExpired: boolean = false;
     isOverLimit: boolean = false;
     isOverDue: boolean = false;
-
-
+    emailAddress: string = null;
+    firstShipmentDate: any = null;
+    paymentTermObh: string = null;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

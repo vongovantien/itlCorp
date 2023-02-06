@@ -19,7 +19,6 @@ import { SettlementTableSurchargeComponent } from '../table-surcharge/table-surc
 import { SettlementShipmentItemComponent, ISettlementShipmentGroup } from '../shipment-item/shipment-item.component';
 import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
 import { SettlementTableListChargePopupComponent } from '../popup/table-list-charge/table-list-charge.component';
-import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from-shipment/charge-form-shipment.popup';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -51,7 +50,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     @ViewChild(SettlementPaymentManagementPopupComponent) paymentManagementPopup: SettlementPaymentManagementPopupComponent;
     @ViewChild(SettlementFormCopyPopupComponent) copyChargePopup: SettlementFormCopyPopupComponent;
     @ViewChild(SettlementTableListChargePopupComponent) tableListChargePopup: SettlementTableListChargePopupComponent;
-    @ViewChild(SettlementChargeFromShipmentPopupComponent) listChargeFromShipmentPopup: SettlementChargeFromShipmentPopupComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentFilePopup: SettlementShipmentAttachFilePopupComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
@@ -204,7 +202,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.selectedIndexSurcharge = -1;
 
             const surchargeFromShipment = this.surcharges.filter(x => x.isFromShipment);
-            const surchargeHasSynced = this.surcharges.filter(x => (!x.hasNotSynce || x.hadIssued || x.chargeAutoRated || x.linkChargeId));
+            const surchargeHasSynced = this.surcharges.filter(x => (x.hasNotSynce === false || x.hadIssued || x.chargeAutoRated || x.linkChargeId));
             const hblIds: string[] = charges.map(x => x.hblid);
             if (charges[0].isChangeShipment) {
                 const chargeMarkedChangeShipment = this.surcharges.filter(x => x.isChangeShipment === false && !x.isFromShipment && x.hasNotSynce);
@@ -212,8 +210,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 // this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
             } else {
                 const chargeIds: string[] = charges.map(x => x.id);
-                this.surcharges = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) === -1 && (x.id === SystemConstants.EMPTY_GUID || chargeIds.indexOf(x.id) === -1))  
-                                    && !x.isFromShipment && x.hasNotSynce && !x.hadIssued && !x.chargeAutoRated && !x.linkChargeId);
+                this.surcharges = this.surcharges.filter(x => (hblIds.indexOf(x.hblid) === -1 && (x.id === SystemConstants.EMPTY_GUID || chargeIds.indexOf(x.id) === -1))
+                    && !x.isFromShipment && x.hasNotSynce && !x.hadIssued && !x.chargeAutoRated && !x.linkChargeId);
             }
 
             this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment, ...surchargeHasSynced];
@@ -251,16 +249,16 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 this._toastService.warning('Charge already linked charge');
                 return;
             }
-            if (!surcharge.hasNotSynce) {
+            if (surcharge.hasNotSynce === false) {
                 this._toastService.warning('Charge already synced');
                 return;
             }
-            if(!surcharge.isFromShipment && surcharge.hadIssued){
+            if (!surcharge.isFromShipment && surcharge.hadIssued) {
                 this._toastService.warning('Charge had issued Soa/CdNote');
                 return;
             }
 
-            if(surcharge.chargeAutoRated){
+            if (surcharge.chargeAutoRated) {
                 this._toastService.warning('Charge had autorate charge');
                 return;
             }
@@ -488,7 +486,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this._toastService.warning('Charge already linked charge');
             return;
         }
-        if (!charge.hasNotSynce) {
+        if (charge.hasNotSynce === false) {
             this._toastService.warning('Charge already synced');
             return;
         }
@@ -496,8 +494,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         if (charge.isFromShipment) {
             const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && surcharge.isFromShipment);
 
-            // this.listChargeFromShipmentPopup.charges = cloneDeep(surchargesFromShipment);
-            // this.listChargeFromShipmentPopup.show();
             this.existingChargePopup.requester = this.requester;
             this.existingChargePopup.getDetailShipmentOfSettle(cloneDeep(surchargesFromShipment));
             this.existingChargePopup.state = 'update';
@@ -506,12 +502,12 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.existingChargePopup.settlementCode = this.settlementCode || null;
             this.existingChargePopup.show();
         } else {
-            if(charge.hadIssued){
+            if (charge.hadIssued) {
                 this._toastService.warning('Charge had issued Soa/CdNote');
                 return;
             }
 
-            if(charge.chargeAutoRated){
+            if (charge.chargeAutoRated) {
                 this._toastService.warning('Charge had autorate charge');
                 return;
             }
@@ -565,8 +561,9 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     } else {
                         this.tableListChargePopup.getAdvances(shipment.jobId, shipment.hblid, !!charge.advanceNo);
                     }
+                    this.tableListChargePopup.getMasterCharges(shipment.officeId, shipment.service);
 
-                    const selectedCD = this.tableListChargePopup.cds.find(x => x.clearanceNo === surcharges[0].clearanceNo);
+                    const selectedCD = (this.tableListChargePopup.cds || []).find(x => x.clearanceNo === surcharges[0].clearanceNo);
                     if (!!selectedCD) {
                         this.tableListChargePopup.selectedCD = selectedCD;
                     }

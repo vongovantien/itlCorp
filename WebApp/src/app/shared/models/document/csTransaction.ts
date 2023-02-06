@@ -116,6 +116,8 @@ export class CsTransaction extends BaseModel {
     isLinkFee: boolean = false;
     isLinkJob: boolean = false;
     serviceNo: string = null;
+    productService: string = null;
+    serviceMode: string = null;
 
     constructor(object?: any) {
         super();

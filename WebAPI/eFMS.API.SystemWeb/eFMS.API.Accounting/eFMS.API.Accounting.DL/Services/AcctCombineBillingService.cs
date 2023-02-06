@@ -1500,7 +1500,7 @@ namespace eFMS.API.Accounting.DL.Services
                 #endregion -- Info CD Note --
 
                 // Exchange Rate from currency charge to current soa
-                //                decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, charge.CurrencyId);
+                // decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, charge.CurrencyId);
                 // decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, "VND");
 
                 decimal _amount = (charge.AmountVND + charge.VATAmountLocal) ?? 0;

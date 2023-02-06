@@ -15,7 +15,7 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface IOpsTransactionService : IRepositoryBase<OpsTransaction, OpsTransactionModel>
     {
-        IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria);
+        IQueryable<OpsTransaction> Query(OpsTransactionCriteria criteria);
         OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount);
         //OpsTransactionModel GetBy(Guid id);
         int CheckDetailPermission(Guid id);
@@ -41,6 +41,6 @@ namespace eFMS.API.Documentation.DL.IService
         Task<HandleState> LinkFeeJob(List<OpsTransactionModel> list);
         List<ExportOutsourcingRegcognisingModel> GetOutsourcingRegcognising(OpsTransactionCriteria criteria);
         HandleState CheckLinkedInteralShipment(OpsTransactionModel model);
-        Task<HandleState> SyncGoodInforToReplicateJob(string jobNo);
+        Task<HandleState> SyncGoodInforToReplicateJob(Guid jobId);
     }
 }

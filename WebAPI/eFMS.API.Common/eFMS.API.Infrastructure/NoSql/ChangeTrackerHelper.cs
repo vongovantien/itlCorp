@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -31,6 +32,7 @@ namespace eFMS.API.Infrastructure.NoSql
                         var primaryKey = properties.FirstOrDefault(x => x.IsKey());
                         List<PropertyChange> changedProperties = new List<PropertyChange>();
                         //log.PropertyChange = new List<PropertyChange>();
+                        string userModified = string.Empty;
                         foreach (var prop in properties)
                         {
                             if (prop.Name == "UserModified" || prop.Name == "DatetimeModified"
@@ -50,7 +52,8 @@ namespace eFMS.API.Infrastructure.NoSql
                                 changedProperties.Add(addObject);
                             }
                         }
-                        if (changedProperties != null)
+                        userModified = change.Entity.GetValueBy("UserModified");
+                        if (changedProperties.Count > 0)
                         {
                             var log = new ItemLog
                             {
@@ -59,7 +62,7 @@ namespace eFMS.API.Infrastructure.NoSql
                                 ActionType = EntityState.Modified,
                                 ActionName = "Modified",
                                 DatetimeModified = DateTime.Now,
-                                UserModified = currentUser.UserID,
+                                UserModified = userModified,
                                 UserNameModified = currentUser.UserName,
                                 CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
                                 OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,

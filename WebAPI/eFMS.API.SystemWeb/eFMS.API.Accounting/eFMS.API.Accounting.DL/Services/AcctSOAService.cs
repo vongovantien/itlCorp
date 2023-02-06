@@ -1933,102 +1933,45 @@ namespace eFMS.API.Accounting.DL.Services
             return resultData;
         }
 
-        private IQueryable<AcctSoa> GetSoasPermission()
+        private IQueryable<AcctSoa> GetSoasPermission(IQueryable<AcctSoa> data, PermissionRange _permissionRange, ICurrentUser _user)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
-            PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            if (_permissionRange == PermissionRange.None) return null;
-
-            IQueryable<AcctSoa> soas = null;
             switch (_permissionRange)
             {
                 case PermissionRange.None:
                     break;
                 case PermissionRange.All:
-                    soas = DataContext.Get();
                     break;
                 case PermissionRange.Owner:
-                    soas = DataContext.Get(x => x.UserCreated == _user.UserID && x.OfficeId == _user.OfficeID);
+                    data = data.Where(x => x.UserCreated == _user.UserID && x.OfficeId == _user.OfficeID);
                     break;
                 case PermissionRange.Group:
-                    soas = DataContext.Get(x => x.GroupId == _user.GroupId
+                   data = data.Where(x => x.GroupId == _user.GroupId
                                             && x.DepartmentId == _user.DepartmentId
                                             && x.OfficeId == _user.OfficeID
                                             && x.CompanyId == _user.CompanyID);
                     break;
                 case PermissionRange.Department:
-                    soas = DataContext.Get(x => x.DepartmentId == _user.DepartmentId
+                    data = data.Where(x => x.DepartmentId == _user.DepartmentId
                                             && x.OfficeId == _user.OfficeID
                                             && x.CompanyId == _user.CompanyID);
                     break;
                 case PermissionRange.Office:
-                    soas = DataContext.Get(x => x.OfficeId == _user.OfficeID
+                    data = data.Where(x => x.OfficeId == _user.OfficeID
                                             && x.CompanyId == _user.CompanyID);
                     break;
                 case PermissionRange.Company:
-                    soas = DataContext.Get(x => x.CompanyId == _user.CompanyID);
+                    data = data.Where(x => x.CompanyId == _user.CompanyID);
                     break;
             }
-            return soas;
+            return data;
         }
 
-        private IQueryable<AcctSoa> GetSoaByCriteria(AcctSOACriteria criteria, IQueryable<AcctSoa> soas)
-        {
-            if (soas == null) return null;
-
-            if (!string.IsNullOrEmpty(criteria.StrCodes))
-            {
-                //Chỉ lấy ra những charge có SOANo (Để hạn chế việc join & get data không cần thiết)
-                var listCode = criteria.StrCodes.Split(',').Where(x => x.ToString() != string.Empty).ToList();
-                List<string> refNo = new List<string>();
-                refNo = (from s in soas
-                         join chg in csShipmentSurchargeRepo.Get() on s.Soano equals (chg.PaySoano ?? chg.Soano) into chg2
-                         from chg in chg2.DefaultIfEmpty()
-                         where
-                                listCode.Contains(s.Soano, StringComparer.OrdinalIgnoreCase)
-                             || listCode.Contains(chg.JobNo, StringComparer.OrdinalIgnoreCase)
-                             || listCode.Contains(chg.Mblno, StringComparer.OrdinalIgnoreCase)
-                             || listCode.Contains(chg.Hblno, StringComparer.OrdinalIgnoreCase)
-                         select s.Soano).ToList();
-                soas = soas.Where(x => refNo.Contains(x.Soano));
-            }
-
-            if (!string.IsNullOrEmpty(criteria.CustomerID))
-            {
-                soas = soas.Where(x => x.Customer == criteria.CustomerID);
-            }
-
-            if (criteria.SoaFromDateCreate != null && criteria.SoaToDateCreate != null)
-            {
-                soas = soas.Where(x =>
-                    x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.SoaFromDateCreate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.SoaToDateCreate.Value.Date : 1 == 2
-                );
-            }
-
-            if (!string.IsNullOrEmpty(criteria.SoaStatus))
-            {
-                soas = soas.Where(x => x.Status == criteria.SoaStatus);
-            }
-
-            if (!string.IsNullOrEmpty(criteria.SoaCurrency))
-            {
-                soas = soas.Where(x => x.Currency == criteria.SoaCurrency);
-            }
-
-            if (!string.IsNullOrEmpty(criteria.SoaUserCreate))
-            {
-                soas = soas.Where(x => x.UserCreated == criteria.SoaUserCreate);
-            }
-
-            var dataSoas = soas.OrderByDescending(x => x.DatetimeModified).AsQueryable();
-            return dataSoas;
-        }
 
         /// <summary>
         /// Nếu không có điều kiện search thì load list Advance 3 tháng kể từ ngày modified mới nhất trở về trước
         /// </summary>
         /// <returns></returns>
-        private Expression<Func<AcctSoa, bool>> ExpressionQueryDefault(AcctSOACriteria criteria)
+        private IQueryable<AcctSoa> GetQueryBy(AcctSOACriteria criteria)
         {
             Expression<Func<AcctSoa, bool>> query = q => true;
             if (string.IsNullOrEmpty(criteria.StrCodes)
@@ -2043,22 +1986,59 @@ namespace eFMS.API.Accounting.DL.Services
                 var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
                 query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
             }
-            return query;
+
+            if (!string.IsNullOrEmpty(criteria.StrCodes))
+            {
+                ////Chỉ lấy ra những charge có SOANo (Để hạn chế việc join & get data không cần thiết)
+                var listCode = criteria.StrCodes.Split(',').Where(x => x.ToString() != string.Empty).ToList();
+                query = query.And(x => listCode.Contains(x.Soano));
+            }
+            if (!string.IsNullOrEmpty(criteria.CustomerID))
+            {
+                query = query.And(x => x.Customer == criteria.CustomerID);
+            }
+
+            if (criteria.SoaFromDateCreate != null && criteria.SoaToDateCreate != null)
+            {
+                query = query.And(x =>
+                    x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date >= criteria.SoaFromDateCreate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.SoaToDateCreate.Value.Date : 1 == 2
+                );
+            }
+
+            if (!string.IsNullOrEmpty(criteria.SoaStatus))
+            {
+                query = query.And(x => x.Status == criteria.SoaStatus);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.SoaCurrency))
+            {
+                query = query.And(x => x.Currency == criteria.SoaCurrency);
+            }
+
+            if (!string.IsNullOrEmpty(criteria.SoaUserCreate))
+            {
+                query = query.And(x => x.UserCreated == criteria.SoaUserCreate);
+            }
+            IQueryable<AcctSoa> dataQuery = DataContext.Get(query);
+            dataQuery = dataQuery?.OrderByDescending(x => x.DatetimeModified);
+            return dataQuery;
         }
 
         public IQueryable<AcctSoa> QueryDataPermission(AcctSOACriteria criteria)
         {
-            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
-            var queryDefault = ExpressionQueryDefault(criteria);
-            var soas = GetSoasPermission().Where(queryDefault);
-            var soaList = GetSoaByCriteria(criteria, soas);
-            return soaList;
+            var data = GetQueryBy(criteria);
+
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (_permissionRange == PermissionRange.None) return null;
+
+            data = GetSoasPermission(data, _permissionRange, _user);
+            return data;
         }
 
         public IQueryable<AcctSOAResult> QueryData(AcctSOACriteria criteria)
         {
-            var soas = DataContext.Get();
-            var soaList = GetSoaByCriteria(criteria, soas);
+            var soaList = GetQueryBy(criteria);
             var dataResult = TakeSoas(soaList);
             return dataResult;
         }

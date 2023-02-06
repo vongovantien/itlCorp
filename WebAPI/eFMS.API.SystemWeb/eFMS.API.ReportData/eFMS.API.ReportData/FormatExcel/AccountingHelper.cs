@@ -29,6 +29,7 @@ namespace eFMS.API.ReportData.FormatExcel
         const string numberFormatUSD = "_-* #,##0.000_-;-* #,##0.000_-;_-* \"-\"??_-;_-@_-_(_)";
 
         const string numberFormatVND = "_-\"VND\"* #,##0.00_-;-\"VND\"* #,##0.00_-;_-\"VND\"* \"-\"??_-;_-@_-_(_)";
+        const string numberFormatPrefixUSD = "_-\"USD\"* #,##0.00_-;-\"USD\"* #,##0.00_-;_-\"USD\"* \"-\"??_-;_-@_-_(_)";
 
         const string decimalFormat = "#,##0.00";
         const string decimalFormat2 = "#,##0";
@@ -775,6 +776,10 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("PaymentTerm", item.PaymentTerm?.ToString("N0"));
                         listKeyData.Add("DueDate", item.DueDate?.ToString("dd/MM/yy"));
                         listKeyData.Add("OverdueDays", item.OverdueDays?.ToString("N0"));
+                        listKeyData.Add("PaymentTermOBH", item.PaymentTermOBH?.ToString("N0"));
+                        listKeyData.Add("DueDateOBH", item.DueDateOBH?.ToString("dd/MM/yy"));
+                        listKeyData.Add("OverdueDaysOBH", item.OverdueDaysOBH?.ToString("N0"));
+
                         listKeyData.Add("JobNo", item.JobNo);
                         listKeyData.Add("MBL", item.MBL);
                         listKeyData.Add("HBL", item.HBL);
@@ -1030,7 +1035,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "STT", //6
                 "Thông tin chung", //7
                 "Qty", //8
-                "Số tiền tạm ứng (VND)", //9
+                "Số tiền tạm ứng ({0})", //9
                 "Số cont - Loại cont", //10
                 "C.W (Kgs)", //11
                 "Số kiện\n(Pcs)", //12
@@ -1089,7 +1094,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "No.", //6
                 "Shipment's Information", //7
                 "Qty", //8
-                "Advance Amount (VND)", //9
+                "Advance Amount ({0})", //9
                 "Con't", //10
                 "C.W (Kgs)", //11
                 "Packages\n(PCS)", //12
@@ -1283,7 +1288,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[15, 1, 15, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[15, 8, 15, 11].Merge = true;
-            workSheet.Cells[15, 8, 15, 11].Value = headers[9];//Số tiến tạm ứng
+            workSheet.Cells[15, 8, 15, 11].Value = string.Format(headers[9], advanceExport.InfoAdvance.AdvanceCurrency);//Số tiến tạm ứng
             workSheet.Cells[15, 8, 15, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[15, 8, 15, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
@@ -1443,7 +1448,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 1, p, 2].Style.Font.UnderLine = true;
             workSheet.Cells[p, 3, p, 3].Value = totalAmount;
             workSheet.Cells[p, 3, p, 3].Style.Font.Bold = true;
-            workSheet.Cells[p, 3, p, 3].Style.Numberformat.Format = numberFormatVND;
+            workSheet.Cells[p, 3, p, 3].Style.Numberformat.Format = advanceExport.InfoAdvance.AdvanceCurrency == CURRENCY_LOCAL ? numberFormatVND : numberFormatPrefixUSD;
 
             p = p + 1;
             workSheet.Cells[p, 1, p, 2].Merge = true;
@@ -3911,7 +3916,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Custom No.", //10
                 "H-BL No.\n(HAWB):", //11
                 "M-BL No.\n(MAWB):", //12
-                "Amount (VND)",//13
+                "Amount ({0})",//13
                 "OBH",//14
                 "Credit",//15
                 "Total Amount",//16
@@ -4081,6 +4086,7 @@ namespace eFMS.API.ReportData.FormatExcel
             decimal? _sumTotalAmount = 0;
             decimal? _sumTotalAdvancedAmount = 0;
             decimal? _sumTotalDifference = 0;
+            var numberFormatSettle = settlementExport.InfoSettlement.SettlementCurrency == CURRENCY_LOCAL ? numberFormat2 : numberFormat;
 
             int p = 17;
             int j = 17;
@@ -4095,7 +4101,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 4].Style.Font.Bold = true;
                 workSheet.Cells[k, 8].Value = invoiceCharges.Select(s => s.ChargeAmount).Sum(); //Value tổng chi phí có hóa đơn
                 workSheet.Cells[k, 8].Style.Font.Bold = true;
-                workSheet.Cells[k, 8].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[k, 8].Style.Numberformat.Format = numberFormatSettle;
                 k += 1;
                 foreach (var invoice in invoiceCharges)
                 {
@@ -4106,7 +4112,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[k, 6].Value = invoice.ChargeNetAmount;
                     workSheet.Cells[k, 7].Value = invoice.ChargeVatAmount;
                     workSheet.Cells[k, 8].Value = invoice.ChargeAmount;
-                    workSheet.Cells[k, 6, k, 8].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[k, 6, k, 8].Style.Numberformat.Format = numberFormatSettle;
 
                     workSheet.Cells[k, 9].Value = invoice.InvoiceNo;
                     workSheet.Cells[k, 10].Value = invoice.ChargeNote;
@@ -4121,7 +4127,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 4].Style.Font.Bold = true;
                 workSheet.Cells[k, 8].Value = noInvoiceCharges.Select(s => s.ChargeAmount).Sum(); //Value tổng chi phí không hóa đơn
                 workSheet.Cells[k, 8].Style.Font.Bold = true;
-                workSheet.Cells[k, 8].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[k, 8].Style.Numberformat.Format = numberFormatSettle;
                 k += 1;
                 foreach (var no_invoice in noInvoiceCharges)
                 {
@@ -4132,7 +4138,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[k, 6].Value = no_invoice.ChargeNetAmount;
                     workSheet.Cells[k, 7].Value = no_invoice.ChargeVatAmount;
                     workSheet.Cells[k, 8].Value = no_invoice.ChargeAmount;
-                    workSheet.Cells[k, 6, k, 8].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[k, 6, k, 8].Style.Numberformat.Format = numberFormatSettle;
 
                     workSheet.Cells[k, 9].Value = no_invoice.InvoiceNo;
                     workSheet.Cells[k, 10].Value = no_invoice.ChargeNote;
@@ -4147,7 +4153,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 4].Style.Font.Bold = true;
                 workSheet.Cells[k, 8].Value = obhCharges.Select(s => s.ChargeAmount).Sum(); //Value tổng phí chi hộ
                 workSheet.Cells[k, 8].Style.Font.Bold = true;
-                workSheet.Cells[k, 8].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[k, 8].Style.Numberformat.Format = numberFormatSettle;
                 k += 1;
                 foreach (var obh in obhCharges)
                 {
@@ -4158,7 +4164,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[k, 6].Value = obh.ChargeNetAmount;
                     workSheet.Cells[k, 7].Value = obh.ChargeVatAmount;
                     workSheet.Cells[k, 8].Value = obh.ChargeAmount;
-                    workSheet.Cells[k, 6, k, 8].Style.Numberformat.Format = numberFormat;
+                    workSheet.Cells[k, 6, k, 8].Style.Numberformat.Format = numberFormatSettle;
 
                     workSheet.Cells[k, 9].Value = obh.InvoiceNo;
                     workSheet.Cells[k, 10].Value = obh.ChargeNote;
@@ -4268,28 +4274,28 @@ namespace eFMS.API.ReportData.FormatExcel
                 // Total net amount
                 var _totalNetAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeNetAmount).Sum();
                 workSheet.Cells[j - 1, 6].Value = _totalNetAmount;
-                workSheet.Cells[j - 1, 6].Style.Numberformat.Format = decimalFormat2;
+                workSheet.Cells[j - 1, 6].Style.Numberformat.Format = numberFormatSettle;
                 workSheet.Cells[j - 1, 6].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 6].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 // Total VAT amount
                 var _totalVatAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeVatAmount).Sum();
                 workSheet.Cells[j - 1, 7].Value = _totalVatAmount;
-                workSheet.Cells[j - 1, 7].Style.Numberformat.Format = decimalFormat2;
+                workSheet.Cells[j - 1, 7].Style.Numberformat.Format = numberFormatSettle;
                 workSheet.Cells[j - 1, 7].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 //Value total amount
                 var _totalAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeAmount).Sum();
                 workSheet.Cells[j - 1, 8].Value = _totalAmount;
-                workSheet.Cells[j - 1, 8].Style.Numberformat.Format = decimalFormat2;
+                workSheet.Cells[j - 1, 8].Style.Numberformat.Format = numberFormatSettle;
                 workSheet.Cells[j - 1, 8].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 8].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 //Value total advanced amount (số tiền đã tạm ứng)
                 var _advanceAmount = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Sum(sum => sum.AdvanceAmount);//settlementExport.ShipmentsSettlement[i].AdvanceAmount ?? 0;
                 workSheet.Cells[j - 1, 11].Value = _advanceAmount;
-                workSheet.Cells[j - 1, 11].Style.Numberformat.Format = decimalFormat2;
+                workSheet.Cells[j - 1, 11].Style.Numberformat.Format = numberFormatSettle;
                 workSheet.Cells[j - 1, 11].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
@@ -4297,7 +4303,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 //Value chênh lệch
                 workSheet.Cells[j - 1, 13].Value = _totalAmount - _advanceAmount;
-                workSheet.Cells[j - 1, 13].Style.Numberformat.Format = decimalFormat2;
+                workSheet.Cells[j - 1, 13].Style.Numberformat.Format = numberFormatSettle;
                 workSheet.Cells[j - 1, 13].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 13].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
@@ -4311,7 +4317,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[p, 11, j - 2, 11].Merge = true;
                 workSheet.Cells[p, 11, j - 2, 11].Value = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Sum(sum => sum.AdvanceAmount); //Value Số tiền đã tạm ứng
-                workSheet.Cells[p, 11, j - 2, 11].Style.Numberformat.Format = decimalFormat2;
+                workSheet.Cells[p, 11, j - 2, 11].Style.Numberformat.Format = numberFormatSettle;
                 workSheet.Cells[p, 11, j - 2, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 11, j - 2, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 11, j - 2, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -4334,7 +4340,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[p, 13, j - 2, 13].Merge = true;
                 workSheet.Cells[p, 13, j - 2, 13].Value = string.Empty; //Value Chênh lệch
-                workSheet.Cells[p, 13, j - 2, 13].Style.Numberformat.Format = decimalFormat2;
+                workSheet.Cells[p, 13, j - 2, 13].Style.Numberformat.Format = numberFormatSettle;
                 workSheet.Cells[p, 13, j - 2, 13].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 13, j - 2, 13].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 13, j - 2, 13].Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -4356,32 +4362,32 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 1, p, 5].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[p, 6].Value = _sumTotalNetAmount; //Value sum total Net amount
-            workSheet.Cells[p, 6].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[p, 6].Style.Numberformat.Format = numberFormatSettle;
             workSheet.Cells[p, 6].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[p, 7].Value = _sumTotalVatAmount; //Value sum total Vat amount
-            workSheet.Cells[p, 7].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[p, 7].Style.Numberformat.Format = numberFormatSettle;
             workSheet.Cells[p, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[p, 8].Value = _sumTotalAmount; //Value sum total amount
-            workSheet.Cells[p, 8].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[p, 8].Style.Numberformat.Format = numberFormatSettle;
             workSheet.Cells[p, 8].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[p, 9].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[p, 11].Value = _sumTotalAdvancedAmount; //Value sum total advanced amount
-            workSheet.Cells[p, 11].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[p, 11].Style.Numberformat.Format = numberFormatSettle;
             workSheet.Cells[p, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[p, 12].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[p, 13].Value = _sumTotalDifference; //Value sum total difference
-            workSheet.Cells[p, 13].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[p, 13].Style.Numberformat.Format = numberFormatSettle;
             workSheet.Cells[p, 13].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             //Bôi đen dòng tổng cộng ở cuối
             workSheet.Cells["A" + p + ":M" + p].Style.Font.Bold = true;
-            workSheet.Cells["A" + p + ":M" + p].Style.Numberformat.Format = decimalFormat2;
+            workSheet.Cells["A" + p + ":M" + p].Style.Numberformat.Format = numberFormatSettle;
 
             //In đậm border dòng 15
             workSheet.Cells[15, 1, 15, 13].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
@@ -4620,7 +4626,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["E18:E19"].Value = headers[12]; // MBL No
 
             workSheet.Cells["F18:G18"].Merge = true;
-            workSheet.Cells["F18:G18"].Value = headers[13]; // Amount
+            workSheet.Cells["F18:G18"].Value = string.Format(headers[13], settlementExport.InfoSettlement.SettlementCurrency); // Amount
             workSheet.Cells["F18:G18"].Style.Numberformat.Format = numberFormat2;
 
             workSheet.Cells["F19"].Merge = true;
@@ -5536,103 +5542,227 @@ namespace eFMS.API.ReportData.FormatExcel
                     return null;
                 }
                 var excel = new ExcelExport(path);
-                int startRow = 6;
-                excel.StartDetailTable = startRow;
-                if (result.Count == 0)
-                    result.Add(new AccountingAgencyPaymentExport());
-                if (paymentCriteria.DueDate != null  || paymentCriteria.FromIssuedDate != null || result.FirstOrDefault().details == null || result.Count(x => x.details != null && x.details.Count() > 0) == 0)
+                int startRow = 2;
+                var listKeyData = new Dictionary<string, object>();
+                if (paymentCriteria.IssuedDate != null)
                 {
-                    excel.DeleteRow(7);
-                    deleteDetailRow = true;
+                    listKeyData.Add("RangeDate", string.Format("From {0} To {0}", paymentCriteria.IssuedDate.Value.ToString("dd/MM/yyyy")));
+                }
+                else if (paymentCriteria.FromUpdatedDate != null)
+                {
+                    listKeyData.Add("RangeDate", string.Format("From {0} To {1}", paymentCriteria.FromUpdatedDate.Value.ToString("dd/MM/yyyy")
+                        , paymentCriteria.ToUpdatedDate.Value.ToString("dd/MM/yyyy")));
+                }
+                else if (paymentCriteria.DueDate != null)
+                {
+                    listKeyData.Add("RangeDate", string.Format("From {0} To {0}", paymentCriteria.DueDate.Value.ToString("dd/MM/yyyy")));
+                }
+                else
+                {
+                    listKeyData.Add("RangeDate", string.Format("From {0} To {0}", DateTime.Now.ToString("dd/MM/yyyy")));
+                }
+                excel.SetData(listKeyData);
+
+                startRow = 6;
+                excel.NumberOfGroup = 2;
+                if (result == null || result.Count == 0)
+                    result.Add(new AccountingAgencyPaymentExport());
+                if (paymentCriteria.DueDate != null  || paymentCriteria.FromIssuedDate != null || result.FirstOrDefault().receiptDetail == null || result.Count(x => x.receiptDetail != null && x.receiptDetail.Count() > 0) == 0)
+                {
+                    //excel.DeleteRow(7);
+                    //deleteDetailRow = true;
+                }
+                var isExistGroup = true;
+                var isExistDetail = true;
+                var isExistAdvRow = true;
+                if (result.FirstOrDefault().receiptDetail == null || result.Count(x => x.receiptDetail != null && x.receiptDetail.Count() > 0) == 0 || paymentCriteria.DueDate != null || paymentCriteria.FromUpdatedDate == null)
+                {
+                    isExistDetail = false;
+                }
+                if (result.Where(x => x.BillingRefNo == "ADVANCE AMOUNT").Count() == 0)
+                {
+                    isExistAdvRow = false;
+                }
+                if (!isExistDetail)
+                {
+                    if (result.Where(x => x.BillingRefNo == "ADVANCE AMOUNT").Count() == result.Count) // If report only have adv amount row
+                    {
+                        isExistGroup = false;
+                    }
+                    if (!isExistGroup)
+                    {
+                        excel.DeleteRow(6, 2);
+                    }
+                    else
+                    {
+                        excel.DeleteRow(7);
+                    }
+                    if (!isExistAdvRow)
+                    {
+                        excel.DeleteRow(7);
+                    }
+                }
+                else if (!isExistAdvRow)
+                {
+                    excel.DeleteRow(8);
+                }
+                if (isExistGroup)
+                {
+                    excel.StartDetailTable = 6;
+                    excel.IndexOfGroup = 1;
+                    excel.SetGroupsTable();
+                    if (isExistDetail)
+                    {
+                        excel.StartDetailTable = 7;
+                        excel.SetDataTable();
+                    }
+                }
+                if (isExistAdvRow)
+                {
+                    excel.StartDetailTable = 8;
+                    excel.IndexOfGroup = 2;
+                    excel.SetGroupsTable();
                 }
 
+                var sumRemainDbUsd = 0m;
+                var sumRemainObhUsd = 0m;
+                var sumAdvanceAmountVnd = 0m;
+                var sumAdvanceAmountUsd = 0m;
+                var sumBalanceUsd = 0m;
+                var sumBalanceVnd = 0m;
+                
                 for (int i = 0; i < result.Count; i++)
                 {
                     var item = result[i];
-                    var listKeyData = new Dictionary<string, object>();
-                    excel.SetGroupsTable();
-                    listKeyData.Add("AgentParentCode", item.AgentParentCode);
-                    listKeyData.Add("AgentPartnerCode", item.AgentPartnerCode);
-                    listKeyData.Add("AgentPartnerName", item.AgentPartnerName);
-                    listKeyData.Add("InvoiceDate", item.InvoiceDate);
-                    listKeyData.Add("InvoiceNo", item.InvoiceNo);
-                    listKeyData.Add("DebitNo", item.DebitNo==null?"":item.DebitNo);
-                    listKeyData.Add("CreditNo", item.CreditNo == null ? "" : item.CreditNo);
-                    listKeyData.Add("JobNo", item.JobNo);
-                    listKeyData.Add("MBLNo", item.MBL);
-                    listKeyData.Add("HBLNo", item.HBL);
-
-                    var remainDb = (item.UnpaidAmountInv ?? 0) - (item.PaidAmount ?? 0);
-                    var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
-                    var remainDbUsd = (item.UnpaidAmountInvUsd ?? 0) - (item.PaidAmountUsd ?? 0);
-                    var remainObhUsd = (item.UnpaidAmountOBHUsd ?? 0) - (item.PaidAmountOBHUsd ?? 0);
-
-                    listKeyData.Add("DebitAmountUsd", item.DebitAmountUsd);
-                    listKeyData.Add("CreditAmountUsd", item.CreditAmountUsd);
-
-                    listKeyData.Add("Debit", item.DebitUsd);
-                    listKeyData.Add("Credit", item.CreditUsd);
-
-                    if (item.DebitAmountUsd != null)
+                    listKeyData = new Dictionary<string, object>();
+                    if (item.BillingRefNo != "ADVANCE AMOUNT")
                     {
-                        listKeyData.Add("RemainDebitUsd", item.DebitAmountUsd - item.DebitUsd);
-                        listKeyData.Add("RemainCreditUsd",0);
+                        excel.IndexOfGroup = 1;
+                        excel.SetGroupsTable();
+                        listKeyData.Add("AgentParentCode", item.PartnerCode);
+                        listKeyData.Add("AgentPartnerCode", item.ParentCode);
+                        listKeyData.Add("AgentPartnerName", item.PartnerName);
+                        listKeyData.Add("InvoiceDate", item.InvoiceDate);
+                        listKeyData.Add("DebitNo", item.BillingRefNo);
+                        listKeyData.Add("CreditNo", item.CreditNo);
+                        listKeyData.Add("JobNo", item.JobNo);
+                        listKeyData.Add("MBLNo", item.MBL);
+                        listKeyData.Add("HBLNo", item.HBL);
+                        listKeyData.Add("DebitAmountUsd", item.UnpaidAmountInvUsd);
+                        listKeyData.Add("OBHAmountUsd", item.UnpaidAmountOBHUsd);
+                        listKeyData.Add("CreditAmountUsd", item.CreditAmountUsd);
+                        listKeyData.Add("PaidAmountDebit", item.PaidAmountUsd);
+                        listKeyData.Add("PaidAmountOBH", item.PaidAmountOBHUsd);
+                        var remainDbUsd = (item.UnpaidAmountInvUsd ?? 0) - (item.PaidAmountUsd ?? 0);
+                        var remainObhUsd = (item.UnpaidAmountOBHUsd ?? 0) - (item.PaidAmountOBHUsd ?? 0);
+                        var remainDbVnd = (item.UnpaidAmountInv ?? 0) - (item.PaidAmount ?? 0);
+                        var remainObhVnd = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
+                        sumRemainDbUsd += remainDbUsd;
+                        sumRemainObhUsd += remainObhUsd;
+                        listKeyData.Add("RemainDebitAmount", remainDbUsd);
+                        listKeyData.Add("RemainOBHAmount", remainObhUsd);
+                        listKeyData.Add("RemainCreditAmount", item.CreditAmountUsd);
+                        listKeyData.Add("CreditTerm", null);
+                        listKeyData.Add("DueDate", item.DueDate);
+                        listKeyData.Add("OverDueDays", item.OverdueDays);
 
-                        listKeyData.Add("RemainDebitVnd", item.DebitAmountVnd - item.DebitVnd);
-                        listKeyData.Add("RemainCreditVnd", 0);
+                        var balanceUsd = (remainDbUsd + remainObhUsd) - (item.CreditAmountUsd ?? 0);
+                        var balanceVnd = (remainDbVnd + remainObhVnd) - (item.CreditAmountVnd ?? 0);
+                        sumBalanceUsd += balanceUsd;
+                        sumBalanceVnd += balanceVnd;
+                        listKeyData.Add("BalanceAmountUsd", balanceUsd);
+                        listKeyData.Add("BalanceAmountVnd", balanceVnd);
+                        listKeyData.Add("InvoiceNo", item.InvoiceNo + (!string.IsNullOrEmpty(item.InvoiceNo) && !string.IsNullOrEmpty(item.VoucherNo) ? " / " : string.Empty) + item.VoucherNo);
+                        listKeyData.Add("AccountNo", item.AccountNo);
+                        listKeyData.Add("Branch", item.BranchName);
+                        listKeyData.Add("ETD", item.EtdDate?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("ETA", item.EtaDate?.ToString("dd/MM/yyyy"));
+                        listKeyData.Add("Salesman", item.Salesman);
+                        listKeyData.Add("Creator", item.Creator);
+
                     }
-                    else if (item.CreditAmountUsd != null)
+                    else
                     {
-                        listKeyData.Add("RemainDebitUsd", 0);
-                        listKeyData.Add("RemainCreditUsd", item.CreditAmountUsd - item.CreditUsd);
-
-                        listKeyData.Add("RemainDebitVnd",0);
-                        listKeyData.Add("RemainCreditVnd", item.CreditAmountVnd-item.CreditVnd);
+                        excel.IndexOfGroup = isExistGroup ? 2 : 1;
+                        excel.SetGroupsTable();
+                        sumAdvanceAmountVnd += (item.AdvanceAmountVnd ?? 0);
+                        sumAdvanceAmountUsd += (item.AdvanceAmountUsd ?? 0);
+                        listKeyData.Add("AgentParentCodeAdv", item.PartnerCode);
+                        listKeyData.Add("AgentPartnerCodeAdv", item.ParentCode);
+                        listKeyData.Add("AgentPartnerNameAdv", item.PartnerName);
+                        listKeyData.Add("AdvanceAmountUsd", item.AdvanceAmountUsd);
+                        listKeyData.Add("AdvanceAmountVnd", item.AdvanceAmountVnd);
                     }
-
-                    listKeyData.Add("ETD", item.EtdDate);
-                    listKeyData.Add("ETA", item.EtaDate);
-
-                    listKeyData.Add("CreditTerm",item.CreditTerm);
-                    listKeyData.Add("DueDate",item.DueDate);
-                    listKeyData.Add("OverDueDays",item.OverDueDays);
-                    listKeyData.Add("VoucherNo", item.VoucherNo);
-
-                    listKeyData.Add("Salesman", item.Salesman);
-                    listKeyData.Add("Creator", item.Creator);
+                   
                     excel.SetData(listKeyData);
                     startRow++;
-                    if ( item.details.Count > 0 && deleteDetailRow == false && (paymentCriteria.DueDate == null || paymentCriteria.FromIssuedDate == null))
+                    if (item.receiptDetail != null && item.receiptDetail.Count > 0 && paymentCriteria.DueDate == null && paymentCriteria.FromUpdatedDate != null)
                     {
-                        foreach (var detail in item.details)
+                        foreach (var detail in item.receiptDetail)
                         {
                             listKeyData = new Dictionary<string, object>();
                             excel.SetDataTable();
+                            listKeyData.Add("AgentParentCodeDt", item.PartnerCode);
+                            listKeyData.Add("AgentPartnerCodeDt", item.ParentCode);
+                            listKeyData.Add("AgentPartnerNameDt", item.PartnerName);
                             listKeyData.Add("InvoiceDateDt", item.InvoiceDate);
-                            listKeyData.Add("DebitNoDt", item.DebitNo);
+                            listKeyData.Add("DebitNoDt", item.BillingRefNo);
                             listKeyData.Add("CreditNoDt", item.CreditNo);
                             listKeyData.Add("JobNoDt", item.JobNo);
                             listKeyData.Add("MBLNoDt", item.MBL);
                             listKeyData.Add("HBLNoDt", item.HBL);
 
-                            listKeyData.Add("PaidDate", detail.PaidDate);
-                            listKeyData.Add("RefNo", detail.RefNo);
+                            listKeyData.Add("PaidAmountDebitDt", detail.PaidAmountUsd);
+                            listKeyData.Add("PaidAmountOBHDt", detail.PaidAmountOBHUsd);
+                            listKeyData.Add("PaidDateDt", detail.PaymentDate?.ToString("dd/MM/yy"));
+                            listKeyData.Add("ReceiptNo", detail.PaymentRefNo);
 
-                            if (item.DebitAmountUsd != null)
-                            {
-                                listKeyData.Add("DebitDt", detail.DebitUsd);
-                                listKeyData.Add("CreditDt", 0);
-                            }
-                            else if (item.CreditAmountUsd != null)
-                            {
-                                listKeyData.Add("DebitDt", 0 );
-                                listKeyData.Add("CreditDt", detail.CreditUsd);
-                            }
+                            //if (item.DebitAmountUsd != null)
+                            //{
+                            //    listKeyData.Add("DebitDt", detail.DebitUsd);
+                            //    listKeyData.Add("CreditDt", 0);
+                            //}
+                            //else if (item.CreditAmountUsd != null)
+                            //{
+                            //    listKeyData.Add("DebitDt", 0 );
+                            //    listKeyData.Add("CreditDt", detail.CreditUsd);
+                            //}
 
                             excel.SetData(listKeyData);
                             startRow++;
                         }
                     }
+                }
+                var listKeyTotal = new Dictionary<string, object>();
+                listKeyTotal.Add("TotalDebitAmountUsd", result.Sum(x => (x.UnpaidAmountInvUsd ?? 0)));
+                listKeyTotal.Add("TotalOBHAmountUsd", result.Sum(x => (x.UnpaidAmountOBHUsd ?? 0)));
+                listKeyTotal.Add("TotalCreditAmountUsd", result.Sum(x => (x.CreditAmountUsd ?? 0)));
+                // Sum total VND
+                listKeyTotal.Add("TotalPaidAmountDebit", result.Sum(x => x.PaidAmountUsd ?? 0));
+                listKeyTotal.Add("TotalPaidAmountOBH", result.Sum(x => x.PaidAmountOBHUsd ?? 0));
+                // Sum remain
+                listKeyTotal.Add("TotalRemainDebitAmount", sumRemainDbUsd);
+                listKeyTotal.Add("TotalRemainOBHAmount", sumRemainObhUsd);
+                listKeyTotal.Add("TotalRemainCreditAmount", result.Sum(x => (x.CreditAmountUsd ?? 0)));
+                // Sum Advance Amount
+                listKeyTotal.Add("TotalAdvAmount", sumAdvanceAmountVnd);
+                listKeyTotal.Add("TotalAdvAmountVnd", sumAdvanceAmountUsd);
+                // Sum balance USD
+                listKeyTotal.Add("TotalBalanceAmount", sumBalanceUsd);
+                listKeyTotal.Add("TotalBalanceAmountVnd", sumBalanceVnd);
+                excel.SetData(listKeyTotal);
+
+                if (isExistGroup)
+                {
+                    excel.DeleteRow(6, 1);
+                    if (isExistDetail)
+                    {
+                        excel.DeleteRow(6, 1);
+                    }
+                }
+                if (isExistAdvRow)
+                {
+                    excel.DeleteRow(6, 1);
                 }
                 return excel.ExcelStream();
             }

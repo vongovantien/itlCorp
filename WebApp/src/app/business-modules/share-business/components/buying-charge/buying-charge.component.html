@@ -27,8 +27,7 @@
                                 <i class="la la-download"></i> Get Charge<span class="caret"></span>
                             </button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item pointer" *ngIf="showGetChargeStandart"
-                                    (click)="getStandardCharge()">Standard</a>
+                                <a class="dropdown-item pointer" (click)="getStandardCharge()">Standard</a>
                                 <a class="dropdown-item pointer" (click)="getOtherCharge()"
                                     *ngIf="showSyncOtherCharge">Other</a>
                                 <a class="dropdown-item pointer" (click)="getRecentlyCharge()">Recently</a>
@@ -170,7 +169,7 @@
                                                 [currentActiveItemId]="{field:'id', value:charge.chargeId}"
                                                 (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                                 [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
-                                                [dataSources]="listCharges$ | async"
+                                                [dataSources]="listCharges"
                                                 [displayFields]="configComboGridCharge.displayFields" [height]="150"
                                                 placeholder="Select charge" (remove)="charge.chargeId = null">
                                             </app-combo-grid-virtual-scroll>
@@ -417,8 +416,7 @@
                                             <app-combo-grid-virtual-scroll
                                                 [currentActiveItemId]="{field: 'id', value: charge.vatPartnerId}"
                                                 (itemSelected)="onSelectDataFormInfo($event, 'vat-partner', charge)"
-                                                [selectedDisplayFields]="['shortName']"
-                                                [dataSources]="listPartner"
+                                                [selectedDisplayFields]="['shortName']" [dataSources]="listPartner"
                                                 [displayFields]="[{'field':'shortName','label':'Name'},{'field':'taxCode','label':'Code'}]"
                                                 (remove)="charge.vatPartnerId = null" placeholder="VAT Partner"
                                                 size="15">

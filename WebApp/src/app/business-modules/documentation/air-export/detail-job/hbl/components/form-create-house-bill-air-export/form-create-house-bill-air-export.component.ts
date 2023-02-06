@@ -24,7 +24,7 @@ import _cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
 import { ToastrService } from 'ngx-toastr';
 import { forkJoin, Observable } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, map, mergeMap, shareReplay, skip, startWith, takeUntil, tap } from 'rxjs/operators';
+import { catchError, debounceTime, distinctUntilChanged, map, mergeMap, shareReplay, skip, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 
 @Component({
@@ -112,7 +112,6 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     shipmentDetail: CsTransaction;
     customerName: string;
-
     AA: string = 'As Arranged';
 
     dims: DIM[] = []; // * Dimension details.
@@ -129,6 +128,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     userCreated: string;
     userModified: string;
     hwbnoSeparate: string;
+    shipmentType: string;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -189,8 +189,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 polDescription: shipment.polDescription,
                                 podDescription: shipment.podDescription,
                                 shipmenttype: shipment.shipmentType,
+                                shipmentType: shipment.shipmentType
                             });
-
                             // *  CR 14501
                             if (shipment.isHawb) {
                                 const valueDefaultFromShipment = {
@@ -391,7 +391,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             originBlnumber: [],
             wtorValpayment: [this.wts[0]],
             otherPayment: [this.wts[0]],
-            shipmenttype: ['Freehand'],
+            shipmenttype: [],
             // * Date
             etd: [],
             eta: [],
@@ -440,6 +440,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
         this.incotermId = this.formCreate.controls["incotermId"];
         this.polDescription = this.formCreate.controls["polDescription"];
         this.podDescription = this.formCreate.controls["podDescription"];
+        // this.shipmentType = this.shipmenttype.value;
 
         // this.formCreate.get('dimensionDetails')
         //     .valueChanges

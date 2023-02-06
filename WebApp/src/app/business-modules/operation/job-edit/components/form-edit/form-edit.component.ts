@@ -11,7 +11,7 @@ import { CommodityGroup, Container, CustomDeclaration, Customer, OpsTransaction,
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { getContainerSaveState, GetContainerSuccessAction, IShareBussinessState, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
-import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState, GetCatalogueWarehouseAction, getCatalogueWarehouseState } from '@store';
+import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState, GetCatalogueWarehouseAction, getCatalogueWarehouseState, getMenuUserSpecialPermissionState } from '@store';
 import { FormValidators } from '@validators';
 
 import { InjectViewContainerRefDirective } from '@directives';
@@ -107,7 +107,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     containers: Observable<any>;
     salesmanName: string = null;
-
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _operationRepo: OperationRepo,
@@ -150,6 +149,9 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.commodityGroups = this._store.select(getCatalogueCommodityGroupState);
         this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
         this.containers = this._store.select(getContainerSaveState);
+
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+
         this.initForm();
     }
 
@@ -194,9 +196,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             clearanceDate: !!this.opsTransaction.clearanceDate ? { startDate: new Date(this.opsTransaction.clearanceDate), endDate: new Date(this.opsTransaction.clearanceDate) } : null,
             suspendTime: this.opsTransaction.suspendTime,
         });
-
-        console.log(this.opsTransaction)
-
         this.customerName = this.opsTransaction.customerName;
         this.shipmentInfo = this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
@@ -305,6 +304,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
+            case 'shipmentMode':
+                this.shipmentInfo = null;
+                this.shipmentNo = null;
+                break;
             case 'supplier':
                 this.supplierId.setValue(data.id);
                 break;
@@ -381,38 +384,44 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     }
 
     getASInfoToLink() {
-        if (!this.hwbno.value || !this.mblno.value) {
-            this._toaster.warning("MBL No and HBL No is empty. Please complete first!");
-            return;
-        }
+        if (!this.shipmentInfo) {
+            if (!this.hwbno.value || !this.mblno.value) {
+                this._toaster.warning("MBL No and HBL No is empty. Please complete first!");
+                return;
+            }
 
-        if (!this.productService.value || !this.serviceMode.value || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
-            this._toaster.warning("Service's not valid to link. Please select another!");
-        } else {
-            this._documentRepo.getASTransactionInfo(this.jobNo.value, this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
-                .pipe(catchError(this.catchError))
-                .subscribe((res: ILinkAirSeaInfoModel) => {
-                    if (!!res?.jobNo) {
-                        this.shipmentNo = res.jobNo;
-                        this.shipmentInfo = res.jobNo;
-                        this.formEdit.patchValue({
-                            sumGrossWeight: res.gw,
-                            sumCbm: res.cw,
-                            sumPackages: res.packageQty
-                        });
+            if (!this.productService.value || !this.serviceMode.value || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
+                this._toaster.warning("Service's not valid to link. Please select another!");
+            } else {
+                this._documentRepo.getASTransactionInfo(this.jobNo.value, this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
+                    .pipe(catchError(this.catchError))
+                    .subscribe((res: ILinkAirSeaInfoModel) => {
+                        if (!!res?.jobNo) {
+                            this.shipmentNo = res.jobNo;
+                            this.shipmentInfo = res.jobNo;
+                            this.formEdit.patchValue({
+                                sumGrossWeight: res.gw,
+                                sumCbm: res.cw,
+                                sumPackages: res.packageQty
+                            });
 
-                        if (res.containers) {
-                            res.containers.forEach(c => {
-                                c.id = SystemConstants.EMPTY_GUID;
-                            })
-                            this._store.dispatch(new GetContainerSuccessAction(res.containers));
+                            if (res.containers) {
+                                res.containers.forEach(c => {
+                                    c.id = SystemConstants.EMPTY_GUID;
+                                })
+                                this._store.dispatch(new GetContainerSuccessAction(res.containers));
+                            }
+                        } else {
+                            this.shipmentNo = null;
+                            this.shipmentInfo = null;
+                            this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
                         }
-                    } else {
-                        this.shipmentNo = null;
-                        this.shipmentInfo = null;
-                        this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
-                    }
-                });
+                    });
+            }
+        }
+        else {
+            this.shipmentNo = null;
+            this.shipmentInfo = null;
         }
     }
 
@@ -424,7 +433,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     getSalesmanList(data: any) {
         this.shipmentType.setValue(data);
-        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
+        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value, this.opsTransaction.officeId)
             .subscribe(
                 (res: any) => {
                     if (!!res) {
@@ -449,7 +458,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     }
 
     syncGoodInforToReplicateJob() {
-        this._documentRepo.syncGoodInforToReplicateJob({ jobNo: this.opsTransaction.jobNo }).pipe(
+        this._documentRepo.syncGoodInforToReplicateJob(this.opsTransaction.id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
         ).subscribe((res: any) => {

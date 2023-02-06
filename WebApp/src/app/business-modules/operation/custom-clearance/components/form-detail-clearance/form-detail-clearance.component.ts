@@ -7,8 +7,9 @@ import { Commodity, CountryModel, Customer, PortIndex, Unit } from '@models';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo } from '@repositories';
 import { IShareBussinessState } from '@share-bussiness';
-import { GetCatalogueCommodityAction, getCatalogueCommodityState, GetCatalogueCountryAction, getCatalogueCountryState, GetCataloguePortAction, getCataloguePortState } from '@store';
+import { GetCatalogueCommodityAction, getCatalogueCommodityState, GetCatalogueCountryAction, getCatalogueCountryState, GetCataloguePortAction, getCataloguePortState, GetCurrenctUser, getCurrentUserState } from '@store';
 import { Observable } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { CustomClearance } from 'src/app/shared/models/tool-setting/custom-clearance.model';
 
@@ -75,6 +76,8 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
     taxCode: string = '';
     customerName: string = '';
     customerId: string;
+    currentUser: any;
+
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IShareBussinessState>,
@@ -86,6 +89,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this._store.dispatch(new GetCatalogueCommodityAction());
         this._store.dispatch(new GetCatalogueCountryAction());
+        this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe)).subscribe(res => this.currentUser = res);
 
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
         this.ports = this._store.select(getCataloguePortState);
@@ -182,7 +186,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         });
 
         if (!!this.customDeclaration.serviceType) {
-            if (this.customDeclaration.serviceType === 'Air' || this.customDeclaration.serviceType === 'Express') {
+            if (this.customDeclaration.serviceType === 'Air' || this.customDeclaration.serviceType === 'Express' || this.customDeclaration.serviceType === 'Sea Consol') {
                 this.isDisableCargo = true;
                 this.cargoType.disable();
             } else {
@@ -226,7 +230,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
             case 'service-type':
                 const serviceType = event;
                 if (!!serviceType) {
-                    if (serviceType === 'Air' || serviceType === 'Express') {
+                    if (serviceType === 'Air' || serviceType === 'Express' || serviceType === 'Sea Consol') {
                         this.isDisableCargo = true;
                         this.formGroup.controls['cargoType'].setValue(null);
                         this.formGroup.controls['cargoType'].disable();

@@ -36,7 +36,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     @ViewChild(SettlementFormCreateComponent, { static: true }) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
-    //@ViewChild(ShareBussinessAttachFileV2Component) public attachRef: ShareBussinessAttachFileV2Component;
+    //@ViewChild(ShareBussinessAttachFileV2Component) public attachList: ShareBussinessAttachFileV2Component;
 
     settlementId: string = '';
     settlementCode: string = '';
@@ -434,6 +434,12 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         this.componentRef.instance.frm.nativeElement.submit();
         this.componentRef.instance.ShowWithDelay(); // Gọi method có delay này để ViewChild Popup nó get đc
     }
+
+    // regetEdoc(event: boolean) {
+    //     if (event) {
+    //         this.attachList.getEDoc("Settlement");
+    //     }
+    // }
 }
 
 export interface ISettlementPaymentData {

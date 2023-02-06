@@ -19,7 +19,7 @@
                 </div>
                 <customer-payment-form-create-receipt></customer-payment-form-create-receipt>
 
-                <customer-payment-list-receipt></customer-payment-list-receipt>
+                <customer-payment-list-receipt (onChangePaymentMethod)="onChangePaymentMethod()"></customer-payment-list-receipt>
 
                 <div class="c-button-actions text-center">
                     <app-permission-button title="Save Draft" class="outline-primary" [icon]="'la la-sticky-note'"

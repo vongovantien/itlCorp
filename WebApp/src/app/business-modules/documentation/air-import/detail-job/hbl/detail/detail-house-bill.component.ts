@@ -36,7 +36,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     hblId: string;
     hblDetail: any;
-
+    shipmentType: string;
     selectedTab: string = HBL_TAB.DETAIL;
     isClickSubMenu: boolean = false;
     checkPointPreview;
@@ -266,12 +266,12 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         // this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
     }
 
-    previewArrivalNotice(_currency: string) {
+    previewArrivalNotice(_currency: string, _language: string) {
         this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
-                        return this._documentationRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: _currency });
+                        return this._documentationRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: _currency, language: _language });
                     }
                     this._toastService.warning(res.message);
                     return of(false)
@@ -290,8 +290,12 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 },
             );
     }
+
     showPreviewSignature(type: string, withSign: boolean) {
         this.isClickSubMenu = false;
+        if (type === 'AUTHORIZE_LETTER_EN') {
+            this.previewAuthorizeLetter1(withSign, "EN");
+        }
         if (type === 'AUTHORIZE_LETTER1') {
             this.previewAuthorizeLetter1(withSign);
         }
@@ -302,9 +306,10 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     onPreview(type: string) {
         this.isClickSubMenu = false;
-        if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND') {
+        if (type === 'ARRIVAL_ORIGINAL' || type === 'ARRIVAL_VND' || type === 'ARRIVAL_ORIGINAL_EN') {
             const _currency = type === 'ARRIVAL_VND' ? 'VND' : 'ORIGINAL';
-            this.previewArrivalNotice(_currency);
+            const _language = type === 'ARRIVAL_ORIGINAL_EN' ? 'EN' : '';
+            this.previewArrivalNotice(_currency, _language);
         }
         if (type === 'PROOF_OF_DELIVERY') {
             this.previewProofOfDelivery();
@@ -344,12 +349,12 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 },
             );
     }
-    previewAuthorizeLetter1(withSign: boolean) {
+    previewAuthorizeLetter1(withSign: boolean, language: string = '') {
         this._documentationRepo.validateCheckPointContractPartner(this.checkPointPreview)
             .pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
-                        return this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId, withSign);
+                        return this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId, withSign, language);
                     }
                     this._toastService.warning(res.message);
                     return of(false)

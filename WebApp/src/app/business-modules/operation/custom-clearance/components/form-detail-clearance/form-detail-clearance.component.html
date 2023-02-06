@@ -84,15 +84,15 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted && (hblid.value == null || hblid.value == '') && isConvertJob}">
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && (hblid.value == null || hblid.value == '') && (isConvertJob || currentUser?.companyCode !== 'ITL')}">
                             <label class="form-control-label" for="">
                                 HBL/HAWB <span class="m--font-danger"
-                                    *ngIf="isSubmitted && (hblid.value == null || hblid.value == '') && isConvertJob">(*)</span>
+                                    *ngIf="(isSubmitted && isConvertJob  && (hblid.value == null || hblid.value == '') || currentUser?.companyCode !== 'ITL')">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
                                 autocomplete="nope" formControlName="hblid">
                             <div class="form-control-feedback"
-                                *ngIf="isSubmitted && (hblid.value == null || hblid.value == '') && isConvertJob">
+                                *ngIf="isSubmitted && (hblid.value == null || hblid.value == '') && (isConvertJob || currentUser?.companyCode !== 'ITL')">
                                 HBL/HAWB is required
                             </div>
                         </div>

@@ -15,12 +15,16 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string BillingRefNo { get; set; }
         public DateTime? BillingDate { get; set; }
         public DateTime? DueDate { get; set; }
+        public DateTime? DueDateOBH { get; set; }
         public int? OverdueDays { get; set; }
+        public int? OverdueDaysOBH { get; set; }
         public decimal? PaymentTerm { get; set; }
+        public decimal? PaymentTermOBH { get; set; }
         public decimal? UnpaidAmountInv { get; set; }
         public decimal? UnpaidAmountInvUsd { get; set; }
         public decimal? UnpaidAmountOBH { get; set; }
         public decimal? UnpaidAmountOBHUsd { get; set; }
+        public decimal? UnpaidAmountCreditUsd { get; set; }
         public decimal? PaidAmount { get; set; }
         public decimal? PaidAmountUsd { get; set; }
         public decimal? PaidAmountOBH { get; set; }

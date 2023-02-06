@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
@@ -26,9 +27,13 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using eFMS.API.Infrastructure.Authorizations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using eFMS.API.Documentation.DL.Helpers;
+using eFMS.API.ForPartner.DL.Models.Receivable;
+using Microsoft.Extensions.Options;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -363,42 +368,38 @@ namespace eFMS.API.Documentation.DL.Services
         private OpsTransaction GetOpsTransactionToGenerateJobNo(SysOffice office)
         {
             OpsTransaction currentShipment = null;
-            if (office != null)
+            switch (office.Code)
             {
-                if (office.Code == "ITLHAN")
-                {
+                case "ITLHAN":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                          && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                          && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: HAN -> H [15202]
-                }
-                else if (office.Code == "ITLDAD")
-                {
+                    break;
+                case "ITLDAD":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
-                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
-                }
-                else
-                {
+                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                        && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
+                                                        .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
+                    break;
+                case "ITLCAM":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
-                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
-                                                         && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
-                }
-            }
-            else
-            {
-                currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
+                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                        && x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-"))
+                                                        .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                    break;
+                default:
+                    currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                      && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                      && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                     && !x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-")
                                                      && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                      .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                    break;
             }
             return currentShipment;
         }
@@ -406,16 +407,19 @@ namespace eFMS.API.Documentation.DL.Services
         private string SetPrefixJobIdByOfficeCode(string officeCode)
         {
             string prefixCode = string.Empty;
-            if (!string.IsNullOrEmpty(officeCode))
+            switch (officeCode)
             {
-                if (officeCode == "ITLHAN")
-                {
-                    prefixCode = "H"; //HAN- >> H
-                }
-                else if (officeCode == "ITLDAD")
-                {
-                    prefixCode = "D"; //DAD- >> D
-                }
+                case "ITLHAN":
+                    prefixCode = "H";
+                    break;
+                case "ITLDAD":
+                    prefixCode = "D";
+                    break;
+                case "ITLCAM":
+                    prefixCode = "C";
+                    break;
+                default:
+                    break;
             }
             return prefixCode;
         }
@@ -445,6 +449,9 @@ namespace eFMS.API.Documentation.DL.Services
 
                 CatPartner customer = partnerRepository.Get(x => x.Id == details.CustomerId).FirstOrDefault();
                 details.CustomerName = customer?.ShortName;
+                details.CustomerAccountNo = customer?.AccountNo;
+                CatPlace place = placeRepository.Get(x => x.Id == details.ClearanceLocation).FirstOrDefault();
+                details.PlaceNameCode = place?.Code;
 
                 details.UserCreatedName = userRepository.Get(x => x.Id == details.UserCreated).FirstOrDefault()?.Username;
                 details.UserModifiedName = userRepository.Get(x => x.Id == details.UserModified).FirstOrDefault()?.Username;
@@ -539,20 +546,14 @@ namespace eFMS.API.Documentation.DL.Services
         {
             criteria.RangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
             var data = Query(criteria);
-            int totalProcessing = 0;
-            int totalfinish = 0;
-            int totalOverdued = 0;
+           
             if (data == null) rowsCount = 0;
             else
             {
-                rowsCount = data.Select(x => x.Id).Count();
-                totalProcessing = data.Count(x => x.CurrentStatus == TermData.Processing);
-                totalfinish = data.Count(x => x.CurrentStatus == TermData.Finish);
-                totalOverdued = data.Count(x => x.CurrentStatus == TermData.Overdue);
+                rowsCount = data.Count();
             }
-            int totalCanceled = 0;
-            totalCanceled = DataContext.Count(x => x.CurrentStatus == TermData.Canceled && x.ServiceDate >= criteria.ServiceDateFrom && x.ServiceDate <= criteria.ServiceDateTo); //data.Count(x => x.CurrentStatus == DataTypeEx.GetJobStatus(JobStatus.Canceled));
             if (rowsCount == 0) return null;
+            var results = new OpsTransactionResult();
             if (size > 1)
             {
                 data = data.OrderByDescending(x => x.DatetimeModified);
@@ -561,40 +562,67 @@ namespace eFMS.API.Documentation.DL.Services
                     page = 1;
                 }
                 data = data.Skip((page - 1) * size).Take(size);
-                IQueryable<CatPartner> customers = partnerRepository.Get(x => x.PartnerGroup.Contains("CUSTOMER"));
-                IQueryable<CatPlace> ports = placeRepository.Get(x => x.PlaceTypeId == "Port");
-
-                data.ToList().ForEach(x =>
-                {
-                    x.ClearanceNo = customDeclarationRepository.Get(cus => cus.JobNo == x.JobNo).OrderBy(cus => cus.ClearanceDate).ThenBy(cus => cus.ClearanceNo)
-                    .Select(cus => cus.ClearanceNo).FirstOrDefault();
-                    x.CustomerName = customers.FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName;
-                    x.POLName = ports.FirstOrDefault(pol => pol.Id == x.Pol)?.NameEn;
-                    x.PODName = ports.FirstOrDefault(pod => pod.Id == x.Pod)?.NameEn;
-                    x.GroupName = groupRepository.Get(y => y.Id == x.GroupId)?.FirstOrDefault().ShortName;
-                    x.DepartmentName = departmentRepository.Get(z => z.Id == x.DepartmentId)?.FirstOrDefault().DeptNameAbbr;
-                    IQueryable<SysUser> sysUsers = userRepository.Get(u => u.Id == x.UserCreated);
-
-                    x.UserCreatedName = sysUsers?.FirstOrDefault()?.Username;
-                    x.UserCreatedNameLinkJob = string.IsNullOrEmpty(x.UserCreatedLinkJob) ? "" : userRepository.Get(u => u.Id == x.UserCreatedLinkJob)?.FirstOrDefault()?.Username;
-
-                    if (x.ReplicatedId != null)
-                    {
-                        var replicateJob = DataContext.Get(d => d.Id == x.ReplicatedId)?.FirstOrDefault();
-                        x.ReplicateJobNo = replicateJob?.JobNo;
-                    }
-                });
+                results.OpsTransactions = FormatDataPaging(data);
             }
-            var results = new OpsTransactionResult
-            {
-                OpsTransactions = data,
-                ToTalInProcessing = totalProcessing,
-                ToTalFinish = totalfinish,
-                TotalOverdued = totalOverdued,
-                TotalCanceled = totalCanceled
-            };
             return results;
         }
+        private string GetClearanceNoOfShipment(string jobNo, IQueryable<CsShipmentSurcharge> surcharge, IQueryable<CustomsDeclaration> clearances)
+        {
+            var surchargeShipment = surcharge.Where(x => x.JobNo == jobNo);
+            var clearanceNos = surchargeShipment.Select(x => x.ClearanceNo).ToList();
+            var clearanceShipments = clearances.Where(x => x.JobNo == jobNo && clearanceNos.Contains(x.ClearanceNo))?.OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).ToList();
+            var clearanceShipment = clearanceShipments.FirstOrDefault();
+            if (clearanceShipments.Any(x => x.ConvertTime != null))
+            {
+                clearanceShipment = clearanceShipments.FirstOrDefault(x => x.ConvertTime != null);
+            }
+            if (surchargeShipment.Count() > 0 && clearanceShipment != null)
+            {
+                return clearanceShipment.ClearanceNo;
+            }
+            else
+            {
+                return clearances.Where(x => x.JobNo == jobNo)?.OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+            }
+        }
+
+        private IQueryable<OpsTransactionModel> FormatDataPaging(IQueryable<OpsTransaction> dataQuery)
+        {
+            IQueryable<CatPartner> customers = partnerRepository.Get(x => x.PartnerGroup.Contains("CUSTOMER"));
+            IQueryable<CatPlace> ports = placeRepository.Get(x => x.PlaceTypeId == "Port");
+            List<OpsTransactionModel> list = new List<OpsTransactionModel>();
+
+            foreach (var x in dataQuery)
+            {
+                OpsTransactionModel item = mapper.Map<OpsTransactionModel>(x);
+                item.ClearanceNo = customDeclarationRepository.Get(cus => cus.JobNo == item.JobNo)
+                    .OrderBy(cus => cus.ClearanceDate)
+                    .ThenBy(cus => cus.ClearanceNo)
+                    .Select(cus => cus.ClearanceNo)
+                    .FirstOrDefault();
+
+                item.CustomerName = customers.FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName;
+                item.POLName = ports.FirstOrDefault(pol => pol.Id == x.Pol)?.NameEn;
+                item.PODName = ports.FirstOrDefault(pod => pod.Id == x.Pod)?.NameEn;
+                item.GroupName = groupRepository.Get(y => y.Id == x.GroupId)?.FirstOrDefault().ShortName;
+                item.DepartmentName = departmentRepository.Get(z => z.Id == x.DepartmentId)?.FirstOrDefault().DeptNameAbbr;
+
+                IQueryable<SysUser> sysUsers = userRepository.Get(u => u.Id == x.UserCreated);
+
+                item.UserCreatedName = sysUsers?.FirstOrDefault()?.Username;
+                item.UserCreatedNameLinkJob = string.IsNullOrEmpty(x.UserCreatedLinkJob) ? "" : userRepository.Get(u => u.Id == x.UserCreatedLinkJob)?.FirstOrDefault()?.Username;
+
+                if (x.ReplicatedId != null)
+                {
+                    var replicateJob = DataContext.Get(d => d.Id == x.ReplicatedId)?.FirstOrDefault();
+                    item.ReplicateJobNo = replicateJob?.JobNo;
+                }
+
+                list.Add(item);
+            }
+            return list.AsQueryable();
+        }
+
         public bool CheckAllowDelete(Guid jobId)
         {
             var detail = DataContext.Get(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled)?.FirstOrDefault();
@@ -627,10 +655,10 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
-        public Expression<Func<OpsTransaction, bool>> QueryByPermission(PermissionRange range)
+        public IQueryable<OpsTransaction> QueryByPermission(IQueryable<OpsTransaction> data, PermissionRange range)
         {
-            //IQueryable<OpsTransaction> data = null;
-            Expression<Func<OpsTransaction, bool>> query = q => (q.CurrentStatus != TermData.Canceled || q.CurrentStatus == null);
+            ////IQueryable<OpsTransaction> data = null;
+            //Expression<Func<OpsTransaction, bool>> query = q => (q.CurrentStatus != TermData.Canceled || q.CurrentStatus == null);
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds("CL", currentUser);
             switch (range)
             {
@@ -638,7 +666,7 @@ namespace eFMS.API.Documentation.DL.Services
                     // query = query.And(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
                     break;
                 case PermissionRange.Owner:
-                    query = query.And(x => ((x.BillingOpsId == currentUser.UserID && x.OfficeId == currentUser.OfficeID)
+                    data = data.Where(x => ((x.BillingOpsId == currentUser.UserID && x.OfficeId == currentUser.OfficeID)
                                                     || x.SalemanId == currentUser.UserID
                                                     || authorizeUserIds.Contains(x.BillingOpsId)
                                                     || authorizeUserIds.Contains(x.SalemanId)
@@ -647,32 +675,32 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case PermissionRange.Group:
                     var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
-                    query = query.And(x => ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                    data = data.Where(x => ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
                                                 || (dataUserLevel.Contains(x.SalemanId))));
                     break;
                 case PermissionRange.Department:
                     var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
-                    query = query.And(x => ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                    data = data.Where(x => ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
                                                 || dataUserLevelDepartment.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Office:
-                    query = query.And(x => ((x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                    data = data.Where(x => ((x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Company:
-                    query = query.And(x => (x.CompanyId == currentUser.CompanyID
+                    data = data.Where(x => (x.CompanyId == currentUser.CompanyID
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
                                                 || x.UserCreated == currentUser.UserID));
                     break;
             }
 
-            return query;
+            return data;
         }
 
         /// <summary>
@@ -681,82 +709,10 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private Expression<Func<OpsTransaction, bool>> ExpressionQueryDefault(OpsTransactionCriteria criteria)
         {
-            Expression<Func<OpsTransaction, bool>> query = q => true;
-            if (string.IsNullOrEmpty(criteria.All) && string.IsNullOrEmpty(criteria.JobNo)
-                && string.IsNullOrEmpty(criteria.Mblno) && string.IsNullOrEmpty(criteria.Hwbno)
-                && string.IsNullOrEmpty(criteria.CustomerId) && string.IsNullOrEmpty(criteria.ClearanceNo)
-                && string.IsNullOrEmpty(criteria.ProductService) && string.IsNullOrEmpty(criteria.ServiceMode)
-                && criteria.CreatedDateFrom == null && criteria.CreatedDateTo == null
-                && string.IsNullOrEmpty(criteria.ShipmentMode) && string.IsNullOrEmpty(criteria.FieldOps)
-                && string.IsNullOrEmpty(criteria.CreditDebitInvoice)
-                && criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
-            {
-                var maxDate = (DataContext.Get().Max(x => x.DatetimeModified) ?? DateTime.Now).AddDays(1).Date;
-                var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
-                query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
-            }
-
-            return query;
-        }
-
-        public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
-        {
-            if (criteria.RangeSearch == PermissionRange.None) return null;
-            //IQueryable<OpsTransaction> data = QueryByPermission(criteria.RangeSearch);
-
-            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
-            var queryDefault = ExpressionQueryDefault(criteria);
-            var data = DataContext.Get(queryDefault);
-            var queryPermission = QueryByPermission(criteria.RangeSearch);
-            queryPermission = QuerySearchLinkJob(queryPermission, criteria);
-            data = data.Where(queryPermission);
-
-            if (data == null) return null;
-
-            List<OpsTransactionModel> results = new List<OpsTransactionModel>();
-            IQueryable<OpsTransaction> datajoin = data.Where(x => x.CurrentStatus != TermData.Canceled);
-
-            if (!string.IsNullOrEmpty(criteria.ClearanceNo))
-            {
-                IQueryable<CustomsDeclaration> listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
-                if (listCustomsDeclaration.Count() > 0)
-                {
-                    datajoin = from custom in listCustomsDeclaration
-                               join datas in data on custom.JobNo equals datas.JobNo
-                               select datas;
-                    if (datajoin.Count() > 1)
-                    {
-                        datajoin = datajoin.GroupBy(x => x.JobNo).SelectMany(x => x).AsQueryable();
-                    }
-                }
-                else
-                {
-                    return results.AsQueryable();
-                }
-            }
-            if (!string.IsNullOrEmpty(criteria.CreditDebitInvoice))
-            {
-                IQueryable<AcctCdnote> listDebit = acctCdNoteRepository.Get(x => x.Code.ToLower().Contains(criteria.CreditDebitInvoice.ToLower()));
-                if (listDebit.Count() > 0)
-                {
-                    datajoin = from acctnote in listDebit
-                               join datas in data on acctnote.JobId equals datas.Id
-                               select datas;
-                    if (datajoin.Count() > 1)
-                    {
-                        datajoin = datajoin.GroupBy(x => x.JobNo).SelectMany(x => x).AsQueryable();
-                    }
-                }
-                else
-                {
-                    return results.AsQueryable();
-                }
-
-            }
-
+            Expression<Func<OpsTransaction, bool>> query = q => q.CurrentStatus != TermData.Canceled;
             if (criteria.All == null)
             {
-                datajoin = datajoin.Where(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                query = query.And(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.Hwbno ?? "").IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.Mblno ?? "").IndexOf(criteria.Mblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -768,11 +724,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 && ((x.ServiceDate ?? null) <= criteria.ServiceDateTo || criteria.ServiceDateTo == null)
                                 && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= criteria.CreatedDateFrom || criteria.CreatedDateFrom == null)
                                 && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= criteria.CreatedDateTo || criteria.CreatedDateTo == null)
-                            ).OrderByDescending(x => x.DatetimeModified);
+                            );
             }
             else
             {
-                datajoin = datajoin.Where(x => (x.JobNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                query = query.And(x => (x.JobNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.Hwbno ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.Mblno ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ProductService ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -782,10 +738,124 @@ namespace eFMS.API.Documentation.DL.Services
                                    || (x.ShipmentMode == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
                                    || ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.CreatedDateFrom ?? null) && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.CreatedDateTo ?? null))
-                               ).OrderByDescending(x => x.DatetimeModified);
+                               );
             }
-            results = mapper.Map<List<OpsTransactionModel>>(datajoin);
-            return results.AsQueryable();
+
+            //if (string.IsNullOrEmpty(criteria.All) && string.IsNullOrEmpty(criteria.JobNo)
+            //    && string.IsNullOrEmpty(criteria.Mblno) && string.IsNullOrEmpty(criteria.Hwbno)
+            //    && string.IsNullOrEmpty(criteria.CustomerId) && string.IsNullOrEmpty(criteria.ClearanceNo)
+            //    && string.IsNullOrEmpty(criteria.ProductService) && string.IsNullOrEmpty(criteria.ServiceMode)
+            //    && criteria.CreatedDateFrom == null && criteria.CreatedDateTo == null
+            //    && string.IsNullOrEmpty(criteria.ShipmentMode) && string.IsNullOrEmpty(criteria.FieldOps)
+            //    && string.IsNullOrEmpty(criteria.CreditDebitInvoice)
+            //    && criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
+            //{
+            //    var maxDate = (DataContext.Get().Max(x => x.DatetimeModified) ?? DateTime.Now).AddDays(1).Date;
+            //    var minDate = maxDate.AddMonths(-1).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
+            //    query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
+            //}
+            if (!string.IsNullOrEmpty(criteria.LinkFeeSearch) && criteria.LinkFeeSearch == "Have Linked")
+                query = query.And(x => x.IsLinkFee == true);
+            if (!string.IsNullOrEmpty(criteria.LinkFeeSearch) && criteria.LinkFeeSearch == "Not Link")
+                query = query.And(x => x.IsLinkFee == null || x.IsLinkFee == false);
+            if (!string.IsNullOrEmpty(criteria.LinkJobSearch) && criteria.LinkJobSearch == "Have Linked")
+                query = query.And(x => !string.IsNullOrEmpty(x.ServiceNo));
+            if (!string.IsNullOrEmpty(criteria.LinkJobSearch) && criteria.LinkJobSearch == "Not Link")
+                query = query.And(x => string.IsNullOrEmpty(x.ServiceNo));
+
+            return query;
+        }
+
+        public IQueryable<OpsTransaction> Query(OpsTransactionCriteria criteria)
+        {
+            if (criteria.RangeSearch == PermissionRange.None) return null;
+            //IQueryable<OpsTransaction> data = QueryByPermission(criteria.RangeSearch);
+
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
+            var queryDefault = ExpressionQueryDefault(criteria);
+            var data = DataContext.Get(queryDefault);
+            data = QueryByPermission(data, criteria.RangeSearch);
+            // queryPermission = QuerySearchLinkJob(queryPermission, criteria);
+            // data = data.Where(queryPermission);
+
+            if (data == null) return null;
+
+            //List<OpsTransactionModel> results = new List<OpsTransactionModel>();
+            //IQueryable<OpsTransaction> datajoin = data.Where(x => x.CurrentStatus != TermData.Canceled);
+
+            //if (!string.IsNullOrEmpty(criteria.ClearanceNo))
+            //{
+            //    IQueryable<CustomsDeclaration> listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
+            //    if (listCustomsDeclaration.Count() > 0)
+            //    {
+            //        datajoin = from custom in listCustomsDeclaration
+            //                   join datas in data on custom.JobNo equals datas.JobNo
+            //                   select datas;
+            //        if (datajoin.Count() > 1)
+            //        {
+            //            datajoin = datajoin.GroupBy(x => x.JobNo).SelectMany(x => x).AsQueryable();
+            //        }
+            //    }
+            //    else
+            //    {
+            //        return results.AsQueryable();
+            //    }
+            //}
+            //if (!string.IsNullOrEmpty(criteria.CreditDebitInvoice))
+            //{
+            //    IQueryable<AcctCdnote> listDebit = acctCdNoteRepository.Get(x => x.Code.ToLower().Contains(criteria.CreditDebitInvoice.ToLower()));
+            //    if (listDebit.Count() > 0)
+            //    {
+            //        datajoin = from acctnote in listDebit
+            //                   join datas in data on acctnote.JobId equals datas.Id
+            //                   select datas;
+            //        if (datajoin.Count() > 1)
+            //        {
+            //            datajoin = datajoin.GroupBy(x => x.JobNo).SelectMany(x => x).AsQueryable();
+            //        }
+            //    }
+            //    else
+            //    {
+            //        return results.AsQueryable();
+            //    }
+
+            //}
+
+            //if (criteria.All == null)
+            //{
+            //    datajoin = datajoin.Where(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
+            //                    && (x.Hwbno ?? "").IndexOf(criteria.Hwbno ?? "", StringComparison.OrdinalIgnoreCase) > -1
+            //                    && (x.Mblno ?? "").IndexOf(criteria.Mblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
+            //                    && (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
+            //                    && (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
+            //                    && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+            //                    && (x.FieldOpsId == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
+            //                    && (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
+            //                    && ((x.ServiceDate ?? null) >= criteria.ServiceDateFrom || criteria.ServiceDateFrom == null)
+            //                    && ((x.ServiceDate ?? null) <= criteria.ServiceDateTo || criteria.ServiceDateTo == null)
+            //                    && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= criteria.CreatedDateFrom || criteria.CreatedDateFrom == null)
+            //                    && ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= criteria.CreatedDateTo || criteria.CreatedDateTo == null)
+            //                ).OrderByDescending(x => x.DatetimeModified);
+            //}
+            //else
+            //{
+            //    datajoin = datajoin.Where(x => (x.JobNo ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+            //                       || (x.Hwbno ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+            //                       || (x.Mblno ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+            //                       || (x.ProductService ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+            //                       || (x.ServiceMode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+            //                       || (x.CustomerId == criteria.All || string.IsNullOrEmpty(criteria.All))
+            //                       || (x.FieldOpsId == criteria.All || string.IsNullOrEmpty(criteria.All))
+            //                       || (x.ShipmentMode == criteria.All || string.IsNullOrEmpty(criteria.All))
+            //                       || ((x.ServiceDate ?? null) >= (criteria.ServiceDateFrom ?? null) && (x.ServiceDate ?? null) <= (criteria.ServiceDateTo ?? null))
+            //                       || ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.CreatedDateFrom ?? null) && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.CreatedDateTo ?? null))
+            //                   ).OrderByDescending(x => x.DatetimeModified);
+            //}
+            // results = mapper.Map<List<OpsTransactionModel>>(datajoin);
+            // var res = datajoin.ProjectTo<OpsTransactionModel>(mapper.ConfigurationProvider);
+            // var d = results.AsQueryable();
+
+            return data;
         }
 
         private Expression<Func<OpsTransaction, bool>> QuerySearchLinkJob(Expression<Func<OpsTransaction, bool>> query, OpsTransactionCriteria criteria)
@@ -1699,6 +1769,8 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                model.ClearanceNo = detail.ClearanceNo;
+
                 var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
                 int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
                 if (code == 403) return new HandleState(403);
@@ -2707,12 +2779,13 @@ namespace eFMS.API.Documentation.DL.Services
                 if (p != null) { p.SetValue(surcharge, item.GetValue(chargeBuy, null), null); }
             }
 
+            var datetimeCR = new DateTime(2023, 1, 1); // [CR:18726] update 8 -> 10% from 1/1/2023
             surcharge.Id = Guid.NewGuid();
             surcharge.Type = DocumentConstants.CHARGE_SELL_TYPE;
             surcharge.ChargeId = chargeBuy.DebitCharge ?? Guid.Empty;
 
-            surcharge.Quantity = 1;
-            surcharge.Vatrate = 8;
+            surcharge.Quantity = chargeBuy.ServiceDate.Value < datetimeCR ? 1 : chargeBuy.Quantity;
+            surcharge.Vatrate = chargeBuy.ServiceDate.Value < datetimeCR ? 8 : 10; // [CR:18726] update 8 -> 10% from 1/1/2023
 
             surcharge.Soano = null;
             surcharge.PaySoano = null;
@@ -2742,7 +2815,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (chargeBuy.CurrencyId == "VND")
             {
-                var per = (double)chargeBuy.Total / (double)0.76;
+                var per = (chargeBuy.ServiceDate.Value < datetimeCR ? (double)chargeBuy.Total  : (double)chargeBuy.UnitPrice) / (double)0.76;
                 surcharge.UnitPrice = NumberHelper.RoundNumber((decimal)per / 10000, 0) * 10000;
                 surcharge.NetAmount = surcharge.UnitPrice * surcharge.Quantity;
                 surcharge.Total = surcharge.NetAmount + ((surcharge.NetAmount * surcharge.Vatrate) / 100) ?? 0;
@@ -2872,11 +2945,10 @@ namespace eFMS.API.Documentation.DL.Services
             return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
         }
 
-        public async Task<HandleState> SyncGoodInforToReplicateJob(string jobNo)
+        public async Task<HandleState> SyncGoodInforToReplicateJob(Guid jobId)
         {
             var hs = new HandleState();
-
-            var job = await DataContext.Get(x => x.JobNo == jobNo && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+            var job = await DataContext.Get(x => x.Id == jobId && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
             if (job != null)
             {
                 var repJob = await DataContext.Get(x => x.Id == job.ReplicatedId && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
@@ -2888,12 +2960,21 @@ namespace eFMS.API.Documentation.DL.Services
                     repJob.SumContainers = job.SumContainers;
                     repJob.SumGrossWeight = job.SumGrossWeight;
                     repJob.PackageTypeId = job.PackageTypeId;
+                    repJob.ContainerDescription = job.ContainerDescription;
 
-                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id);
+                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id, false);
+                    if (hs.Success)
+                    {
+                        var listConOfJob = await csMawbcontainerRepository.GetAsync(x => x.Mblid == job.Id);
+                        var listCont = mapper.Map<List<CsMawbcontainerModel>>(listConOfJob);
+                        listCont.ForEach(x => x.Id = Guid.Empty);
+                        hs = mawbcontainerService.UpdateMasterBill(listCont, job.ReplicatedId ?? Guid.Empty);
+                    }
+                    hs = DataContext.SubmitChanges();
+
                     return hs;
                 }
             }
-
 
             return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_REPLICATE_NOT_EXISTS].Value);
         }

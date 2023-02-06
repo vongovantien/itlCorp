@@ -7,7 +7,7 @@ using System.Data;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
-using System.Timers;
+using System.Threading;
 
 namespace eFMSWindowService
 {
@@ -21,21 +21,13 @@ namespace eFMSWindowService
         public SendMailExpiredAgreementService()
         {
             InitializeComponent();
-            _scheduleTime = DateTime.Today.AddDays(1).AddHours(8);
+            SetSchedule(DateTime.MinValue);
         }
 
         public void Start()
         {
-            FileHelper.WriteToFile("SendMailExpiredAgreement", "[SendMailExpiredAgreementService] [START]:" + DateTime.Now);
-            // Tạo 1 timer từ libary System.Timers
-            _timer = new Timer();
-            // Execute mỗi ngày vào lúc 8h sáng
-            _timer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
-            //_timer.Interval = 10000;
-            // Những gì xảy ra khi timer đó dc tick
-            _timer.Elapsed += Timer_Elapsed;
-            // Enable timer
-            _timer.Enabled = true;
+            _scheduleTime = ScheduleSetting.GetValidDate();
+            Timer_Elapsed();
         }
 
         protected override void OnStart(string[] args)
@@ -43,16 +35,50 @@ namespace eFMSWindowService
             this.Start();
         }
 
-        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void SetSchedule(DateTime _dtOption, bool? isNextDay = false)
+        {
+            List<ScheduleTime> _scheduled = new List<ScheduleTime>();
+            _scheduled.Add(new ScheduleTime() { DateOfWeek = isNextDay == true ? GetNextDay() : DateTime.Now.DayOfWeek, Time = "08:00", DateTimeOption = _dtOption });
+            ScheduleSetting.SetDateTimeSchedule(_scheduled);
+        }
+
+        private DayOfWeek GetNextDay()
+        {
+            DateTime nextDay = DateTime.Now.AddDays(1);
+            return nextDay.DayOfWeek;
+        }
+
+        private void ChangeIntervalTime(DateTime currentTime)
+        {
+            SetSchedule(currentTime, true);
+            _scheduleTime = ScheduleSetting.GetValidDate();
+            this.Timer_Elapsed();
+        }
+
+        private void Timer_Elapsed()
         {
             try
             {
-                FileHelper.WriteToFile("SendMailExpiredAgreement", "[RECALL] at " + DateTime.Now);
                 // Get data and send email
-                StartGetAndSendEmail();
-                if (_timer.Interval != 24 * 60 * 60 * 1000)
+                _timer = new Timer(new TimerCallback(SchedularCallback));
+                if (_scheduleTime == null)
                 {
-                    _timer.Interval = 24 * 60 * 60 * 1000;
+                    SetSchedule(DateTime.MinValue);
+                }
+                var isDiff = ScheduleSetting.IsTimeToRun(_scheduleTime);
+                if (!isDiff)
+                {
+                    //If Scheduled Time is passed set Schedule for the next day.
+                    var dueTime = ScheduleSetting.GetDueTime(_scheduleTime);
+
+                    //Change the Timer's Due Time.
+                    _timer.Change(dueTime, Timeout.Infinite);
+                }
+                else
+                {
+                    FileHelper.WriteToFile("SendMailExpiredAgreement", "[RECALL] at " + DateTime.Now);
+                    StartGetAndSendEmail();
+                    ChangeIntervalTime(DateTime.Now);
                 }
             }
             catch (Exception ex)
@@ -60,6 +86,11 @@ namespace eFMSWindowService
                 FileHelper.WriteToFile("SendMailExpiredAgreement", "[ERROR][Timer_Elapsed]:" + ex.Message);
                 throw ex;
             }
+        }
+
+        private void SchedularCallback(object e)
+        {
+            this.Timer_Elapsed();
         }
 
         /// <summary>

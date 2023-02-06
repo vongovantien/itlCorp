@@ -7,6 +7,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -38,6 +39,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ICurrentUser currentUser;
         private readonly IAccAccountReceivableService accountReceivableService;
         private readonly IAcctDebitManagementARService acctDebitArService;
+        private readonly IRabbitBus _busControl;
         /// <summary>
         /// Contructor
         /// </summary>
@@ -51,6 +53,7 @@ namespace eFMS.API.Accounting.Controllers
             IAccountingManagementService accService,
             IAccAccountReceivableService accountReceivable,
             IAcctDebitManagementARService acctDebitAr,
+            IRabbitBus _bus,
             ICurrentUser currUser)
         {
             stringLocalizer = localizer;
@@ -59,6 +62,7 @@ namespace eFMS.API.Accounting.Controllers
             currentUser = currUser;
             accountReceivableService = accountReceivable;
             acctDebitArService = acctDebitAr;
+            _busControl = _bus;
         }
 
         [Authorize]
@@ -102,8 +106,8 @@ namespace eFMS.API.Accounting.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = accountingService.CalculatorReceivableAcctMngt(id);
-                    await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
-                    if(type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                    await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
+                    if (type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                     {
                         acctDebitArService.DeleteDebit(id);
                     }
@@ -225,7 +229,7 @@ namespace eFMS.API.Accounting.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = accountingService.CalculatorReceivableAcctMngt(model.Id);
-                    await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                    await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     if (model.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                     {
                         await acctDebitArService.AddAndUpdate(model.Id);
@@ -306,7 +310,7 @@ namespace eFMS.API.Accounting.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = accountingService.CalculatorReceivableAcctMngt(model.Id);
-                    await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                    await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     if (model.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
                     {
                         await acctDebitArService.AddAndUpdate(model.Id);
@@ -505,7 +509,7 @@ namespace eFMS.API.Accounting.Controllers
                     Response.OnCompleted(async () =>
                     {
                         List<ObjectReceivableModel> modelReceivableList = accountingService.CalculatorReceivableAcctMngt(acctMngtId);
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
 
                     });
                 }

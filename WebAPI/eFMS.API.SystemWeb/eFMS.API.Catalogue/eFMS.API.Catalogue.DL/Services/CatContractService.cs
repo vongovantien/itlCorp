@@ -253,7 +253,9 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 contract.ShipmentType = "Freehand & Nominated";
             }
+    
             var hs = DataContext.Add(contract, false);
+            
             DataContext.SubmitChanges();
             if (hs.Success)
             {
@@ -426,12 +428,50 @@ namespace eFMS.API.Catalogue.DL.Services
             return ContractServicesName;
         }
 
+        public IQueryable<CatContract> CheckDuplicatedContract(CatContractModel modelUpdate, bool isCurrentContract)
+        {
+            var isDuplicate = false;
+            var currentContract = DataContext.Get(x => x.Id == modelUpdate.Id && x.PartnerId == modelUpdate.PartnerId).FirstOrDefault();
+            if (isCurrentContract == true)
+            {
+                modelUpdate = mapper.Map<CatContractModel>(currentContract);
+            }
+
+            var contractOffices = modelUpdate.OfficeId.Split(";");
+            var contractServices = modelUpdate.SaleService.Split(";");
+
+            var contracts = DataContext.Get(x => x.Id != currentContract.Id && x.Active == true && x.PartnerId == modelUpdate.PartnerId && x.SaleManId == modelUpdate.SaleManId);
+            if (contracts == null || (modelUpdate.Active == false && isCurrentContract == false))
+            {
+                return null;
+            }
+            foreach (var item in contracts)
+            {
+                var offices = item.OfficeId.Split(";");
+                var services = item.SaleService.Split(";");
+
+                var officeIntersect = contractOffices.Intersect(offices);
+                var serviceIntersect = contractServices.Intersect(services);
+                if (modelUpdate.SaleManId != currentContract.SaleManId || officeIntersect.Any() || serviceIntersect.Any())
+                {
+                    isDuplicate = (item.SaleManId == modelUpdate.SaleManId && officeIntersect.Any() && serviceIntersect.Any());
+                    if (isDuplicate)
+                    {
+                        return contracts;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public HandleState Update(CatContractModel model)
         {
+            var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
             var entity = mapper.Map<CatContract>(model);
             entity.UserModified = currentUser.UserID;
             entity.DatetimeModified = DateTime.Now;
-            var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+
             // Get payment term change type
             model.PaymentTermChanged = (model.PaymentTerm ?? 0) != (currentContract.PaymentTerm ?? 0) ? "DEBIT" : string.Empty;
             model.PaymentTermChanged += (model.PaymentTermObh ?? 0) != (currentContract.PaymentTermObh ?? 0) ? ";OBH" : string.Empty;
@@ -442,7 +482,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (entity.Active == true)
                 {
-                    var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate).Date);
+                    var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate));
                     if (expiredCheck <= 0)
                     {
                         entity.IsExpired = false;
@@ -457,7 +497,6 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 entity.IsExpired = false;
             }
-
             if (entity.ContractType == "Cash")
             {
                 entity.ShipmentType = "Nominated";
@@ -467,7 +506,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.ShipmentType = "Freehand & Nominated";
 
             }
-            
             var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
             if (hs.Success)
             {
@@ -669,11 +707,12 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             active = false;
             var isUpdateDone = new HandleState();
-            var objUpdate = DataContext.First(x => x.Id == id);
-            var DataCheckExisted = CheckExistedContractActive(id, partnerId);
-            if (DataCheckExisted != null && DataCheckExisted.Count() > 0 && objUpdate.Active == false)
+            CatContractModel objUpdate = mapper.Map<CatContractModel>(DataContext.First(x => x.Id == id));
+
+            var dataCheckExisted = CheckDuplicatedContract(objUpdate, true);
+            if (dataCheckExisted != null && dataCheckExisted.Count() > 0 && objUpdate.Active == false)
             {
-                foreach (var item in DataCheckExisted)
+                foreach (var item in dataCheckExisted)
                 {
                     item.UserModified = currentUser.UserID;
                     item.DatetimeModified = DateTime.Now;
@@ -698,15 +737,18 @@ namespace eFMS.API.Catalogue.DL.Services
                 DateTime localDate = DateTime.Now;
                 if (objUpdate.ExpiredDate != null)
                 {
-                    var expiredCheck = DateTime.Compare(localDate, (DateTime)objUpdate.ExpiredDate);
+                    if (objUpdate.NoDue == null || objUpdate.NoDue == false)
+                    {
+                        var expiredCheck = DateTime.Compare(((DateTime.Now).Date), (DateTime)objUpdate.ExpiredDate);
 
-                    if (expiredCheck <= 0)
-                    {
-                        objUpdate.IsExpired = false;
-                    }
-                    else if (expiredCheck > 0)
-                    {
-                        objUpdate.IsExpired = true;
+                        if (expiredCheck <= 0)
+                        {
+                            objUpdate.IsExpired = false;
+                        }
+                        else if (expiredCheck > 0)
+                        {
+                            objUpdate.IsExpired = true;
+                        }
                     }
                 }
                 else
@@ -736,23 +778,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
             }
             return isUpdateDone;
-        }
-
-        public IQueryable<CatContract> CheckExistedContractActive(Guid id, string partnerId)
-        {
-            var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
-            var ContractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId && x.SaleManId == contract.SaleManId);
-            if (ContractActive.Count() == 0)
-            {
-                return null;
-            }
-            var IsExisted = ContractActive
-                .Any(x => x.SaleManId == contract.SaleManId && x.OfficeId.Intersect(contract.OfficeId).Any() && x.SaleService.Intersect(contract.SaleService).Any());
-            if (IsExisted)
-            {
-                return ContractActive;
-            }
-            return null;
         }
 
         public CatContract CheckExistedContractInActive(Guid id, string partnerId, out List<ServiceOfficeGroup> serviceOfficeGrps)
@@ -1213,10 +1238,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
 
                 var DataHeadOfficeAR = sysOfficeRepository.Get(x => x.OfficeType == "Head").FirstOrDefault();
+                var DataCamOfficeAR = sysOfficeRepository.Get(x => x.OfficeType == "Repo").FirstOrDefault();
                 if (DataHeadOfficeAR == null)
                 {
                     lstCCAR = null;
                 }
+                else if (DataCamOfficeAR.Id.ToString().ToUpper().Equals(OfficeId.ToUpper()))
+                {
+                    lstCCAR = null;
+                }    
                 else
                 {
                     var departmentHeadAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOfficeAR.Id).FirstOrDefault();

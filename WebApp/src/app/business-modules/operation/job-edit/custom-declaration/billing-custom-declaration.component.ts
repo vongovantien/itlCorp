@@ -12,6 +12,7 @@ import { CustomDeclaration } from '@models';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
+import { CustomClearanceAddNewModalComponent } from './components/custom-clearance-add-new-modal/custom-clearance-add-new-modal.component';
 
 @Component({
     selector: 'app-billing-custom-declaration',
@@ -19,8 +20,9 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class BillingCustomDeclarationComponent extends AppList implements OnInit {
     @ViewChild(InjectViewContainerRefDirective) injectViewContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(AddMoreModalComponent) popUpAddMore: AddMoreModalComponent;
+    @ViewChild(CustomClearanceAddNewModalComponent) popUpAddNew: CustomClearanceAddNewModalComponent;
 
-    @ViewChild(AddMoreModalComponent) poupAddMore: AddMoreModalComponent;
     currentJob: OpsTransaction;
     customClearances: any[];
     importedData: any = [];
@@ -45,7 +47,7 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
         super();
         this._progressRef = this._ngProgressService.ref();
         this.requestSort = this.sortLocal;
-        this.requestList = this.getCustomClearanesOfJob;
+        this.requestList = this.getCustomClearancesOfJob;
     }
 
     ngOnInit() {
@@ -66,9 +68,11 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
             }
         });
     }
+
     sortLocal(sort: string): void {
         this.customClearances = this._sortService.sort(this.customClearances, sort, this.order);
     }
+
     getShipmentDetails(id: any) {
         this._progressRef.start();
         this._documentRepo.getDetailShipment(id)
@@ -83,7 +87,7 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
                 })
             ).subscribe(
                 () => {
-                    this.getCustomClearanesOfJob();
+                    this.getCustomClearancesOfJob();
                 },
             );
     }
@@ -97,12 +101,12 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        this.poupAddMore.partnerTaxcode = res.accountNo;
+                        this.popUpAddMore.partnerTaxcode = res.accountNo;
                     }
                 }
             );
     }
-    getCustomClearanesOfJob() {
+    getCustomClearancesOfJob() {
         this._operationRepo.getListImportedInJob(this.currentJob.jobNo).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
@@ -148,27 +152,27 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
             this._operationRepo.updateJobToClearances(dataToUpdate)
                 .subscribe(
                     (responses: any) => {
-                        if (responses.success === true) {
+                        if (responses.status === true) {
                             this._operationRepo.getListImportedInJob(this.currentJob.jobNo).pipe(
                                 takeUntil(this.ngUnsubscribe),
                                 catchError(this.catchError),
                                 finalize(() => {
-                                    this.updateShipmentVolumn();
+                                    this.updateShipmentColumn();
                                 })
                             ).subscribe(
                                 () => {
                                     this.page = 1;
-                                    this.getCustomClearanesOfJob();
+                                    this._toastService.success(responses.message);
+                                    this.getCustomClearancesOfJob();
                                 }
                             );
                         }
                     }
                 );
-
         }
     }
 
-    updateShipmentVolumn() {
+    updateShipmentColumn() {
         if (this.importedData != null) {
             this.currentJob.sumGrossWeight = 0;
             this.currentJob.sumNetWeight = 0;
@@ -199,8 +203,8 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
     }
 
     showPopupAdd() {
-        this.poupAddMore.getClearanceNotImported();
-        this.poupAddMore.show();
+        this.popUpAddMore.getClearanceNotImported();
+        this.popUpAddMore.show();
 
     }
 
@@ -219,7 +223,7 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
     closeAddMore(event: any) {
         if (event) {
             this.page = 1;
-            this.getCustomClearanesOfJob();
+            this.getCustomClearancesOfJob();
         }
     }
 
@@ -271,5 +275,15 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
         });
     }
 
+    addNewCustomDeclaration() {
+        this.popUpAddNew.show();
+        this.popUpAddNew.setFormValue(this.currentJob)
+    }
 
+    closePopUpAddNew(event: any) {
+        if (event) {
+            this.popUpAddNew.hide()
+            this.getCustomClearancesOfJob();
+        }
+    }
 }

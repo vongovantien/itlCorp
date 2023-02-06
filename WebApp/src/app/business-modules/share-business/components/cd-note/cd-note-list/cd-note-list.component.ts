@@ -1,26 +1,26 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ChargeConstants, SystemConstants } from '@constants';
-import { delayTime } from '@decorators';
-import { InjectViewContainerRefDirective } from '@directives';
-import { Crystal } from '@models';
-import { Store } from '@ngrx/store';
+import { AppList } from 'src/app/app.list';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from 'src/app/shared/repositories';
+import { catchError, concatMap, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import _uniq from 'lodash/uniq';
-import { ToastrService } from 'ngx-toastr';
 import { combineLatest, of } from 'rxjs';
-import { catchError, concatMap, finalize, map, mergeMap, takeUntil } from 'rxjs/operators';
-import { AppList } from 'src/app/app.list';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ReportPreviewComponent } from 'src/app/shared/common/report-preview/report-preview.component';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
 import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
-import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { TransactionActions } from '../../../store';
 import { ShareBussinessCdNoteAddPopupComponent } from '../add-cd-note/add-cd-note.popup';
 import { ShareBussinessCdNoteDetailPopupComponent } from '../detail-cd-note/detail-cd-note.popup';
+import { Store } from '@ngrx/store';
+import { ActivatedRoute } from '@angular/router';
+import { InjectViewContainerRefDirective } from '@directives';
+import { delayTime } from '@decorators';
+import { Crystal } from '@models';
+import { ChargeConstants, SystemConstants } from '@constants';
 
 @Component({
     selector: 'cd-note-list',
@@ -43,7 +43,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
-
+    selectedCdNote: AcctCDNote = null;
     isDesc = true;
     sortKey: string = '';
 
@@ -277,7 +277,7 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         this.componentRef.instance.show();
     }
 
-    renderAndShowReport() {
+    renderAndShowReport(templateCode: string, jobId: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -289,7 +289,6 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 this.subscription.unsubscribe();
                 this.reportContainerRef.viewContainerRef.clear();
             });
-
         let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
             .pipe(
                 concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
@@ -299,10 +298,10 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                             url: (this.dataReport as Crystal).pathReportGenerate || null,
                             module: 'Document',
                             folder: 'Shipment',
-                            objectId: this.idMasterBill,
+                            objectId: jobId,
                             hblId: SystemConstants.EMPTY_GUID,
-                            templateCode: this.cdNotePrint[0].type,
-                            transactionType: TransactionTypeEnum[this.transactionType]
+                            templateCode: templateCode,
+                            transactionType: this.utility.getTransationTypeByEnum(this.transactionType)
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
                     }
@@ -315,7 +314,6 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                     if (!res) return;
                     if (res.status) {
                         this._toastService.success(res.message);
-                        //this.closeReport();
                     } else {
                         this._toastService.success(res.message || "Upload fail");
                     }
@@ -372,11 +370,94 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport(this.cdNotePrint[0].type, this.cdNotePrint[0].jobId);
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
                 },
             );
+    }
+    previewItem(jobId: string, cdNote: string, currency: string = 'VND') {
+        let typeCdNote = this.selectedCdNote.type;
+        if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
+            this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
+                .pipe(
+            ).subscribe(
+                (res: any) => {
+                    if (res !== false) {
+                        if (res?.dataSource?.length > 0) {
+                            this.dataReport = res;
+                            this.renderAndShowReport(typeCdNote, jobId);
+                        } else {
+                            this._toastService.warning('There is no data to display preview');
+                        }
+                    }
+                },
+            );
+        } else {
+            this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: any) => {
+                        if (res != null) {
+                            if (res?.dataSource?.length > 0) {
+                                this.dataReport = res;
+                                this.renderAndShowReport(typeCdNote, jobId);
+                            } else {
+                                this._toastService.warning('There is no data to display preview');
+                            }
+                        }
+                    },
+                );
+        }
+    }
+
+    onSelectCdNote(cd: AcctCDNote) {
+        this.selectedCdNote = cd;
+
+    }
+    exportItem(jobId: string, cdNote: string, format: string) {
+        let url: string;
+        let _format = 0;
+        switch (format) {
+            case 'PDF':
+                _format = 5;
+                break;
+            case 'WORD':
+                _format = 3;
+                break;
+            case 'EXCEL':
+                _format = 4;
+                break;
+            default:
+                _format = 5;
+                break;
+        }
+        this._documentationRepo.getDetailsCDNote(jobId, cdNote)
+            .pipe(
+                switchMap((detail) => {
+                    if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
+                        return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                    }
+                    else {
+                        return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format })
+                    }
+                }),
+                concatMap((x) => {
+                    url = x.pathReportGenerate;
+                    return this._exportRepo.exportCrystalReportPDF(x);
+                })
+            ).subscribe(
+                (res: any) => {
+
+                },
+                (error) => {
+                    this._exportRepo.downloadExport(url);
+                },
+                () => {
+                    console.log(url);
+                }
+            );
+
     }
 }

@@ -1,7 +1,6 @@
-import { HttpResponse } from '@angular/common/http';
 import { Component, Input, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ReportPreviewComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent } from '@common';
 import { SystemConstants } from '@constants';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
@@ -11,9 +10,8 @@ import { SystemFileManageRepo } from '@repositories';
 import _uniq from 'lodash/uniq';
 import { ToastrService } from 'ngx-toastr';
 import { combineLatest, of } from 'rxjs';
-import { catchError, concatMap, finalize, map, mergeMap, takeUntil } from 'rxjs/operators';
+import { catchError, concatMap, filter, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
 import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
@@ -23,6 +21,8 @@ import { ICustomDeclarationState } from '../../store/reducers/custom-clearance.r
 import { IOPSTransactionState } from '../../store/reducers/operation.reducer';
 import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/ops-cd-note-add.popup';
 import { OpsCdNoteDetailPopupComponent } from '../components/popup/ops-cd-note-detail/ops-cd-note-detail.popup';
+import { getCurrentUserState, IAppState } from '@store';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
     selector: 'ops-cd-note-list',
@@ -43,6 +43,8 @@ export class OpsCDNoteComponent extends AppList {
     selectedCdNoteId: string = '';
     transactionType: TransactionTypeEnum = 0;
     cdNotePrint: AcctCDNote[] = [];
+    selectedCdNote: AcctCDNote = null;
+
     isDesc = true;
     sortKey: string = '';
 
@@ -52,8 +54,7 @@ export class OpsCDNoteComponent extends AppList {
         private _sortService: SortService,
         private _activedRouter: ActivatedRoute,
         private _toastService: ToastrService,
-        private _fileMngtRepo: SystemFileManageRepo,
-        private _store: Store<IOperationState>,
+        private _fileMngtRepo: SystemFileManageRepo
     ) {
         super();
     }
@@ -281,9 +282,7 @@ export class OpsCDNoteComponent extends AppList {
         this.componentRef.instance.show();
     }
 
-    renderAndShowReport() {
-        console.log(this.cdNotePrint);
-
+    renderAndShowReport(templateCode: string, jobId: string, hblid: string) {
         // * Render dynamic
         this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.viewContainerRef.viewContainerRef);
         (this.componentRef.instance as ReportPreviewComponent).data = this.dataReport;
@@ -295,7 +294,6 @@ export class OpsCDNoteComponent extends AppList {
                 this.subscription.unsubscribe();
                 this.viewContainerRef.viewContainerRef.clear();
             });
-
         let sub = ((this.componentRef.instance) as ReportPreviewComponent).onConfirmEdoc
             .pipe(
                 concatMap(() => this._exportRepo.exportCrystalReportPDF(this.dataReport, 'response', 'text')),
@@ -305,9 +303,9 @@ export class OpsCDNoteComponent extends AppList {
                             url: (this.dataReport as Crystal).pathReportGenerate || null,
                             module: 'Document',
                             folder: 'Shipment',
-                            objectId: this.idMasterBill,
-                            hblId: SystemConstants.EMPTY_GUID,
-                            templateCode: this.cdNotePrint[0].type,
+                            objectId: jobId,
+                            hblId: hblid,
+                            templateCode: templateCode,
                             transactionType: 'CL'
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
@@ -331,7 +329,7 @@ export class OpsCDNoteComponent extends AppList {
                 () => {
                     sub.unsubscribe();
                 }
-            );
+            );        
     }
 
     preview(isOrigin: boolean) {
@@ -348,7 +346,7 @@ export class OpsCDNoteComponent extends AppList {
                 (res: Crystal) => {
                     this.dataReport = res;
                     if (res.dataSource.length > 0) {
-                        this.renderAndShowReport();
+                        this.renderAndShowReport(this.cdNotePrint[0].type, this.cdNotePrint[0].jobId, this.cdNotePrint[0].hblid);
                     } else {
                         this._toastService.warning('There is no data to display preview');
                     }
@@ -374,9 +372,111 @@ export class OpsCDNoteComponent extends AppList {
                 },
             );
     }
-}
+    previewItem(jobId: string, cdNote: string, currency: string = 'VND') {
+        let typeCdNote = this.selectedCdNote.type;
+        let hblidCdNote = this.selectedCdNote.hblid;
+        let sourcePreview$;
+        if (typeCdNote === "DEBIT") {
+            sourcePreview$ = this._documentRepo.validateCheckPointContractPartner({
+                partnerId: this.selectedCdNote.partnerId,
+                hblId: hblidCdNote,
+                transactionType: 'CL',
+                type: 3
+            }).pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency });
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+            )
+        }
+        else {
+            sourcePreview$ = this._documentRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency });
+        }
+        sourcePreview$
+            .subscribe(
+                (res: any) => {
+                    if (res != null && res?.dataSource.length > 0) {
+                        this.dataReport = res;
+                        this.renderAndShowReport(typeCdNote, jobId, hblidCdNote);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+    onSelectCdNote(cd: AcctCDNote) {
+        this.selectedCdNote = cd;
 
-interface IOperationState {
-    transaction: IOPSTransactionState;
-    clearance: ICustomDeclarationState;
+    }
+    exportItem(jobId: string, cdNote: string, format: string) {
+        let url: string;
+        let _format = 0;
+        switch (format) {
+            case 'PDF':
+                _format = 5;
+                break;
+            case 'WORD':
+                _format = 3;
+                break;
+            case 'EXCEL':
+                _format = 4;
+                break;
+            default:
+                _format = 5;
+                break;
+        }
+        let sourcePreview$;
+        if (this.selectedCdNote.type === "DEBIT") {
+            sourcePreview$ = this._documentRepo.validateCheckPointContractPartner({
+                partnerId: this.selectedCdNote.partnerId,
+                hblId: this.selectedCdNote.hblid,
+                transactionType: 'CL',
+                type: 3
+            }).pipe(
+                switchMap((res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        return this._documentRepo.getDetailsCDNote(jobId, cdNote)
+                            .pipe(
+                                switchMap(() => {
+                                    return this._documentRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                                }),
+                                concatMap((x) => {
+                                    url = x.pathReportGenerate;
+                                    return this._exportRepo.exportCrystalReportPDF(x);
+                                }),
+                                takeUntil(this.ngUnsubscribe)
+                            );
+                    }
+                    this._toastService.warning(res.message);
+                    return of(false);
+                })
+            )
+        } else {
+            sourcePreview$ = this._documentRepo.getDetailsCDNote(jobId, cdNote)
+                .pipe(
+                    switchMap(() => {
+                        return this._documentRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                    }),
+                    concatMap((x) => {
+                        url = x.pathReportGenerate;
+                        return this._exportRepo.exportCrystalReportPDF(x);
+                    }), takeUntil(this.ngUnsubscribe))
+        }
+        sourcePreview$.subscribe(
+            (res: any) => {
+
+            },
+            (error) => {
+                if (error.status === 200) {
+                    this._exportRepo.downloadExport(url);
+                }
+            },
+            () => {
+                console.log(url);
+            }
+        );
+    }
 }

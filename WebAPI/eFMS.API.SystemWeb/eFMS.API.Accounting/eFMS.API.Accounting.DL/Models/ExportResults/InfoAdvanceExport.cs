@@ -28,5 +28,6 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string PaymentMethod { get; set; }
         public DateTime? DeadlinePayment { get; set; }
         public bool IsDisplayLogo { get; set; }
+        public string AdvanceCurrency { get; set; }
     }
 }

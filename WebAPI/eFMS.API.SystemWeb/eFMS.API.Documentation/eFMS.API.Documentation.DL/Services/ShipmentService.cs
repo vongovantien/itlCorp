@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -359,7 +358,7 @@ namespace eFMS.API.Documentation.DL.Services
                 HBL = x.HBL,
                 HBLID = x.HBLID,
                 CustomNo = x.CustomNo,
-                Service = Common.CustomData.Services.FirstOrDefault(s => s.Value == x.Service)?.DisplayName
+                Service = x.Service
             }).ToList();
             return dataList;
         }
@@ -1751,7 +1750,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalSellAmountBooking += charge.AmountVnd; // Phí Selling trước thuế
                             }
                         }
-                        if(isOtherSell == true)
+                        if (isOtherSell == true)
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -4654,7 +4653,7 @@ namespace eFMS.API.Documentation.DL.Services
             decimal revenue = 0;
             var chargeComId = catChargeGroupRepo.Get(x => x.Name.ToUpper() == "COM")?.Select(x => x.Id).FirstOrDefault();
             Expression<Func<CsShipmentSurcharge, bool>> query;
-            if(!string.IsNullOrEmpty(exceptId))
+            if (!string.IsNullOrEmpty(exceptId))
             {
                 query = x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblid
                              && !((x.KickBack == true || x.ChargeGroup == chargeComId) && x.PaymentObjectId == exceptId);
@@ -4893,7 +4892,7 @@ namespace eFMS.API.Documentation.DL.Services
                 forMonth = string.Format("{0} - {1}", startMonth?.ToString("MMM yyyy"), endMonth?.ToString("MMM yyyy"));
             }
             commissionData.ForMonth = forMonth;
-            
+
             commissionData.ExchangeRate = criteria.ExchangeRate;
             // Partner info
             if (!string.IsNullOrEmpty(criteria.Beneficiary))
