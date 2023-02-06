@@ -3931,7 +3931,7 @@ namespace eFMS.API.Accounting.DL.Services
                     chargeCopy.IsFromShipment = charge.IsFromShipment;
                     chargeCopy.TypeOfFee = charge.TypeOfFee;
                     chargeCopy.AdvanceNo = advance;
-
+                    chargeCopy.TypeService = charge.TypeService;
                     chargesCopy.Add(chargeCopy);
                 }
             }
