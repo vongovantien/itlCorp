@@ -23,7 +23,7 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
-    public class AccAccountReceivableHostedService : RepositoryBase<AccAccountReceivable, AccAccountReceivableModel>, IAccAccountReceivableHostedService
+    public class AccAccountReceivableHostedService :  IAccAccountReceivableHostedService
     {
         private readonly IContextBase<CatPartner> partnerRepo;
         private readonly IContextBase<CatContract> contractPartnerRepo;
@@ -33,8 +33,11 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<OpsTransaction> opsRepo;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
         private readonly ICurrencyExchangeService currencyExchangeService;
+        private readonly IContextBase<AccAccountReceivable> DataContext;
+        IMapper mapper;
+
         public AccAccountReceivableHostedService(IContextBase<AccAccountReceivable> repository, 
-            IMapper mapper,
+            IMapper _mapper,
             ICurrencyExchangeService currencyExchange,
             IContextBase<CatPartner> partner,
             IContextBase<CatContract> contract,
@@ -43,8 +46,10 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CsTransactionDetail> transactionDetail,
             IContextBase<OpsTransaction> ops,
             IContextBase<CsShipmentSurcharge> surcharge
-            ) : base(repository, mapper)
+            )
         {
+            DataContext = repository;
+            mapper = _mapper;
             partnerRepo = partner;
             contractPartnerRepo = contract;
             userRepo = user;
@@ -1001,91 +1006,74 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var contractPartner = Enumerable.Empty<CatContract>().AsQueryable();
                     //Agreement của partner
-                    if (agreementIds.Count == 0)
+                    if (agreementIds.Count > 0)
                     {
-                        contractPartner = contractPartnerRepo.Get(x => x.PartnerId == partnerId);
-                    }
-                    else
-                    {
-                        contractPartner = contractPartnerRepo.Get(x => x.PartnerId == partnerId
-                                                                    && agreementIds.Contains(x.Id));
-                    }
-
-                    if (contractPartner.Count() > 0)
-                    {
-                        foreach (var item in contractPartner)
-                        {
-                            var agreementPartner = CalculatorAgreement(item);
-                            await contractPartnerRepo.UpdateAsync(item, x => x.Id == agreementPartner.Id);
-
-                            if (agreementPartner.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
-                            {
-                                var relateGuaranteeContracts = contractPartnerRepo.Get(x => x.Active == true
-                                    && x.SaleManId == agreementPartner.SaleManId
-                                    && x.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE);
-
-                                if (relateGuaranteeContracts.Count() > 0)
-                                {
-                                    var _totalDebitAmount = relateGuaranteeContracts.Sum(x => x.DebitAmount);
-                                    var _totalAdv = relateGuaranteeContracts.Sum(x => x.CustomerAdvanceAmountVnd);
-
-                                    var salesman = userRepo.Get(x => x.Id == agreementPartner.SaleManId)?.FirstOrDefault();
-
-                                    var _creditRate = ((_totalDebitAmount - _totalAdv) / (salesman.CreditLimit ?? 1)) * 100;
-                                    if (_creditRate >= AccountingConstants.MAX_CREDIT_LIMIT_RATE_CONTRACT)
-                                    {
-                                        foreach (var contract in relateGuaranteeContracts)
-                                        {
-                                            contract.CreditRate = _creditRate;
-                                            contract.IsOverLimit = true;
-                                            contractPartnerRepo.Update(contract, x => x.Id == contract.Id, false);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        foreach (var i in relateGuaranteeContracts)
-                                        {
-                                            i.CreditRate = _creditRate;
-                                            i.IsOverLimit = false;
-                                            contractPartnerRepo.Update(i, x => x.Id == i.Id, false);
-                                        }
-                                    }
-
-                                    salesman.CreditRate = _creditRate;
-                                    var hsUpdateUser = await userRepo.UpdateAsync(salesman, x => x.Id == salesman.Id, false);
-                                }
-                                hs = contractPartnerRepo.SubmitChanges();
-                                if (hs.Success && agreementPartner.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
-                                {
-                                    userRepo.SubmitChanges();
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //Agreement của AcRef của partner
-                        var contractParent = contractPartnerRepo.Get(x => x.Active == true
-                                                                       && x.PartnerId == partner.ParentId
-                                                                       && agreementIds.Contains(x.Id)).FirstOrDefault();
-                        foreach (var item in contractPartner)
-                        {
-                            var agreementPartner = CalculatorAgreement(item);
-                            await contractPartnerRepo.UpdateAsync(item, x => x.Id == agreementPartner.Id);
-                        }
+                        var dhd = await CalculatorAgreement(agreementIds, partnerId);
                     }
                 }
             }
             return hs;
         }
 
-        private CatContract CalculatorAgreement(CatContract agreement)
+        private async Task<HandleState> CalculatorAgreement(List<Guid?> agreementIds, string partnerId)
         {
-            var receivables = DataContext.Get(x => x.PartnerId == agreement.PartnerId
-                                                && x.SaleMan == agreement.SaleManId
-                                                && agreement.SaleService.Contains(x.Service)
-                                                && agreement.OfficeId.Contains(x.Office.ToString()));
-            return ModifiedAgreementWithReceivables(agreement, receivables);
+            var hs = new HandleState();
+            var contractPartner = contractPartnerRepo.Get(x => x.PartnerId == partnerId
+                                                                   && agreementIds.Contains(x.Id));
+            foreach (var agreement in contractPartner)
+            {
+                var receivables = DataContext.Get(x => x.PartnerId == agreement.PartnerId
+                                                                && x.SaleMan == agreement.SaleManId
+                                                                && agreement.SaleService.Contains(x.Service)
+                                                                && agreement.OfficeId.Contains(x.Office.ToString()));
+                var agreementPartner = ModifiedAgreementWithReceivables(agreement, receivables);
+                hs = await contractPartnerRepo.UpdateAsync(agreementPartner, x => x.Id == agreementPartner.Id);
+                // var hs = contractPartnerRepo.Update(agreement, x => x.Id == agreement.Id);
+                if (hs.Success)
+                {
+                    if (agreement.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
+                    {
+                        var relateGuaranteeContracts = contractPartnerRepo.Get(x => x.Active == true
+                            && x.SaleManId == agreement.SaleManId
+                            && x.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE);
+
+                        if (relateGuaranteeContracts.Count() > 0)
+                        {
+                            var _totalDebitAmount = relateGuaranteeContracts.Sum(x => x.DebitAmount);
+                            var _totalAdv = relateGuaranteeContracts.Sum(x => x.CustomerAdvanceAmountVnd);
+
+                            var salesman = userRepo.Get(x => x.Id == agreement.SaleManId)?.FirstOrDefault();
+
+                            var _creditRate = ((_totalDebitAmount - _totalAdv) / (salesman.CreditLimit ?? 1)) * 100;
+                            if (_creditRate >= AccountingConstants.MAX_CREDIT_LIMIT_RATE_CONTRACT)
+                            {
+                                foreach (var contract in relateGuaranteeContracts)
+                                {
+                                    contract.CreditRate = _creditRate;
+                                    contract.IsOverLimit = true;
+                                    contractPartnerRepo.Update(contract, x => x.Id == contract.Id, false);
+                                }
+                            }
+                            else
+                            {
+                                foreach (var i in relateGuaranteeContracts)
+                                {
+                                    i.CreditRate = _creditRate;
+                                    i.IsOverLimit = false;
+                                    contractPartnerRepo.Update(i, x => x.Id == i.Id, false);
+                                }
+                            }
+
+                            salesman.CreditRate = _creditRate;
+                            var hsUpdateUser = await userRepo.UpdateAsync(salesman, x => x.Id == salesman.Id);
+                        }
+                        hs = contractPartnerRepo.SubmitChanges();
+                    }
+                }
+
+            }
+            
+            return hs;
         }
 
         private CatContract ModifiedAgreementWithReceivables(CatContract agreement, IQueryable<AccAccountReceivable> receivables)

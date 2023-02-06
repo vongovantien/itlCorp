@@ -22,7 +22,7 @@ namespace eFMS.API.Infrastructure.RabbitMQ
                 _channel.QueueDeclare(queue, true, false, false);
 
                 var properties = _channel.CreateBasicProperties();
-                properties.Persistent = false;
+                properties.Persistent = true;
 
                 var output = JsonConvert.SerializeObject(message);
                 _channel.BasicPublish(string.Empty, queue, properties, Encoding.UTF8.GetBytes(output));
@@ -37,7 +37,7 @@ namespace eFMS.API.Infrastructure.RabbitMQ
                 _channel.QueueDeclare(queue, true, false, false);
 
                 var properties = _channel.CreateBasicProperties();
-                properties.Persistent = false;
+                properties.Persistent = true;
 
                 var output = JsonConvert.SerializeObject(message);
                 _channel.BasicPublish(exchange, queue, body: Encoding.UTF8.GetBytes(output));
