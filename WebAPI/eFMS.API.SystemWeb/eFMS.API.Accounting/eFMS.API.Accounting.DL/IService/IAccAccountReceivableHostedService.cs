@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.IService
 {
-    public interface IAccAccountReceivableHostedService: IRepositoryBase<AccAccountReceivable, AccAccountReceivableModel>
-    {
+    public interface IAccAccountReceivableHostedService
+    { 
         Task<HandleState> CalculatorReceivableDebitAmountAsync(List<ObjectReceivableModel> models);
     }
 }

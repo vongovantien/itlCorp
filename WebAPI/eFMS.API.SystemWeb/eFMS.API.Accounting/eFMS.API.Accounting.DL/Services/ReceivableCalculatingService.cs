@@ -26,15 +26,15 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
-                new LogHelper("ReceivableCalculatingBackgroundService", "RUNNING\n");
-                await _busControl.ReceiveAsync<List<ObjectReceivableModel>>(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, (models) =>
+                new LogHelper("ReceivableCalculatingBackgroundService", "RUNNING at " + DateTime.Now);
+                await _busControl.ReceiveAsync<List<ObjectReceivableModel>>(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, async (models) =>
                 {
                     Console.WriteLine("==================== ReceivableCalculatingBackgroundService ============================");
-                    new LogHelper("ReceivableCalculatingBackgroundService", "EXCUTE\n" + JsonConvert.SerializeObject(models));
+                    new LogHelper("ReceivableCalculatingBackgroundService", "EXCUTE at " + DateTime.Now + " " + JsonConvert.SerializeObject(models));
                     using (var scope = _services.CreateScope())
                     {
                         var scopedService = scope.ServiceProvider.GetRequiredService<IAccAccountReceivableHostedService>();
-                        scopedService.CalculatorReceivableDebitAmountAsync(models);
+                        var d = await scopedService.CalculatorReceivableDebitAmountAsync(models);
                     }
                     Console.WriteLine("==================== ReceivableCalculatingBackgroundService ============================");
 
@@ -42,7 +42,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
-                new LogHelper("ReceivableCalculatingBackgroundService", " ERROR\n" + ex.ToString() + " ");
+                new LogHelper("ReceivableCalculatingBackgroundService", " ERROR at " + DateTime.Now + " " + ex.ToString() + " ");
                 throw;
             }
             
@@ -52,12 +52,12 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
-                new LogHelper("ReceivableCalculatingBackgroundService", "STOPPED\n");
+                new LogHelper("ReceivableCalculatingBackgroundService", "STOPPED at " + DateTime.Now);
                 await base.StopAsync(stoppingToken);
             }
             catch (Exception ex)
             {
-                new LogHelper("ReceivableCalculatingBackgroundService", " ERROR\n" + ex.ToString() + " ");
+                new LogHelper("ReceivableCalculatingBackgroundService", " ERROR at " + DateTime.Now + " " + ex.ToString() + " ");
                 throw;
             }
            
