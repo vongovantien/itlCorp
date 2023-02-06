@@ -335,7 +335,11 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 try
                 {
-                    var detailBravoRefNos = model.Details;//.Where(x => !string.IsNullOrEmpty(x.BravoRefNo)).ToList();
+                    var detailBravoRefNos = model.Details.Where(x => x.TransactionType != "NONE"
+                                            && x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV
+                                            && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE
+                                            && x.TransactionType != ForPartnerConstants.TYPE_DEBIT
+                                            && x.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE).ToList(); ;//.Where(x => !string.IsNullOrEmpty(x.BravoRefNo)).ToList();
                     if (detailBravoRefNos.Count == 0)
                     {
                         return hsUpdate;
