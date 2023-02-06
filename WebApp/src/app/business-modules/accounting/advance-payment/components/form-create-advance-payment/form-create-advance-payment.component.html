@@ -90,7 +90,7 @@
             </div>
             <div class="col-lg-4">
                 <div class="form-group"
-                    [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAccountNo.dirty)  && !bankAccountNo.valid}">
+                    [ngClass]="{'m-form__group has-danger': isSubmitted  && !bankAccountNo.valid}">
                     <label class="form-control-label">
                         Bank Account No:
                     </label>
