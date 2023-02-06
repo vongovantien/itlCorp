@@ -69,11 +69,11 @@
                                 <td>{{item.expiredDate | date: 'dd/MM/yyyy'}}</td>
                                 <td [ngClass]="item.active ? 'text-success' : 'text-danger'">
                                     {{item.active ? 'Active' : 'Inactive'}}</td>
-                                <td>{{item.officeNameAbbr}}</td>
-                                <td>{{item.companyNameEn}}</td>
                                 <td>
                                     <app-switch disabled [(ngModel)]="item.arconfirmed" size="sm"></app-switch>
                                 </td>
+                                <td>{{item.officeNameAbbr}}</td>
+                                <td>{{item.companyNameEn}}</td>
                             </tr>
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(isLoading) && !contracts.length"></tr>
