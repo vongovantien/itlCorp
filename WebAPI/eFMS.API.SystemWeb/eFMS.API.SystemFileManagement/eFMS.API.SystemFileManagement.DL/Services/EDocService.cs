@@ -1098,7 +1098,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         {
                             if (item.Contains("LOG"))
                             {
-                                var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (opsJob != null)
                                 {
                                     transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "AD", HBLId = opsJob.Hblid });
@@ -1106,7 +1106,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             }
                             else
                             {
-                                var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                var csJob = DC.CsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (csJob != null)
                                 {
                                     transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType, BillingNo = bilingNo, Code = "AD" });
@@ -1122,7 +1122,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     {
                         if (item.JobNo.Contains("LOG"))
                         {
-                            var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item.JobNo);
+                            var opsJob = DC.OpsTransaction.Where(x=> x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item.JobNo);
                             if (opsJob != null)
                             {
                                 transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SM", HBLId = null });
@@ -1130,7 +1130,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         }
                         else
                         {
-                            var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item.JobNo);
+                            var csJob = DC.CsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item.JobNo);
                             if (csJob != null)
                             {
                                 var hblId = _tranDeRepo.Get(x => x.JobId == csJob.Id).FirstOrDefault().Id;
@@ -1159,7 +1159,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         {
                             if (item.Contains("LOG"))
                             {
-                                var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (opsJob != null)
                                 {
                                     transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SOA" });
@@ -1167,7 +1167,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             }
                             else
                             {
-                                var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                var csJob = DC.CsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (csJob != null)
                                 {
                                     transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType, BillingNo = bilingNo, Code = "SOA" });
@@ -1181,12 +1181,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     if (csjobdetail != null)
                     {
                         bilingNo = csjobdetail.Hwbno;
-                        var csjob = _cstranRepo.Get(x => x.Id == csjobdetail.JobId).FirstOrDefault();
+                        var csjob = _cstranRepo.Get(x => x.Id == csjobdetail.JobId&& x.CurrentStatus != "Canceled").FirstOrDefault();
                         transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csjobdetail.JobId, TransactionType = csjob.TransactionType, BillingNo = bilingNo, Code = "OTH" });
                     }
                     else
                     {
-                        var opsjob = _opsTranRepo.Get(x => x.Hblid.ToString() == billingId).FirstOrDefault();
+                        var opsjob = _opsTranRepo.Get(x => x.Hblid.ToString() == billingId && x.CurrentStatus != "Canceled").FirstOrDefault();
                         if (opsjob != null)
                         {
                             transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsjob.Id, TransactionType = "CL", BillingNo = opsjob.Hwbno, Code = "OTH" });
