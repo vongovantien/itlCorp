@@ -674,49 +674,49 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.chargeWeight;
                 } else {
-                    data = this.hbl.chargeWeight || this.hbl.cw;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.chargeWeight : (this.hbl.chargeWeight || this.hbl.cw);
                 }
                 break;
             case 'gw':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.grossWeight;
                 } else {
-                    data = this.hbl.grossWeight || this.hbl.gw;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.grossWeight : (this.hbl.grossWeight || this.hbl.gw);
                 }
                 break;
             case 'nw':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.netWeight;
                 } else {
-                    data = this.hbl.netWeight;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.netWeight : this.hbl.netWeight;
                 }
                 break;
             case 'cbm':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.cbm;
                 } else {
-                    data = this.hbl.cbm;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.cbm : this.hbl.cbm;
                 }
                 break;
             case 'packageQuantity':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.packageQty;
                 } else {
-                    data = this.hbl.packageQty;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.packageQty : this.hbl.packageQty;
                 }
                 break;
             case 'quantity':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.chargeWeight;
                 } else {
-                    data = this.hbl.chargeWeight;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.chargeWeight : this.hbl.chargeWeight;
                 }
                 break;
             case 'gw':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.grossWeight;
                 } else {
-                    data = this.hbl.grossWeight;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.grossWeight : this.hbl.grossWeight;
                 }
                 break;
             default:
@@ -1291,6 +1291,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                             if (!!c.quantityType) {
                                 c.quantity = this.getQuantityByquantityType(c.quantityType);
                             }
+                            this.onChangeDataUpdateTotal(c);
+
                             this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
                         });
                     }
@@ -1303,6 +1305,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                             if (!!c.quantityType) {
                                 c.quantity = this.getQuantityByquantityType(c.quantityType);
                             }
+                            this.onChangeDataUpdateTotal(c);
+
                             this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
                         });
                     }
@@ -1370,6 +1374,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 if (!!c.quantityType) {
                                     c.quantity = this.getQuantityByquantityType(c.quantityType);
                                 }
+                                this.onChangeDataUpdateTotal(c);
+
                                 this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
                             });
                         }
@@ -1382,6 +1388,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 if (!!c.quantityType) {
                                     c.quantity = this.getQuantityByquantityType(c.quantityType);
                                 }
+                                this.onChangeDataUpdateTotal(c);
+
                                 this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
                             });
                         }
@@ -1394,6 +1402,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 if (!!c.quantityType) {
                                     c.quantity = this.getQuantityByquantityType(c.quantityType);
                                 }
+                                this.onChangeDataUpdateTotal(c);
+
                                 this._store.dispatch(new fromStore.AddOBHSurchargeAction(c));
                             });
                         }
