@@ -157,7 +157,12 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             )
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.startDownloadReport(res.body, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    if (res.body) {
+                        this.startDownloadReport(res.body, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                        return;
+                    }
+                    this._toastService.warning('No Data To View');
+                    this.loadingPopupComponent.hide();
                 }
             );
     }
@@ -357,23 +362,23 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     }
 
     exportStatementReceivableAgency() {
-        if (!this.refPayments.length) {
-            this._toastService.warning('No Data To View, Please Re-Apply Filter');
-            return;
-        } else {
-            this._spinner.hide();
-            this.loadingPopupComponent.show();
-            this._exportRepo.exportStatementReceivableAgency(this.dataSearch)
-                .pipe(
-                    catchError(() => of(this.loadingPopupComponent.downloadFail())),
-                    finalize(() => this._progressRef.complete())
-                )
-                .subscribe(
-                    (res: Blob) => {
-                        this.startDownloadReport(res, 'Statement of Receivable Agency - eFMS.xlsx');
+        this._spinner.hide();
+        this.loadingPopupComponent.show();
+        this._exportRepo.exportStatementReceivableAgency(this.dataSearch)
+            .pipe(
+                catchError(() => of(this.loadingPopupComponent.downloadFail())),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: HttpResponse<any>) => {
+                    if (res.body) {
+                        this.startDownloadReport(res.body, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                        return;
                     }
-                );
-        }
+                    this._toastService.warning('No Data To Download');
+                    this.loadingPopupComponent.hide();
+                }
+            );
     }
 }
 

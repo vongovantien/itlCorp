@@ -27,7 +27,7 @@ export class CustomClearanceAddnewComponent extends AppPage implements OnInit {
         private _store: Store<IAppState>,
         private _toastr: ToastrService) {
         super();
-        
+
     }
 
     ngOnInit() {

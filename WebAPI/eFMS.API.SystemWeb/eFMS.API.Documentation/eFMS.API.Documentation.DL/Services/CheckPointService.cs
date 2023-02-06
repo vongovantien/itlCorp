@@ -189,7 +189,7 @@ namespace eFMS.API.Documentation.DL.Services
             var surcharges = csSurchargeRepository.Get(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.Hblid == HblId);
             if (surcharges.Count() == 0)
             {
-                return false;
+                return true; // Không có phí nếu hợp đồng prepaid trước đó false.
             }
 
             var hasIssuedDebit = surcharges.Any(x => string.IsNullOrEmpty(x.DebitNo));
@@ -444,17 +444,23 @@ namespace eFMS.API.Documentation.DL.Services
             switch (contract.ContractType)
             {
                 case "Cash":
-                    if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE || checkPointType == CHECK_POINT_TYPE.HBL || checkPointType == CHECK_POINT_TYPE.SHIPMENT)
-                    {
-                        isValid = true;
-                        break;
-                    }
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
                     {
-                        isValid = ValidateCheckPointCashContractPartner(criteria.PartnerId, criteria.HblId, criteria.TransactionType, criteria.SettlementCode, CHECK_POINT_TYPE.SURCHARGE);
+                        if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                        {
+                            isValid = true;
+                            break;
+                        } else if (contract.IsOverDue == true)
+                        {
+                            isValid = false;
+                        } else
+                        {
+                            isValid = true;
+                        }
+                        // isValid = ValidateCheckPointCashContractPartner(criteria.PartnerId, criteria.HblId, criteria.TransactionType, criteria.SettlementCode, CHECK_POINT_TYPE.SURCHARGE);
                     }
                     else isValid = true;
-                    if (!isValid) errorCode = 1;
+                    if (!isValid) errorCode = 2;
 
                     break;
                 case "Trial":

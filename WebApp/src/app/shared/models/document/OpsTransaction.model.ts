@@ -63,7 +63,8 @@ export class OpsTransaction extends BaseModel {
     deliveryDate: any = null;
     suspendTime: string = '';
     clearanceDate: any = null;
-
+    placeNameCode: string = '';
+    customerAccountNo: string = '';
     note: string = '';
     isLinkFee: boolean = false;
     isLinkJob: boolean = false;

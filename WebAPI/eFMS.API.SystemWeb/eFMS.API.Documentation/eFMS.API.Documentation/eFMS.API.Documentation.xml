@@ -271,7 +271,7 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.PreviewDeliveryOrder(System.Guid)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.PreviewDeliveryOrder(System.Guid,System.String)">
             <summary>
             return data source of deliver order report
             </summary>
@@ -1100,6 +1100,13 @@
             get the list of countries by conditions
             </summary>
             <param name="criteria">search conditions</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.SyncGoodInforToReplicateJob(System.Guid)">
+            <summary>
+            
+            </summary>
+            <param name="jobId"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.ReportLogController">

@@ -25,6 +25,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using eFMS.API.Infrastructure.RabbitMQ;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -43,6 +44,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ISysImageService sysFileService;
         public IBackgroundTaskQueue _queue { get; }
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly IRabbitBus _busControl;
 
         public AccountingController(
             IStringLocalizer<LanguageSub> localizer,
@@ -52,7 +54,8 @@ namespace eFMS.API.Accounting.Controllers
             ICurrentUser currUser,
             ISysImageService SysImageService,
             IBackgroundTaskQueue queue, 
-            IServiceScopeFactory serviceScopeFactory
+            IServiceScopeFactory serviceScopeFactory,
+            IRabbitBus busControl
             )
         {
             stringLocalizer = localizer;
@@ -69,7 +72,23 @@ namespace eFMS.API.Accounting.Controllers
             sysFileService = SysImageService;
             _queue = queue;
             _serviceScopeFactory = serviceScopeFactory;
+            _busControl = busControl;
         }
+        [HttpPost("PublishRabbitFromAccounting")]
+        public async Task<IActionResult> PublishRabbitFromAccounting(string message)
+        {
+            var models = new List<ObjectReceivableModel> {
+                new ObjectReceivableModel
+                {
+                    Office = Guid.Parse("33facfe3-304e-4460-8705-a25f6292b11a"),
+                    PartnerId = "15f38925-f6ce-4ebb-bee6-c81ab09da4b8",
+                    Service = "CL"
+                }
+            };
+            await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, models);
+            return Ok(new { Messages = "Push Rabbit Success" });
+        }
+
         [HttpGet]
         public IActionResult Get()
         {
@@ -96,6 +115,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPost("GetListVoucherToSync")]
         public IActionResult GetListVoucherToSync(List<Guid> Ids)
         {
+            currentUser.Action = "GetListVoucherToSync";
             var data = accountingService.GetListVoucherToSyncBravo(Ids);
             return Ok(data);
         }
@@ -103,6 +123,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPost("GetListSettleToSync")]
         public IActionResult GetListSettleToSync(List<Guid> Ids)
         {
+            currentUser.Action = "GetListSettleToSync";
             var data = accountingService.GetListSettlementToSyncBravo(Ids);
             return Ok(data);
         }
@@ -340,20 +361,6 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listAdd.Count > 0)
                     {
-                        foreach (var item in listAdd)
-                        {
-                            string fileNameAttached = request.Where(x => x.Action == ACTION.ADD && item.Stt == x.Id)?.FirstOrDefault().fileName;
-                            if(!string.IsNullOrEmpty(fileNameAttached))
-                            {
-                                item.AtchDocInfo.Add(new BravoAttachDoc
-                                {
-                                    AttachDocRowId = Guid.NewGuid().ToString(),
-                                    AttachDocName = item.ReferenceNo,
-                                    AttachDocPath = fileNameAttached,
-                                    AttachDocDate = DateTime.Now
-                                });
-                            }
-                        }
                         resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSAdvanceSyncAdd", listAdd, loginResponse.TokenKey);
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -374,20 +381,20 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listUpdate.Count > 0)
                     {
-                        foreach (var item in listUpdate)
-                        {
-                            string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
-                            if (!string.IsNullOrEmpty(fileNameAttached))
-                            {
-                                item.AtchDocInfo.Add(new BravoAttachDoc
-                                {
-                                    AttachDocRowId = Guid.NewGuid().ToString(),
-                                    AttachDocName = "Advance Preview Template",
-                                    AttachDocPath = fileNameAttached,
-                                    AttachDocDate = DateTime.Now
-                                });
-                            }
-                        }
+                        //foreach (var item in listUpdate)
+                        //{
+                        //    string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
+                        //    if (!string.IsNullOrEmpty(fileNameAttached))
+                        //    {
+                        //        item.AtchDocInfo.Add(new BravoAttachDoc
+                        //        {
+                        //            AttachDocRowId = Guid.NewGuid().ToString(),
+                        //            AttachDocName = "Advance Preview Template",
+                        //            AttachDocPath = fileNameAttached,
+                        //            AttachDocDate = DateTime.Now
+                        //        });
+                        //    }
+                        //}
                         resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSAdvanceSyncUpdate", listUpdate, loginResponse.TokenKey);
                         responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -465,20 +472,20 @@ namespace eFMS.API.Accounting.Controllers
                     // 3. Call Bravo to SYNC.
                     if (listAdd.Count > 0)
                     {
-                        foreach (var item in listAdd)
-                        {
-                            string fileNameAttached = request.Where(x => x.Action == ACTION.ADD && item.Stt == x.Id)?.FirstOrDefault().fileName;
-                            if (!string.IsNullOrEmpty(fileNameAttached))
-                            {
-                                item.AtchDocInfo.Add(new BravoAttachDoc
-                                {
-                                    AttachDocRowId = Guid.NewGuid().ToString(),
-                                    AttachDocName = "SM Preview Template",
-                                    AttachDocPath = fileNameAttached,
-                                    AttachDocDate = DateTime.Now
-                                });
-                            }
-                        }
+                        //foreach (var item in listAdd)
+                        //{
+                        //    string fileNameAttached = request.Where(x => x.Action == ACTION.ADD && item.Stt == x.Id)?.FirstOrDefault().fileName;
+                        //    if (!string.IsNullOrEmpty(fileNameAttached))
+                        //    {
+                        //        item.AtchDocInfo.Add(new BravoAttachDoc
+                        //        {
+                        //            AttachDocRowId = Guid.NewGuid().ToString(),
+                        //            AttachDocName = "SM Preview Template",
+                        //            AttachDocPath = fileNameAttached,
+                        //            AttachDocDate = DateTime.Now
+                        //        });
+                        //    }
+                        //}
                         resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", listAdd, loginResponse.TokenKey);
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -499,20 +506,20 @@ namespace eFMS.API.Accounting.Controllers
 
                     if (listUpdate.Count > 0)
                     {
-                        foreach (var item in listUpdate)
-                        {
-                            string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
-                            if (!string.IsNullOrEmpty(fileNameAttached))
-                            {
-                                item.AtchDocInfo.Add(new BravoAttachDoc
-                                {
-                                    AttachDocRowId = Guid.NewGuid().ToString(),
-                                    AttachDocName = "SM Preview Template",
-                                    AttachDocPath = fileNameAttached,
-                                    AttachDocDate = DateTime.Now
-                                });
-                            }
-                        }
+                        //foreach (var item in listUpdate)
+                        //{
+                        //    string fileNameAttached = request.Where(x => x.Action == ACTION.UPDATE && item.Stt == x.Id)?.FirstOrDefault().fileName;
+                        //    if (!string.IsNullOrEmpty(fileNameAttached))
+                        //    {
+                        //        item.AtchDocInfo.Add(new BravoAttachDoc
+                        //        {
+                        //            AttachDocRowId = Guid.NewGuid().ToString(),
+                        //            AttachDocName = "SM Preview Template",
+                        //            AttachDocPath = fileNameAttached,
+                        //            AttachDocDate = DateTime.Now
+                        //        });
+                        //    }
+                        //}
                         resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncUpdate", listUpdate, loginResponse.TokenKey);
                         responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -1057,6 +1064,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("GetListCdNoteDebit")]
         public IActionResult GetListCdNoteDebit(List<RequestGuidTypeListModel> request)
         {
+            currentUser.Action = "GetListCdNoteDebit";
             List<Guid> Ids = request.Where(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE).Select(x => x.Id).ToList();
             List<SyncModel> list = (Ids.Count > 0) ? accountingService.GetListCdNoteToSync(Ids) : new List<SyncModel>();
             return Ok(list);
@@ -1070,6 +1078,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("GetListSOADebit")]
         public IActionResult GetListSOADebit(List<RequestStringTypeListModel> request)
         {
+            currentUser.Action = "GetListSOADebit";
             List<string> Ids = request.Where(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
             List<SyncModel> list = (Ids.Count > 0) ? accountingService.GetListSoaToSync(Ids) : new List<SyncModel>();
             return Ok(list);

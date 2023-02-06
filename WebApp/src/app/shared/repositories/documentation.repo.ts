@@ -558,8 +558,8 @@ export class DocumentationRepo {
         );
     }
 
-    previewDeliveryOrder(hblId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/PreviewDeliveryOrder`, { hblid: hblId }).pipe(
+    previewDeliveryOrder(hblId: string, language: string = '') {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/PreviewDeliveryOrder`, { hblid: hblId, language: language }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -600,8 +600,8 @@ export class DocumentationRepo {
         );
     }
 
-    previewAirImportAuthorizeLetter1(id: string, withSign: boolean) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirImptAuthorisedLetter`, { housbillId: id, printSign: withSign }).pipe(
+    previewAirImportAuthorizeLetter1(id: string, withSign: boolean, language: string = '') {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirImptAuthorisedLetter`, { housbillId: id, printSign: withSign, language: language  }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -610,7 +610,7 @@ export class DocumentationRepo {
     }
 
     previewAirImportAuthorizeLetter2(id: string, withSign: boolean) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/AirImptAuthorisedLetter_Consign`, { housbillId: id, printSign: withSign }).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/AirImptAuthorisedLetter_Consign`, { housbillId: id, printSign: withSign}).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -1282,8 +1282,8 @@ export class DocumentationRepo {
             );
     }
 
-    syncGoodInforToReplicateJob(body: any) {
-        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/SyncGoodInforToReplicateJob`, body).pipe(
+    syncGoodInforToReplicateJob(jobId: string, body: any = {}) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/SyncGoodInforToReplicateJob`, body, {jobId: jobId}).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

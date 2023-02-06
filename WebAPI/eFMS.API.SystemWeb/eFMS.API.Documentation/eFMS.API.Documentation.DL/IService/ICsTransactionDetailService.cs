@@ -53,7 +53,9 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewHouseAirwayBillLastest(Guid hblId, string reportType);
 
         Crystal PreviewAirAttachList(Guid hblId);
-        Crystal PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign);
+
+        Crystal PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign, string language);
+        
         Crystal PreviewAirImptAuthorisedLetterConsign(Guid housbillId, bool printSign);
 
         CsTransactionDetailModel GetDetails(Guid id);

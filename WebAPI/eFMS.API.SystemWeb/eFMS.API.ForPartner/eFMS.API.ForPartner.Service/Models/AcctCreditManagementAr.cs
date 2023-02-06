@@ -31,5 +31,8 @@ namespace eFMS.API.ForPartner.Service.Models
         public bool? NetOff { get; set; }
         public string ReferenceNo { get; set; }
         public string Source { get; set; }
+        public string VoucherNo { get; set; }
+        public DateTime? VoucherDate { get; set; }
+        public string TransactionType { get; set; }
     }
 }

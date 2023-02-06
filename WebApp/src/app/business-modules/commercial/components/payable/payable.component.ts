@@ -1,10 +1,8 @@
-import { Currency } from './../../../../shared/models/catalogue/catCurrency.model';
-import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup } from '@angular/forms';
 import { AppForm } from '@app';
 import { ConfirmPopupComponent } from '@common';
-import { Contract, Partner } from '@models';
-import { AccountingRepo, CatalogueRepo, SystemFileManageRepo } from '@repositories';
+import { AccountingRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize } from 'rxjs/operators';
 
@@ -22,7 +20,7 @@ export class PayableComponent extends AppForm {
     ];
     partnerId: string = "";
     fileList: any = null;
-    files: any = {};
+    files: any = [];
     selectedFile: any = {};
     paymentTerm: AbstractControl;
     currency: AbstractControl;

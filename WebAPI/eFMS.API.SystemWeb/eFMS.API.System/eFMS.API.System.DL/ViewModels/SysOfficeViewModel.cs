@@ -37,5 +37,6 @@ namespace eFMS.API.System.DL.ViewModels
         public string InternalCode { get; set; }
 
         public DateTime? DatetimeModified { get; set; }
+        public string OfficeType { get; set; }
     }
 }

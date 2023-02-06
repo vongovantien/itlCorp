@@ -85,14 +85,22 @@ namespace eFMS.API.SystemFileManagement.Controllers
 
 
         [HttpGet("GetDocumentType")]
-        public async Task<IActionResult> GetDocumentTypeAsync(string transactionType, string billingId)
+        public async Task<IActionResult> GetDocumentTypeAsync(string transactionType)
         {
-            var result = await AttachFilteTemplateService.GetDocumentType(transactionType, billingId);
+            var result = await AttachFilteTemplateService.GetDocumentType(transactionType);
             if (result == null)
             {
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+
+        [HttpGet("ClearCache")]
+        public async Task<IActionResult> clearCache()
+        {
+            AttachFilteTemplateService.clearCache();
+            return Ok();
         }
     }
 }

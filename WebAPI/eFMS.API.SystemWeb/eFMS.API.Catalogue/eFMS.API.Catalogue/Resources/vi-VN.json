@@ -50,6 +50,10 @@
   "MSG_PARTNER_WORKPLACE_NOT_FOUND": "Workplace '{0}' is not found!",
   //------------end  : partner data
 
+  // contract
+  "MSG_CONTRACT_DUPLICATE": "Hợp đồng đã tồn tại trên hệ thống, vui lòng sửa thông tin trên hợp đồng hoặc chọn lại nhân viên bán hàng/loại hợp đồng đó.",
+  //-----------end contract
+
   //------------start: place
   "MSG_PLACE_NAME_EN_EMPTY": "NameEn is not allow empty!|wrong",
   "MSG_PLACE_NAME_LOCAL_EMPTY": "NameVn is not allow empty!|wrong",
@@ -109,6 +113,7 @@
   "EF_COMMOIDITY_DISPLAYNAME_NAMEEN": "Name EN",
   "EF_COMMOIDITY_DISPLAYNAME_GROUP": "Group",
   //------------end  : Commodity
+
 
   //------------start: COUNTRY
   "MSG_COUNTRY_NAME_EN_EMPTY": "Name En is not allow empty!|wrong",

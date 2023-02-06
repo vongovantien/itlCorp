@@ -13,7 +13,7 @@
                         [ngClass]="{'m-form__group has-danger':(isSubmitted || partnerNameEn.dirty) && !partnerNameEn.valid }">
                         <label required>English Name</label>
                         <input type="text" class="form-control" formControlName="partnerNameEn"
-                            [attr.disabled]="this.isActive === true ? 'disabled' : null">
+                            [attr.disabled]="this.isActive === true && this.isBranchSub === false ? 'disabled' : null">
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -21,7 +21,7 @@
                         [ngClass]="{'m-form__group has-danger':(isSubmitted || shortName.dirty) && !shortName.valid }">
                         <label required>ABBR Name</label>
                         <input type="text" class="form-control" formControlName="shortName"
-                            [attr.disabled]="this.isActive === true ? 'disabled' : null">
+                            [attr.disabled]="this.isActive === true && this.isBranchSub === false ? 'disabled' : null">
                     </div>
                 </div>
                 <div class="col-lg-8">
@@ -29,7 +29,7 @@
                         [ngClass]="{'m-form__group has-danger':(isSubmitted || partnerNameVn.dirty) && !partnerNameVn.valid }">
                         <label required>Local Name</label>
                         <input type="text" class="form-control" formControlName="partnerNameVn"
-                            [attr.disabled]="this.isActive === true ? 'disabled' : null">
+                            [attr.disabled]="this.isActive === true && this.isBranchSub === false ? 'disabled' : null">
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -50,7 +50,7 @@
                                 [ngClass]="{'m-form__group has-danger':(isSubmitted || taxCode.dirty) && !taxCode.valid }">
                                 <label required>Tax Code</label>
                                 <input type="text" class="form-control" formControlName="taxCode"
-                                    [attr.disabled]="active ? 'disabled' : null"
+                                    [attr.disabled]="active || isBranchSubCurrent || this.isBranchSub ? 'disabled' : null"
                                     (blur)="getInforCompanyByTaxCode(this.taxCode.value)">
                                 <div class="form-control-feedback"
                                     *ngIf="(isSubmitted &&
@@ -73,8 +73,7 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger':(isSubmitted || internalReferenceNo.dirty) && !internalReferenceNo.valid}">
                                 <label>Internal Reference</label>
-                                <input [attr.disabled]="isDisabled === true ? 'disabeld' : null" #focusInput type="text"
-                                    class="form-control" formControlName="internalReferenceNo">
+                                <input #focusInput type="text" class="form-control" formControlName="internalReferenceNo">
                                 <div class="form-control-feedback" *ngIf="isSubmitted &&
                                 ((internalReferenceNo.errors | equalError: 'maxlength' )|| (internalReferenceNo.errors | equalError: 'minlength'))
                                 ">

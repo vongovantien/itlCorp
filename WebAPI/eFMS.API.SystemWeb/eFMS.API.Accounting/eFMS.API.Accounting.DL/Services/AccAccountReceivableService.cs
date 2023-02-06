@@ -413,8 +413,6 @@ namespace eFMS.API.Accounting.DL.Services
                        from parent in parents.DefaultIfEmpty()
                        join user in users on contract.AgreementSalesmanId equals user.Id into users2
                        from user in users2.DefaultIfEmpty()
-                       join employee in employees on user.EmployeeId equals employee.Id into employees2
-                       from employee in employees2.DefaultIfEmpty()
                        select new AccountReceivableResult
                        {
                            AgreementId = contract.AgreementId,
@@ -430,7 +428,7 @@ namespace eFMS.API.Accounting.DL.Services
                            AgreementType = contract.AgreementType,
                            AgreementStatus = contract.AgreementStatus,
                            AgreementSalesmanId = contract.AgreementSalesmanId,
-                           AgreementSalesmanName = employee.EmployeeNameVn,
+                           AgreementSalesmanName = user.Username,
                            AgreementCurrency = contract.AgreementCurrency,
                            OfficeId = contract.OfficeId,
                            ArServiceCode = contract.ArServiceCode,
@@ -1298,17 +1296,34 @@ namespace eFMS.API.Accounting.DL.Services
             DebitAmountDetail debitAmountDetail = new DebitAmountDetail();
             var contract = contractPartnerRepo.Get(x => x.Id == criteria.AgreementId).FirstOrDefault();
             var partner = partnerRepo.Get(x => x.Id == criteria.PartnerId.ToString()).FirstOrDefault();
-            debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
+            if (criteria.AgreementId != null)
             {
-                ContractNo = contract.ContractNo,
-                EffectiveDate = contract.EffectiveDate,
-                ContracType = contract.ContractType,
-                ExpiredDate = contract.ExpiredDate,
-                PartnerCode = partner.TaxCode,
-                PartnerName = partner.ShortName,
-                Currency = contract.CurrencyId
-            };
-            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId(criteria.AgreementId, criteria.PartnerId, criteria.AgreementSalesmanId).ToList();
+                debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
+                {
+                    ContractNo = contract.ContractNo,
+                    EffectiveDate = contract.EffectiveDate,
+                    ContracType = contract.ContractType,
+                    ExpiredDate = contract.ExpiredDate,
+                    PartnerCode = partner.TaxCode,
+                    PartnerName = partner.ShortName,
+                    Currency = contract.CurrencyId
+                };
+            }
+            else
+            {
+                criteria.AgreementId = Guid.Empty;
+                debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
+                {
+                    ContractNo = null,
+                    EffectiveDate = null,
+                    ContracType = null,
+                    ExpiredDate = null,
+                    PartnerCode = partner.TaxCode,
+                    PartnerName = partner.ShortName,
+                    Currency = null
+                };
+            }
+            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId((Guid)criteria.AgreementId, criteria.PartnerId, criteria.AgreementSalesmanId).ToList();
             //debitAmountDetail.DebitAmountDetails.ForEach(x =>
             //{
             //    if (!checkingPaidLoop2(x.AcctManagementID)) debitAmountDetail.DebitAmountDetails.Remove(x);
@@ -1373,13 +1388,14 @@ namespace eFMS.API.Accounting.DL.Services
                     var invoiceData = contractModel.PaymentTermChanged.Contains("DEBIT") ? accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId &&
                                              (!string.IsNullOrEmpty(x.ServiceType) && contractModel.SaleService.Contains(x.ServiceType.ToLower())) &&
                                             (x.OfficeId != null && contractModel.OfficeId.Contains(x.OfficeId.ToString().ToLower())) &&
-                                            x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).ToList()
+                                            x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
+                                            && x.SalesmanId == contractModel.SaleManId).ToList()
                                             : new List<AccAccountingManagement>();
                     if (contractModel.PaymentTermChanged.Contains("OBH"))
                     {
                         var acctOBH = accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId && contractModel.SaleService.Contains(x.ServiceType.ToLower()) &&
                                                  contractModel.OfficeId.ToLower().Contains(x.OfficeId.ToString().ToLower()) &&
-                                                 x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
+                                                 x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && x.SalesmanId == contractModel.SaleManId);
                         if (acctOBH.Count() > 0)
                         {
                             var surcharges = surchargeRepo.Get(x => x.AcctManagementId != null && x.PaymentObjectId == contractModel.PartnerId);

@@ -168,7 +168,7 @@ export class PartnerDetailComponent extends AppList {
                         this.allowUpdate = this.partner.permission.allowUpdate;
                         this.formPartnerComponent.isAddBranchSub = this.isAddSubPartner;
                         this.formPartnerComponent.groups = this.partner.partnerGroup;
-                        console.log("res: ", res);
+                        // console.log("res: ", res);
                         this.formPartnerComponent.setFormData(this.partner);
                         if (this.isAddSubPartner) {
                             this.formPartnerComponent.getACRefName(this.partner.id);
@@ -496,7 +496,7 @@ export class PartnerDetailComponent extends AppList {
                         this.formPartnerComponent.isExistedTaxcode = true;
 
                         if (!!res.internalReferenceNo) {
-                            this.deleteMessage = `This Partner is existed, please you check again!`;
+                            this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in <b>${res.shortName}</b>, If you want to Create Internal account, Please change <b>Internal Reference Info</b>.`;;
                             this.confirmDuplicatePartner.show();
                         } else {
                             this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;

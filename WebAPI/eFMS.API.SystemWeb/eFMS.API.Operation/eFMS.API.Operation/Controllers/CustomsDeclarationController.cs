@@ -129,7 +129,7 @@ namespace eFMS.API.Operation.Controllers
         [HttpPost]
         [Route("Add")]
         [AuthorizeEx(Menu.opsCustomClearance, UserPermission.Add)]
-        public IActionResult AddNew(CustomsDeclarationModel model)
+        public async Task<IActionResult> AddNew(CustomsDeclarationModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var code = CheckForbitUpdate(_user.UserMenuPermission.Write);
@@ -140,7 +140,7 @@ namespace eFMS.API.Operation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
             model = GetModelAdd(model);
-            var hs = customsDeclarationService.Add(model);
+            var hs = await customsDeclarationService.AddNewCustomsDeclaration(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -295,17 +295,20 @@ namespace eFMS.API.Operation.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost("UpdateJobToClearances")]
-        public IActionResult UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
+        public async Task<IActionResult> UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
             if (clearances.Any(x => x.isDelete == true))
             {
-                if (customsDeclarationService.CheckAllowUpdate(clearances.Select(t => t.jobId).FirstOrDefault()) == false)
+                if (customsDeclarationService.CheckAllowUpdate(clearances.Select(t => t.jobId).FirstOrDefault(), clearances.Select(x => x.ClearanceNo).ToList()) == false)
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[OperationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
                 }
             }
 
-            var result = customsDeclarationService.UpdateJobToClearances(clearances);
+            var hs = await customsDeclarationService.UpdateJobToClearances(clearances);
+            string message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
             return Ok(result);
         }
 

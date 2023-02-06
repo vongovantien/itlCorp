@@ -101,8 +101,8 @@
                             <label class="form-control-label" for="">
                                 Office
                             </label>
-                            <ng-select [items]="offices | async" formControlName="office" class="custom"
-                                bindLabel="shortName" bindValue="id">
+                            <ng-select [items]="offices" formControlName="office" class="custom" bindLabel="shortName"
+                                bindValue="id" placeholder="All">
                             </ng-select>
                         </div>
                     </div>
@@ -111,8 +111,8 @@
                             <label class="form-control-label" for="">
                                 Department
                             </label>
-                            <ng-select [items]="departments | async" formControlName="departments" class="custom"
-                                [multiple]="true" bindLabel="code" bindValue="id">
+                            <ng-select [items]="departments" formControlName="departments" class="custom"
+                                [multiple]="true" bindLabel="code" bindValue="id" placeholder="All">
                             </ng-select>
                         </div>
                     </div>

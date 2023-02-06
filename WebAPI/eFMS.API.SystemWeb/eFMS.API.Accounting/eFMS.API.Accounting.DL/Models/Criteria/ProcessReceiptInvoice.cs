@@ -14,6 +14,6 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public string Currency { get; set; }
         [Required]
         public decimal FinalExchangeRate { get; set; }
-        
+        public string ReceiptType { get; set; }
     }
 }

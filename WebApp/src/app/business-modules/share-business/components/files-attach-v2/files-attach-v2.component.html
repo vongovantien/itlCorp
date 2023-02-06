@@ -40,24 +40,24 @@
                         <div class="m-portlet__head-caption">
                             <div class="m-portlet__head-title d-flex justify-content-between align-items-center
                                 btn-toggle-collapse collapse-toggle" data-toggle="collapse"
-                                [attr.data-target]="'#' + docType.documentType.code">
+                                [attr.data-target]="'#' + docType.documentType?.code">
                                 <h4 class=" m-portlet__head-text font-14">
-                                    <i class="la la-angle-up margin-right-5"></i> {{docType.documentType.nameEn}}
+                                    <i class="la la-angle-up margin-right-5"></i> {{docType.documentType?.nameEn}}
                                 </h4>
                             </div>
                         </div>
                         <div class="c-button-actions">
                             <div class="form-group float-right">
                                 <button class="btn btn-sm m-btn--pill m-btn--icon m-btn--icon-only"
-                                    *ngIf="docType.documentType.required"
-                                    [ngClass]="((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length)  ? 'btn-success': 'btn-danger'">
+                                    *ngIf="docType.documentType?.required"
+                                    [ngClass]="((docType.documentType?.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length)  ? 'btn-success': 'btn-danger'">
                                     <i
-                                        class="la la-{{((docType.documentType.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length) ? 'check' : 'exclamation'}}"></i>
+                                        class="la la-{{((docType.documentType?.required && !!docType?.eDocs?.length) || !!docType?.eDocs?.length) ? 'check' : 'exclamation'}}"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div class="m-portlet__body p-0" id={{docType.documentType.code}}
+                    <div class="m-portlet__body p-0" id={{docType.documentType?.code}}
                         [class]="!!(docType?.eDocs?.length) ? 'collapse show':'collapse'">
                         <div class="table-wrapper table-scrollable">
                             <table class="table table-hover table-editable dataTable-edit table-summary ">
@@ -76,8 +76,7 @@
                                                 <span>{{doc.systemFileName}} </span>
                                             </td>
                                             <td>
-                                                <a class="text-underline htmlLink"
-                                                    (click)="viewEdocFromName(doc.imageUrl)"
+                                                <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
                                                     download>{{doc.userFileName}}
                                                     <icon-file [url]="doc.imageUrl"></icon-file>
                                                 </a>
@@ -116,23 +115,117 @@
         <div class="m-portlet__head pointer">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title w-100">
-                    <h3 class="m-portlet__head-text btn-toggle-collapse collapse-toggle" data-toggle="collapse"
+                    <!-- <h3 class="m-portlet__head-text btn-toggle-collapse collapse-toggle" data-toggle="collapse"
                         [attr.data-target]="'#accountingFile'" aria-expanded="true">
                         <i class="la la-minus m--margin-right-5"></i>
                         Accounting File
-                    </h3>
-                    <div class="c-button-actions" *ngIf="(typeFrom !== 'Shipment' && !readonly)">
+                    </h3> -->
+                    <div class="row">
+                        <div class="col-3">
+                            <h3 class="m-portlet__head-text btn-toggle-collapse collapse-toggle" data-toggle="collapse"
+                                [attr.data-target]="'#accountingFile'" aria-expanded="true">
+                                <i class="la la-minus m--margin-right-5"></i>
+                                Accounting File
+                            </h3>
+                        </div>
+                        <div class="col-9">
+                            <div class="row">
+                                <div class="col-6">
+                                    <!-- <div class="m-form m-form--state" [formGroup]="formSearch">
+                                        <div class="input-group m-input m-input--square-group m-input-icon">
+                                            <input type="text" class="form-control" formControlName="aliasSearch"
+                                                placeholder="Enter Alias Name">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-primary" title="Search" (click)="searchBAlias()">
+                                                    <i class="la la-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div> -->
+                                    <div class="form-group">
+                                        <div class="m-input-icon m-input-icon--right">
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                placeholder="Search" [(ngModel)]="keyword" name=keyword>
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-search"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 c-button-actions" *ngIf="(typeFrom !== 'Shipment' && !readonly)">
+                                    <!-- <div class="form-group float-right">
+                                        <button type="button"
+                                            class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
+                                            (click)="showDocumentAttach()">
+                                            <span>
+                                                <i class="la la-download"></i>
+                                                <span>
+                                                    Attach Files
+                                                </span>
+                                            </span>
+                                        </button>
+                                    </div> -->
+                                    <div class="form-group float-right">
+                                        <button type="button"
+                                            class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
+                                            *ngIf="!readonly" (click)="showDocumentAttach()">
+                                            <span>
+                                                <i class="la la-download"></i>
+                                                <span>
+                                                    Attach Files
+                                                </span>
+                                            </span>
+                                        </button>
+                                        <button type="button" class="btn btn-primary m-btn--icon m-btn--uppercase"
+                                            [dpToggle]="dropdownMenu" position="bottomLeft" mode="dropdown"
+                                            *ngIf="typeFrom==='Settlement'">
+                                            <span>
+                                                <i class="la la-download"></i>
+                                                <span> Get Files</span>
+                                            </span>
+                                        </button>
+                                        <app-dropdown #dropdownMenu>
+                                            <a class="dropdown-item pointer" (click)="genFileToSM('Advance')">
+                                                <span>Get Files Advance</span>
+                                            </a>
+                                            <a class="dropdown-item pointer" (click)="genFileToSM('SOA')">
+                                                <span>Get Files SOA</span>
+                                            </a>
+                                            <a class="dropdown-item pointer" (click)="genFileToSM('MBL')">
+                                                <span>Get Files MasterBill</span>
+                                            </a>
+                                            <a class="dropdown-item pointer" (click)="genFileToSM('HBL')">
+                                                <span>Get Files HouseBill</span>
+                                            </a>
+                                            <a class="dropdown-item pointer" (click)="genFileToSM('INV')">
+                                                <span>Get Files Invoice</span>
+                                            </a>
+                                            <!-- <a class="dropdown-item pointer" (click)="genFileSOAToSM()">
+                                                    <span>Get Files SOA</span>
+                                                </a> -->
+                                        </app-dropdown>
+                                        <!-- <div class="btn-group" [autoClose]="!isClickSubMenu" dropdown container="body">
+                                                <app-permission-button type="export" title="Get Files" [dpToggle]="dropdownMenu" position="bottomLeft"
+                                                    mode="dropdown">
+                                                </app-permission-button>
+                                            </div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- <div class="c-button-actions" *ngIf="(typeFrom ==='Settlement' && !readonly)">
                         <div class="form-group float-right">
-                            <button type="button" class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
-                                (click)="showDocumentAttach()">
+                            <button type="button" class="btn btn-primary m-btn--icon m-btn--uppercase" (click)="getFilesAdvance()">
                                 <span>
                                     <i class="la la-download"></i>
-                                    <span>
-                                        Attach Files
-                                    </span>
+                                    <span> Get Files Advance</span>
                                 </span>
                             </button>
                         </div>
+                    </div> -->
                     </div>
                 </div>
             </div>
@@ -144,8 +237,8 @@
                         <div class="m-portlet__head-caption">
                             <div class="m-portlet__head-title d-flex justify-content-between align-items-center">
                                 <h4 class="m-portlet__head-text collapse-toggle" data-toggle="collapse"
-                                    [attr.data-target]="'#' + docType.documentType.code + i">
-                                    <i class="la la-angle-up m--margin-right-5"></i> {{docType.documentType.nameEn}}
+                                    [attr.data-target]="'#' + docType.documentType?.code + i">
+                                    <i class="la la-angle-up m--margin-right-5"></i> {{docType.documentType?.nameEn}}
                                 </h4>
                                 <div class="text-right" *ngIf="!!docType?.eDocs?.length">
                                     <button class="btn btn-sm m-btn--pill m-btn--icon m-btn--icon-only btn-success">
@@ -157,7 +250,7 @@
                     </div>
                     <div class="m-portlet__body p-0">
                         <div [class]="docType?.eDocs?.length>0? 'collapse show':'collapse'"
-                            [id]="docType.documentType.code + i">
+                            [id]="docType.documentType?.code + i">
                             <div class="table-wrapper table-scrollable">
                                 <table class="table table-hover table-editable dataTable table-summary ">
                                     <thead app-table-header [headers]="headers"
@@ -181,10 +274,10 @@
                                                         target="_blank">{{doc.userFileName}}
                                                         <icon-file [url]="doc.userFileName"></icon-file>
                                                     </a> -->
-                                                    <a class="text-underline htmlLink" (click)="viewEdocFromName(doc.imageUrl)"
-                                                    download>{{doc.userFileName}}
-                                                    <icon-file [url]="doc.imageUrl"></icon-file>
-                                                </a>
+                                                    <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
+                                                        download>{{doc.userFileName}}
+                                                        <icon-file [url]="doc.imageUrl"></icon-file>
+                                                    </a>
                                                 </td>
                                                 <td>
                                                     <span>{{doc.hblNo}}</span>
@@ -235,7 +328,9 @@
                                 </th>
                             </thead>
                             <tbody>
-                                <ng-container *ngFor="let doc of edocByAcc.eDocs; let i = index; trackBy: trackByFn">
+                                <!-- <ng-container *ngFor="let doc of edocByAcc.eDocs; let i = index; trackBy: trackByFn"> -->
+                                <ng-container
+                                    *ngFor="let doc of edocByAcc.eDocs| filter: keyword: ['systemFileName','jobNo']; let i = index; trackBy: trackByFn">
                                     <tr [contextMenu]="edocAccountantContext" (onTouch)="onSelectEDoc(doc)"
                                         [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
                                         <td>{{i + 1}}</td>
@@ -244,10 +339,14 @@
                                                 download>{{doc.systemFileName}}
                                                 <icon-file [url]="doc.userFileName"></icon-file>
                                             </a> -->
-                                            <a class="text-underline htmlLink" (click)="viewEdocFromName(doc.imageUrl)"
-                                            download>{{doc.systemFileName}}
-                                            <icon-file [url]="doc.imageUrl"></icon-file>
-                                        </a>
+                                            <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
+                                                download>{{doc.systemFileName}}
+                                                <icon-file [url]="doc.imageUrl"></icon-file>
+                                            </a>
+                                        </td>
+                                        <td
+                                            *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">
+                                            <span>{{doc.jobNo}}</span>
                                         </td>
                                         <td>
                                             <span>{{doc.documentTypeName}}</span>
@@ -255,10 +354,10 @@
                                         <td *ngIf="typeFrom!=='Settlement'&&typeFrom!=='Advance'&&typeFrom!=='SOA'">
                                             <span>{{doc.hblNo}}</span>
                                         </td>
-                                        <td
+                                        <!-- <td
                                             *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">
                                             <span>{{doc.jobNo}}</span>
-                                        </td>
+                                        </td> -->
                                         <td>
                                             <span>{{doc.note}}</span>
                                         </td>
@@ -282,7 +381,7 @@
         </ng-container>
     </div>
 </div>
-<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDoc($event)" [jobId]="jobId" [jobNo]="jobNo" [jobs]="jobs"
+<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDoc($event)" [jobId]="jobId" [jobNo]="jobNo"
     [billingId]="billingId" [transactionType]="transactionType" [housebills]="housebills">
 </document-type-attach>
 

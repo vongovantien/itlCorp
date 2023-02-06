@@ -6,7 +6,7 @@ import { ActionsSubject, Store } from '@ngrx/store';
 import { AppForm } from '@app';
 import { CommonEnum } from '@enums';
 import { Commodity, CsTransaction, Customer, DIM, Incoterm, PortIndex, Unit, User, Warehouse } from '@models';
-import { GetCatalogueAgentAction, getCatalogueAgentLoadingState, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierLoadingState, getCatalogueCarrierState, GetCatalogueCommodityAction, getCatalogueCommodityState, getCataloguePortLoadingState, GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
+import { GetCatalogueAgentAction, getCatalogueAgentLoadingState, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierLoadingState, getCatalogueCarrierState, GetCatalogueCommodityAction, getCatalogueCommodityState, getCataloguePortLoadingState, GetCatalogueUnitAction, getCatalogueUnitState, getMenuUserSpecialPermissionState } from '@store';
 import { FormValidators } from '@validators';
 
 import { JobConstants } from '@constants';
@@ -148,6 +148,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
         this._store.dispatch(new GetCatalogueUnitAction({ active: true }));
         this._store.dispatch(new GetCatalogueCommodityAction({ active: true }));
 
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        
         this.isLoadingPort = this._store.select(getCataloguePortLoadingState).pipe(
             takeUntil(this.ngUnsubscribe)
         );

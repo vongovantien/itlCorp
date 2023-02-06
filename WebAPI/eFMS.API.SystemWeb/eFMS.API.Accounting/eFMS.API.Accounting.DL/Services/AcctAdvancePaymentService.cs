@@ -63,6 +63,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatCharge> catChargeRepository;
         private readonly IContextBase<SysSettingFlow> sysSettingFlowRepository;
         private readonly IContextBase<SysImageDetail> imagedetailRepository;
+        private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -99,7 +100,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysEmailSetting> sysEmailSettingRepo,
             IContextBase<SysImageDetail> imageDetailRepo,
             IContextBase<SysSettingFlow> sysSettingFlowRepos,
-            IContextBase<CatCharge> catChargeRepo) : base(repository, mapper)
+            IContextBase<CatCharge> catChargeRepo, IContextBase<CustomsDeclaration> customsDeclarationRepo) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = wUrl;
@@ -135,6 +136,7 @@ namespace eFMS.API.Accounting.DL.Services
             catChargeRepository = catChargeRepo;
             sysSettingFlowRepository = sysSettingFlowRepo;
             imagedetailRepository = imageDetailRepo;
+            customsDeclarationRepository = customsDeclarationRepo;
         }
 
         #region --- LIST & PAGING ---
@@ -1050,7 +1052,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new List<ShipmentExistedInAdvanceModel>();
             }
@@ -1349,6 +1351,29 @@ namespace eFMS.API.Accounting.DL.Services
             return model;
         }
 
+        private string GetCustomNoOldOfShipment(string jobNo)
+        {
+            var customNos = "";
+            var mainClaranceNo = customsDeclarationRepository.Get(x => x.JobNo == jobNo && x.ConvertTime != null).FirstOrDefault();
+            if (mainClaranceNo != null)
+            {
+                customNos = mainClaranceNo.ClearanceNo;
+            }
+            else
+            {
+                var customLastGrp = customsDeclarationRepository.Get(x => x.JobNo == jobNo).ToList();
+                if (customLastGrp.Count() > 0)
+                {
+                    var CustomLastOrder = customLastGrp.OrderBy(o => o.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
+                    if (CustomLastOrder.Count() > 1)
+                    {
+                        CustomLastOrder.OrderBy(x => x.DatetimeModified);
+                    }
+                    customNos = CustomLastOrder.FirstOrDefault().ClearanceNo;
+                }
+            }
+            return customNos;
+        }
         public HandleState UpdateAdvancePayment(AcctAdvancePaymentModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
@@ -2059,7 +2084,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (!string.IsNullOrEmpty(approve.Requester))
                             {
                                 advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED;
-                                approve.LeaderApr = userCurrent;
+                                approve.LeaderApr = approve.Leader = userCurrent;
                                 approve.LeaderAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_LEADER;
                                 userApproveNext = managerLevel.UserId;
@@ -2134,7 +2159,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if ((!string.IsNullOrEmpty(approve.Leader) && !string.IsNullOrEmpty(approve.LeaderApr)) || string.IsNullOrEmpty(approve.Leader) || leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO)
                             {
                                 advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
-                                approve.ManagerApr = userCurrent;
+                                approve.ManagerApr = approve.Manager = userCurrent;
                                 approve.ManagerAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_MANAGER;
                                 userApproveNext = accountantLevel.UserId;
@@ -2200,7 +2225,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if ((!string.IsNullOrEmpty(approve.Manager) && !string.IsNullOrEmpty(approve.ManagerApr)) || string.IsNullOrEmpty(approve.Manager) || managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO)
                             {
                                 advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
-                                approve.AccountantApr = userCurrent;
+                                approve.AccountantApr = approve.Accountant = userCurrent;
                                 approve.AccountantAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
                                 userApproveNext = buHeadLevel.UserId;
@@ -2261,17 +2286,17 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
                             {
-                                approve.LeaderApr = userCurrent;
+                                approve.LeaderApr = approve.Leader = userCurrent;
                                 approve.LeaderAprDate = DateTime.Now;
                             }
                             if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
                             {
-                                approve.ManagerApr = userCurrent;
+                                approve.ManagerApr = approve.Manager = userCurrent;
                                 approve.ManagerAprDate = DateTime.Now;
                             }
                             if (!string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
                             {
-                                approve.AccountantApr = userCurrent;
+                                approve.AccountantApr = approve.Accountant = userCurrent;
                                 approve.AccountantAprDate = DateTime.Now;
                             }
                         }
@@ -2280,7 +2305,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if ((!string.IsNullOrEmpty(approve.Accountant) && !string.IsNullOrEmpty(approve.AccountantApr)) || string.IsNullOrEmpty(approve.Accountant) || accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
                             {
                                 advancePayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
-                                approve.BuheadApr = userCurrent;
+                                approve.BuheadApr = approve.Buhead = userCurrent;
                                 approve.BuheadAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_BOD;
                             }
@@ -3959,27 +3984,27 @@ namespace eFMS.API.Accounting.DL.Services
 
             #region -- Advance Amount & Sayword --           
             var _advanceAmount = advancePayment.AdvanceRequests.Select(s => s.Amount).Sum();
-            if (advancePayment.AdvanceCurrency != AccountingConstants.CURRENCY_LOCAL)
-            {
-                //Tỉ giá quy đổi theo ngày đề nghị tạm ứng (RequestDate)
-                var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == advancePayment.RequestDate.Value.Date).ToList();
-                if (currencyExchange.Count == 0)
-                {
-                    DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
-                    currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
-                }
-                var _rate = currencyExchangeService.GetRateCurrencyExchange(currencyExchange, advancePayment.AdvanceCurrency, AccountingConstants.CURRENCY_LOCAL);
-                _advanceAmount = _advanceAmount * _rate;
-            }
+            //if (advancePayment.AdvanceCurrency != AccountingConstants.CURRENCY_LOCAL)
+            //{
+            //    //Tỉ giá quy đổi theo ngày đề nghị tạm ứng (RequestDate)
+            //    var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == advancePayment.RequestDate.Value.Date).ToList();
+            //    if (currencyExchange.Count == 0)
+            //    {
+            //        DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+            //        currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            //    }
+            //    var _rate = currencyExchangeService.GetRateCurrencyExchange(currencyExchange, advancePayment.AdvanceCurrency, AccountingConstants.CURRENCY_LOCAL);
+            //    _advanceAmount = _advanceAmount * _rate;
+            //}
             var _sayWordAmount = string.Empty;
             var _currencyAdvance = (language == "VN" && _advanceAmount >= 1) ?
                        (_advanceAmount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                     :
                     advancePayment.AdvanceCurrency;
-            _sayWordAmount = (language == "VN" && _advanceAmount >= 1) ?
+            _sayWordAmount = advancePayment.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL ?
                         InWordCurrency.ConvertNumberCurrencyToString(_advanceAmount.Value, _currencyAdvance)
                     :
-                        InWordCurrency.ConvertNumberCurrencyToStringUSD(_advanceAmount.Value, "") + " " + AccountingConstants.CURRENCY_LOCAL;
+                        InWordCurrency.ConvertNumberCurrencyToStringUSD(_advanceAmount.Value, "") + " " + advancePayment.AdvanceCurrency;
             #endregion -- Advance Amount & Sayword --
 
             #region -- Info Manager, Accoutant & Department --
@@ -4024,7 +4049,8 @@ namespace eFMS.API.Accounting.DL.Services
                 BankCode = advancePayment.BankCode,
                 PaymentMethod = advancePayment.PaymentMethod,
                 DeadlinePayment = advancePayment?.DeadlinePayment,
-                IsDisplayLogo = isCommonOffice
+                IsDisplayLogo = isCommonOffice,
+                AdvanceCurrency = advancePayment.AdvanceCurrency
             };
             return infoAdvance;
         }
@@ -4121,20 +4147,20 @@ namespace eFMS.API.Accounting.DL.Services
                                             && x.AdvanceType == AccountingConstants.ADVANCE_TYPE_OTHER)
                                             .Select(s => s.Amount).Sum() ?? 0,
                 };
-                if (advancePayment.AdvanceCurrency != AccountingConstants.CURRENCY_LOCAL)
-                {
-                    //Tỉ giá quy đổi theo ngày đề nghị tạm ứng (RequestDate)
-                    var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == advancePayment.RequestDate.Value.Date).ToList();
-                    if (currencyExchange.Count == 0)
-                    {
-                        DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
-                        currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
-                    }
-                    var _rate = currencyExchangeService.GetRateCurrencyExchange(currencyExchange, advancePayment.AdvanceCurrency, AccountingConstants.CURRENCY_LOCAL);
-                    shipmentAdvance.NormAmount = shipmentAdvance.NormAmount * _rate;
-                    shipmentAdvance.InvoiceAmount = shipmentAdvance.InvoiceAmount * _rate;
-                    shipmentAdvance.OtherAmount = shipmentAdvance.OtherAmount * _rate;
-                }
+                //if (advancePayment.AdvanceCurrency != AccountingConstants.CURRENCY_LOCAL)
+                //{
+                //    //Tỉ giá quy đổi theo ngày đề nghị tạm ứng (RequestDate)
+                //    var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == advancePayment.RequestDate.Value.Date).ToList();
+                //    if (currencyExchange.Count == 0)
+                //    {
+                //        DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+                //        currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+                //    }
+                //    var _rate = currencyExchangeService.GetRateCurrencyExchange(currencyExchange, advancePayment.AdvanceCurrency, AccountingConstants.CURRENCY_LOCAL);
+                //    shipmentAdvance.NormAmount = shipmentAdvance.NormAmount * _rate;
+                //    shipmentAdvance.InvoiceAmount = shipmentAdvance.InvoiceAmount * _rate;
+                //    shipmentAdvance.OtherAmount = shipmentAdvance.OtherAmount * _rate;
+                //}
                 shipmentsAdvance.Add(shipmentAdvance);
             }
             var result = shipmentsAdvance.ToArray().OrderBy(x => x.JobNo); //Sắp xếp tăng dần theo JobNo [05-01-2021]
@@ -4264,7 +4290,6 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<AccAdvancePaymentVoucherImportModel> CheckValidImport(List<AccAdvancePaymentVoucherImportModel> list, bool validDate)
         {
-            DateTime dt;
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.AdvanceNo))

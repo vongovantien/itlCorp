@@ -23,7 +23,8 @@
     <custom-clearance-form-detail></custom-clearance-form-detail>
 </div>
 <app-dropdown #dropdownMenuClearance>
-    <a class="dropdown-item pointer" (click)="convertClearance(true)" *ngIf="(currentUser$ | async)?.officeType !== 'OutSource'" title="Create clearance with replicate">
+    <a class="dropdown-item pointer" (click)="convertClearance(true)"
+        *ngIf="(currentUser$ | async)?.officeType === 'Head' || (currentUser$ | async)?.officeType === 'Branch'" title="Create clearance with replicate">
         <i class="la la-copy"></i>
         <span> Replicate</span>
     </a>

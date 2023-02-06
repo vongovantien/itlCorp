@@ -4,14 +4,14 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 
-import { Shipment, CustomDeclaration } from '@models';
+import { Shipment, CustomDeclaration, Office } from '@models';
 import { SortService } from '@services';
-import { DocumentationRepo, ExportRepo, OperationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, OperationRepo, SystemRepo } from '@repositories';
 import { ConfirmPopupComponent, LoadingPopupComponent, Permission403PopupComponent, ReportPreviewComponent } from '@common';
 
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
-import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom, tap } from 'rxjs/operators';
 import { JobConstants, RoutingConstants, SystemConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
@@ -19,6 +19,7 @@ import { GetCurrenctUser, getCurrentUserState, getMenuUserSpecialPermissionState
 import { Observable, of } from 'rxjs';
 import { delayTime } from '@decorators';
 import { LinkChargeJobRepPopupComponent } from './components/popup/link-charge-from-jobRep-popup/link-charge-from-job-rep.popup';
+import { formatDate } from '@angular/common';
 
 
 
@@ -44,13 +45,14 @@ export class JobManagementComponent extends AppList implements OnInit {
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
     defaultDataSearch = {
-        createdDateFrom: JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate,
+        createdDateFrom: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 1, new Date().getDate()), 'yyyy-MM-dd', 'en'),
         createdDateTo: JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate,
     };
 
     currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
     isSearchLinkFeea: boolean = false;
-
+  
+ 
     constructor(
         private sortService: SortService,
         private _documentRepo: DocumentationRepo,
@@ -60,7 +62,8 @@ export class JobManagementComponent extends AppList implements OnInit {
         private _router: Router,
         private _store: Store<fromOperationStore.IOperationState>,
         private _exportRepo: ExportRepo,
-        private _spinner: NgxSpinnerService
+        private _spinner: NgxSpinnerService,
+        private _systemRepo: SystemRepo
     ) {
         super();
         this.requestSort = this.sortShipment;
@@ -127,7 +130,6 @@ export class JobManagementComponent extends AppList implements OnInit {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.currentUser$ = this._store.select(getCurrentUserState);
     }
-
     requestSearchShipment() {
         this._store.dispatch(new fromOperationStore.OPSTransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }

@@ -65,7 +65,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             .subscribe(
                 (res: SystemInterface.IUserPermission) => {
                     if (res !== null && res !== undefined) {
-                        console.log(res)
+                        // console.log(res)
                         this.menuPermission = res;
                     }
                 }
@@ -120,7 +120,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             shipmentType: null,
             emailAddress: null,
             firstShipmentDate: null,
-            paymentTermObh: null
+            paymentTermObh: null,
+            debitAmount: 0
         });
         this.formContractPopup.files = null;
         this.formContractPopup.fileList = null;

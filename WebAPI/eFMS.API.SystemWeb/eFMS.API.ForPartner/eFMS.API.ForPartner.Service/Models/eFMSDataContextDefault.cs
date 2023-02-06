@@ -63,6 +63,11 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.AcctManagementId)
+                    .HasColumnName("AcctManagementID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.BillingNo)
                     .HasMaxLength(30)
                     .IsUnicode(false);
@@ -960,6 +965,10 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.SurchargeId).IsUnicode(false);
 
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Type)
                     .HasMaxLength(15)
                     .IsUnicode(false);
@@ -969,6 +978,12 @@ namespace eFMS.API.ForPartner.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.VoucherDate).HasColumnType("datetime");
+
+                entity.Property(e => e.VoucherNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
@@ -1458,6 +1473,8 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
+                entity.Property(e => e.Offices).HasMaxLength(250);
+
                 entity.Property(e => e.ProductDept)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1547,7 +1564,7 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
 
                 entity.Property(e => e.EmailAddress)
-                    .HasMaxLength(50)
+                    .HasMaxLength(1000)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");

@@ -2,6 +2,7 @@
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -61,10 +62,10 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="type">type=BUY/SELL/OBH</param>
         /// <param name="transactionType">transactionType=AI/AE/SFE/SFI/SLE/SLI/SCE/SCI</param>
         /// <returns></returns>
-        [HttpGet("GetBy")]
-        public IActionResult GetBy(string type, string transactionType)
+        [HttpPost("GetBy")]
+        public IActionResult GetBy(CatStandardChargeCriteria criteria)
         {
-            var data = catStandardChargeService.GetBy(type, transactionType);
+            var data = catStandardChargeService.GetBy(criteria);
             return Ok(data);
         }
         /// <summary>
@@ -99,7 +100,7 @@ namespace eFMS.API.Catalogue.Controllers
                         ServiceType = worksheet.Cells[row, 9].Value?.ToString().Trim(),
                         Office = worksheet.Cells[row, 10].Value?.ToString().Trim(),
                         Notes = worksheet.Cells[row, 11].Value?.ToString().Trim(),
-                        UnitId = short.Parse(worksheet.Cells[row, 12].Value?.ToString().Trim()),
+                        UnitCode = worksheet.Cells[row, 12].Value?.ToString().Trim(),
                         QuantityType = worksheet.Cells[row, 13].Value?.ToString().Trim()
 
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -1308,6 +1310,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
@@ -1949,6 +1952,10 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                 entity.Property(e => e.ObjectId)
                     .HasColumnName("ObjectID")
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SyncStatus)
+                    .HasMaxLength(10)
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);

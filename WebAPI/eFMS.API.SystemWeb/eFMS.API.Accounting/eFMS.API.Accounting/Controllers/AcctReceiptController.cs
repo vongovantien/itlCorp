@@ -22,6 +22,8 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using eFMS.API.Common.Helpers;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using eFMS.API.Infrastructure.RabbitMQ;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -35,11 +37,12 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IAcctReceiptService acctReceiptService;
         private readonly ICurrentUser currentUser;
         private readonly IOptions<ApiUrl> apiServiceUrl;
-
+        private readonly IRabbitBus _busControl; 
 
         public AcctReceiptController(IStringLocalizer<LanguageSub> localizer,
             ICurrentUser curUser,
             IOptions<ApiUrl> _apiServiceUrl,
+            IRabbitBus _bus,
            IAcctReceiptService acctReceipt)
         {
             stringLocalizer = localizer;
@@ -154,7 +157,11 @@ namespace eFMS.API.Accounting.Controllers
             {
                 Response.OnCompleted(async () =>
                 {
-                    await acctReceiptService.CalculatorReceivableForReceipt(id);
+                    var modelReceivableList = acctReceiptService.GetListReceivableReceipt(id);
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
+                    }                    
                 });
             }
             return Ok(result);
@@ -268,16 +275,20 @@ namespace eFMS.API.Accounting.Controllers
                     result = new ResultHandle { Status = false, Message = "Save Receipt fail" };
                     break;
             }
-            
+
             if (!hs.Success)
             {
                 return BadRequest(result);
             }
-            else if(saveAction == SaveAction.SAVECANCEL || saveAction == SaveAction.SAVEDONE)
-            {                
+            else if (saveAction == SaveAction.SAVECANCEL || saveAction == SaveAction.SAVEDONE)
+            {
                 Response.OnCompleted(async () =>
                 {
-                    await acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
+                    var modelReceivableList = acctReceiptService.GetListReceivableReceipt(receiptModel.Id);
+                    if(modelReceivableList.Count > 0)
+                    {
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
+                    }
                     if (saveAction == SaveAction.SAVEDONE && !string.IsNullOrEmpty(receiptModel.NotifyDepartment))
                     {
                         List<int> deptIds = receiptModel.NotifyDepartment.Split(",").Select(x => Int32.Parse(x)).Distinct().ToList();
@@ -285,6 +296,18 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     await CalculateOverDueAsync(new List<string>() { receiptModel.CustomerId });
                 });
+            }
+            if (saveAction == SaveAction.SAVEDRAFT_ADD || saveAction == SaveAction.SAVEDRAFT_UPDATE || saveAction == SaveAction.SAVEDONE)
+            {
+                // Cập nhật cấn trừ debit
+                if (receiptModel.Type == "Agent")
+                {
+                    var hsDebit = acctReceiptService.UpdateAccountingDebitAR(receiptModel.Payments, saveAction);
+                    if (!hsDebit.Success)
+                    {
+                        new LogHelper("eFMS_SaveReceipt_UpdateDebitAR_LOG", hsDebit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
+                    }
+                }
             }
             return Ok(result);
         }
@@ -311,7 +334,11 @@ namespace eFMS.API.Accounting.Controllers
 
                 Response.OnCompleted(async () =>
                 {
-                    await acctReceiptService.CalculatorReceivableForReceipt(receiptId);
+                    var modelReceivableList = acctReceiptService.GetListReceivableReceipt(receiptId);
+                    if (modelReceivableList.Count > 0)
+                    {
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
+                    }
                     var receipt = acctReceiptService.First(x => x.Id == receiptId);
                     if(receipt != null)
                     {
@@ -460,8 +487,9 @@ namespace eFMS.API.Accounting.Controllers
                                 && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd))
                                 )
                 {
-                    List<ReceiptInvoiceModel> invalidPayments = payments.Where(x => x.Type == "DEBIT" && x.TotalPaidVnd > 0
-                    && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd)).ToList();
+                    List<ReceiptInvoiceModel> invalidPayments = model.Type.ToLower() == "customer" ?
+                        payments.Where(x => x.Type == "DEBIT" && x.TotalPaidVnd > 0 && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd)).ToList() :
+                        payments.Where(x => x.Type == "DEBIT" && x.TotalPaidUsd > 0 && x.TotalPaidUsd > x.UnpaidAmountUsd).ToList();
                     List<string> messages = new List<string>();
                     if (invalidPayments.Count > 0)
                     {

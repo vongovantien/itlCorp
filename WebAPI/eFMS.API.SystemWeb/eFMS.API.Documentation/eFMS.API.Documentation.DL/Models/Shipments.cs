@@ -15,6 +15,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string Service { get; set; }
         public string LockedLog { get; set; }
         public string CustomNo { get; set; }
+        public Guid OfficeId { get; set; }
 
     }
 }

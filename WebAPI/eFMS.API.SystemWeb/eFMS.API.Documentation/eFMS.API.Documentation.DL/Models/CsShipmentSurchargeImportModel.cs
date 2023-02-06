@@ -9,6 +9,7 @@ namespace eFMS.API.Documentation.DL.Models
     {
         public string HBLNoError { get; set; }
         public string MBLNoError { get; set; }
+        public string ClearanceNoError { get; set; }
         public string PartnerCode { get; set; }
         public string PartnerCodeError { get; set; }
         public string ObhPartner { get; set; }

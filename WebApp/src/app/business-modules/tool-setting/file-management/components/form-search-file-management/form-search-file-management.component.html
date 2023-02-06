@@ -1,22 +1,83 @@
-<div class="row pl-5 py-1">
-    <div class="col-md-8">
-        <form [formGroup]="formSearch" (ngSubmit)="onClickSearch()">
-            <div class="input-group m-input m-input--square-group m-input m-input--square-group--square">
-                <input type="text" class="form-control" placeholder="Input text to search..." formControlName="name"
-                    (keyup)="onClickSearch()">
-                <div class="input-group-append">
-                    <button class="btn btn-primary" type="submit" title="Search">
-                        <i class="la la-search"></i>
-                    </button>
-                    &nbsp;&nbsp;&nbsp;
-                    <button class="btn btn-default" type="reset" title="Reset" (click)="resetSearch()">
-                        <i class="la la-refresh"></i> Reset
-                    </button>
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div [formGroup]="formSearchFile" class="m-form m-form--state">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label required>Reference No</label>
+                        <ng-select formControlName="searchType" [items]="referenceTypes" class="custom"
+                            bindLabel="title" bindValue="value" [clearable]="false">
+                        </ng-select>
+                        <textarea [rows]="4" class="form-control" formControlName="referenceNo" required></textarea>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="">Date</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
+                                        [alwaysShowCalendars]="true" name="daterange" placeholder="From date - to date"
+                                        formControlName="date" [allowRemove]="false" />
+                                    <span class="m-input-icon__icon m-input-icon__icon--right">
+                                        <span>
+                                            <i class="la la-calendar"></i>
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="">Date Mode</label>
+                                <ng-select formControlName="dateMode" [items]="dateModes" class="custom"
+                                    bindLabel="title" bindValue="value" [clearable]="false">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6" *ngIf="isAcc">
+                            <div class="form-group">
+                                <label>Accountant Type</label>
+                                <ng-select formControlName="accountantType" [items]="accountantTypes" class="custom"
+                                    (add)="selelectedSelect($event)" bindLabel="title" [multiple]="true"
+                                    bindValue="value" [clearable]="false">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6" *ngIf="!isAcc">
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label></label>
+                                <div class="row">
+                                    <div class="col-lg-12 m--align-right">
+                                        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
+                                            (click)="submitSearch(formSearchFile.value)">
+                                            <span>
+                                                <i class="la la-search"></i>
+                                                <span>
+                                                    Search
+                                                </span>
+                                            </span>
+                                        </button>
+                                        <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase"
+                                            (click)="submitReset()">
+                                            <span>
+                                                <i class="la la-refresh"></i>
+                                                <span>
+                                                    Reset
+                                                </span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </form>
-    </div>
-    <div class="col-md-4 text-center">
-        <button class="btn btn-success"><i class="la la-upload"></i>Upload Files</button>
+        </div>
     </div>
 </div>

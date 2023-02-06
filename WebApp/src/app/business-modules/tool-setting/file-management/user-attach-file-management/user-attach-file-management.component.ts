@@ -69,7 +69,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
     }
 
     getDocumentType(transactionType: string, billingId: string) {
-        this._systemFileRepo.getDocumentType(transactionType, billingId)
+        this._systemFileRepo.getDocumentType(transactionType)
             .subscribe(
                 (res: any[]) => {
                     this.documentTypes = res;

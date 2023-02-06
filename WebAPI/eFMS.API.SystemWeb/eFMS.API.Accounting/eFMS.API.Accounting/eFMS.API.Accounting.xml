@@ -358,7 +358,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IEDocService,eFMS.API.Accounting.DL.IService.IAcctAdvancePaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctAdvancePaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService)">
             <summary>
             Contructor
             </summary>
@@ -984,7 +984,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSOAService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService,eFMS.API.Accounting.DL.IService.IEDocService)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSOAService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService)">
             <summary>
             constructor
             </summary>
