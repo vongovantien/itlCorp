@@ -1482,6 +1482,7 @@ namespace eFMS.API.Documentation.DL.Services
             var listPartner = partnerRepository.Get(x => x.Active == true);
             var chargeData = catChargeRepository.Get(x => x.Active == true).ToLookup(x => x.Code);
             var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var customsDeclaration = customsDeclarationRepository.Get().ToLookup(x => x.ClearanceNo); ;
             string TypeCompare = string.Empty;
             list.ForEach(item =>
             {
@@ -1492,12 +1493,17 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno) && x.Hwbno == item.Hblno))
-                    {
-                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
-                        item.IsValid = false;
+                    //if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno) && x.Hwbno == item.Hblno))
+                    //{
+                    //    item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
+                    //    item.IsValid = false;
 
-                    }
+                    //}
+                    if(!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno.Trim()) && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
+                    {
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST_OFFICE], item.Hblno, currentUser.OfficeCode);
+                        item.IsValid = false;
+                    }    
                 }
                 if (string.IsNullOrEmpty(item.Mblno))
                 {
@@ -1506,9 +1512,14 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno)))
+                    //if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno)))
+                    //{
+                    //    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                    //    item.IsValid = false;
+                    //}
+                    if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno.Trim()) && x.OfficeId == currentUser.OfficeID))
                     {
-                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST_OFFICE], item.Mblno, currentUser.OfficeCode);
                         item.IsValid = false;
                     }
                     else if (!string.IsNullOrEmpty(item.Hblno) && !string.IsNullOrEmpty(item.Mblno))
@@ -1521,7 +1532,19 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     }
                 }
-
+                if (!string.IsNullOrEmpty(item.ClearanceNo))
+                {
+                    if (item.HBLNoError == null && item.MBLNoError == null)
+                    {
+                        var jobNoCurrent = opsTransaction.Where(job => job.Hwbno == item.Hblno.Trim() && job.Mblno == item.Mblno.Trim() && job.OfficeId == currentUser.OfficeID).FirstOrDefault().JobNo;
+                        var customNo = customsDeclaration[item.ClearanceNo.Trim()].Any(x => x.JobNo != null && x.JobNo == jobNoCurrent);
+                        if (!customNo)
+                        {
+                            item.ClearanceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CUSTOM_NO_NOT_EXIST_JOB], jobNoCurrent);
+                            item.IsValid = false;
+                        }
+                    }
+                }    
                 if (string.IsNullOrEmpty(item.PartnerCode))
                 {
                     item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTNER_CODE_EMPTY]);

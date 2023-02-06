@@ -44,7 +44,7 @@ export class AutoFormatCurrencyDirective {
     }
 
     private regexString(max?: number) {
-        return "^\\s*((\\d+(\\.\\d{0," + max + "})?)|((\\d*(\\.\\d{1," + max + "}))))\\s*$";
+        return "^\\-?\\s*((\\d+(\\.\\d{0," + max + "})?)|((\\d*(\\.\\d{1," + max + "}))))\\s*$";
     }
 
     ngOnInit(): void {
@@ -101,6 +101,11 @@ export class AutoFormatCurrencyDirective {
             this.isReadyClear = false;
             this.onInput(v);
         }
+        const value: string = this.el.value;
+        const next: string = value.concat(v.key);
+        if (v.key !== '-' && next && !this.check(next)) {
+            v.preventDefault();
+        }
     }
 
     @HostListener('input', ['$event'])
@@ -123,5 +128,8 @@ export class AutoFormatCurrencyDirective {
             .replace(/[^0-9.]+/g, '');
         this.el.value = '';
         document.execCommand('insertText', false, pastedInput);
+    }
+    private check(value: string) {
+        return String(value).match(new RegExp(this.regexString(5)));
     }
 }

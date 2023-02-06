@@ -189,7 +189,7 @@ namespace eFMS.API.Documentation.DL.Services
             var surcharges = csSurchargeRepository.Get(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.Hblid == HblId);
             if (surcharges.Count() == 0)
             {
-                return false;
+                return true; // Không có phí nếu hợp đồng prepaid trước đó false.
             }
 
             var hasIssuedDebit = surcharges.Any(x => string.IsNullOrEmpty(x.DebitNo));
