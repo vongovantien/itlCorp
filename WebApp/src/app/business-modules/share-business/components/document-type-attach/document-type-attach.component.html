@@ -4,7 +4,7 @@
             <div class="modal-header">
                 <h5 class="modal-title">Attachments Files</h5>
                 <button type="button" class="close" aria-label="Close"
-                    (click)="hide();resetForm(); isSubmitted = false;selectedtDocType=null">
+                    (click)="hide();resetForm(); isSubmitted = false;selectedDocType=null">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -56,7 +56,7 @@
                                                         disabled>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td *ngIf="typeFrom==='Settlement'||typeFrom==='Shipment'">
                                                 <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.docType||file
                                                         .docType===null)) }">
                                                     <!-- <select class="form-control" [(ngModel)]="file.docType"
@@ -77,11 +77,22 @@
                                                     </div>
                                                 </div>
                                             </td>
+                                            <td *ngIf="typeFrom==='SOA'">
+                                                <div class="form-group">
+                                                    <input class="form-control" [disabled]="true" type="text"
+                                                        [ngModel]="'SOA'">
+                                                </div>
+                                            </td>
+                                            <td *ngIf="typeFrom==='Advance'">
+                                                <div class="form-group">
+                                                    <input class="form-control" [disabled]="true" type="text"
+                                                        [ngModel]="'AD'">
+                                                </div>
+                                            </td>
                                             <ng-container *ngIf="typeFrom==='Settlement'">
                                                 <td>
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.payee||file
-                                                        .payee===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }"
+                                                    <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.payee||file.payee===null))
+                                                        &&(file.Code === 'INV' || file.Code === 'OBH_INV') }"
                                                         *ngIf="!file.payeeName;else payeeName">
                                                         <app-combo-grid-virtual-scroll [height]="150"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'payee')"
@@ -100,7 +111,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file.inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV')&&noINV===false }">
+                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file.inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV')&&file.noINV===false }">
                                                         <app-combo-grid-virtual-scroll [height]="150"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'inv')"
                                                             [dataSources]="payFirst[i]===true?invDataSourceUpdate[i]:invDataSource"
@@ -170,7 +181,7 @@
                 <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="uploadEDoc()">
                 </app-default-button>
                 <app-default-button [buttonSetting]="cancelButtonSetting"
-                    (onClick)="hide();resetForm();isSubmitted=false;selectedtDocType=null">
+                    (onClick)="hide();resetForm();isSubmitted=false;selectedDocType=null;cleanListFile()">
                 </app-default-button>
             </div>
         </div>
