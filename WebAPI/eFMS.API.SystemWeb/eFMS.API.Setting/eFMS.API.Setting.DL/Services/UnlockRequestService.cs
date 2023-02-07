@@ -136,7 +136,7 @@ namespace eFMS.API.Setting.DL.Services
             var result = new List<SetUnlockRequestJobModel>();
             if (criteria.JobIds != null && criteria.JobIds.Count > 0)
             {
-                var dataOps = opsTransactionRepo.Get(x => criteria.JobIds.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo) && x.OfficeId == currentUser.OfficeID).Select(s => new SetUnlockRequestJobModel()
+                var dataOps = opsTransactionRepo.Get(x => criteria.JobIds.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo) && x.OfficeId == currentUser.OfficeID && x.CurrentStatus != "Canceled").Select(s => new SetUnlockRequestJobModel()
                 {
                     UnlockName = s.JobNo,
                     Job = s.JobNo,

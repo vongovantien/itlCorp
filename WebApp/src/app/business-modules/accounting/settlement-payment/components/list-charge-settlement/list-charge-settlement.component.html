@@ -280,18 +280,15 @@
 <shipment-attach-file (onChange)="onChangeShipmentGroupAttachFile($event)" [readOnly]="readonly"></shipment-attach-file>
 
 <ng-container *ngIf="!readonly">
-
-    <existing-charge-popup (onRequest)="onRequestSurcharge($event)"></existing-charge-popup>
+    <existing-charge-popup (onRequest)="onRequestSurcharge($event)" *ngIf="!isDirectSettlement"></existing-charge-popup>
 
     <form-charge-popup (onRequest)="onRequestSurcharge($event)" [state]="stateFormCharge"
         (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>
 
     <copy-settlement-popup (onCopy)="onRequestSurcharge($event, true)"></copy-settlement-popup>
 
-    <table-list-charge-popup (onChange)="onRequestSurcharge($event)"
+    <table-list-charge-popup (onChange)="onRequestSurcharge($event)" *ngIf="!isExistingSettlement"
         (onUpdate)="onUpdateSurchargeFromTableChargeList($event)"></table-list-charge-popup>
-
-    <charge-form-shipment-popup (onUpdate)="onUpdateChargeFromShipment($event)"></charge-form-shipment-popup>
 
 </ng-container>
 

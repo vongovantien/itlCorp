@@ -2,10 +2,10 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { AccountingRepo, DocumentationRepo } from 'src/app/shared/repositories';
 import { Surcharge } from 'src/app/shared/models';
-import { catchError, map, finalize } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from 'src/app/shared/services';
+import { forkJoin, Observable, of } from 'rxjs';
 
 @Component({
     selector: 'copy-settlement-popup',
@@ -33,13 +33,10 @@ export class SettlementFormCopyPopupComponent extends PopupBase {
         private _accountingRepo: AccountingRepo,
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
-        private _progressService: NgProgress,
         private _sortService: SortService
 
     ) {
         super();
-
-        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit(): void {
@@ -91,18 +88,67 @@ export class SettlementFormCopyPopupComponent extends PopupBase {
             this._toastService.warning('Bạn chưa chọn lô hàng, bạn vui lòng chọn chọn lô hàng để copy !', `You don't select Shipment, Please select shipment to copy !`);
             return;
         }
-        this._progressRef.start();
         this._accountingRepo.copyChargeToShipment(body)
-            .pipe(catchError(err => this.catchError(err)), finalize(() => this._progressRef.complete()))
+            .pipe(
+                switchMap((res: any) => {
+                    if (!!res.length) {
+                        const obhCharges = res.filter(x => x.type === "OBH");
+                        if (!!obhCharges.length) {
+                            // const result = obhCharges.reduce((acc, curr) => {
+                            //     if (!acc[curr.paymentObjectId]) {
+                            //         acc[curr.paymentObjectId] = [];
+                            //     }
+                            //     acc[curr.paymentObjectId].push(curr);
+                            //     return acc;
+                            // }, {} as { [key: string]: any[] });
+
+                            // const groupPartners = Object.entries(result).map(([paymentObjectId, charges]) => {
+                            //     return {
+                            //         paymentObjectId,
+                            //         charges: charges
+                            //     };
+                            // });
+
+                            const checkPointCriterias: any[] = obhCharges.map(x => ({
+                                partnerId: x.paymentObjectId,
+                                hblId: x.hblid,
+                                transactionType: x.typeService === 'OPS' ? "CL" : 'DOC',
+                                settlementCode: null
+                            }));
+                            const sourceValidate: Observable<any>[] = checkPointCriterias.map(criteria => this._documentRepo.validateCheckPointContractPartner(criteria));
+
+                            return forkJoin(sourceValidate)
+                                .pipe(
+                                    map((values: CommonInterface.IResult[]) => {
+                                        console.log(values);
+                                        const isSucces = values.every(x => x.status);
+                                        return isSucces ? res : false;
+                                    })
+                                );
+                        }
+                    }
+                    return of(res);
+                }),
+                map((value) => {
+                    if (value === false) {
+                        return [];
+                    }
+                    return value;
+                })
+
+            )
             .subscribe(
                 (res: any) => {
+                    if (res === false) {
+                        return;
+                    }
                     if (!!res.length) {
                         this.onCopy.emit(res);
                         this.closePopup();
                     }
-                },
-                (errors: any) => {
-                },
+                }, (error => {
+                    console.log(error);
+                })
             );
     }
 
