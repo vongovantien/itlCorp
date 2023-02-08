@@ -14,7 +14,8 @@ namespace eFMS.API.Accounting.Service.Contexts
                     options =>
                     {
                         options.UseRowNumberForPaging();
-                    });
+                    })
+                    .EnableSensitiveDataLogging();
             }
         }
         public override int SaveChanges()
