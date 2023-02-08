@@ -2822,40 +2822,13 @@ namespace eFMS.API.Documentation.DL.Services
             return soas;
         }
 
-        private IQueryable<InvoiceListModel> GetChargeNotSoaFromSettle(CDNoteCriteria criteria)
+        private IQueryable<InvoiceListModel> GetChargeNotSoaFromSettle()
         {
             var settlePayments = acctSettlementPaymentRepository.Where(x => x.StatusApproval == DocumentConstants.STATUS_APPROVAL_DONE);
-            var charges = surchargeRepository.Where(x => string.IsNullOrEmpty(x.Soano) && string.IsNullOrEmpty(x.CreditNo) && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE));
+            var charges = surchargeRepository.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.Soano)
+                && string.IsNullOrEmpty(x.CreditNo) && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE));
 
-            charges = charges.Where(x => ((string.IsNullOrEmpty(criteria.CreatorId) || x.UserCreated == criteria.CreatorId)));
-
-            if (!string.IsNullOrEmpty(criteria.PartnerId))
-            {
-                settlePayments = settlePayments.Where(x => x.Payee == criteria.PartnerId);
-            }
-            if (!string.IsNullOrEmpty(criteria.ReferenceNos))
-            {
-                IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
-                {
-                    settlePayments = settlePayments.Where(x => refNos.Any(a => a == x.SettlementNo));
-                }
-            }
-            if (string.IsNullOrEmpty(criteria.ReferenceNos)
-              && string.IsNullOrEmpty(criteria.PartnerId)
-              && criteria.IssuedDate == null
-              && string.IsNullOrEmpty(criteria.CreatorId)
-              && string.IsNullOrEmpty(criteria.Type)
-              && string.IsNullOrEmpty(criteria.Status)
-              && criteria.FromExportDate == null
-              && criteria.ToExportDate == null
-              )
-            {
-                var maxDate = charges.Max(x => x.DatetimeCreated) ?? DateTime.Now;
-                var minDate = maxDate.AddMonths(-1); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
-                charges = charges.Where(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
-            }
-
-            var accMangData = accountingManagementRepository.Get(x => string.IsNullOrEmpty(criteria.PartnerId) || x.PartnerId == criteria.PartnerId);
+            var accMangData = accountingManagementRepository.Get();
             var transactionData = cstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
             var transactionDetailData = trandetailRepositoty.Get();
             var opstransactionData = opstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
@@ -2886,11 +2859,11 @@ namespace eFMS.API.Documentation.DL.Services
                             Creator = chg.UserCreated,
                             Status = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) != null ? "Issued" : "New",
                             InvoiceNo = chg.InvoiceNo,
-                            VoucherId = chg.VoucherId,
+                            VoucherId = chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.VoucherIdre : chg.VoucherId,
                             IssuedStatus = (!string.IsNullOrEmpty(chg.InvoiceNo) && chg.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(chg.VoucherId) && (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) != null) ? "Issued Voucher" : "New",
                             DatetimeModified = chg.DatetimeModified,
                             DatetimeCreated = chg.DatetimeCreated,
-                            VoucherIddate = chg.VoucherIddate,
+                            VoucherIddate = chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.VoucherIdredate : chg.VoucherIddate,
                             CodeNo = chg.Type == "Debit" ? chg.DebitNo : chg.CreditNo,
                             ChargeId = chg.Id,
                             CodeType = chg.Type == "Debit" ? "DEBIT" : "CREDIT",
@@ -2903,6 +2876,12 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return null;
             }
+            var hs = query.ToList().GroupBy(g => new
+            {
+                g.HBLId,
+                g.VoucherId,
+                g.SoaNo,
+            });
 
             var result = query.ToList().GroupBy(g => new
             {
@@ -3906,7 +3885,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var cdNoteData = GetDataCdNote(criteria);
             var soaData = GetDataSoaNotIssuedCdNote(criteria);
-            var chargeNotSoa = GetChargeNotSoaFromSettle(criteria);
+            var chargeNotSoa = GetChargeNotSoaFromSettle();
 
             if (cdNoteData == null && soaData == null && chargeNotSoa == null)
             {
