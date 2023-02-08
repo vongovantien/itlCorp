@@ -210,7 +210,16 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
     onChangePaymentMethod(method: string) {
         if (method !== 'Cash') {
-            this.getBankAccountPayee(true);
+            if (!this.payee.value) {
+                this.bankAccountName.setValue(this.userLogged.nameVn || null);
+                this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
+                this.bankName.setValue(this.userLogged.bankName || null);
+                this.bankCode.setValue(this.userLogged.bankCode || null);
+            } else {
+                const partner = this.getPartnerById(this.payee.value);
+                this.selectedPayee = partner;
+                this.getBankAccountPayee(true);
+            }
         }
         else {
             this.bankAccountName.setValue(null);
@@ -244,8 +253,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                             }
                         }
                         else {
-                            const partner = this.getPartnerById(this.payee.value)
-                            this.setBankInfoForPayee(partner);
+                            this.setBankInfoForPayee(this.selectedPayee);
                         }
                     })
         }
