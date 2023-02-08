@@ -548,7 +548,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserCreated = x.UserCreated,
                         UserFileName = x.Name,
                         UserModified = x.UserModified,
-                        DocumentTypeName = "Other"
+                        DocumentTypeName = "Other",
                     };
                     lstEdocOT.Add(edoc);
                 });
@@ -612,7 +612,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             Source = x.FirstOrDefault()?.Source,
                             AccountingType = x.FirstOrDefault()?.AccountingType,
                             DatetimeCreated = x.FirstOrDefault()?.DatetimeCreated,
-                            Note = x.Count() > 1 ? null : x.FirstOrDefault()?.Note,
+                            Note = x.FirstOrDefault()?.Note,
                             Id = x.FirstOrDefault().Id,
                         };
                         lstEdocModel.Add(edoc);
@@ -691,7 +691,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserCreated = x.FirstOrDefault().UserCreated,
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
-                        Note = x.Count() > 1 ? null : x.FirstOrDefault().Note,
+                        Note =  x.FirstOrDefault().Note,
                         HBLNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
                         JobNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
                     };
@@ -768,7 +768,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserCreated = x.FirstOrDefault().UserCreated,
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
-                        Note = x.Count() > 1 ? null : x.FirstOrDefault().Note,
+                        Note = x.FirstOrDefault().Note,
                         HBLNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
                         JobNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
                     };
