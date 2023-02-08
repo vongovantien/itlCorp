@@ -78,6 +78,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsTransactionDetail> transactionDetailRepository;
         private readonly ICsShipmentSurchargeService csShipmentSurchargeServe;
         private readonly ICsTransactionService csTransactionServe;
+        readonly IContextBase<SysOffice> sysOfficeRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
         private IDatabaseUpdateService databaseUpdateService;
@@ -120,6 +121,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsLinkCharge> csLinkChargeRepo,
             IContextBase<CatDepartment> departmentRepo,
             IContextBase<CsShipmentSurcharge> surChargeRepo,
+            IContextBase<SysOffice> sysOfficeRepo,
             IContextBase<SysGroup> groupRepo,
             IDatabaseUpdateService _databaseUpdateService,
             IAccAccountReceivableService accAccountReceivable,
@@ -171,6 +173,7 @@ namespace eFMS.API.Documentation.DL.Services
             accMngtRepo = accMngt;
             apiUrl = aUrl;
             csStageAssignedService = csStageAssigned;
+            sysOfficeRepository = sysOfficeRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1630,9 +1633,9 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new FormPLsheetReportParameter
             {
                 Contact = currentUser.UserName,
-                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyName = sysOfficeRepository.Get(x => x.Id == shipment.OfficeId).FirstOrDefault().BranchNameEn,
                 CompanyDescription = string.Empty,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress1 = sysOfficeRepository.Get(x => x.Id == shipment.OfficeId).FirstOrDefault().AddressEn,
                 CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
                 Website = DocumentConstants.COMPANY_WEBSITE,
                 CurrDecimalNo = 2,
