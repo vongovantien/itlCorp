@@ -5547,7 +5547,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
                 if (isExistAdvRow)
                 {
-                    excel.StartDetailTable = 8;
+                    excel.StartDetailTable = isExistDetail ? 8 : 7;
                     excel.IndexOfGroup = 2;
                     excel.SetGroupsTable();
                 }
