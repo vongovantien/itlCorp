@@ -149,7 +149,7 @@
                     <ng-container *ngIf="!readonlyForm; else payeeTpl">
                         <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:payee.value}"
                             (itemSelected)="payee.setValue($event.id); onSelectPayee($event)"
-                            [dataSources]="customers | async" [displayFields]="[
+                            [dataSources]="customers" [displayFields]="[
                         { field: 'shortName', label: 'Name ABBR' },
                         { field: 'partnerNameEn', label: 'Name EN' },
                         { field: 'taxCode', label: 'Tax Code' }]" [selectedDisplayFields]="['shortName']"

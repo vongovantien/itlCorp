@@ -41,7 +41,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     advanceForDatas: string[] = ["HBL"]; // update MBL sau , "MBL"
 
     users: Observable<User[]>;
-    customers: Observable<Partner[]>;
+    customers: Partner[];
 
     formCreate: FormGroup;
     advanceNo: AbstractControl;
@@ -96,8 +96,11 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
         this.banks = this._store.select(getCatalogueBankState);
         this.users = this._systemRepo.getListSystemUser();
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
-
+        this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL).subscribe(
+            (data) => {
+                this.customers = data;
+            }
+        );
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((u) => {
@@ -198,29 +201,22 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         }
     }
 
+    changeAdvanceFor(data: any) {
+        if (!!data) {
+            console.log('changeAdvanceFor', data)
+            this.onChangeAdvanceFor.emit(data);
+        }
+    }
+
     onChangePaymentMethod(method: string) {
         if (method !== 'Cash') {
-            if (!this.payee.value) {
-                this.bankAccountName.setValue(this.userLogged.nameVn || null);
-                this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
-                this.bankName.setValue(this.userLogged.bankName || null);
-                this.bankCode.setValue(this.userLogged.bankCode || null);
-            } else if (!!this.selectedPayee) {
-                this.getBankAccountPayee(true);
-            }
+            this.getBankAccountPayee(true);
         }
         else {
             this.bankAccountName.setValue(null);
             this.bankAccountNo.setValue(null);
             this.bankName.setValue(null);
             this.bankCode.setValue(null);
-        }
-    }
-
-    changeAdvanceFor(data: any) {
-        if (!!data) {
-            console.log('changeAdvanceFor', data)
-            this.onChangeAdvanceFor.emit(data);
         }
     }
 
@@ -248,10 +244,16 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                             }
                         }
                         else {
-                            this.setBankInfoForPayee(this.selectedPayee);
+                            const partner = this.getPartnerById(this.payee.value)
+                            this.setBankInfoForPayee(partner);
                         }
                     })
         }
+    }
+
+    getPartnerById(id: string) {
+        const partner: Partner = !this.customers ? null : this.customers.find((p: Partner) => p.id === id);
+        return partner || null;
     }
 
     setBankInfoForPayee(payee: Partner) {
