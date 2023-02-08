@@ -42,6 +42,9 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysOffice> sysOfficeRepository;
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         private readonly IContextBase<CsTransactionDetail> csTransactionDetailRepository;
+        private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepository;
+        private readonly IContextBase<AccAccountPayable> accountPayableRepository;
+        private readonly IContextBase<AcctCreditManagementAr> creditManagementArRepository;
 
         public AccAccountingPaymentService(IContextBase<AccAccountingPayment> repository,
             IMapper mapper,
@@ -61,6 +64,9 @@ namespace eFMS.API.Accounting.DL.Services
              IContextBase<SysOffice> sysOfficeRepo,
              IContextBase<OpsTransaction> opsTransactionRepo,
              IContextBase<CsTransactionDetail> csTransactionDetailRepo,
+             IContextBase<AcctSettlementPayment> settlementPaymentRepo,
+             IContextBase<AccAccountPayable> accountPayableRepo,
+             IContextBase<AcctCreditManagementAr> creditManagementArRepo,
             ICurrentUser currUser) : base(repository, mapper)
         {
             userRepository = userRepo;
@@ -80,6 +86,9 @@ namespace eFMS.API.Accounting.DL.Services
             sysOfficeRepository = sysOfficeRepo;
             opsTransactionRepository = opsTransactionRepo;
             csTransactionDetailRepository = csTransactionDetailRepo;
+            settlementPaymentRepository = settlementPaymentRepo;
+            accountPayableRepository = accountPayableRepo;
+            creditManagementArRepository = creditManagementArRepo;
         }
 
         public IQueryable<AccAccountingPaymentModel> GetBy(string refNo, string type, string invoiceNo)
@@ -123,16 +132,17 @@ namespace eFMS.API.Accounting.DL.Services
         public IQueryable<AccountingPaymentModel> Paging(PaymentCriteria criteria, int page, int size, out int rowsCount)
         {
             criteria.IsPaging = true;
+            criteria.Size = page * size;
             var data = Query(criteria);
             //var _totalItem = data.Select(s => s.RefId).Distinct().Count();
             //rowsCount = (_totalItem > 0) ? _totalItem : 0;
             var _totalItem = 0;
             if (size > 0)
             {
-                if (data != null)
-                {
-                    data = data.Take(page * size);
-                }
+                //if (data != null)
+                //{
+                //    data = data.Take(page * size);
+                //}
 
                 if (page < 1)
                 {
@@ -544,21 +554,16 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         private IQueryable<AccountingPaymentModel> GetCreditDataPayment(PaymentCriteria criteria)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
-            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            if (rangeSearch == PermissionRange.None) return null;
-            Expression<Func<AccAccountingPayment, bool>> perQuery = GetQueryADVPermission(rangeSearch, _user);
             var results = new List<AccountingPaymentModel>();
-            Expression<Func<AccAccountingPayment, bool>> query = x => (x.PaymentType == "CREDIT" && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId)));
-            if (criteria.IssuedDate != null)
-            {
-                //query = query.And(x => false);
-                return null;
-            }
-            if (criteria.DueDate != null)
-            {
-                query = query.And(x => false);
-            }
+            //Expression<Func<AccAccountingPayment, bool>> query = x => (x.PaymentType == "CREDIT" && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId)));
+            //if (criteria.IssuedDate != null)
+            //{
+            //    //query = query.And(x => false);
+            //}
+            //if (criteria.DueDate != null)
+            //{
+            //    query = query.And(x => false);
+            //}
             //switch (criteria.OverDueDays)
             //{
             //    case Common.OverDueDate.Between1_15:
@@ -568,139 +573,300 @@ namespace eFMS.API.Accounting.DL.Services
             //        query = query.And(x => false);
             //        break;
             //}
-            if (criteria.OverDueDays != OverDueDate.All)
-            {
-                return null;
-            }
-            if (perQuery != null)
-            {
-                query = query.And(perQuery);
-            }
-            var paymentData = DataContext.Get(query);
-            var partners = partnerRepository.Get().Select(x => new { x.Id, x.ShortName });
-            var querySoa = SoaCreditExpressionQuery(criteria);
-            var soaData = soaRepository.Get(querySoa).Select(x => new { x.Id, x.Soano, x.Customer, x.NetOff, x.Currency, x.CreditAmount, x.DatetimeModified });
-            var queryCdNote = CreditNoteExpressionQuery(criteria);
-            var cdNoteData = cdNoteRepository.Get(queryCdNote).Select(x => new { x.Id, x.Code, x.PartnerId, x.NetOff, x.Total, x.CurrencyId, x.DatetimeModified });
-            var surchargeData = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.VoucherId) || !string.IsNullOrEmpty(x.VoucherIdre)).Select(x => new { x.Type, x.CreditNo, x.PaySoano, x.InvoiceNo, x.VoucherId, x.VoucherIdre, x.AmountVnd, x.VatAmountVnd, x.AmountUsd, x.VatAmountUsd });
-            if(criteria.IsPaging == true)
-            {
-                soaData = soaData.Take(50);
-                cdNoteData = cdNoteData.Take(50);
-            }
+            //if (criteria.OverDueDays != OverDueDate.All)
+            //{
+            //    return null;
+            //}
+            //if (perQuery != null)
+            //{
+            //    query = query.And(perQuery);
+            //}
+            //var paymentData = DataContext.Get(query);
+            var partners = partnerRepository.Get(x => x.Active == true && x.PartnerType != "Supplier");
+            //var querySoa = SoaCreditExpressionQuery(criteria);
+            //var soaData = soaRepository.Get(querySoa).Take(criteria.Size ?? 1).Select(x => new { x.Id, x.Soano, x.Customer, x.NetOff, x.Currency, x.CreditAmount, x.DatetimeModified });
+            //var queryCdNote = CreditNoteExpressionQuery(criteria);
+            //var cdNoteData = cdNoteRepository.Get(queryCdNote).Take(criteria.Size ?? 1).Select(x => new { x.Id, x.Code, x.PartnerId, x.NetOff, x.Total, x.CurrencyId, x.DatetimeModified });
 
-            var creditSoaData = (from soa in soaData
-                                 join surcharge in surchargeData on soa.Soano equals surcharge.PaySoano
-                                 join payments in paymentData on soa.Id equals payments.RefId into grpPayment
-                                 from payment in grpPayment.DefaultIfEmpty()
-                                 join partner in partners on soa.Customer equals partner.Id into grpPartners
-                                 from part in grpPartners.DefaultIfEmpty()
-                                 select new
-                                 {
-                                     BillingRefNo = soa.Soano,
-                                     Type = payment == null ? "CREDIT" : payment.Type,
-                                     PartnerId = part.Id,
-                                     part.ShortName,
-                                     soa.NetOff,
-                                     soa.Currency,
-                                     VoucherId = surcharge.Type == "OBH" ? surcharge.VoucherIdre : surcharge.VoucherId,
-                                     Amount = soa.CreditAmount,
-                                     TotalAmountVnd = (surcharge.AmountVnd ?? 0) + (surcharge.VatAmountVnd ?? 0),
-                                     TotalAmountUsd = (surcharge.AmountUsd ?? 0) + (surcharge.VatAmountUsd ?? 0),
-                                     InvoiceNo = payment == null ? surcharge.InvoiceNo : payment.InvoiceNo,
-                                     PaidAmount = payment == null ? 0 : payment.PaymentAmount,
-                                     PaidAmountVnd = payment == null ? 0 : payment.PaymentAmountVnd,
-                                     PaidAmountUsd = payment == null ? 0 : payment.PaymentAmountUsd,
-                                     UnpaidAmount = payment == null ? soa.CreditAmount : (soa.Currency == AccountingConstants.CURRENCY_LOCAL ? (payment.UnpaidPaymentAmountVnd ?? 0) : (payment.UnpaidPaymentAmountUsd ?? 0)),
-                                     UnpaidAmountVnd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountVnd ?? 0),
-                                     UnpaidAmountUsd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountUsd ?? 0),
-                                     PaidDate = payment == null ? null : payment.PaidDate,
-                                     ReceiptId = payment == null ? null : payment.ReceiptId,
-                                     DatetimeSorting = soa.DatetimeModified
-                                 });
+            //var surchargeData = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.VoucherId) || !string.IsNullOrEmpty(x.VoucherIdre));//.Select(x => new { x.Type, x.CreditNo, x.PaySoano, x.InvoiceNo, x.VoucherId, x.VoucherIdre, x.AmountVnd, x.VatAmountVnd, x.AmountUsd, x.VatAmountUsd });
+            //var surchargeSettle = surchargeData.Where(x => x.PaySyncedFrom == "SETTLEMENT" || x.PaySyncedFrom == "SETTLEMENT");
 
-            var creditNoteData = (from cdNote in cdNoteData
-                                  join surcharge in surchargeData on cdNote.Code equals surcharge.CreditNo
-                                  join payments in paymentData on cdNote.Id.ToString() equals payments.RefId into grpPayment
-                                  from payment in grpPayment.DefaultIfEmpty()
-                                  join partner in partners on cdNote.PartnerId equals partner.Id into grpPartners
-                                  from part in grpPartners.DefaultIfEmpty()
-                                  select new
-                                  {
-                                      BillingRefNo = cdNote.Code,
-                                      Type = payment == null ? "CREDIT" : payment.Type,
-                                      PartnerId = part.Id,
-                                      part.ShortName,
-                                      cdNote.NetOff,
-                                      Currency = cdNote.CurrencyId,
-                                      VoucherId = surcharge.Type == "OBH" ? surcharge.VoucherIdre : surcharge.VoucherId,
-                                      Amount = cdNote.Total,
-                                      TotalAmountVnd = (surcharge.AmountVnd ?? 0) + (surcharge.VatAmountVnd ?? 0),
-                                      TotalAmountUsd = (surcharge.AmountUsd ?? 0) + (surcharge.VatAmountUsd ?? 0),
-                                      InvoiceNo = payment == null ? surcharge.InvoiceNo : payment.InvoiceNo,
-                                      PaidAmount = payment == null ? 0 : payment.PaymentAmount,
-                                      PaidAmountVnd = payment == null ? 0 : payment.PaymentAmountVnd,
-                                      PaidAmountUsd = payment == null ? 0 : payment.PaymentAmountUsd,
-                                      UnpaidAmount = payment == null ? cdNote.Total : cdNote.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (payment.UnpaidPaymentAmountVnd ?? 0) : (payment.UnpaidPaymentAmountUsd ?? 0),
-                                      UnpaidAmountVnd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountVnd ?? 0),
-                                      UnpaidAmountUsd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountUsd ?? 0),
-                                      PaidDate = payment == null ? null : payment.PaidDate,
-                                      ReceiptId = payment == null ? null : payment.ReceiptId,
-                                      DatetimeSorting = cdNote.DatetimeModified
-                                  });
-            var data = (creditSoaData.Concat(creditNoteData)).ToList();
-            var resultGroups = data.GroupBy(x => new
-            {
-                x.BillingRefNo,
-                x.Type,
-                x.PartnerId,
-                x.ShortName,
-            }).Select(x => new { grp = x.Key, payment = x.Select(z => new { z.NetOff, z.VoucherId, z.PaidDate, z.InvoiceNo, z.ReceiptId, z.Amount, z.TotalAmountVnd, z.TotalAmountUsd, z.Currency, z.PaidAmount, z.PaidAmountVnd, z.PaidAmountUsd, z.UnpaidAmount, z.UnpaidAmountVnd, z.UnpaidAmountUsd, z.DatetimeSorting }) });
-            foreach (var item in resultGroups)
-            {
-                var payment = new AccountingPaymentModel();
-                var acctPayment = item.payment.FirstOrDefault();
-                payment.RefNo = item.grp.BillingRefNo;
-                payment.ReceiptId = acctPayment.ReceiptId;
-                payment.PaidDate = acctPayment.PaidDate;
-                payment.Type = "NETOFF";
-                payment.PartnerId = item.grp.PartnerId;
-                payment.InvoiceNoReal = acctPayment.InvoiceNo;
-                payment.PartnerName = item.grp.ShortName;
-                payment.Amount = acctPayment.Amount ?? 0;
-                payment.TotalAmountVnd = item.payment.Sum(x => x.TotalAmountVnd);
-                payment.TotalAmountUsd = item.payment.Sum(x => x.TotalAmountUsd);
-                payment.Currency = acctPayment.Currency;
-                payment.PaidAmount = acctPayment.PaidAmount ?? 0;
-                payment.PaidAmountVnd = acctPayment.PaidAmountVnd ?? 0;
-                payment.PaidAmountUsd = acctPayment.PaidAmountUsd ?? 0;
-                payment.UnpaidAmount = acctPayment.UnpaidAmount;
-                payment.UnpaidAmountVnd = acctPayment.UnpaidAmountVnd == 0 ? payment.TotalAmountVnd : acctPayment.UnpaidAmountVnd;
-                payment.UnpaidAmountUsd = acctPayment.UnpaidAmountUsd == 0 ? payment.TotalAmountUsd : acctPayment.UnpaidAmountUsd;
-                payment.Status = acctPayment.NetOff == true ? "Paid" : "Unpaid";
-                payment.PaidDate = acctPayment.PaidDate;
-                payment.DatetimeSorting = acctPayment.DatetimeSorting;
-                results.Add(payment);
-            }
+            var payableDatas = QueryPayable(criteria);
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
                 if (criteria.SearchType == "ReceiptNo")
                 {
-                    var listReceiptInfo = acctReceiptRepository.Get(receipt => receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE && criteria.ReferenceNos.Contains(receipt.PaymentRefNo)).Select(x => x.Id).ToList();
-                    results = results.Where(x => listReceiptInfo.Any(z => z == x.ReceiptId)).ToList();
+                    return Enumerable.Empty<AccountingPaymentModel>().AsQueryable();
                 }
             }
             if (criteria.FromUpdatedDate != null)
             {
-                results = results.Where(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date).ToList();
+                payableDatas = payableDatas.Where(x => x.VoucherDate != null && x.VoucherDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.VoucherDate.Value.Date <= criteria.ToUpdatedDate.Value.Date);
+            }
+            if (criteria.IssuedDate != null)
+            {
+                return Enumerable.Empty<AccountingPaymentModel>().AsQueryable();
             }
             if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
             {
-                results = results.Where(x => criteria.PaymentStatus.Contains(x.Status ?? "Unpaid")).ToList();
+                payableDatas = payableDatas.Where(x => criteria.PaymentStatus.Contains(x.Status ?? "Unpaid"));
             }
-            return results.AsQueryable();
+
+            var creditData = (from payable in payableDatas
+                              join partner in partners on payable.PartnerId equals partner.Id
+                              select new
+                              {
+                                  RefId = payable.Id.ToString(),
+                                  BillingRefNo = payable.BillingNo,
+                                  Type = payable.BillingType,
+                                  PartnerId = partner.Id,
+                                  PartnerName = partner.ShortName,
+                                  Status = payable.Status,
+                                  Currency = payable.Currency,
+                                  VoucherNo = payable.VoucherNo,
+                                  Amount = payable.TotalAmount,
+                                  TotalAmountVnd = (payable.TotalAmountVnd ?? 0),
+                                  TotalAmountUsd = (payable.TotalAmountUsd ?? 0) ,
+                                  InvoiceNo = payable.InvoiceNo,
+                                  payable.InvoiceDate,
+                                  PaidAmount = payable.PaymentAmount ?? 0,
+                                  PaidAmountVnd = payable.PaymentAmountVnd ?? 0,
+                                  PaidAmountUsd = payable.PaymentAmountUsd ?? 0,
+                                  UnpaidAmount = (payable.RemainAmount ?? 0),
+                                  UnpaidAmountVnd = (payable.RemainAmountVnd ?? 0),
+                                  UnpaidAmountUsd = (payable.RemainAmountUsd ?? 0),
+                                  VoucherDate = payable.VoucherDate,
+                                  TransactionType = payable.TransactionType,
+                                  PaymentDueDate = payable.PaymentDueDate,
+                              });
+            #region delete old
+            //var creditSoaData = (from soa in soaData
+            //                     join surcharge in surchargeData on soa.Soano equals surcharge.PaySoano
+            //                     join payments in paymentData on soa.Id equals payments.RefId into grpPayment
+            //                     from payment in grpPayment.DefaultIfEmpty()
+            //                     join partner in partners on soa.Customer equals partner.Id into grpPartners
+            //                     from part in grpPartners.DefaultIfEmpty()
+            //                     select new
+            //                     {
+            //                         BillingRefNo = soa.Soano,
+            //                         Type = payment == null ? "CREDIT" : payment.Type,
+            //                         PartnerId = part.Id,
+            //                         part.ShortName,
+            //                         soa.NetOff,
+            //                         soa.Currency,
+            //                         VoucherId = surcharge.Type == "OBH" ? surcharge.VoucherIdre : surcharge.VoucherId,
+            //                         Amount = soa.CreditAmount,
+            //                         TotalAmountVnd = (surcharge.AmountVnd ?? 0) + (surcharge.VatAmountVnd ?? 0),
+            //                         TotalAmountUsd = (surcharge.AmountUsd ?? 0) + (surcharge.VatAmountUsd ?? 0),
+            //                         InvoiceNo = payment == null ? surcharge.InvoiceNo : payment.InvoiceNo,
+            //                         PaidAmount = payment == null ? 0 : payment.PaymentAmount,
+            //                         PaidAmountVnd = payment == null ? 0 : payment.PaymentAmountVnd,
+            //                         PaidAmountUsd = payment == null ? 0 : payment.PaymentAmountUsd,
+            //                         UnpaidAmount = payment == null ? soa.CreditAmount : (soa.Currency == AccountingConstants.CURRENCY_LOCAL ? (payment.UnpaidPaymentAmountVnd ?? 0) : (payment.UnpaidPaymentAmountUsd ?? 0)),
+            //                         UnpaidAmountVnd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountVnd ?? 0),
+            //                         UnpaidAmountUsd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountUsd ?? 0),
+            //                         PaidDate = payment == null ? null : payment.PaidDate,
+            //                         ReceiptId = payment == null ? null : payment.ReceiptId,
+            //                         DatetimeSorting = soa.DatetimeModified
+            //                     });
+
+            //var creditNoteData = (from cdNote in cdNoteData
+            //                      join surcharge in surchargeData on cdNote.Code equals surcharge.CreditNo
+            //                      join payments in paymentData on cdNote.Id.ToString() equals payments.RefId into grpPayment
+            //                      from payment in grpPayment.DefaultIfEmpty()
+            //                      join partner in partners on cdNote.PartnerId equals partner.Id into grpPartners
+            //                      from part in grpPartners.DefaultIfEmpty()
+            //                      select new
+            //                      {
+            //                          BillingRefNo = cdNote.Code,
+            //                          Type = payment == null ? "CREDIT" : payment.Type,
+            //                          PartnerId = part.Id,
+            //                          part.ShortName,
+            //                          cdNote.NetOff,
+            //                          Currency = cdNote.CurrencyId,
+            //                          VoucherId = surcharge.Type == "OBH" ? surcharge.VoucherIdre : surcharge.VoucherId,
+            //                          Amount = cdNote.Total,
+            //                          TotalAmountVnd = (surcharge.AmountVnd ?? 0) + (surcharge.VatAmountVnd ?? 0),
+            //                          TotalAmountUsd = (surcharge.AmountUsd ?? 0) + (surcharge.VatAmountUsd ?? 0),
+            //                          InvoiceNo = payment == null ? surcharge.InvoiceNo : payment.InvoiceNo,
+            //                          PaidAmount = payment == null ? 0 : payment.PaymentAmount,
+            //                          PaidAmountVnd = payment == null ? 0 : payment.PaymentAmountVnd,
+            //                          PaidAmountUsd = payment == null ? 0 : payment.PaymentAmountUsd,
+            //                          UnpaidAmount = payment == null ? cdNote.Total : cdNote.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (payment.UnpaidPaymentAmountVnd ?? 0) : (payment.UnpaidPaymentAmountUsd ?? 0),
+            //                          UnpaidAmountVnd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountVnd ?? 0),
+            //                          UnpaidAmountUsd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountUsd ?? 0),
+            //                          PaidDate = payment == null ? null : payment.PaidDate,
+            //                          ReceiptId = payment == null ? null : payment.ReceiptId,
+            //                          DatetimeSorting = cdNote.DatetimeModified
+            //                      });
+            //var data = (creditSoaData.Concat(creditNoteData)).ToList();
+            #endregion
+
+            var resultGroups = creditData.OrderByDescending(x => x.VoucherDate).GroupBy(x => new
+            {
+                x.RefId,
+                x.PartnerId,
+                //x.ShortName,
+                x.VoucherNo,
+                x.VoucherDate,
+                x.InvoiceNo,
+                x.BillingRefNo,
+                x.TransactionType
+            });
+            var data = resultGroups.Select(x => new { grp = x.Key, payment = x.Select(z => new { z.PartnerName, z.InvoiceDate, OverdueDays = (z.PaymentDueDate != null && (DateTime.Today > z.PaymentDueDate.Value.Date)) ? (DateTime.Today - z.PaymentDueDate.Value.Date).Days : 0, z.PaymentDueDate, z.Status, z.Amount, z.TotalAmountVnd, z.TotalAmountUsd, z.Currency, z.PaidAmount, z.PaidAmountVnd, z.PaidAmountUsd, z.UnpaidAmount, z.UnpaidAmountVnd, z.UnpaidAmountUsd }) });
+            
+            foreach (var item in data)
+            {
+                var payment = new AccountingPaymentModel();
+                var acctPayment = item.payment.FirstOrDefault();
+                payment.RefNo = item.grp.BillingRefNo;
+                //payment.ReceiptId = acctPayment.ReceiptId;
+                payment.Type = "NETOFF";//item.grp.TransactionType;
+                payment.PartnerId = item.grp.PartnerId;
+                payment.InvoiceNoReal = item.grp.InvoiceNo;
+                payment.PartnerName = acctPayment.PartnerName;
+                payment.Amount = acctPayment.Amount ?? 0;
+                payment.TotalAmountVnd = item.payment.Sum(x => x.TotalAmountVnd);
+                payment.TotalAmountUsd = item.payment.Sum(x => x.TotalAmountUsd);
+                payment.Currency = acctPayment.Currency;
+                payment.PaidAmount = acctPayment.PaidAmount;
+                payment.PaidAmountVnd = acctPayment.PaidAmountVnd;
+                payment.PaidAmountUsd = acctPayment.PaidAmountUsd;
+                payment.UnpaidAmount = acctPayment.UnpaidAmount;
+                payment.UnpaidAmountVnd = acctPayment.UnpaidAmountVnd == 0 ? payment.TotalAmountVnd : acctPayment.UnpaidAmountVnd;
+                payment.UnpaidAmountUsd = acctPayment.UnpaidAmountUsd == 0 ? payment.TotalAmountUsd : acctPayment.UnpaidAmountUsd;
+                payment.Status = acctPayment.Status;
+                payment.PaidDate = item.grp.VoucherDate;
+                payment.DatetimeSorting = item.grp.VoucherDate;
+                payment.DueDate = acctPayment.PaymentDueDate;
+                payment.IssuedDate = acctPayment.InvoiceDate;
+                payment.OverdueDays = acctPayment.OverdueDays;
+                results.Add(payment);
+            }
+            var resultData = results.AsQueryable();
+            switch (criteria.OverDueDays)
+            {
+                case Common.OverDueDate.Between1_15:
+                    resultData = resultData.Where(x => x.OverdueDays < 16 && x.OverdueDays > 0);
+                    break;
+                case Common.OverDueDate.Between16_30:
+                    resultData = resultData.Where(x => x.OverdueDays < 31 && x.OverdueDays > 15);
+                    break;
+                case Common.OverDueDate.Between31_60:
+                    resultData = resultData.Where(x => x.OverdueDays < 61 && x.OverdueDays > 30);
+                    break;
+                case Common.OverDueDate.Between61_90:
+                    resultData = resultData.Where(x => x.OverdueDays < 91 && x.OverdueDays > 60);
+                    break;
+            }
+            if(criteria.IsPaging == true)
+            {
+                resultData = resultData.Take(criteria.Size ?? 1);
+            }
+            //if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            //{
+            //    if (criteria.SearchType == "ReceiptNo")
+            //    {
+            //        //var listReceiptInfo = acctReceiptRepository.Get(receipt => receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE && criteria.ReferenceNos.Contains(receipt.PaymentRefNo)).Select(x => x.Id).ToList();
+            //        //results = results.Where(x => listReceiptInfo.Any(z => z == x.ReceiptId)).ToList();
+            //        results = results.Where(x => false).ToList();
+            //    }
+            //}
+            //if (criteria.FromUpdatedDate != null)
+            //{
+            //    results = results.Where(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date).ToList();
+            //}
+            //if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
+            //{
+            //    results = results.Where(x => criteria.PaymentStatus.Contains(x.Status ?? "Unpaid")).ToList();
+            //}
+            return resultData;
         }
 
+        /// <summary>
+        /// Get payable data
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        private IQueryable<AccAccountPayable> QueryPayable(PaymentCriteria criteria)
+        {
+            var data = accountPayableRepository.Get(x => !string.IsNullOrEmpty(x.ReferenceNo) && x.TransactionType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE);
+            if (!string.IsNullOrEmpty(criteria.PartnerId))
+            {
+                data = data.Where(q => q.PartnerId == criteria.PartnerId);
+            }
+            if (criteria.Office != null && criteria.Office.Count > 0)
+            {
+                data = data.Where(x => x.OfficeId != null && criteria.Office.Contains(x.OfficeId.ToString()));
+            }
+            if (criteria.ReferenceNos?.Count(x => !string.IsNullOrEmpty(x)) > 0)
+            {
+                switch (criteria.SearchType)
+                {
+                    case "VatInvoice":
+                        data = data.Where(x => criteria.ReferenceNos.Contains(x.InvoiceNo));
+                        break;
+                    case "DebitInvoice":
+                        data = data.Where(x => false);
+                        break;
+                    case "Soa":
+                        data = data.Where(x => criteria.ReferenceNos.Contains(x.BillingNo));
+                        break;
+                    case "ReceiptNo":
+                        data = data.Where(x => false);
+                        break;
+                    case "CreditNote":
+                        data = data.Where(x => criteria.ReferenceNos.Contains(x.BillingNo));
+                        break;
+                    case "HBL":
+                        var hblNos = creditManagementArRepository.Get(x => criteria.ReferenceNos.Contains(x.Hblno)).Select(x => x.Code).ToList();
+                        if(hblNos.Count > 0)
+                        {
+                            data = data.Where(x => hblNos.Contains(x.BillingNo));
+                        }
+                        else
+                        {
+                            data = data.Where(x => false);
+                        }
+                        break;
+                    case "MBL":
+                        var mblNos = creditManagementArRepository.Get(x => criteria.ReferenceNos.Contains(x.Mblno)).Select(x => x.Code).ToList();
+                        if (mblNos.Count > 0)
+                        {
+                            data = data.Where(x => mblNos.Contains(x.BillingNo));
+                        }
+                        else
+                        {
+                            data = data.Where(x => false);
+                        }
+                        break;
+                    case "JobNo":
+                        var jobNos = creditManagementArRepository.Get(x => criteria.ReferenceNos.Contains(x.JobNo)).Select(x => x.Code).ToList();
+                        if (jobNos.Count > 0)
+                        {
+                            data = data.Where(x => jobNos.Contains(x.BillingNo));
+                        }
+                        else
+                        {
+                            data = data.Where(x => false);
+                        }
+                        break;
+                }
+            }
+            if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
+            {
+                data = data.Where(x => criteria.PaymentStatus.Any(z => z == x.Status));
+            }
+
+            // Get data within 1 months if search without anything
+            if (IsInitSearch(criteria))
+            {
+                var maxDate = (accountPayableRepository.Get().Max(x => x.VoucherDate) ?? DateTime.Now).AddDays(1).Date;
+                var minDate = maxDate.AddMonths(-1).AddDays(-1).Date; // Start from 1 months ago
+                data = data.Where(x => x.VoucherDate != null && (x.VoucherDate.Value > minDate && x.VoucherDate.Value < maxDate));
+            }
+            return data;
+        }      
 
         private Expression<Func<AcctCdnote, bool>> CreditNoteExpressionQuery(PaymentCriteria criteria)
         {
@@ -1121,6 +1287,10 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 data = data.Where(x => x.OfficeId != null && criteria.Office.Contains(x.OfficeId.ToString()));
             }
+            if (perQuery != null)
+            {
+                data = data.Where(perQuery);
+            }
 
             // Get data within 3 months if search without anything
             if (IsInitSearch(criteria))
@@ -1129,11 +1299,11 @@ namespace eFMS.API.Accounting.DL.Services
                 var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; // Start from 3 months ago
                 data = data.Where(x => x.Date.Value > minDate && x.Date.Value < maxDate);
             }
-
-            if (perQuery != null)
+            else if (criteria.IsPaging == true)
             {
-                data = data.Where(perQuery);
+                data = data.Take(criteria.Size ?? 1);
             }
+
             //var data = accountingManaRepository.Get(query);
             if (data == null) return null;
             var results = data.OrderByDescending(x => x.PaymentDatetimeUpdated).Select(x => new AccountingPaymentModel
