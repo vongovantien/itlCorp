@@ -14,7 +14,7 @@ namespace eFMS.API.SystemFileManagement.Service.Contexts
                     options =>
                     {
                         options.UseRowNumberForPaging();
-                    });
+                    }).EnableSensitiveDataLogging();
             }
         }
         public override int SaveChanges()
