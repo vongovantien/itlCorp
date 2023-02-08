@@ -5673,8 +5673,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyTotal.Add("TotalRemainOBHAmount", sumRemainObhUsd);
                 listKeyTotal.Add("TotalRemainCreditAmount", result.Sum(x => (x.CreditAmountUsd ?? 0)));
                 // Sum Advance Amount
-                listKeyTotal.Add("TotalAdvAmount", sumAdvanceAmountVnd);
-                listKeyTotal.Add("TotalAdvAmountVnd", sumAdvanceAmountUsd);
+                listKeyTotal.Add("TotalAdvAmount", sumAdvanceAmountUsd);
+                listKeyTotal.Add("TotalAdvAmountVnd", sumAdvanceAmountVnd);
                 // Sum balance USD
                 listKeyTotal.Add("TotalBalanceAmount", sumBalanceUsd);
                 listKeyTotal.Add("TotalBalanceAmountVnd", sumBalanceVnd);
