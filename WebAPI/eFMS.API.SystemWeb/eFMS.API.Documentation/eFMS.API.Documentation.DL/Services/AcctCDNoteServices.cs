@@ -9,24 +9,24 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.Exports;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
-using eFMS.API.Documentation.Service.ViewModels;
-using System.Data.SqlClient;
-using System.Data;
-using eFMS.API.Documentation.Service.Contexts;
-using ITL.NetCore.Connection;
-using Microsoft.Extensions.Options;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -2827,9 +2827,12 @@ namespace eFMS.API.Documentation.DL.Services
             var settlePayments = acctSettlementPaymentRepository.Where(x => x.StatusApproval == DocumentConstants.STATUS_APPROVAL_DONE);
             var charges = surchargeRepository.Where(x => string.IsNullOrEmpty(x.Soano) && string.IsNullOrEmpty(x.CreditNo) && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE));
 
-            if (criteria.FromExportDate != null && criteria.ToExportDate != null)
-                charges = charges.Where(x => x.DatetimeCreated.Value.Date >= criteria.FromExportDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToExportDate.Value.Date);
+            charges = charges.Where(x => ((string.IsNullOrEmpty(criteria.CreatorId) || x.UserCreated == criteria.CreatorId)));
 
+            if (!string.IsNullOrEmpty(criteria.PartnerId))
+            {
+                settlePayments = settlePayments.Where(x => x.Payee == criteria.PartnerId);
+            }
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
@@ -2890,7 +2893,7 @@ namespace eFMS.API.Documentation.DL.Services
                             VoucherIddate = chg.VoucherIddate,
                             CodeNo = chg.Type == "Debit" ? chg.DebitNo : chg.CreditNo,
                             ChargeId = chg.Id,
-                            CodeType = "CREDIT",
+                            CodeType = chg.Type == "Debit" ? "DEBIT" : "CREDIT",
                             ChargeType = chg.Type,
                             PayerId = !string.IsNullOrEmpty(settle.Payee) ? settle.Payee : String.Empty,
                             SoaNo = chg.SettlementCode
