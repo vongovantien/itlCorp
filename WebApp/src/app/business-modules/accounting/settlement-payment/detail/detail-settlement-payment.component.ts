@@ -264,16 +264,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         return true;
     }
 
-    checkValidAttachEdoc(smId: string) {
-        this._systemFileRepo.CheckAllowSettleEdocSendRequest(smId)
-            .subscribe(
-                (res: any) => {
-                    if (!res) {
-                        return false;
-                    }
-                }
-            );
-    }
 
     saveAndSendRequest() {
         // if (!this.requestSurchargeListComponent.surcharges.length) {

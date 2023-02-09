@@ -10,7 +10,7 @@ import { Partner, Surcharge, SysImage } from '@models';
 import { AccountingRepo, DocumentationRepo } from '@repositories';
 import { DataService, SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 
 import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from-shipment/charge-form-shipment.popup';
 import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
@@ -28,7 +28,7 @@ import { getCurrentUserState } from '@store';
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ISettlementPaymentData } from "../../detail/detail-settlement-payment.component";
-import { ISettlementPaymentState, LoadDetailSettlePaymentSuccess, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
+import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -162,18 +162,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     updateListSurcharge() {
-        console.log('update');
-        console.log(this.detailSettlement);
-        this._store.select(getSettlementPaymentDetailState)
-            .pipe(catchError(this.catchError),)
-            .subscribe((res) => {
-                if (res) {
-                    console.log(res);
-                    res.chargeNoGrpSettlement = this.surcharges;
-                    this.settlementDetail = res;
-                }
-            })
-        this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementDetail));
+        this._store.dispatch(UpdateListNoGroupSurcharge({ data: this.surcharges }));
     }
 
     onRequestSurcharge(surcharge: Surcharge[], isCopy?: boolean) {

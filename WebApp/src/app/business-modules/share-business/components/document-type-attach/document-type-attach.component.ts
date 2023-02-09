@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import { SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
-import { catchError } from 'rxjs/operators';
-import { getSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { PopupBase } from 'src/app/popup.base';
 import { getTransactionLocked, getTransactionPermission } from '../../store';
 @Component({
@@ -33,9 +33,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     detailDocId: number;
     formData: IEDocUploadFile;
     @Input() documentTypes: any[] = [];
-    //@Input() documentSource: any[] = [];
     isSubmitted: boolean = false;
-    isADV: boolean = false;
 
     constructor(
         private _toastService: ToastrService,
@@ -50,25 +48,20 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     ngOnInit(): void {
         this.transactionType = this.typeFrom;
         if (this.typeFrom === 'Settlement') {
-            this._store.select(getSettlementPaymentDetailState)
-                .pipe(catchError(this.catchError),)
-                .subscribe((res) => {
-                    if (res) {
-                        this.isADV = false;
-                        console.log(res);
-                        res.chargeNoGrpSettlement.forEach(x => {
-                            if (x.advanceNo !== null) {
-                                this.isADV = true;
-                            }
-                        })
-                        this.updateDocTypeSettle();
+            this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        if (!!data) {
+                            this.updateDocTypeSettle(data.some(x => x.advanceNo !== null))
+                        }
                     }
-                })
-            //this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementDetail));
+                );
         }
     }
 
-    updateDocTypeSettle() {
+    updateDocTypeSettle(isADV: boolean) {
         this._systemFileManagerRepo.getDocumentType('Settlement')
             .pipe(
                 catchError(this.catchError),
@@ -76,9 +69,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             .subscribe(
                 (res: any[]) => {
                     console.log('update docType');
-                    console.log(this.isADV);
-
-                    if (this.isADV) {
+                    if (isADV) {
                         this.documentTypes = res.filter(x => x.accountingType === 'ADV-Settlement');
                     } else {
                         this.documentTypes = res.filter(x => x.accountingType === 'Settlement');
@@ -103,7 +94,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             }
             this.listFile.push(files[i]);
-            //this.listFile[i].aliasName = files[i].name.substring(0, files[i].name.lastIndexOf('.'));
         }
         if (fileList?.length > 0) {
             let validSize: boolean = true;
