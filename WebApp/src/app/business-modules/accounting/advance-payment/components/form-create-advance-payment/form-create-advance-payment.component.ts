@@ -41,7 +41,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     advanceForDatas: string[] = ["HBL"]; // update MBL sau , "MBL"
 
     users: Observable<User[]>;
-    customers: Partner[];
+    customers: Observable<Partner[]>;
 
     formCreate: FormGroup;
     advanceNo: AbstractControl;
@@ -96,11 +96,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
         this.banks = this._store.select(getCatalogueBankState);
         this.users = this._systemRepo.getListSystemUser();
-        this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL).subscribe(
-            (data) => {
-                this.customers = data;
-            }
-        );
+        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((u) => {
@@ -216,8 +212,9 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 this.bankName.setValue(this.userLogged.bankName || null);
                 this.bankCode.setValue(this.userLogged.bankCode || null);
             } else {
-                const partner = this.getPartnerById(this.payee.value);
-                this.selectedPayee = partner;
+                if (!this.selectedPayee) {
+                    this.getPartnerById(this.payee.value)
+                }
                 this.getBankAccountPayee(true);
             }
         }
@@ -227,6 +224,12 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             this.bankName.setValue(null);
             this.bankCode.setValue(null);
         }
+    }
+
+    getPartnerById(id: string) {
+        this.customers.pipe(
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(x => this.selectedPayee = x.find(s => s.id = id));
     }
 
     onSelectPayee(payee: Partner) {
@@ -257,11 +260,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                         }
                     })
         }
-    }
-
-    getPartnerById(id: string) {
-        const partner: Partner = !this.customers ? null : this.customers.find((p: Partner) => p.id === id);
-        return partner || null;
     }
 
     setBankInfoForPayee(payee: Partner) {
