@@ -15,8 +15,8 @@ import { SettlementListChargeComponent } from '../components/list-charge-settlem
 
 import { InfoPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
-import { EMPTY } from 'rxjs';
-import { catchError, concatMap, finalize } from 'rxjs/operators';
+import { EMPTY, of } from 'rxjs';
+import { catchError, concatMap, finalize, takeUntil } from 'rxjs/operators';
 @Component({
     selector: 'app-settle-payment-new',
     templateUrl: './add-settle-payment.component.html'
@@ -142,23 +142,8 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             );
     }
 
-    checkValidAttachEdoc(smId: string) {
-        this._systemFileRepo.CheckAllowSettleEdocSendRequest(smId)
-            .subscribe(
-                (res: any) => {
-                    if (!res) {
-                        return false;
-                    }
-                }
-            );
-        return true;
-    }
 
     saveAndSendRequest() {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
         if (!this.checkValidSettle()) {
             return;
         }
@@ -168,21 +153,8 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
-        if (!this.checkValidAttachEdoc(body.settlement.id)) {
-            this._toastService.error("Please check your Document Type !");
-            return;
-        }
+        //this.checkValidAttachEdoc(body.settlement.id);
 
-        // this._systemFileRepo.CheckAllowSettleEdocSendRequest(body.settlement.id)
-        //     .subscribe(
-        //         (res: any) => {
-        //             console.log(res);
-        //             if (!res) {
-        //                 this._toastService.error("Please check your Document Type !");
-        //                 return;
-        //             }
-        //         }
-        //     );
 
         let settlementResult: any = {};
 
@@ -190,45 +162,54 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             .pipe(catchError(this.catchError), finalize(() => this.isLoading = false),
                 concatMap((res: CommonInterface.IResult) => {
                     if (!res.status && !!res.message) {
-                        this._toastService.warning(res.message, '', { enableHtml: true });
-                        return;
+                        return of(res);
                     }
-                    else {
-                        return this._accountingRepo.checkIfInvalidFeeShipmentSettle(body).pipe(
-                            catchError(this.catchError),
-                            concatMap((res: CommonInterface.IResult) => {
-                                if (!res.status) {
-                                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
-                                        title: 'Warning',
-                                        body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
-                                        class: 'bg-danger'
-                                    });
-                                    return EMPTY;
-                                } else {
-                                    return this._accountingRepo.saveAndSendRequestSettlemntPayment(body).pipe(
-                                        catchError(this.catchError),
-                                        concatMap((res: CommonInterface.IResult) => {
-                                            if (!res.status) {
-                                                this._toastService.warning(res.message, '', { enableHtml: true });
-                                                this.requestSurchargeListComponent.selectedIndexSurcharge = null;
-                                            } else {
-                                                settlementResult = res.data.settlement;
-                                                let approve: any = {
-                                                    settlementNo: settlementResult.settlementNo,
-                                                    requester: settlementResult.requester
-                                                }
-                                                return this._accountingRepo.updateAndSendMailApprovalSettlement(approve);
-                                            }
-                                        })
-                                    );
-                                }
-                            })
-                        );
+                    return this._accountingRepo.checkIfInvalidFeeShipmentSettle(body);
+                }),
+                concatMap((res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        res.data = 1;
+                        return of(res);
                     }
-                }
-                ))
+                    return this._systemFileRepo.CheckAllowSettleEdocSendRequest(body.settlement.id);
+                }),
+                concatMap((v) => {
+                    if (!v) {
+                        let data: CommonInterface.IResult = ({
+                            data: null,
+                            message: 'Please check your Document Type !',
+                            status: false
+                        })
+                        return of(data);
+                    }
+                    return this._accountingRepo.saveAndSendRequestSettlemntPayment(body);
+                }),
+                concatMap((res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        this.requestSurchargeListComponent.selectedIndexSurcharge = null;
+                        return of(res);
+                    } else {
+                        settlementResult = res.data.settlement;
+                        let approve: any = {
+                            settlementNo: settlementResult.settlementNo,
+                            requester: settlementResult.requester
+                        }
+                        return this._accountingRepo.updateAndSendMailApprovalSettlement(approve);
+                    }
+                }),
+                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe),
+            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
+                    if (res.data === 1) {
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            title: 'Warning',
+                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
+                            class: 'bg-danger'
+                        });
+                        return;
+                    }
                     if (!res.status) {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
@@ -236,7 +217,6 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                         this._toastService.success(`${settlementResult.settlementNo}`, ' Send request successfully');
                         this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${settlementResult.id}/approve`]);
                     }
-                    this.requestSurchargeListComponent.selectedIndexSurcharge = null;
                 },
                 (error) => {
                     if (error instanceof HttpErrorResponse) {

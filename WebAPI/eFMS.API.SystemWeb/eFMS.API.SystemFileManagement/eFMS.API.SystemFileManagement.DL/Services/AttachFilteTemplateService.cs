@@ -57,7 +57,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             ClearCache();
         }
 
-        public async Task<List<DocumentTypeModel>> GetDocumentType(string transactionType, string billingId)
+        public async Task<List<DocumentTypeModel>> GetDocumentType(string transactionType)
         {
             var data = Get();
             switch (transactionType)
@@ -70,27 +70,30 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Code = x.FirstOrDefault().Code,
                         NameEn = x.FirstOrDefault().NameEn,
                         TransactionType = "SOA",
+                        AccountingType = x.FirstOrDefault().AccountingType,
                     }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 case "Settlement":
-                    IQueryable<SysAttachFileTemplate> SMCode;
-                    var advAmount = _settleRepo.Get(x => x.Id.ToString() == billingId).FirstOrDefault().AdvanceAmount;
-                    if (advAmount > 0)
-                    {
-                         SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "ADV-Settlement"));
-                    }
-                    else if(advAmount==0|| advAmount == null)
-                    {
-                         SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement"));
-                    }
-                    else {
-                        SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "ADV-Settlement"|| x.AccountingType == "Settlement"));
-                    }
+                    var SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement"));
+                    //IQueryable<SysAttachFileTemplate> SMCode;
+                    //var advAmount = _settleRepo.Get(x => x.Id.ToString() == billingId).FirstOrDefault().AdvanceAmount;
+                    //if (advAmount > 0)
+                    //{
+                    //     SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "ADV-Settlement"));
+                    //}
+                    //else if(advAmount==0|| advAmount == null)
+                    //{
+                    //     SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "Settlement"));
+                    //}
+                    //else {
+                    //    SMCode = data.Where(x => x.Type == "Accountant" && x.Code != "OTH" && (x.AccountingType == "ADV-Settlement"|| x.AccountingType == "Settlement"));
+                    //}
                     return SMCode.GroupBy(x => new { x.Code, x.AccountingType, x.NameEn }).Select(x => new DocumentTypeModel()
                     {
                         Id = x.FirstOrDefault().Id,
                         Code = x.FirstOrDefault().Code,
                         NameEn = x.FirstOrDefault().NameEn,
                         TransactionType = x.FirstOrDefault().TransactionType,
+                        AccountingType = x.FirstOrDefault().AccountingType,
                     }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 case "Advance":
                     var advs = data.Where(x => x.Type == "Accountant" && x.AccountingType == "Advance" && x.Code != "OTH");
@@ -98,7 +101,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     {
                         Id = x.FirstOrDefault().Id,
                         Code = x.FirstOrDefault().Code,
-                        NameEn = x.FirstOrDefault().NameEn
+                        NameEn = x.FirstOrDefault().NameEn,
+                        AccountingType = x.FirstOrDefault().AccountingType,
                     }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 default:
                     var jobs = data.Where(x => x.Type != "Accountant" && x.TransactionType == transactionType);
@@ -110,6 +114,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                              Id = x.Id,
                              Code = x.Code,
                              NameEn = x.NameEn,
+
                          };
                          result.Add(type);
                      });

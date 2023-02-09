@@ -1,33 +1,34 @@
-import { Component, ViewChild, ViewChildren, QueryList, Input, Output, EventEmitter } from '@angular/core';
 import { coerceBooleanProperty } from "@angular/cdk/coercion";
-import { takeUntil, finalize } from 'rxjs/operators';
+import { Component, EventEmitter, Input, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { AppList } from '@app';
-import { Surcharge, Partner, SysImage } from '@models';
-import { SortService, DataService } from '@services';
-import { ToastrService } from 'ngx-toastr';
-import { CommonEnum } from '@enums';
-import { delayTime } from '@decorators';
-import { DocumentationRepo, AccountingRepo } from '@repositories';
 import { ReportPreviewComponent } from '@common';
+import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
+import { CommonEnum } from '@enums';
 import { ICrystalReport } from '@interfaces';
+import { Partner, Surcharge, SysImage } from '@models';
+import { AccountingRepo, DocumentationRepo } from '@repositories';
+import { DataService, SortService } from '@services';
+import { ToastrService } from 'ngx-toastr';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
+import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from-shipment/charge-form-shipment.popup';
+import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
 import { SettlementExistingChargePopupComponent } from '../popup/existing-charge/existing-charge.popup';
 import { SettlementFormChargePopupComponent } from '../popup/form-charge/form-charge.popup';
 import { SettlementPaymentManagementPopupComponent } from '../popup/payment-management/payment-management.popup';
-import { SettlementTableSurchargeComponent } from '../table-surcharge/table-surcharge.component';
-import { SettlementShipmentItemComponent, ISettlementShipmentGroup } from '../shipment-item/shipment-item.component';
-import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
 import { SettlementTableListChargePopupComponent } from '../popup/table-list-charge/table-list-charge.component';
-import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from-shipment/charge-form-shipment.popup';
+import { ISettlementShipmentGroup, SettlementShipmentItemComponent } from '../shipment-item/shipment-item.component';
+import { SettlementTableSurchargeComponent } from '../table-surcharge/table-surcharge.component';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
+import { SystemConstants } from '@constants';
+import { Store } from '@ngrx/store';
+import { getCurrentUserState } from '@store';
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ISettlementPaymentState, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
-import { Store } from '@ngrx/store';
-import { SystemConstants } from '@constants';
-import { getCurrentUserState } from '@store';
+import { ISettlementPaymentData } from "../../detail/detail-settlement-payment.component";
+import { ISettlementPaymentState, LoadDetailSettlePaymentSuccess, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -81,9 +82,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     selectedGroupShipmentIndex: number;
 
     detailSettlement: Observable<any>;
+    settlementDetail: ISettlementPaymentData;
 
     isLoadingSurchargeList: boolean = false;
     isLoadingGroupShipment: boolean = false;
+    settlementPayment: ISettlementPaymentData;
     constructor(
         private readonly _sortService: SortService,
         private readonly _toastService: ToastrService,
@@ -158,7 +161,23 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.tableListChargePopup.show();
     }
 
+    updateListSurcharge() {
+        console.log('update');
+        console.log(this.detailSettlement);
+        this._store.select(getSettlementPaymentDetailState)
+            .pipe(catchError(this.catchError),)
+            .subscribe((res) => {
+                if (res) {
+                    console.log(res);
+                    res.chargeNoGrpSettlement = this.surcharges;
+                    this.settlementDetail = res;
+                }
+            })
+        this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementDetail));
+    }
+
     onRequestSurcharge(surcharge: Surcharge[], isCopy?: boolean) {
+
         if (surcharge[0].isFromShipment) {
             this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
             this.surcharges = [...this.surcharges, ...surcharge];
@@ -197,6 +216,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         if (surcharge[0].isFromShipment) {
             this.onChange.emit(true);
         }
+        this.updateListSurcharge();
     }
 
     onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {
@@ -218,7 +238,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
             this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment, ...surchargeHasSynced];
             this.surcharges.forEach(c => c.isChangeShipment = undefined)
-
+            this.updateListSurcharge();
         }
     }
     onUpdateRequestSurcharge(surcharge: any) {
@@ -230,6 +250,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             // * Update next charge.
             this.openSurchargeDetail(this.surcharges[this.selectedIndexSurcharge + 1], this.selectedIndexSurcharge + 1, 'update');
         }
+        this.updateListSurcharge();
     }
 
     openSurchargeDetail(surcharge: Surcharge, index?: number, action?: string) {
@@ -370,6 +391,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         for (const item of headingShipmentComponent) {
             item.isCheckAll = false;
         }
+        this.updateListSurcharge();
     }
 
     returnChargeFromShipment(groupShipment: any) {

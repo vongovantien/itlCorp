@@ -133,7 +133,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     TransactionType = x.TransactionType,
                     BillingId = x.BillingId,
                     Note = x.Note,
-                    DocumentId = x.DocumentId
+                    DocumentId = x.DocumentId,
+                    AccountingType=x.AccountingType
                 };
                 lstDocMap.Add(z);
             });
@@ -238,7 +239,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             }
                             foreach (var item in models)
                             {
-                                var attachTemplate = GetAttTepmlateByJob(edoc.Code, edoc.DocumentId, item.TransactionType);
+                                var attachTemplate = GetAttTepmlateByJob(edoc.Code, edoc.DocumentId, item.TransactionType,edoc.AccountingType);
                                 var imageDetail = new SysImageDetail
                                 {
                                     SysImageId = imageID,
@@ -324,10 +325,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
         }
 
-        public SysAttachFileTemplate GetAttTepmlateByJob(string Code, int docId, string transationType)
+        public SysAttachFileTemplate GetAttTepmlateByJob(string Code, int docId, string transationType,string accountingType)
         {
             //var nameEn = _attachFileTemplateRepo.Get(x => x.Id == docId).FirstOrDefault()?.NameEn;
-            return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.TransactionType == transationType).FirstOrDefault();
+            return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.TransactionType == transationType&&x.AccountingType==accountingType).FirstOrDefault();
         }
         public async Task<List<EDocGroupByType>> GetEDocByJob(Guid jobID, string transactionType)
         {

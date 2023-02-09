@@ -59,7 +59,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                         this.objectId = param.objectId;
                         this.billingNo = param.billingNo;
 
-                        this.getDocumentType(param.folder, null);
+                        this.getDocumentType(param.folder);
                         this.getEdoc(this.objectId, this.folder);
                     } else {
                         this._toastService.warning("Params invalid");
@@ -68,8 +68,8 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
             )
     }
 
-    getDocumentType(transactionType: string, billingId: string) {
-        this._systemFileRepo.getDocumentType(transactionType, billingId)
+    getDocumentType(transactionType: string) {
+        this._systemFileRepo.getDocumentType(transactionType)
             .subscribe(
                 (res: any[]) => {
                     this.documentTypes = res;
@@ -97,6 +97,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
             if (!!docType) {
                 files[i].Code = docType.code;
                 files[i].DocumentId = docType.id;
+                files[i].AccountingType = docType.accountingType;
                 files[i].docType = docType.id;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             }
@@ -130,6 +131,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                 if (!selectedDocType) { return; }
                 this.listFile[index].Code = selectedDocType.code;
                 this.listFile[index].DocumentId = selectedDocType.id;
+                this.listFile[index].AccountingType = selectedDocType.accountingType;
                 this.listFile[index].docType = selectedDocType.id;
                 this.listFile[index].aliasName = selectedDocType.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 break;
@@ -162,7 +164,8 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                 Note: x.note !== undefined ? x.note : '',
                 BillingId: this.objectId,
                 Id: SystemConstants.EMPTY_GUID,
-                DocumentId: x.DocumentId
+                DocumentId: x.DocumentId,
+                AccountingType: x.accountingType
             }));
         });
 

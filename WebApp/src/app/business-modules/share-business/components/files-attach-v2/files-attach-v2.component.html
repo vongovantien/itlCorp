@@ -171,7 +171,7 @@
                                     <div class="form-group float-right">
                                         <button type="button"
                                             class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
-                                            *ngIf="!readonly" (click)="showDocumentAttach()">
+                                            *ngIf="!readonly " (click)="showDocumentAttach()">
                                             <span>
                                                 <i class="la la-download"></i>
                                                 <span>
@@ -385,7 +385,8 @@
     </div>
 </div>
 <document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDoc($event)" [jobId]="jobId" [jobNo]="jobNo" [jobs]="jobs"
-    [billingId]="billingId" [transactionType]="transactionType" [housebills]="housebills">
+    [documentTypes]="documentTypes" [billingId]="billingId" [transactionType]="transactionType"
+    [housebills]="housebills">
 </document-type-attach>
 
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">

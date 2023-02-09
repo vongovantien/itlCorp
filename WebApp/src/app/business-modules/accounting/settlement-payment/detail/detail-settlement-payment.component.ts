@@ -21,8 +21,8 @@ import { SettlementListChargeComponent } from '../components/list-charge-settlem
 
 import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
-import { EMPTY, Observable } from 'rxjs';
-import { catchError, concatMap, finalize, pluck } from 'rxjs/operators';
+import { EMPTY, Observable, of } from 'rxjs';
+import { catchError, concatMap, finalize, pluck, takeUntil } from 'rxjs/operators';
 import { ShareBussinessAttachFileV2Component } from 'src/app/business-modules/share-business/components/files-attach-v2/files-attach-v2.component';
 import isUUID from 'validator/lib/isUUID';
 import { LoadDetailSettlePayment, LoadDetailSettlePaymentFail, LoadDetailSettlePaymentSuccess } from '../components/store';
@@ -46,6 +46,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     attachFiles: any[] = [];
     folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
+    advAmount: number = 0;
+    //isAttach: boolean = true;
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -151,7 +153,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         // this.attachRef.getHblList();
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId, 'LIST');
-                        this.attachRef.getDocumentType('Settlement', this.settlementId);
+                        this.attachRef.getDocumentType('Settlement');
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
@@ -271,7 +273,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     }
                 }
             );
-        return false;
     }
 
     saveAndSendRequest() {
@@ -289,55 +290,68 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
-        if (!this.checkValidAttachEdoc(body.settlement.id)) {
-            this._toastService.error("Please check your Document Type !");
-            return;
-        }
+        // if (!this.checkValidAttachEdoc(body.settlement.id)) {
+        //     this._toastService.error("Please check your Document Type !");
+        //     return;
+        // }
 
         let settlementResult: any = {};
         this._accoutingRepo.checkValidToSendRequestSettle(body)
             .pipe(catchError(this.catchError), finalize(() => this.isLoading = false),
                 concatMap((res: CommonInterface.IResult) => {
                     if (!res.status && !!res.message) {
-                        this._toastService.warning(res.message, '', { enableHtml: true });
-                        return;
+                        return of(res);
                     }
-                    else {
-                        return this._accoutingRepo.checkIfInvalidFeeShipmentSettle(body).pipe(
-                            catchError(this.catchError),
-                            concatMap((res: CommonInterface.IResult) => {
-                                if (!res.status) {
-                                    this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
-                                        title: 'Warning',
-                                        body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
-                                        class: 'bg-danger'
-                                    });
-                                    return EMPTY;
-                                } else {
-                                    return this._accoutingRepo.saveAndSendRequestSettlemntPayment(body).pipe(
-                                        catchError(this.catchError),
-                                        concatMap((res: CommonInterface.IResult) => {
-                                            if (!res.status) {
-                                                this._toastService.warning(res.message, '', { enableHtml: true });
-                                                this.requestSurchargeListComponent.selectedIndexSurcharge = null;
-                                            } else {
-                                                settlementResult = res.data.settlement;
-                                                let approve: any = {
-                                                    settlementNo: settlementResult.settlementNo,
-                                                    requester: settlementResult.requester
-                                                }
-                                                return this._accoutingRepo.updateAndSendMailApprovalSettlement(approve);
-                                            }
-                                        })
-                                    );
-                                }
-                            })
-                        );
-                    }
+                    return this._accoutingRepo.checkIfInvalidFeeShipmentSettle(body);
                 }
-                ))
+                ),
+                concatMap((res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        res.data = 1;
+                        return of(res);
+                    }
+                    return this._systemFileRepo.CheckAllowSettleEdocSendRequest(body.settlement.id);
+                },
+                ),
+                concatMap(
+                    (v) => {
+                        if (!v) {
+                            let data: CommonInterface.IResult = ({
+                                data: null,
+                                message: 'Please check your Document Type !',
+                                status: false
+                            })
+                            return of(data);
+                        }
+                        return this._accoutingRepo.saveAndSendRequestSettlemntPayment(body);
+                    }
+                ),
+                concatMap((res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        this.requestSurchargeListComponent.selectedIndexSurcharge = null;
+                        return of(res);
+                    } else {
+                        settlementResult = res.data.settlement;
+                        let approve: any = {
+                            settlementNo: settlementResult.settlementNo,
+                            requester: settlementResult.requester
+                        }
+                        return this._accoutingRepo.updateAndSendMailApprovalSettlement(approve);
+                    }
+                }),
+                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe),
+            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
+                    if (res.data === 1) {
+                        this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
+                            title: 'Warning',
+                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
+                            class: 'bg-danger'
+                        });
+                        return;
+                    }
                     if (!res.status) {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }

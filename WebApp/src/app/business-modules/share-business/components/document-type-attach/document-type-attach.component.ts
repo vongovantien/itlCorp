@@ -5,6 +5,7 @@ import { SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { catchError } from 'rxjs/operators';
+import { getSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { PopupBase } from 'src/app/popup.base';
 import { getTransactionLocked, getTransactionPermission } from '../../store';
 @Component({
@@ -31,8 +32,10 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     isUpdate: boolean = false;
     detailDocId: number;
     formData: IEDocUploadFile;
-    documentTypes: any[] = [];
+    @Input() documentTypes: any[] = [];
+    //@Input() documentSource: any[] = [];
     isSubmitted: boolean = false;
+    isADV: boolean = false;
 
     constructor(
         private _toastService: ToastrService,
@@ -46,6 +49,42 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     ngOnInit(): void {
         this.transactionType = this.typeFrom;
+        if (this.typeFrom === 'Settlement') {
+            this._store.select(getSettlementPaymentDetailState)
+                .pipe(catchError(this.catchError),)
+                .subscribe((res) => {
+                    if (res) {
+                        this.isADV = false;
+                        console.log(res);
+                        res.chargeNoGrpSettlement.forEach(x => {
+                            if (x.advanceNo !== null) {
+                                this.isADV = true;
+                            }
+                        })
+                        this.updateDocTypeSettle();
+                    }
+                })
+            //this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementDetail));
+        }
+    }
+
+    updateDocTypeSettle() {
+        this._systemFileManagerRepo.getDocumentType('Settlement')
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: any[]) => {
+                    console.log('update docType');
+                    console.log(this.isADV);
+
+                    if (this.isADV) {
+                        this.documentTypes = res.filter(x => x.accountingType === 'ADV-Settlement');
+                    } else {
+                        this.documentTypes = res.filter(x => x.accountingType === 'Settlement');
+                    }
+                },
+            );
     }
 
     chooseFile(event: any) {
@@ -59,6 +98,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             if (!!docType) {
                 files[i].Code = docType.code;
                 files[i].DocumentId = docType.id;
+                files[i].AccountingType = docType.accountingType;
                 files[i].docType = docType;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             }
@@ -82,11 +122,13 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         event.target.value = ''
 
     }
+
     onSelectDataFormInfo(event: any, index: number, type: string) {
         switch (type) {
             case 'docType':
                 this.listFile[index].Code = event.code;
                 this.listFile[index].DocumentId = event.id;
+                this.listFile[index].AccountingType = event.accountingType;
                 this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 this.selectedtDocType = event.id;
                 break;
@@ -129,7 +171,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 Note: x.note !== undefined ? x.note : '',
                 BillingId: this.billingId !== '' ? this.billingId : SystemConstants.EMPTY_GUID,
                 Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
-                DocumentId: x.DocumentId
+                DocumentId: x.DocumentId,
+                AccountingType: x.AccountingType,
             }));
         });
         this.EdocUploadFile = ({
@@ -208,5 +251,6 @@ export interface IEDocFile {
     Note: string,
     BillingId: string,
     Id: string,
-    DocumentId: string
+    DocumentId: string,
+    AccountingType: string,
 }

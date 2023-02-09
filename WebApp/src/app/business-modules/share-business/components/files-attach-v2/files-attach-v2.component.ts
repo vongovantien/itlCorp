@@ -8,7 +8,7 @@ import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
 import { AccountingRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
-import { getCurrentUserState, IAppState } from '@store';
+import { IAppState, getCurrentUserState } from '@store';
 import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
@@ -138,7 +138,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: CsTransaction) => {
                             this.transactionType = res.transactionType;
-                            this.getDocumentType(res.transactionType, null);
+                            this.getDocumentType(res.transactionType);
                             this.getEDoc(res.transactionType);
                             this.jobNo = res.jobNo;
                             this.isLocked = res.isLocked;
@@ -150,7 +150,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: any) => {
                             this.transactionType = 'CL';
-                            this.getDocumentType('CL', null);
+                            this.getDocumentType('CL');
                             this.getEDoc('CL');
                             this.jobNo = res.opstransaction.jobNo;
                             this.isLocked = res.opstransaction.isLocked;
@@ -160,7 +160,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         } else {
             this.transactionType = this.typeFrom;
             this.getJobList();
-            this.getDocumentType(this.typeFrom, this.billingId);
+            this.getDocumentType(this.typeFrom);
             this.getEDoc(this.typeFrom);
         }
         this.headers = [
@@ -254,7 +254,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.documentAttach.selectedtDocType = edoc.documentTypeId;
         this.isView = true;
         const extension = this.selectedEdoc.imageUrl.split('.').pop();
-        if (extension === 'zip') {
+        if (!['xlsx', 'docx', 'doc', 'xls', 'html', 'htm', 'pdf', 'txt', 'png', 'jpeg', 'jpg'].includes(extension)) {
             this.isView = false;
         }
         this.clearMenuContext(this.queryListMenuContext);
@@ -349,18 +349,28 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
 
-    getDocumentType(transactionType: string, billingId: string) {
-        this._systemFileRepo.getDocumentType(transactionType, billingId)
+    getDocumentType(transactionType: string) {
+        this._systemFileRepo.getDocumentType(transactionType)
             .pipe(
                 catchError(this.catchError),
             )
             .subscribe(
                 (res: any[]) => {
                     this.documentTypes = res;
-                    this.documentAttach.documentTypes = res;
+                    // this.documentAttach.documentTypes = res;
+                    // console.log(this.documentAttach.documentTypes);
+
                 },
             );
     }
+
+    // getDocTypeFromAttDoc(advAmount: number) {
+    //     console.log(advAmount);
+
+    //     //this.documentAttach.advAmount = this.advAmount;
+    //     //this.documentAttach.getDocumentType('Settlement');
+    //     this.documentAttach.filterDocTypeSettle(advAmount);
+    // }
 
     getEDoc(transactionType: string) {
         if (this.typeFrom === 'Shipment') {
@@ -431,7 +441,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 }
             )
         }
-        else {
+        else if (['pdf', 'txt', 'png', 'jpeg', 'jpg'].includes(extension.toLowerCase())) {
             this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
         }
     }
@@ -513,7 +523,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 Note: '',
                 BillingId: SystemConstants.EMPTY_GUID,
                 Id: SystemConstants.EMPTY_GUID,
-                DocumentId: x.DocumentId
+                DocumentId: x.DocumentId,
+                AccountingType: x.AccountingType
             }));
         });
         let EdocUploadFile: IEDocUploadFile;
