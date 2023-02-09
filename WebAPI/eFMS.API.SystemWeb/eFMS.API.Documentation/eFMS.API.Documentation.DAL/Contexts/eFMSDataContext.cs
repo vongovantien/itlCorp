@@ -1,6 +1,8 @@
-﻿using eFMS.API.Documentation.Service.Models;
+﻿using eFMS.API.Common.Helpers;
+using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Infrastructure.NoSql;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace eFMS.API.Documentation.Service.Contexts
 {
@@ -15,33 +17,44 @@ namespace eFMS.API.Documentation.Service.Contexts
                     {
                         options.UseRowNumberForPaging();
                     })
+                    .EnableDetailedErrors()
                     .EnableSensitiveDataLogging();
             }
         }
         public override int SaveChanges()
         {
-            var entities = ChangeTracker.Entries();
-            var mongoDb = MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
-            var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
-            var addedList = ChangeTrackerHelper.GetAdded(entities);
-            var deletedList = ChangeTrackerHelper.GetDeleted(entities);
-            var result = base.SaveChanges();
-            if (result > 0)
+            try
             {
-                if (addedList != null)
+                var entities = ChangeTracker.Entries();
+                var mongoDb = MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
+                var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
+                var addedList = ChangeTrackerHelper.GetAdded(entities);
+                var deletedList = ChangeTrackerHelper.GetDeleted(entities);
+                var result = base.SaveChanges();
+                if (result > 0)
                 {
-                    ChangeTrackerHelper.InsertToMongoDb(addedList);
+                    if (addedList != null)
+                    {
+                        ChangeTrackerHelper.InsertToMongoDb(addedList);
+                    }
+                    if (modifiedList != null)
+                    {
+                        ChangeTrackerHelper.InsertToMongoDb(modifiedList);
+                    }
+                    if (deletedList != null)
+                    {
+                        ChangeTrackerHelper.InsertToMongoDb(deletedList);
+                    }
                 }
-                if (modifiedList != null)
-                {
-                    ChangeTrackerHelper.InsertToMongoDb(modifiedList);
-                }
-                if (deletedList != null)
-                {
-                    ChangeTrackerHelper.InsertToMongoDb(deletedList);
-                }
+                return result;
+
             }
-            return result;
+            catch (Exception ex)
+            {
+                new LogHelper("SaveChangesError", ex.Message?.ToString());
+                throw;
+            }
+            
         }
     }
 }
