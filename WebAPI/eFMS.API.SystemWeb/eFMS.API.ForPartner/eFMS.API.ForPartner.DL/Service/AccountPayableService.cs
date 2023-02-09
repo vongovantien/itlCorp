@@ -248,7 +248,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             {
                                 invChargeIds = catChargeRepository.Get(x => x.Mode == ForPartnerConstants.CHARGE_MODE_NINV).Select(x => x.Id).ToList();
                             }
-                            var grpVoucherDetail = voucherDetail.Where(z => !invChargeIds.Any(chg => chg == z.ChargeId)).GroupBy(z => customer.PartnerMode == ForPartnerConstants.PARTNER_MODE_INTERNAL ? new { z.VoucherNo, z.VoucherDate, z.BravoRefNo } : new { VoucherNo = string.Empty, VoucherDate = (DateTime?)null, z.BravoRefNo }).Select(z => z).ToList();
+                            var grpVoucherDetail = voucherDetail.Where(z => !invChargeIds.Any(chg => chg == z.ChargeId)).GroupBy(z => new { z.VoucherNo, z.VoucherDate, z.BravoRefNo }).Select(z => z).ToList();
                             grpVoucherDetail.ForEach(c =>
                             {
                                 var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
@@ -419,6 +419,8 @@ namespace eFMS.API.ForPartner.DL.Service
                         acctCredit.VoucherNo = item.FirstOrDefault().VoucherNo;
                         acctCredit.VoucherDate = item.FirstOrDefault().VoucherDate;
                         acctCredit.TransactionType = item.FirstOrDefault().TransactionType.ToLower().Contains("credit") ? "CREDIT" : item.FirstOrDefault().TransactionType;
+                        acctCredit.AccountNo = item.FirstOrDefault().AccountNo;
+                        acctCredit.SerieNo = item.FirstOrDefault().SerieNo;
 
                         var existedCreditAR = creditManagementArRepository.Get(x => x.VoucherNo == acctCredit.VoucherNo && x.Code == _code && x.Type == _type && x.PartnerId == acctCredit.PartnerId && x.Hblid == acctCredit.Hblid && x.ReferenceNo == acctCredit.ReferenceNo).FirstOrDefault();
                         if (existedCreditAR != null)
