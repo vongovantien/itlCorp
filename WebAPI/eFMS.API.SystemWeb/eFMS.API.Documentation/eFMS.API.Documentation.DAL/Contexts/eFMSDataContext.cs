@@ -16,6 +16,8 @@ namespace eFMS.API.Documentation.Service.Contexts
                     options =>
                     {
                         options.UseRowNumberForPaging();
+                        options.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null);
+                        options.CommandTimeout(120);
                     })
                     .EnableDetailedErrors()
                     .EnableSensitiveDataLogging();
