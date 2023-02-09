@@ -193,5 +193,12 @@ namespace eFMS.API.SystemFileManagement.Controllers
             }
             return BadRequest(hs);
         }
+        
+        [HttpGet("CheckAllowSettleEdocSendRequest/{settleId}")]
+        public async Task<IActionResult> CheckAllowSettleEdocSendRequest(Guid settleId)
+        {
+            var result = _edocService.CheckAllowSettleEdocSendRequest(settleId);
+            return Ok(result);
+        }
     }
 }

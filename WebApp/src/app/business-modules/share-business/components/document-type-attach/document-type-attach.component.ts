@@ -9,6 +9,7 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
 import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getSOADetailState } from 'src/app/business-modules/accounting/statement-of-account/store/reducers';
+import { getSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { PopupBase } from 'src/app/popup.base';
 import { getTransactionLocked, getTransactionPermission } from '../../store';
 @Component({
@@ -35,7 +36,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     isUpdate: boolean = false;
     detailDocId: number;
     formData: IEDocUploadFile;
-    documentTypes: any[] = [];
+    @Input() documentTypes: any[] = [];
+    //@Input() documentSource: any[] = [];
     isSubmitted: boolean = false;
     configJob: CommonInterface.IComboGirdConfig | any = {};
     configPayee: CommonInterface.IComboGirdConfig | any = {};
@@ -49,6 +51,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     payFirst: boolean[] = [];
     payFilled: boolean = true;
     //noINV: boolean = false;
+    isADV: boolean = false;
+
     constructor(
         private _toastService: ToastrService,
         private _store: Store<IAppState>,
@@ -87,6 +91,43 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 { field: 'nameEn', label: 'Name EN' },
             ]
         }, { selectedDisplayFields: ['nameEn'], });
+
+        if (this.typeFrom === 'Settlement') {
+            this._store.select(getSettlementPaymentDetailState)
+                .pipe(catchError(this.catchError),)
+                .subscribe((res) => {
+                    if (res) {
+                        this.isADV = false;
+                        console.log(res);
+                        res.chargeNoGrpSettlement.forEach(x => {
+                            if (x.advanceNo !== null) {
+                                this.isADV = true;
+                            }
+                        })
+                        this.updateDocTypeSettle();
+                    }
+                })
+            //this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementDetail));
+        }
+    }
+
+    updateDocTypeSettle() {
+        this._systemFileManagerRepo.getDocumentType('Settlement')
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: any[]) => {
+                    console.log('update docType');
+                    console.log(this.isADV);
+
+                    if (this.isADV) {
+                        this.documentTypes = res.filter(x => x.accountingType === 'ADV-Settlement');
+                    } else {
+                        this.documentTypes = res.filter(x => x.accountingType === 'Settlement');
+                    }
+                },
+            );
     }
 
     chooseFile(event: any) {
@@ -101,6 +142,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             if (!!docType) {
                 files[i].Code = docType.code;
                 files[i].DocumentId = docType.id;
+                files[i].AccountingType = docType.accountingType;
                 files[i].docType = docType;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             }
@@ -247,6 +289,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 this.enablePayeeINV[index] = false;
                 this.listFile[index].Code = event.code;
                 this.listFile[index].DocumentId = event.id;
+                this.listFile[index].AccountingType = event.accountingType;
                 this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 this.selectedDocType = event.id;
                 this.listFile[index].docType = event.code;
@@ -310,92 +353,92 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     removeFile(index: number) {
         this.listFile?.splice(index, 1);
     }
+
+    checkValidateDocTypeOBH() {
+        return this.listFile.some(x => (x.payee === null || !x.payee) || ((!x.inv || x.inv === null) && x.noINV === false));
+    }
+
     uploadEDoc() {
-        this.payFilled = true;
         let edocFileList: IEDocFile[] = [];
         let files: any[] = [];
         this.isSubmitted = true;
+
+        if (this.checkValidateDocTypeOBH()) {
+            this._toastService.warning("Please fill Inv/serieNo/Payee");
+            return;
+        }
         this.listFile.forEach(x => {
-            if (x.Code === 'INV' || x.Code === 'OBH_INV') {
-                if ((x.payee === null || !x.payee) || ((!x.inv || x.inv === null) && x.noINV === false)) {
-                    this._toastService.error("Please fill all field!");
-                    this.payFilled = false;
-                    return;
-                }
-            }
+            files.push(x);
+            edocFileList.push(({
+                JobId: this.typeFrom === 'Shipment' ? this.jobId : x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
+                Code: x.Code,
+                TransactionType: this.transactionType,
+                AliasName: x.aliasName,
+                BillingNo: '',
+                BillingType: this.typeFrom,
+                HBL: x.hblid !== undefined ? x.hblid : SystemConstants.EMPTY_GUID,
+                FileName: x.name,
+                Note: x.note !== undefined ? x.note : '',
+                BillingId: this.billingId !== '' ? this.billingId : SystemConstants.EMPTY_GUID,
+                Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
+                DocumentId: x.DocumentId,
+                AccountingType: x.AccountingType,
+            }));
+        });
+
+        this.EdocUploadFile = ({
+            ModuleName: this.typeFrom === 'Shipment' ? 'Document' : 'Accounting',
+            FolderName: this.typeFrom,
+            Id: this.typeFrom === 'Shipment' ? this.jobId !== undefined ? this.jobId : SystemConstants.EMPTY_GUID : this.billingId,
+            EDocFiles: edocFileList,
         })
-        if (this.payFilled) {
-            this.listFile.forEach(x => {
-                files.push(x);
-                edocFileList.push(({
-                    JobId: this.typeFrom === 'Shipment' ? this.jobId : x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
-                    Code: x.Code,
-                    TransactionType: this.transactionType,
-                    AliasName: x.aliasName,
-                    BillingNo: '',
-                    BillingType: this.typeFrom,
-                    HBL: x.hblid !== undefined ? x.hblid : SystemConstants.EMPTY_GUID,
-                    FileName: x.name,
-                    Note: x.note !== undefined ? x.note : '',
-                    BillingId: this.billingId !== '' ? this.billingId : SystemConstants.EMPTY_GUID,
-                    Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
-                    DocumentId: x.DocumentId
-                }));
-            });
-            this.EdocUploadFile = ({
-                ModuleName: this.typeFrom === 'Shipment' ? 'Document' : 'Accounting',
-                FolderName: this.typeFrom,
-                Id: this.typeFrom === 'Shipment' ? this.jobId !== undefined ? this.jobId : SystemConstants.EMPTY_GUID : this.billingId,
-                EDocFiles: edocFileList,
-            })
-            if (this.isUpdate) {
-                let edocUploadModel: any = {
-                    Hblid: edocFileList[0].HBL,
-                    SystemFileName: edocFileList[0].AliasName,
-                    Note: edocFileList[0].Note,
-                    Id: edocFileList[0].Id,
-                    JobId: edocFileList[0].JobId,
-                    DocumentTypeId: this.selectedDocType,
-                    TransactionType: this.selectedtTrantype,
-                }
-
-                if (edocUploadModel.DocumentTypeId === undefined || edocUploadModel.SystemFileName === '') {
-                    this._toastService.error("Please fill all field!");
-                    return;
-                }
-                this._systemFileManagerRepo.updateEdoc(edocUploadModel)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            if (res.status) {
-                                this._toastService.success("Upload file successfully!");
-                                this.resetForm();
-                                this.hide();
-                                this.onSearch.emit(this.transactionType);
-                                this.isSubmitted = false;
-                            }
-                        }
-                    );
-            } else {
-                if (edocFileList.find(x => x.DocumentId === undefined || x.AliasName === '')) {
-
-                    this._toastService.error("Please fill all field!");
-                    return;
-                }
-                this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files, this.typeFrom)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            if (res.status) {
-                                this._toastService.success("Upload file successfully!");
-                                this.resetForm();
-                                this.hide();
-                                this.onSearch.emit(this.transactionType);
-                                this.isSubmitted = false;
-                            }
-                        }
-                    );
+        if (this.isUpdate) {
+            let edocUploadModel: any = {
+                Hblid: edocFileList[0].HBL,
+                SystemFileName: edocFileList[0].AliasName,
+                Note: edocFileList[0].Note,
+                Id: edocFileList[0].Id,
+                JobId: edocFileList[0].JobId,
+                DocumentTypeId: this.selectedDocType,
+                TransactionType: this.selectedtTrantype,
             }
+
+            if (edocUploadModel.DocumentTypeId === undefined || edocUploadModel.SystemFileName === '') {
+                this._toastService.error("Please fill all field!");
+                return;
+            }
+            this._systemFileManagerRepo.updateEdoc(edocUploadModel)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success("Upload file successfully!");
+                            this.resetForm();
+                            this.hide();
+                            this.onSearch.emit(this.transactionType);
+                            this.isSubmitted = false;
+                        }
+                    }
+                );
+        } else {
+            if (edocFileList.find(x => x.DocumentId === undefined || x.AliasName === '')) {
+
+                this._toastService.error("Please fill all field!");
+                return;
+            }
+            this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files, this.typeFrom)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success("Upload file successfully!");
+                            this.resetForm();
+                            this.hide();
+                            this.onSearch.emit(this.transactionType);
+                            this.isSubmitted = false;
+                        }
+                    }
+                );
         }
     }
 
@@ -453,5 +496,6 @@ export interface IEDocFile {
     Note: string,
     BillingId: string,
     Id: string,
-    DocumentId: string
+    DocumentId: string,
+    AccountingType: string,
 }

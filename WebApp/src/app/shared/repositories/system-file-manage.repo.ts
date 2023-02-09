@@ -128,4 +128,10 @@ export class SystemFileManageRepo {
             map((data: any) => data)
         );
     }
+
+    CheckAllowSettleEdocSendRequest(smId: string) {
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/CheckAllowSettleEdocSendRequest/${smId}`).pipe(
+            map((data: any) => data)
+        );
+    }
 }

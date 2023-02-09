@@ -1,6 +1,6 @@
 import { ActionReducerMap, createFeatureSelector, createSelector } from "@ngrx/store";
-import { settlePaymentDetailreducer, SettlePaymentDetailState } from "./settlement-payment-detail-reducer";
-import { settlePaymentListreducer, SettlePaymentListState } from "./settlement-payment-list.reducer";
+import { SettlePaymentDetailState, settlePaymentDetailreducer } from "./settlement-payment-detail-reducer";
+import { SettlePaymentListState, settlePaymentListreducer } from "./settlement-payment-list.reducer";
 
 export * from './settlement-payment-list.reducer';
 export interface ISettlementPaymentState {

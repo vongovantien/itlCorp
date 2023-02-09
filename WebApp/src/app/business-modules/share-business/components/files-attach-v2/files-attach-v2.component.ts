@@ -316,10 +316,20 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             .subscribe(
                 (res: any[]) => {
                     this.documentTypes = res;
-                    this.documentAttach.documentTypes = res;
+                    // this.documentAttach.documentTypes = res;
+                    // console.log(this.documentAttach.documentTypes);
+
                 },
             );
     }
+
+    // getDocTypeFromAttDoc(advAmount: number) {
+    //     console.log(advAmount);
+
+    //     //this.documentAttach.advAmount = this.advAmount;
+    //     //this.documentAttach.getDocumentType('Settlement');
+    //     this.documentAttach.filterDocTypeSettle(advAmount);
+    // }
 
     getEDoc(transactionType: string) {
         if (this.typeFrom === 'Shipment') {
@@ -502,7 +512,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 Note: '',
                 BillingId: SystemConstants.EMPTY_GUID,
                 Id: SystemConstants.EMPTY_GUID,
-                DocumentId: x.DocumentId
+                DocumentId: x.DocumentId,
+                AccountingType: x.AccountingType
             }));
         });
         let EdocUploadFile: IEDocUploadFile;
