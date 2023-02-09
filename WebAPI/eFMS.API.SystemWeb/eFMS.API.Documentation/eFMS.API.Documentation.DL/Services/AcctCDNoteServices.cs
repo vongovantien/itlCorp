@@ -58,6 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<SysUserNotification> sysUserNotificationRepository;
         IContextBase<CatCommodityGroup> catCommodityGroupRepository;
         IContextBase<AccAccountingManagement> accountingManagementRepository;
+        IContextBase<AcctSettlementPayment> acctSettlementPaymentRepository;
         IContextBase<CatDepartment> departmentRepository;
         IContextBase<AcctCdnote> acctCdnoteRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
@@ -103,6 +104,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctSoa> acctSoa,
             IContextBase<AcctSettlementPayment> acctSettlementPaymentRepo,
             IContextBase<AcctCombineBilling> acctCombineBillingRepo,
+            IContextBase<AcctSettlementPayment> acctSettlementPaymentRepo,
             IOptions<ApiUrl> aUrl,
             ICheckPointService checkPoint
             ) : base(repository, mapper)
@@ -138,6 +140,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctCreditManagementArRepository = acctCreditManagementArRepo;
             acctSoaRepo = acctSoa;
             acctCombineBillingRepository = acctCombineBillingRepo;
+            acctSettlementPaymentRepository = acctSettlementPaymentRepo;
             apiUrl = aUrl;
             checkPointService = checkPoint;
             catchargeGroupRepository = catChargeGroupRepository;
@@ -2192,7 +2195,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.CDNote.Code+ CrystalEx.GetExtension(format);
+            var reportName = data.CDNote.Code + CrystalEx.GetExtension(format);
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -2825,6 +2828,109 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return soas;
         }
+
+        private IQueryable<InvoiceListModel> GetChargeNotSoaFromSettle()
+        {
+            var settlePayments = acctSettlementPaymentRepository.Where(x => x.StatusApproval == DocumentConstants.STATUS_APPROVAL_DONE);
+            var charges = surchargeRepository.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.Soano)
+                && string.IsNullOrEmpty(x.CreditNo) && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE));
+
+            var accMangData = accountingManagementRepository.Get();
+            var transactionData = cstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+            var transactionDetailData = trandetailRepositoty.Get();
+            var opstransactionData = opstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+
+            var query = from settle in settlePayments
+                        join chg in charges on settle.SettlementNo equals chg.SettlementCode
+                        join trans in transactionData on chg.JobNo equals trans.JobNo into transGrp
+                        from trans in transGrp.DefaultIfEmpty()
+                        join tranDs in transactionDetailData on trans.Id equals tranDs.JobId into tranDsGrp
+                        from tranDs in tranDsGrp.DefaultIfEmpty()
+                        join ops in opstransactionData on chg.JobNo equals ops.JobNo into opsGrp
+                        from ops in opsGrp.DefaultIfEmpty()
+                        join acc in accMangData on chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId equals acc.Id into accGrp
+                        from acc in accGrp.DefaultIfEmpty()
+                        select new InvoiceListModel
+                        {
+                            Id = chg.Id.ToString(),
+                            PartnerId = chg.PayerId,
+                            ReferenceNo = chg.Soano,
+                            HBLId = chg.Hblid,
+                            JobNo = chg.JobNo,
+                            JobId = chg.TransactionType == "CL" ? ops.Id : trans.Id,
+                            MBLNo = chg.Mblno,
+                            HBLNo = chg.Hblno,
+                            Total = chg.Total,
+                            Currency = chg.CurrencyId,
+                            IssuedDate = chg.DatetimeCreated, //export date
+                            Creator = chg.UserCreated,
+                            Status = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) != null ? "Issued" : "New",
+                            InvoiceNo = chg.InvoiceNo,
+                            VoucherId = chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.VoucherIdre : chg.VoucherId,
+                            IssuedStatus = (!string.IsNullOrEmpty(chg.InvoiceNo) && chg.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(chg.VoucherId) && (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) != null) ? "Issued Voucher" : "New",
+                            DatetimeModified = chg.DatetimeModified,
+                            DatetimeCreated = chg.DatetimeCreated,
+                            VoucherIddate = chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.VoucherIdredate : chg.VoucherIddate,
+                            CodeNo = chg.Type == "BUY" ? chg.CreditNo : chg.DebitNo,
+                            ChargeId = chg.Id,
+                            CodeType = chg.Type == "BUY" ? "CREDIT" : "DEBIT",
+                            ChargeType = chg.Type,
+                            PayerId = !string.IsNullOrEmpty(settle.Payee) ? settle.Payee : String.Empty,
+                            SoaNo = chg.SettlementCode
+                        };
+
+            if (query == null || query.Count() == 0)
+            {
+                return null;
+            }
+            var hs = query.ToList().GroupBy(g => new
+            {
+                g.HBLId,
+                g.VoucherId,
+                g.SoaNo,
+            });
+
+            var result = query.ToList().GroupBy(g => new
+            {
+                g.HBLId,
+                g.VoucherId,
+                g.SoaNo,
+            }).Select(se => new InvoiceListModel
+            {
+                Id = se.FirstOrDefault().Id,
+                JobId = se.FirstOrDefault().JobId,
+                PartnerId = se.FirstOrDefault().PartnerId,
+                PartnerName = string.Empty,
+                ReferenceNo = se.FirstOrDefault().ReferenceNo,
+                BillingType = se.FirstOrDefault().BillingType,
+                HBLId = se.FirstOrDefault().HBLId,
+                JobNo = se.FirstOrDefault().JobNo,
+                MBLNo = se.FirstOrDefault().MBLNo,
+                HBLNo = se.FirstOrDefault().HBLNo,
+                Total = se.GroupBy(x => x.ChargeId).Sum(z => z.FirstOrDefault().Total),
+                Currency = se.FirstOrDefault().Currency,
+                IssuedDate = se.FirstOrDefault().IssuedDate,
+                Creator = se.FirstOrDefault().Creator,
+                Status = se.Any(x => x.Status == "Issued") ? "Issued" : "New",
+                InvoiceNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo)?.Distinct()),
+                VoucherId = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.VoucherId)).Select(x => x.VoucherId).Distinct()),
+                IssuedStatus = se.Any(y => y.IssuedStatus == "Issued Invoice") ? "Issued Invoice" : (se.Any(y => y.IssuedStatus == "Issued Voucher") ? "Issued Voucher" : "New"),
+                SyncStatus = se.FirstOrDefault().SyncStatus,
+                LastSyncDate = se.FirstOrDefault().LastSyncDate,
+                DatetimeModified = se.FirstOrDefault().DatetimeModified,
+                VoucherIddate = se.Where(x => x.VoucherIddate != null).FirstOrDefault()?.VoucherIddate,
+                PaymentStatus = se.FirstOrDefault().PaymentStatus,
+                CodeNo = se.FirstOrDefault().CodeNo,
+                CodeType = se.FirstOrDefault().CodeType,
+                ChargeType = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.ChargeType)).Select(x => x.ChargeType).Distinct()),
+                PayerId = se.FirstOrDefault().PayerId,
+                DepartmentId = se.FirstOrDefault().DepartmentId,
+                AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
+                SoaNo = se.FirstOrDefault().SoaNo,
+            }).AsQueryable();
+            return result;
+        }
+
         /// <summary>
         /// Get soa data with charges without issued cdnote
         /// </summary>
@@ -2979,8 +3085,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var result = data.ToList().GroupBy(g => new
             {
-                g.ReferenceNo,
                 g.HBLId,
+                g.ReferenceNo,
                 g.Currency
             }).Select(se => new InvoiceListModel
             {
@@ -4294,8 +4400,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var cdNoteData = GetDataCdNote(criteria);
             var soaData = GetDataSoaNotIssuedCdNote(criteria);
+            var chargeNotSoa = GetChargeNotSoaFromSettle();
 
-            if (cdNoteData == null && soaData == null)
+            if (cdNoteData == null && soaData == null && chargeNotSoa == null)
             {
                 return new List<AccAccountingManagementResult>();
             }
@@ -4309,10 +4416,15 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 queryData = queryData.Union(soaData);
             }
+
             if (criteria.FromAccountingDate != null && criteria.ToAccountingDate != null)
                 queryData = queryData.Where(x => x.VoucherIddate != null && (x.VoucherIddate.Value.Date >= criteria.FromAccountingDate.Value.Date && x.VoucherIddate.Value.Date <= criteria.ToAccountingDate.Value.Date));
             // Get by status
             queryData = GetStatusInvoiceList(criteria.Status, queryData);
+            if (chargeNotSoa?.Count() > 0)
+            {
+                queryData = queryData.Union(chargeNotSoa);
+            }
             var _resultDatas = queryData.OrderByDescending(o => o.DatetimeModified).ToList();
 
             var partners = partnerRepositoty.Get();
