@@ -312,6 +312,9 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             );
     }
     exportAgencyTemplate() {
+        if (this.dataSearch.partnerId == null) {
+            return this._toastService.error('Please select partner!');
+        }
         this._progressRef.start();
         this._exportRepo.exportAgencyTemplate(this.dataSearch)
             .pipe(
