@@ -221,7 +221,6 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getPartnerById(id: string) {
-        console.log(this.customers)
         const partner: Partner = !this.customers ? null : this.customers.find((p: Partner) => p.id === id);
         return partner || null;
     }
@@ -263,6 +262,7 @@ export class SettlementFormCreateComponent extends AppForm {
                             }
                         }
                         else {
+                            this.bankAccount = [];
                             const beneficiary = this.getPartnerById(this.payee.value);
                             if (!!beneficiary) {
                                 this.beneficiaryName.setValue(beneficiary.partnerNameVn);

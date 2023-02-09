@@ -256,6 +256,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                             }
                         }
                         else {
+                            this.bankAccount = [];
                             this.setBankInfoForPayee(this.selectedPayee);
                         }
                     })
@@ -272,8 +273,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     onSelectDataBankInfo(data: any) {
         if (data) {
             this.bankName.setValue(data.bankNameEn);
-            this.bankAccountName.setValue(data.bankAccountName)
-            this.bankAccountNo.setValue(data.bankAccountNo)
+            // this.bankAccountName.setValue(data.bankAccountName)
+            // this.bankAccountNo.setValue(data.bankAccountNo)
             this.mapBankCode(data.code);
         }
     }
