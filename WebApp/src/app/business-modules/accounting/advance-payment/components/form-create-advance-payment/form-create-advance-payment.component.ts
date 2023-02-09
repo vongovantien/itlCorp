@@ -126,7 +126,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             paymentMethod: [this.methods[0].value],
             note: [],
             currency: [],
-            paymentTerm: [9],
+            paymentTerm: [7],
             bankAccountNo: [],
             bankAccountName: [],
             bankName: [],
