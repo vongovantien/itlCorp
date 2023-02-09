@@ -45,6 +45,7 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
 
+        private readonly IContextBase<SysOffice> sysOfficeRepository;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
@@ -61,6 +62,7 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
+            IContextBase<SysOffice> sysOffice,
         IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
@@ -77,6 +79,7 @@ namespace eFMS.API.Operation.DL.Services
             csShipmentSurchargeRepo = csShipmentSurcharge;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
             accAdvancePaymentRepository = accAdvancePaymentRepo;
+            sysOfficeRepository = sysOffice;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -384,13 +387,21 @@ namespace eFMS.API.Operation.DL.Services
 
 
             var data = Get().Where(query);
+            var officeOutsource = sysOfficeRepository.Get(x => x.OfficeType == "OutSource");
             if (Imported == true)
             {
                 data = data.Where(x => x.JobNo != null);
             }
             else if (Imported == false)
             {
-                data = data.Where(x => x.JobNo == null);
+                foreach (var item in officeOutsource)
+                {
+                    if(currentUser.OfficeID.ToString().ToLower().Equals(item.Id.ToString().ToLower()))
+                    {
+                        data = data.Where(x => x.JobNo == null && x.Source == "Replicate");
+                    }    
+                }    
+                data = data.Where(x => x.JobNo == null && x.Source == "eFMS");
             }
             rowsCount = data.Count();
             if (rowsCount == 0) return returnList;
@@ -483,7 +494,11 @@ namespace eFMS.API.Operation.DL.Services
                         clearance.DatetimeModified = DateTime.Now;
                         clearance.UserModified = currentUser.UserID;
                     }
-                    result = DataContext.Update(clearance, x => x.Id == item.Id, false);
+                    DataContext.Update(clearance, x => x.Id == item.Id, false);
+                    if (item.isDelete == true && item.Source == "Replicate")
+                    {
+                        DataContext.Delete(x => x.Id == item.Id);
+                    }
                 }
                 result = DataContext.SubmitChanges();
 
@@ -1633,7 +1648,7 @@ namespace eFMS.API.Operation.DL.Services
                         return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
                     }
 
-                    var opsJobReplicate = opsTransactionRepo.Get(x => x.Id == opsJob.ReplicatedId)?.FirstOrDefault();
+                    var opsJobReplicate = opsTransactionRepo.Get(x => x.Id == opsJob.ReplicatedId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
                     if (opsJobReplicate == null)
                     {
                         return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
