@@ -95,7 +95,7 @@
                     </label>
                     <ng-container *ngIf="paymentMethod.value !== 'Cash'; else bankTemplate">
                         <app-combo-grid-virtual-scroll [tooltip]="bankAccountNo.value"
-                            (itemSelected)="onSelectDataBankInfo($event)" [selectedDisplayFields]="['bankAccountNo']"
+                            (itemSelected)="onSelectDataBankInfo($event, 'bankAccountNo')" [selectedDisplayFields]="['bankAccountNo']"
                             [dataSources]="bankAccount" [displayFields]="displayFieldBankAccount"
                             (remove)="resetFormControl(bankAccountNo)" (showedDropdown)="getBankAccountPayee(false)"
                             placeholder="Please Select Bank Account No" allowFreeText formControlName="bankAccountNo">
@@ -121,7 +121,7 @@
                         Bank Name:
                     </label>
                     <ng-container *ngIf="!readonlyForm; else bankTpl">
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event)"
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event, 'bankName')"
                             [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
                             [displayFields]="displayFieldBank" (remove)="resetFormControl(bankName)"
                             placeholder="Please Select Bank Name" allowFreeText formControlName="bankName">
