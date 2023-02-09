@@ -97,7 +97,6 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.banks = this._store.select(getCatalogueBankState);
         this.users = this._systemRepo.getListSystemUser();
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
-
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((u) => {
@@ -198,6 +197,13 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         }
     }
 
+    changeAdvanceFor(data: any) {
+        if (!!data) {
+            console.log('changeAdvanceFor', data)
+            this.onChangeAdvanceFor.emit(data);
+        }
+    }
+
     onChangePaymentMethod(method: string) {
         if (method !== 'Cash') {
             if (!this.payee.value) {
@@ -205,7 +211,10 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
                 this.bankName.setValue(this.userLogged.bankName || null);
                 this.bankCode.setValue(this.userLogged.bankCode || null);
-            } else if (!!this.selectedPayee) {
+            } else {
+                if (!this.selectedPayee) {
+                    this.getPartnerById(this.payee.value)
+                }
                 this.getBankAccountPayee(true);
             }
         }
@@ -217,11 +226,10 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         }
     }
 
-    changeAdvanceFor(data: any) {
-        if (!!data) {
-            console.log('changeAdvanceFor', data)
-            this.onChangeAdvanceFor.emit(data);
-        }
+    getPartnerById(id: string) {
+        this.customers.pipe(
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(x => this.selectedPayee = x.find(s => s.id = id));
     }
 
     onSelectPayee(payee: Partner) {
@@ -248,6 +256,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                             }
                         }
                         else {
+                            this.bankAccount = [];
                             this.setBankInfoForPayee(this.selectedPayee);
                         }
                     })
@@ -261,12 +270,22 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.mapBankCode(payee.bankCode);
     }
 
-    onSelectDataBankInfo(data: any) {
+    onSelectDataBankInfo(data: any, type: string) {
         if (data) {
-            this.bankName.setValue(data.bankNameEn);
-            this.bankAccountName.setValue(data.bankAccountName)
-            this.bankAccountNo.setValue(data.bankAccountNo)
-            this.mapBankCode(data.code);
+            switch (type) {
+                case "bankName":
+                    this.bankName.setValue(data.bankNameEn);
+                    this.mapBankCode(data.code);
+                    break;
+                case "bankAccountNo":
+                    this.bankAccountName.setValue(data.bankAccountName)
+                    this.bankAccountNo.setValue(data.bankAccountNo)
+                    this.bankName.setValue(data.bankNameEn);
+                    this.mapBankCode(data.code);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

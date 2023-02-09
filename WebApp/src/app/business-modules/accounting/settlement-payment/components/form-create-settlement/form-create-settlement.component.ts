@@ -245,7 +245,7 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getBankAccountPayee(isSetBank: Boolean) {
-        if (!!this.payee.value && (this.paymentMethod.value.value !== 'Cash')) {
+        if (!!this.payee.value && this.paymentMethod.value.value !== 'Cash') {
             this._catalogueRepo.getListBankByPartnerById(this.payee.value)
                 .pipe(catchError(this.catchError), finalize(() => {
                     this.isLoading = false;
@@ -257,10 +257,12 @@ export class SettlementFormCreateComponent extends AppForm {
                                 this.bankAccountNo.setValue(res[0].bankAccountNo);
                                 this.bankNameDescription.setValue(res[0].bankNameEn);
                                 this.bankName.setValue(res[0].bankNameEn);
+                                this.beneficiaryName.setValue(res[0].bankAccountName)
                                 this.mapBankCode(res[0].code);
                             }
                         }
                         else {
+                            this.bankAccount = [];
                             const beneficiary = this.getPartnerById(this.payee.value);
                             if (!!beneficiary) {
                                 this.beneficiaryName.setValue(beneficiary.partnerNameVn);
