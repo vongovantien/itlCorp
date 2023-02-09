@@ -3253,7 +3253,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     query = query.And(x => refNos.Any(a => a == x.Code));
                 }
-                if (surchargesCdNote.Count > 0)
+                if (surchargesCdNote.Any())
                 {
                     querySoa = querySoa.And(x => refNos.Any(a => a == x.Soano) || surchargesCdNote.Any(a => a == x.Soano));
                 }
@@ -3430,10 +3430,11 @@ namespace eFMS.API.Documentation.DL.Services
                                   InvDueDay = acc.PaymentDueDate
                               };
 
-            IEnumerable<InvoiceListModel> data = creditData.AsEnumerable();
-            data = data.Union(debitData.AsEnumerable());
-            data = data.Union(soadat.AsEnumerable());
-            data = data.Union(settleData.AsEnumerable());
+            var data = new List<InvoiceListModel>();
+            data.AddRange(creditData.ToList());
+            data.AddRange(debitData.ToList());
+            data.AddRange(soadat.ToList());
+            data.AddRange(settleData.ToList());
             var result = data.GroupBy(cd => new
             {
                 HblId = cd.HBLId,
@@ -3504,7 +3505,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     query = query.And(x => refNos.Any(a => a == x.Code));
                 }
-                if (surchargesCdNote.Count > 0)
+                if (surchargesCdNote.Any())
                 {
                     querySoa = querySoa.And(x => refNos.Any(a => a == x.Soano) || surchargesCdNote.Any(a => a == x.Soano));
                 }
@@ -3681,10 +3682,11 @@ namespace eFMS.API.Documentation.DL.Services
                              InvDueDay = acc.PaymentDueDate
                          };
 
-            IEnumerable<InvoiceListModel> data = creditDataOps.AsEnumerable();
-            data = data.Union(debitDataOps.AsEnumerable());
-            data = data.Union(soadatOps.AsEnumerable());
-            data = data.Union(settleDataOps.AsEnumerable());
+            var data = new List<InvoiceListModel>();
+            data.AddRange(creditDataOps.ToList());
+            data.AddRange(debitDataOps.ToList());
+            data.AddRange(soadatOps.ToList());
+            data.AddRange(settleDataOps.ToList());
             var result = data.GroupBy(cd => new
             {
                 HblId = cd.HBLId,
@@ -4366,6 +4368,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var cdNoteData = GetDataCdNoteAgency(criteria);
             var opsData = GetDataCdNoteAgencyOps(criteria);
+
             if (cdNoteData == null || cdNoteData.Count() == 0)
             {
                 if (opsData == null || opsData.Count() == 0)
@@ -4373,8 +4376,10 @@ namespace eFMS.API.Documentation.DL.Services
                     return new List<AccAccountingManagementAgencyResult>();
                 }
             }
+
             var queryData = cdNoteData;
             var queryDataOps = opsData;
+
             if (queryData == null || queryData.Count() == 0)
             {
                 if (queryDataOps == null || queryDataOps.Count() == 0)
@@ -4382,72 +4387,74 @@ namespace eFMS.API.Documentation.DL.Services
                     return new List<AccAccountingManagementAgencyResult>();
                 }
             }
-            // queryData
+
             queryData = GetStatusInvoiceList(criteria.Status, queryData);
-            var _resultDatas = queryData.OrderByDescending(o => o.DatetimeModified).ToList();
+
+            var resultDatas = queryData.OrderByDescending(o => o.DatetimeModified).ToList();
+            var resultDatasOps = queryDataOps.OrderByDescending(o => o.DatetimeModified).ToList();
             var places = placeRepository.Get();
-            var dataTrans = from rs in _resultDatas
-                            select new AccAccountingManagementAgencyResult
-                            {
-                                InvoiceNo = rs?.CodeNo == null ? rs?.SoaNo : rs.CodeNo,
-                                JobNo = rs.JobNo,
-                                CodeType = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? "DN" : (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY" ? "CN" : rs.Type?.ToUpper()),
-                                IssueDate = rs?.IssuedDate,
-                                FlexId = rs?.FlexID,
-                                MAWB = rs?.Mawb != null ? rs.Mawb : rs?.MBLNo,
-                                CdNoteNo = rs?.CdNoteNo,
-                                ChargeWeight = rs?.ChargeWeight,
-                                OriginChargeAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
-                                Destination = rs?.POD,
-                                Origin = rs?.POL,
-                                Status = rs?.PaymentStatus == null ? "Unpaid" : rs.PaymentStatus,
-                                FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
-                                DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
-                                CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
-                                VatVoucher = rs.VatVoucher,
-                                InvDueDay = rs?.InvDueDay
-                            };
+            var chargeGroups = catchargeGroupRepository.Get();
+
+            var dataTrans = resultDatas.Select(rs => new AccAccountingManagementAgencyResult
+            {
+                InvoiceNo = rs?.CodeNo ?? rs?.SoaNo,
+                JobNo = rs.JobNo,
+                CodeType = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? "DN" : (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY" ? "CN" : rs.Type?.ToUpper()),
+                IssueDate = rs?.IssuedDate,
+                FlexId = rs?.FlexID,
+                MAWB = rs?.Mawb ?? rs?.MBLNo,
+                CdNoteNo = rs?.CdNoteNo,
+                ChargeWeight = rs?.ChargeWeight,
+                OriginChargeAmount = (rs.ChargeGroup != null) ? (chargeGroups.FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
+                Destination = rs?.POD,
+                Origin = rs?.POL,
+                Status = rs?.PaymentStatus == null ? "Unpaid" : rs.PaymentStatus,
+                FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
+                DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
+                CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
+                VatVoucher = rs.VatVoucher,
+                InvDueDay = rs?.InvDueDay
+            });
 
             var res = dataTrans.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
 
             var _resultDatasOps = queryDataOps.OrderByDescending(o => o.DatetimeModified).ToList();
-            var dataOps = from rs in _resultDatasOps
-                          select new AccAccountingManagementAgencyResult
-                          {
-                              InvoiceNo = rs?.CodeNo == null ? rs?.SoaNo : rs.CodeNo,
-                              JobNo = rs.JobNo,
-                              CodeType = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? "DN" : (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY" ? "CN" : rs.Type?.ToUpper()),
-                              IssueDate = rs?.IssuedDate,
-                              FlexId = rs?.FlexID,
-                              MAWB = rs?.Mawb != null ? rs.Mawb : rs?.MBLNo,
-                              CdNoteNo = rs?.CdNoteNo,
-                              ChargeWeight = rs?.ChargeWeight,
-                              OriginChargeAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
-                              Destination = rs.PodId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PodId).NameEn,
-                              Origin = rs.PolId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PolId).NameEn,
-                              Status = rs?.PaymentStatus == null ? "Unpaid" : rs.PaymentStatus,
-                              FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
-                              DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
-                              CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
-                              VatVoucher = rs.VatVoucher,
-                              InvDueDay = rs?.InvDueDay
-                          };
+            var dataOps = resultDatasOps.Select(rs => new AccAccountingManagementAgencyResult
+            {
+                InvoiceNo = rs?.CodeNo == null ? rs?.SoaNo : rs.CodeNo,
+                JobNo = rs.JobNo,
+                CodeType = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? "DN" : (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY" ? "CN" : rs.Type?.ToUpper()),
+                IssueDate = rs?.IssuedDate,
+                FlexId = rs?.FlexID,
+                MAWB = rs?.Mawb != null ? rs.Mawb : rs?.MBLNo,
+                CdNoteNo = rs?.CdNoteNo,
+                ChargeWeight = rs?.ChargeWeight,
+                OriginChargeAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
+                Destination = rs.PodId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PodId).NameEn,
+                Origin = rs.PolId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PolId).NameEn,
+                Status = rs?.PaymentStatus == null ? "Unpaid" : rs.PaymentStatus,
+                FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
+                DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
+                CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
+                VatVoucher = rs.VatVoucher,
+                InvDueDay = rs?.InvDueDay
+            });
 
             var resOps = dataOps.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
             var resExport = res.Union(resOps).ToList<AccAccountingManagementAgencyResult>();
             return resExport;
         }
-    
 
-            #region -- Store procedures
-            /// <summary>
-            /// Store Proceduce to insert/update Credit Manegement AR Table
-            /// </summary>
-            /// <param name="updateLst">List to insert/update</param>
-            /// <param name="deleteLst">List to delete</param>
-            /// <param name="action"></param>
-            /// <returns></returns>
-            private sp_AcctInsertUpdateCreditMng UpdateCreditManagement(List<AcctCreditManagementModel> updateLst, List<AcctCreditManagementModel> deleteLst, string action)
+
+        #region -- Store procedures
+        /// <summary>
+        /// Store Proceduce to insert/update Credit Manegement AR Table
+        /// </summary>
+        /// <param name="updateLst">List to insert/update</param>
+        /// <param name="deleteLst">List to delete</param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        private sp_AcctInsertUpdateCreditMng UpdateCreditManagement(List<AcctCreditManagementModel> updateLst, List<AcctCreditManagementModel> deleteLst, string action)
         {
             var parameters = new[]{
                 new SqlParameter()
