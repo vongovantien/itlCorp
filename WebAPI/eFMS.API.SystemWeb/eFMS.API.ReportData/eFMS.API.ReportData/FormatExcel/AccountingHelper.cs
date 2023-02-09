@@ -5279,8 +5279,15 @@ namespace eFMS.API.ReportData.FormatExcel
                     excel.Worksheet.Cells[rowStart, 12].Style.Numberformat.Format = formatAmountUSD;
                     listKeyData.Add("CreditUSD", item.CreditUsd);
                     excel.Worksheet.Cells[rowStart, 13].Style.Numberformat.Format = formatAmountUSD;
-                    listKeyData.Add("Balance", (item?.DebitUsd ==null && item?.CreditUsd==null) ? "Unpaid" : (Math.Abs((decimal)(item?.DebitUsd - item?.CreditUsd))).ToString());
-                    excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = formatAmountUSD;
+                    if ((item?.DebitUsd ==null && item?.CreditUsd==null))
+                    {
+                        listKeyData.Add("Balance", "Unpaid");
+                    }
+                    else
+                    {
+                        listKeyData.Add("Balance", (item?.DebitUsd - item?.CreditUsd));
+                    }
+                    // excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = numberFormat;
                     listKeyData.Add("InvDueDay", item.InvDueDay);
                     excel.Worksheet.Cells[rowStart, 15].Style.Numberformat.Format = "MMM. dd,yyyy";
                     listKeyData.Add("Status", item.Status);
