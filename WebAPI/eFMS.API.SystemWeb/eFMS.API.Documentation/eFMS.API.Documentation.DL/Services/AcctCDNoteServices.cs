@@ -2864,9 +2864,9 @@ namespace eFMS.API.Documentation.DL.Services
                             DatetimeModified = chg.DatetimeModified,
                             DatetimeCreated = chg.DatetimeCreated,
                             VoucherIddate = chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.VoucherIdredate : chg.VoucherIddate,
-                            CodeNo = chg.Type == "Debit" ? chg.DebitNo : chg.CreditNo,
+                            CodeNo = chg.Type == "Buy" ? chg.CreditNo : chg.DebitNo,
                             ChargeId = chg.Id,
-                            CodeType = chg.Type == "Debit" ? "DEBIT" : "CREDIT",
+                            CodeType = chg.Type == "Buy" ? "CREDIT" : "DEBIT",
                             ChargeType = chg.Type,
                             PayerId = !string.IsNullOrEmpty(settle.Payee) ? settle.Payee : String.Empty,
                             SoaNo = chg.SettlementCode
