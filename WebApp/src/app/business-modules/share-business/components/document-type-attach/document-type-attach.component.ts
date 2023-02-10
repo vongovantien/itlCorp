@@ -4,7 +4,8 @@ import { Store } from '@ngrx/store';
 import { SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
-import { catchError } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { PopupBase } from 'src/app/popup.base';
 import { getTransactionLocked, getTransactionPermission } from '../../store';
 @Component({
@@ -46,7 +47,33 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     ngOnInit(): void {
         this.transactionType = this.typeFrom;
+        if (this.typeFrom === 'Settlement') {
+            this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        if (!!data) {
+                            this.updateDocTypeSettle(data.some(x => x.advanceNo !== null))
+                        }
+                    }
+                );
+        }
     }
+
+    updateDocTypeSettle(isADV: boolean) {
+        this._systemFileManagerRepo.getDocumentType('Settlement')
+            .subscribe(
+                (res: any[]) => {
+                    if (isADV) {
+                        this.documentTypes = res.filter(x => x.accountingType === 'ADV-Settlement');
+                    } else {
+                        this.documentTypes = res.filter(x => x.accountingType === 'Settlement');
+                    }
+                },
+            );
+    }
+
 
     chooseFile(event: any) {
         const fileList = event.target['files'];

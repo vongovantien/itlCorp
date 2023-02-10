@@ -59,7 +59,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                         this.objectId = param.objectId;
                         this.billingNo = param.billingNo;
 
-                        this.getDocumentType(param.folder, null);
+                        this.getDocumentType(param.folder);
                         this.getEdoc(this.objectId, this.folder);
                     } else {
                         this._toastService.warning("Params invalid");
@@ -68,8 +68,8 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
             )
     }
 
-    getDocumentType(transactionType: string, billingId: string) {
-        this._systemFileRepo.getDocumentType(transactionType, billingId)
+    getDocumentType(transactionType: string) {
+        this._systemFileRepo.getDocumentType(transactionType)
             .subscribe(
                 (res: any[]) => {
                     this.documentTypes = res;

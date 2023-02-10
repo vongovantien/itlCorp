@@ -350,7 +350,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     getDocumentType(transactionType: string, billingId: string) {
-        this._systemFileRepo.getDocumentType(transactionType, billingId)
+        this._systemFileRepo.getDocumentType(transactionType)
             .pipe(
                 catchError(this.catchError),
             )
