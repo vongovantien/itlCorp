@@ -4,7 +4,7 @@
             <div class="modal-header">
                 <h5 class="modal-title">Attachments Files</h5>
                 <button type="button" class="close" aria-label="Close"
-                    (click)="hide();resetForm(); isSubmitted = false;selectedtDocType=null">
+                    (click)="hide();resetForm(); isSubmitted = false;selectedDocType=null">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -36,90 +36,102 @@
                             <ng-container>
                                 <tbody>
                                     <ng-container *ngIf="listFile.length>0">
-                                        <ng-container *ngFor="let file of listFile; let i = index">
-                                            <tr>
-                                                <td class="table-actions-col">
-                                                    <app-permission-button type="delete" (onClick)="removeFile(i)">
-                                                    </app-permission-button>
-                                                </td>
-                                                <td class="">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.aliasName) }">
-                                                        <input class="form-control" placeholder="Aias name" type="text"
-                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'aliasName')"
-                                                            [ngModel]="file.aliasName">
-                                                    </div>
-                                                </td>
-                                                <td class="disabled">
-                                                    <div class="form-group ">
-                                                        <input type="text" class="form-control " [ngModel]="file.name"
-                                                            disabled>
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.docType) }">
-                                                        <select class="form-control" [(ngModel)]="file.docType"
+                                        <tr *ngFor="let file of listFile; let i = index;">
+                                            <td class="table-actions-col">
+                                                <app-permission-button type="delete" (onClick)="removeFile(i)">
+                                                </app-permission-button>
+                                            </td>
+                                            <td class="">
+                                                <div class="form-group"
+                                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !file.aliasName}">
+                                                    <input class="form-control" placeholder="Aias name"
+                                                        [disabled]="file.aliasGenPay" type="text"
+                                                        (ngModelChange)="onSelectDataFormInfo($event,i,'aliasName')"
+                                                        [ngModel]="file.aliasName">
+                                                </div>
+                                            </td>
+                                            <td class="disabled">
+                                                <div class="form-group ">
+                                                    <input type="text" class="form-control " [ngModel]="file.name"
+                                                        disabled>
+                                                </div>
+                                            </td>
+                                            <td *ngIf="typeFrom==='Settlement'||typeFrom==='Shipment'">
+                                                <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.docType||file
+                                                        .docType===null)) }">
+                                                    <!-- <select class="form-control" [(ngModel)]="file.docType"
                                                             (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
                                                             <option *ngFor="let docType of documentTypes"
                                                                 [ngValue]="docType">
                                                                 {{docType.nameEn}}
                                                             </option>
-                                                        </select>
-                                                    </div>
-                                                </td>
-                                                <td class="disabled" *ngIf="typeFrom==='Shipment'">
-                                                    <div class="form-group ">
-                                                        <input type="text" class="form-control " [ngModel]="jobNo"
-                                                            disabled>
-                                                    </div>
-                                                </td>
-                                                <td class="disabled" *ngIf="typeFrom!=='Shipment'">
-                                                    <select class="form-control" [(ngModel)]="file.job"
-                                                        (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
-                                                        <option *ngFor="let job of jobs" [ngValue]="job">
-                                                            {{job.jobNo}}
-                                                        </option>
-                                                    </select>
-                                                </td>
-                                                <td class="" *ngIf="typeFrom==='Shipment'">
-                                                    <div class="form-group ">
-                                                        <select class="form-control" [(ngModel)]="file.hwbNo"
-                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
-                                                            <option *ngFor="let hbl of housebills" [ngValue]="hbl">
-                                                                {{hbl.hwbno}}
-                                                            </option>
-                                                        </select>
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <div class="form-group ">
-                                                        <input type="text" class="form-control " placeholder="Note"
-                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'note')"
-                                                            [ngModel]="file.note">
-                                                    </div>
-                                                </td>
-
-                                            </tr>
-                                        </ng-container>
-                                    </ng-container>
-                                    <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!listFile.length">
-                                    </tr>
-                                </tbody>
-                            </ng-container>
-                        </table>
+                                                        </select>-->
+                                                </div>
                     </div>
+                    </td>
+                    <td *ngIf="typeFrom==='SOA'">
+                        <div class="form-group">
+                            <input class="form-control" [disabled]="true" type="text" [ngModel]="'SOA'">
+                        </div>
+                    </td>
+                    <td *ngIf="typeFrom==='Advance'">
+                        <div class="form-group">
+                            <input class="form-control" [disabled]="true" type="text" [ngModel]="'AD'">
+                        </div>
+                    </td>
+                    <ng-container *ngIf="typeFrom==='Settlement'">
+                        <td>
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.payee||file.payee===null))
+                                                        &&(file.Code === 'INV' || file.Code === 'OBH_INV') }"
+                                *ngIf="!file.payeeName;else payeeName">
+                                <app-combo-grid-virtual-scroll [height]="150"
+                                    (itemSelected)="onSelectDataFormInfo($event,i, 'payee')"
+                                    [dataSources]="payeeDataSource" [displayFields]="configPayee.displayFields"
+                                    [selectedDisplayFields]="configPayee.selectedDisplayFields"
+                                    (remove)="removePayee(i)" [disabled]="!enablePayeeINV[i]">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file
+                                                    .inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV')&&file.noINV===false }">
+                                <app-combo-grid-virtual-scroll [height]="150"
+                                    (itemSelected)="onSelectDataFormInfo($event,i, 'inv')"
+                                    [dataSources]="payFirst[i]===true?invDataSourceUpdate[i]:invDataSource"
+                                    [displayFields]="configINV.displayFields"
+                                    [selectedDisplayFields]="configINV.selectedDisplayFields" (remove)="removeINV(i)"
+                                    [disabled]="!enablePayeeINV[i]">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                        </td>
+                        <td class="">
+                            <div class="form-group ">
+                                <input type="text" class="form-control " placeholder="Note"
+                                    (ngModelChange)="onSelectDataFormInfo($event,i,'note')" [ngModel]="file.note">
+                            </div>
+                        </td>
+
+                        </tr>
+                    </ng-container>
+                    </ng-container>
+                    <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!listFile.length">
+                    </tr>
+                    </tbody>
+                    </ng-container>
+                    </table>
                 </div>
             </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="uploadEDoc()">
-                </app-default-button>
-                <app-default-button [buttonSetting]="cancelButtonSetting"
-                    (onClick)="hide();resetForm();isSubmitted=false;selectedtDocType=null">
-                </app-default-button>
-            </div>
+        </div>
+        <div class="modal-footer m--align-center c-button-actions">
+            <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="uploadEDoc()">
+            </app-default-button>
+            <app-default-button [buttonSetting]="cancelButtonSetting"
+                (onClick)="hide();resetForm();isSubmitted=false;selectedDocType=null;cleanListFile()">
+            </app-default-button>
         </div>
     </div>
+</div>
 </div>
 
 <ng-template inject></ng-template>
