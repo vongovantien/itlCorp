@@ -2822,9 +2822,14 @@ namespace eFMS.API.Documentation.DL.Services
             return soas;
         }
 
-        private IQueryable<InvoiceListModel> GetChargeNotSoaFromSettle()
+        private IQueryable<InvoiceListModel> GetChargeNotSoaFromSettle(CDNoteCriteria criteria)
         {
             var settlePayments = acctSettlementPaymentGroupRepo.Where(x => x.StatusApproval == DocumentConstants.STATUS_APPROVAL_DONE);
+
+            if (!string.IsNullOrEmpty(criteria.PartnerId))
+            {
+                settlePayments = settlePayments.Where(x => x.Payee == criteria.PartnerId);
+            }
             var charges = surchargeRepository.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.Soano)
                 && string.IsNullOrEmpty(x.CreditNo) && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE));
 
@@ -3885,7 +3890,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var cdNoteData = GetDataCdNote(criteria);
             var soaData = GetDataSoaNotIssuedCdNote(criteria);
-            var chargeNotSoa = GetChargeNotSoaFromSettle();
+            var chargeNotSoa = GetChargeNotSoaFromSettle(criteria);
 
             if (cdNoteData == null && soaData == null && chargeNotSoa == null)
             {
