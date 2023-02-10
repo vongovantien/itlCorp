@@ -177,7 +177,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.isExistingSettlement = false;
             this.isShowButtonCopyCharge = true;
         }
-        if (this.existingChargePopup.selectedCharge.length > 0) {
+        if (this.existingChargePopup?.selectedCharge?.length > 0) {
             this.isExistingSettlement = true;
             this.isDirectSettlement = false;
             this.isShowButtonCopyCharge = false;
@@ -200,6 +200,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         if (surcharge[0].isFromShipment) {
             this.onChange.emit(true);
         }
+        this.updateListSurcharge();
     }
 
     onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {
@@ -221,8 +222,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
             this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment, ...surchargeHasSynced];
             this.surcharges.forEach(c => c.isChangeShipment = undefined)
-
         }
+        this.updateListSurcharge();
     }
     onUpdateRequestSurcharge(surcharge: any) {
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
@@ -233,6 +234,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             // * Update next charge.
             this.openSurchargeDetail(this.surcharges[this.selectedIndexSurcharge + 1], this.selectedIndexSurcharge + 1, 'update');
         }
+        this.updateListSurcharge();
     }
 
     openSurchargeDetail(surcharge: Surcharge, index?: number, action?: string) {
@@ -373,6 +375,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         for (const item of headingShipmentComponent) {
             item.isCheckAll = false;
         }
+        this.updateListSurcharge();
     }
 
     returnChargeFromShipment(groupShipment: any) {

@@ -9,13 +9,9 @@ import { Store } from '@ngrx/store';
 import { AccountingRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { IAppState, getCurrentUserState } from '@store';
-import _uniqBy from 'lodash/uniqBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
-import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
-import { getSOADetailState } from 'src/app/business-modules/accounting/statement-of-account/store/reducers';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../store';
 import { IEDocFile, IEDocUploadFile, ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
@@ -51,7 +47,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     selectedEdoc1: IEDocItem;
     transactionType: string = '';
     housebills: any[] = [];
-    jobs: any[] = [];
+    //jobs: any[] = [];
     modifiedDocTypes: any;
     jobNo: string = '';
     private _readonly: boolean = false;
@@ -99,12 +95,25 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     ]
 
     headerSettleAttach: any[] = [
-        { title: 'Alias Name', field: 'aliasName', width: 300 },
-        { title: 'Real File Name', field: 'realFilename', width: 300 },
+        { title: 'Alias Name', field: 'aliasName', width: 200 },
+        { title: 'Real File Name', field: 'realFilename' },
+        { title: 'Document Type', field: 'docType', required: true },
+        { title: 'Payee', field: 'payee' },
+        { title: 'Invoice No', field: 'invoiceNo' },
+        { title: 'Series No', field: 'seriesNo' },
+        { title: 'Job Ref', field: 'jobRef' },
+        { title: 'Note', field: 'note' },
+
+    ]
+
+    headerAccAttach: any[] = [
+        { title: 'Alias Name', field: 'aliasName', width: 200 },
+        { title: 'Real File Name', field: 'realFilename' },
         { title: 'Document Type', field: 'docType', required: true },
         { title: 'Job Ref', field: 'jobRef' },
         { title: 'Note', field: 'note' },
     ]
+
 
     constructor(
         private readonly _systemFileRepo: SystemFileManageRepo,
@@ -159,7 +168,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             }
         } else {
             this.transactionType = this.typeFrom;
-            this.getJobList();
             this.getDocumentType(this.typeFrom, this.billingId);
             this.getEDoc(this.typeFrom);
         }
@@ -182,58 +190,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.getHblList();
     }
 
-    getJobList() {
-        this.jobs = [];
-        if (this.typeFrom === 'Settlement') {
-            this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-                .subscribe(
-                    (data) => {
-                        if (!!data) {
-                            _uniqBy(data, 'hbl').forEach(element => {
-                                let item = ({
-                                    jobNo: element.jobId,
-                                    id: element.shipmentId
-                                })
-                                this.jobs.push(item);
-                            }
-                            );
-                        }
-                    }
-                );
-        } else if (this.typeFrom === 'Advance') {
-            this._store.select(getAdvanceDetailRequestState).pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-                .subscribe(
-                    (data) => {
-                        if (!!data) {
-                            for (let element of data) {
-                                console.log(element);
-
-                                this.jobs.push({ jobNo: element.jobId, id: element.shipmentId })
-                            }
-                        }
-                    }
-                );
-        } else if (this.typeFrom === 'SOA') {
-            this._store.select(getSOADetailState).pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-                .subscribe(
-                    (data) => {
-                        if (!!data) {
-                            for (let element of data.groupShipments) {
-                                console.log(element);
-                                this.jobs.push({ jobNo: element.jobId, id: element.shipmentId })
-                            }
-                        }
-                    }
-                );
-        }
-
-    }
 
     getHblList() {
         this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
@@ -251,7 +207,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     onSelectEDoc(edoc: any) {
         this.selectedEdoc = edoc;
         this.selectedEdoc1 = edoc;
-        this.documentAttach.selectedtDocType = edoc.documentTypeId;
+        this.documentAttach.selectedDocType = edoc.documentTypeId;
         this.isView = true;
         const extension = this.selectedEdoc.imageUrl.split('.').pop();
         if (!['xlsx', 'docx', 'doc', 'xls', 'html', 'htm', 'pdf', 'txt', 'png', 'jpeg', 'jpg'].includes(extension)) {
@@ -289,10 +245,13 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     editEdoc() {
-        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance' || this.typeFrom === 'SOA') {
+        if (this.typeFrom === 'Settlement') {
             this.documentAttach.headers = this.headerSettleAttach;
-
-        } else {
+        }
+        else if (this.typeFrom === 'Advance' || this.typeFrom === 'SOA') {
+            this.documentAttach.headers = this.headerAccAttach;
+        }
+        else {
             this.documentAttach.headers = this.headerAttach;
         }
         this.documentAttach.isUpdate = true;
@@ -316,7 +275,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             AccountingType: this.typeFrom
         })
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
-        this.documentAttach.selectedtTrantype = this.selectedEdoc.transactionType;
+        this.documentAttach.selectedTrantype = this.selectedEdoc.transactionType;
         this.documentAttach.listFile.push(detailSeletedEdoc);
         this.documentAttach.show();
     }
@@ -390,9 +349,14 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     showDocumentAttach() {
-        if (this.typeFrom === 'Settlement' || this.typeFrom === 'Advance' || this.typeFrom === 'SOA') {
+        if (this.typeFrom === 'Settlement') {
             this.documentAttach.headers = this.headerSettleAttach;
-        } else {
+        }
+        else if (this.typeFrom === 'Advance' || this.typeFrom === 'SOA') {
+            this.documentAttach.headers = this.headerAccAttach;
+        }
+        else {
+
             this.documentAttach.headers = this.headerAttach;
         }
         this.documentAttach.isUpdate = false;
