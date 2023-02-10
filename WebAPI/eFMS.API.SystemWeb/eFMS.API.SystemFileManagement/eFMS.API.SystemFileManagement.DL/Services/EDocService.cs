@@ -692,7 +692,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserCreated = x.FirstOrDefault().UserCreated,
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
-                        Note =  x.FirstOrDefault().Note,
+                        Note = x.FirstOrDefault().Note,
                         HBLNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
                         JobNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
                     };

@@ -26,7 +26,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() jobId: string = '';
     @Input() transactionType: string = '';
     @Input() selectedDocType: any = null;
-    @Input() selectedtTrantype: any = null;
+    @Input() selectedTrantype: any = null;
     @Input() typeFrom: string = 'Shipment';
 
     headers: CommonInterface.IHeaderTable[] = [];
@@ -40,7 +40,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     configJob: CommonInterface.IComboGirdConfig | any = {};
     configPayee: CommonInterface.IComboGirdConfig | any = {};
     configINV: CommonInterface.IComboGirdConfig | any = {};
-    jobDatSource: any[] = [];
+    jobDataSource: any[] = [];
     payeeDataSource: any[] = [];
     invDataSource: any[] = [];
     invDataSourceUpdate: [any[]] = [[]];
@@ -48,8 +48,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     enablePayeeINV: boolean[] = [];
     payFirst: boolean[] = [];
     payFilled: boolean = true;
-    //noINV: boolean = false;
-    isADV: boolean = false;
 
     constructor(
         private _toastService: ToastrService,
@@ -63,7 +61,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     ngOnInit(): void {
         this.getJobList();
-        this.getDocumentType();
         this.transactionType = this.typeFrom;
         this.configJob = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
@@ -73,16 +70,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 { field: 'mbl', label: 'Master Bill' },
             ]
         }, { selectedDisplayFields: ['jobId'], });
-        this.configPayee = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'payer', label: 'Name EN' },
-            ]
-        }, { selectedDisplayFields: ['payer'], });
-        this.configINV = Object.assign({}, this.configComoBoGrid, {
-            displayFields: [
-                { field: 'invoiceNo', label: 'Invoice No' },
-            ]
-        }, { selectedDisplayFields: ['invoiceNo'], });
         this.configDocType = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'id', label: 'Code' },
@@ -91,6 +78,17 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         }, { selectedDisplayFields: ['nameEn'], });
 
         if (this.typeFrom === 'Settlement') {
+            this.configPayee = Object.assign({}, this.configComoBoGrid, {
+                displayFields: [
+                    { field: 'payer', label: 'Name EN' },
+                ]
+            }, { selectedDisplayFields: ['payer'], });
+            this.configINV = Object.assign({}, this.configComoBoGrid, {
+                displayFields: [
+                    { field: 'invoiceNo', label: 'Invoice No' },
+                ]
+            }, { selectedDisplayFields: ['invoiceNo'], });
+
             this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
                 takeUntil(this.ngUnsubscribe)
             )
@@ -106,20 +104,116 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     updateDocTypeSettle(isADV: boolean) {
         this._systemFileManagerRepo.getDocumentType('Settlement')
-            .pipe(
-                catchError(this.catchError),
-            )
             .subscribe(
                 (res: any[]) => {
-                    console.log('update docType');
                     if (isADV) {
                         this.documentTypes = res.filter(x => x.accountingType === 'ADV-Settlement');
+                        this.configDocType.dataSource = res.filter(x => x.accountingType === 'ADV-Settlement');;
+
                     } else {
                         this.documentTypes = res.filter(x => x.accountingType === 'Settlement');
+                        this.configDocType.dataSource = res.filter(x => x.accountingType === 'Settlement');;
+
                     }
                 },
             );
     }
+
+    getJobList() {
+        this.jobDataSource = [];
+        this.payeeDataSource = [];
+        this.invDataSource = [];
+        if (this.typeFrom === 'Settlement') {
+            this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        if (!!data) {
+                            _uniqBy(data, 'hbl').forEach(element => {
+                                let item = ({
+                                    jobId: element.jobId,
+                                    id: element.shipmentId,
+                                    customNo: element.clearanceNo,
+                                    hbl: element.hbl,
+                                    mbl: element.mbl
+
+                                })
+                                this.jobDataSource.push(item);
+                            }
+                            );
+
+                            _uniqBy(data, 'payer').forEach(element => {
+                                let item = ({
+                                    payer: element.payer,
+                                })
+                                this.payeeDataSource.push(item);
+                            }
+                            );
+
+                            _uniqBy(data, 'invoiceNo').forEach(element => {
+                                if (element.invoiceNo !== '') {
+                                    let item = ({
+                                        invoiceNo: element.invoiceNo,
+                                        payer: element.payer,
+                                        series: element.seriesNo,
+                                    })
+                                    this.invDataSource.push(item);
+                                }
+                            }
+                            );
+
+                        }
+                    }
+                );
+        } else if (this.typeFrom === 'Advance') {
+            this._store.select(getAdvanceDetailRequestState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        if (!!data) {
+                            _uniqBy(data, 'hbl').forEach(element => {
+                                let item = ({
+                                    jobId: element.jobId,
+                                    id: element.shipmentId,
+                                    customNo: element.customNo,
+                                    hbl: element.hbl,
+                                    mbl: element.mbl
+
+                                })
+                                this.jobDataSource.push(item);
+                            }
+                            );
+                        }
+                    }
+                );
+        } else if (this.typeFrom === 'SOA') {
+            this._store.select(getSOADetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        if (!!data) {
+                            _uniqBy(data.chargeShipments, 'hbl').forEach(element => {
+                                let item = ({
+                                    jobId: element.jobId,
+                                    id: element.shipmentId,
+                                    customNo: element.clearanceNo,
+                                    hbl: element.hbl,
+                                    mbl: element.mbl
+
+                                })
+                                this.jobDataSource.push(item);
+                            }
+                            );
+                        }
+                    }
+                );
+        }
+
+    }
+
 
     chooseFile(event: any) {
         this.getJobList();
@@ -168,109 +262,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     this.configDocType.dataSource = res;
                 },
             );
-    }
-
-
-    getJobList() {
-        //let jobs: any[] = [];
-        this.jobDatSource = [];
-        this.payeeDataSource = [];
-        this.invDataSource = [];
-        if (this.typeFrom === 'Settlement') {
-            this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-                .subscribe(
-                    (data) => {
-                        if (!!data) {
-                            _uniqBy(data, 'hbl').forEach(element => {
-                                let item = ({
-                                    jobId: element.jobId,
-                                    id: element.shipmentId,
-                                    customNo: element.clearanceNo,
-                                    hbl: element.hbl,
-                                    mbl: element.mbl
-
-                                })
-                                this.jobDatSource.push(item);
-                            }
-                            );
-
-                            _uniqBy(data, 'payer').forEach(element => {
-                                let item = ({
-                                    payer: element.payer,
-                                })
-                                this.payeeDataSource.push(item);
-                            }
-                            );
-
-                            _uniqBy(data, 'invoiceNo').forEach(element => {
-                                if (element.invoiceNo !== '') {
-                                    let item = ({
-                                        invoiceNo: element.invoiceNo,
-                                        payer: element.payer,
-                                        series: element.seriesNo,
-                                    })
-                                    this.invDataSource.push(item);
-                                }
-                            }
-                            );
-                            // if (this.invDataSource.length === 0) {
-                            //     this.noINV = true;
-                            // } else {
-                            //     this.noINV = false;
-                            // }
-                            // console.log(this.noINV);
-
-                        }
-                    }
-                );
-        } else if (this.typeFrom === 'Advance') {
-            this._store.select(getAdvanceDetailRequestState).pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-                .subscribe(
-                    (data) => {
-                        if (!!data) {
-                            _uniqBy(data, 'hbl').forEach(element => {
-                                let item = ({
-                                    jobId: element.jobId,
-                                    id: element.shipmentId,
-                                    customNo: element.customNo,
-                                    hbl: element.hbl,
-                                    mbl: element.mbl
-
-                                })
-                                this.jobDatSource.push(item);
-                            }
-                            );
-                        }
-                    }
-                );
-        } else if (this.typeFrom === 'SOA') {
-            this._store.select(getSOADetailState).pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
-                .subscribe(
-                    (data) => {
-                        if (!!data) {
-                            _uniqBy(data.chargeShipments, 'hbl').forEach(element => {
-                                let item = ({
-                                    jobId: element.jobId,
-                                    id: element.shipmentId,
-                                    customNo: element.clearanceNo,
-                                    hbl: element.hbl,
-                                    mbl: element.mbl
-
-                                })
-                                this.jobDatSource.push(item);
-                            }
-                            );
-                        }
-                    }
-                );
-        }
-
     }
 
     onSelectDataFormInfo(event: any, index: number, type: string) {
@@ -344,19 +335,12 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile?.splice(index, 1);
     }
 
-    checkValidateDocTypeOBH() {
-        return this.listFile.some(x => (x.payee === null || !x.payee) || ((!x.inv || x.inv === null) && x.noINV === false));
-    }
-
     uploadEDoc() {
+        this.payFilled = true;
         let edocFileList: IEDocFile[] = [];
         let files: any[] = [];
         this.isSubmitted = true;
 
-        if (this.checkValidateDocTypeOBH()) {
-            this._toastService.warning("Please fill Inv/serieNo/Payee");
-            return;
-        }
         this.listFile.forEach(x => {
             files.push(x);
             edocFileList.push(({
@@ -390,7 +374,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 Id: edocFileList[0].Id,
                 JobId: edocFileList[0].JobId,
                 DocumentTypeId: this.selectedDocType,
-                TransactionType: this.selectedtTrantype,
+                TransactionType: this.selectedTrantype,
             }
 
             if (edocUploadModel.DocumentTypeId === undefined || edocUploadModel.SystemFileName === '') {
@@ -408,12 +392,11 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             this.onSearch.emit(this.transactionType);
                             this.isSubmitted = false;
                         }
-                    }
-                );
+                    });
         } else {
             if (edocFileList.find(x => x.DocumentId === undefined || x.AliasName === '')) {
 
-                this._toastService.error("Please fill all field!");
+                this._toastService.warning("Please fill all field!");
                 return;
             }
             this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files, this.typeFrom)
@@ -436,17 +419,21 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile[index].jobNo = null;
         this.listFile[index].jobId = SystemConstants.EMPTY_GUID;
     }
+
     removePayee(index: number) {
         this.listFile[index].payee = null;
         this.payFirst[index] = false;
         this.listFile[index].series = null;
         this.listFile[index].payeeName = null;
         this.listFile[index].inv = null;
+        this.listFile[index].invoiceNo = null;
         this.listFile[index].aliasName = null;
+
     }
+
     removeINV(index: number) {
         this.listFile[index].inv = null;
-        this.listFile[index].payeeName = null;
+        //this.listFile[index].payeeName = null;
         this.listFile[index].series = null;
         this.listFile[index].payee = null;
         this.listFile[index].aliasName = null;

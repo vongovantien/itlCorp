@@ -47,6 +47,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     selectedEdoc1: IEDocItem;
     transactionType: string = '';
     housebills: any[] = [];
+    //jobs: any[] = [];
     modifiedDocTypes: any;
     jobNo: string = '';
     private _readonly: boolean = false;
@@ -114,6 +115,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Note', field: 'note' },
     ]
 
+
     constructor(
         private readonly _systemFileRepo: SystemFileManageRepo,
         private readonly _activedRoute: ActivatedRoute,
@@ -167,7 +169,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             }
         } else {
             this.transactionType = this.typeFrom;
-            //this.getJobList();
             this.getDocumentType(this.typeFrom);
             this.getEDoc(this.typeFrom);
         }
@@ -246,7 +247,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     editEdoc() {
         if (this.typeFrom === 'Settlement') {
             this.documentAttach.headers = this.headerSettleAttach;
-
         }
         else if (this.typeFrom === 'Advance' || this.typeFrom === 'SOA') {
             this.documentAttach.headers = this.headerAccAttach;
@@ -275,7 +275,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             AccountingType: this.typeFrom
         })
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
-        this.documentAttach.selectedtTrantype = this.selectedEdoc.transactionType;
+        this.documentAttach.selectedTrantype = this.selectedEdoc.transactionType;
         this.documentAttach.listFile.push(detailSeletedEdoc);
         this.documentAttach.show();
     }

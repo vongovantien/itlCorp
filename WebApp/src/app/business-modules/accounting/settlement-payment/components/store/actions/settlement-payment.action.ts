@@ -13,7 +13,6 @@ export enum SettlementPaymentActionTypes {
     GET_DETAIL_FAIL = '[SettlementPayment] Get Detail Fail',
     UPDATE_LIST_NO_GROUP_SURCHARGE = '[SettlementPayment] Update No Group List Surcharge',
 
-
 };
 
 type searchType = ISearchSettlePayment;

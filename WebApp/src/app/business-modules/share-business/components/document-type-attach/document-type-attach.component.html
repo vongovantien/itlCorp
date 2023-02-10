@@ -59,13 +59,6 @@
                                             <td *ngIf="typeFrom==='Settlement'||typeFrom==='Shipment'">
                                                 <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.docType||file
                                                         .docType===null)) }">
-                                                    <!-- <select class="form-control" [(ngModel)]="file.docType"
-                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
-                                                            <option *ngFor="let docType of documentTypes"
-                                                                [ngValue]="docType">
-                                                                {{docType.nameEn}}
-                                                            </option>
-                                                        </select> -->
                                                     <div class="list-master">
                                                         <app-combo-grid-virtual-scroll class="index1" [height]="150"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'docType')"
@@ -111,7 +104,8 @@
                                                 </td>
                                                 <td>
                                                     <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file.inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV')&&file.noINV===false }">
+                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file
+                                                    .inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV')&&file.noINV===false }">
                                                         <app-combo-grid-virtual-scroll [height]="150"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'inv')"
                                                             [dataSources]="payFirst[i]===true?invDataSourceUpdate[i]:invDataSource"
@@ -126,6 +120,12 @@
                                                         <input type="text" class="form-control " placeholder="Series No"
                                                             [ngModel]="file.series" disabled>
                                                     </div>
+                                                    <ng-template #payeeName>
+                                                        <div class="form-group ">
+                                                            <input type="text" class="form-control "
+                                                                [ngModel]="file?.payeeName" disabled>
+                                                        </div>
+                                                    </ng-template>
                                                 </td>
                                             </ng-container>
                                             <td class="disabled" *ngIf="typeFrom==='Shipment'">
@@ -134,16 +134,10 @@
                                                 </div>
                                             </td>
                                             <td class="disabled" *ngIf="typeFrom!=='Shipment'">
-                                                <!-- <select class="form-control" [(ngModel)]="file.job"
-                                                                (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
-                                                                <option *ngFor="let job of jobs" [ngValue]="job">
-                                                                    {{job.jobNo}}
-                                                                </option>
-                                                            </select> -->
                                                 <div class="list-master">
                                                     <app-combo-grid-virtual-scroll [height]="150"
                                                         (itemSelected)="onSelectDataFormInfo($event,i, 'job')"
-                                                        [dataSources]="jobDatSource"
+                                                        [dataSources]="jobDataSource"
                                                         [displayFields]="configJob.displayFields"
                                                         [selectedDisplayFields]="configJob.selectedDisplayFields"
                                                         (remove)="removeJob(i)">

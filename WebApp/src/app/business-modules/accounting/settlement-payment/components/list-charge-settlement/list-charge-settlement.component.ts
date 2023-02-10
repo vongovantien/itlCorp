@@ -26,8 +26,8 @@ import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ISettlementPaymentData } from "../../detail/detail-settlement-payment.component";
 import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
+import { ISettlementPaymentData } from "../../detail/detail-settlement-payment.component";
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -130,6 +130,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.detailSettlement = this._store.select(getSettlementPaymentDetailState);
     }
 
+    updateListSurcharge() {
+        this._store.dispatch(UpdateListNoGroupSurcharge({ data: this.surcharges }));
+    }
+
+
     showExistingCharge() {
         this.existingChargePopup.requester = this.getUserId(this.requester);
         this.existingChargePopup.allowUpdate = this.checkAllowUpdateExistingCharge();
@@ -159,10 +164,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.tableListChargePopup.show();
     }
 
-    updateListSurcharge() {
-        this._store.dispatch(UpdateListNoGroupSurcharge({ data: this.surcharges }));
-    }
-
     onRequestSurcharge(surcharge: Surcharge[], isCopy?: boolean) {
 
         if (surcharge[0].isFromShipment) {
@@ -180,7 +181,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.isExistingSettlement = false;
             this.isShowButtonCopyCharge = true;
         }
-        if (this.existingChargePopup.selectedCharge.length > 0) {
+        if (this.existingChargePopup?.selectedCharge?.length > 0) {
             this.isExistingSettlement = true;
             this.isDirectSettlement = false;
             this.isShowButtonCopyCharge = false;
@@ -225,8 +226,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
             this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment, ...surchargeHasSynced];
             this.surcharges.forEach(c => c.isChangeShipment = undefined)
-            this.updateListSurcharge();
         }
+        this.updateListSurcharge();
     }
     onUpdateRequestSurcharge(surcharge: any) {
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST

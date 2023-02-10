@@ -381,7 +381,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             return filecCoppyModel;
         }
-        private bool MoveEdoc(Guid oldImgId,Guid newImgId)
+        private bool MoveEdoc(Guid oldImgId, Guid newImgId)
         {
             //List<SysImageDetail> imgDetails = new List<SysImageDetail>();
             var edoc = _sysImageDetailRepo.Get(x => x.SysImageId == oldImgId);
@@ -390,7 +390,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 var edocNew = x;
                 edocNew.SysImageId = newImgId;
                 //imgDetails.Add(edocNew);
-                var updateEdoc=_sysImageDetailRepo.Update(edocNew, z => z.Id == x.Id);
+                var updateEdoc = _sysImageDetailRepo.Update(edocNew, z => z.Id == x.Id);
             });
             var hs = _sysImageDetailRepo.SubmitChanges();
             if (hs.Success)
