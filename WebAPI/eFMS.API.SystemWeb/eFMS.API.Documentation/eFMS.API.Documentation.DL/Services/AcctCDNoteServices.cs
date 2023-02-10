@@ -2824,7 +2824,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<InvoiceListModel> GetChargeNotSoaFromSettle(CDNoteCriteria criteria)
         {
-            var settlePayments = acctSettlementPaymentGroupRepo.Where(x => x.StatusApproval == DocumentConstants.STATUS_APPROVAL_DONE);
+            var settlePayments = acctSettlementPaymentGroupRepo.Where(x => x.StatusApproval == DocumentConstants.STATUS_APPROVAL_DONE && !string.IsNullOrEmpty(x.Payee));
 
             if (!string.IsNullOrEmpty(criteria.PartnerId))
             {
