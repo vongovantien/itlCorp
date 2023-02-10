@@ -58,7 +58,6 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<SysUserNotification> sysUserNotificationRepository;
         IContextBase<CatCommodityGroup> catCommodityGroupRepository;
         IContextBase<AccAccountingManagement> accountingManagementRepository;
-        IContextBase<AcctSettlementPayment> acctSettlementPaymentRepository;
         IContextBase<CatDepartment> departmentRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
         IContextBase<AcctSoa> acctSoaRepo;
@@ -99,7 +98,6 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo,
             IContextBase<AcctSoa> acctSoa,
             IContextBase<AcctCombineBilling> acctCombineBillingRepo,
-            IContextBase<AcctSettlementPayment> acctSettlementPaymentRepo,
             IOptions<ApiUrl> aUrl,
             ICheckPointService checkPoint
             ) : base(repository, mapper)
@@ -135,7 +133,6 @@ namespace eFMS.API.Documentation.DL.Services
             acctCreditManagementArRepository = acctCreditManagementArRepo;
             acctSoaRepo = acctSoa;
             acctCombineBillingRepository = acctCombineBillingRepo;
-            acctSettlementPaymentRepository = acctSettlementPaymentRepo;
             apiUrl = aUrl;
             checkPointService = checkPoint;
         }
