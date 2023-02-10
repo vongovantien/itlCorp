@@ -23,6 +23,7 @@ export abstract class AppForm extends AppPage {
     isCollapsed: boolean = true;
     isDuplicate: boolean = false;
     isReadonly: any = false;
+    isSearchAdv: boolean = false;
 
     selectedRange: any;
 
