@@ -1,10 +1,11 @@
-import { Directive, ViewContainerRef, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Directive, ViewContainerRef, Input, OnDestroy, Output, EventEmitter, ElementRef, ViewChild } from '@angular/core';
 import { Overlay, OverlayRef, ConnectionPositionPair, OverlayConfig } from '@angular/cdk/overlay';
 import { Subscription, merge, fromEvent } from 'rxjs';
 import { OVERLAY_POSITION_MAP } from '@constants';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { IDropdownPanel } from '../common/dropdown/dropdown.component';
 import { filter, take } from 'rxjs/operators';
+import { ClassGetter } from '@angular/compiler/src/output/output_ast';
 
 @Directive({
     selector: '[contextMenu]',
@@ -45,7 +46,30 @@ export class ContextMenuDirective implements OnDestroy {
                 .position()
                 .flexibleConnectedTo({ x: this.mouseX, y: this.mouseY })
                 .withPositions([
-                    this.position
+                    {
+                        originX: 'end',
+                        originY: 'top',
+                        overlayX: 'start',
+                        overlayY: 'top',
+                    },
+                    {
+                        originX: 'start',
+                        originY: 'top',
+                        overlayX: 'end',
+                        overlayY: 'top',
+                    },
+                    {
+                        originX: 'end',
+                        originY: 'bottom',
+                        overlayX: 'start',
+                        overlayY: 'bottom',
+                    },
+                    {
+                        originX: 'start',
+                        originY: 'bottom',
+                        overlayX: 'end',
+                        overlayY: 'bottom',
+                    },
                 ])
         });
     }
@@ -74,17 +98,49 @@ export class ContextMenuDirective implements OnDestroy {
         this.mouseX = x;
         this.mouseY = y;
         this.overlayRef = this._overlay.create(this.overlayConfig);
-
+        const windowHeight = window.screen.availHeight;
+        let contextMenuHeight = 0;
+        if (this.menuTemplate && this.menuTemplate.templateRef.elementRef.nativeElement.nextElementSibling) {
+          contextMenuHeight = this.menuTemplate.templateRef.elementRef.nativeElement.nextElementSibling.offsetHeight;
+        }
+        if (this.mouseY + 200 > windowHeight) {
+            this.overlayConfig.positionStrategy = this._overlay.position().flexibleConnectedTo({ x: this.mouseX, y: this.mouseY }).withPositions([
+                {
+                    originX: 'end',
+                    originY: 'top',
+                    overlayX: 'start',
+                    overlayY: 'top',
+                  },
+                  {
+                    originX: 'start',
+                    originY: 'top',
+                    overlayX: 'end',
+                    overlayY: 'top',
+                  },
+                  {
+                    originX: 'end',
+                    originY: 'bottom',
+                    overlayX: 'start',
+                    overlayY: 'bottom',
+                  },
+                  {
+                    originX: 'start',
+                    originY: 'bottom',
+                    overlayX: 'end',
+                    overlayY: 'bottom',
+                  },
+            ]);
+        }
         this.overlayRef.attach(new TemplatePortal(
-            this.menuTemplate.templateRef, this.viewContainerRef
+          this.menuTemplate.templateRef, this.viewContainerRef
         ));
-
+        console.log('a', this.menuTemplate.templateRef);
         // Listen Event Closing
         this.dropdownClosingActions$ = this.onClosingDropdown()
-            .subscribe(
-                () => this.close()
-            );
-    }
+          .subscribe(
+            () => this.close()
+          );
+      }
 
     private onClosingDropdown() {
         // const backdropClick$ = this.overlayRef.backdropClick(); // ? clickoutside 
