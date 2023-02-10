@@ -147,7 +147,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: CsTransaction) => {
                             this.transactionType = res.transactionType;
-                            this.getDocumentType(res.transactionType, null);
+                            this.getDocumentType(res.transactionType);
                             this.getEDoc(res.transactionType);
                             this.jobNo = res.jobNo;
                             this.isLocked = res.isLocked;
@@ -159,7 +159,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: any) => {
                             this.transactionType = 'CL';
-                            this.getDocumentType('CL', null);
+                            this.getDocumentType('CL');
                             this.getEDoc('CL');
                             this.jobNo = res.opstransaction.jobNo;
                             this.isLocked = res.opstransaction.isLocked;
@@ -168,7 +168,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             }
         } else {
             this.transactionType = this.typeFrom;
-            this.getDocumentType(this.typeFrom, this.billingId);
+            this.getDocumentType(this.typeFrom);
             this.getEDoc(this.typeFrom);
         }
         this.headers = [
@@ -308,7 +308,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
 
-    getDocumentType(transactionType: string, billingId: string) {
+    getDocumentType(transactionType: string) {
         this._systemFileRepo.getDocumentType(transactionType)
             .pipe(
                 catchError(this.catchError),
