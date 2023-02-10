@@ -5287,7 +5287,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     {
                         listKeyData.Add("Balance", (item?.DebitUsd - item?.CreditUsd));
                     }
-                    // excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = numberFormat;
+                    excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = numberFormat;
                     listKeyData.Add("InvDueDay", item.InvDueDay);
                     excel.Worksheet.Cells[rowStart, 15].Style.Numberformat.Format = "MMM. dd,yyyy";
                     listKeyData.Add("Status", item.Status);
