@@ -58,7 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<SysUserNotification> sysUserNotificationRepository;
         IContextBase<CatCommodityGroup> catCommodityGroupRepository;
         IContextBase<AccAccountingManagement> accountingManagementRepository;
-        IContextBase<AcctSettlementPayment> acctSettlementPaymentRepository;
+        IContextBase<AcctSettlementPayment> acctSettlementPaymentGroupRepo;
         IContextBase<CatDepartment> departmentRepository;
         IContextBase<AcctCdnote> acctCdnoteRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
@@ -140,7 +140,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctCreditManagementArRepository = acctCreditManagementArRepo;
             acctSoaRepo = acctSoa;
             acctCombineBillingRepository = acctCombineBillingRepo;
-            acctSettlementPaymentRepository = acctSettlementPaymentRepo;
+            acctSettlementPaymentGroupRepo = acctSettlementPaymentRepo;
             apiUrl = aUrl;
             checkPointService = checkPoint;
             catchargeGroupRepository = catChargeGroupRepository;
@@ -2831,7 +2831,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<InvoiceListModel> GetChargeNotSoaFromSettle()
         {
-            var settlePayments = acctSettlementPaymentRepository.Where(x => x.StatusApproval == DocumentConstants.STATUS_APPROVAL_DONE);
+            var settlePayments = acctSettlementPaymentGroupRepo.Where(x => x.StatusApproval == DocumentConstants.STATUS_APPROVAL_DONE);
             var charges = surchargeRepository.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.Soano)
                 && string.IsNullOrEmpty(x.CreditNo) && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE));
 
