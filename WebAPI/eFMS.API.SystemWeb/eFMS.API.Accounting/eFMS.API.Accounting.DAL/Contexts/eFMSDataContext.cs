@@ -16,7 +16,6 @@ namespace eFMS.API.Accounting.Service.Contexts
                     options =>
                     {
                         options.UseRowNumberForPaging();
-                        options.EnableRetryOnFailure();
                     })
                     .EnableDetailedErrors()
                     .EnableSensitiveDataLogging();
