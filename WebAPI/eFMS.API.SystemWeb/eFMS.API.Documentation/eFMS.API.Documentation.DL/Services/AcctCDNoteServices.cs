@@ -58,6 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<SysUserNotification> sysUserNotificationRepository;
         IContextBase<CatCommodityGroup> catCommodityGroupRepository;
         IContextBase<AccAccountingManagement> accountingManagementRepository;
+        IContextBase<AcctSettlementPayment> acctSettlementPaymentGroupRepo;
         IContextBase<CatDepartment> departmentRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
         IContextBase<AcctSoa> acctSoaRepo;
@@ -98,6 +99,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo,
             IContextBase<AcctSoa> acctSoa,
             IContextBase<AcctCombineBilling> acctCombineBillingRepo,
+            IContextBase<AcctSettlementPayment> acctSettlementPaymentRepo,
             IOptions<ApiUrl> aUrl,
             ICheckPointService checkPoint
             ) : base(repository, mapper)
@@ -133,6 +135,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctCreditManagementArRepository = acctCreditManagementArRepo;
             acctSoaRepo = acctSoa;
             acctCombineBillingRepository = acctCombineBillingRepo;
+            acctSettlementPaymentGroupRepo = acctSettlementPaymentRepo;
             apiUrl = aUrl;
             checkPointService = checkPoint;
         }
@@ -2821,7 +2824,7 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<InvoiceListModel> GetChargeNotSoaFromSettle()
         {
-            var settlePayments = acctSettlementPaymentRepository.Where(x => x.StatusApproval == DocumentConstants.STATUS_APPROVAL_DONE);
+            var settlePayments = acctSettlementPaymentGroupRepo.Where(x => x.StatusApproval == DocumentConstants.STATUS_APPROVAL_DONE);
             var charges = surchargeRepository.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.Soano)
                 && string.IsNullOrEmpty(x.CreditNo) && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE));
 
