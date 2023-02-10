@@ -64,7 +64,6 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
         IContextBase<AcctSoa> acctSoaRepo;
         IContextBase<CatChargeGroup> catchargeGroupRepository;
-        IContextBase<AcctSettlementPayment> acctSettlementPaymentGroupRepo;
         private readonly IContextBase<AcctCombineBilling> acctCombineBillingRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
@@ -104,7 +103,6 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctSoa> acctSoa,
             IContextBase<AcctSettlementPayment> acctSettlementPaymentRepo,
             IContextBase<AcctCombineBilling> acctCombineBillingRepo,
-            IContextBase<AcctSettlementPayment> acctSettlementPaymentRepo,
             IOptions<ApiUrl> aUrl,
             ICheckPointService checkPoint
             ) : base(repository, mapper)
@@ -144,7 +142,6 @@ namespace eFMS.API.Documentation.DL.Services
             apiUrl = aUrl;
             checkPointService = checkPoint;
             catchargeGroupRepository = catChargeGroupRepository;
-            acctSettlementPaymentGroupRepo = acctSettlementPaymentRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
