@@ -46,30 +46,9 @@ export class ContextMenuDirective implements OnDestroy {
                 .position()
                 .flexibleConnectedTo({ x: this.mouseX, y: this.mouseY })
                 .withPositions([
-                    {
-                        originX: 'end',
-                        originY: 'top',
-                        overlayX: 'start',
-                        overlayY: 'top',
-                    },
-                    {
-                        originX: 'start',
-                        originY: 'top',
-                        overlayX: 'end',
-                        overlayY: 'top',
-                    },
-                    {
-                        originX: 'end',
-                        originY: 'bottom',
-                        overlayX: 'start',
-                        overlayY: 'bottom',
-                    },
-                    {
-                        originX: 'start',
-                        originY: 'bottom',
-                        overlayX: 'end',
-                        overlayY: 'bottom',
-                    },
+                    this._position,
+                    OVERLAY_POSITION_MAP.leftalignedTop,
+                    OVERLAY_POSITION_MAP.leftAlignedBottom,
                 ])
         });
     }
@@ -98,43 +77,10 @@ export class ContextMenuDirective implements OnDestroy {
         this.mouseX = x;
         this.mouseY = y;
         this.overlayRef = this._overlay.create(this.overlayConfig);
-        const windowHeight = window.screen.availHeight;
-        let contextMenuHeight = 0;
-        if (this.menuTemplate && this.menuTemplate.templateRef.elementRef.nativeElement.nextElementSibling) {
-          contextMenuHeight = this.menuTemplate.templateRef.elementRef.nativeElement.nextElementSibling.offsetHeight;
-        }
-        if (this.mouseY + 200 > windowHeight) {
-            this.overlayConfig.positionStrategy = this._overlay.position().flexibleConnectedTo({ x: this.mouseX, y: this.mouseY }).withPositions([
-                {
-                    originX: 'end',
-                    originY: 'top',
-                    overlayX: 'start',
-                    overlayY: 'top',
-                  },
-                  {
-                    originX: 'start',
-                    originY: 'top',
-                    overlayX: 'end',
-                    overlayY: 'top',
-                  },
-                  {
-                    originX: 'end',
-                    originY: 'bottom',
-                    overlayX: 'start',
-                    overlayY: 'bottom',
-                  },
-                  {
-                    originX: 'start',
-                    originY: 'bottom',
-                    overlayX: 'end',
-                    overlayY: 'bottom',
-                  },
-            ]);
-        }
+
         this.overlayRef.attach(new TemplatePortal(
-          this.menuTemplate.templateRef, this.viewContainerRef
+            this.menuTemplate.templateRef, this.viewContainerRef
         ));
-        console.log('a', this.menuTemplate.templateRef);
         // Listen Event Closing
         this.dropdownClosingActions$ = this.onClosingDropdown()
           .subscribe(
