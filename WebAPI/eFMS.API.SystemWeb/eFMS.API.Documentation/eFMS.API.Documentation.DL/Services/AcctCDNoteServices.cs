@@ -3303,6 +3303,8 @@ namespace eFMS.API.Documentation.DL.Services
                              join partner in partnerData on cd.PartnerId equals partner.Id
                              join trans in transactionDetailData on sc.Hblid equals trans.Id into transGrps
                              from trans in transGrps.DefaultIfEmpty()
+                             join ops in opstransactionData on cd.JobId equals ops.Id into opsGrps
+                             from ops in opsGrps.DefaultIfEmpty()
                              join acc in accMangData on sc.AcctManagementId equals acc.Id
                              where partner.PartnerType == "Agent" 
                              select new InvoiceListModel
@@ -3316,6 +3318,8 @@ namespace eFMS.API.Documentation.DL.Services
                                  FlexID = cd.FlexId,
                                  POL = trans.PolDescription,
                                  POD = trans.PodDescription,
+                                 PolId = ops.Pol,
+                                 PodId = ops.Pod,
                                  TotalAmountUsd = sc.AmountUsd + sc.VatAmountUsd,
                                  ChargeWeight = trans.ChargeWeight,
                                  ChargeGroup = sc.ChargeGroup,
@@ -3331,11 +3335,13 @@ namespace eFMS.API.Documentation.DL.Services
                              join partner in partnerData on cd.PartnerId equals partner.Id
                              join trans in transactionDetailData on sc.Hblid equals trans.Id into transGrps
                              from trans in transGrps.DefaultIfEmpty()
+                             join ops in opstransactionData on cd.JobId equals ops.Id into opsGrps
+                             from ops in opsGrps.DefaultIfEmpty()
                              join acc in accMangData on sc.AcctManagementId equals acc.Id
                              where partner.PartnerType == "Agent"
                              select new InvoiceListModel
                              {
-                                 HBLId = trans.Id,
+                                 HBLId = trans.Id == Guid.Empty ? ops.Hblid: trans.Id,
                                  IssuedDate = sc.DatetimeCreated,
                                  JobNo = sc.JobNo,
                                  CodeNo = sc.DebitNo,
@@ -3344,8 +3350,10 @@ namespace eFMS.API.Documentation.DL.Services
                                  MBLNo = sc.Mblno,
                                  POL = trans.PolDescription,
                                  POD = trans.PodDescription,
+                                 PolId = ops.Pol,
+                                 PodId = ops.Pod,
                                  PaymentStatus = soa.PaymentStatus,
-                                 ChargeWeight = trans.ChargeWeight,
+                                 ChargeWeight = trans.ChargeWeight??ops.SumChargeWeight,
                                  TotalAmountUsd = sc.AmountUsd,
                                  ChargeGroup = sc.ChargeGroup,
                                  VatVoucher = sc.VoucherId,
@@ -3458,7 +3466,9 @@ namespace eFMS.API.Documentation.DL.Services
                 ChargeGroup = se.FirstOrDefault().ChargeGroup,
                 VatVoucher= se.FirstOrDefault().VatVoucher,
                 InvDueDay = se.FirstOrDefault().InvDueDay,
-                SoaNo = se.FirstOrDefault().SoaNo
+                SoaNo = se.FirstOrDefault().SoaNo,
+                PolId = se.FirstOrDefault().PolId,
+                PodId = se.FirstOrDefault().PodId
             }).AsQueryable();
             return result;
         }
@@ -3548,6 +3558,7 @@ namespace eFMS.API.Documentation.DL.Services
             var surchargeData = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo));
 
             // Gom tren ops
+            /*
             var places = placeRepository.Get();
             var creditDataOps = from cd in cdNoteData
                                 join sc in surchargeData on cd.Code equals sc.CreditNo
@@ -3603,7 +3614,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    PaymentStatus = acc.PaymentStatus,
                                    InvDueDay = acc.PaymentDueDate
                                };
-
+            */
             // Case settlement
             var settlementData = acctSettlementPaymentGroupRepo.Get();
             var settleDataOps = from sc in surchargeData
@@ -3683,8 +3694,8 @@ namespace eFMS.API.Documentation.DL.Services
                          };
 
             var data = new List<InvoiceListModel>();
-            data.AddRange(creditDataOps.ToList());
-            data.AddRange(debitDataOps.ToList());
+            //data.AddRange(creditDataOps.ToList());
+            // data.AddRange(debitDataOps.ToList());
             data.AddRange(soadatOps.ToList());
             data.AddRange(settleDataOps.ToList());
             var result = data.GroupBy(cd => new
@@ -4406,8 +4417,8 @@ namespace eFMS.API.Documentation.DL.Services
                 CdNoteNo = rs?.CdNoteNo,
                 ChargeWeight = rs?.ChargeWeight,
                 OriginChargeAmount = (rs.ChargeGroup != null) ? (chargeGroups.FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
-                Destination = rs?.POD,
-                Origin = rs?.POL,
+                Destination = rs?.POD ?? ((rs.PodId == null || rs.PodId == Guid.Empty) ? null : places.FirstOrDefault(x => x.Id == rs.PodId).NameEn),
+                Origin = rs?.POL ?? ((rs.PolId==null || rs.PolId == Guid.Empty) ? null : places.FirstOrDefault(x => x.Id == rs.PolId).NameEn),
                 Status = rs?.PaymentStatus == null ? "Unpaid" : rs.PaymentStatus,
                 FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
                 DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
@@ -4417,35 +4428,33 @@ namespace eFMS.API.Documentation.DL.Services
             });
 
             var res = dataTrans.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
-            if (res.Count() == 0 || res == null)
-            {
-                var _resultDatasOps = queryDataOps.OrderByDescending(o => o.DatetimeModified).ToList();
-                var dataOps = resultDatasOps.Select(rs => new AccAccountingManagementAgencyResult
-                {
-                    InvoiceNo = rs?.CodeNo == null ? rs?.SoaNo : rs.CodeNo,
-                    JobNo = rs.JobNo,
-                    CodeType = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? "DN" : (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY" ? "CN" : rs.Type?.ToUpper()),
-                    IssueDate = rs?.IssuedDate,
-                    FlexId = rs?.FlexID,
-                    MAWB = rs?.Mawb != null ? rs.Mawb : rs?.MBLNo,
-                    CdNoteNo = rs?.CdNoteNo,
-                    ChargeWeight = rs?.ChargeWeight,
-                    OriginChargeAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
-                    Destination = rs.PodId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PodId).NameEn,
-                    Origin = rs.PolId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PolId).NameEn,
-                    Status = rs?.PaymentStatus == null ? "Unpaid" : rs.PaymentStatus,
-                    FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
-                    DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
-                    CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
-                    VatVoucher = rs.VatVoucher,
-                    InvDueDay = rs?.InvDueDay
-                });
 
-                var resOps = dataOps.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
-                var resExport = res.Union(resOps).ToList<AccAccountingManagementAgencyResult>();
-                return resExport;
-            }
-            return res;
+            var _resultDatasOps = queryDataOps.OrderByDescending(o => o.DatetimeModified).ToList();
+            var dataOps = resultDatasOps.Select(rs => new AccAccountingManagementAgencyResult
+            {
+                InvoiceNo = rs?.CodeNo == null ? rs?.SoaNo : rs.CodeNo,
+                JobNo = rs.JobNo,
+                CodeType = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? "DN" : (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY" ? "CN" : rs.Type?.ToUpper()),
+                IssueDate = rs?.IssuedDate,
+                FlexId = rs?.FlexID,
+                MAWB = rs?.Mawb != null ? rs.Mawb : rs?.MBLNo,
+                CdNoteNo = rs?.CdNoteNo,
+                ChargeWeight = rs?.ChargeWeight,
+                OriginChargeAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
+                Destination = rs.PodId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PodId).NameEn,
+                Origin = rs.PolId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PolId).NameEn,
+                Status = rs?.PaymentStatus == null ? "Unpaid" : rs.PaymentStatus,
+                FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
+                DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
+                CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
+                VatVoucher = rs.VatVoucher,
+                InvDueDay = rs?.InvDueDay
+            });
+
+            var resOps = dataOps.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
+            var resExport = res.Union(resOps).Distinct().ToList<AccAccountingManagementAgencyResult>();
+            return resExport;
+
         }
 
 
