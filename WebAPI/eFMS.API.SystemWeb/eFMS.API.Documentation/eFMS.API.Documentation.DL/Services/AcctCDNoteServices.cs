@@ -4417,32 +4417,35 @@ namespace eFMS.API.Documentation.DL.Services
             });
 
             var res = dataTrans.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
-
-            var _resultDatasOps = queryDataOps.OrderByDescending(o => o.DatetimeModified).ToList();
-            var dataOps = resultDatasOps.Select(rs => new AccAccountingManagementAgencyResult
+            if (res.Count() == 0 || res == null)
             {
-                InvoiceNo = rs?.CodeNo == null ? rs?.SoaNo : rs.CodeNo,
-                JobNo = rs.JobNo,
-                CodeType = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? "DN" : (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY" ? "CN" : rs.Type?.ToUpper()),
-                IssueDate = rs?.IssuedDate,
-                FlexId = rs?.FlexID,
-                MAWB = rs?.Mawb != null ? rs.Mawb : rs?.MBLNo,
-                CdNoteNo = rs?.CdNoteNo,
-                ChargeWeight = rs?.ChargeWeight,
-                OriginChargeAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
-                Destination = rs.PodId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PodId).NameEn,
-                Origin = rs.PolId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PolId).NameEn,
-                Status = rs?.PaymentStatus == null ? "Unpaid" : rs.PaymentStatus,
-                FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
-                DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
-                CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
-                VatVoucher = rs.VatVoucher,
-                InvDueDay = rs?.InvDueDay
-            });
+                var _resultDatasOps = queryDataOps.OrderByDescending(o => o.DatetimeModified).ToList();
+                var dataOps = resultDatasOps.Select(rs => new AccAccountingManagementAgencyResult
+                {
+                    InvoiceNo = rs?.CodeNo == null ? rs?.SoaNo : rs.CodeNo,
+                    JobNo = rs.JobNo,
+                    CodeType = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? "DN" : (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY" ? "CN" : rs.Type?.ToUpper()),
+                    IssueDate = rs?.IssuedDate,
+                    FlexId = rs?.FlexID,
+                    MAWB = rs?.Mawb != null ? rs.Mawb : rs?.MBLNo,
+                    CdNoteNo = rs?.CdNoteNo,
+                    ChargeWeight = rs?.ChargeWeight,
+                    OriginChargeAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() != "FREIGHT" ? rs?.TotalAmountUsd : null) : rs?.TotalAmountUsd,
+                    Destination = rs.PodId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PodId).NameEn,
+                    Origin = rs.PolId == null ? "" : places.FirstOrDefault(x => x.Id == rs.PolId).NameEn,
+                    Status = rs?.PaymentStatus == null ? "Unpaid" : rs.PaymentStatus,
+                    FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
+                    DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
+                    CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
+                    VatVoucher = rs.VatVoucher,
+                    InvDueDay = rs?.InvDueDay
+                });
 
-            var resOps = dataOps.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
-            var resExport = res.Union(resOps).ToList<AccAccountingManagementAgencyResult>();
-            return resExport;
+                var resOps = dataOps.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
+                var resExport = res.Union(resOps).ToList<AccAccountingManagementAgencyResult>();
+                return resExport;
+            }
+            return res;
         }
 
 
