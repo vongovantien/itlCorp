@@ -342,6 +342,25 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             return filecCoppyModel;
         }
+        private bool MoveEdoc(Guid oldImgId, Guid newImgId)
+        {
+            //List<SysImageDetail> imgDetails = new List<SysImageDetail>();
+            var edoc = _sysImageDetailRepo.Get(x => x.SysImageId == oldImgId);
+            edoc.ToList().ForEach(x =>
+            {
+                var edocNew = x;
+                edocNew.SysImageId = newImgId;
+                //imgDetails.Add(edocNew);
+                var updateEdoc = _sysImageDetailRepo.Update(edocNew, z => z.Id == x.Id);
+            });
+            var hs = _sysImageDetailRepo.SubmitChanges();
+            if (hs.Success)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public async Task<HandleState> MoveObjectAsync(FileCoppyModel filecCoppyModel)
         {
             try
