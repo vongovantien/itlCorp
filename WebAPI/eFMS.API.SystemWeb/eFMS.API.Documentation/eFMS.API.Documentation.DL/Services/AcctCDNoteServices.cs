@@ -2851,7 +2851,8 @@ namespace eFMS.API.Documentation.DL.Services
                         select new InvoiceListModel
                         {
                             Id = chg.Id.ToString(),
-                            PartnerId = chg.PayerId,
+                            PartnerId = settle.Payee,
+                            DepartmentId = settle.DepartmentId,
                             ReferenceNo = chg.Soano,
                             HBLId = chg.Hblid,
                             JobNo = chg.JobNo,
@@ -2873,7 +2874,6 @@ namespace eFMS.API.Documentation.DL.Services
                             ChargeId = chg.Id,
                             CodeType = chg.Type == "BUY" ? "CREDIT" : "DEBIT",
                             ChargeType = chg.Type,
-                            PayerId = !string.IsNullOrEmpty(settle.Payee) ? settle.Payee : String.Empty,
                             SoaNo = chg.SettlementCode
                         };
 
@@ -2921,7 +2921,6 @@ namespace eFMS.API.Documentation.DL.Services
                 CodeNo = se.FirstOrDefault().CodeNo,
                 CodeType = se.FirstOrDefault().CodeType,
                 ChargeType = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.ChargeType)).Select(x => x.ChargeType).Distinct()),
-                PayerId = se.FirstOrDefault().PayerId,
                 DepartmentId = se.FirstOrDefault().DepartmentId,
                 AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
                 SoaNo = se.FirstOrDefault().SoaNo,
@@ -3897,7 +3896,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return new List<AccAccountingManagementResult>();
             }
 
-            var queryData = cdNoteData;
+            var queryData = chargeNotSoa;
             if (queryData == null || queryData.Count() == 0)
             {
                 queryData = soaData;
