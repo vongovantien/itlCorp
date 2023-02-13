@@ -103,6 +103,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctSoa> acctSoa,
             IContextBase<AcctSettlementPayment> acctSettlementPaymentRepo,
             IContextBase<AcctCombineBilling> acctCombineBillingRepo,
+            IContextBase<AcctSettlementPayment> acctSettlementPaymentRepo,
             IOptions<ApiUrl> aUrl,
             ICheckPointService checkPoint
             ) : base(repository, mapper)
@@ -2975,7 +2976,7 @@ namespace eFMS.API.Documentation.DL.Services
                 )
             {
                 var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
-                var minDate = maxDate.AddMonths(-1); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
+                var minDate = maxDate.AddDays(-7); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
                 soaQuery = soaQuery.Where(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
             }
             if (soaQuery == null || soaQuery.Count() == 0)
@@ -3175,7 +3176,7 @@ namespace eFMS.API.Documentation.DL.Services
                 )
             {
                 var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
-                var minDate = maxDate.AddMonths(-1); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
+                var minDate = maxDate.AddDays(-7); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
                 query = query.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
             }
             var cdNoteData = DataContext.Get(query);
@@ -3592,9 +3593,9 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="size"></param>
         /// <param name="rowsCount"></param>
         /// <returns></returns>
-        public List<InvoiceListModel> PagingInvoiceList(CDNoteCriteria criteria, int page, int size, out int rowsCount)
+        public IQueryable<InvoiceListModel> PagingInvoiceList(CDNoteCriteria criteria, int page, int size, out int rowsCount)
         {
-            List<InvoiceListModel> results = null;
+            IQueryable<InvoiceListModel> results = Enumerable.Empty<InvoiceListModel>().AsQueryable();
             var cdNoteData = GetDataCdNote(criteria);
             var soaData = GetDataSoaNotIssuedCdNote(criteria);
 
@@ -3665,7 +3666,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    InvDueDay = cd.InvDueDay
                                };
 
-                results = joinData.ToList();
+                results = joinData;
             }
             return results;
         }
