@@ -119,14 +119,14 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             }],
             deadlinePayment: [
                 {
-                    startDate: new Date(new Date().setDate(new Date().getDate() + 9)),
-                    endDate: new Date(new Date().setDate(new Date().getDate() + 9)),
+                    startDate: new Date(new Date().setDate(new Date().getDate() + 7)),
+                    endDate: new Date(new Date().setDate(new Date().getDate() + 7)),
                 }
             ],
             paymentMethod: [this.methods[0].value],
             note: [],
             currency: [],
-            paymentTerm: [9],
+            paymentTerm: [7],
             bankAccountNo: [],
             bankAccountName: [],
             bankName: [],
