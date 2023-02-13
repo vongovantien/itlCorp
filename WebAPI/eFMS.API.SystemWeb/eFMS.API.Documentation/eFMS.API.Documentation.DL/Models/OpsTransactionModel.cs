@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class OpsTransactionModel: OpsTransaction
+    public class OpsTransactionModel : OpsTransaction
     {
         public List<CsMawbcontainerModel> CsMawbcontainers { get; set; }
         public string PODName { get; set; }
@@ -27,5 +27,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string SalesmanName { get; set; }
         public string DepartmentName { get; set; }
         public string GroupName { get; set; }
+        public string PlaceNameCode { get; set; }
+        public string CustomerAccountNo { get; set; }
     }
 }
