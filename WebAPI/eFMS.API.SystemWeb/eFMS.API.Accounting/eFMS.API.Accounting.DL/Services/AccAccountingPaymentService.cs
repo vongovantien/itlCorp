@@ -132,7 +132,7 @@ namespace eFMS.API.Accounting.DL.Services
         public IQueryable<AccountingPaymentModel> Paging(PaymentCriteria criteria, int page, int size, out int rowsCount)
         {
             criteria.IsPaging = true;
-            criteria.Size = page * size;
+            criteria.Size = (page * size) + 1;
             var data = Query(criteria);
             //var _totalItem = data.Select(s => s.RefId).Distinct().Count();
             //rowsCount = (_totalItem > 0) ? _totalItem : 0;
@@ -441,6 +441,10 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 results = results.Where(x => criteria.PaymentStatus.Contains(x.Status)).ToList();
             }
+            if (criteria.IsPaging == true)
+            {
+                return results.Take(criteria.Size ?? 1).AsQueryable();
+            }
             return results.AsQueryable();
         }
 
@@ -741,6 +745,7 @@ namespace eFMS.API.Accounting.DL.Services
                 payment.DueDate = acctPayment.PaymentDueDate;
                 payment.IssuedDate = acctPayment.InvoiceDate;
                 payment.OverdueDays = acctPayment.OverdueDays;
+                payment.DatetimeSorting = item.grp.VoucherDate;
                 results.Add(payment);
             }
             var resultData = results.AsQueryable();
@@ -1298,10 +1303,6 @@ namespace eFMS.API.Accounting.DL.Services
                 var maxDate = (accountingManaRepository.Get().Max(x => x.Date) ?? DateTime.Now).AddDays(1).Date;
                 var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; // Start from 3 months ago
                 data = data.Where(x => x.Date.Value > minDate && x.Date.Value < maxDate);
-            }
-            else if (criteria.IsPaging == true)
-            {
-                data = data.Take(criteria.Size ?? 1);
             }
 
             //var data = accountingManaRepository.Get(query);
@@ -3465,33 +3466,33 @@ namespace eFMS.API.Accounting.DL.Services
                 new SqlParameter(){ ParameterName = "@office", Value = criteria.Office == null ? null : string.Join(";",criteria.Office) }
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDataExportAgencyAccountingPayment>(parameters);
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
-            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            //if (rangeSearch == PermissionRange.None) return null;
-            switch (rangeSearch)
-            {
-                case PermissionRange.All:
-                    break;
-                case PermissionRange.Owner:
-                    data = data.Where(x => x.Type != "CREDIT" && x.UserCreated == _user.UserID).ToList();
-                    break;
-                case PermissionRange.Group:
-                    data = data.Where(x => x.Type != "CREDIT" && (x.GroupId == _user.GroupId && x.DepartmentId == _user.DepartmentId && x.OfficeId == _user.OfficeID && x.CompanyId == _user.CompanyID)
-                                                || x.UserCreated == _user.UserID).ToList();
-                    break;
-                case PermissionRange.Department:
-                    data = data.Where(x => x.Type != "CREDIT" && (x.DepartmentId == _user.DepartmentId && x.OfficeId == _user.OfficeID && x.CompanyId == _user.CompanyID)
-                                                || x.UserCreated == _user.UserID).ToList();
-                    break;
-                case PermissionRange.Office:
-                    data = data.Where(x => x.Type != "CREDIT" && (x.OfficeId == _user.OfficeID && x.CompanyId == _user.CompanyID)
-                                                || x.UserCreated == currentUser.UserID).ToList();
-                    break;
-                case PermissionRange.Company:
-                    data = data.Where(x => x.Type != "CREDIT" && (x.CompanyId == _user.CompanyID
-                                                || x.UserCreated == currentUser.UserID)).ToList();
-                    break;
-            }
+            //ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
+            //PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            ////if (rangeSearch == PermissionRange.None) return null;
+            //switch (rangeSearch)
+            //{
+            //    case PermissionRange.All:
+            //        break;
+            //    case PermissionRange.Owner:
+            //        data = data.Where(x => x.UserCreated == _user.UserID).ToList();
+            //        break;
+            //    case PermissionRange.Group:
+            //        data = data.Where(x => (x.GroupId == _user.GroupId && x.DepartmentId == _user.DepartmentId && x.OfficeId == _user.OfficeID && x.CompanyId == _user.CompanyID)
+            //                                    || x.UserCreated == _user.UserID).ToList();
+            //        break;
+            //    case PermissionRange.Department:
+            //        data = data.Where(x => (x.DepartmentId == _user.DepartmentId && x.OfficeId == _user.OfficeID && x.CompanyId == _user.CompanyID)
+            //                                    || x.UserCreated == _user.UserID).ToList();
+            //        break;
+            //    case PermissionRange.Office:
+            //        data = data.Where(x => (x.OfficeId == _user.OfficeID && x.CompanyId == _user.CompanyID)
+            //                                    || x.UserCreated == currentUser.UserID).ToList();
+            //        break;
+            //    case PermissionRange.Company:
+            //        data = data.Where(x => (x.CompanyId == _user.CompanyID
+            //                                    || x.UserCreated == currentUser.UserID)).ToList();
+            //        break;
+            //}
             return data;
         }
 
@@ -3624,6 +3625,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.PartnerCode,
                 x.PartnerName,
                 x.ParentCode,
+                x.RefId,
                 x.BillingRefNo,
                 x.Type,
                 x.JobNo,
@@ -3820,7 +3822,7 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.BranchName = officeData[(Guid)invoiceObhGroup.FirstOrDefault().invc.FirstOrDefault()?.OfficeId].FirstOrDefault()?.ShortName;
 
                         var surcharge = item.surcharge.FirstOrDefault();
-                        if (item.grp.Type == "DEBIT")
+                        //if (item.grp.Type == "DEBIT")
                         {
                             payment.JobNo = item.surcharge.FirstOrDefault()?.JobNo; //string.Join(",", item.surcharge.Select(x => x.JobNo).Distinct());
                             payment.MBL = item.surcharge.FirstOrDefault()?.Mblno;
