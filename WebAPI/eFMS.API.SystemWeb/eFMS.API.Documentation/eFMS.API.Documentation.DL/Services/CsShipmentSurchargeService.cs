@@ -1015,157 +1015,44 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return results;
         }
-        public IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria)
+        public List<sp_GetSurchargeRecently> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria)
         {
-            Expression<Func<OpsTransaction, bool>> queryShipmentNearest = x => (x.OfficeId == currentUser.OfficeID
-                                                   && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                                                   && (x.SupplierId == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId)));
-            if (queryShipmentNearest == null) return null;
-            List<Guid> houseIds = new List<Guid>();
-            queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId); // kHác với lô hiện tại
-
-            OpsTransaction shipment = opsTransRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
-
-            if (shipment == null) return null;
-
-            if (criteria.ChargeType == DocumentConstants.CHARGE_BUY_TYPE)
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@Type", Value = criteria.ChargeType },
+                new SqlParameter(){ ParameterName = "@SupplierID", Value = criteria.ColoaderId },
+                new SqlParameter(){ ParameterName = "@CustomerID", Value = criteria.CustomerId },
+                new SqlParameter(){ ParameterName = "@OfficeID", Value = currentUser.OfficeID },
+                new SqlParameter(){ ParameterName = "@ID", Value = criteria.JobId },
+                new SqlParameter(){ ParameterName = "@SalemanID", Value = criteria.SalesmanId },
+            };
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeRecently>(parameters);
+            if(data.Count == 0)
             {
-                if (criteria.ColoaderId == null) return null;
-                houseIds = opsTransRepository.Get(x => x.Id == shipment.Id && x.SupplierId == criteria.ColoaderId).Select(x => x.Hblid).ToList();
+                return null;
             }
-            else
-            {
-                if (criteria.CustomerId == null) return null;
-                houseIds = opsTransRepository.Get(x => x.Id == shipment.Id && x.CustomerId == criteria.CustomerId).Select(x => x.Hblid).ToList();
-            }
-
-            if (houseIds.Count == 0) return null;
-            IQueryable<CsShipmentSurcharge> csShipmentSurcharge = DataContext.Get(x => houseIds.Contains(x.Hblid) && x.Type == criteria.ChargeType && x.IsFromShipment == true);
-            if (csShipmentSurcharge == null) return null;
-            IQueryable<CsShipmentSurchargeDetailsModel> result = (
-               from surcharge in csShipmentSurcharge
-               join charge in catChargeRepository.Get() on surcharge.ChargeId equals charge.Id
-               join p in partnerRepository.Get() on surcharge.PaymentObjectId equals p.Id into gp
-               from p1 in gp.DefaultIfEmpty()
-               join payer in partnerRepository.Get() on surcharge.PayerId equals payer.Id into gp2
-               from p2 in gp2.DefaultIfEmpty()
-               select new CsShipmentSurchargeDetailsModel
-               {
-                   Type = surcharge.Type,
-                   ChargeId = surcharge.ChargeId,
-                   Quantity = surcharge.Quantity,
-                   QuantityType = surcharge.QuantityType,
-                   UnitId = surcharge.UnitId,
-                   UnitPrice = surcharge.UnitPrice,
-                   CurrencyId = surcharge.CurrencyId,
-                   IncludedVat = surcharge.IncludedVat,
-                   Vatrate = surcharge.Vatrate,
-                   Total = surcharge.Total,
-                   PayerId = surcharge.PayerId,
-                   ObjectBePaid = surcharge.ObjectBePaid,
-                   PaymentObjectId = surcharge.PaymentObjectId,
-                   ExchangeDate = surcharge.ExchangeDate,
-                   Notes = surcharge.Notes,
-                   IsFromShipment = true,
-                   TypeOfFee = surcharge.TypeOfFee,
-                   KickBack = surcharge.KickBack,
-                   PartnerShortName = p1.ShortName,
-                   PartnerName = p1.PartnerNameEn,
-                   ReceiverShortName = p1.ShortName,
-                   ReceiverName = p1.PartnerNameEn,
-                   PayerShortName = p2.ShortName,
-                   PayerName = p2.PartnerNameEn,
-                   ChargeNameEn = charge.ChargeNameEn,
-                   ChargeCode = charge.Code,
-                   ChargeGroup = surcharge.ChargeGroup
-               });
-            return result;
+            return data;
         }
 
-        public IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria)
+        public List<sp_GetSurchargeRecently> GetRecentlyCharges(RecentlyChargeCriteria criteria)
         {
-            // get charge info of newest shipment by charge type of an PIC and not existed in current shipment and by criteria: POL, POD, Customer, Shipping Line, Consignee
             string transactionType = DataTypeEx.GetType(criteria.TransactionType);
-
-            Expression<Func<CsTransaction, bool>> queryShipmentNearest = x => (x.OfficeId == currentUser.OfficeID
-                                                        && (x.AgentId == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                                                        && (x.ColoaderId == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                                                        && x.TransactionType == transactionType);
-
-
-            if (queryShipmentNearest == null) return null;
-            List<Guid> houseIds = new List<Guid>();
-
-            if (criteria.ChargeType == DocumentConstants.CHARGE_BUY_TYPE)
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@Type", Value = criteria.ChargeType },
+                new SqlParameter(){ ParameterName = "@SupplierID", Value = criteria.ColoaderId },
+                new SqlParameter(){ ParameterName = "@CustomerID", Value = criteria.CustomerId },
+                new SqlParameter(){ ParameterName = "@OfficeID", Value = currentUser.OfficeID },
+                new SqlParameter(){ ParameterName = "@ID", Value = criteria.JobId },
+                new SqlParameter(){ ParameterName = "@SalemanID", Value = criteria.SalesmanId },
+                new SqlParameter(){ ParameterName = "@HBLID", Value = criteria.HblId },
+                new SqlParameter(){ ParameterName = "@TransactionType", Value = transactionType },
+                new SqlParameter(){ ParameterName = "@AgentID", Value = criteria.AgentId },
+            };
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeRecently>(parameters);
+            if (data.Count == 0)
             {
-                if (criteria.ColoaderId == null) return null;
-                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId); // kHác với lô hiện tại
-
-                CsTransaction shipment = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
-                if (shipment == null) return null;
-
-                houseIds = tranDetailRepository.Get(x => x.JobId == shipment.Id && x.Id != criteria.HblId).Select(x => x.Id).ToList();
+                return null;
             }
-            else
-            {
-                if (criteria.CustomerId == null) return null;
-                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId);
-                IQueryable<CsTransaction> shipmentQuery = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).Take(1);
-                if (shipmentQuery == null) return null;
-
-                // Chỉ lấy house
-                foreach (var shipment in shipmentQuery)
-                {
-                    var houseId = tranDetailRepository.Get(x => x.JobId == shipment.Id && x.CustomerId == criteria.CustomerId && x.Id != criteria.HblId).Select(x => x.Id).ToList();
-                    houseIds.AddRange(houseId);
-                }
-            }
-
-            if (houseIds.Count == 0) return null;
-            IQueryable<CsShipmentSurcharge> csShipmentSurcharge = DataContext.Get(x => houseIds.Contains(x.Hblid) && x.Type == criteria.ChargeType && x.IsFromShipment == true);
-            if (csShipmentSurcharge == null) return null;
-
-            IQueryable<CsShipmentSurchargeDetailsModel> result = (
-                from surcharge in csShipmentSurcharge
-                join charge in catChargeRepository.Get() on surcharge.ChargeId equals charge.Id
-                join p in partnerRepository.Get() on surcharge.PaymentObjectId equals p.Id into gp
-                from p1 in gp.DefaultIfEmpty()
-                join payer in partnerRepository.Get() on surcharge.PayerId equals payer.Id into gp2
-                from p2 in gp2.DefaultIfEmpty()
-                select new CsShipmentSurchargeDetailsModel
-                {
-                    Type = surcharge.Type,
-                    ChargeId = surcharge.ChargeId,
-                    Quantity = surcharge.Quantity,
-                    QuantityType = surcharge.QuantityType,
-                    UnitId = surcharge.UnitId,
-                    UnitPrice = surcharge.UnitPrice,
-                    CurrencyId = surcharge.CurrencyId,
-                    IncludedVat = surcharge.IncludedVat,
-                    Vatrate = surcharge.Vatrate,
-                    Total = surcharge.Total,
-                    PayerId = surcharge.PayerId,
-                    ObjectBePaid = surcharge.ObjectBePaid,
-                    PaymentObjectId = surcharge.PaymentObjectId,
-                    ExchangeDate = surcharge.ExchangeDate,
-                    Notes = surcharge.Notes,
-                    IsFromShipment = true,
-                    TypeOfFee = surcharge.TypeOfFee,
-                    KickBack = surcharge.KickBack,
-
-                    PartnerShortName = p1.ShortName,
-                    PartnerName = p1.PartnerNameEn,
-                    ReceiverShortName = p1.ShortName,
-                    ReceiverName = p1.PartnerNameEn,
-                    PayerShortName = p2.ShortName,
-                    PayerName = p2.PartnerNameEn,
-
-                    ChargeNameEn = charge.ChargeNameEn,
-                    ChargeCode = charge.Code,
-                    ChargeGroup = surcharge.ChargeGroup
-
-                });
-            return result;
+            return data;
         }
 
         public HandleState NotificationCreditTerm(List<CsShipmentSurchargeModel> list)
