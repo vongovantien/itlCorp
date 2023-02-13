@@ -16,6 +16,7 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.Controllers
@@ -193,11 +194,10 @@ namespace eFMS.API.SystemFileManagement.Controllers
             }
             return BadRequest(hs);
         }
-        
-        [HttpGet("CheckAllowSettleEdocSendRequest/{settleId}")]
-        public async Task<IActionResult> CheckAllowSettleEdocSendRequest(Guid settleId)
+        [HttpGet("CheckAllowSettleEdocSendRequest")]
+        public async Task<IActionResult> CheckAllowSettleEdocSendRequest(Guid billingId)
         {
-            var result = _edocService.CheckAllowSettleEdocSendRequest(settleId);
+            var result = _edocService.CheckAllowSettleEdocSendRequest(billingId);
             return Ok(result);
         }
     }

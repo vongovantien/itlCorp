@@ -105,7 +105,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         AccountingType = x.FirstOrDefault().AccountingType
                     }).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
                 default:
-                    var jobs = data.Where(x => x.Type != "Accountant" && x.TransactionType == transactionType);
+                    var jobs = data.Where(x => x.Type != "Accountant"&&x.TransactionType==transactionType);
                     var result = new List<DocumentTypeModel>();
                     jobs.ToList().ForEach(x =>
                      {
@@ -118,7 +118,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                          };
                          result.Add(type);
                      });
-                    return result.OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
+                    return result.GroupBy(x => new { x.Code, x.NameEn }).Select(x => new DocumentTypeModel() { Code = x.FirstOrDefault().Code, NameEn = x.FirstOrDefault().NameEn ,Id=x.FirstOrDefault().Id}).OrderBy(x => x.NameEn.Substring(0, 1)).ToList();
             }
         }
     }

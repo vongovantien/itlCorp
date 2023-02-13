@@ -27,6 +27,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     @ViewChild(SettlementListChargeComponent) requestSurchargeListComponent: SettlementListChargeComponent;
     @ViewChild(SettlementFormCreateComponent) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
 
     constructor(
         private _accountingRepo: AccountingRepo,
@@ -165,25 +166,16 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                         return of(res);
                     }
                     return this._accountingRepo.checkIfInvalidFeeShipmentSettle(body);
-                }),
+                }
+                ),
                 concatMap((res: CommonInterface.IResult) => {
                     if (!res.status) {
                         res.data = 1;
                         return of(res);
                     }
-                    return this._systemFileRepo.CheckAllowSettleEdocSendRequest(body.settlement.id);
-                }),
-                concatMap((v) => {
-                    if (!v) {
-                        let data: CommonInterface.IResult = ({
-                            data: null,
-                            message: 'Please check your Document Type !',
-                            status: false
-                        })
-                        return of(data);
-                    }
                     return this._accountingRepo.saveAndSendRequestSettlemntPayment(body);
-                }),
+                }
+                ),
                 concatMap((res: CommonInterface.IResult) => {
                     if (!res.status) {
                         this.requestSurchargeListComponent.selectedIndexSurcharge = null;
@@ -203,7 +195,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.data === 1) {
-                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                        this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
                             title: 'Warning',
                             body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
                             class: 'bg-danger'
@@ -227,6 +219,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                 }
             );
     }
+
 
     getDataForm() {
         const dataSettle = {

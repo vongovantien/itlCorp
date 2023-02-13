@@ -57,8 +57,8 @@
                                                 </div>
                                             </td>
                                             <td *ngIf="typeFrom==='Settlement'||typeFrom==='Shipment'">
-                                                <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.docType||file
-                                                        .docType===null)) }">
+                                                <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.DocumentId||file
+                                                        .DocumentId===null)) }">
                                                     <div class="list-master">
                                                         <app-combo-grid-virtual-scroll class="index1" [height]="150"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'docType')"
@@ -85,38 +85,58 @@
                                             <ng-container *ngIf="typeFrom==='Settlement'">
                                                 <td>
                                                     <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.payee||file.payee===null))
-                                                        &&(file.Code === 'INV' || file.Code === 'OBH_INV') }"
-                                                        *ngIf="!file.payeeName;else payeeName">
-                                                        <app-combo-grid-virtual-scroll [height]="150"
-                                                            (itemSelected)="onSelectDataFormInfo($event,i, 'payee')"
-                                                            [dataSources]="payeeDataSource"
-                                                            [displayFields]="configPayee.displayFields"
-                                                            [selectedDisplayFields]="configPayee.selectedDisplayFields"
-                                                            (remove)="removePayee(i)" [disabled]="!enablePayeeINV[i]">
-                                                        </app-combo-grid-virtual-scroll>
-                                                    </div>
-                                                    <ng-template #payeeName>
-                                                        <div class="form-group ">
-                                                            <input type="text" class="form-control "
-                                                                [ngModel]="file?.payeeName" disabled>
+                                                        &&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
+                                                        <div class="list-second">
+                                                            <app-combo-grid-virtual-scroll [height]="150"
+                                                                [currentActiveItemId]="{field:'payer', value: file.payee}"
+                                                                (itemSelected)="onSelectDataFormInfo($event,i, 'payee')"
+                                                                [dataSources]="configPayee.dataSource"
+                                                                [displayFields]="configPayee.displayFields"
+                                                                [selectedDisplayFields]="configPayee.selectedDisplayFields"
+                                                                (remove)="removePayee(i)"
+                                                                [disabled]="!enablePayeeINV[i]">
+                                                            </app-combo-grid-virtual-scroll>
                                                         </div>
-                                                    </ng-template>
-                                                </td>
-                                                <td>
-                                                    <div class="form-group"
-                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file
-                                                    .inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV')&&file.noINV===false }">
-                                                        <app-combo-grid-virtual-scroll [height]="150"
-                                                            (itemSelected)="onSelectDataFormInfo($event,i, 'inv')"
-                                                            [dataSources]="payFirst[i]===true?invDataSourceUpdate[i]:invDataSource"
-                                                            [displayFields]="configINV.displayFields"
-                                                            [selectedDisplayFields]="configINV.selectedDisplayFields"
-                                                            (remove)="removeINV(i)" [disabled]="!enablePayeeINV[i]">
-                                                        </app-combo-grid-virtual-scroll>
                                                     </div>
                                                 </td>
+                                                <ng-container *ngIf="enablePayeeINV[i]">
+                                                    <td>
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file.inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
+                                                            <div class="list-second">
+                                                                <app-combo-grid-virtual-scroll [height]="150"
+                                                                    [currentActiveItemId]="{field:'invoiceNo', value: file.inv}"
+                                                                    (itemSelected)="onSelectDataFormInfo($event,i, 'inv')"
+                                                                    [dataSources]="payFirst[i]?invDataSourceUpdate[i]:invDataSource"
+                                                                    [displayFields]="configINV.displayFields"
+                                                                    [selectedDisplayFields]="configINV.selectedDisplayFields"
+                                                                    (remove)="removeINV(i)"
+                                                                    [disabled]="!enablePayeeINV[i]">
+                                                                </app-combo-grid-virtual-scroll>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </ng-container>
+                                                <ng-container *ngIf="!enablePayeeINV[i]">
+                                                    <!-- <td class="">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.payee||file.payee===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
+                                                            <input type="text" class="form-control " placeholder="Payee"
+                                                                [ngModel]="file.series" disabled>
+                                                        </div>
+                                                    </td> -->
+                                                    <td class="">
+                                                        <div class="form-group"
+                                                            [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file.inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
+                                                            <input type="text" class="form-control "
+                                                                placeholder="Invoice No" disabled>
+                                                        </div>
+                                                    </td>
+                                                </ng-container>
+
                                                 <td class="">
-                                                    <div class="form-group ">
+                                                    <div class="form-group"
+                                                        [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.series||file.series===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
                                                         <input type="text" class="form-control " placeholder="Series No"
                                                             [ngModel]="file.series" disabled>
                                                     </div>

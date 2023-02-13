@@ -272,7 +272,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             jobId: this.selectedEdoc.jobId,
             Code: docType?.code,
             tranType: this.selectedEdoc.transactionType,
-            AccountingType: this.typeFrom
+            AccountingType: null
         })
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.selectedTrantype = this.selectedEdoc.transactionType;
@@ -316,9 +316,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             .subscribe(
                 (res: any[]) => {
                     this.documentTypes = res;
-                    // this.documentAttach.documentTypes = res;
-                    // console.log(this.documentAttach.documentTypes);
-
+                    this.documentAttach.configDocType.dataSource = res;
                 },
             );
     }
@@ -495,6 +493,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.uploadEDoc(listFile);
     }
 
+
+    // ** UPLOAD PER FILE ON CONTEXT MENU LIST EDOC ON JOB
     uploadEDoc(listFile: any[]) {
         let edocFileList: IEDocFile[] = [];
         let files: any[] = [];
@@ -513,7 +513,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 BillingId: SystemConstants.EMPTY_GUID,
                 Id: SystemConstants.EMPTY_GUID,
                 DocumentId: x.DocumentId,
-                AccountingType: x.AccountingType
+                AccountingType: null
             }));
         });
         let EdocUploadFile: IEDocUploadFile;
@@ -550,18 +550,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 },
             );
     }
-
-    // genFileSOAToSM() {
-    //     this._systemFileRepo.genEdocFromBilling(this.billingNo, "SOA")
-    //         .pipe(catchError(this.catchError))
-    //         .subscribe(
-    //             (res: any) => {
-    //                 if (res.status) {
-    //                     this.getEDoc(this.transactionType);
-    //                 }
-    //             },
-    //         );
-    // }
 }
 
 interface IEdocAcc {

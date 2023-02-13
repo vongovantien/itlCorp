@@ -95,6 +95,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
         }
         for (let i = 0; i < files.length; i++) {
             if (!!docType) {
+                files[i].AccountingType = docType.accountingType;
                 files[i].Code = docType.code;
                 files[i].DocumentId = docType.id;
                 files[i].AccountingType = docType.accountingType;
@@ -133,6 +134,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                 this.listFile[index].DocumentId = selectedDocType.id;
                 this.listFile[index].AccountingType = selectedDocType.accountingType;
                 this.listFile[index].docType = selectedDocType.id;
+                this.listFile[index].AccountingType = selectedDocType.accountingType;
                 this.listFile[index].aliasName = selectedDocType.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 break;
         }
@@ -165,7 +167,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                 BillingId: this.objectId,
                 Id: SystemConstants.EMPTY_GUID,
                 DocumentId: x.DocumentId,
-                AccountingType: x.accountingType
+                AccountingType: x.AccountingType
             }));
         });
 
