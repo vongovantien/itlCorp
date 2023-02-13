@@ -476,7 +476,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 BillingId: SystemConstants.EMPTY_GUID,
                 Id: SystemConstants.EMPTY_GUID,
                 DocumentId: x.DocumentId,
-                AccountingType: x.AccountingType
+                AccountingType: null
             }));
         });
         let EdocUploadFile: IEDocUploadFile;

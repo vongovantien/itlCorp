@@ -287,6 +287,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 }
                 this.listFile[index].AccountingType = event.accountingType;
                 break;
+            case 'aliasName':
+                this.listFile[index].aliasName = event;
+                break;
             case 'houseBill':
                 this.listFile[index].hblid = event.id;
                 break;
