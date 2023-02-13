@@ -3896,7 +3896,7 @@ namespace eFMS.API.Documentation.DL.Services
                 return new List<AccAccountingManagementResult>();
             }
 
-            var queryData = chargeNotSoa;
+            var queryData = cdNoteData;
             if (queryData == null || queryData.Count() == 0)
             {
                 queryData = soaData;
