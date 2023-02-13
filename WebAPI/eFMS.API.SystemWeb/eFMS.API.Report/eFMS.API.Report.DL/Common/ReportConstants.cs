@@ -39,6 +39,7 @@ namespace eFMS.API.Report.DL.Common
         public const string CombineBillingByShipmentVND = "CombingBillingByJobVND.xlsx";
         public const string CombineBillingByShipmentUSD = "CombingBillingByJobUSD.xlsx";
         public const string OutsourcingRecognisingTemplate = "Outsourcing Recognising Template.xlsx";
+        public const string Accounting_PL_Sheet = "AccountingPLSheet.xlsx";
 
         public static readonly string LG_SHIPMENT = "CL";// Custom Logistic
         public static readonly string SEF_SHIPMENT = "SEF"; //Sea FCL Export
