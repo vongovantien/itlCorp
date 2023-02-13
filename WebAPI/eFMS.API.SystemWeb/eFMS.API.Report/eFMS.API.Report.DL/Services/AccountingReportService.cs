@@ -244,6 +244,8 @@ namespace eFMS.API.Report.DL.Services
                 data.BillNoSynced = charge.BillNoSynced;
                 data.PaySyncedFrom = charge.PaySyncedFrom;
                 data.PayBillNoSynced = charge.PayBillNoSynced;
+                data.Quantity = charge.Quantity;
+                data.UnitPrice = charge.UnitPrice;
                 dataList.Add(data);
             }
             return dataList.AsQueryable();
