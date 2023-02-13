@@ -103,7 +103,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Series No', field: 'seriesNo' },
         { title: 'Job Ref', field: 'jobRef' },
         { title: 'Note', field: 'note' },
-
     ]
 
     headerAccAttach: any[] = [
@@ -190,7 +189,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.getHblList();
     }
 
-
     getHblList() {
         this._documentationRepo.getListHouseBillOfJob({ jobId: this.jobId })
             .pipe(
@@ -272,7 +270,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             jobId: this.selectedEdoc.jobId,
             Code: docType?.code,
             tranType: this.selectedEdoc.transactionType,
-            AccountingType: this.typeFrom
+            AccountingType: null
         })
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.selectedTrantype = this.selectedEdoc.transactionType;
@@ -316,7 +314,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             .subscribe(
                 (res: any[]) => {
                     this.documentTypes = res;
-                    this.documentAttach.documentTypes = res;
+
                 },
             );
     }
@@ -434,7 +432,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         let docType = this.selectedEdoc1?.documentTypeId;
         let listFile: any[] = [];
 
-        for (let i = 0; i < files.length; i++) {
+        for (let i = 0; i < files?.length; i++) {
             if (!!docType) {
                 files[i].DocumentId = docType;
                 files[i].DocumentCode = this.selectedEdoc1?.documentCode;
@@ -477,7 +475,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 Note: '',
                 BillingId: SystemConstants.EMPTY_GUID,
                 Id: SystemConstants.EMPTY_GUID,
-                DocumentId: x.DocumentId
+                DocumentId: x.DocumentId,
+                AccountingType: x.AccountingType
             }));
         });
         let EdocUploadFile: IEDocUploadFile;
@@ -514,18 +513,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 },
             );
     }
-
-    // genFileSOAToSM() {
-    //     this._systemFileRepo.genEdocFromBilling(this.billingNo, "SOA")
-    //         .pipe(catchError(this.catchError))
-    //         .subscribe(
-    //             (res: any) => {
-    //                 if (res.status) {
-    //                     this.getEDoc(this.transactionType);
-    //                 }
-    //             },
-    //         );
-    // }
 }
 
 interface IEdocAcc {

@@ -87,13 +87,16 @@
                                                     <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.payee||file.payee===null))
                                                         &&(file.Code === 'INV' || file.Code === 'OBH_INV') }"
                                                         *ngIf="!file.payeeName;else payeeName">
-                                                        <app-combo-grid-virtual-scroll [height]="150"
-                                                            (itemSelected)="onSelectDataFormInfo($event,i, 'payee')"
-                                                            [dataSources]="payeeDataSource"
-                                                            [displayFields]="configPayee.displayFields"
-                                                            [selectedDisplayFields]="configPayee.selectedDisplayFields"
-                                                            (remove)="removePayee(i)" [disabled]="!enablePayeeINV[i]">
-                                                        </app-combo-grid-virtual-scroll>
+                                                        <div class="list-second">
+                                                            <app-combo-grid-virtual-scroll [height]="150"
+                                                                (itemSelected)="onSelectDataFormInfo($event,i, 'payee')"
+                                                                [dataSources]="payeeDataSource"
+                                                                [displayFields]="configPayee.displayFields"
+                                                                [selectedDisplayFields]="configPayee.selectedDisplayFields"
+                                                                (remove)="removePayee(i)"
+                                                                [disabled]="!enablePayeeINV[i]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                        </div>
                                                     </div>
                                                     <ng-template #payeeName>
                                                         <div class="form-group ">
@@ -106,13 +109,15 @@
                                                     <div class="form-group"
                                                         [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file
                                                     .inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV')&&file.noINV===false }">
-                                                        <app-combo-grid-virtual-scroll [height]="150"
-                                                            (itemSelected)="onSelectDataFormInfo($event,i, 'inv')"
-                                                            [dataSources]="payFirst[i]===true?invDataSourceUpdate[i]:invDataSource"
-                                                            [displayFields]="configINV.displayFields"
-                                                            [selectedDisplayFields]="configINV.selectedDisplayFields"
-                                                            (remove)="removeINV(i)" [disabled]="!enablePayeeINV[i]">
-                                                        </app-combo-grid-virtual-scroll>
+                                                        <div class="list-second">
+                                                            <app-combo-grid-virtual-scroll [height]="150"
+                                                                (itemSelected)="onSelectDataFormInfo($event,i, 'inv')"
+                                                                [dataSources]="payFirst[i]===true?invDataSourceUpdate[i]:invDataSource"
+                                                                [displayFields]="configINV.displayFields"
+                                                                [selectedDisplayFields]="configINV.selectedDisplayFields"
+                                                                (remove)="removeINV(i)" [disabled]="!enablePayeeINV[i]">
+                                                            </app-combo-grid-virtual-scroll>
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td class="">

@@ -20,7 +20,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() jobNo: string = '';
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
     @Input() housebills: any[] = [];
-    @Input() jobs: any[] = [];
+    //@Input() jobs: any[] = [];
     @Input() billingId: string = '';
     @Input() billingNo: string = '';
     @Input() jobId: string = '';
@@ -35,7 +35,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     isUpdate: boolean = false;
     detailDocId: number;
     formData: IEDocUploadFile;
-    documentTypes: any[] = [];
+    @Input() documentTypes: any[] = [];
     isSubmitted: boolean = false;
     configJob: CommonInterface.IComboGirdConfig | any = {};
     configPayee: CommonInterface.IComboGirdConfig | any = {};
@@ -48,7 +48,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     enablePayeeINV: boolean[] = [];
     payFirst: boolean[] = [];
     payFilled: boolean = true;
-
 
     constructor(
         private _toastService: ToastrService,
@@ -215,8 +214,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     }
 
-
     chooseFile(event: any) {
+        console.log(this.documentTypes);
+        console.log(this.configDocType.dataSource);
         this.getJobList();
         const fileList = event.target['files'];
         const files: any[] = event.target['files'];
@@ -225,8 +225,18 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             docType = this.documentTypes[0];
         }
         for (let i = 0; i < files.length; i++) {
-            if (!!docType) {
-                files[i].Code = docType.code;
+            if (this.typeFrom == 'SOA') {
+                files[i].DocumentId = 0;
+                files[i].docType = 'SOA';
+                files[i].aliasName = 'SOA' + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
+                files[i].Code = 'SOA';
+            } else if (this.typeFrom === 'Advance') {
+                files[i].DocumentId = 0;
+                files[i].docType = 'AD';
+                files[i].aliasName = 'AD' + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
+                files[i].Code = 'AD';
+            }
+            else if (!!docType) {
                 files[i].DocumentId = docType.id;
                 files[i].docType = docType;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
@@ -250,21 +260,32 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         event.target.value = ''
 
     }
+
+    getDocumentType() {
+        this._systemFileManagerRepo.getDocumentType(this.transactionType)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (res: any[]) => {
+                    this.documentTypes = res;
+                    this.configDocType.dataSource = res;
+                },
+            );
+    }
+
     onSelectDataFormInfo(event: any, index: number, type: string) {
         switch (type) {
             case 'docType':
+                this.enablePayeeINV[index] = false;
                 this.listFile[index].Code = event.code;
                 this.listFile[index].DocumentId = event.id;
                 this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
-                this.selectedDocType = event.id;
                 this.listFile[index].docType = event.code;
                 if (event.code === 'INV' || event.code === 'OBH_INV') {
                     this.enablePayeeINV[index] = true;
                 }
-
-                break;
-            case 'aliasName':
-                this.listFile[index].aliasName = event;
+                this.listFile[index].AccountingType = event.accountingType;
                 break;
             case 'houseBill':
                 this.listFile[index].hblid = event.id;
@@ -311,7 +332,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 }
                 this.listFile[index].aliasName = this.listFile[index].Code + '_' + this.listFile[index].payee + '_' + this.listFile[index].inv;
                 break;
-
         }
     }
     resetForm() {
@@ -326,15 +346,17 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         let edocFileList: IEDocFile[] = [];
         let files: any[] = [];
         this.isSubmitted = true;
-        this.listFile.forEach(x => {
-            if (x.Code === 'INV' || x.Code === 'OBH_INV') {
-                if ((x.payee === null || !x.payee) || ((!x.inv || x.inv === null) && x.noINV === false)) {
-                    this._toastService.warning("Please fill all field!");
-                    this.payFilled = false;
-                    return;
+        if (this.typeFrom === 'Settlement') {
+            this.listFile.forEach(x => {
+                if (x.Code === 'INV' || x.Code === 'OBH_INV') {
+                    if ((x.payee === null || !x.payee) || ((!x.inv || x.inv === null) && x.noINV === false)) {
+                        this._toastService.warning("Please fill all field!");
+                        this.payFilled = false;
+                        return;
+                    }
                 }
-            }
-        })
+            })
+        }
         if (this.payFilled) {
             this.listFile.forEach(x => {
                 files.push(x);
@@ -350,7 +372,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     Note: x.note !== undefined ? x.note : '',
                     BillingId: this.billingId !== '' ? this.billingId : SystemConstants.EMPTY_GUID,
                     Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
-                    DocumentId: x.DocumentId
+                    DocumentId: x.DocumentId,
+                    AccountingType: x.AccountingType,
                 }));
             });
             this.EdocUploadFile = ({
@@ -414,6 +437,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile[index].jobNo = null;
         this.listFile[index].jobId = SystemConstants.EMPTY_GUID;
     }
+
     removePayee(index: number) {
         this.listFile[index].payee = null;
         this.payFirst[index] = false;
@@ -424,6 +448,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile[index].aliasName = null;
 
     }
+
     removeINV(index: number) {
         this.listFile[index].inv = null;
         //this.listFile[index].payeeName = null;
@@ -447,8 +472,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     cleanListFile() {
         this.listFile = [];
     }
-
-
 }
 export interface IEDocUploadFile {
     FolderName: string,
@@ -468,5 +491,6 @@ export interface IEDocFile {
     Note: string,
     BillingId: string,
     Id: string,
-    DocumentId: string
+    DocumentId: string,
+    AccountingType: string,
 }
