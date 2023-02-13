@@ -5669,7 +5669,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("RemainDebitAmount", remainDbUsd);
                         listKeyData.Add("RemainOBHAmount", remainObhUsd);
                         listKeyData.Add("RemainCreditAmount", item.CreditAmountUsd);
-                        listKeyData.Add("CreditTerm", null);
+                        listKeyData.Add("CreditTerm", item.PaymentTerm);
                         listKeyData.Add("DueDate", item.DueDate);
                         listKeyData.Add("OverDueDays", item.OverdueDays);
 
