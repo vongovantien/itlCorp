@@ -75,7 +75,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         }, { selectedDisplayFields: ['jobId'], });
         this.configDocType = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
-                { field: 'id', label: 'Code' },
+                { field: 'code', label: 'Code' },
                 { field: 'nameEn', label: 'Name EN' },
             ]
         }, { selectedDisplayFields: ['nameEn'], });
@@ -99,26 +99,38 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            this.updateDocTypeSettle(data.some(x => x.advanceNo !== null))
+                            this.getDocType(data.some(x => x.advanceNo !== null))
                         }
                     }
                 );
+        } else {
+            this.configDocType.dataSource = this.documentTypes
         }
+        // else {
+        //     this.getDocType(true);
+        // }
     }
 
-    updateDocTypeSettle(isADV: boolean) {
-        this._systemFileManagerRepo.getDocumentType('Settlement')
+    getDocType(isADV: boolean) {
+        this._systemFileManagerRepo.getDocumentType(this.transactionType)
             .subscribe(
                 (res: any[]) => {
-                    if (isADV) {
-                        this.documentTypes = res.filter(x => x.accountingType === 'ADV-Settlement');
-                        this.configDocType.dataSource = res.filter(x => x.accountingType === 'ADV-Settlement');;
+                    if (this.transactionType === 'Settlement') {
+                        if (isADV) {
+                            this.documentTypes = res.filter(x => x.accountingType === 'ADV-Settlement');
+                            this.configDocType.dataSource = res.filter(x => x.accountingType === 'ADV-Settlement');
 
-                    } else {
-                        this.documentTypes = res.filter(x => x.accountingType === 'Settlement');
-                        this.configDocType.dataSource = res.filter(x => x.accountingType === 'Settlement');;
+                        } else {
+                            this.documentTypes = res.filter(x => x.accountingType === 'Settlement');
+                            this.configDocType.dataSource = res.filter(x => x.accountingType === 'Settlement');
 
+                        }
                     }
+                    // else {
+                    //     console.log(res);
+                    //     this.documentTypes = res;
+                    //     this.configDocType.dataSource = res;
+                    // }
                 },
             );
     }

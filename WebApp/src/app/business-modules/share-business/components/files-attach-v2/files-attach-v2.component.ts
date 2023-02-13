@@ -314,7 +314,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             .subscribe(
                 (res: any[]) => {
                     this.documentTypes = res;
-
+                    this.documentAttach.configDocType.dataSource = res;
                 },
             );
     }
@@ -458,6 +458,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.uploadEDoc(listFile);
     }
 
+
+    // ** UPLOAD PER FILE ON CONTEXT MENU LIST EDOC ON JOB
     uploadEDoc(listFile: any[]) {
         let edocFileList: IEDocFile[] = [];
         let files: any[] = [];
