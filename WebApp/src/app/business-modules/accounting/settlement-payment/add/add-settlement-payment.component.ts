@@ -157,19 +157,6 @@ export class SettlementPaymentAddNewComponent extends AppPage {
 
         this._accountingRepo.checkValidToSendRequestSettle(body)
             .pipe(catchError(this.catchError), finalize(() => this.isLoading = false),
-                concatMap((res: CommonInterface.IResult) => {
-                    if (!res.status && !!res.message) {
-                        return of(res);
-                    }
-                    return this._accountingRepo.checkIfInvalidFeeShipmentSettle(body);
-                }),
-                concatMap((res: CommonInterface.IResult) => {
-                    if (!res.status) {
-                        res.data = 1;
-                        return of(res);
-                    }
-                    return this._systemFileRepo.CheckAllowSettleEdocSendRequest(body.settlement.id);
-                }),
                 concatMap((v) => {
                     if (!v) {
                         let data: CommonInterface.IResult = ({

@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import { SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
 import _uniqBy from 'lodash/uniqBy';
+import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
@@ -48,6 +49,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     enablePayeeINV: boolean[] = [];
     payFirst: boolean[] = [];
     payFilled: boolean = true;
+    //clearINV: boolean[] = [];
+    //: boolean[] = [];
 
     constructor(
         private _toastService: ToastrService,
@@ -86,6 +89,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             this.configINV = Object.assign({}, this.configComoBoGrid, {
                 displayFields: [
                     { field: 'invoiceNo', label: 'Invoice No' },
+                    { field: 'invoiceDate', label: 'Invoice Date' },
                 ]
             }, { selectedDisplayFields: ['invoiceNo'], });
 
@@ -150,6 +154,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                                 this.payeeDataSource.push(item);
                             }
                             );
+                            this.configPayee.dataSource = this.payeeDataSource;
+                            console.log(this.configPayee.dataSource);
+
 
                             _uniqBy(data, 'invoiceNo').forEach(element => {
                                 if (element.invoiceNo !== '') {
@@ -157,6 +164,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                                         invoiceNo: element.invoiceNo,
                                         payer: element.payer,
                                         series: element.seriesNo,
+                                        invoiceDate: moment.utc(element.invoiceDate).format('DD/MM/YYYY')
                                     })
                                     this.invDataSource.push(item);
                                 }
@@ -273,7 +281,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 },
             );
     }
-
     onSelectDataFormInfo(event: any, index: number, type: string) {
         switch (type) {
             case 'docType':
@@ -286,6 +293,10 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     this.enablePayeeINV[index] = true;
                 }
                 this.listFile[index].AccountingType = event.accountingType;
+                this.listFile[index].series = null;
+                this.listFile[index].payee = null;
+                this.listFile[index].payeeName = null;
+                this.listFile[index].inv = null
                 break;
             case 'aliasName':
                 this.listFile[index].aliasName = event;
@@ -301,44 +312,38 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 this.listFile[index].note = event;
                 break;
             case 'payee':
-
                 this.listFile[index].payee = event.payer;
                 this.listFile[index].aliasGenPay = true;
+                this.listFile[index].inv = null;
+                this.listFile[index].series = null;
                 if (!this.listFile[index]?.inv || this.listFile[index]?.inv === null) {
                     this.invDataSourceUpdate[index] = this.invDataSource.filter(x => x.payer == event.payer);
-                    if (this.invDataSourceUpdate[index].length === 0) {
-                        this.listFile[index].noINV === true;
-                    } else {
-                        this.listFile[index].noINV = false;
-                    }
                     this.payFirst[index] = true;
-                } else {
-                    this.payFirst[index] = false;
                 }
-                console.log(this.listFile[index]);
-                console.log(this.listFile[index]?.inv !== undefined);
-                if (this.payFirst[index]) {
-                    this.listFile[index].aliasName = this.listFile[index].Code + '_' + this.listFile[index].payee;
-                }
-
+                this.listFile[index].aliasName = this.listFile[index].Code + '_' + this.listFile[index].payee + ('_' + this.listFile[index].inv === null ? '' : this.listFile[index]?.inv);
                 break;
             case 'inv':
+                console.log(this.listFile[index]);
                 this.listFile[index].aliasGenPay = true;
                 this.listFile[index].inv = event.invoiceNo;
                 this.listFile[index].series = event.series;
                 if (!this.payFirst[index]) {
-                    console.log(event);
-                    console.log(this.listFile[index]);
                     this.listFile[index].payee = event.payer;
-                    this.listFile[index].inv = event.invoiceNo;
                     this.listFile[index].payeeName = event.payer;
+                    this.listFile[index].payer = event.payer;
                 }
+                this.listFile[index].payee = event.payer;
+                this.listFile[index].inv = event.invoiceNo;
+                this.listFile[index].payeeName = event.payer;
                 this.listFile[index].aliasName = this.listFile[index].Code + '_' + this.listFile[index].payee + '_' + this.listFile[index].inv;
                 break;
         }
     }
     resetForm() {
         this.listFile?.splice(0, this.listFile.length);
+        this.enablePayeeINV = [];
+        this.payFirst = [];
+        this.payFilled = true;
     }
     removeFile(index: number) {
         this.listFile?.splice(index, 1);
@@ -351,8 +356,12 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.isSubmitted = true;
         if (this.typeFrom === 'Settlement') {
             this.listFile.forEach(x => {
-                if (x.Code === 'INV' || x.Code === 'OBH_INV') {
-                    if ((x.payee === null || !x.payee) || ((!x.inv || x.inv === null) && x.noINV === false)) {
+                if (x.DocumentId === null) {
+                    this._toastService.warning("Please fill all field!");
+                    this.payFilled = false;
+                    return;
+                } else if (x.Code === 'INV' || x.Code === 'OBH_INV') {
+                    if (((x.payee === null || !x.payee) || ((!x.inv || x.inv === null) && x.noINV === false) || x.series === null)) {
                         this._toastService.warning("Please fill all field!");
                         this.payFilled = false;
                         return;
@@ -442,34 +451,28 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     removePayee(index: number) {
-        this.listFile[index].payee = null;
-        this.payFirst[index] = false;
-        this.listFile[index].series = null;
-        this.listFile[index].payeeName = null;
-        this.listFile[index].inv = null;
-        this.listFile[index].invoiceNo = null;
-        this.listFile[index].aliasName = null;
-
+        //this.clearINV[index] = !!this.clearINV[index] ? !this.clearINV[index] : true;
+        this.removeINV(index);
     }
 
     removeINV(index: number) {
-        this.listFile[index].inv = null;
-        //this.listFile[index].payeeName = null;
         this.listFile[index].series = null;
-        this.listFile[index].payee = null;
+        this.listFile[index].inv = null;
+        this.listFile[index].invoiceNo = null; this.listFile[index].payee = null;
+        this.listFile[index].payer = null;
+        this.listFile[index].payeeName = null;
         this.listFile[index].aliasName = null;
+        this.payFirst[index] = false;
+        this.listFile[index].payee = null;
+        //this.clearPayee[index] = !!this.clearPayee[index] ? !this.clearPayee[index] : true;
     }
 
     removeDocType(index: number) {
         this.listFile[index].Code = null;
         this.listFile[index].DocumentId = null;
-        this.listFile[index].aliasName = null;
         this.selectedDocType = null;
         this.enablePayeeINV[index] = false;
-        this.listFile[index].payee = null;
-        this.listFile[index].series = null;
-        this.listFile[index].payeeName = null;
-        this.listFile[index].inv = null;
+        this.removePayee(index);
     }
 
     cleanListFile() {
