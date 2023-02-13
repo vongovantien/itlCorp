@@ -35,7 +35,7 @@ export class CustomClearance {
     userCreatedName: string;
     datetimeCreated: Date = null;
     datetimeModified: null;
-    customerName: null;
+    customerName: string = null;
     importCountryName: string;
     exportCountryName: string;
     gatewayName: string;
