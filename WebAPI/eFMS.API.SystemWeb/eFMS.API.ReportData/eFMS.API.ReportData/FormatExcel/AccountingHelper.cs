@@ -5157,7 +5157,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "VoucherID",//4
                 "Accounting Date",//5
                 "CD Note",//6
-                "SOA",//7
+                "SOA/ Settlement",//7
                 "Code_Type",//1+7
                 "ChargeType",//1+8
                 "PayerID",//1+9
