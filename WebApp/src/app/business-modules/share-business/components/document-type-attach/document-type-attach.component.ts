@@ -29,6 +29,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() selectedDocType: any = null;
     @Input() selectedTrantype: any = null;
     @Input() typeFrom: string = 'Shipment';
+    @Input() docTypeId: number = 0;
 
     headers: CommonInterface.IHeaderTable[] = [];
     EdocUploadFile: IEDocUploadFile;
@@ -105,10 +106,12 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 );
         } else {
             this.configDocType.dataSource = this.documentTypes
+            console.log(this.documentTypes);
         }
         // else {
         //     this.getDocType(true);
         // }
+
     }
 
     getDocType(isADV: boolean) {
