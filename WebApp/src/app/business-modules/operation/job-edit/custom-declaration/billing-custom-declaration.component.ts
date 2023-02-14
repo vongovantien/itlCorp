@@ -12,7 +12,7 @@ import { CustomDeclaration } from '@models';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
-import { CustomClearanceAddNewModalComponent } from './components/custom-clearance-add-new-modal/custom-clearance-add-new-modal.component';
+import { AddNewModalComponent } from './add-new-modal/add-new-modal.component';
 
 @Component({
     selector: 'app-billing-custom-declaration',
@@ -21,7 +21,7 @@ import { CustomClearanceAddNewModalComponent } from './components/custom-clearan
 export class BillingCustomDeclarationComponent extends AppList implements OnInit {
     @ViewChild(InjectViewContainerRefDirective) injectViewContainerRef: InjectViewContainerRefDirective;
     @ViewChild(AddMoreModalComponent) popUpAddMore: AddMoreModalComponent;
-    @ViewChild(CustomClearanceAddNewModalComponent) popUpAddNew: CustomClearanceAddNewModalComponent;
+    @ViewChild(AddNewModalComponent) popUpAddNew: AddNewModalComponent;
 
     currentJob: OpsTransaction;
     customClearances: any[];
