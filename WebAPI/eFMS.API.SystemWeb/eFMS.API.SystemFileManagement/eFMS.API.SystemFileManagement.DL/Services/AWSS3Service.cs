@@ -342,24 +342,24 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             return filecCoppyModel;
         }
-        private bool MoveEdoc(Guid oldImgId, Guid newImgId)
-        {
-            //List<SysImageDetail> imgDetails = new List<SysImageDetail>();
-            var edoc = _sysImageDetailRepo.Get(x => x.SysImageId == oldImgId);
-            edoc.ToList().ForEach(x =>
-            {
-                var edocNew = x;
-                edocNew.SysImageId = newImgId;
-                //imgDetails.Add(edocNew);
-                var updateEdoc = _sysImageDetailRepo.Update(edocNew, z => z.Id == x.Id);
-            });
-            var hs = _sysImageDetailRepo.SubmitChanges();
-            if (hs.Success)
-            {
-                return true;
-            }
-            return false;
-        }
+        //private bool MoveEdoc(Guid oldImgId, Guid newImgId)
+        //{
+        //    //List<SysImageDetail> imgDetails = new List<SysImageDetail>();
+        //    var edoc = _sysImageDetailRepo.Get(x => x.SysImageId == oldImgId);
+        //    edoc.ToList().ForEach(x =>
+        //    {
+        //        var edocNew = x;
+        //        edocNew.SysImageId = newImgId;
+        //        //imgDetails.Add(edocNew);
+        //        var updateEdoc = _sysImageDetailRepo.Update(edocNew, z => z.Id == x.Id);
+        //    });
+        //    var hs = _sysImageDetailRepo.SubmitChanges();
+        //    if (hs.Success)
+        //    {
+        //        return true;
+        //    }
+        //    return false;
+        //}
 
         public async Task<HandleState> MoveObjectAsync(FileCoppyModel filecCoppyModel)
         {
@@ -382,23 +382,22 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     var images = _sysImageRepo.Get(x => x.KeyS3 == item).ToList();
                     foreach (var image in images)
                     {
-                        var oldId = image.Id;
-                        var newId = Guid.NewGuid();
-                        image.Id = newId;
+                        //var oldId = image.Id;
+                        //var newId = Guid.NewGuid();
+                        //image.Id = newId;
                         image.KeyS3 = filecCoppyConvert.destKey + image.Name;
                         image.ObjectId = filecCoppyModel.destKey.ToLower();
                         image.Url = _apiUrl.Value.Url.ToString() + "/file/api/v1/en-Us/AWSS3/OpenFile/" + filecCoppyConvert.destKey + image.Name;
-                        var updateImg = _sysImageRepo.Add(image);
+                        var updateImg = _sysImageRepo.UpdateAsync(image,x=>x.Id==image.Id);
                         if (updateImg == null)
                         {
                             return new HandleState(false, "Update Image Error");
                         }
-                        var moveEdoc = MoveEdoc(oldId, newId);
-                        if (!moveEdoc)
-                        {
-                            return new HandleState(false, "Move Edoc Error");
-                        }
-
+                        //var moveEdoc = MoveEdoc(oldId, newId);
+                        //if (!moveEdoc)
+                        //{
+                        //    return new HandleState(false, "Move Edoc Error");
+                        //}
                     }
                 }
                 return new HandleState(true, listFile);
