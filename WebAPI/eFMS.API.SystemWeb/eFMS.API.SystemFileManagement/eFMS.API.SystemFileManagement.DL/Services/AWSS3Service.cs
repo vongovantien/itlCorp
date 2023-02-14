@@ -81,6 +81,36 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
+
+        public async Task<HandleState> DeleteFileS3(string moduleName, string folder, Guid id, Guid objId)
+        {
+            HandleState result = new HandleState();
+            try
+            {
+                var lst = await _sysImageRepo.GetAsync(x => x.Id == id);
+                var it = lst.Where(x => x.Id == id).FirstOrDefault();
+                if (it == null) { return new HandleState("Not found data"); }
+                var key = moduleName + "/" + folder + "/" + objId + "/" + it.Name;
+
+                DeleteObjectRequest request = new DeleteObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = it.KeyS3,
+                };
+
+                DeleteObjectResponse rsDelete = await _client.DeleteObjectAsync(request);
+                if (rsDelete == null)
+                {
+                    return new HandleState(true,"Delete File S3 Wrong");
+                }
+                return new HandleState(true, "Delete File S3 Success");
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+
         public async Task<List<SysImage>> GetFileSysImage(string moduleName, string folder, Guid id, string child = null)
         {
             var res = await _sysImageRepo.GetAsync(x => x.Folder == folder
@@ -385,10 +415,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         //var oldId = image.Id;
                         //var newId = Guid.NewGuid();
                         //image.Id = newId;
+                        //image.Id = Guid.NewGuid();
                         image.KeyS3 = filecCoppyConvert.destKey + image.Name;
                         image.ObjectId = filecCoppyModel.destKey.ToLower();
                         image.Url = _apiUrl.Value.Url.ToString() + "/file/api/v1/en-Us/AWSS3/OpenFile/" + filecCoppyConvert.destKey + image.Name;
-                        var updateImg = _sysImageRepo.UpdateAsync(image,x=>x.Id==image.Id);
+                        var updateImg = await _sysImageRepo.UpdateAsync(image,x=>x.Id==image.Id);
                         if (updateImg == null)
                         {
                             return new HandleState(false, "Update Image Error");
