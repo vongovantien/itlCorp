@@ -65,6 +65,9 @@ export class Contract {
     emailAddress: string = null;
     firstShipmentDate: any = null;
     paymentTermObh: string = null;
+    isUpdateCreditTermInfo: boolean = false;
+
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

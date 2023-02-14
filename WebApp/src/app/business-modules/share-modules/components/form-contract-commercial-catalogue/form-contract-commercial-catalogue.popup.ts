@@ -571,7 +571,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             }
                         }
                     );
-            } else if (this.isUpdate && !this.isCreateNewCommercial) {
+            } else if (this.isUpdate && !this.isCreateNewCommercial) {      
+                if ((this.formGroup.controls['trialCreditLimit'].dirty || this.formGroup.controls['paymentTermObh'].dirty || this.formGroup.controls['paymentTerm'].dirty ||
+                this.formGroup.controls['creditLimitRate'].dirty || this.formGroup.controls['creditLimit'].dirty || this.formGroup.controls['trialCreditLimit'].dirty ||
+                this.formGroup.controls['baseOn'].dirty) && this.selectedContract.arconfirmed == true) {
+                    this.selectedContract.isUpdateCreditTermInfo = true; 
+                }                       
                 const body = new Contract(this.selectedContract);
                 if (this.contractTypeDetail !== this.contractType.value && this.selectedContract.active === true && this.isAllowActiveContract === false) { //&& this.isChangeAgrmentType === false && this.isAllowActiveContract === false) {
                     this.status = this.statusContract;
@@ -1097,6 +1102,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     onARConfirmed() {
         this._progressRef.start();
+        if ((this.formGroup.controls['trialCreditLimit'].dirty || this.formGroup.controls['paymentTermObh'].dirty || this.formGroup.controls['paymentTerm'].dirty ||
+            this.formGroup.controls['creditLimitRate'].dirty || this.formGroup.controls['creditLimit'].dirty || this.formGroup.controls['trialCreditLimit'].dirty ||
+            this.formGroup.controls['baseOn'].dirty) && this.isUpdate && !this.isCreateNewCommercial) {
+            this.selectedContract.isUpdateCreditTermInfo = true;
+            this.selectedContract.isRequestApproval = true;
+            const body = new Contract(this.selectedContract);
+            this.updateContract(body)
+            return;
+        } 
         this._catalogueRepo.arConfirmed(this.partnerId, this.selectedContract.id, this.type)
             .pipe(
                 finalize(() => this._progressRef.complete())

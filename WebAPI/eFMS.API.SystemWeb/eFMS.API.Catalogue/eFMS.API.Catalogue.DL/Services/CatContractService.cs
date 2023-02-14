@@ -478,6 +478,11 @@ namespace eFMS.API.Catalogue.DL.Services
 
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
+            if(model.IsUpdateCreditTermInfo == true && model.Active == false)
+            {
+                entity.Arconfirmed = false;
+
+            }
             if (entity.ExpiredDate != null)
             {
                 if (entity.Active == true)

@@ -28,5 +28,7 @@ namespace eFMS.API.Catalogue.DL.Models
         public bool? isChangeAgrmentType { get; set; }
         public bool? ViewDetail { get; set; }
         public string PaymentTermChanged { get; set; }
+        public bool? IsUpdateCreditTermInfo { get; set; }
+
     }
 }
