@@ -54,12 +54,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     isView: boolean = true;
     elementInput: HTMLElement = null;
     isEdocByJob: boolean = false;
-    isEdocByAcc: boolean = false;
     edocByAcc: IEdocAcc[] = [({
         documentType: null,
         eDocs: [],
     })];
-
+    docTypeId: number = 0;
+    isEdocByAcc: boolean = false;
 
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
@@ -274,6 +274,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             tranType: this.selectedEdoc.transactionType,
             AccountingType: null
         })
+        console.log(docType);
+        this.docTypeId = docType.id;
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.selectedTrantype = this.selectedEdoc.transactionType;
         this.documentAttach.listFile.push(detailSeletedEdoc);
@@ -315,6 +317,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             )
             .subscribe(
                 (res: any[]) => {
+                    console.log(res);
                     this.documentTypes = res;
                     this.documentAttach.configDocType.dataSource = res;
                 },
@@ -358,6 +361,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     },
                 );
         }
+        console.log(this.edocByAcc);
+
     }
 
     showDocumentAttach() {
@@ -432,15 +437,18 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     downloadAllEdoc() {
+        console.log(this.isEdocByAcc);
+
         // let countEdocJob = _some(this.edocByJob, x => (x.eDocs !== null && x.eDocs?.length > 0));
         // let countEdocAcc = _some(this.edocByAcc, x => (x.eDocs !== null && x.eDocs?.length > 0));
+        //console.log(this.edocByJob);
         console.log(this.edocByAcc);
-
         if (this.typeFrom === 'Shipment') {
-            if (this.edocByJob?.some(x => x.eDocs?.length > 0) || this.isEdocByAcc) {
+            if (!this.edocByJob?.some(x => x.eDocs?.length > 0)) {
                 return this._toast.warning("No data to Export");
             }
-        } else {
+        }
+        else {
             if (!this.isEdocByAcc) {
                 return this._toast.warning("No data to Export");
             }

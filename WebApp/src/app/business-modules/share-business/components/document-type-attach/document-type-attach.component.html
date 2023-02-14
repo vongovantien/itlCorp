@@ -61,6 +61,7 @@
                                                         .DocumentId===null)) }">
                                                     <div class="list-master">
                                                         <app-combo-grid-virtual-scroll class="index1" [height]="150"
+                                                            [currentActiveItemId]="{field:'id', value: docTypeId}"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'docType')"
                                                             [dataSources]="configDocType.dataSource"
                                                             [displayFields]="configDocType.displayFields"
