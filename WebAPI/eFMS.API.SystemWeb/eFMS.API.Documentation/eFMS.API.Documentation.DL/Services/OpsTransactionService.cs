@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
@@ -27,13 +26,9 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using eFMS.API.Infrastructure.Authorizations;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using eFMS.API.Documentation.DL.Helpers;
-using eFMS.API.ForPartner.DL.Models.Receivable;
-using Microsoft.Extensions.Options;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -546,7 +541,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             criteria.RangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
             var data = Query(criteria);
-           
+
             if (data == null) rowsCount = 0;
             else
             {
@@ -1771,7 +1766,6 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
-                model.ClearanceNo = detail.ClearanceNo;
 
                 var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
                 int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
@@ -2817,7 +2811,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (chargeBuy.CurrencyId == "VND")
             {
-                var per = (chargeBuy.ServiceDate.Value < datetimeCR ? (double)chargeBuy.Total  : (double)chargeBuy.UnitPrice) / (double)0.76;
+                var per = (chargeBuy.ServiceDate.Value < datetimeCR ? (double)chargeBuy.Total : (double)chargeBuy.UnitPrice) / (double)0.76;
                 surcharge.UnitPrice = NumberHelper.RoundNumber((decimal)per / 10000, 0) * 10000;
                 surcharge.NetAmount = surcharge.UnitPrice * surcharge.Quantity;
                 surcharge.Total = surcharge.NetAmount + ((surcharge.NetAmount * surcharge.Vatrate) / 100) ?? 0;
