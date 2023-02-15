@@ -883,6 +883,12 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.VoucherDate).HasColumnType("datetime");
+
+                entity.Property(e => e.VoucherNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<AcctSettlementPayment>(entity =>
@@ -3944,8 +3950,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.ClearanceDate).HasColumnType("datetime");
-
-                entity.Property(e => e.ClearanceNo).HasMaxLength(50);
 
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
