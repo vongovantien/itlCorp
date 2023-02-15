@@ -1,0 +1,76 @@
+<div class="form-search-invoice">
+    <h3>
+        <span><i class="la la-edit"></i></span>
+        Create {{typeCombine === 'EXISTING' ? 'Existing Combine' : 'Combine'}} Receipt
+    </h3>
+    <form [formGroup]="form" class="row m-form m-form--state">
+        <div class="col-lg-6">
+            <div class="form-group"
+                [ngClass]="{'m-form__group has-danger':(isSubmitted || partnerId.dirty) && !partnerId.valid }">
+                <label class="form-control-label" required>
+                    Agency: {{partnerName | json}}
+                </label>
+                <app-combo-grid-virtual-scroll #comboGridPartner
+                    (itemSelected)="onSelectDataFormInfo($event, 'partner')" (remove)="resetFormControl(partnerId)"
+                    [currentActiveItemId]="{field:'id', value: partnerId.value, hardValue: partnerName}"
+                    [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
+                    [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
+                    [disabled]="readonly">
+                </app-combo-grid-virtual-scroll>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="form-control-label" required>
+                    AR Combine No:
+                </label>
+                <ng-container *ngIf="typeCombine === 'EXISTING'; else readOnlyCombineTpl">
+                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                        (remove)="resetFormControl(combineNo)"
+                        [currentActiveItemId]="{field:'no', value: combineNo.value}" [selectedDisplayFields]="['no']"
+                        [dataSources]="exsitingCombines | async" [displayFields]="displayFieldsPartner"
+                        placeholder="Select combine" [clearable]="false" [disabled]="readonly">
+                    </app-combo-grid-virtual-scroll>
+                </ng-container>
+                <ng-template #readOnlyCombineTpl>
+                    <input disabled type="text" formControlName="combineNo" class="form-control text-primary">
+                </ng-template>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="form-group">
+                <label class="form-control-label">
+                    Payment Date:
+                </label>
+                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                    <input type="text" ngxDaterangepickerMd class="form-control"
+                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange" placeholder="DD/MM/YYYY"
+                        [autoApply]="true" formControlName="paymentDate" [singleDatePicker]="true" readonly calendar
+                        [attr.disabled]="readonly" [allowRemove]="false" />
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="form-control-label">
+                            Exchange Rate:
+                        </label>
+                        <input type="text" autoFormatCurrency formControlName="exchangeRate"
+                            class="form-control text-primary">
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="form-control-label">
+                            Currency:
+                        </label>
+                        <input type="text" formControlName="currency" class="form-control text-primary">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>

@@ -1,0 +1,53 @@
+:host /deep/ {
+    .list-general-receipt {
+        .table-wrapper {
+            height: 350px;
+            max-height: 450px;
+        }
+        .table-editable {
+            .list-master-charge {
+                .e--combogrid-content {
+                    width: 520px;
+                }
+            }
+            .table-date {
+                .table-condensed {
+                    tr {
+                        th:not(:first-child) {
+                            min-width: 30px;
+                        }
+                        td:not(:first-child) {
+                            min-width: auto;
+                        }
+                    }
+                }
+            }
+            .e--combogrid {
+                .e--combogrid_icon {
+                    right: 7px;
+                }
+                table {
+                    white-space: pre-wrap;
+                }
+                .form-control {
+                    background: inherit;
+                    padding: 4px 8px;
+                }
+                tr {
+                    th:not(:first-child) {
+                        min-width: 130px;
+                    }
+                    td:not(:first-child) {
+                        min-width: 130px;
+                    }
+                    th:first-child {
+                        min-width: 130px;
+                    }
+                    td:first-child {
+                        min-width: 130px;
+                    }
+                }
+            }
+        }
+    }
+}

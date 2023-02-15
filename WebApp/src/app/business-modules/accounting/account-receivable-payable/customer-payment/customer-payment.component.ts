@@ -291,20 +291,20 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
         this._accountingRepo.syncReceiptToAccountant(receiptSyncIds)
             .pipe(
-            ).subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (((res as CommonInterface.IResult).status)) {
-                        this._toastService.success(`Send ${receipt.paymentRefNo} to Accountant System Successful`);
-                        this.requestLoadListCustomerPayment();
+        ).subscribe(
+            (res: CommonInterface.IResult) => {
+                if (((res as CommonInterface.IResult).status)) {
+                    this._toastService.success(`Send ${receipt.paymentRefNo} to Accountant System Successful`);
+                    this.requestLoadListCustomerPayment();
 
-                    } else {
-                        this._toastService.error("Send Data Fail");
-                    }
-                },
-                (error) => {
-                    console.log(error);
+                } else {
+                    this._toastService.error("Send Data Fail");
                 }
-            );
+            },
+            (error) => {
+                console.log(error);
+            }
+        );
     }
 
     exportAdvanceReceipt() {

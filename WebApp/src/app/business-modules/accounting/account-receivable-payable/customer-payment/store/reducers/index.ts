@@ -1,8 +1,10 @@
 import { IReceiptState, receiptReducer } from './customer-payment.reducer';
 import { createFeatureSelector, ActionReducerMap, createSelector } from '@ngrx/store';
+import { IReceiptCombineState, receiptCombineReducer } from './receipt-combine.reducer';
 
 export interface ICustomerPaymentState {
     receipt: IReceiptState;
+    receiptCombine: IReceiptCombineState;
 }
 
 
@@ -28,6 +30,17 @@ export const ReceiptIsAutoConvertPaidState = createSelector(customerPaymentState
 export const ReceiptClassState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state?.receipt?.class);
 export const ReceiptExchangeRate = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt?.exchangeRate);
 
+export const ReceiptCombineState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receiptCombine);
+export const ReceiptCombinePartnerState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receiptCombine?.partnerId);
+export const ReceiptCombineLoadingState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receiptCombine?.isLoading);
+export const ReceiptCombineLoadedState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receiptCombine?.isLoaded);
+export const ReceiptCombineGeneralListState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receiptCombine?.generalCombineList);
+export const ReceiptCombineCreditListState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receiptCombine?.creditCombineList);
+export const ReceiptCombineDeditListState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receiptCombine?.debitCombineList);
+export const ReceiptCombineExchangeState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receiptCombine?.exchangeRate);
+
+
 export const reducers: ActionReducerMap<ICustomerPaymentState> = {
     receipt: receiptReducer,
+    receiptCombine: receiptCombineReducer,
 };
