@@ -1,23 +1,23 @@
-import { Component, ViewChild, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/forms';
 
-import { CatalogueRepo } from '@repositories';
 import { AppForm } from '@app';
-import { DataService } from '@services';
-import { JobConstants } from '@constants';
-import { CsTransactionDetail, PortIndex, CsTransaction, ProviceModel, Customer, Incoterm } from '@models';
-import { CommonEnum } from '@enums';
 import { InfoPopupComponent } from '@common';
-import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction } from '@store';
+import { JobConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { CsTransaction, CsTransactionDetail, Customer, Incoterm, PortIndex, ProviceModel } from '@models';
+import { CatalogueRepo } from '@repositories';
+import { DataService } from '@services';
+import { GetCataloguePortAction, getCataloguePortLoadingState, getCataloguePortState } from '@store';
 
 import * as fromShareBussiness from './../../../../share-business/store';
 
-import { Observable } from 'rxjs';
-import { takeUntil, shareReplay, catchError, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { InjectViewContainerRefDirective } from '@directives';
 import { FormValidators } from '@validators';
 import { ToastrService } from 'ngx-toastr';
-import { InjectViewContainerRefDirective } from '@directives';
+import { Observable } from 'rxjs';
+import { catchError, distinctUntilChanged, shareReplay, switchMap, takeUntil } from 'rxjs/operators';
 import { getTransactionDetailCsTransactionState } from './../../../../share-business/store';
 
 @Component({
@@ -127,11 +127,22 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
 
         this.getMasterData();
         this.getConfigComboGrid();
-        
+
         this.getShipmentType();
         this.initForm();
 
         this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.type] });
+
+
+        this._store.select(fromShareBussiness.getDetailHBlState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    this.dateTimeCreated = res.datetimeCreated;
+                    this.dateTimeModified = res.datetimeModified;
+                    this.userCreated = res.userNameCreated;
+                    this.userModified = res.userNameModified;
+                });
 
         this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -139,10 +150,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                 (res: CsTransaction) => {
                     this.shipmentDetail = res;
                     this.jobId = this.shipmentDetail.id;
-                    this.dateTimeCreated = res.datetimeCreated;
-                    this.dateTimeModified = res.datetimeModified;
-                    this.userCreated = res.userNameCreated;
-                    this.userModified = res.userNameModified;
+                    // this.dateTimeCreated = res.datetimeCreated;
+                    // this.dateTimeModified = res.datetimeModified;
+                    // this.userCreated = res.userNameCreated;
+                    // this.userModified = res.userNameModified;
                     this.shipmentType = res.shipmentType;
                     this.type = res.transactionType;
                     if (!this.isUpdate) {
@@ -169,7 +180,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             );
     }
 
-    getShipmentType(){
+    getShipmentType() {
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(catchError(this.catchError),
                 distinctUntilChanged(),
