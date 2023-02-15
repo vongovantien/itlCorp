@@ -119,7 +119,9 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (action: fromShareBussiness.ContainerAction) => {
+
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
+                        console.log(action.payload)
                         this.lstMasterContainers = action.payload;
                         this.updateData(this.lstMasterContainers);
                     }
@@ -170,7 +172,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         // this.editForm.formEdit.controls['sumPackages'].setValue(sumPackages === 0 ? null : sumPackages);
         // this.editForm.formEdit.controls['sumNetWeight'].setValue(sumNetWeight === 0 ? null : sumNetWeight);
         // this.editForm.formEdit.controls['sumGrossWeight'].setValue(sumGrossWeight === 0 ? null : sumGrossWeight);
-
+        console.log(this.editForm)
         this.editForm.formEdit.controls['containerDescription'].setValue(containerDescription);
         this.editForm.formEdit.controls['sumContainers'].setValue(dataSum.sumContainers === 0 ? null : dataSum.sumContainers);
     }

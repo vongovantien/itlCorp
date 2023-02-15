@@ -157,7 +157,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("UploadFile")]
-        public IActionResult UploadFileContainer(IFormFile uploadedFile, [Required] Guid id, bool isHouseBill = false)
+        public IActionResult UploadFileContainer(IFormFile uploadedFile, Guid id, bool isHouseBill = false)
         {
             Guid? hblid = null;
             Guid? mblid = null;
