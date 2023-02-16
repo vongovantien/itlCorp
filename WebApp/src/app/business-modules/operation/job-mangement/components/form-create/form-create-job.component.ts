@@ -124,16 +124,13 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.users = this._systemRepo.getListSystemUser();
         this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
         this._store.dispatch(new ClearContainerAction());
-        console.log("có chạy")
         this._store.select(getContainerSaveState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((res: any) => {
                 if (!!res) {
-                    console.log(res)
                     this.containers = res;
                 }
             })
-
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((res: any) => {

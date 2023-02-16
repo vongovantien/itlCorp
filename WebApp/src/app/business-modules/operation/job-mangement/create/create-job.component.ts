@@ -16,7 +16,7 @@ import { catchError, mergeMap, switchMap, takeUntil } from "rxjs/operators";
 import { ActionsSubject, Store } from "@ngrx/store";
 import _groupBy from 'lodash/groupBy';
 import * as fromShareBussiness from '../../../share-business/store'
-import { ClearContainerAction, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
+import { ShareBussinessContainerListPopupComponent } from '@share-bussiness';
 @Component({
     selector: "app-job-mangement-create",
     templateUrl: "./create-job.component.html",
@@ -41,7 +41,6 @@ export class JobManagementCreateJobComponent extends AppForm {
     }
 
     ngOnInit() {
-        //this._store.dispatch(new fromShareBussiness.ClearContainerAction());
         this.subscriptionSaveContainerChange();
     }
 
