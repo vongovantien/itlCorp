@@ -1,6 +1,11 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ReportPreviewComponent } from '@common';
 import { SysImage } from '@models';
+import { Store } from '@ngrx/store';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { ShareDocumentTypeAttachComponent } from 'src/app/business-modules/share-business/components/document-type-attach/document-type-attach.component';
+import { ISettlementPaymentState, getSettlementPaymentDetailState } from '../store';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
 @Component({
@@ -12,7 +17,7 @@ import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-
 export class SettlementShipmentItemComponent {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentAttachFilePopup: SettlementShipmentAttachFilePopupComponent;
-
+    @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
     @Output() onCheck: EventEmitter<any> = new EventEmitter<any>();
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
     @Output() onPrintPlUSD: EventEmitter<any> = new EventEmitter<any>();
@@ -23,14 +28,45 @@ export class SettlementShipmentItemComponent {
 
     initCheckbox: boolean = false;
     isCheckAll: boolean = false;
-
     constructor(
+        private _store: Store<ISettlementPaymentState>,
     ) {
 
     }
 
     ngOnInit() {
+        console.log(this.data);
     }
+
+    showDocumentAttach() {
+        this.documentAttach.headers = [
+            { title: 'Alias Name', field: 'aliasName', width: 200 },
+            { title: 'Real File Name', field: 'realFilename' },
+            { title: 'Document Type', field: 'docType', required: true },
+            { title: 'Payee', field: 'payee' },
+            { title: 'Invoice No', field: 'invoiceNo' },
+            { title: 'Series No', field: 'seriesNo' },
+            { title: 'Job Ref', field: 'jobRef' },
+            { title: 'Note', field: 'note' },
+        ]
+
+        this.documentAttach.isUpdate = false;
+        this.documentAttach.perJob = true;
+        this.documentAttach.jobNo = this.data.jobId;
+        this.documentAttach.jobId = this.data.shipmentId;
+        //this._store.dispatch(UpdateListEDoc({ data: true }));
+        this._store.select(getSettlementPaymentDetailState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res) => {
+                if (res) {
+                    this.documentAttach.billingId = res.settlement.id;
+                    this.documentAttach.billingNo = res.settlement.settlementNo
+                }
+            })
+        this.documentAttach.show();
+    }
+
+    ngUnsubscribe: Subject<any> = new Subject();
 
     showPaymentManagement($event: Event): any {
         this.onClick.emit();

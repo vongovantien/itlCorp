@@ -143,12 +143,12 @@
                                                     </div>
                                                 </td>
                                             </ng-container>
-                                            <td class="disabled" *ngIf="typeFrom==='Shipment'">
+                                            <td class="disabled" *ngIf="typeFrom==='Shipment'||perJob">
                                                 <div class="form-group ">
                                                     <input type="text" class="form-control " [ngModel]="jobNo" disabled>
                                                 </div>
                                             </td>
-                                            <td class="disabled" *ngIf="typeFrom!=='Shipment'">
+                                            <td class="disabled" *ngIf="typeFrom!=='Shipment'&&!perJob">
                                                 <div class="list-master">
                                                     <app-combo-grid-virtual-scroll [height]="150"
                                                         (itemSelected)="onSelectDataFormInfo($event,i, 'job')"
