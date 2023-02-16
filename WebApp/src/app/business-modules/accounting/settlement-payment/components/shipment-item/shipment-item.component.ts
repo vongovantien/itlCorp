@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewCh
 import { ReportPreviewComponent } from '@common';
 import { SysImage } from '@models';
 import { Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { AppPage } from 'src/app/app.base';
 import { ShareDocumentTypeAttachComponent } from 'src/app/business-modules/share-business/components/document-type-attach/document-type-attach.component';
 import { ISettlementPaymentState, getSettlementPaymentDetailState } from '../store';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
@@ -14,7 +14,7 @@ import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class SettlementShipmentItemComponent {
+export class SettlementShipmentItemComponent extends AppPage {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentAttachFilePopup: SettlementShipmentAttachFilePopupComponent;
     @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
@@ -31,7 +31,7 @@ export class SettlementShipmentItemComponent {
     constructor(
         private _store: Store<ISettlementPaymentState>,
     ) {
-
+        super();
     }
 
     ngOnInit() {
@@ -51,7 +51,7 @@ export class SettlementShipmentItemComponent {
         ]
 
         this.documentAttach.isUpdate = false;
-        this.documentAttach.perJob = true;
+        this.documentAttach.jobOnSettle = true;
         this.documentAttach.jobNo = this.data.jobId;
         this.documentAttach.jobId = this.data.shipmentId;
         //this._store.dispatch(UpdateListEDoc({ data: true }));
@@ -65,8 +65,6 @@ export class SettlementShipmentItemComponent {
             })
         this.documentAttach.show();
     }
-
-    ngUnsubscribe: Subject<any> = new Subject();
 
     showPaymentManagement($event: Event): any {
         this.onClick.emit();

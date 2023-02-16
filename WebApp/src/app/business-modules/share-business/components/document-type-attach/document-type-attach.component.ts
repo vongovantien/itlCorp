@@ -19,7 +19,7 @@ import { getTransactionLocked, getTransactionPermission } from '../../store';
 })
 export class ShareDocumentTypeAttachComponent extends PopupBase implements OnInit {
     @Input() jobNo: string = '';
-    @Input() perJob: boolean = false;
+    @Input() jobOnSettle: boolean = false; // * Job to attach File on Settle
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
     @Input() housebills: any[] = [];
     //@Input() jobs: any[] = [];
@@ -391,7 +391,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             this.listFile.forEach(x => {
                 files.push(x);
                 edocFileList.push(({
-                    JobId: this.typeFrom === 'Shipment' || this.perJob ? this.jobId : x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
+                    JobId: this.typeFrom === 'Shipment' || this.jobOnSettle ? this.jobId : x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
                     Code: x.Code,
                     TransactionType: this.transactionType,
                     AliasName: x.aliasName,
@@ -451,7 +451,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
-                                if (this.perJob) {
+                                if (this.jobOnSettle) {
                                     this._store.dispatch(UpdateListEDoc({ data: true }));
                                 }
                                 this._toastService.success("Upload file successfully!");
