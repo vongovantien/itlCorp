@@ -253,7 +253,9 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 contract.ShipmentType = "Freehand & Nominated";
             }
+    
             var hs = DataContext.Add(contract, false);
+            
             DataContext.SubmitChanges();
             if (hs.Success)
             {
@@ -476,6 +478,11 @@ namespace eFMS.API.Catalogue.DL.Services
 
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
+            if(model.IsUpdateCreditTermInfo == true && model.Active == false)
+            {
+                entity.Arconfirmed = false;
+
+            }
             if (entity.ExpiredDate != null)
             {
                 if (entity.Active == true)
@@ -495,7 +502,6 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 entity.IsExpired = false;
             }
-
             if (entity.ContractType == "Cash")
             {
                 entity.ShipmentType = "Nominated";
@@ -505,7 +511,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.ShipmentType = "Freehand & Nominated";
 
             }
-            
             var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
             if (hs.Success)
             {
@@ -1238,10 +1243,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
 
                 var DataHeadOfficeAR = sysOfficeRepository.Get(x => x.OfficeType == "Head").FirstOrDefault();
+                var DataCamOfficeAR = sysOfficeRepository.Get(x => x.OfficeType == "Repo").FirstOrDefault();
                 if (DataHeadOfficeAR == null)
                 {
                     lstCCAR = null;
                 }
+                else if (DataCamOfficeAR.Id.ToString().ToUpper().Equals(OfficeId.ToUpper()))
+                {
+                    lstCCAR = null;
+                }    
                 else
                 {
                     var departmentHeadAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOfficeAR.Id).FirstOrDefault();

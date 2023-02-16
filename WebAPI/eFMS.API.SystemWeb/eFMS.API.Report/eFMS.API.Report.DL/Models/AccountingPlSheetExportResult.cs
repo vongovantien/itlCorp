@@ -54,5 +54,7 @@ namespace eFMS.API.Report.DL.Models
         public string BillNoSynced { get; set; }
         public string PaySyncedFrom { get; set; }
         public string PayBillNoSynced { get; set; }
+        public decimal UnitPrice { get; set; }
+        public decimal Quantity { get; set; }
     }
 }

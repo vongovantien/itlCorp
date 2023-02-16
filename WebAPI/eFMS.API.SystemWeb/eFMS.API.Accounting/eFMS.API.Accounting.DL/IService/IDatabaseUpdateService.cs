@@ -14,5 +14,6 @@ namespace eFMS.API.Accounting.DL.IService
         void UpdateSurchargeSettleDataToDB(List<CsShipmentSurcharge> surcharges, string settleCode, decimal kickBackExcRate, string action);
         void UpdateSurchargeAfterSynced(string type, string code);
         void LogAddEntity(object entity);
+        void LogUpdateEntity(IEnumerable<object> oldEntity, IEnumerable<object> newEntity);
     }
 }

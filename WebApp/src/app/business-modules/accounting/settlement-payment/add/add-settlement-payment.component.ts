@@ -154,6 +154,9 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
+        //this.checkValidAttachEdoc(body.settlement.id);
+
+
         let settlementResult: any = {};
 
         this._accountingRepo.checkValidToSendRequestSettle(body)

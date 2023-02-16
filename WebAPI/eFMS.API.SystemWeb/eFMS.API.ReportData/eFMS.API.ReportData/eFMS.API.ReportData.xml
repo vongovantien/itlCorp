@@ -146,6 +146,13 @@
             <param name="key">String random</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingAgencyPayment(eFMS.API.ReportData.Models.Criteria.AccountingPaymentCriteria)">
+            <summary>
+            Export Statement Of Receivable - Agent
+            </summary>
+            <param name="paymentCriteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingPayableStandartReport(eFMS.API.ReportData.Models.Criteria.AccountPayableCriteria)">
             <summary>
             Export Accounting Payable Standart Report
@@ -434,6 +441,13 @@
         <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportAccountingManagementDebCreInvoice(eFMS.API.ReportData.Models.Criteria.AccAccountingManagementCriteriaDebCreInvoice)">
             <summary>
             Export accounting management
+            </summary>
+            <param name="criteria">List Voucher or Invoices</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportAccountingManagementAgencyTemplate(eFMS.API.ReportData.Models.Criteria.AccAccountingManagementCriteriaDebCreInvoice)">
+            <summary>
+            Export accounting management agency template
             </summary>
             <param name="criteria">List Voucher or Invoices</param>
             <returns></returns>

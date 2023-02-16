@@ -1,6 +1,7 @@
 ﻿using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -21,13 +22,13 @@ namespace eFMS.API.Documentation.DL.IService
         List<HousbillProfit> GetShipmentTotalProfit(Guid jobId);
         HandleState DeleteMultiple(List<Guid> listId);
         HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list, out List<Guid> Ids);
-        IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria);
+        List<sp_GetSurchargeRecently> GetRecentlyCharges(RecentlyChargeCriteria criteria);
         object CheckAccountReceivable(List<CsShipmentSurchargeModel> list);
         HandleState NotificationCreditTerm(List<CsShipmentSurchargeModel> list);
         HandleState NotificationExpiredAgreement(List<CsShipmentSurchargeModel> list);
         HandleState NotificationPaymenTerm(List<CsShipmentSurchargeModel> list);
         List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list);
-        IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria);
+        List<sp_GetSurchargeRecently> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria);
         HandleState Import(List<CsShipmentSurchargeImportModel> data, out List<Guid> Ids);
         HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD(List<Guid> Ids);
         HandleState CancelLinkCharge(Guid chargeId);

@@ -141,6 +141,12 @@
                                                         <input type="text" class="form-control " placeholder="Series No"
                                                             [ngModel]="file.series" disabled>
                                                     </div>
+                                                    <ng-template #payeeName>
+                                                        <div class="form-group ">
+                                                            <input type="text" class="form-control "
+                                                                [ngModel]="file?.payeeName" disabled>
+                                                        </div>
+                                                    </ng-template>
                                                 </td>
                                             </ng-container>
                                             <td class="disabled" *ngIf="typeFrom==='Shipment'||perJob">

@@ -54,6 +54,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     private _readonly: boolean = false;
     isView: boolean = true;
     elementInput: HTMLElement = null;
+    isEdocByJob: boolean = false;
     edocByAcc: IEdocAcc[] = [({
         documentType: null,
         eDocs: [],
@@ -334,6 +335,14 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
 
+    // getDocTypeFromAttDoc(advAmount: number) {
+    //     console.log(advAmount);
+
+    //     //this.documentAttach.advAmount = this.advAmount;
+    //     //this.documentAttach.getDocumentType('Settlement');
+    //     this.documentAttach.filterDocTypeSettle(advAmount);
+    // }
+
     getEDoc(transactionType: string) {
         if (this.typeFrom === 'Shipment') {
             this._systemFileRepo.getEDocByJob(this.jobId, this.transactionType)
@@ -375,7 +384,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             this.documentAttach.headers = this.headerAccAttach;
         }
         else {
-
             this.documentAttach.headers = this.headerAttach;
         }
         this.documentAttach.isUpdate = false;
@@ -392,17 +400,24 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
     }
 
-    viewEdocFromName(imageUrl: string) {
-        this.selectedEdoc = Object.assign({}, this.selectedEdoc);
-        this.selectedEdoc.imageUrl = imageUrl;
+    viewEdocFromName(edoc: any) {
+        // this.selectedEdoc = Object.assign({}, this.selectedEdoc);
+        // this.selectedEdoc.imageUrl = edoc.imageUrl;
+        console.log(edoc);
+
+        this.selectedEdoc = edoc;
         this.viewFileEdoc();
     }
 
     viewFileEdoc() {
+        console.log(this.selectedEdoc);
+
         if (!this.selectedEdoc.imageUrl) {
             return;
         }
         const extension = this.selectedEdoc.imageUrl.split('.').pop();
+        console.log(extension);
+
         if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
             this._exportRepo.previewExport(this.selectedEdoc.imageUrl);
         }
@@ -416,6 +431,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
         else if (['pdf', 'txt', 'png', 'jpeg', 'jpg'].includes(extension.toLowerCase())) {
             this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
+        } else {
+            this.downloadEdoc();
         }
     }
 

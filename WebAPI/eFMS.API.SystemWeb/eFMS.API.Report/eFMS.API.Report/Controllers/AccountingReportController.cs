@@ -82,10 +82,12 @@ namespace eFMS.API.Report.Controllers
             var data = accountingReport.GetDataAccountingPLSheet(criteria);
             if (data == null)
             {
-                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return Ok(null);
+                //return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
             new LogHelper("ExportAccountingPlSheet", "" + data.Count().ToString());
-            var stream = new ReportHelper().GenerateAccountingPLSheetExcel(data, criteria, null);
+            //var stream = new ReportHelper().GenerateAccountingPLSheetExcel(data, criteria, null);
+            var stream = new ReportHelper().BindingDataAccountingPLSheetExportExcel(data, criteria);
             if (stream == null)
             {
                 new LogHelper("Stream null");

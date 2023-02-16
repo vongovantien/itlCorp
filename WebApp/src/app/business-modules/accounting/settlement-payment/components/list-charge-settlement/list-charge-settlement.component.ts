@@ -27,6 +27,7 @@ import { getCurrentUserState } from '@store';
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
+import { ISettlementPaymentData } from "../../detail/detail-settlement-payment.component";
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -81,6 +82,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     detailSettlement: Observable<any>;
     isLoadingSurchargeList: boolean = false;
     isLoadingGroupShipment: boolean = false;
+    settlementPayment: ISettlementPaymentData;
     constructor(
         private readonly _sortService: SortService,
         private readonly _toastService: ToastrService,
@@ -163,6 +165,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     onRequestSurcharge(surcharge: Surcharge[], isCopy?: boolean) {
+
         if (surcharge[0].isFromShipment) {
             this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
             this.surcharges = [...this.surcharges, ...surcharge];

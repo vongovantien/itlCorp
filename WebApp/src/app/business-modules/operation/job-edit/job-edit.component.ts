@@ -1,8 +1,8 @@
-import { formatDate } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { AbstractControl } from '@angular/forms';
-import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
-import { ActionsSubject, Store } from '@ngrx/store';
+import { Store, ActionsSubject } from '@ngrx/store';
+import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { getCurrentUserState, getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
 
@@ -13,6 +13,8 @@ import { InjectViewContainerRefDirective } from '@directives';
 import { RoutingConstants, JobConstants, SystemConstants } from '@constants';
 import { ICanComponentDeactivate } from '@core';
 import { AppForm } from '@app';
+
+
 import { Container, Crystal, CsTransaction, CsTransactionDetail, OpsTransaction } from '@models';
 import { ShareBussinessContainerListPopupComponent, ShareBussinessSellingChargeComponent } from '@share-bussiness';
 import { OPSTransactionGetDetailSuccessAction } from '../store';
@@ -316,6 +318,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.sumNetWeight = form.sumNetWeight === 0 ? null : form.sumNetWeight;
         this.opsTransaction.sumPackages = form.sumPackages === 0 ? null : form.sumPackages;
         this.opsTransaction.sumContainers = form.sumContainers === 0 ? null : form.sumContainers;
+        this.opsTransaction.sumChargeWeight = (this.lstMasterContainers || []).reduce((acc, curr) => acc += curr.chargeAbleWeight, 0);
         this.opsTransaction.sumCbm = form.sumCbm === 0 ? null : form.sumCbm;
         this.opsTransaction.containerDescription = form.containerDescription;
         this.opsTransaction.note = form.note;

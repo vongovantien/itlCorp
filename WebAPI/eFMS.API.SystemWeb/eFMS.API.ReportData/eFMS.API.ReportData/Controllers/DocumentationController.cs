@@ -787,6 +787,39 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// Export accounting management agency template
+        /// </summary>
+        /// <param name="criteria">List Voucher or Invoices</param>
+        /// <returns></returns>
+        [Route("ExportAccountingManagementAgencyTemplate")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingManagementAgencyTemplate(AccAccountingManagementCriteriaDebCreInvoice criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataExportAgencyInvUrl, accessToken);
+            var dataObjects = await responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
+
+            if (dataObjects == null || dataObjects.Count == 0)
+            {
+                return Ok(dataObjects);
+            }
+
+            var stream = new AccountingHelper().GenerateAccountingManagementInvAgncyExcel(dataObjects, criteria.TypeOfAcctManagement);
+
+            if (stream == null)
+            {
+                return BadRequest();
+            }
+
+            var fileName = "AG-ARSOA";
+            var fileContent = new FileHelper().ExportExcel(null, stream, fileName);
+            // var fileContent = new FileHelper().ExportExcel(null, stream, "AG" + "-ARSOA" + "-" + DateTime.Now.ToString("ddMMyy"));
+            HeaderResponse(fileContent.FileDownloadName);
+            return fileContent;
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.ReportData.Consts;
 using eFMS.API.ReportData.FormatExcel;
 using eFMS.API.ReportData.Helpers;
@@ -17,6 +12,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace eFMS.API.ReportData.Controllers
 {
@@ -515,7 +515,7 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountReceivableResultExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
-            var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
+            var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result, criteria.ArType);
             //var stream = new AccountingHelper().GenerateAccountingReceivableArSumary(dataObjects.Result);
 
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
@@ -551,7 +551,7 @@ namespace eFMS.API.ReportData.Controllers
 
             if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(null,stream, "DebitDetail-eFMS.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "DebitDetail-eFMS.xlsx");
 
             return fileContent;
         }
@@ -581,6 +581,11 @@ namespace eFMS.API.ReportData.Controllers
             return fileContent;
         }
 
+        /// <summary>
+        /// Export Statement Of Receivable - Agent
+        /// </summary>
+        /// <param name="paymentCriteria"></param>
+        /// <returns></returns>
         [Route("ExportAccountingAgencyPayment")]
         [HttpPost]
         [Authorize]
@@ -590,10 +595,10 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.PostAPI(paymentCriteria, aPis.AccountingAPI + Urls.Accounting.AgencyPaymentUrl, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingAgencyPaymentExport>>();
-            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
+            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return NotFound();
 
             var stream = new AccountingHelper().GenerateExportAgencyHistoryPayment(dataObjects.Result, paymentCriteria);
-            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "Statement of Receivable Agency - eFMS");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Statement of Receivable Agency - eFMS");
             HeaderResponse(fileContent.FileDownloadName);
@@ -756,7 +761,7 @@ namespace eFMS.API.ReportData.Controllers
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             //var responseFromApi = await HttpServiceExtension.PostAPI(agreementId, aPis.AccountingAPI + Urls.Accounting.GetDetailARByArgeementIdUrl,accessToken);
-            var responseFromApi = await HttpServiceExtension.PostAPI(criteria,aPis.AccountingAPI + Urls.Accounting.GetDetailARByArgeementIdUrl,accessToken);
+            var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.GetDetailARByArgeementIdUrl, accessToken);
             #region -- Ghi Log Report --
             var reportLogModel = new SysReportLogModel
             {

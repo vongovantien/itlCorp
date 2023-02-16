@@ -120,6 +120,7 @@ export class Receipt {
     paidAmountVnd: number = 0;
     referenceNo: string = null;
     bankAccountNo: string = null;
+    exchangeRate: number = 0;
 
     constructor(object?: any) {
         const self = this;

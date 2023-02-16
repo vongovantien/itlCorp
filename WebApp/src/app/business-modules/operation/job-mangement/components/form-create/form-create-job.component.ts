@@ -96,7 +96,6 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
 
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
-
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this._store.dispatch(new GetCatalogueCarrierAction());
         this._store.dispatch(new GetCatalogueAgentAction());

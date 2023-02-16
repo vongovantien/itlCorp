@@ -65,7 +65,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             .subscribe(
                 (res: SystemInterface.IUserPermission) => {
                     if (res !== null && res !== undefined) {
-                        console.log(res)
+                        // console.log(res)
                         this.menuPermission = res;
                     }
                 }
@@ -79,9 +79,9 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             { title: 'Effective Date', field: 'trialEffectDate', sortable: true },
             { title: 'Expired Date', field: 'trialExpiredDate', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
+            { title: 'AR Confirmed', field: 'arconfirmed', sortable: true },
             { title: 'Office', field: 'officeNameEn', sortable: true },
             { title: 'Company', field: 'companyNameAbbr', sortable: true },
-            { title: 'AR Confirmed', field: 'arconfirmed', sortable: true },
         ];
 
     }
@@ -120,7 +120,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             shipmentType: null,
             emailAddress: null,
             firstShipmentDate: null,
-            paymentTermObh: null
+            paymentTermObh: null,
+            debitAmount: 0
         });
         this.formContractPopup.files = null;
         this.formContractPopup.fileList = null;

@@ -46,6 +46,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     attachFiles: any[] = [];
     folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
+    advAmount: number = 0;
+    //isAttach: boolean = true;
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -151,6 +153,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         // this.attachRef.getHblList();
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId, 'LIST');
+                        this.attachRef.getDocumentType('Settlement');
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
@@ -261,6 +264,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         return true;
     }
 
+
     saveAndSendRequest() {
         // if (!this.requestSurchargeListComponent.surcharges.length) {
         //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
@@ -275,6 +279,11 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             settlement: this.getBodySettlement(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
+
+        // if (!this.checkValidAttachEdoc(body.settlement.id)) {
+        //     this._toastService.error("Please check your Document Type !");
+        //     return;
+        // }
 
         let settlementResult: any = {};
         this._accoutingRepo.checkValidToSendRequestSettle(body)

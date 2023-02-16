@@ -138,6 +138,9 @@
                                                     <td [ngClass]="sale.active ? 'text-success' : 'text-danger'">
                                                         {{sale.active ? 'Active' : 'Inactive'}}</td>
                                                     <td>
+                                                        <app-switch disabled [(ngModel)]="sale.arconfirmed" size="sm"></app-switch>
+                                                    </td>
+                                                    <td>
                                                         <span>{{sale.datetimeCreated | date: 'dd/MM/yyyy'}}</span>
                                                     </td>
                                                 </tr>

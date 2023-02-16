@@ -259,6 +259,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             }
             else if (!!docType) {
                 files[i].DocumentId = docType.id;
+                files[i].AccountingType = docType.accountingType;
                 files[i].docType = docType;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             }
@@ -300,6 +301,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 this.enablePayeeINV[index] = false;
                 this.listFile[index].Code = event.code;
                 this.listFile[index].DocumentId = event.id;
+                this.listFile[index].AccountingType = event.accountingType;
                 this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 this.listFile[index].docType = event.code;
                 if (event.code === 'INV' || event.code === 'OBH_INV') {
@@ -461,6 +463,25 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                         }
                     );
             }
+        } else {
+            if (edocFileList.find(x => x.DocumentId === undefined || x.AliasName === '')) {
+
+                this._toastService.warning("Please fill all field!");
+                return;
+            }
+            this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files, this.typeFrom)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success("Upload file successfully!");
+                            this.resetForm();
+                            this.hide();
+                            this.onSearch.emit(this.transactionType);
+                            this.isSubmitted = false;
+                        }
+                    }
+                );
         }
     }
 

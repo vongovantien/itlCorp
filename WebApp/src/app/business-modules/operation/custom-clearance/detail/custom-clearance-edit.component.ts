@@ -6,9 +6,6 @@ import { AppPage } from 'src/app/app.base';
 
 import { CustomClearanceFormDetailComponent } from '../components/form-detail-clearance/form-detail-clearance.component';
 import { ToastrService } from 'ngx-toastr';
-import { switchMap } from 'rxjs/operators';
-import { of } from 'rxjs';
-import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState, IAppState } from '@store';
 
@@ -36,12 +33,12 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
         this.currentUser$ = this._store.select(getCurrentUserState);
         this.route.params.subscribe(prams => {
             if (!!prams.id) {
-                this.getCustomCleanranceById(+prams.id);
+                this.getCustomClearanceById(+prams.id);
             }
         });
     }
 
-    getCustomCleanranceById(id: number) {
+    getCustomClearanceById(id: number) {
         this._operationRepo.getDetailCustomsDeclaration(id)
             .subscribe(
                 (res: CustomClearance) => {
@@ -58,7 +55,7 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = false;
 
-        if (!this.detailComponent.isDisableCargo && !this.detailComponent.cargoType.value) {
+        if (!this.detailComponent.isDisableCargo && !this.detailComponent.cargoType.value || (!this.detailComponent.hblid.value && this.detailComponent.currentUser?.companyCode !== 'ITL')) {
             return;
         }
         if (this.detailComponent.formGroup.invalid || (!!this.detailComponent.clearanceDate.value && !this.detailComponent.clearanceDate.value.startDate)) {
@@ -73,7 +70,7 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
             .subscribe((respone) => {
                 if (respone['status'] === true) {
                     this._toart.success(respone['message']);
-                    this.getCustomCleanranceById(this.customDeclaration.id);
+                    this.getCustomClearanceById(this.customDeclaration.id);
                 }
             });
     }
@@ -102,7 +99,7 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
             .subscribe((response) => {
                 if (!!response && response.status) {
                     this._toart.success(`Convert ${body.clearanceNo} Successfull`);
-                    this.getCustomCleanranceById(body.id);
+                    this.getCustomClearanceById(body.id);
                 }
             });
     }

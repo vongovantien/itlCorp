@@ -19,7 +19,7 @@ namespace eFMS.API.Operation.DL.IService
         IQueryable<CustomsDeclarationModel> GetCustomDeclaration(string keysearch, string customerNo, bool impPorted, int pageNumber, int pageSize, out int rowsCount);
         IQueryable<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria);
         List<CustomsDeclarationModel> GetBy(string jobNo);
-        HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances);
+        Task<HandleState> UpdateJobToClearances(List<CustomsDeclarationModel> clearances);
         CustomsDeclaration GetById(int id);
         HandleState CheckAllowDelete(List<CustomsDeclarationModel> customs);
         HandleState DeleteMultiple(List<CustomsDeclarationModel> customs);
@@ -29,8 +29,9 @@ namespace eFMS.API.Operation.DL.IService
         int CheckDetailPermission(int id);
         CustomsDeclarationModel GetDetail(int id);
         List<CustomsDeclarationModel> GetListCustomNoAsignPIC();
-        bool CheckAllowUpdate(Guid? jobId);
+        bool CheckAllowUpdate(Guid? jobId, List<string> ClearanceNos);
         HandleState ImportClearancesOlaFromEcus();
         Task<HandleState> ReplicateCustomClearance(int Id);
+        Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model);
     }
 }

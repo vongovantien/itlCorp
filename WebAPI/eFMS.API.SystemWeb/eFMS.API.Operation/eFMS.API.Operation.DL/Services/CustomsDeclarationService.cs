@@ -17,6 +17,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,9 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<SysUser> userRepository;
         private readonly IContextBase<CatPartner> customerRepository;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
+        private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
+
+        private readonly IContextBase<SysOffice> sysOfficeRepository;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
@@ -57,6 +61,8 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<SysUser> userRepo,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
+            IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
+            IContextBase<SysOffice> sysOffice,
         IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
@@ -72,6 +78,8 @@ namespace eFMS.API.Operation.DL.Services
             customerRepository = customerRepo;
             csShipmentSurchargeRepo = csShipmentSurcharge;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
+            accAdvancePaymentRepository = accAdvancePaymentRepo;
+            sysOfficeRepository = sysOffice;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -379,13 +387,21 @@ namespace eFMS.API.Operation.DL.Services
 
 
             var data = Get().Where(query);
+            var officeOutsource = sysOfficeRepository.Get(x => x.OfficeType == "OutSource");
             if (Imported == true)
             {
                 data = data.Where(x => x.JobNo != null);
             }
             else if (Imported == false)
             {
-                data = data.Where(x => x.JobNo == null);
+                foreach (var item in officeOutsource)
+                {
+                    if(currentUser.OfficeID.ToString().ToLower().Equals(item.Id.ToString().ToLower()))
+                    {
+                        data = data.Where(x => x.JobNo == null && x.Source == "Replicate");
+                    }    
+                }    
+                data = data.Where(x => x.JobNo == null && x.Source == "eFMS");
             }
             rowsCount = data.Count();
             if (rowsCount == 0) return returnList;
@@ -461,9 +477,11 @@ namespace eFMS.API.Operation.DL.Services
             return results;
         }
 
-        public HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
+        public async Task<HandleState> UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
             var result = new HandleState();
+            var jobOps = opsTransactionRepo.First(x => x.Id == clearances.FirstOrDefault().jobId);
+
             try
             {
                 foreach (var item in clearances)
@@ -477,8 +495,34 @@ namespace eFMS.API.Operation.DL.Services
                         clearance.UserModified = currentUser.UserID;
                     }
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
+                    if (item.isDelete == true && item.Source == "Replicate")
+                    {
+                        DataContext.Delete(x => x.Id == item.Id);
+                    }
                 }
-                DataContext.SubmitChanges();
+                result = DataContext.SubmitChanges();
+
+                //Xoa to khai khi chua issua chung tu
+                //Kiem tra to khai chinh co bi xoa hay khong -> neu co update lai to khai chinh
+                if (clearances.Any(x => x.isDelete == true && x.ClearanceNo == jobOps.ClearanceNo))
+                {
+                    if (result.Success)
+                    {
+                        var customNo = DataContext.Any(x => x.JobNo == jobOps.JobNo) ? await GetOldestClearanceNo(jobOps.JobNo) : String.Empty;
+                        jobOps.ClearanceNo = customNo;
+                        var hs = await opsTransactionRepo.UpdateAsync(jobOps, x => x.Id == jobOps.Id);
+                        result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
+                    }
+                }
+
+                //Kiem tra chua co to khai chinh, lay lai to khai chinh
+                if (string.IsNullOrEmpty(jobOps.ClearanceNo) && DataContext.Any(x => x.JobNo == jobOps.JobNo))
+                {
+                    var customNo = await GetOldestClearanceNo(jobOps.JobNo);
+                    jobOps.ClearanceNo = customNo;
+                    var hs = await opsTransactionRepo.UpdateAsync(jobOps, x => x.Id == jobOps.Id);
+                    result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
+                }
             }
             catch (Exception ex)
             {
@@ -486,6 +530,53 @@ namespace eFMS.API.Operation.DL.Services
             }
             return result;
         }
+
+        private void UpdateChargeAndAdvReq(string jobNo)
+        {
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.JobNo == jobNo && x.AcctManagementId == null & x.PayerAcctManagementId == null && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom));
+            var advRQs = accAdvanceRequestRepository.Get(x => x.JobId == jobNo);
+            var clearanceData = DataContext.Get(x=>x.JobNo==jobNo);
+            string oldestyCleNo = null;
+            if (clearanceData.Count() > 0)
+            {
+                oldestyCleNo = clearanceData.OrderBy(x => x.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault().OrderBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+            }
+            if (surcharges.Count() > 0 || advRQs.Count() > 0)
+            {
+                var clearanceNo = surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault() != null ? surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault().ClearanceNo : null ;
+                if (clearanceNo==null)
+                {
+                    if (clearanceData.Count()>0)
+                    {
+                        clearanceNo = oldestyCleNo;
+                    }
+                    else
+                    {
+                        clearanceNo = null; 
+                    }
+                    
+                }else if (string.IsNullOrEmpty(clearanceNo) && advRQs.Where(x => !string.IsNullOrEmpty(x.CustomNo)).FirstOrDefault() != null)
+                {
+                    clearanceNo = advRQs.Where(x => !string.IsNullOrEmpty(x.CustomNo)).FirstOrDefault().CustomNo;
+                }
+                else if(!clearanceData.Any(x=>x.ClearanceNo==clearanceNo))
+                {
+                    clearanceNo=oldestyCleNo;
+                }
+                foreach(var item in surcharges)
+                {
+                    item.ClearanceNo = clearanceNo;
+                    csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id, false);
+                }
+                csShipmentSurchargeRepo.SubmitChanges();
+                foreach(var item in advRQs)
+                {
+                    item.CustomNo = clearanceNo;
+                    accAdvanceRequestRepository.Update(item, x => x.Id == item.Id);
+                }
+            }
+        }
+
         public CustomsDeclaration GetById(int id)
         {
             var detail = DataContext.Get(x => x.Id == id).FirstOrDefault();
@@ -1376,24 +1467,26 @@ namespace eFMS.API.Operation.DL.Services
             return new List<CustomsDeclarationModel>();
         }
 
-        public bool CheckAllowUpdate(Guid? jobId)
+        public bool CheckAllowUpdate(Guid? jobId, List<string> clearanceNos)
         {
             var detail = opsTransactionRepo.Get(x => x.Id == jobId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
             var query = csShipmentSurchargeRepo.Get(x => x.Hblid == detail.Hblid &&
-                          (!string.IsNullOrEmpty(x.CreditNo)
+            (!string.IsNullOrEmpty(x.CreditNo)
                           || !string.IsNullOrEmpty(x.DebitNo)
                           || !string.IsNullOrEmpty(x.Soano)
                           || !string.IsNullOrEmpty(x.PaymentRefNo)
                           || !string.IsNullOrEmpty(x.AdvanceNo)
                           || !string.IsNullOrEmpty(x.VoucherId)
+
                           || !string.IsNullOrEmpty(x.PaySoano)
                           || !string.IsNullOrEmpty(x.SettlementCode)
-                          || !string.IsNullOrEmpty(x.SyncedFrom))
-                          );
-            if (query.Any() || accAdvanceRequestRepository.Any(x => x.JobId == detail.JobNo))
+                          || !string.IsNullOrEmpty(x.SyncedFrom))).Select(x => x.ClearanceNo);
+            var cleanceNoRequet = accAdvanceRequestRepository.Get(y => y.JobId == detail.JobNo && !string.IsNullOrEmpty(y.CustomNo)).Select(x => x.CustomNo).ToList();
+            if (clearanceNos.Any(x => query.Any(y => y == x) || cleanceNoRequet.Any(z => z == x)))
             {
                 return false;
             }
+
             return true;
         }
 
@@ -1555,7 +1648,7 @@ namespace eFMS.API.Operation.DL.Services
                         return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
                     }
 
-                    var opsJobReplicate = opsTransactionRepo.Get(x => x.Id == opsJob.ReplicatedId)?.FirstOrDefault();
+                    var opsJobReplicate = opsTransactionRepo.Get(x => x.Id == opsJob.ReplicatedId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
                     if (opsJobReplicate == null)
                     {
                         return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
@@ -1605,6 +1698,58 @@ namespace eFMS.API.Operation.DL.Services
             {
                 return new HandleState((object)"Không tìm thấy thông tin job trong tờ khai!");
             }
+
+            return hs;
+        }
+        private async Task<string> GetOldestClearanceNo(string jobNo)
+        {
+            var mainCus = await DataContext.Get(x => x.JobNo == jobNo)
+                .OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).FirstOrDefaultAsync();
+
+            return mainCus?.ClearanceNo ?? string.Empty;
+        }
+
+        public async Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model)
+        {
+            bool isExistCus = true;
+            if (!string.IsNullOrEmpty(model.JobNo))
+            {
+                isExistCus = DataContext.Any(x => x.JobNo == model.JobNo);
+            }
+            HandleState result = DataContext.Add(model);
+
+            if (!isExistCus && result.Success)
+            {
+                var jobOps = opsTransactionRepo.First(x => x.Id == model.jobId);
+                jobOps.ClearanceNo = model.ClearanceNo;
+                var hs = await opsTransactionRepo.UpdateAsync(jobOps, x => x.Id == jobOps.Id);
+                result = await UpdateCustomNoFromCus(model.ClearanceNo, jobOps.Hblid);
+            }
+
+            return result;
+        }
+
+        private async Task<HandleState> UpdateCustomNoFromCus(string customNo, Guid hblId)
+        {
+            var hs = new HandleState();
+
+            //Update tất cả charge
+            var listSurcharge = csShipmentSurchargeRepo.Get(x => x.Hblid == hblId
+                && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom)
+            );
+
+            //Update những charge chưa ghi nhận vô phí
+            var query = from advRequest in accAdvanceRequestRepository.Get(x => x.Hblid == hblId)
+                        join advPayment in accAdvancePaymentRepository.Get()
+                        on advRequest.AdvanceNo equals advPayment.AdvanceNo
+                        where advPayment.SyncStatus == null
+                        select advRequest;
+
+            await query.ForEachAsync(x => x.CustomNo = customNo);
+            hs = accAdvanceRequestRepository.SubmitChanges();
+
+            await listSurcharge.ForEachAsync(x => x.ClearanceNo = customNo);
+            hs = csShipmentSurchargeRepo.SubmitChanges();
 
             return hs;
         }
