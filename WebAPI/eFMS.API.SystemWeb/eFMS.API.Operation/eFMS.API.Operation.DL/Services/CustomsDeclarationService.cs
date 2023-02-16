@@ -396,11 +396,11 @@ namespace eFMS.API.Operation.DL.Services
             {
                 foreach (var item in officeOutsource)
                 {
-                    if(currentUser.OfficeID.ToString().ToLower().Equals(item.Id.ToString().ToLower()))
+                    if (currentUser.OfficeID.ToString().ToLower().Equals(item.Id.ToString().ToLower()))
                     {
                         data = data.Where(x => x.JobNo == null && x.Source == "Replicate");
-                    }    
-                }    
+                    }
+                }
                 data = data.Where(x => x.JobNo == null && x.Source == "eFMS");
             }
             rowsCount = data.Count();
@@ -477,11 +477,9 @@ namespace eFMS.API.Operation.DL.Services
             return results;
         }
 
-        public async Task<HandleState> UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
+        public HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances)
         {
             var result = new HandleState();
-            var jobOps = opsTransactionRepo.First(x => x.Id == clearances.FirstOrDefault().jobId);
-
             try
             {
                 foreach (var item in clearances)
@@ -495,34 +493,8 @@ namespace eFMS.API.Operation.DL.Services
                         clearance.UserModified = currentUser.UserID;
                     }
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
-                    if (item.isDelete == true && item.Source == "Replicate")
-                    {
-                        DataContext.Delete(x => x.Id == item.Id);
-                    }
                 }
-                result = DataContext.SubmitChanges();
-
-                //Xoa to khai khi chua issua chung tu
-                //Kiem tra to khai chinh co bi xoa hay khong -> neu co update lai to khai chinh
-                if (clearances.Any(x => x.isDelete == true && x.ClearanceNo == jobOps.ClearanceNo))
-                {
-                    if (result.Success)
-                    {
-                        var customNo = DataContext.Any(x => x.JobNo == jobOps.JobNo) ? await GetOldestClearanceNo(jobOps.JobNo) : String.Empty;
-                        jobOps.ClearanceNo = customNo;
-                        var hs = await opsTransactionRepo.UpdateAsync(jobOps, x => x.Id == jobOps.Id);
-                        result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
-                    }
-                }
-
-                //Kiem tra chua co to khai chinh, lay lai to khai chinh
-                if (string.IsNullOrEmpty(jobOps.ClearanceNo) && DataContext.Any(x => x.JobNo == jobOps.JobNo))
-                {
-                    var customNo = await GetOldestClearanceNo(jobOps.JobNo);
-                    jobOps.ClearanceNo = customNo;
-                    var hs = await opsTransactionRepo.UpdateAsync(jobOps, x => x.Id == jobOps.Id);
-                    result = await UpdateCustomNoFromCus(customNo, jobOps.Hblid);
-                }
+                DataContext.SubmitChanges();
             }
             catch (Exception ex)
             {
@@ -535,7 +507,7 @@ namespace eFMS.API.Operation.DL.Services
         {
             var surcharges = csShipmentSurchargeRepo.Get(x => x.JobNo == jobNo && x.AcctManagementId == null & x.PayerAcctManagementId == null && string.IsNullOrEmpty(x.SyncedFrom) && string.IsNullOrEmpty(x.PaySyncedFrom));
             var advRQs = accAdvanceRequestRepository.Get(x => x.JobId == jobNo);
-            var clearanceData = DataContext.Get(x=>x.JobNo==jobNo);
+            var clearanceData = DataContext.Get(x => x.JobNo == jobNo);
             string oldestyCleNo = null;
             if (clearanceData.Count() > 0)
             {
@@ -543,33 +515,34 @@ namespace eFMS.API.Operation.DL.Services
             }
             if (surcharges.Count() > 0 || advRQs.Count() > 0)
             {
-                var clearanceNo = surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault() != null ? surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault().ClearanceNo : null ;
-                if (clearanceNo==null)
+                var clearanceNo = surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault() != null ? surcharges.Where(x => !string.IsNullOrEmpty(x.ClearanceNo)).FirstOrDefault().ClearanceNo : null;
+                if (clearanceNo == null)
                 {
-                    if (clearanceData.Count()>0)
+                    if (clearanceData.Count() > 0)
                     {
                         clearanceNo = oldestyCleNo;
                     }
                     else
                     {
-                        clearanceNo = null; 
+                        clearanceNo = null;
                     }
-                    
-                }else if (string.IsNullOrEmpty(clearanceNo) && advRQs.Where(x => !string.IsNullOrEmpty(x.CustomNo)).FirstOrDefault() != null)
+
+                }
+                else if (string.IsNullOrEmpty(clearanceNo) && advRQs.Where(x => !string.IsNullOrEmpty(x.CustomNo)).FirstOrDefault() != null)
                 {
                     clearanceNo = advRQs.Where(x => !string.IsNullOrEmpty(x.CustomNo)).FirstOrDefault().CustomNo;
                 }
-                else if(!clearanceData.Any(x=>x.ClearanceNo==clearanceNo))
+                else if (!clearanceData.Any(x => x.ClearanceNo == clearanceNo))
                 {
-                    clearanceNo=oldestyCleNo;
+                    clearanceNo = oldestyCleNo;
                 }
-                foreach(var item in surcharges)
+                foreach (var item in surcharges)
                 {
                     item.ClearanceNo = clearanceNo;
                     csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id, false);
                 }
                 csShipmentSurchargeRepo.SubmitChanges();
-                foreach(var item in advRQs)
+                foreach (var item in advRQs)
                 {
                     item.CustomNo = clearanceNo;
                     accAdvanceRequestRepository.Update(item, x => x.Id == item.Id);
@@ -1701,13 +1674,13 @@ namespace eFMS.API.Operation.DL.Services
 
             return hs;
         }
-        private async Task<string> GetOldestClearanceNo(string jobNo)
-        {
-            var mainCus = await DataContext.Get(x => x.JobNo == jobNo)
-                .OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).FirstOrDefaultAsync();
+        //private async Task<string> GetOldestClearanceNo(string jobNo)
+        //{
+        //    var mainCus = await DataContext.Get(x => x.JobNo == jobNo)
+        //        .OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).FirstOrDefaultAsync();
 
-            return mainCus?.ClearanceNo ?? string.Empty;
-        }
+        //    return mainCus?.ClearanceNo ?? string.Empty;
+        //}
 
         public async Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model)
         {
@@ -1721,7 +1694,7 @@ namespace eFMS.API.Operation.DL.Services
             if (!isExistCus && result.Success)
             {
                 var jobOps = opsTransactionRepo.First(x => x.Id == model.jobId);
-                jobOps.ClearanceNo = model.ClearanceNo;
+                //jobOps.ClearanceNo = model.ClearanceNo;
                 var hs = await opsTransactionRepo.UpdateAsync(jobOps, x => x.Id == jobOps.Id);
                 result = await UpdateCustomNoFromCus(model.ClearanceNo, jobOps.Hblid);
             }

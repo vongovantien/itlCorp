@@ -305,7 +305,7 @@ namespace eFMS.API.Operation.Controllers
                 }
             }
 
-            var hs = await customsDeclarationService.UpdateJobToClearances(clearances);
+            var hs = customsDeclarationService.UpdateJobToClearances(clearances);
             string message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
 

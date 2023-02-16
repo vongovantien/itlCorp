@@ -19,7 +19,7 @@ namespace eFMS.API.Operation.DL.IService
         IQueryable<CustomsDeclarationModel> GetCustomDeclaration(string keysearch, string customerNo, bool impPorted, int pageNumber, int pageSize, out int rowsCount);
         IQueryable<CustomsDeclarationModel> Query(CustomsDeclarationCriteria criteria);
         List<CustomsDeclarationModel> GetBy(string jobNo);
-        Task<HandleState> UpdateJobToClearances(List<CustomsDeclarationModel> clearances);
+        HandleState UpdateJobToClearances(List<CustomsDeclarationModel> clearances);
         CustomsDeclaration GetById(int id);
         HandleState CheckAllowDelete(List<CustomsDeclarationModel> customs);
         HandleState DeleteMultiple(List<CustomsDeclarationModel> customs);
