@@ -12,7 +12,7 @@ export enum SettlementPaymentActionTypes {
     GET_DETAIL_SUCCESS = '[SettlementPayment] Get Detail Success',
     GET_DETAIL_FAIL = '[SettlementPayment] Get Detail Fail',
     UPDATE_LIST_NO_GROUP_SURCHARGE = '[SettlementPayment] Update No Group List Surcharge',
-
+    REGET_EDOC = '[SettlementPayment] Reget EDoc',
 };
 
 type searchType = ISearchSettlePayment;
@@ -26,3 +26,4 @@ export const LoadDetailSettlePayment = createAction(SettlementPaymentActionTypes
 export const LoadDetailSettlePaymentSuccess = createAction(SettlementPaymentActionTypes.GET_DETAIL_SUCCESS, props<ISettlementPaymentData>());
 export const LoadDetailSettlePaymentFail = createAction(SettlementPaymentActionTypes.GET_DETAIL_FAIL);
 export const UpdateListNoGroupSurcharge = createAction(SettlementPaymentActionTypes.UPDATE_LIST_NO_GROUP_SURCHARGE, props<{ data: Surcharge[] }>());
+export const UpdateListEDoc = createAction(SettlementPaymentActionTypes.REGET_EDOC, props<{ data: boolean }>());

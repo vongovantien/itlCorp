@@ -5,12 +5,14 @@ export interface SettlePaymentDetailState {
     settlement: ISettlementPaymentData;
     isLoading: boolean;
     isLoaded: boolean;
+    IsUpdateListEDoc: boolean;
 }
 
 export const initialState: SettlePaymentDetailState = {
     settlement: null,
     isLoading: false,
-    isLoaded: false
+    isLoaded: false,
+    IsUpdateListEDoc: false
 };
 
 const reducer = createReducer(
@@ -26,6 +28,9 @@ const reducer = createReducer(
     })),
     on(Actions.UpdateListNoGroupSurcharge, (state: SettlePaymentDetailState, payload: any) => ({
         ...state, settlement: { ...state.settlement, chargeNoGrpSettlement: payload.data }
+    })),
+    on(Actions.UpdateListEDoc, (state: SettlePaymentDetailState, payload: any) => ({
+        ...state, IsUpdateListEDoc: payload.data
     })),
 );
 

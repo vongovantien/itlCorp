@@ -12,6 +12,7 @@ import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
+import { UpdateListEDoc, getUpdateListEDoc } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../store';
 import { IEDocFile, IEDocUploadFile, ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
@@ -181,6 +182,16 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
             { title: 'Attach Person', field: 'userCreated', sortable: true },
         ];
+        this._store.select(getUpdateListEDoc)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res: any) => {
+                console.log(res);
+                if (res) {
+                    this.getEDoc(this.typeFrom);
+                    this._store.dispatch(UpdateListEDoc({ data: false }));
+                }
+            }
+            )
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(

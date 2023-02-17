@@ -80,8 +80,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     selectedGroupShipmentIndex: number;
 
     detailSettlement: Observable<any>;
-    settlementDetail: ISettlementPaymentData;
-
     isLoadingSurchargeList: boolean = false;
     isLoadingGroupShipment: boolean = false;
     settlementPayment: ISettlementPaymentData;
@@ -128,6 +126,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
         this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState);
         this.detailSettlement = this._store.select(getSettlementPaymentDetailState);
+        console.log(this.detailSettlement);
+
     }
 
     updateListSurcharge() {

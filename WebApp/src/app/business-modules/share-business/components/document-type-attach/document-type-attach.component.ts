@@ -8,7 +8,7 @@ import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
-import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { UpdateListEDoc, getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getSOADetailState } from 'src/app/business-modules/accounting/statement-of-account/store/reducers';
 import { PopupBase } from 'src/app/popup.base';
 import { getTransactionLocked, getTransactionPermission } from '../../store';
@@ -19,6 +19,7 @@ import { getTransactionLocked, getTransactionPermission } from '../../store';
 })
 export class ShareDocumentTypeAttachComponent extends PopupBase implements OnInit {
     @Input() jobNo: string = '';
+    @Input() jobOnSettle: boolean = false; // * Job to attach File on Settle
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
     @Input() housebills: any[] = [];
     //@Input() jobs: any[] = [];
@@ -170,9 +171,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             }
                             );
                             this.configPayee.dataSource = this.payeeDataSource;
-                            console.log(this.configPayee.dataSource);
-
-
                             _uniqBy(data, 'invoiceNo').forEach(element => {
                                 if (element.invoiceNo !== '') {
                                     let item = ({
@@ -314,6 +312,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 this.listFile[index].payee = null;
                 this.listFile[index].payeeName = null;
                 this.listFile[index].inv = null
+                if (this.isUpdate) {
+                    this.selectedDocType = event.id;
+                }
                 break;
             case 'aliasName':
                 this.listFile[index].aliasName = event;
@@ -390,7 +391,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             this.listFile.forEach(x => {
                 files.push(x);
                 edocFileList.push(({
-                    JobId: this.typeFrom === 'Shipment' ? this.jobId : x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
+                    JobId: this.typeFrom === 'Shipment' || this.jobOnSettle ? this.jobId : x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
                     Code: x.Code,
                     TransactionType: this.transactionType,
                     AliasName: x.aliasName,
@@ -450,6 +451,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
+                                if (this.jobOnSettle) {
+                                    this._store.dispatch(UpdateListEDoc({ data: true }));
+                                }
                                 this._toastService.success("Upload file successfully!");
                                 this.resetForm();
                                 this.hide();
