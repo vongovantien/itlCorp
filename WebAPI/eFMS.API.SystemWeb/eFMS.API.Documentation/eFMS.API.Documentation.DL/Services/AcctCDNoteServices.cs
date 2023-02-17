@@ -3119,7 +3119,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  DepartmentId = cdNote.DepartmentId,
                                  AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
                                  SoaNo = chg.Soano,
-                                 TotalAmountUsd= chg.AmountUsd,
+                                 TotalAmountUsd = chg.AmountUsd,
                                  VatAmountUsd = chg.VatAmountUsd,
                                  ChargeGroup = chg.ChargeGroup,
                                  Balance = acc.UnpaidAmountUsd == null ? null : acc.UnpaidAmountUsd
@@ -3279,7 +3279,7 @@ namespace eFMS.API.Documentation.DL.Services
                 querySoa = querySoa.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
             }
             var cdNoteData = DataContext.Get(query);
-            var soaData =  acctSoaRepo.Get(querySoa);
+            var soaData = acctSoaRepo.Get(querySoa);
 
             if (cdNoteData == null || cdNoteData.Count() == 0)
             {
@@ -3304,7 +3304,8 @@ namespace eFMS.API.Documentation.DL.Services
                              join partner in partnerData on cd.PartnerId equals partner.Id
                              join acc in accMangData on sc.AcctManagementId equals acc.Id into accGrps
                              from acc in accGrps.DefaultIfEmpty()
-                             where partner.PartnerType == "Agent" 
+                             where partner.PartnerType == "Agent" && (sc.Type == "OBH" && (String.IsNullOrEmpty(sc.PaySyncedFrom) || sc.PaySyncedFrom != "SOA")) ||
+                             sc.Type!="OBH" && (String.IsNullOrEmpty(sc.SyncedFrom) || sc.SyncedFrom != "SOA")
                              select new InvoiceListModel
                              {
                                  JobNo = sc.JobNo,
@@ -3323,39 +3324,43 @@ namespace eFMS.API.Documentation.DL.Services
                                  ChargeGroup = sc.ChargeGroup,
                                  VatVoucher = sc.InvoiceNo,
                                  PaymentStatus = acc.PaymentStatus,
-                                 InvDueDay = acc.PaymentDueDate
+                                 InvDueDay = acc.PaymentDueDate,
+                                 VoucherIddate = sc.VoucherIddate,
+                                 IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
                              };
-            var debitData =  from cd in cdNoteData
-                             join sc in surchargeData on cd.Code equals sc.DebitNo
-                             join ops in opstransactionData on sc.Hblid equals ops.Hblid into opsGrps
-                             from ops in opsGrps.DefaultIfEmpty()
-                             join trans in transactionDetailData on sc.Hblid equals trans.Id into transGrps
-                             from trans in transGrps.DefaultIfEmpty()
-                             join partner in partnerData on cd.PartnerId equals partner.Id
-                             join acc in accMangData on sc.AcctManagementId equals acc.Id into accGrps
-                             from acc in accGrps.DefaultIfEmpty()
-                             where partner.PartnerType == "Agent"
-                             select new InvoiceListModel
-                             {
-                                 HBLId = trans.Id == Guid.Empty ? ops.Hblid: trans.Id,
-                                 IssuedDate = sc.DatetimeCreated,
-                                 JobNo = sc.JobNo,
-                                 CodeNo = sc.DebitNo,
-                                 Type = cd.Type,
-                                 FlexID= cd.FlexId,
-                                 MBLNo = sc.Mblno,
-                                 POL = trans.PolDescription,
-                                 POD = trans.PodDescription,
-                                 PolId = ops.Pol,
-                                 PodId = ops.Pod,
-                                 PaymentStatus = acc.PaymentStatus,
-                                 ChargeWeight = trans.ChargeWeight??ops.SumChargeWeight,
-                                 TotalAmountUsd = sc.AmountUsd,
-                                 ChargeGroup = sc.ChargeGroup,
-                                 VatVoucher = sc.VoucherId,
-                                 InvDueDay =  acc.PaymentDueDate,
-                                 SoaNo = sc.Soano
-                             };
+            var debitData = from cd in cdNoteData
+                            join sc in surchargeData on cd.Code equals sc.DebitNo
+                            join ops in opstransactionData on sc.Hblid equals ops.Hblid into opsGrps
+                            from ops in opsGrps.DefaultIfEmpty()
+                            join trans in transactionDetailData on sc.Hblid equals trans.Id into transGrps
+                            from trans in transGrps.DefaultIfEmpty()
+                            join partner in partnerData on cd.PartnerId equals partner.Id
+                            join acc in accMangData on sc.AcctManagementId equals acc.Id into accGrps
+                            from acc in accGrps.DefaultIfEmpty()
+                            where partner.PartnerType == "Agent" && (String.IsNullOrEmpty(sc.SyncedFrom) || sc.SyncedFrom != "SOA")
+                            select new InvoiceListModel
+                            {
+                                HBLId = trans.Id == Guid.Empty ? ops.Hblid : trans.Id,
+                                IssuedDate = sc.DatetimeCreated,
+                                JobNo = sc.JobNo,
+                                CodeNo = sc.DebitNo,
+                                Type = cd.Type,
+                                FlexID = cd.FlexId,
+                                MBLNo = sc.Mblno,
+                                POL = trans.PolDescription,
+                                POD = trans.PodDescription,
+                                PolId = ops.Pol,
+                                PodId = ops.Pod,
+                                PaymentStatus = acc.PaymentStatus,
+                                ChargeWeight = trans.ChargeWeight ?? ops.SumChargeWeight,
+                                TotalAmountUsd = sc.AmountUsd,
+                                ChargeGroup = sc.ChargeGroup,
+                                VatVoucher = sc.VoucherId,
+                                InvDueDay = acc.PaymentDueDate,
+                                SoaNo = sc.Soano,
+                                VoucherIddate = sc.VoucherIddate,
+                                IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
+                            };
 
             // case soa
             // var surchargeDataSoa = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.Soano));
@@ -3370,6 +3375,7 @@ namespace eFMS.API.Documentation.DL.Services
                              Soano = soa.Soano,
                              HblId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.Hblid : sc.Hblid,
                              AcctManagementId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.AcctManagementId : sc.AcctManagementId,
+                             PayerAcctManagementId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.PayerAcctManagementId : sc.PayerAcctManagementId,
                              Customer = soa.Customer,
                              DatetimeCreated = soa.DatetimeCreated,
                              Type = soa.Type,
@@ -3379,6 +3385,10 @@ namespace eFMS.API.Documentation.DL.Services
                              VatAmountUsd = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.VatAmountUsd : sc.VatAmountUsd,
                              ChargeGroup = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.ChargeGroup : sc.ChargeGroup,
                              InvoiceNo = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.InvoiceNo : sc.InvoiceNo,
+                             VoucherIddate = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.VoucherIddate : sc.VoucherIddate,
+                             VoucherId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.VoucherId : sc.VoucherId,
+                             SyncedFrom = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.SyncedFrom : sc.SyncedFrom,
+                             PaySyncedFrom = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.PaySyncedFrom : sc.PaySyncedFrom
                          };
             // case soa
             var soadat = from soa in soaGrp
@@ -3391,6 +3401,8 @@ namespace eFMS.API.Documentation.DL.Services
                          join acc in accMangData on soa.AcctManagementId equals acc.Id into accGrps1
                          from acc in accGrps1.DefaultIfEmpty()
                          where part.PartnerType == "Agent"
+                         && (soa.Type != "Credit" && (soa.SyncedFrom == "SOA") ||
+                         soa.Type == "Credit" && (soa.PaySyncedFrom == "SOA"))
                          select new InvoiceListModel
                          {
                              JobNo = soa.JobNo,
@@ -3407,7 +3419,9 @@ namespace eFMS.API.Documentation.DL.Services
                              ChargeGroup = soa.ChargeGroup,
                              VatVoucher = soa.InvoiceNo,
                              PaymentStatus = acc.PaymentStatus,
-                             InvDueDay = acc.PaymentDueDate
+                             InvDueDay = acc.PaymentDueDate,
+                             VoucherIddate = soa.VoucherIddate,
+                             IssuedStatus = (!string.IsNullOrEmpty(soa.InvoiceNo) && soa.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(soa.VoucherId) && (soa.Type == DocumentConstants.CHARGE_OBH_TYPE ? soa.PayerAcctManagementId : soa.AcctManagementId) != null) ? "Issued Voucher" : "New",
                          };
 
             // Case settle
@@ -3439,8 +3453,16 @@ namespace eFMS.API.Documentation.DL.Services
                                   ChargeGroup = sc.ChargeGroup,
                                   VatVoucher = sc.InvoiceNo,
                                   PaymentStatus = acc.PaymentStatus,
-                                  InvDueDay = acc.PaymentDueDate
+                                  InvDueDay = acc.PaymentDueDate,
+                                  VoucherIddate = sc.VoucherIddate
                               };
+
+            // HashSet<string> debitSoaNos = new HashSet<string>(debitData.Select(z => z.SoaNo));
+            // HashSet<string> creditSoaNos = new HashSet<string>(creditData.Select(z => z.SoaNo));
+
+            // var newSoaDat = from p in soadat
+               //             where !debitSoaNos.Contains(p.SoaNo) || !creditSoaNos.Contains(p.SoaNo)
+                //            select p;
 
             var data = new List<InvoiceListModel>();
             data.AddRange(creditData.ToList());
@@ -3472,7 +3494,9 @@ namespace eFMS.API.Documentation.DL.Services
                 InvDueDay = se.FirstOrDefault().InvDueDay,
                 SoaNo = se.FirstOrDefault().SoaNo,
                 PolId = se.FirstOrDefault().PolId,
-                PodId = se.FirstOrDefault().PodId
+                PodId = se.FirstOrDefault().PodId,
+                IssuedStatus = se.Any(y => y.IssuedStatus == "Issued Invoice") ? "Issued Invoice" : (se.Any(y => y.IssuedStatus == "Issued Voucher") ? "Issued Voucher" : "New"),
+                VoucherIddate = se.Where(x => x.VoucherIddate != null).FirstOrDefault()?.VoucherIddate,
             }).AsQueryable();
             return result;
         }
@@ -4146,7 +4170,10 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             queryData = GetStatusInvoiceList(criteria.Status, queryData);
-
+            if (criteria.FromAccountingDate != null && criteria.ToAccountingDate != null)
+            {
+                queryData = queryData.Where(x => x.VoucherIddate != null && (x.VoucherIddate.Value.Date >= criteria.FromAccountingDate.Value.Date && x.VoucherIddate.Value.Date <= criteria.ToAccountingDate.Value.Date));
+            }
             var resultDatas = queryData.OrderByDescending(o => o.DatetimeModified).ToList();
             var places = placeRepository.Get();
             var chargeGroups = catchargeGroupRepository.Get();
