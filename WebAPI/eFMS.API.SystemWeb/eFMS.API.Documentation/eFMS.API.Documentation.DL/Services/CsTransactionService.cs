@@ -16,15 +16,19 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Cryptography;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -74,6 +78,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICsStageAssignedService csStageAssignedService;
         private readonly IStageService catStageService;
         private readonly IContextBase<AccAccountingManagement> accMngtRepo;
+        private readonly IConfiguration _configuration;
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -115,7 +120,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<OpsTransaction> opsTransactionRepo,
             ICsStageAssignedService csStageAssigned,
             IStageService stageService,
-            IContextBase<AccAccountingManagement> accMngt
+            IContextBase<AccAccountingManagement> accMngt, IConfiguration configuration
             ) : base(repository, mapper)
         {
             currentUser = user;
@@ -158,6 +163,7 @@ namespace eFMS.API.Documentation.DL.Services
             csStageAssignedService = csStageAssigned;
             catStageService = stageService;
             accMngtRepo = accMngt;
+            _configuration = configuration;
         }
 
         #region -- INSERT & UPDATE --
@@ -1072,7 +1078,7 @@ namespace eFMS.API.Documentation.DL.Services
                     result.Containers = containers;
                 }
             }
-            if(result != null && result.JobNo != null && result.HblId == null)
+            if (result != null && result.JobNo != null && result.HblId == null)
             {
                 var surchargesOrg = csShipmentSurchargeRepo.Get(x => x.JobNo == jobOps);
                 var surchargesLink = csShipmentSurchargeRepo.Get(x => x.JobNo == result.JobNo);
@@ -2969,9 +2975,9 @@ namespace eFMS.API.Documentation.DL.Services
                             revenue = surcharge.Total;
                         }
                         string _paymentStatus = string.Empty;
-                        if(surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE || surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                        if (surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE || surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                         {
-                            if(surcharge.AcctManagementId != null && surcharge.AcctManagementId != Guid.Empty)
+                            if (surcharge.AcctManagementId != null && surcharge.AcctManagementId != Guid.Empty)
                             {
                                 var acct = accMngtRepo.Get(x => x.Id == surcharge.AcctManagementId)?.FirstOrDefault();
                                 _paymentStatus = acct?.PaymentStatus;
@@ -3670,9 +3676,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             return catContractRepo.Any(y => y.PartnerId == tranDes.CustomerId
                            && y.SaleManId == tranDes.SaleManId && y.Active == true
-                           && y.SaleService.Contains(transactionType) && (y.ShipmentType == "Nominated"||y.ShipmentType== "Freehand & Nominated"));
+                           && y.SaleService.Contains(transactionType) && (y.ShipmentType == "Nominated" || y.ShipmentType == "Freehand & Nominated"));
         }
-        
+
         public HandleState UpdateJobStatus(ChargeShipmentStatusModel model)
         {
             CatStage stage = null;
@@ -3773,6 +3779,36 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     trans.Dispose();
                 }
+            }
+        }
+
+        public async Task<object> TrackShipmentProgress(string hbl)
+        {
+            var baseUrl = _configuration.GetValue<string>("TrackingApiKey:Urls");
+            var apiKey = _configuration.GetValue<string>("TrackingApiKey:ApiKey");
+            try
+            {
+                var newModel = new List<SysFlightInfo>();
+                var model = new Dictionary<string, string>();
+                model.Add("awb_number", hbl);
+
+                HttpClient client = new HttpClient();
+                client.DefaultRequestHeaders.Accept
+                    .Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                string jsonContent = JsonConvert.SerializeObject(model);
+                var httpContent = new StringContent(jsonContent.ToString(), Encoding.UTF8, "application/json");
+                client.Timeout = TimeSpan.FromMinutes(5);
+                client.DefaultRequestHeaders.Add("Tracking-Api-Key", apiKey);
+
+                HttpResponseMessage response = await client.PostAsync(baseUrl, httpContent);
+                var result = await response.Content.ReadAsAsync<object>();
+                var data = result.GetValueBy("data")["track_info"];
+
+                return data;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
     }
