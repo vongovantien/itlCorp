@@ -40,7 +40,6 @@ namespace eFMS.API.Report.Helpers
             }
             catch (Exception ex)
             {
-                new LogHelper("ExportAccountingPlSheet", "" + ex.ToString());
             }
             return null;
         }
@@ -220,6 +219,7 @@ namespace eFMS.API.Report.Helpers
             }
             catch (Exception ex)
             {
+                new LogHelper("BindingDataAccountingPLSheetExportExcelError", ex.Message?.ToString());
                 return null;
             }
         }
