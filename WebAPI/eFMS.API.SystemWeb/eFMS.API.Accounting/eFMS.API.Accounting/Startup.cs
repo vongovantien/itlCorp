@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.API.Common.Globals;
 using eFMS.API.Infrastructure;
 using Microsoft.AspNetCore.Builder;
@@ -46,7 +48,9 @@ namespace eFMS.API.Accounting
             services.AddInfrastructure<LanguageSub>(Configuration);
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
+            services.SetUpRabbitMq(Configuration);
         }
+
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)
         {
