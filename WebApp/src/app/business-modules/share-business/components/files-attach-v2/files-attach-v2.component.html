@@ -382,8 +382,8 @@
         </ng-container>
     </div>
 </div>
-<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDoc($event)" [jobId]="jobId" [jobNo]="jobNo" [jobs]="jobs"
-    [billingId]="billingId" [transactionType]="transactionType" [housebills]="housebills">
+<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDoc($event)" [jobId]="jobId" [jobNo]="jobNo"
+    [docTypeId]="docTypeId" [billingId]="billingId" [transactionType]="transactionType" [housebills]="housebills">
 </document-type-attach>
 
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">
