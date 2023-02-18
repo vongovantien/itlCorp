@@ -1454,14 +1454,16 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         surchargeRepository.Delete(x => x.Id == item.Id, false);
                     }
-                    var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo);
+                    //Xóa job OPS xóa luôn tờ khai rep
+                    var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo && x.Source == "Replicate");
                     if (clearances != null)
                     {
                         foreach (var item in clearances)
                         {
-                            item.JobNo = null;
-                            item.ConvertTime = null;
-                            customDeclarationRepository.Update(item, x => x.Id == item.Id, false);
+                            //item.JobNo = null;
+                            //item.ConvertTime = null;
+                            //customDeclarationRepository.Update(item, x => x.Id == item.Id, false);
+                            customDeclarationRepository.Delete(x => x.Id == item.Id, false);
                         }
                     }
                 }

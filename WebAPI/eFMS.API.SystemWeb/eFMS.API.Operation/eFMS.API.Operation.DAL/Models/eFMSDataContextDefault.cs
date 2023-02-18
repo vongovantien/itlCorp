@@ -24,6 +24,7 @@ namespace eFMS.API.Operation.Service.Models
         public virtual DbSet<OpsTransaction> OpsTransaction { get; set; }
         public virtual DbSet<SetEcusconnection> SetEcusconnection { get; set; }
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
+        public virtual DbSet<SysOffice> SysOffice { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -1733,6 +1734,140 @@ namespace eFMS.API.Operation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysOffice>(entity =>
+            {
+                entity.ToTable("sysOffice");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Active)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
+
+                entity.Property(e => e.AddressEn)
+                    .HasColumnName("Address_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.AddressVn)
+                    .HasColumnName("Address_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.BankAccountNameEn)
+                    .HasColumnName("BankAccountName_EN")
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.BankAccountNameVn)
+                    .HasColumnName("BankAccountName_VN")
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.BankAccountUsd)
+                    .HasColumnName("BankAccount_USD")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankAccountVnd)
+                    .HasColumnName("BankAccount_VND")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankAddressEn)
+                    .HasColumnName("BankAddress_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.BankAddressLocal)
+                    .HasColumnName("BankAddress_Local")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.BankNameEn)
+                    .HasColumnName("BankName_EN")
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.BankNameLocal)
+                    .HasColumnName("BankName_Local")
+                    .HasMaxLength(1000);
+
+                entity.Property(e => e.BranchNameEn)
+                    .HasColumnName("BranchName_EN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.BranchNameVn)
+                    .HasColumnName("BranchName_VN")
+                    .HasMaxLength(4000);
+
+                entity.Property(e => e.Buid).HasColumnName("BUID");
+
+                entity.Property(e => e.Code).HasMaxLength(640);
+
+                entity.Property(e => e.CountryId).HasColumnName("CountryID");
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Fax)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.InternalCode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Location).HasMaxLength(4000);
+
+                entity.Property(e => e.Logo).HasColumnType("image");
+
+                entity.Property(e => e.ManagerId)
+                    .HasColumnName("ManagerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OfficeType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerMapping)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ShortName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SwiftCode)
+                    .HasMaxLength(400)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Taxcode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Tel)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Website)
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
