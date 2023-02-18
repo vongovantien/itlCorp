@@ -57,6 +57,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     private _readonly: boolean = false;
     isView: boolean = true;
     elementInput: HTMLElement = null;
+    isEdocByJob: boolean = false;
+    isEdocByAcc: boolean = false;
     edocByAcc: IEdocAcc[] = [({
         documentType: null,
         eDocs: [],
@@ -138,7 +140,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: CsTransaction) => {
                             this.transactionType = res.transactionType;
-                            this.getDocumentType(res.transactionType, null);
+                            this.getDocumentType(res.transactionType);
                             this.getEDoc(res.transactionType);
                             this.jobNo = res.jobNo;
                             this.isLocked = res.isLocked;
@@ -150,7 +152,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     .subscribe(
                         (res: any) => {
                             this.transactionType = 'CL';
-                            this.getDocumentType('CL', null);
+                            this.getDocumentType('CL');
                             this.getEDoc('CL');
                             this.jobNo = res.opstransaction.jobNo;
                             this.isLocked = res.opstransaction.isLocked;
@@ -160,7 +162,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         } else {
             this.transactionType = this.typeFrom;
             this.getJobList();
-            this.getDocumentType(this.typeFrom, this.billingId);
+            this.getDocumentType(this.typeFrom);
             this.getEDoc(this.typeFrom);
         }
         this.headers = [
@@ -254,7 +256,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.documentAttach.selectedtDocType = edoc.documentTypeId;
         this.isView = true;
         const extension = this.selectedEdoc.imageUrl.split('.').pop();
-        if (extension === 'zip') {
+        if (!['xlsx', 'docx', 'doc', 'xls', 'html', 'htm', 'pdf', 'txt', 'png', 'jpeg'].includes(extension)) {
             this.isView = false;
         }
         this.clearMenuContext(this.queryListMenuContext);
@@ -349,8 +351,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             );
     }
 
-    getDocumentType(transactionType: string, billingId: string) {
-        this._systemFileRepo.getDocumentType(transactionType, billingId)
+    getDocumentType(transactionType: string) {
+        this._systemFileRepo.getDocumentType(transactionType)
             .pipe(
                 catchError(this.catchError),
             )
@@ -383,6 +385,10 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 .subscribe(
                     (res: any) => {
                         this.edocByAcc = res;
+                        console.log(res);
+                        if (res.eDocs.length > 0) {
+                            this.isEdocByAcc = true
+                        }
                         this.onChange.emit(res);
                     },
                 );
@@ -409,17 +415,24 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
     }
 
-    viewEdocFromName(imageUrl: string) {
-        this.selectedEdoc = Object.assign({}, this.selectedEdoc);
-        this.selectedEdoc.imageUrl = imageUrl;
+    viewEdocFromName(edoc: any) {
+        // this.selectedEdoc = Object.assign({}, this.selectedEdoc);
+        // this.selectedEdoc.imageUrl = edoc.imageUrl;
+        console.log(edoc);
+
+        this.selectedEdoc = edoc;
         this.viewFileEdoc();
     }
 
     viewFileEdoc() {
+        console.log(this.selectedEdoc);
+
         if (!this.selectedEdoc.imageUrl) {
             return;
         }
         const extension = this.selectedEdoc.imageUrl.split('.').pop();
+        console.log(extension);
+
         if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
             this._exportRepo.previewExport(this.selectedEdoc.imageUrl);
         }
@@ -431,8 +444,10 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                 }
             )
         }
-        else {
+        else if (['pdf', 'txt', 'png', 'jpeg'].includes(extension.toLowerCase())) {
             this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
+        } else {
+            this.downloadEdoc();
         }
     }
 
@@ -448,6 +463,19 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     downloadAllEdoc() {
+        // let countEdocJob = _some(this.edocByJob, x => (x.eDocs !== null && x.eDocs?.length > 0));
+        // let countEdocAcc = _some(this.edocByAcc, x => (x.eDocs !== null && x.eDocs?.length > 0));
+        console.log(this.edocByAcc);
+
+        if (this.typeFrom === 'Shipment') {
+            if (this.edocByJob?.some(x => x.eDocs?.length > 0)) {
+                return this._toast.warning("No data to Export");
+            }
+        } else {
+            if (!this.isEdocByAcc) {
+                return this._toast.warning("No data to Export");
+            }
+        }
         let model = {
             folderName: this.typeFrom,
             objectId: this.typeFrom === 'Shipment' ? this.jobId : this.billingId,
@@ -470,7 +498,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         let docType = this.selectedEdoc1?.documentTypeId;
         let listFile: any[] = [];
 
-        for (let i = 0; i < files.length; i++) {
+        for (let i = 0; i < files?.length; i++) {
             if (!!docType) {
                 files[i].DocumentId = docType;
                 files[i].DocumentCode = this.selectedEdoc1?.documentCode;
