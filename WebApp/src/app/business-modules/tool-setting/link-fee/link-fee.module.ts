@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { SharedModule } from 'src/app/shared/shared.module';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { ModalModule } from 'ngx-bootstrap/modal';
+import { RouterModule, Routes } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { FormRuleComponent } from './components/form-rule/form-rule.component';
-import { LinkFeeComponent } from './link-fee.component';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
+import { SharedModule } from 'src/app/shared/shared.module';
+import { FormRuleComponent } from './components/form-rule/form-rule.component';
 import { FormSearchRuleComponent } from './components/form-search-rule/form-search-rule.component';
 import { LinkFeeImportComponent } from './link-fee-import/link-fee-import.component';
-import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { LinkFeeComponent } from './link-fee.component';
 
 const routing: Routes = [
     {

@@ -4,12 +4,14 @@ using eFMS.API.Setting.Service.Models;
 using ITL.NetCore.Connection.BL;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Setting.DL.IService
 {
-    public interface IFileManagementService: IRepositoryBase<SysImage, SysImageModel>
+    public interface IFileManagementService : IRepositoryBase<SysImage, SysImageModel>
     {
         IQueryable<SysImageViewModel> Get(FileManagementCriteria criteria, int page, int size, out int rowsCount);
         List<SysImageViewModel> GetDetail(string folderName, string objectId);
+        Task<FileManageResponse> GetEdocManagement(EDocManagementCriterial criterial,int page,int size);
     }
 }

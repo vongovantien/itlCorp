@@ -25,5 +25,8 @@ namespace eFMS.API.Setting.Service.Models
         public Guid? ReplicateOfficeId { get; set; }
         public string ReplicatePrefix { get; set; }
         public bool? IsApplyContract { get; set; }
+        public bool? ApprovalAdvance { get; set; }
+        public bool? ApprovalSettlement { get; set; }
+        public bool? AlertAtd { get; set; }
     }
 }

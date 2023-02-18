@@ -108,6 +108,13 @@
     </button>
 </ng-template>
 
+<ng-template #downloadTpl>
+    <button type="button" NoDbClick class="btn btn-{{class ? class : 'success'}}  m-btn--icon m-btn--icon-only"
+        (click)="onClicked($event)">
+        <i class="la la-download"></i>
+    </button>
+</ng-template>
+
 <ng-template #copyTpl>
     <button type="button" NoDbClick class="btn btn-{{class ? class : 'success'}}  m-btn--icon m-btn--icon-only"
         (click)="onClicked($event)">
