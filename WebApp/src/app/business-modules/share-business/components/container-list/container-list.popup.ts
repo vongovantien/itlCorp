@@ -106,7 +106,7 @@ export class ShareBussinessContainerListPopupComponent extends PopupBase impleme
         this.isSubmitted = false;
         this.isDuplicateContPakage = false;
         this.initContainers = [...this.initContainers, new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: !!this.defaultWeightUnit ? this.defaultWeightUnit.id : null, unitOfMeasureName: !!this.defaultWeightUnit ? this.defaultWeightUnit.unitNameEn : null })];
-        // this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION 
+        // this._store.dispatch(new fromStore.AddContainerAction(new Container({ nw: null, cbm: null, chargeAbleWeight: null, gw: null, unitOfMeasureId: 119, unitOfMeasureName: 'Kilogram' }))); // * DISPATCH Add ACTION
     }
 
     duplicate(index: number) {
