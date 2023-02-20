@@ -511,7 +511,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.setError(this.currencyId);
         this.isSubmitted = true;
         this.selectedContract.index = this.indexDetailContract;
-
+        this.checkUpdateCreditInfo();
         if (!this.checkSubmitData()) {
             return;
         }
@@ -571,12 +571,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             }
                         }
                     );
-            } else if (this.isUpdate && !this.isCreateNewCommercial) {      
-                if ((this.formGroup.controls['trialCreditLimit'].dirty || this.formGroup.controls['paymentTermObh'].dirty || this.formGroup.controls['paymentTerm'].dirty ||
-                this.formGroup.controls['creditLimitRate'].dirty || this.formGroup.controls['creditLimit'].dirty || this.formGroup.controls['trialCreditLimit'].dirty ||
-                this.formGroup.controls['baseOn'].dirty) && this.selectedContract.arconfirmed == true) {
-                    this.selectedContract.isUpdateCreditTermInfo = true; 
-                }                       
+            } else if (this.isUpdate && !this.isCreateNewCommercial) {                            
                 const body = new Contract(this.selectedContract);
                 if (this.contractTypeDetail !== this.contractType.value && this.selectedContract.active === true && this.isAllowActiveContract === false) { //&& this.isChangeAgrmentType === false && this.isAllowActiveContract === false) {
                     this.status = this.statusContract;
@@ -944,9 +939,26 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + trialDays)),
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + trialDays)),
             });
+            this.selectedContract.isUpdateCreditTermInfo = true; 
         }
     }
-
+    onUpdateTrialExpiredDate(value: { startDate: any; endDate: any }) {
+        if (!!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate) {
+            this.effectiveDate.setValue({
+                startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate())),
+                endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate())),
+            });
+            this.selectedContract.isUpdateCreditTermInfo = true; 
+        }
+    }
+    checkUpdateCreditInfo()
+    {
+        if((this.formGroup.controls['trialCreditLimit'].dirty || this.formGroup.controls['paymentTermObh'].dirty || this.formGroup.controls['paymentTerm'].dirty ||
+        this.formGroup.controls['creditLimitRate'].dirty || this.formGroup.controls['creditLimit'].dirty || this.formGroup.controls['trialCreditLimit'].dirty ||
+        this.formGroup.controls['baseOn'].dirty) && this.isUpdate && !this.isCreateNewCommercial) {
+            this.selectedContract.isUpdateCreditTermInfo = true;
+        }
+    }
     onUpdateEffectiveDate(value: { startDate: any; endDate: any }) {
         if (!!value.startDate && this.contractType.value === 'Trial') {
             this.expiredDate.setValue({
@@ -1102,10 +1114,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     onARConfirmed() {
         this._progressRef.start();
-        if ((this.formGroup.controls['trialCreditLimit'].dirty || this.formGroup.controls['paymentTermObh'].dirty || this.formGroup.controls['paymentTerm'].dirty ||
-            this.formGroup.controls['creditLimitRate'].dirty || this.formGroup.controls['creditLimit'].dirty || this.formGroup.controls['trialCreditLimit'].dirty ||
-            this.formGroup.controls['baseOn'].dirty) && this.isUpdate && !this.isCreateNewCommercial) {
-            this.selectedContract.isUpdateCreditTermInfo = true;
+        this.checkUpdateCreditInfo();
+        if (this.selectedContract.isUpdateCreditTermInfo === true){
             this.selectedContract.isRequestApproval = true;
             const body = new Contract(this.selectedContract);
             this.updateContract(body)

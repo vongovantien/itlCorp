@@ -378,6 +378,7 @@
                                                 ngxDaterangepickerMd
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                                 [singleDatePicker]="true" name="daterange" [autoApply]="true"
+                                                (datesUpdated)="onUpdateTrialExpiredDate($event)"
                                                 formControlName="trialExpiredDate" [minDate]="minDateExpiredTrial"
                                                 readonly />
                                             <span class="m-input-icon__icon m-input-icon__icon--right">
