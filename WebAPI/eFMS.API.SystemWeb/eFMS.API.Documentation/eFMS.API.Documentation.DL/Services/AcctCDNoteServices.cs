@@ -3395,10 +3395,10 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
-                soaGrp = soaGrp.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.HblNo));
+                soaGrp = soaGrp.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.HblNo || a==x.Soano));
             }
-                // case soa
-                var soadat = from soa in soaGrp
+            // case soa
+            var soadat = from soa in soaGrp
                          join part in partnerData on soa.Customer equals part.Id into partGroup
                          from part in partGroup.DefaultIfEmpty()
                          join trans in transactionDetailData on soa.HblId equals trans.Id into transGrps
@@ -3408,8 +3408,9 @@ namespace eFMS.API.Documentation.DL.Services
                          join acc in accMangData on soa.AcctManagementId equals acc.Id into accGrps1
                          from acc in accGrps1.DefaultIfEmpty()
                          where part.PartnerType == "Agent"
-                         && (soa.Type != "Credit" && (soa.SyncedFrom == "SOA") ||
-                         soa.Type == "Credit" && (soa.PaySyncedFrom == "SOA"))
+                         && ((soa.Type != "Credit" && (soa.SyncedFrom == "SOA") ||
+                         soa.Type == "Credit" && (soa.PaySyncedFrom == "SOA")))
+                         || (string.IsNullOrEmpty(soa.SyncedFrom) || string.IsNullOrEmpty(soa.SyncedFrom))
                          select new InvoiceListModel
                          {
                              JobNo = soa.JobNo,
