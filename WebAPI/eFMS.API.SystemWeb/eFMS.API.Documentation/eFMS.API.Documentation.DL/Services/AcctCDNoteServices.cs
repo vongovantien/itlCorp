@@ -3253,9 +3253,9 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     query = query.And(x => refNos.Any(a => a == x.Code));
                 }
-                if (surchargesCdNote.Any())
+                if (surchargesSoa.Any())
                 {
-                    querySoa = querySoa.And(x => refNos.Any(a => a == x.Soano) || surchargesCdNote.Any(a => a == x.Soano));
+                    querySoa = querySoa.And(x => refNos.Any(a => a == x.Soano) || surchargesSoa.Any(a => a == x.Soano)); 
                 }
                 else
                 {
@@ -3369,11 +3369,13 @@ namespace eFMS.API.Documentation.DL.Services
                          from sc in soagrp.DefaultIfEmpty()
                          join sc2 in surchargeDataSoa on soa.Soano equals sc2.Soano into soagrp2
                          from sc2 in soagrp2.DefaultIfEmpty()
-                         where (sc.DebitNo == null && sc.CreditNo == null) || (sc2.DebitNo == null && sc2.CreditNo == null)
+                         where (string.IsNullOrEmpty(sc.DebitNo) && string.IsNullOrEmpty(sc.CreditNo)) ||
+                         (string.IsNullOrEmpty(sc2.DebitNo) && string.IsNullOrEmpty(sc2.CreditNo))
                          select new
                          {
                              Soano = soa.Soano,
                              HblId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.Hblid : sc.Hblid,
+                             HblNo = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.Hblno : sc.Hblno,
                              AcctManagementId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.AcctManagementId : sc.AcctManagementId,
                              PayerAcctManagementId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.PayerAcctManagementId : sc.PayerAcctManagementId,
                              Customer = soa.Customer,
@@ -3390,8 +3392,13 @@ namespace eFMS.API.Documentation.DL.Services
                              SyncedFrom = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.SyncedFrom : sc.SyncedFrom,
                              PaySyncedFrom = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.PaySyncedFrom : sc.PaySyncedFrom
                          };
-            // case soa
-            var soadat = from soa in soaGrp
+            if (!string.IsNullOrEmpty(criteria.ReferenceNos))
+            {
+                IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
+                soaGrp = soaGrp.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.HblNo));
+            }
+                // case soa
+                var soadat = from soa in soaGrp
                          join part in partnerData on soa.Customer equals part.Id into partGroup
                          from part in partGroup.DefaultIfEmpty()
                          join trans in transactionDetailData on soa.HblId equals trans.Id into transGrps
