@@ -245,10 +245,10 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     this.selectedIndexSurcharge = indexSurcharge;
                 }
             }
-            // if (surcharge.linkChargeId) {
-            //     this._toastService.warning('Charge already linked charge');
-            //     return;
-            // }
+            if (surcharge.linkChargeId && surcharge.jobId.startsWith("R")) {
+                this._toastService.warning('Charge already linked charge');
+                return;
+            }
             if (surcharge.hasNotSynce === false) {
                 this._toastService.warning('Charge already synced');
                 return;
@@ -326,11 +326,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     return;
                 }
 
-                // let checks: any[] = groupShipment.chargeSettlements.filter((x: any) => x.isSelected && x.linkChargeId);
-                // if (!!checks.length) {
-                //     this._toastService.warning('Charge already linked charge');
-                //     return;
-                // }
+                let checks: any[] = groupShipment.chargeSettlements.filter((x: any) => x.isSelected && x.linkChargeId);
+                if (!!checks.length) {
+                    this._toastService.warning('Charge already linked charge');
+                    return;
+                }
                 groupShipment.chargeSettlements = this.returnChargeFromShipment(groupShipment);
             }
 
@@ -349,11 +349,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 return;
             }
 
-            // let checkChargeLinks: Surcharge[] = surchargeSelected.filter((surcharge: Surcharge) => surcharge.isSelected && surcharge.linkChargeId);
-            // if (!!checkChargeLinks.length) {
-            //     this._toastService.warning('Charge already linked charge');
-            //     return;
-            // }
+            let checkChargeLinks: Surcharge[] = surchargeSelected.filter((surcharge: Surcharge) => surcharge.isSelected && surcharge.linkChargeId && surcharge.jobId.startsWith("R"));
+            if (!!checkChargeLinks.length) {
+                this._toastService.warning('Charge already linked charge');
+                return;
+            }
 
             if (!!surchargeSelected.length) {
                 this.surcharges = this.surcharges.filter((surcharge: Surcharge) => !surcharge.isSelected);
@@ -482,10 +482,10 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         if (!charge) {
             return;
         }
-        // if (charge.linkChargeId) {
-        //     this._toastService.warning('Charge already linked charge');
-        //     return;
-        // }
+        if (charge.linkChargeId && charge.jobId.startsWith("R")) {
+            this._toastService.warning('Charge already linked charge');
+            return;
+        }
         if (charge.hasNotSynce === false) {
             this._toastService.warning('Charge already synced');
             return;
