@@ -212,17 +212,19 @@
 <app-context-menu #receiptContextMenu (clickOutside)="selectedReceipt = null">
     <ng-container *ngIf="selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !== 'Synced'">
         <div class="menu-context__item" (click)="confirmSyncReceipt(selectedReceipt)">
-            <span><i class="la la-cloud-upload "></i><span> Sync to accountant system</span></span>
+            <span><i class="la la-cloud-upload text-primary"></i><span> Sync to accountant system</span></span>
         </div>
     </ng-container>
     <ng-container *ngIf="selectedReceipt?.status !== 'Draft'">
         <div class="menu-context__item" (click)="confirmCopyReceipt()">
-            <span><i class="la la-copy"></i><span> Copy receipt {{selectedReceipt?.paymentRefNo}}</span></span>
+            <span><i class="la la-copy text-primary"></i><span> Copy receipt
+                    {{selectedReceipt?.paymentRefNo}}</span></span>
         </div>
     </ng-container>
     <ng-container *ngIf="selectedReceipt?.status === 'Done' && selectedReceipt.class !== 'Clear Debit'">
         <div class="menu-context__item" (click)="confirmCreateClearDebit()">
-            <span><i class="la la-plus"></i><span> Clear debit receipt {{selectedReceipt?.paymentRefNo}}</span></span>
+            <span><i class="la la-plus text-primary"></i><span> Clear debit receipt
+                    {{selectedReceipt?.paymentRefNo}}</span></span>
         </div>
     </ng-container>
     <!-- <div class="menu-context__item">
@@ -231,40 +233,30 @@
     <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
         <div class="d-flex justify-content-between">
             <div>
-                <i class="la la-download"></i>
+                <i class="la la-download text-primary"></i>
                 <span>Export...</span>
             </div>
-            <div>
-                <span><i class="la la-caret-right"></i></span>
+            <div class="d-flex align-items-center">
+                <i class="la la-caret-right font-13"></i>
             </div>
         </div>
 
     </div>
     <ng-container *ngIf="(selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !=='Synced')">
         <hr />
-        <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentRefNo')">
-            <span><i class="la la-edit"></i><span> Update receipt no </span></span>
-        </div>
-        <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentDate')">
-            <span><i class="la la-edit"></i><span>Update payment date</span></span>
-        </div>
-        <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentMethod')">
-            <span><i class="la la-edit"></i><span>Update payment method</span></span>
-        </div>
-        <div class="menu-context__item" (click)="showQuickUpdatePopup('bankAccountNo')">
-            <span><i class="la la-edit"></i><span>Update account no</span></span>
-        </div>
-        <div class="menu-context__item" (click)="showQuickUpdatePopup('obhpartnerId')">
-            <span><i class="la la-edit"></i><span>Update OBH partner</span></span>
+        <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentRefNo')" [dpToggle]="updateTpl"
+            position="rightTop" trigger="hover" ClickStopPropagation>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <i class="la la-edit text-primary"></i>
+                    <span> Update...</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="la la-caret-right font-13"></i>
+                </div>
+            </div>
         </div>
     </ng-container>
-
-    <!-- <ng-container *ngIf="(selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !=='Synced')">
-        <hr />
-        <div class="menu-context__item" (click)="cancelReceipt(selectedReceipt)">
-            <span><i class="la la-times-circle"></i><span>Cancel receipt</span></span>
-        </div>
-    </ng-container> -->
     <ng-container *ngIf="selectedReceipt?.status === 'Draft'">
         <div class="menu-context__item">
             <app-permission-button type="delete" (onClick)="checkAllowDelete(selectedReceipt)"
@@ -288,10 +280,30 @@
     </span>
 </app-dropdown>
 
+<app-dropdown #updateTpl>
+    <span class="dropdown-item pointer" (click)="showQuickUpdatePopup('paymentRefNo')">
+        Receipt No
+    </span>
+    <span class="dropdown-item pointer" (click)="showQuickUpdatePopup('paymentDate')">
+        Payment Date
+    </span>
+
+    <span class="dropdown-item pointer" (click)="showQuickUpdatePopup('paymentMethod')">
+        Payment Method
+    </span>
+    <span class="dropdown-item pointer" (click)="showQuickUpdatePopup('bankAccountNo')">
+        Bank Account No
+    </span>
+    <span class="dropdown-item pointer" (click)="showQuickUpdatePopup('obhpartnerId')">
+        OBH Partner
+    </span>
+</app-dropdown>
+
 <app-dropdown #createReceitTypeTpl>
     <a class="dropdown-item pointer" (click)="gotoCreateReceipt('CUSTOMER')">Customer Receipt</a>
     <ng-container>
         <a class="dropdown-item pointer" (click)="gotoCreateReceipt('AGENT')">Agency
             Receipt</a>
     </ng-container>
+    <a class="dropdown-item pointer" (click)="gotoCreateReceipt('COMBINE')">Combine Receipt</a>
 </app-dropdown>

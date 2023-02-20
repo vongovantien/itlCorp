@@ -147,7 +147,7 @@ a {
     border-radius: 0;
 }
 .dropdown-menu-wrapper {
-    .dropdown-item {
+    a.dropdown-item {
         &:active,
         .active {
             background: none;

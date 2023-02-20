@@ -1,0 +1,156 @@
+<div class="m-portlet">
+    <div class="m-portlet__head alert-block__heading pointer bg-secondary">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title w-100">
+                <h3 class="m-portlet__head-text collapse-toggle" data-toggle="collapse" data-target="#credit-summary">
+                    General
+                    <ng-container *ngIf="!!generalReceipts?.length">
+                        <span class="badge badge-success">{{generalReceipts?.length}}</span>
+                    </ng-container>
+                </h3>
+            </div>
+        </div>
+    </div>
+    <div class="m-portlet__body list-general-receipt">
+        <div class="table-wrapper table-editable m--margin-top-20 m-animate-fade-in">
+            <table class="table table-bordered dataTable-edit">
+                <thead app-table-header [headers]="headers"
+                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                    <th class="m--w-90 first table-actions-col fixed-side">
+
+                    </th>
+                </thead>
+                <tbody class="tbody-group">
+                    <ng-container *ngIf="!!generalReceipts.length">
+                        <tr *ngFor="let item of generalReceipts; let i = index; trackBy: trackByFn">
+                            <td class="table-actions-col fixed-side">
+                                <div class="table-actions">
+                                    <button (click)="duplicateGeneralItem(i)"
+                                        class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only text-white"
+                                        title="Duplicate"><i class="la la-copy"></i>
+                                    </button>
+                                    <ng-container>
+                                        <button type="button" (click)="deleteGeneralItem(i)"
+                                            class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove">
+                                            <i class="la la-trash"></i>
+                                        </button>
+                                    </ng-container>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.partnerId) }">
+                                    <div class="list-master-charge">
+                                        <app-combo-grid-virtual-scroll #comboGridOffice
+                                            [currentActiveItemId]="{field:'id', value:item.partnerId}"
+                                            (itemSelected)="onSelectDataTableInfo($event.id, item, 'partnerId')"
+                                            [selectedDisplayFields]="['shortName']" [dataSources]="partners"
+                                            [displayFields]="displayFieldsPartner" [height]="150"
+                                            placeholder="Please Select" (remove)="item.partnerId = null"
+                                            [disabled]="!!item.readonly" [clearable]="false">
+                                        </app-combo-grid-virtual-scroll>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && !item.paymentMethod}">
+                                    <select class="form-control" [(ngModel)]="item.paymentMethod"
+                                        placeholder="payment method"
+                                        (ngModelChange)="onSelectDataTableInfo($event, item, 'paymentMethod')">
+                                        <option [ngValue]="null" disabled>Please select</option>
+                                        <option *ngFor="let method of paymentMethods" [ngValue]="method.value">
+                                            {{method.title}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group "
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (item.amountUsd < 0 || item.amountUsd === null)}">
+                                    <ng-container *ngIf="!item.readonly else AmoutUsdTpl ">
+                                        <input type="number" class="form-control" [(ngModel)]="item.amountUsd"
+                                            (blur)="onSelectDataTableInfo($event, item,'amountUsd')"
+                                            placeholder="Amount USD" min="0" autoFormatCurrency>
+                                    </ng-container>
+                                    <ng-template #AmoutUsdTpl>
+                                        <span style="cursor: not-allowed;">
+                                            {{item.amountUsd}}
+                                        </span>
+                                    </ng-template>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group "
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (item.amountVnd < 0 || item.amountVnd === null)}">
+                                    <ng-container *ngIf="!item.readonly else AmoutVndTpl ">
+                                        <input type="number" class="form-control" [(ngModel)]="item.amountVnd"
+                                            placeholder="Amount VND" min="0" autoFormatCurrency>
+                                    </ng-container>
+                                    <ng-template #AmoutVndTpl>
+                                        <span style="cursor: not-allowed;">
+                                            {{item.amountVnd}}
+                                        </span>
+                                    </ng-template>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!item.obhPartnerId) }">
+                                    <div class="list-master-unit">
+                                        <app-combo-grid-virtual-scroll #comboGridOffice
+                                            [currentActiveItemId]="{field:'id', value:item.obhPartnerId}"
+                                            (itemSelected)="onSelectDataTableInfo($event.id, item, 'obhPartnerId')"
+                                            [selectedDisplayFields]="['shortName']" [dataSources]="obhPartners"
+                                            [displayFields]="[{ field: 'accountNo', label: 'Partner Code' },{ field: 'shortName', label: 'Name ABBR' }]"
+                                            [height]="150" placeholder="Please Select"
+                                            (remove)="item.obhPartnerId = null" [disabled]="!!item.readonly">
+                                        </app-combo-grid-virtual-scroll>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && !item.officeId}">
+                                    <select class="form-control" [(ngModel)]="item.officeId"
+                                        placeholder="payment method"
+                                        (ngModelChange)="onSelectDataTableInfo($event, item, 'officeId')">
+                                        <option [ngValue]="null" disabled>Please select</option>
+                                        <option *ngFor="let method of offices" [ngValue]="method.id">
+                                            {{method.code}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group ">
+                                    <ng-container *ngIf="!item.readonly; else notesTpl">
+                                        <input type="text" class="form-control" [(ngModel)]="item.notes"
+                                            placeholder="Notes">
+                                    </ng-container>
+                                    <ng-template #notesTpl>
+                                        {{item.notes}}
+                                    </ng-template>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-container>
+                    <tr app-table-none-record *ngIf="!(isLoading | async) && !generalReceipts.length">
+                    </tr>
+                    <tr app-table-row-loading *ngIf="(isLoading | async)">
+                    </tr>
+                    <tr>
+                        <ng-container>
+                            <td colspan=1 class="fixed-side">
+                                <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"
+                                    (click)="addGeneralItem()">
+                                    <i class="fa fa-plus-circle fa-2x"></i>
+                                </a>
+                            </td>
+                        </ng-container>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -21,13 +21,18 @@ import { ARCustomerPaymentReceiptDebitListComponent } from './components/receipt
 import { ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent } from './components/form-search-agent-customer/form-search-customer-agent-cd-invoice.component';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from './components/customer-agent-debit/customer-agent-debit.popup';
 import { ARCustomerPaymentFormQuickUpdateReceiptPopupComponent } from './components/popup/form-quick-update-receipt-popup/form-quick-update-receipt.popup';
+import { ARCustomerPaymentCreateReciptCombineComponent } from './create-receipt-combine/create-receipt-combine.component';
+import { ARCustomerPaymentFormCreateReceiptCombineComponent } from './components/form-combine-receipt/form-combine-receipt.component';
+import { ARCustomerPaymentReceiptGeneralCombineComponent } from './components/general-combine/receipt-general-combine.component';
+import { ARCustomerPaymentReceiptCDCombineComponent } from './components/cd-combine/receipt-cd-combine.component';
 
 const routing: Routes = [
     {
         path: '', data: { name: '' }, children: [
             { path: '', component: ARCustomerPaymentComponent },
-            { path: 'receipt/:type/new', component: ARCustomerPaymentCreateReciptComponent, data: { name: 'New' } },
-            { path: 'receipt/:id', component: ARCustomerPaymentDetailReceiptComponent },
+            { path: 'receipt/combine/new', component: ARCustomerPaymentCreateReciptCombineComponent, data: { type: 'new' } },
+            { path: 'receipt/combine/existing', component: ARCustomerPaymentCreateReciptCombineComponent, data: { type: 'EXISTING', name: 'Receipt Combine' }, },
+            { path: 'receipt/:type/new', component: ARCustomerPaymentCreateReciptComponent, data: { type: 'NEW', name: 'Receipt Combine' } },
         ]
     },
 
@@ -46,7 +51,11 @@ const routing: Routes = [
         ARCustomerPaymentReceiptDebitListComponent,
         ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent,
         ARCustomerPaymentCustomerAgentDebitPopupComponent,
-        ARCustomerPaymentFormQuickUpdateReceiptPopupComponent
+        ARCustomerPaymentFormQuickUpdateReceiptPopupComponent,
+        ARCustomerPaymentCreateReciptCombineComponent,
+        ARCustomerPaymentFormCreateReceiptCombineComponent,
+        ARCustomerPaymentReceiptGeneralCombineComponent,
+        ARCustomerPaymentReceiptCDCombineComponent
     ],
     imports: [
         SharedModule,
