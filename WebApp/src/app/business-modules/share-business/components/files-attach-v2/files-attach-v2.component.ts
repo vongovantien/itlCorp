@@ -55,12 +55,12 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     isView: boolean = true;
     elementInput: HTMLElement = null;
     isEdocByJob: boolean = false;
+    isEdocByAcc: boolean = false;
     edocByAcc: IEdocAcc[] = [({
         documentType: null,
         eDocs: [],
     })];
     docTypeId: number = 0;
-    isEdocByAcc: boolean = false;
 
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },

@@ -489,10 +489,10 @@ namespace eFMS.API.Operation.DL.Services
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
                     if (clearance != null)
                     {
-                        clearance.JobNo = item.JobNo;
-                        clearance.ConvertTime = item.ConvertTime;
-                        clearance.DatetimeModified = DateTime.Now;
-                        clearance.UserModified = currentUser.UserID;
+                       clearance.JobNo = item.JobNo;
+                       clearance.ConvertTime = item.ConvertTime;
+                       clearance.DatetimeModified = DateTime.Now;
+                       clearance.UserModified = currentUser.UserID;
                     }
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
                     if (item.isDelete == true && item.Source == "Replicate")

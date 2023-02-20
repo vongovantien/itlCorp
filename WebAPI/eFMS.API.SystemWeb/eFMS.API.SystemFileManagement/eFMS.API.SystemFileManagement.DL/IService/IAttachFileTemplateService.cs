@@ -12,7 +12,7 @@ namespace eFMS.API.SystemFileManagement.DL.IService
     {
         IQueryable<SysAttachFileTemplateModel> GetAttachTemplates();
         Task<HandleState> Import(List<SysAttachFileTemplate> list);
-        Task<List<DocumentTypeModel>> GetDocumentType(string transactionType);
         void clearCache();
+        Task<List<DocumentTypeModel>> GetDocumentType(string transactionType);
     }
 }
