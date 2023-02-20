@@ -235,8 +235,12 @@ namespace eFMS.API.Documentation.DL.Services
                             var opsInfo = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                             // Insert Replicate Data
                             entityReplicate.JobNo += opsInfo.JobNo;
-                            databaseUpdateService.InsertDataToDB(entityReplicate);
+                            addResult = databaseUpdateService.InsertDataToDB(entityReplicate);
                             result = new HandleState(addResult.Status, (object)addResult.Message);
+                            if (model.CsMawbcontainers?.Count > 0 && result.Success)
+                            {
+                                var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, entityReplicate.Id);
+                            }
                         }
                     }
                     else
@@ -251,6 +255,10 @@ namespace eFMS.API.Documentation.DL.Services
                         OpsTransaction entity = mapper.Map<OpsTransaction>(opsInfo);
                         result = new HandleState(addResult.Status, (object)addResult.Message);
                     }
+                    if (model.CsMawbcontainers?.Count > 0 && result.Success)
+                    {
+                        var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -258,12 +266,6 @@ namespace eFMS.API.Documentation.DL.Services
                     result = new HandleState(ex.Message);
                 }
             }
-            if (model.CsMawbcontainers?.Count > 0 && result.Success)
-            {
-                var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
-            }
-
-
             return result;
         }
 
