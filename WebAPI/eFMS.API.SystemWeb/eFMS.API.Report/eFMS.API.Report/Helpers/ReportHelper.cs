@@ -438,7 +438,7 @@ namespace eFMS.API.Report.Helpers
                 workSheet.Cells[rowStart, 11].Value = listData[i].ChargeName;
                 workSheet.Cells[rowStart, 12].Value = listData[i].Quantity;
                 workSheet.Cells[rowStart, 13].Value = listData[i].UnitPrice;
-                workSheet.Cells[rowStart, 13].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                workSheet.Cells[rowStart, 12, rowStart, 13].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
                 workSheet.Cells[rowStart, 14].Value = listData[i].TaxInvNoRevenue;
                 workSheet.Cells[rowStart, 15].Value = listData[i].VoucherIdRevenue;
