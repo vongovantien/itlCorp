@@ -6,6 +6,7 @@ using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -30,6 +31,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ICurrentUser currentUser;
         private readonly IAccAccountReceivableService accountReceivableService;
         private readonly IEDocService _edocService;
+        private readonly IRabbitBus _busControl;
 
         /// <summary>
         /// constructor
@@ -37,13 +39,14 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="user"></param>
-        public AcctSOAController(IStringLocalizer<LanguageSub> localizer, IAcctSOAService service, ICurrentUser user, IAccAccountReceivableService accountReceivable, IEDocService edocService)
+        public AcctSOAController(IStringLocalizer<LanguageSub> localizer, IAcctSOAService service, ICurrentUser user, IAccAccountReceivableService accountReceivable, IEDocService edocService, IRabbitBus _bus)
         {
             stringLocalizer = localizer;
             acctSOAService = service;
             currentUser = user;
             accountReceivableService = accountReceivable;
             _edocService = edocService;
+            _busControl = _bus;
         }
 
         /// <summary>
@@ -90,7 +93,8 @@ namespace eFMS.API.Accounting.Controllers
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
+
                     }
                 });
             }
@@ -141,7 +145,7 @@ namespace eFMS.API.Accounting.Controllers
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
                     // await _edocService.GenerateEdocSOA(model);
                 });
@@ -210,7 +214,7 @@ namespace eFMS.API.Accounting.Controllers
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(soaNo, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
                     await _edocService.DeleteEdocByBillingNo(soaNo);
                 });
@@ -522,7 +526,7 @@ namespace eFMS.API.Accounting.Controllers
                     modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.CODE, model.Action);
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
                 });
             }

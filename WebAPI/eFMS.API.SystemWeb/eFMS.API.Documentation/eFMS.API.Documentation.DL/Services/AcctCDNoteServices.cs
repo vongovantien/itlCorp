@@ -9,24 +9,24 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.Exports;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Documentation.Service.ViewModels;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
-using eFMS.API.Documentation.Service.ViewModels;
-using System.Data.SqlClient;
-using System.Data;
-using eFMS.API.Documentation.Service.Contexts;
-using ITL.NetCore.Connection;
-using Microsoft.Extensions.Options;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -58,6 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<SysUserNotification> sysUserNotificationRepository;
         IContextBase<CatCommodityGroup> catCommodityGroupRepository;
         IContextBase<AccAccountingManagement> accountingManagementRepository;
+        IContextBase<AcctSettlementPayment> acctSettlementPaymentGroupRepo;
         IContextBase<CatDepartment> departmentRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
         IContextBase<AcctSoa> acctSoaRepo;
@@ -98,6 +99,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo,
             IContextBase<AcctSoa> acctSoa,
             IContextBase<AcctCombineBilling> acctCombineBillingRepo,
+            IContextBase<AcctSettlementPayment> acctSettlementPaymentRepo,
             IOptions<ApiUrl> aUrl,
             ICheckPointService checkPoint
             ) : base(repository, mapper)
@@ -133,6 +135,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctCreditManagementArRepository = acctCreditManagementArRepo;
             acctSoaRepo = acctSoa;
             acctCombineBillingRepository = acctCombineBillingRepo;
+            acctSettlementPaymentGroupRepo = acctSettlementPaymentRepo;
             apiUrl = aUrl;
             checkPointService = checkPoint;
         }
@@ -327,8 +330,8 @@ namespace eFMS.API.Documentation.DL.Services
                     _partnerAcRef = _partner;
                 }
                 var _transactionType = GetTransactionType(model.TransactionTypeEnum);
-                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty) 
-                && x.OfficeId.Contains(currentUser.OfficeID.ToString()) 
+                var _contractAcRef = catContractRepo.Get(x => x.Active == true && x.PartnerId == (_partnerAcRef != null ? _partnerAcRef.Id : string.Empty)
+                && x.OfficeId.Contains(currentUser.OfficeID.ToString())
                 && x.SaleManId == (model.SalemanId != null ? model.SalemanId : x.SaleManId)
                 && x.SaleService.Contains(_transactionType)).FirstOrDefault();
 
@@ -358,7 +361,7 @@ namespace eFMS.API.Documentation.DL.Services
                             model.Status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
                         }
 
-                        if(model.Status == "New")
+                        if (model.Status == "New")
                         {
                             _customerId = chargeFirst.PaymentObjectId;
                             model.Status = GenerateDebitStatus(_customerId, _salesmanId, _transactionType);
@@ -383,7 +386,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
 
-                        if(!hasPrepaid)
+                        if (!hasPrepaid)
                         {
                             foreach (var item in dataGrpPartners)
                             {
@@ -681,34 +684,34 @@ namespace eFMS.API.Documentation.DL.Services
                         //[9/11/2021][Cho update phí cập nhật lại tỷ giá]
                         //if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
                         //{
-                            //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
-                            charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
+                        //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
+                        charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
 
-                            if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
-                            {
-                                charge.FinalExchangeRate = cdNote.ExcRateUsdToLocal;
-                            }
-                            else if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                charge.FinalExchangeRate = 1;
-                            }
-                            else
-                            {
-                                charge.FinalExchangeRate = null;
-                            }
+                        if (charge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                        {
+                            charge.FinalExchangeRate = cdNote.ExcRateUsdToLocal;
+                        }
+                        else if (charge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            charge.FinalExchangeRate = 1;
+                        }
+                        else
+                        {
+                            charge.FinalExchangeRate = null;
+                        }
 
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
-                            charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                            charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                            charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                            charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                            charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                            charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                            charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                        //}
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
+                        charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                        charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                        charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                        charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                        charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                        charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                        charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                                                                            //}
 
 
-                 
+
 
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = currentUser.UserID;
@@ -1688,7 +1691,6 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (data != null)
             {
-                int i = 1;
                 foreach (var item in data.ListSurcharges)
                 {
                     var exchargeDateSurcharge = item.ExchangeDate == null ? DateTime.Now : item.ExchangeDate;
@@ -2186,7 +2188,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = data.CDNote.Code+ CrystalEx.GetExtension(format);
+            var reportName = data.CDNote.Code + CrystalEx.GetExtension(format);
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -2258,11 +2260,6 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.UnitPriceStr = (_unitPrice + _decimalNumber).ToString(); //cộng thêm phần thập phân
                     //Giá trị thực tế VAT (% VAT hoặc số tiền tuyệt đối)
                     charge.VAT = Math.Abs(item.Vatrate ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
-
-                    //Amount trước thuế
-                    // decimal _netAmount = _unitPrice * item.Quantity;
-                    //Tiền thuế (nếu có)
-                    decimal _taxMoney = 0;
                     //if (isOriginCurr)
                     //{
                     //    _netAmount = (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL) ? NumberHelper.RoundNumber(_netAmount, 0) : NumberHelper.RoundNumber(_netAmount, 2); //Làm tròn NetAmount
@@ -2824,6 +2821,113 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return soas;
         }
+
+        private IQueryable<InvoiceListModel> GetChargeNotSoaFromSettle(CDNoteCriteria criteria)
+        {
+            var settlePayments = acctSettlementPaymentGroupRepo.Where(x => x.StatusApproval == DocumentConstants.STATUS_APPROVAL_DONE && !string.IsNullOrEmpty(x.Payee));
+
+            if (!string.IsNullOrEmpty(criteria.PartnerId))
+            {
+                settlePayments = settlePayments.Where(x => x.Payee == criteria.PartnerId);
+            }
+            var charges = surchargeRepository.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.Soano)
+                && string.IsNullOrEmpty(x.CreditNo) && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE));
+
+            var accMangData = accountingManagementRepository.Get();
+            var transactionData = cstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+            var transactionDetailData = trandetailRepositoty.Get();
+            var opstransactionData = opstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+
+            var query = from settle in settlePayments
+                        join chg in charges on settle.SettlementNo equals chg.SettlementCode
+                        join trans in transactionData on chg.JobNo equals trans.JobNo into transGrp
+                        from trans in transGrp.DefaultIfEmpty()
+                        join tranDs in transactionDetailData on trans.Id equals tranDs.JobId into tranDsGrp
+                        from tranDs in tranDsGrp.DefaultIfEmpty()
+                        join ops in opstransactionData on chg.JobNo equals ops.JobNo into opsGrp
+                        from ops in opsGrp.DefaultIfEmpty()
+                        join acc in accMangData on chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId equals acc.Id into accGrp
+                        from acc in accGrp.DefaultIfEmpty()
+                        select new InvoiceListModel
+                        {
+                            Id = chg.Id.ToString(),
+                            PartnerId = settle.Payee,
+                            DepartmentId = settle.DepartmentId,
+                            ReferenceNo = chg.Soano,
+                            HBLId = chg.Hblid,
+                            JobNo = chg.JobNo,
+                            JobId = chg.TransactionType == "CL" ? ops.Id : trans.Id,
+                            MBLNo = chg.Mblno,
+                            HBLNo = chg.Hblno,
+                            Total = chg.Total,
+                            Currency = chg.CurrencyId,
+                            IssuedDate = chg.DatetimeCreated, //export date
+                            Creator = chg.UserCreated,
+                            Status = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) != null ? "Issued" : "New",
+                            InvoiceNo = chg.InvoiceNo,
+                            VoucherId = chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.VoucherIdre : chg.VoucherId,
+                            IssuedStatus = (!string.IsNullOrEmpty(chg.InvoiceNo) && chg.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(chg.VoucherId) && (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) != null) ? "Issued Voucher" : "New",
+                            DatetimeModified = chg.DatetimeModified,
+                            DatetimeCreated = chg.DatetimeCreated,
+                            VoucherIddate = chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.VoucherIdredate : chg.VoucherIddate,
+                            CodeNo = chg.Type == "BUY" ? chg.CreditNo : chg.DebitNo,
+                            ChargeId = chg.Id,
+                            CodeType = chg.Type == "BUY" ? "CREDIT" : "DEBIT",
+                            ChargeType = chg.Type,
+                            SoaNo = chg.SettlementCode
+                        };
+
+            if (query == null || query.Count() == 0)
+            {
+                return null;
+            }
+            var hs = query.ToList().GroupBy(g => new
+            {
+                g.HBLId,
+                g.VoucherId,
+                g.SoaNo,
+            });
+
+            var result = query.ToList().GroupBy(g => new
+            {
+                g.HBLId,
+                g.VoucherId,
+                g.SoaNo,
+            }).Select(se => new InvoiceListModel
+            {
+                Id = se.FirstOrDefault().Id,
+                JobId = se.FirstOrDefault().JobId,
+                PartnerId = se.FirstOrDefault().PartnerId,
+                PartnerName = string.Empty,
+                ReferenceNo = se.FirstOrDefault().ReferenceNo,
+                BillingType = se.FirstOrDefault().BillingType,
+                HBLId = se.FirstOrDefault().HBLId,
+                JobNo = se.FirstOrDefault().JobNo,
+                MBLNo = se.FirstOrDefault().MBLNo,
+                HBLNo = se.FirstOrDefault().HBLNo,
+                Total = se.GroupBy(x => x.ChargeId).Sum(z => z.FirstOrDefault().Total),
+                Currency = se.FirstOrDefault().Currency,
+                IssuedDate = se.FirstOrDefault().IssuedDate,
+                Creator = se.FirstOrDefault().Creator,
+                Status = se.Any(x => x.Status == "Issued") ? "Issued" : "New",
+                InvoiceNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo)?.Distinct()),
+                VoucherId = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.VoucherId)).Select(x => x.VoucherId).Distinct()),
+                IssuedStatus = se.Any(y => y.IssuedStatus == "Issued Invoice") ? "Issued Invoice" : (se.Any(y => y.IssuedStatus == "Issued Voucher") ? "Issued Voucher" : "New"),
+                SyncStatus = se.FirstOrDefault().SyncStatus,
+                LastSyncDate = se.FirstOrDefault().LastSyncDate,
+                DatetimeModified = se.FirstOrDefault().DatetimeModified,
+                VoucherIddate = se.Where(x => x.VoucherIddate != null).FirstOrDefault()?.VoucherIddate,
+                PaymentStatus = se.FirstOrDefault().PaymentStatus,
+                CodeNo = se.FirstOrDefault().CodeNo,
+                CodeType = se.FirstOrDefault().CodeType,
+                ChargeType = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.ChargeType)).Select(x => x.ChargeType).Distinct()),
+                DepartmentId = se.FirstOrDefault().DepartmentId,
+                AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
+                SoaNo = se.FirstOrDefault().SoaNo,
+            }).AsQueryable();
+            return result;
+        }
+
         /// <summary>
         /// Get soa data with charges without issued cdnote
         /// </summary>
@@ -2867,7 +2971,7 @@ namespace eFMS.API.Documentation.DL.Services
                 )
             {
                 var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
-                var minDate = maxDate.AddMonths(-1); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
+                var minDate = maxDate.AddDays(-7); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
                 soaQuery = soaQuery.Where(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
             }
             if (soaQuery == null || soaQuery.Count() == 0)
@@ -2978,8 +3082,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var result = data.ToList().GroupBy(g => new
             {
-                g.ReferenceNo,
                 g.HBLId,
+                g.ReferenceNo,
                 g.Currency
             }).Select(se => new InvoiceListModel
             {
@@ -3067,7 +3171,7 @@ namespace eFMS.API.Documentation.DL.Services
                 )
             {
                 var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
-                var minDate = maxDate.AddMonths(-1); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
+                var minDate = maxDate.AddDays(-7); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
                 query = query.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
             }
             var cdNoteData = DataContext.Get(query);
@@ -3217,9 +3321,9 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="size"></param>
         /// <param name="rowsCount"></param>
         /// <returns></returns>
-        public List<InvoiceListModel> PagingInvoiceList(CDNoteCriteria criteria, int page, int size, out int rowsCount)
+        public IQueryable<InvoiceListModel> PagingInvoiceList(CDNoteCriteria criteria, int page, int size, out int rowsCount)
         {
-            List<InvoiceListModel> results = null;
+            IQueryable<InvoiceListModel> results = Enumerable.Empty<InvoiceListModel>().AsQueryable();
             var cdNoteData = GetDataCdNote(criteria);
             var soaData = GetDataSoaNotIssuedCdNote(criteria);
 
@@ -3289,7 +3393,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    PaymentStatus = cd.PaymentStatus
                                };
 
-                results = joinData.ToList();
+                results = joinData;
             }
             return results;
         }
@@ -3785,8 +3889,9 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var cdNoteData = GetDataCdNote(criteria);
             var soaData = GetDataSoaNotIssuedCdNote(criteria);
+            var chargeNotSoa = GetChargeNotSoaFromSettle(criteria);
 
-            if (cdNoteData == null && soaData == null)
+            if (cdNoteData == null && soaData == null && chargeNotSoa == null)
             {
                 return new List<AccAccountingManagementResult>();
             }
@@ -3800,10 +3905,15 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 queryData = queryData.Union(soaData);
             }
+
             if (criteria.FromAccountingDate != null && criteria.ToAccountingDate != null)
                 queryData = queryData.Where(x => x.VoucherIddate != null && (x.VoucherIddate.Value.Date >= criteria.FromAccountingDate.Value.Date && x.VoucherIddate.Value.Date <= criteria.ToAccountingDate.Value.Date));
             // Get by status
             queryData = GetStatusInvoiceList(criteria.Status, queryData);
+            if (chargeNotSoa?.Count() > 0)
+            {
+                queryData = queryData.Union(chargeNotSoa);
+            }
             var _resultDatas = queryData.OrderByDescending(o => o.DatetimeModified).ToList();
 
             var partners = partnerRepositoty.Get();

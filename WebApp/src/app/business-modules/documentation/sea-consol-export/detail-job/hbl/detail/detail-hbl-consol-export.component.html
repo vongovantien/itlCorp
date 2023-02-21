@@ -13,12 +13,12 @@
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
                 <tab heading="HAWB Detail">
-                    <app-form-create-hbl-sea-export [isUpdate]="true" [jobId]="jobId"></app-form-create-hbl-sea-export>
+                    <app-form-create-hbl-sea-export [isUpdate]="true" type="SCE"></app-form-create-hbl-sea-export>
                     <hbl-goods-summary-fcl type="export">HBL Goods Summary</hbl-goods-summary-fcl>
                     <hbl-proof-of-delivery></hbl-proof-of-delivery>
                 </tab>
                 <tab heading="Attach List">
-                    <attach-list-house-bill></attach-list-house-bill>
+                    <attach-list-house-bill action="UPDATE"></attach-list-house-bill>
                 </tab>
                 <!-- <tab heading="Proof Of Delivery">
                     <hbl-proof-of-delivery></hbl-proof-of-delivery>

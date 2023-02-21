@@ -50,7 +50,7 @@ export class DropdownToggleDirective implements OnDestroy {
                 .position()
                 .flexibleConnectedTo(this._elementRef)
                 .withPositions([
-                    this.position
+                    this.position,
                 ])
         });
     }

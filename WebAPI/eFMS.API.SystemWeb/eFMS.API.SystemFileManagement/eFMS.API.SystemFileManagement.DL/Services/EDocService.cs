@@ -133,7 +133,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     TransactionType = x.TransactionType,
                     BillingId = x.BillingId,
                     Note = x.Note,
-                    DocumentId = x.DocumentId
+                    DocumentId = x.DocumentId,
+                    AccountingType=x.AccountingType
                 };
                 lstDocMap.Add(z);
             });
@@ -238,7 +239,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             }
                             foreach (var item in models)
                             {
-                                var attachTemplate = GetAttTepmlateByJob(edoc.Code, edoc.DocumentId, item.TransactionType);
+                                var attachTemplate = GetAttTepmlateByJob(edoc.Code, edoc.DocumentId, item.TransactionType,edoc.AccountingType);
                                 var imageDetail = new SysImageDetail
                                 {
                                     SysImageId = imageID,
@@ -324,10 +325,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
         }
 
-        public SysAttachFileTemplate GetAttTepmlateByJob(string Code, int docId, string transationType)
+        public SysAttachFileTemplate GetAttTepmlateByJob(string Code, int docId, string transationType,string accountingType)
         {
             //var nameEn = _attachFileTemplateRepo.Get(x => x.Id == docId).FirstOrDefault()?.NameEn;
-            return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.TransactionType == transationType).FirstOrDefault();
+            return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.TransactionType == transationType&&x.AccountingType==accountingType).FirstOrDefault();
         }
         public async Task<List<EDocGroupByType>> GetEDocByJob(Guid jobID, string transactionType)
         {
@@ -548,7 +549,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserCreated = x.UserCreated,
                         UserFileName = x.Name,
                         UserModified = x.UserModified,
-                        DocumentTypeName = "Other"
+                        DocumentTypeName = "Other",
                     };
                     lstEdocOT.Add(edoc);
                 });
@@ -612,7 +613,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             Source = x.FirstOrDefault()?.Source,
                             AccountingType = x.FirstOrDefault()?.AccountingType,
                             DatetimeCreated = x.FirstOrDefault()?.DatetimeCreated,
-                            Note = x.Count() > 1 ? null : x.FirstOrDefault()?.Note,
+                            Note = x.FirstOrDefault()?.Note,
                             Id = x.FirstOrDefault().Id,
                         };
                         lstEdocModel.Add(edoc);
@@ -691,7 +692,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserCreated = x.FirstOrDefault().UserCreated,
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
-                        Note = x.Count() > 1 ? null : x.FirstOrDefault().Note,
+                        Note = x.FirstOrDefault().Note,
                         HBLNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
                         JobNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
                     };
@@ -768,7 +769,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserCreated = x.FirstOrDefault().UserCreated,
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
-                        Note = x.Count() > 1 ? null : x.FirstOrDefault().Note,
+                        Note = x.FirstOrDefault().Note,
                         HBLNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
                         JobNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
                     };
@@ -1098,7 +1099,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         {
                             if (item.Contains("LOG"))
                             {
-                                var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (opsJob != null)
                                 {
                                     transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "AD", HBLId = opsJob.Hblid });
@@ -1106,7 +1107,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             }
                             else
                             {
-                                var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                var csJob = DC.CsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (csJob != null)
                                 {
                                     transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType, BillingNo = bilingNo, Code = "AD" });
@@ -1122,7 +1123,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     {
                         if (item.JobNo.Contains("LOG"))
                         {
-                            var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item.JobNo);
+                            var opsJob = DC.OpsTransaction.Where(x=> x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item.JobNo);
                             if (opsJob != null)
                             {
                                 transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SM", HBLId = null });
@@ -1130,7 +1131,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         }
                         else
                         {
-                            var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item.JobNo);
+                            var csJob = DC.CsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item.JobNo);
                             if (csJob != null)
                             {
                                 var hblId = _tranDeRepo.Get(x => x.JobId == csJob.Id).FirstOrDefault().Id;
@@ -1159,7 +1160,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         {
                             if (item.Contains("LOG"))
                             {
-                                var opsJob = DC.OpsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (opsJob != null)
                                 {
                                     transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SOA" });
@@ -1167,7 +1168,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             }
                             else
                             {
-                                var csJob = DC.CsTransaction.FirstOrDefault(x => x.JobNo == item);
+                                var csJob = DC.CsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (csJob != null)
                                 {
                                     transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csJob.Id, TransactionType = csJob.TransactionType, BillingNo = bilingNo, Code = "SOA" });
@@ -1181,12 +1182,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     if (csjobdetail != null)
                     {
                         bilingNo = csjobdetail.Hwbno;
-                        var csjob = _cstranRepo.Get(x => x.Id == csjobdetail.JobId).FirstOrDefault();
+                        var csjob = _cstranRepo.Get(x => x.Id == csjobdetail.JobId&& x.CurrentStatus != "Canceled").FirstOrDefault();
                         transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = csjobdetail.JobId, TransactionType = csjob.TransactionType, BillingNo = bilingNo, Code = "OTH" });
                     }
                     else
                     {
-                        var opsjob = _opsTranRepo.Get(x => x.Hblid.ToString() == billingId).FirstOrDefault();
+                        var opsjob = _opsTranRepo.Get(x => x.Hblid.ToString() == billingId && x.CurrentStatus != "Canceled").FirstOrDefault();
                         if (opsjob != null)
                         {
                             transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsjob.Id, TransactionType = "CL", BillingNo = opsjob.Hwbno, Code = "OTH" });
@@ -2013,6 +2014,21 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 }
             }
             return false;
+        }
+        public bool CheckAllowSettleEdocSendRequest(Guid settleId)
+        {
+            var settleNo = _setleRepo.Get(x => settleId == x.Id).FirstOrDefault().SettlementNo;
+            var docTypeId = _sysImageDetailRepo.Get(x => x.BillingNo == settleNo && x.BillingType == "Settlement").Select(x => x.DocumentTypeId).ToList();
+            var attAdvSm = _attachFileTemplateRepo.Get(x => x.Type == "Accountant" && (x.AccountingType == "ADV-Settlement")).Select(x => (int?)x.Id).ToList();
+            if (attAdvSm.Intersect(docTypeId).Any())
+            {
+                var attSm = _attachFileTemplateRepo.Get(x => x.Type == "Accountant" && (x.AccountingType == "Settlement")).Select(x => (int?)x.Id).ToList();
+                if (attSm.Intersect(docTypeId).Any())
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

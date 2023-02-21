@@ -27,7 +27,7 @@
             <!--begin::Advance-search-->
             <div class="collapse" [collapse]="isCollapsed" [isAnimated]="true" (collapsed)="collapsed()"
                 (expanded)="expanded()">
-                <div class="div-inside bg-secondary">
+                <div class="div-inside bg-secondary" *ngIf="isSearchAdv">
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">

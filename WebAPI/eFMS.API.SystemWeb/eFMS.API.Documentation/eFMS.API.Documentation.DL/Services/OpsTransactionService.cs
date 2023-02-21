@@ -444,6 +444,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                 CatPartner customer = partnerRepository.Get(x => x.Id == details.CustomerId).FirstOrDefault();
                 details.CustomerName = customer?.ShortName;
+                details.CustomerAccountNo = customer?.AccountNo;
+
+                CatPlace place = placeRepository.Get(x => x.Id == details.ClearanceLocation).FirstOrDefault();
+                details.PlaceNameCode = place?.Code;
 
                 details.UserCreatedName = userRepository.Get(x => x.Id == details.UserCreated).FirstOrDefault()?.Username;
                 details.UserModifiedName = userRepository.Get(x => x.Id == details.UserModified).FirstOrDefault()?.Username;
@@ -1450,14 +1454,16 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         surchargeRepository.Delete(x => x.Id == item.Id, false);
                     }
-                    var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo);
+                    //Xóa job OPS xóa luôn tờ khai rep
+                    var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo && x.Source == "Replicate");
                     if (clearances != null)
                     {
                         foreach (var item in clearances)
                         {
-                            item.JobNo = null;
-                            item.ConvertTime = null;
-                            customDeclarationRepository.Update(item, x => x.Id == item.Id, false);
+                            //item.JobNo = null;
+                            //item.ConvertTime = null;
+                            //customDeclarationRepository.Update(item, x => x.Id == item.Id, false);
+                            customDeclarationRepository.Delete(x => x.Id == item.Id, false);
                         }
                     }
                 }
@@ -1559,9 +1565,9 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new FormPLsheetReportParameter
             {
                 Contact = currentUser.UserName,
-                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyName = sysOfficeRepo.Get(x => x.Id == shipment.OfficeId).FirstOrDefault().BranchNameEn,
                 CompanyDescription = string.Empty,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress1 = sysOfficeRepo.Get(x => x.Id == shipment.OfficeId).FirstOrDefault().AddressEn,
                 CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
                 Website = DocumentConstants.COMPANY_WEBSITE,
                 CurrDecimalNo = 2,
@@ -2706,12 +2712,13 @@ namespace eFMS.API.Documentation.DL.Services
                 if (p != null) { p.SetValue(surcharge, item.GetValue(chargeBuy, null), null); }
             }
 
+            var datetimeCR = new DateTime(2023, 1, 1); // [CR:18726] update 8 -> 10% from 1/1/2023
             surcharge.Id = Guid.NewGuid();
             surcharge.Type = DocumentConstants.CHARGE_SELL_TYPE;
             surcharge.ChargeId = chargeBuy.DebitCharge ?? Guid.Empty;
 
-            surcharge.Quantity = 1;
-            surcharge.Vatrate = chargeBuy.ServiceDate.Value < new DateTime(2023, 1, 1) ? 8 : 10; // [CR:18726] update 8 -> 10% from 1/1/2023
+            surcharge.Quantity = chargeBuy.ServiceDate.Value < datetimeCR ? 1 : chargeBuy.Quantity;
+            surcharge.Vatrate = chargeBuy.ServiceDate.Value < datetimeCR ? 8 : 10; // [CR:18726] update 8 -> 10% from 1/1/2023
 
             surcharge.Soano = null;
             surcharge.PaySoano = null;
@@ -2741,7 +2748,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (chargeBuy.CurrencyId == "VND")
             {
-                var per = (double)chargeBuy.Total / (double)0.76;
+                var per = (chargeBuy.ServiceDate.Value < datetimeCR ? (double)chargeBuy.Total  : (double)chargeBuy.UnitPrice) / (double)0.76;
                 surcharge.UnitPrice = NumberHelper.RoundNumber((decimal)per / 10000, 0) * 10000;
                 surcharge.NetAmount = surcharge.UnitPrice * surcharge.Quantity;
                 surcharge.Total = surcharge.NetAmount + ((surcharge.NetAmount * surcharge.Vatrate) / 100) ?? 0;

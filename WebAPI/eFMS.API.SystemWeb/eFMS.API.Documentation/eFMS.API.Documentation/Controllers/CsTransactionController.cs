@@ -8,6 +8,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -47,7 +48,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICheckPointService checkPointService;
         private readonly ICsStageAssignedService csStageAssignedService;
         private readonly IEDocService _edocService;
-
+        private readonly IRabbitBus _busControl;
         /// <summary>
         /// constructor
         /// </summary>
@@ -68,8 +69,9 @@ namespace eFMS.API.Documentation.Controllers
             IOptions<ApiServiceUrl> serviceUrl,
             ICheckPointService checkPoint,
             ISysImageService imageService,
-             IEDocService edocService,
-        ICsStageAssignedService stageAssignedService)
+            IEDocService edocService,
+            IRabbitBus _bus,
+            ICsStageAssignedService stageAssignedService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
@@ -81,6 +83,7 @@ namespace eFMS.API.Documentation.Controllers
             checkPointService = checkPoint;
             csStageAssignedService = stageAssignedService;
             _edocService= edocService;
+            _busControl = _bus;
         }
 
         /// <summary>
@@ -551,13 +554,9 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
-        {
-            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
-            string accessToken = Request.Headers["Authorization"].ToString();
-
-            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, accessToken);
-            var response = await resquest.Content.ReadAsAsync<HandleState>();
-            return response;
+        {        
+            await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, model);
+            return new HandleState();
         }
 
         [Authorize]
