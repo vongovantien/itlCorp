@@ -3327,6 +3327,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  InvDueDay = acc.PaymentDueDate,
                                  VoucherIddate = sc.VoucherIddate,
                                  IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
+                                 Status = (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null ? "Issued" : "New",
                              };
             var debitData = from cd in cdNoteData
                             join sc in surchargeData on cd.Code equals sc.DebitNo
@@ -3359,6 +3360,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 InvDueDay = acc.PaymentDueDate,
                                 SoaNo = sc.Soano,
                                 VoucherIddate = sc.VoucherIddate,
+                                Status = (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null ? "Issued" : "New",
                                 IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
                             };
 
@@ -3390,7 +3392,7 @@ namespace eFMS.API.Documentation.DL.Services
                              VoucherIddate = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.VoucherIddate : sc.VoucherIddate,
                              VoucherId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.VoucherId : sc.VoucherId,
                              SyncedFrom = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.SyncedFrom : sc.SyncedFrom,
-                             PaySyncedFrom = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.PaySyncedFrom : sc.PaySyncedFrom
+                             PaySyncedFrom = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.PaySyncedFrom : sc.PaySyncedFrom,
                          };
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
@@ -3430,6 +3432,7 @@ namespace eFMS.API.Documentation.DL.Services
                              InvDueDay = acc.PaymentDueDate,
                              VoucherIddate = soa.VoucherIddate,
                              IssuedStatus = (!string.IsNullOrEmpty(soa.InvoiceNo) && soa.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(soa.VoucherId) && (soa.Type == DocumentConstants.CHARGE_OBH_TYPE ? soa.PayerAcctManagementId : soa.AcctManagementId) != null) ? "Issued Voucher" : "New",
+                             Status = (soa.Type == DocumentConstants.CHARGE_OBH_TYPE ? soa.PayerAcctManagementId : soa.AcctManagementId) != null ? "Issued" : "New"
                          };
 
             // Case settle
@@ -3462,7 +3465,9 @@ namespace eFMS.API.Documentation.DL.Services
                                   VatVoucher = sc.InvoiceNo,
                                   PaymentStatus = acc.PaymentStatus,
                                   InvDueDay = acc.PaymentDueDate,
-                                  VoucherIddate = sc.VoucherIddate
+                                  VoucherIddate = sc.VoucherIddate,
+                                  IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
+                                  Status = (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null ? "Issued" : "New"
                               };
 
             // HashSet<string> debitSoaNos = new HashSet<string>(debitData.Select(z => z.SoaNo));
@@ -3505,6 +3510,7 @@ namespace eFMS.API.Documentation.DL.Services
                 PodId = se.FirstOrDefault().PodId,
                 IssuedStatus = se.Any(y => y.IssuedStatus == "Issued Invoice") ? "Issued Invoice" : (se.Any(y => y.IssuedStatus == "Issued Voucher") ? "Issued Voucher" : "New"),
                 VoucherIddate = se.Where(x => x.VoucherIddate != null).FirstOrDefault()?.VoucherIddate,
+                Status = se.Any(x => x.Status == "Issued") ? "Issued" : "New",
             }).AsQueryable();
             return result;
         }
