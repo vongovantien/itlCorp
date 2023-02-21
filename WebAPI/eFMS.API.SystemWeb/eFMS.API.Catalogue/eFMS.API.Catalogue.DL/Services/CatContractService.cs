@@ -478,7 +478,7 @@ namespace eFMS.API.Catalogue.DL.Services
             entity.UserCreated = currentContract.UserCreated;
             if (entity.ExpiredDate != null)
             {
-                if (entity.Active == true && (entity.NoDue == false || entity.NoDue == null))
+                if (entity.Active == true)
                 {
                     var expiredCheck = DateTime.Compare(((DateTime.Now).Date), ((DateTime)entity.ExpiredDate));
                     if (expiredCheck <= 0)
@@ -1238,10 +1238,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
 
                 var DataHeadOfficeAR = sysOfficeRepository.Get(x => x.OfficeType == "Head").FirstOrDefault();
+                var DataCamOfficeAR = sysOfficeRepository.Get(x => x.OfficeType == "Repo").FirstOrDefault();
                 if (DataHeadOfficeAR == null)
                 {
                     lstCCAR = null;
                 }
+                else if (DataCamOfficeAR.Id.ToString().ToUpper().Equals(OfficeId.ToUpper()))
+                {
+                    lstCCAR = null;
+                }    
                 else
                 {
                     var departmentHeadAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOfficeAR.Id).FirstOrDefault();

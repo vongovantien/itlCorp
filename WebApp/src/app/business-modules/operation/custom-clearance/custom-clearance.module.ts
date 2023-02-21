@@ -11,8 +11,9 @@ import { CustomClearanceFormSearchComponent } from './components/form-search-cus
 import { CustomClearanceAddnewComponent } from './addnew/custom-clearance-addnew.component';
 import { CustomClearanceEditComponent } from './detail/custom-clearance-edit.component';
 import { CustomClearanceImportComponent } from './import/custom-clearance-import.component';
-import { CustomClearanceFormDetailComponent } from './components/form-detail-clearance/form-detail-clearance.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { SharedOperationModule } from '../shared-operation.module';
+
 
 const routing: Routes = [
     {
@@ -39,7 +40,8 @@ const LIB = [
     imports: [
         SharedModule,
         RouterModule.forChild(routing),
-        ...LIB
+        ...LIB,
+        SharedOperationModule
     ],
     exports: [],
     declarations: [
@@ -48,7 +50,6 @@ const LIB = [
         CustomClearanceImportComponent,
         CustomClearanceEditComponent,
         CustomClearanceFormSearchComponent,
-        CustomClearanceFormDetailComponent
     ],
     providers: [],
 })

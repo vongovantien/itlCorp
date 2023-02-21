@@ -2032,7 +2032,7 @@ namespace eFMS.API.Setting.DL.Services
         {
             foreach (var job in jobs)
             {
-                var ops = opsTransactionRepo.Get(x => x.JobNo == job).FirstOrDefault();
+                var ops = opsTransactionRepo.Get(x => x.JobNo == job && x.CurrentStatus != "Canceled").FirstOrDefault();
                 if (ops != null)
                 {
                     if (type == "Shipment")

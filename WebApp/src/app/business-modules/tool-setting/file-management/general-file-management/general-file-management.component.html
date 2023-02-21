@@ -1,0 +1,37 @@
+<div class="m-subheader">
+    <div class="d-flex align-items-center">
+        <div class="mr-auto">
+            <app-breadcrumb></app-breadcrumb>
+        </div>
+    </div>
+</div>
+<div class="m-content m-portlet__body">
+    <tabset class="custom-class-tab">
+        <tab [active]="true">
+            <ng-template tabHeading>
+                <a routerLink="/home/tool/file-management/general" class="dropdown-item"
+                    href="javascript:void(0)">Files Managment</a>
+            </ng-template>
+            <div class="row">
+                <div class="col-md-12">
+                    <form-search-file-management (onSearch)="onSearchFile($event)" [tabType]="'fileGeneralManage'" (onReset)="reset($event)" >
+                    </form-search-file-management>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <app-list-file-management [listEdocFile]="edocFiles" [headers]="headers"
+                        (changePage)="RepageEDoc($event)" [tabType]="'General'">
+                    </app-list-file-management>
+                </div>
+            </div>
+        </tab>
+        <tab (selectTab)="onSelectTab('Acc')">
+            <ng-template tabHeading>
+                <a routerLink="/home/tool/file-management/accountant" style="color:#6f727d">
+                    Accountant Files
+                </a>
+            </ng-template>
+        </tab>
+    </tabset>
+</div>

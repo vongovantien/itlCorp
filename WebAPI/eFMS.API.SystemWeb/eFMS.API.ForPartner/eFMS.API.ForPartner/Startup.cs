@@ -47,6 +47,8 @@ namespace eFMS.API.ForPartner
             services.AddInfrastructure<LanguageSub>(Configuration);
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
+            services.SetUpRabbitMq(Configuration);
+
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

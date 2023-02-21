@@ -7,5 +7,6 @@
         public string Code { get; set; }
         public string TransactionType { get; set; }
         public string BillingNo { get; set; }
+        public string AccountingType { get; set; }
     }
 }

@@ -18,7 +18,7 @@ namespace eFMS.API.ForPartner.DL.IService
         HandleState RemoveVoucherAdvance(string voucherNo, string apiKey);
         HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey, out Guid Id);
         HandleState UpdateInvoice(InvoiceUpdateInfo model, string apiKey);
-        HandleState DeleteInvoice(InvoiceInfo model, string apiKey, out Guid Id);
+        HandleState DeleteInvoice(InvoiceInfo model, string apiKey, out AccAccountingManagement invoice);
         HandleState RejectData(RejectData model, string apiKey);
         HandleState RemoveVoucher(RejectData model, string apiKey);
         List<Guid> GetSurchargeIdsByRefNoInvoice(string referenceNo);

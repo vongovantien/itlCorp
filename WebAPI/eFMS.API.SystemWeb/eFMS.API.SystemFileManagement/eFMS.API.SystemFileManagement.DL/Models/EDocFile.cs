@@ -15,5 +15,7 @@ namespace eFMS.API.SystemFileManagement.DL.Models
         public string AliasName { get; set; }
         public string FileName { get; set; }
         public string Note { get; set; }
+        public string AccountingType { get; set; }
     }
+    
 }
