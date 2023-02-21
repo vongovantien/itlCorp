@@ -240,6 +240,7 @@ namespace eFMS.API.Documentation.DL.Services
                             if (model.CsMawbcontainers?.Count > 0 && result.Success)
                             {
                                 var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, entityReplicate.Id);
+                                model.CsMawbcontainers.ForEach(x => x.Id = Guid.Empty);
                             }
                         }
                     }
