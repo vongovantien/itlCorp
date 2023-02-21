@@ -39,6 +39,13 @@ namespace eFMS.API.Report.Controllers
             return Ok(data);
         }
 
+        [HttpPost("QueryDataEDocReport")]
+        public IActionResult QueryDataEDocReport(GeneralReportCriteria criteria)
+        {
+            var data = generalReportService.QueryDataEDocsReport(criteria);
+            return Ok(data);
+        }
+
         [HttpPost("GetDataExportShipmentOverview")]
         public IActionResult GetDataExportShipmentOverview(GeneralReportCriteria criteria)
         {
@@ -168,6 +175,37 @@ namespace eFMS.API.Report.Controllers
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
+
+        [Route("ExportEDocTemplateReport")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportEDocTemplateReport(GeneralReportCriteria criteria)
+        {
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ReportConstants.Standard_Report,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ReportConstants.Export_Excel
+            };
+            #endregion -- Ghi Log Report --
+
+            var data = generalReportService.QueryDataEDocsReport(criteria);
+            if (data == null)
+            {
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
+            }
+            var stream = new ReportHelper().BindingDataEDocReport(data, criteria);
+            if (stream == null)
+            {
+                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, "EdocReportTemplate");
+            HeaderResponse(fileContent.FileDownloadName);
+            return fileContent;
+        }
+
+
 
         private void HeaderResponse(string fileName)
         {

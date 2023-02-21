@@ -18,6 +18,7 @@ namespace eFMS.API.Report.DL.Services
     {
         private readonly IContextBase<OpsTransaction> opsRepository;
         private readonly IContextBase<CsTransactionDetail> detailRepository;
+        private readonly IContextBase<CsTransaction> tranRepository;
         private readonly IContextBase<CsShipmentSurcharge> surCharge;
         private readonly IContextBase<CatPartner> catPartnerRepo;
         private readonly ICurrentUser currentUser;
@@ -33,10 +34,12 @@ namespace eFMS.API.Report.DL.Services
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepo; 
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<CatIncoterm> catIncotermRepository;
+        private readonly IContextBase<SysImageDetail> imageDetailRepository;
+        private readonly IContextBase<SysAttachFileTemplate> sysattachRepository; 
 
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)opsRepository.DC;
 
-        public GeneralReportService(ICurrentUser currentUser,
+        public GeneralReportService(
             IContextBase<OpsTransaction> ops,
             IContextBase<CsTransactionDetail> detail,
             IContextBase<CsShipmentSurcharge> surcharge,
@@ -58,7 +61,10 @@ namespace eFMS.API.Report.DL.Services
             IContextBase<SysOffice> Office,
             IContextBase<CustomsDeclaration> customsDeclaration,
             IContextBase<CatIncoterm> catIncoterm,
-            IContextBase<SysUserLevel> UserLevel)
+            IContextBase<SysImageDetail> imageDetailRepo,
+            IContextBase<CsTransaction> tranRepo,
+            IContextBase<SysAttachFileTemplate> sysattachRepo,
+        IContextBase<SysUserLevel> UserLevel)
         {
             opsRepository = ops;
             detailRepository = detail;
@@ -77,6 +83,9 @@ namespace eFMS.API.Report.DL.Services
             currencyExchangeService = currencyExchange;
             catUnitRepo = catUnit;
             catIncotermRepository = catIncoterm;
+            imageDetailRepository = imageDetailRepo;
+            tranRepository = tranRepo;
+            sysattachRepository = sysattachRepo;
         }
 
         public List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria, int page, int size, out int rowsCount)
@@ -187,6 +196,76 @@ namespace eFMS.API.Report.DL.Services
             return dataList.AsQueryable();
         }
 
+        private IQueryable<EDocReportResult> EdocReportDocumentation(GeneralReportCriteria criteria)
+        {
+            var dataShipment = GetDataGeneralReport(criteria);
+            var listjob = dataShipment.GroupBy(x => x.JobNo).Select(x => x.FirstOrDefault().JobNo);
+            var lstOPS = listjob.Where(x => x.Contains("LOG")).ToList();
+            var lstCS = listjob.Where(x => !x.Contains("LOG")).ToList();
+            var jobOps = opsRepository.Get(x=>lstOPS.Contains(x.JobNo));
+            var jobCs = tranRepository.Get(x=>lstCS.Contains(x.JobNo));
+            var jobDTCs = detailRepository.Get();
+            var edoc = imageDetailRepository.Get();
+            var partner = catPartnerRepo.Get();
+            var clearance = customsDeclarationRepo.Get();
+            var docType=sysattachRepository.Get();
+            var user = sysUserRepo.Get();
+            var currUser= currentUser.UserName;
+            var cdJob = from cs in jobCs
+                        join ed in edoc on cs.Id equals ed.JobId 
+                        join cd in jobDTCs on cs.Id equals cd.JobId 
+                        join pa in partner on cd.CustomerId equals pa.Id
+                        //join cl in clearance on cs.JobNo equals cl.JobNo
+                        join doc in docType on ed.DocumentTypeId equals doc.Id
+                        join us in user on cs.UserCreated equals us.Id
+                        select new EDocReportResult()
+                        {
+                            creator = us.Username,
+                            createDate = cs.DatetimeCreated,
+                            attachPerson = ed.UserCreated,
+                            aliasName = ed.SystemFileName,
+                            attachTime = ed.DatetimeCreated,
+                            codeCus = pa.AccountNo,
+                            customer = pa.PartnerNameEn,
+                            customNo = null,
+                            documentType = doc.NameEn,
+                            HBL = cd.Hwbno,
+                            MBL = cs.Mawb,
+                            jobNo = cs.JobNo,
+                            realFileName = ed.UserFileName,
+                            require = doc.Required,
+                            taxCode = pa.TaxCode,
+                            userExport = currUser,
+                        };
+            var opsJob = from ops in jobOps
+                         join ed in edoc on ops.Id equals ed.JobId
+                         join pa in partner on ops.CustomerId equals pa.Id
+                         join cl in clearance on ops.JobNo equals cl.JobNo
+                         join doc in docType on ed.DocumentTypeId equals doc.Id
+                         join us in user on ops.UserCreated equals us.Id
+                         select new EDocReportResult()
+                         {
+                             creator = us.Username,
+                             createDate = ops.DatetimeCreated,
+                             attachPerson = ed.UserCreated,
+                             aliasName = ed.SystemFileName,
+                             attachTime = ed.DatetimeCreated,
+                             codeCus = pa.AccountNo,
+                             customer = pa.PartnerNameEn,
+                             customNo = cl.ClearanceNo,
+                             documentType = doc.NameEn,
+                             HBL = ops.Hwbno,
+                             MBL = ops.Mblno,
+                             jobNo = ops.JobNo,
+                             realFileName = ed.UserFileName,
+                             require = doc.Required,
+                             taxCode = pa.TaxCode,
+                             userExport = currUser,
+                        };
+            var dataList = cdJob.Concat(opsJob);
+            return dataList;
+        }
+
         private List<sp_GetDataGeneralReport> GetDataGeneralReport(GeneralReportCriteria criteria)
         {
             var parameters = new[]{
@@ -220,6 +299,11 @@ namespace eFMS.API.Report.DL.Services
         {
             var dataDocumentation = GeneralReportDocumentation(criteria);
             return dataDocumentation;
+        }
+        public List<EDocReportResult> QueryDataEDocsReport(GeneralReportCriteria criteria)
+        {
+            var dataDocumentation = EdocReportDocumentation(criteria);
+            return dataDocumentation.ToList();
         }
 
         public IQueryable<GeneralExportShipmentOverviewResult> GetDataGeneralExportShipmentOverview(GeneralReportCriteria criteria)
