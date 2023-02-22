@@ -18,6 +18,7 @@ namespace eFMS.API.Report.DL.Services
     {
         private readonly IContextBase<OpsTransaction> opsRepository;
         private readonly IContextBase<CsTransactionDetail> detailRepository;
+        private readonly IContextBase<CsTransaction> tranRepository;
         private readonly IContextBase<CsShipmentSurcharge> surCharge;
         private readonly IContextBase<CatPartner> catPartnerRepo;
         private readonly ICurrentUser currentUser;
@@ -33,10 +34,12 @@ namespace eFMS.API.Report.DL.Services
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepo; 
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<CatIncoterm> catIncotermRepository;
+        private readonly IContextBase<SysImageDetail> imageDetailRepository;
+        private readonly IContextBase<SysAttachFileTemplate> sysattachRepository; 
 
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)opsRepository.DC;
 
-        public GeneralReportService(ICurrentUser currentUser,
+        public GeneralReportService(
             IContextBase<OpsTransaction> ops,
             IContextBase<CsTransactionDetail> detail,
             IContextBase<CsShipmentSurcharge> surcharge,
@@ -58,25 +61,31 @@ namespace eFMS.API.Report.DL.Services
             IContextBase<SysOffice> Office,
             IContextBase<CustomsDeclaration> customsDeclaration,
             IContextBase<CatIncoterm> catIncoterm,
-            IContextBase<SysUserLevel> UserLevel)
+            IContextBase<SysImageDetail> imageDetailRepo,
+            IContextBase<CsTransaction> tranRepo,
+            IContextBase<SysAttachFileTemplate> sysattachRepo,
+        IContextBase<SysUserLevel> UserLevel)
         {
-            opsRepository = ops;
-            detailRepository = detail;
-            surCharge = surcharge;
-            catPartnerRepo = catPartner;
-            currentUser = user;
-            sysEmployeeRepo = sysEmployee;
-            sysUserRepo = sysUser;
-            catCurrencyExchangeRepo = catCurrencyExchange;
-            catPlaceRepo = catPlace;
-            catChargeRepo = catCharge;
-            catChargeGroupRepo = ChargeGroup;
-            sysOfficeRepo = Office;
-            sysUserLevelRepo = UserLevel;
-            customsDeclarationRepo = customsDeclaration;
-            currencyExchangeService = currencyExchange;
-            catUnitRepo = catUnit;
-            catIncotermRepository = catIncoterm;
+                opsRepository = ops;
+                detailRepository = detail;
+                surCharge = surcharge;
+                catPartnerRepo = catPartner;
+                currentUser = user;
+                sysEmployeeRepo = sysEmployee;
+                sysUserRepo = sysUser;
+                catCurrencyExchangeRepo = catCurrencyExchange;
+                catPlaceRepo = catPlace;
+                catChargeRepo = catCharge;
+                catChargeGroupRepo = ChargeGroup;
+                sysOfficeRepo = Office;
+                sysUserLevelRepo = UserLevel;
+                customsDeclarationRepo = customsDeclaration;
+                currencyExchangeService = currencyExchange;
+                catUnitRepo = catUnit;
+                catIncotermRepository = catIncoterm;
+                imageDetailRepository = imageDetailRepo;
+                tranRepository = tranRepo;
+                sysattachRepository = sysattachRepo;
         }
 
         public List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria, int page, int size, out int rowsCount)

@@ -168,7 +168,6 @@ namespace eFMS.API.Report.Controllers
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
-
         private void HeaderResponse(string fileName)
         {
             Response.Headers.Add("efms-file-name", fileName);
