@@ -56,9 +56,9 @@ namespace eFMS.API.ReportData.Models.Accounting
         public DateTime? ReleaseDateEInvoice { get; set; } //Ngày phát hành E-Invoice
         public string TkNoVat { get; set; } //Tài khoản Nợ VAT
         public string TkCoVat { get; set; } //Tài khoản Có VAT
-        public string CdNoteType { get;  set; }
+        public string CdNoteType { get; set; }
         public string ChargeType { get; set; }
-        public string PayerId { get;set; }
+        public string PayerId { get; set; }
         public string PayerName { get; set; }
         public string PayerType { get; set; }
         public decimal? Amount { get; set; }
@@ -80,7 +80,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public decimal? FreightAmount { get; set; }
         public decimal? DebitUsd { get; set; }
         public decimal? CreditUsd { get; set; }
-        public decimal? Balance { get;  set; }
+        public decimal? Balance { get; set; }
         public string INVCreNo { get; set; }
         public string VatVoucher { get; set; }
         public DateTime? InvDueDay { get; set; }

@@ -800,7 +800,7 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataExportAgencyInvUrl, accessToken);
             var dataObjects = await responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
 
-            if (dataObjects == null || dataObjects.Count == 0)
+            if (dataObjects == null || dataObjects.Count() == 0)
             {
                 return Ok(dataObjects);
             }

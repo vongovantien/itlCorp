@@ -79,7 +79,7 @@
             public const string NeutralHawbExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/NeutralHawbExport";
             public const string AirwayBillExportUrl = "/Documentation/api/v1/en-US/CsAirWayBill/AirwayBillExport?jobId=";
 
-          
+
             public const string GetDataHousebillDailyExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/GetHousebillsDailyExport?issuedDate=";
 
             public const string GetDataCDNoteExportUrl = "/Documentation/api/v1/en-US/AcctCDNote/ExportOpsCdNote?jobId=";

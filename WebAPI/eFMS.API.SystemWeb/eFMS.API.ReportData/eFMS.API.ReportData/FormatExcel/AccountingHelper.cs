@@ -25,7 +25,7 @@ namespace eFMS.API.ReportData.FormatExcel
         const double maxWidth = 500.00;
         //const string numberFormat = "_-* #,##0.00_-;-* #,##0.00_-;_-* \"-\"??_-;_-@_-_(_)";
         const string numberFormat = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
-        const string numberFormat2= "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
+        const string numberFormat2 = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
         const string numberFormatUSD = "_-* #,##0.000_-;-* #,##0.000_-;_-* \"-\"??_-;_-@_-_(_)";
 
         const string numberFormatVND = "_-\"VND\"* #,##0.00_-;-\"VND\"* #,##0.00_-;_-\"VND\"* \"-\"??_-;_-@_-_(_)";
@@ -5238,7 +5238,7 @@ namespace eFMS.API.ReportData.FormatExcel
         }
 
         private Stream BindingDataAccoutingManagementAgencyInvExcel(List<AccountingManagementExport> acctMngts)
-        { 
+        {
             try
             {
                 FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, ResourceConsts.AgencyTemplate));
@@ -5279,7 +5279,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     excel.Worksheet.Cells[rowStart, 12].Style.Numberformat.Format = formatAmountUSD;
                     listKeyData.Add("CreditUSD", item.CreditUsd);
                     excel.Worksheet.Cells[rowStart, 13].Style.Numberformat.Format = formatAmountUSD;
-                    if ((item?.DebitUsd ==null && item?.CreditUsd==null))
+                    if ((item?.DebitUsd == null && item?.CreditUsd == null))
                     {
                         listKeyData.Add("Balance", "Unpaid");
                     }
@@ -5287,7 +5287,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     {
                         listKeyData.Add("Balance", (item?.DebitUsd - item?.CreditUsd));
                     }
-                    excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = numberFormat;
+                    excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = numberFormat;                    
                     listKeyData.Add("InvDueDay", item.InvDueDay);
                     excel.Worksheet.Cells[rowStart, 15].Style.Numberformat.Format = "MMM. dd,yyyy";
                     listKeyData.Add("Status", item.Status);
@@ -5305,7 +5305,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
-        public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType,Stream stream = null)
+        public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
         {
             if (arType == ARTypeEnum.TrialOrOffical)
                 return GenerateAccountingReceivableArSumary(acctMngts);
