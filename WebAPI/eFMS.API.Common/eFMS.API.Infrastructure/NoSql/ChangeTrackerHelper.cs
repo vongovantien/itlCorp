@@ -11,7 +11,7 @@ namespace eFMS.API.Infrastructure.NoSql
 {
     public static class ChangeTrackerHelper
     {
-        //public static string currentUser;
+        //public static string currentUser?;
         public static ICurrentUser currentUser;
         public static List<AuditLog> GetChangModifield(IEnumerable<EntityEntry> entities)
         {
@@ -62,16 +62,16 @@ namespace eFMS.API.Infrastructure.NoSql
                                 ActionType = EntityState.Modified,
                                 ActionName = "Modified",
                                 DatetimeModified = DateTime.Now,
-                                UserModified = userModified,
-                                UserNameModified = currentUser.UserName,
-                                CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
-                                OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,
-                                DepartmentId = currentUser.DepartmentId,
-                                GroupId = currentUser.GroupId,
+                                UserModified = currentUser?.UserID,
+                                UserNameModified = currentUser?.UserName,
+                                CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
+                                OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
+                                DepartmentId = currentUser?.DepartmentId,
+                                GroupId = currentUser?.GroupId,
                                 // UserModified = change.CurrentValues["UserModified"]?.ToString()
                             };
                             log.ItemObject = change.Entity;
-                            log.Function = currentUser.Action;
+                            log.Function = currentUser?.Action;
                             log.ChangedProperties = changedProperties;
                             var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
                             listLog.Add(objectLog);
@@ -129,15 +129,15 @@ namespace eFMS.API.Infrastructure.NoSql
                             ActionType = EntityState.Modified,
                             ActionName = "Modified",
                             DatetimeModified = DateTime.Now,
-                            UserModified = currentUser.UserID,
-                            UserNameModified = currentUser.UserName,
-                            CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
-                            OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,
-                            DepartmentId = currentUser.DepartmentId,
-                            GroupId = currentUser.GroupId,
+                            UserModified = currentUser?.UserID,
+                            UserNameModified = currentUser?.UserName,
+                            CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
+                            OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
+                            DepartmentId = currentUser?.DepartmentId,
+                            GroupId = currentUser?.GroupId,
                         };
                         log.ItemObject = newChange;
-                        log.Function = currentUser.Action;
+                        log.Function = currentUser?.Action;
                         log.ChangedProperties = changedProperties;
                         var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
                         listLog.Add(objectLog);
@@ -168,15 +168,15 @@ namespace eFMS.API.Infrastructure.NoSql
                         ActionType = EntityState.Added,
                         ActionName = "Added",
                         DatetimeModified = DateTime.Now,
-                        UserModified = currentUser.UserID,
-                        UserNameModified = currentUser.UserName,
-                        CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
-                        OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,
-                        DepartmentId = currentUser.DepartmentId,
-                        GroupId = currentUser.GroupId,
+                        UserModified = currentUser?.UserID,
+                        UserNameModified = currentUser?.UserName,
+                        CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
+                        OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
+                        DepartmentId = currentUser?.DepartmentId,
+                        GroupId = currentUser?.GroupId,
                     };
                     log.ItemObject = add.Entity;
-                    log.Function = currentUser.Action;
+                    log.Function = currentUser?.Action;
                     var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
                     listLog.Add(objectLog);
                 }
@@ -206,15 +206,15 @@ namespace eFMS.API.Infrastructure.NoSql
                         ActionType = EntityState.Added,
                         ActionName = "Added",
                         DatetimeModified = DateTime.Now,
-                        UserModified = currentUser.UserID,
-                        UserNameModified = currentUser.UserName,
-                        CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
-                        OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,
-                        DepartmentId = currentUser.DepartmentId,
-                        GroupId = currentUser.GroupId,
+                        UserModified = currentUser?.UserID,
+                        UserNameModified = currentUser?.UserName,
+                        CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
+                        OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
+                        DepartmentId = currentUser?.DepartmentId,
+                        GroupId = currentUser?.GroupId,
                     };
                     log.ItemObject = addEntity;
-                    log.Function = currentUser.Action;
+                    log.Function = currentUser?.Action;
                     var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
                     listLog.Add(objectLog);
                 }
@@ -243,15 +243,15 @@ namespace eFMS.API.Infrastructure.NoSql
                         ActionType = EntityState.Deleted,
                         ActionName = "Deleted",
                         DatetimeModified = DateTime.Now,
-                        UserModified = currentUser.UserID,
-                        UserNameModified = currentUser.UserName,
-                        CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
-                        OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,
-                        DepartmentId = currentUser.DepartmentId,
-                        GroupId = currentUser.GroupId,
+                        UserModified = currentUser?.UserID,
+                        UserNameModified = currentUser?.UserName,
+                        CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
+                        OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
+                        DepartmentId = currentUser?.DepartmentId,
+                        GroupId = currentUser?.GroupId,
                     };
                     log.ItemObject = delete.Entity;
-                    log.Function = currentUser.Action;
+                    log.Function = currentUser?.Action;
                     var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
                     listLog.Add(objectLog);
                 }
@@ -281,15 +281,15 @@ namespace eFMS.API.Infrastructure.NoSql
                         ActionType = EntityState.Deleted,
                         ActionName = "Deleted",
                         DatetimeModified = DateTime.Now,
-                        UserModified = currentUser.UserID,
-                        UserNameModified = currentUser.UserName,
-                        CompanyId = true ? currentUser.CompanyID.ToString() : string.Empty,
-                        OfficeId = true ? currentUser.OfficeID.ToString() : string.Empty,
-                        DepartmentId = currentUser.DepartmentId,
-                        GroupId = currentUser.GroupId,
+                        UserModified = currentUser?.UserID,
+                        UserNameModified = currentUser?.UserName,
+                        CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
+                        OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
+                        DepartmentId = currentUser?.DepartmentId,
+                        GroupId = currentUser?.GroupId,
                     };
                     log.ItemObject = deleteEntity;
-                    log.Function = currentUser.Action;
+                    log.Function = currentUser?.Action;
                     var objectLog = new AuditLog { EntityName = entityName, ChangeLog = log };
                     listLog.Add(objectLog);
                 }

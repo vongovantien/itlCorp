@@ -49,6 +49,7 @@ namespace eFMS.API.Accounting.Controllers
             acctReceiptService = acctReceipt;
             currentUser = curUser;
             apiServiceUrl = _apiServiceUrl;
+            _busControl = _bus;
         }
 
         [HttpPost]
