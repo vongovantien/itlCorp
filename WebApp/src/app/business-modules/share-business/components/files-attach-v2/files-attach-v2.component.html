@@ -77,7 +77,7 @@
                                             </td>
                                             <td>
                                                 <a class="text-underline htmlLink"
-                                                    (click)="viewEdocFromName(doc.imageUrl)"
+                                                    (click)="viewEdocFromName(doc)"
                                                     download>{{doc.userFileName}}
                                                     <icon-file [url]="doc.imageUrl"></icon-file>
                                                 </a>
@@ -275,12 +275,10 @@
                                                         target="_blank">{{doc.userFileName}}
                                                         <icon-file [url]="doc.userFileName"></icon-file>
                                                     </a> -->
-                                                    <a class="text-underline htmlLink"
-                                                        (click)="viewEdocFromName(doc.imageUrl)"
-                                                        download>{{doc.userFileName}}
-                                                        <icon-file [url]="doc.imageUrl"></icon-file>
-                                                    </a>
-
+                                                    <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
+                                                    download>{{doc.userFileName}}
+                                                    <icon-file [url]="doc.imageUrl"></icon-file>
+                                                </a>
                                                 </td>
                                                 <td>
                                                     <span>{{doc.hblNo}}</span>
@@ -342,10 +340,10 @@
                                                 download>{{doc.systemFileName}}
                                                 <icon-file [url]="doc.userFileName"></icon-file>
                                             </a> -->
-                                            <a class="text-underline htmlLink" (click)="viewEdocFromName(doc.imageUrl)"
-                                                download>{{doc.systemFileName}}
-                                                <icon-file [url]="doc.imageUrl"></icon-file>
-                                            </a>
+                                            <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
+                                            download>{{doc.systemFileName}}
+                                            <icon-file [url]="doc.imageUrl"></icon-file>
+                                        </a>
                                         </td>
                                         <td
                                             *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">
@@ -384,8 +382,8 @@
         </ng-container>
     </div>
 </div>
-<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDoc($event)" [jobId]="jobId" [jobNo]="jobNo" [jobs]="jobs"
-    [billingId]="billingId" [transactionType]="transactionType" [housebills]="housebills">
+<document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDoc($event)" [jobId]="jobId" [jobNo]="jobNo"
+    [docTypeId]="docTypeId" [billingId]="billingId" [transactionType]="transactionType" [housebills]="housebills">
 </document-type-attach>
 
 <app-context-menu #edocContext (clickOutside)="selectedEdoc = null">

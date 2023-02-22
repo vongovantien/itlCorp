@@ -674,42 +674,49 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.chargeWeight;
                 } else {
-                    data = this.hbl.chargeWeight || this.hbl.cw;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.chargeWeight : (this.hbl.chargeWeight || this.hbl.cw);
                 }
                 break;
             case 'gw':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.grossWeight;
                 } else {
-                    data = this.hbl.grossWeight || this.hbl.gw;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.grossWeight : (this.hbl.grossWeight || this.hbl.gw);
                 }
                 break;
             case 'nw':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.netWeight;
                 } else {
-                    data = this.hbl.netWeight;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.netWeight : this.hbl.netWeight;
                 }
                 break;
             case 'cbm':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.cbm;
                 } else {
-                    data = this.hbl.cbm;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.cbm : this.hbl.cbm;
                 }
                 break;
             case 'packageQuantity':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.packageQty;
                 } else {
-                    data = this.hbl.packageQty;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.packageQty : this.hbl.packageQty;
                 }
                 break;
             case 'quantity':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.chargeWeight;
                 } else {
-                    data = this.hbl.chargeWeight;
+                    data = this.serviceTypeId === 'CL' ? this.shipment.chargeWeight : this.hbl.chargeWeight;
+                }
+                break;
+            case 'gw':
+                if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                    data = this.shipment.grossWeight;
+                } else {
+                    data = this.serviceTypeId === 'CL' ? this.shipment.grossWeight : this.hbl.grossWeight;
                 }
                 break;
             default:
@@ -1265,6 +1272,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             agentId: this.shipment.agentId,
             chargeType: this.TYPE,
             customerId: this.shipment.customerId,
+            salesmanId: this.hbl.saleManId
         };
         this._documentRepo.getRecentlyChargesOps(body)
             .pipe(map((v: any[]) => (v || []).map((i => new CsShipmentSurcharge(i)))))
@@ -1280,6 +1288,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                             c.mblno = this.getMblNo(this.shipment, this.hbl);
                             c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            if (!!c.quantityType) {
+                                c.quantity = this.getQuantityByquantityType(c.quantityType);
+                            }
+                            this.onChangeDataUpdateTotal(c);
+
                             this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
                         });
                     }
@@ -1289,11 +1302,44 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                             c.mblno = this.getMblNo(this.shipment, this.hbl);
                             c.jobNo = this.shipment.jobNo || null;
                             c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            if (!!c.quantityType) {
+                                c.quantity = this.getQuantityByquantityType(c.quantityType);
+                            }
+                            this.onChangeDataUpdateTotal(c);
+
                             this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
                         });
                     }
                 }
             );
+    }
+
+    getQuantityByquantityType(quantityType: string) {
+        let quantity: number = null;
+        switch (quantityType) {
+            case CommonEnum.QUANTITY_TYPE.GW:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'gw') : this.getDataHint('gw');
+                break;
+            case CommonEnum.QUANTITY_TYPE.NW:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'nw') : this.getDataHint('nw');
+                break;
+            case CommonEnum.QUANTITY_TYPE.CBM:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'cbm') : this.getDataHint('cbm');
+                break;
+            case CommonEnum.QUANTITY_TYPE.CONT:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'quantity') : this.getDataHint('quantity');
+                break;
+            case CommonEnum.QUANTITY_TYPE.CW:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'chargeAbleWeight') : this.getDataHint('chargeAbleWeight');
+                break;
+            case CommonEnum.QUANTITY_TYPE.PACKAGE:
+                quantity = !!this.containers.length ? this.calculateContainer(this.containers, 'packageQuantity') : this.getDataHint('packageQuantity');
+                break;
+            default:
+                break;
+        }
+
+        return quantity;
     }
 
     getRecentlyCharge() {
@@ -1309,6 +1355,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 agentId: this.shipment.agentId,
                 chargeType: this.TYPE,
                 customerId: this.hbl.customerId,
+                salesmanId: this.hbl.saleManId
             };
             this._documentRepo.getRecentlyCharges(body)
                 .pipe(map((v: any[]) => (v || []).map((i => new CsShipmentSurcharge(i)))))
@@ -1324,6 +1371,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 c.mblno = this.getMblNo(this.shipment, this.hbl);
                                 c.jobNo = this.shipment.jobNo || null;
                                 c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                                if (!!c.quantityType) {
+                                    c.quantity = this.getQuantityByquantityType(c.quantityType);
+                                }
+                                this.onChangeDataUpdateTotal(c);
+
                                 this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
                             });
                         }
@@ -1333,6 +1385,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 c.mblno = this.getMblNo(this.shipment, this.hbl);
                                 c.jobNo = this.shipment.jobNo || null;
                                 c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                                if (!!c.quantityType) {
+                                    c.quantity = this.getQuantityByquantityType(c.quantityType);
+                                }
+                                this.onChangeDataUpdateTotal(c);
+
                                 this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
                             });
                         }
@@ -1342,6 +1399,11 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                                 c.mblno = this.getMblNo(this.shipment, this.hbl);
                                 c.jobNo = this.shipment.jobNo || null;
                                 c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                                if (!!c.quantityType) {
+                                    c.quantity = this.getQuantityByquantityType(c.quantityType);
+                                }
+                                this.onChangeDataUpdateTotal(c);
+
                                 this._store.dispatch(new fromStore.AddOBHSurchargeAction(c));
                             });
                         }
@@ -1598,6 +1660,7 @@ interface IRecentlyCharge {
     coloaderId: string; // * MBL
     chargeType: string; // * BUY/SELL/OBH
     jobId: string;
+    salesmanId: string;
 }
 
 interface IStandardChargeCriteria {

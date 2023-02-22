@@ -40,7 +40,6 @@ namespace eFMS.API.Report.Helpers
             }
             catch (Exception ex)
             {
-                new LogHelper("ExportAccountingPlSheet", "" + ex.ToString());
             }
             return null;
         }
@@ -87,6 +86,142 @@ namespace eFMS.API.Report.Helpers
             workSheet.Column(38).Width = 24; //Cột AL
             workSheet.Column(39).Width = 24; //Cột AM
             workSheet.Column(40).Width = 24; //Cột AN
+        }
+
+        /// <summary>
+        /// Generate file PL sheet report
+        /// </summary>
+        /// <param name="listData"></param>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        public Stream BindingDataAccountingPLSheetExportExcel(IQueryable<AccountingPlSheetExportResult> listData, GeneralReportCriteria criteria)
+        {
+            try
+            {
+                FileInfo f = new FileInfo(Path.Combine(ReportConstants.PathOfTemplateExcel, ReportConstants.Accounting_PL_Sheet));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                excel.Worksheet.Name = "Accounting PL Sheet (" + criteria.Currency + ")";
+                // Set logo company
+                Image image = Image.FromFile(CrystalEx.GetLogoITL());
+                excel.SetPicture(image, "Logo", 1, 1);
+                DateTime? _fromDate = criteria.CreatedDateFrom != null ? criteria.CreatedDateFrom : criteria.ServiceDateFrom;
+                DateTime? _toDate = criteria.CreatedDateTo != null ? criteria.CreatedDateTo : criteria.ServiceDateTo;
+                var listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("DateRange", "From: " + _fromDate.Value.ToString("dd MMM, yyyy") + " to: " + _toDate.Value.ToString("dd MMM, yyyy"));
+                excel.SetData(listKeyData);
+                int rowStart = 9;
+                excel.StartDetailTable = rowStart;
+                foreach (var item in listData)
+                {
+                    listKeyData = new Dictionary<string, object>();
+                    excel.SetDataTable();
+                    listKeyData.Add("Date", item.ServiceDate?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("JobNo", item.JobId);
+                    listKeyData.Add("CustomerNo", item.PartnerCode);
+                    listKeyData.Add("TaxCode", item.PartnerTaxCode);
+                    listKeyData.Add("CustomerName", item.PartnerName);
+                    listKeyData.Add("MBLNo", item.Mbl);
+                    listKeyData.Add("HBLNo", item.Hbl);
+                    listKeyData.Add("CustomNo", item.CustomNo);
+                    listKeyData.Add("PaymentTerm", item.PaymentMethodTerm);
+                    listKeyData.Add("ChargeCode", item.ChargeCode);
+                    listKeyData.Add("ChargeName", item.ChargeName);
+                    listKeyData.Add("Quantity", item.Quantity);
+                    listKeyData.Add("UnitPrice", item.UnitPrice);
+                    excel.Worksheet.Cells[rowStart, 13].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatVNDNew : _formatNew;
+
+                    listKeyData.Add("TaxInvNoRevenue", item.TaxInvNoRevenue);
+                    listKeyData.Add("VoucherIdRevenue", item.VoucherIdRevenue);
+
+                    listKeyData.Add("UsdRevenue", (item.UsdRevenue != null && item.UsdRevenue != 0) ? item.UsdRevenue : null);
+
+                    listKeyData.Add("VndRevenue", (item.VndRevenue != null && item.VndRevenue != 0) ? item.VndRevenue : null);
+
+                    listKeyData.Add("TaxOut", (item.TaxOut != null && item.TaxOut != 0) ? item.TaxOut : null);
+                    excel.Worksheet.Cells[rowStart, 16].Style.Numberformat.Format = _formatNew;
+                    excel.Worksheet.Cells[rowStart, 17, rowStart, 19].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatVNDNew : _formatNew;
+
+                    listKeyData.Add("TotalRevenue", (item.TotalRevenue != null && item.TotalRevenue != 0) ? item.TotalRevenue : null);
+                    listKeyData.Add("TaxInvNoCost", item.TaxInvNoCost);
+                    listKeyData.Add("VoucherIdCost", item.VoucherIdCost);
+
+                    listKeyData.Add("UsdCost", (item.UsdCost != null && item.UsdCost != 0) ? item.UsdCost : null);
+
+                    listKeyData.Add("VndCost", (item.VndCost != null && item.VndCost != 0) ? item.VndCost : null);
+
+                    listKeyData.Add("TaxIn", (item.TaxIn != null && item.TaxIn != 0) ? item.TaxIn : null);
+
+                    listKeyData.Add("TotalCost", (item.TotalCost != null && item.TotalCost != 0) ? item.TotalCost : null);
+
+                    listKeyData.Add("TotalKickBack", (item.TotalKickBack != null && item.TotalKickBack != 0) ? item.TotalKickBack : null);
+
+                    if (item.ExchangeRate != 0)
+                    {
+                        listKeyData.Add("ExchangeRate", item.ExchangeRate);
+                    }
+                    else
+                    {
+                        listKeyData.Add("ExchangeRate", null);
+                    }
+                    listKeyData.Add("Balance", (item.Balance != null && item.Balance != 0) ? item.Balance : null);
+
+                    listKeyData.Add("InvNoObh", item.InvNoObh);
+
+                    listKeyData.Add("OBHNetAmount", (item.AmountObh != null && item.AmountObh != 0) ? item.OBHNetAmount : null);
+                    listKeyData.Add("AmountObh", (item.AmountObh != null && item.AmountObh != 0) ? item.AmountObh : null);
+                    excel.Worksheet.Cells[rowStart, 22].Style.Numberformat.Format = _formatNew;
+                    excel.Worksheet.Cells[rowStart, 23, rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatVNDNew : _formatNew;
+
+                    listKeyData.Add("PaidDate", item.PaidDate?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("AcVoucherNo", item.AcVoucherNo);
+                    listKeyData.Add("PmVoucherNo", item.PmVoucherNo);
+                    listKeyData.Add("Service", item.Service);
+                    listKeyData.Add("CdNote", item.CdNote);
+                    listKeyData.Add("Creator", item.Creator);
+                    listKeyData.Add("SyncedFrom", item.SyncedFrom);
+                    listKeyData.Add("BillNoSynced", item.BillNoSynced);
+                    listKeyData.Add("PaySyncedFrom", item.PaySyncedFrom);
+                    listKeyData.Add("PayBillNoSynced", item.PayBillNoSynced);
+                    listKeyData.Add("VatPartnerName", item.VatPartnerName);
+                    excel.SetData(listKeyData);
+                    rowStart++;
+                }
+
+                listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("TotalUsdRevenue", listData.Select(s => s.UsdRevenue).Sum()); // Total USD Revenue           
+                listKeyData.Add("TotalVndRevenue", listData.Select(s => s.VndRevenue).Sum()); // Total VND Revenue
+                listKeyData.Add("TotalTaxOut", listData.Select(s => s.TaxOut).Sum()); // Total TaxOut
+                listKeyData.Add("SumTotalRevenue", listData.Select(s => s.TotalRevenue).Sum()); // Sum Total Revenue
+                excel.Worksheet.Cells[rowStart, 16].Style.Numberformat.Format = _formatNew;
+                excel.Worksheet.Cells[rowStart, 17, rowStart, 19].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatVNDNew : _formatNew;
+
+                listKeyData.Add("TotalUsdCost", listData.Select(s => s.UsdCost).Sum()); // Total USD Cost
+                listKeyData.Add("TotalVndCost", listData.Select(s => s.VndCost).Sum()); // Total VND Cost
+                listKeyData.Add("TotalTaxIn", listData.Select(s => s.TaxIn).Sum()); // Total TaxIn
+                listKeyData.Add("SumTotalCost", listData.Select(s => s.TotalCost).Sum()); // Sum Total Cost
+                excel.Worksheet.Cells[rowStart, 22].Style.Numberformat.Format = _formatNew;
+                excel.Worksheet.Cells[rowStart, 23, rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatVNDNew : _formatNew;
+
+                listKeyData.Add("SumBalance", listData.Select(s => s.Balance).Sum()); // Sum Total Balance
+                excel.Worksheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatVNDNew : _formatNew;
+                listKeyData.Add("SumAmountObh", listData.Select(s => s.AmountObh).Sum()); // Sum Total Amount OBH
+                excel.Worksheet.Cells[rowStart, 30].Style.Numberformat.Format = criteria.Currency == "VND" ? _formatVNDNew : _formatNew;
+
+                listKeyData.Add("UserExport", "Print date: " + DateTime.Now.ToString("dd MMM, yyyy HH:ss tt") + ", by: " + listData.FirstOrDefault()?.UserExport);
+                excel.SetData(listKeyData);
+
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                new LogHelper("BindingDataAccountingPLSheetExportExcelError", ex.Message?.ToString());
+                return null;
+            }
         }
 
         private void BindingDataAccountingPLSheetExportExcel(ExcelWorksheet workSheet, List<AccountingPlSheetExportResult> listData, GeneralReportCriteria criteria)

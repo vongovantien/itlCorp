@@ -79,9 +79,9 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             { title: 'Effective Date', field: 'trialEffectDate', sortable: true },
             { title: 'Expired Date', field: 'trialExpiredDate', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
+            { title: 'AR Confirmed', field: 'arconfirmed', sortable: true },
             { title: 'Office', field: 'officeNameEn', sortable: true },
             { title: 'Company', field: 'companyNameAbbr', sortable: true },
-            { title: 'AR Confirmed', field: 'arconfirmed', sortable: true },
         ];
 
     }

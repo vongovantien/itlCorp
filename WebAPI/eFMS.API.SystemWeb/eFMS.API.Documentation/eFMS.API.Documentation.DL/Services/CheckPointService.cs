@@ -1,10 +1,12 @@
-﻿using eFMS.API.Documentation.DL.Common;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +19,7 @@ namespace eFMS.API.Documentation.DL.Services
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)csSurchargeRepository.DC;
 
         private readonly ICurrentUser currentUser;
+        private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IContextBase<AccAccountingManagement> accAccountMngtRepository;
         private readonly IContextBase<CatPartner> catPartnerRepository;
@@ -39,6 +42,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly Guid? BH = Guid.Empty;
 
         public CheckPointService(ICurrentUser currUser,
+            IStringLocalizer<LanguageSub> localizer,
             IContextBase<SysUser> sysUserRepository,
             IContextBase<AccAccountingManagement> accAccountMngtRepository,
             IContextBase<CatPartner> catPartnerRepository,
@@ -55,6 +59,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysSettingFlow> sysSettingFlow
             )
         {
+            this.stringLocalizer = localizer;
             this.currentUser = currUser;
             this.sysUserRepository = sysUserRepository;
             this.accAccountMngtRepository = accAccountMngtRepository;
@@ -438,7 +443,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (contract == null)
             {
-                return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
+                string officeName = sysOfficeRepository.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
+                string mess = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], partner.ShortName, officeName);
+                return new HandleState((object)mess);
             }
 
             switch (contract.ContractType)
@@ -603,12 +610,16 @@ namespace eFMS.API.Documentation.DL.Services
             if (string.IsNullOrEmpty(saleman))
             {
                 contract = contractRepository.Get(x => x.PartnerId == partnerId
+                                       && x.OfficeId.ToLower().Contains(currentUser.OfficeID.ToString().ToLower())
                                        && x.Active == true).OrderBy(x => x.ContractType)
                                        .FirstOrDefault();
             }
             else
             {
-                contract = contractRepository.Get(x => x.PartnerId == partnerId && x.Active == true && x.SaleManId == saleman)?.FirstOrDefault();
+                contract = contractRepository.Get(x => x.PartnerId == partnerId 
+                && x.Active == true
+                && x.OfficeId.ToLower().Contains(currentUser.OfficeID.ToString().ToLower())
+                && x.SaleManId == saleman)?.FirstOrDefault();
                 //if (contracts.Count() > 1)
                 //{
                 //    contract = contracts.FirstOrDefault(x => x.SaleManId == saleman);

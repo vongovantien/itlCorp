@@ -58,6 +58,7 @@ namespace eFMS.API.Shipment
                 option.ApiUrlAccounting = Configuration.GetSection("ApiUrlAccounting").Value;
                 option.ApiUrlExport = Configuration.GetSection("ApiUrlExport").Value;
             });
+            services.SetUpRabbitMq(Configuration);
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

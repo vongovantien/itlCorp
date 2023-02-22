@@ -903,6 +903,8 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasColumnName("ID")
                     .HasDefaultValueSql("(newid())");
 
+                entity.Property(e => e.AccountNo).HasMaxLength(150);
+
                 entity.Property(e => e.AmountUsd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.AmountVnd).HasColumnType("decimal(18, 4)");
@@ -958,6 +960,8 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.RemainUsd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.RemainVnd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.SerieNo).HasMaxLength(150);
 
                 entity.Property(e => e.Source)
                     .HasMaxLength(50)

@@ -1,10 +1,11 @@
-import { Directive, ViewContainerRef, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Directive, ViewContainerRef, Input, OnDestroy, Output, EventEmitter, ElementRef, ViewChild } from '@angular/core';
 import { Overlay, OverlayRef, ConnectionPositionPair, OverlayConfig } from '@angular/cdk/overlay';
 import { Subscription, merge, fromEvent } from 'rxjs';
 import { OVERLAY_POSITION_MAP } from '@constants';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { IDropdownPanel } from '../common/dropdown/dropdown.component';
 import { filter, take } from 'rxjs/operators';
+import { ClassGetter } from '@angular/compiler/src/output/output_ast';
 
 @Directive({
     selector: '[contextMenu]',
@@ -45,7 +46,9 @@ export class ContextMenuDirective implements OnDestroy {
                 .position()
                 .flexibleConnectedTo({ x: this.mouseX, y: this.mouseY })
                 .withPositions([
-                    this.position
+                    this._position,
+                    OVERLAY_POSITION_MAP.leftalignedTop,
+                    OVERLAY_POSITION_MAP.leftAlignedBottom,
                 ])
         });
     }
@@ -78,13 +81,12 @@ export class ContextMenuDirective implements OnDestroy {
         this.overlayRef.attach(new TemplatePortal(
             this.menuTemplate.templateRef, this.viewContainerRef
         ));
-
         // Listen Event Closing
         this.dropdownClosingActions$ = this.onClosingDropdown()
-            .subscribe(
-                () => this.close()
-            );
-    }
+          .subscribe(
+            () => this.close()
+          );
+      }
 
     private onClosingDropdown() {
         // const backdropClick$ = this.overlayRef.backdropClick(); // ? clickoutside 

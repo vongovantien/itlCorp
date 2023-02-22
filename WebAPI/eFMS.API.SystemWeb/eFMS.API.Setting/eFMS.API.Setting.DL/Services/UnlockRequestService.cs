@@ -730,10 +730,11 @@ namespace eFMS.API.Setting.DL.Services
                         var moved = await client.GetAsync(MoveFileS3Url + advanceCurrent.Id + "/" + newID + "/" + type);
                         if (moved.IsSuccessStatusCode)
                         {
-                            var images = sysImageRepo.Get(x => x.ObjectId == advanceCurrent.Id.ToString().ToLower()).ToList();
+                            var images = sysImageRepo.Get(x => x.ObjectId == newID.ToString().ToLower()).ToList();
                             foreach(var image in images)
                             {
-                                var delete = await client.DeleteAsync(DeleteFileS3Url + "Accounting/Settlement/" + image.Id);
+                                var delete = await client.DeleteAsync(DeleteFileS3Url + "Accounting/Advance/" + image.Id+"/"+advanceCurrent.Id);
+                                //
                                 if (!delete.IsSuccessStatusCode)
                                 {
                                     return new HandleState(false, "can't delete Folder");
@@ -776,10 +777,10 @@ namespace eFMS.API.Setting.DL.Services
                         var moved = await client.GetAsync(MoveFileS3Url + settlementCurrent.Id + "/" + newID + "/" + type);
                         if (moved.IsSuccessStatusCode)
                         {
-                            var images = sysImageRepo.Get(x => x.ObjectId == settlementCurrent.Id.ToString().ToLower()).ToList();
+                            var images = sysImageRepo.Get(x => x.ObjectId == newID.ToString().ToLower()).ToList();
                             foreach(var image in images)
                             {
-                                var delete = await client.DeleteAsync(DeleteFileS3Url + "Accounting/Settlement/" + image.Id);
+                                var delete = await client.DeleteAsync(DeleteFileS3Url + "Accounting/Settlement/" + image.Id + "/" + settlementCurrent.Id);
                                 if (!delete.IsSuccessStatusCode)
                                 {
                                     return new HandleState(false, "can't delete Folder");
@@ -818,10 +819,10 @@ namespace eFMS.API.Setting.DL.Services
                         var moved = await client.GetAsync(MoveFileS3Url + SOACurrent.Id + "/" + newID + "/" + type);
                         if (moved.IsSuccessStatusCode)
                         {
-                            var images = sysImageRepo.Get(x => x.ObjectId == SOACurrent.Id.ToLower()).ToList();
+                            var images = sysImageRepo.Get(x => x.ObjectId == newID.ToString().ToLower()).ToList();
                             foreach(var image in images)
                             {
-                                var delete = await client.DeleteAsync(DeleteFileS3Url + "Accounting/SOA/" + image.Id);
+                                var delete = await client.DeleteAsync(DeleteFileS3Url + "Accounting/SOA/" + image.Id + "/" + SOACurrent.Id);
                                 if (!delete.IsSuccessStatusCode)
                                 {
                                     return new HandleState(false, "can't delete Folder");
