@@ -493,6 +493,10 @@ namespace eFMS.API.Operation.DL.Services
                        clearance.UserModified = currentUser.UserID;
                     }
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
+                    if(item.isDelete == true && item.Source == "Replicate")
+                    {
+                        DataContext.Delete(x => x.Id == item.Id);
+                    }
                 }
                 DataContext.SubmitChanges();
             }
