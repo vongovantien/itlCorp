@@ -83,7 +83,7 @@ export class ReportManagementRepo {
     }
 
     exportEDocReport(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.REPORT_MANAGEMENT}/api/v1/vi/GeneralReport/ExportEDocTemplateReport`, searchObject, null, null, 'response').pipe(
+        return this._api.downloadfile(`${environment.HOST.REPORT_MANAGEMENT}/api/v1/vi/EDocReport/ExportEDocTemplateReport`, searchObject, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
