@@ -1,7 +1,10 @@
 ﻿using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.NoSql;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 
 namespace eFMS.API.Accounting.Service.Contexts
@@ -31,6 +34,8 @@ namespace eFMS.API.Accounting.Service.Contexts
                 var addedList = ChangeTrackerHelper.GetAdded(entities);
                 var deletedList = ChangeTrackerHelper.GetDeleted(entities);
                 var result = base.SaveChanges();
+
+    
                 if (result > 0)
                 {
                     if (addedList != null)
@@ -50,7 +55,18 @@ namespace eFMS.API.Accounting.Service.Contexts
             }
             catch (Exception ex)
             {
-                new LogHelper("SaveChangesError", ex.Message?.ToString());
+                ResponseExModel log = new ResponseExModel
+                {
+                    Code = 500,
+                    Message = ex.Message?.ToString(),
+                    Exception = ex.InnerException?.Message?.ToString(),
+                    Success = false,
+                    Source = ex.Source,
+                    Name = ex.GetType().Name,
+                    Body = null,
+                    Path = null,
+                };
+                new LogHelper("SaveChangesError", JsonConvert.SerializeObject(log));
                 throw;
             }
             
