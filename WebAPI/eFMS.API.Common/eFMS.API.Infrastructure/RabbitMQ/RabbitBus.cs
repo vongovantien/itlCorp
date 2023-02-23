@@ -52,9 +52,10 @@ namespace eFMS.API.Infrastructure.RabbitMQ
                 var jsonSpecified = Encoding.UTF8.GetString(e.Body.Span);
                 var item = JsonConvert.DeserializeObject<T>(jsonSpecified);
                 onMessage(item);
+                _channel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
                 await Task.Yield();
             };
-            _channel.BasicConsume(queue, true, consumer);
+            _channel.BasicConsume(queue, autoAck: false, consumer: consumer);
             await Task.Yield();
         }
 
@@ -69,11 +70,30 @@ namespace eFMS.API.Infrastructure.RabbitMQ
                 var jsonSpecified = Encoding.UTF8.GetString(e.Body.Span);
                 var item = JsonConvert.DeserializeObject<T>(jsonSpecified);
                 onMessage(item);
+                _channel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
                 await Task.Yield();
             };
-            _channel.BasicConsume(queue, true, consumer);
+            _channel.BasicConsume(queue, autoAck: false, consumer: consumer);
             await Task.Yield();
         }
 
+        public async Task ReceiveAsync<T>(string exchange, string queue, Action<T> onMessage, TimeSpan interval)
+        {
+            _channel.ExchangeDeclare(exchange, "direct", true, false);
+            _channel.QueueDeclare(queue, true, false, false);
+            _channel.QueueBind(queue, exchange, queue);
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            consumer.Received += async (s, e) =>
+            {
+                var jsonSpecified = Encoding.UTF8.GetString(e.Body.Span);
+                var item = JsonConvert.DeserializeObject<T>(jsonSpecified);
+                onMessage(item);
+                _channel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
+                await Task.Delay(interval);
+            };
+            _channel.BasicConsume(queue, autoAck: false, consumer: consumer);
+            await Task.Yield();
+
+        }
     }
 }
