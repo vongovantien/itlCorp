@@ -9,5 +9,6 @@ namespace eFMS.API.Infrastructure.RabbitMQ
         Task SendAsync<T>(string exchange, string queue, T message);
         Task ReceiveAsync<T>(string queue, Action<T> onMessage);
         Task ReceiveAsync<T>(string exchange, string queue, Action<T> onMessage);
+        Task ReceiveAsync<T>(string exchange, string queue, Action<T> onMessage, TimeSpan interval);
     }
 }
