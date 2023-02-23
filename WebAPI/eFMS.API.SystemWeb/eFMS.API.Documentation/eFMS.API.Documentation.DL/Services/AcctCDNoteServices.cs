@@ -3331,7 +3331,6 @@ namespace eFMS.API.Documentation.DL.Services
             Expression<Func<AcctSoa, bool>> querySoa = x => (x.Customer == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
                                             && (x.UserCreated == criteria.CreatorId || string.IsNullOrEmpty(criteria.CreatorId))
                                             && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type));
-
             if (criteria.FromExportDate != null && criteria.ToExportDate != null)
             {
                 query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromExportDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToExportDate.Value.Date);
@@ -3344,7 +3343,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var charges = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo));
             var surchargeDataSoa = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.Soano));
-
+            var settlementData = acctSettlementPaymentGroupRepo.Get();
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
@@ -3411,8 +3410,10 @@ namespace eFMS.API.Documentation.DL.Services
                              join partner in partnerData on cd.PartnerId equals partner.Id
                              join acc in accMangData on sc.AcctManagementId equals acc.Id into accGrps
                              from acc in accGrps.DefaultIfEmpty()
+                             join sm in settlementData on sc.SettlementCode equals sm.SettlementNo into smGrps
+                             from sm in smGrps.DefaultIfEmpty()
                              where partner.PartnerType == "Agent" && (sc.Type == "OBH" && (String.IsNullOrEmpty(sc.PaySyncedFrom) || sc.PaySyncedFrom != "SOA")) ||
-                             sc.Type!="OBH" && (String.IsNullOrEmpty(sc.SyncedFrom) || sc.SyncedFrom != "SOA") || (sc.SyncedFrom=="SETTLEMENT" || sc.PaySyncedFrom=="SETTLEMENT")
+                             sc.Type != "OBH" && (String.IsNullOrEmpty(sc.SyncedFrom) || sc.SyncedFrom != "SOA") || (sc.SyncedFrom == "SETTLEMENT" || sc.PaySyncedFrom == "SETTLEMENT")
                              select new InvoiceListModel
                              {
                                  JobNo = sc.JobNo,
@@ -3426,14 +3427,14 @@ namespace eFMS.API.Documentation.DL.Services
                                  POD = trans.PodDescription,
                                  PolId = ops.Pol,
                                  PodId = ops.Pod,
-                                 TotalAmountUsd = sc.AmountUsd + sc.VatAmountUsd,
+                                 TotalAmountUsd = string.IsNullOrEmpty(sc.SettlementCode) ? (sc.AmountUsd + sc.VatAmountUsd) : acc.TotalAmountUsd,
                                  ChargeWeight = trans.ChargeWeight,
                                  ChargeGroup = sc.ChargeGroup,
                                  VatVoucher = sc.InvoiceNo,
                                  PaymentStatus = acc.PaymentStatus,
                                  InvDueDay = acc.PaymentDueDate,
                                  VoucherIddate = sc.VoucherIddate,
-                                 IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
+                                 IssuedStatus = cd.Status== "Issued Voucher" ? cd.Status : (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
                                  Status = (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null ? "Issued" : "New",
                              };
             var debitData = from cd in cdNoteData
@@ -3500,6 +3501,7 @@ namespace eFMS.API.Documentation.DL.Services
                              VoucherId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.VoucherId : sc.VoucherId,
                              SyncedFrom = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.SyncedFrom : sc.SyncedFrom,
                              PaySyncedFrom = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.PaySyncedFrom : sc.PaySyncedFrom,
+                             SettlementCode = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.SettlementCode : sc.SettlementCode,
                          };
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
@@ -3512,15 +3514,16 @@ namespace eFMS.API.Documentation.DL.Services
                          from part in partGroup.DefaultIfEmpty()
                          join trans in transactionDetailData on soa.HblId equals trans.Id into transGrps
                          from trans in transGrps.DefaultIfEmpty()
-                         join optrans in opstransactionData on soa.HblId equals optrans.Hblid into opstransGrps
-                         from optrans in opstransGrps.DefaultIfEmpty()
+                         join ops in opstransactionData on soa.HblId equals ops.Hblid into opstransGrps
+                         from ops in opstransGrps.DefaultIfEmpty()
                          join acc in accMangData on soa.AcctManagementId equals acc.Id into accGrps1
                          from acc in accGrps1.DefaultIfEmpty()
+                         join sm in settlementData on soa.SettlementCode equals sm.SettlementNo into smGrps
+                         from sm in smGrps.DefaultIfEmpty()
                          where part.PartnerType == "Agent"
                          && ((soa.Type != "Credit" && (soa.SyncedFrom == "SOA") ||
                          soa.Type == "Credit" && (soa.PaySyncedFrom == "SOA")))
                          || (string.IsNullOrEmpty(soa.SyncedFrom) || string.IsNullOrEmpty(soa.SyncedFrom))
-                         || (soa.SyncedFrom == "SETTLEMENT" || soa.PaySyncedFrom == "SETTLEMENT")
                          select new InvoiceListModel
                          {
                              JobNo = soa.JobNo,
@@ -3532,7 +3535,9 @@ namespace eFMS.API.Documentation.DL.Services
                              FlexID = trans.FlexId,
                              POL = trans.PolDescription,
                              POD = trans.PodDescription,
-                             TotalAmountUsd = soa.AmountUsd + soa.VatAmountUsd,
+                             PolId = ops.Pol,
+                             PodId = ops.Pod,
+                             TotalAmountUsd = string.IsNullOrEmpty(soa.SettlementCode) ? (soa.AmountUsd + soa.VatAmountUsd) : acc.TotalAmountUsd,
                              ChargeWeight = trans.ChargeWeight,
                              ChargeGroup = soa.ChargeGroup,
                              VatVoucher = soa.InvoiceNo,
@@ -3544,46 +3549,40 @@ namespace eFMS.API.Documentation.DL.Services
                          };
 
             // Case settle
-            var settlementData = acctSettlementPaymentGroupRepo.Get();
             var settleData = from sc in surchargeData
-                              join sm in settlementData on sc.SettlementCode equals sm.SettlementNo
-                              join part in partnerData on sm.Payee equals part.Id
-                              join trans in transactionDetailData on sc.Hblid equals trans.Id into transGrps
-                              from trans in transGrps.DefaultIfEmpty()
-                              join ops in opstransactionData on sc.Hblid equals ops.Hblid into opsGrps
-                              from ops in opsGrps.DefaultIfEmpty()
-                              join acc in accMangData on sc.AcctManagementId equals acc.Id
-                              where part.PartnerType == "Agent"
-                              select new InvoiceListModel
-                              {
-                                  JobNo = sc.JobNo,
-                                  IssuedDate = sc.DatetimeCreated,
-                                  Type = sc.Type,
-                                  CodeNo = sc.CreditNo,
-                                  HBLId = sc.Hblid,
-                                  MBLNo = sc.Mblno,
-                                  FlexID = trans.FlexId,
-                                  POL = trans.PolDescription,
-                                  POD = trans.PodDescription,
-                                  PolId = ops.Pol,
-                                  PodId = ops.Pod,
-                                  TotalAmountUsd = sc.AmountUsd + sc.VatAmountUsd,
-                                  ChargeWeight = trans.ChargeWeight,
-                                  ChargeGroup = sc.ChargeGroup,
-                                  VatVoucher = sc.InvoiceNo,
-                                  PaymentStatus = acc.PaymentStatus,
-                                  InvDueDay = acc.PaymentDueDate,
-                                  VoucherIddate = sc.VoucherIddate,
-                                  IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
-                                  Status = (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null ? "Issued" : "New"
-                              };
-
-            // HashSet<string> debitSoaNos = new HashSet<string>(debitData.Select(z => z.SoaNo));
-            // HashSet<string> creditSoaNos = new HashSet<string>(creditData.Select(z => z.SoaNo));
-
-            // var newSoaDat = from p in soadat
-               //             where !debitSoaNos.Contains(p.SoaNo) || !creditSoaNos.Contains(p.SoaNo)
-                //            select p;
+                             join sm in settlementData on sc.SettlementCode equals sm.SettlementNo into smGrps
+                             from sm in smGrps.DefaultIfEmpty()
+                             join part in partnerData on sm.Payee equals part.Id into partGroup
+                             from part in partGroup.DefaultIfEmpty()
+                             join trans in transactionDetailData on sc.Hblid equals trans.Id into transGrps
+                             from trans in transGrps.DefaultIfEmpty()
+                             join ops in opstransactionData on sc.Hblid equals ops.Hblid into opsGrps
+                             from ops in opsGrps.DefaultIfEmpty()
+                             join acc in accMangData on sc.AcctManagementId equals acc.Id
+                             where part.PartnerType == "Agent"
+                             select new InvoiceListModel
+                             {
+                                 JobNo = sc.JobNo,
+                                 IssuedDate = sc.DatetimeCreated,
+                                 Type = sc.Type,
+                                 CodeNo = sc.CreditNo,
+                                 HBLId = sc.Hblid,
+                                 MBLNo = sc.Mblno,
+                                 FlexID = trans.FlexId,
+                                 POL = trans.PolDescription,
+                                 POD = trans.PodDescription,
+                                 PolId = ops.Pol,
+                                 PodId = ops.Pod,
+                                 TotalAmountUsd = acc.TotalAmountUsd,
+                                 ChargeWeight = trans.ChargeWeight,
+                                 ChargeGroup = sc.ChargeGroup,
+                                 VatVoucher = sc.InvoiceNo,
+                                 PaymentStatus = acc.PaymentStatus,
+                                 InvDueDay = acc.PaymentDueDate,
+                                 VoucherIddate = sc.VoucherIddate,
+                                 IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
+                                 Status = (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null ? "Issued" : "New"
+                             };
 
             var data = new List<InvoiceListModel>();
             data.AddRange(creditData.ToList());
