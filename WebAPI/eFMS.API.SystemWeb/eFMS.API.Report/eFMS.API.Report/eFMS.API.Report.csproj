@@ -139,6 +139,9 @@
     <None Update="FormatExcel\TemplateExport\ShipmentOverviewLCL.xlsx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="FormatExcel\TemplateExport\Template-Report-eDOC.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

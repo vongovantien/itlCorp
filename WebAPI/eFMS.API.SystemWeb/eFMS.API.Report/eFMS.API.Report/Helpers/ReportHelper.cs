@@ -1996,7 +1996,7 @@ namespace eFMS.API.Report.Helpers
                 listKeyData.Add("DateRange", "From: " + _fromDate.Value.ToString("dd MMM, yyyy") + " to: " + _toDate.Value.ToString("dd MMM, yyyy"));
                 excel.SetData(listKeyData);
                 int rowStart = 9;
-                int rowCount = 0;
+                int rowCount = 1;
                 excel.StartDetailTable = rowStart;
                 foreach (var result in listResult)
                 {
