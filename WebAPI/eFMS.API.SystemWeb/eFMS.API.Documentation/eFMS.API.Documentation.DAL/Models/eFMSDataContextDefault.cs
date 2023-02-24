@@ -62,7 +62,6 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<SysCompany> SysCompany { get; set; }
         public virtual DbSet<SysEmailTemplate> SysEmailTemplate { get; set; }
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
-        public virtual DbSet<SysFlightInfo> SysFlightInfo { get; set; }
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysNotifications> SysNotifications { get; set; }
@@ -4446,27 +4445,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<SysFlightInfo>(entity =>
-            {
-                entity.ToTable("sysFlightInfo");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.ArrivalStation).HasMaxLength(50);
-
-                entity.Property(e => e.ArrivalTime).HasColumnType("datetime");
-
-                entity.Property(e => e.DepartStation).HasMaxLength(50);
-
-                entity.Property(e => e.DepartTime).HasColumnType("datetime");
-
-                entity.Property(e => e.PlanArrivalTime).HasColumnType("datetime");
-
-                entity.Property(e => e.PlanDepartTime).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<SysGroup>(entity =>
