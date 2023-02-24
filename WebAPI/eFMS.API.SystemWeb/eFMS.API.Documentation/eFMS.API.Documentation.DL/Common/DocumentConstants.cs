@@ -14,6 +14,11 @@
         public static readonly string SEND_AL_CODE = "S_AL";
         public static readonly string SEND_HB_CODE = "S_HB";
 
+
+        //tracking constants
+        public const string IN_TRANSIT = "IN TRANSIT";
+        public const string DONE = "DONE";
+
         //stage constants
         public const string UPDATE_ATA = "UPDATE_ATA";
         public const string UPDATE_ATD = "UPDATE_ATD";
@@ -138,7 +143,7 @@
         public static readonly string USER_EFMS_SYSTEM = "d1bb21ea-249a-455c-a981-dcb554c3b848";
         public static readonly string SETTING_FLOW_APPLY_TYPE_CHECK_POINT = "Check Point";
         public static readonly string SETTING_FLOW_APPLY_TYPE_NONE = "None";
-        public static readonly string SETTING_FLOW_APPLY_TYPE_ALERT= "Alert";
+        public static readonly string SETTING_FLOW_APPLY_TYPE_ALERT = "Alert";
 
         public static readonly string SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH = "Both";
         public static readonly string SETTING_FLOW_APPLY_CONTRACT_TYPE_CASH = "Cash";

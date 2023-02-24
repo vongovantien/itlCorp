@@ -5,7 +5,7 @@ import { FormGroup } from '@angular/forms';
 import { extend } from 'validator';
 import { AppPage } from '../app.base';
 import { Shipment } from '../shared/models/operation/shipment';
-import { DataService } from '@services';
+import { DataService, DestroyService } from '@services';
 import { DocumentationRepo } from '@repositories';
 import { catchError, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
@@ -14,7 +14,9 @@ import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import { Permission403PopupComponent } from '@common';
 import { ChargeConstants, RoutingConstants } from '@constants';
+import { error } from 'console';
 // import { Chart } from 'angular-highcharts';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-dashboard',
@@ -31,16 +33,20 @@ export class DashboardComponent extends AppPage implements OnInit {
     headersShipment: CommonInterface.IHeaderTable[];
     serviceList: CommonInterface.INg2Select[] = [];
 
+    shipmentTracking: ShipmentTracking;
+    shipmentType: string = "AIR";
     constructor(private _dataService: DataService,
         private _documentRepo: DocumentationRepo,
-        private router: Router
+        private _destroyService: DestroyService,
+        private router: Router,
+        private _toastService: ToastrService,
     ) {
         super();
         // this.keepCalendarOpeningWithRange = true;
         // this.selectedDate = Date.now();
         // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
-
+    isSubmitted: Boolean = true;
     ngOnInit() {
         this.initBasicData();
         // * Search autocomplete shipment.
@@ -106,36 +112,36 @@ export class DashboardComponent extends AppPage implements OnInit {
         }
     }
 
-    checkPermission(service: string, shipmentId: string, productService: string){
-        if(service==='OPS'){
+    checkPermission(service: string, shipmentId: string, productService: string) {
+        if (service === 'OPS') {
             this._documentRepo.checkViewDetailPermission(shipmentId)
-            .subscribe(
-                (res: boolean) =>{
-                    if(res){
-                        this.gotoActionLink(productService);
-                    }else{
-                        this.permissionPopup.show();
+                .subscribe(
+                    (res: boolean) => {
+                        if (res) {
+                            this.gotoActionLink(productService);
+                        } else {
+                            this.permissionPopup.show();
+                        }
                     }
-                }
-            )
+                )
         }
-        else if(service==='CS'){
+        else if (service === 'CS') {
             this._documentRepo.checkDetailShippmentPermission(shipmentId)
-            .subscribe(
-                (res: boolean) =>{
-                    if(res){
-                        this.gotoActionLink(productService);
-                    }else{
-                        this.permissionPopup.show();
+                .subscribe(
+                    (res: boolean) => {
+                        if (res) {
+                            this.gotoActionLink(productService);
+                        } else {
+                            this.permissionPopup.show();
+                        }
                     }
-                }
-            )
+                )
         }
     }
 
-    gotoActionLink(service: string){
-        switch(service){
-            case  ChargeConstants.AE_CODE:
+    gotoActionLink(service: string) {
+        switch (service) {
+            case ChargeConstants.AE_CODE:
                 //return this.router.navigate([`home/documentation/air-export/${this.selectedShipment.id}`]);
                 return this.router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.selectedShipment.id}`]);
             case ChargeConstants.AI_CODE:
@@ -198,12 +204,32 @@ export class DashboardComponent extends AppPage implements OnInit {
 
     }
 
-
-
     onClickOutsideShipmentName() {
         this._isShowAutoComplete.next(false);
     }
-   //https://www.npmjs.com/package/angular-highcharts
+
+    getType(event) {
+        this.shipmentType = event;
+        this.isSubmitted = true;
+    }
+
+    getValueSearch(obj) {
+        this.trackShipmentProgress(obj)
+    }
+
+    trackShipmentProgress(obj: any) {
+        this._documentRepo.trackShipmentProgress(obj).pipe(takeUntil(this._destroyService))
+            .subscribe(
+                (res: ShipmentTracking) => {
+                    this.shipmentTracking = res;
+                    this.isSubmitted = false;
+                }, (error: any) => {
+                    this.isSubmitted = true;
+                });
+    }
+
+
+    //https://www.npmjs.com/package/angular-highcharts
     // chart: Chart;
 
     // //draw chart by month
@@ -532,4 +558,34 @@ export class DashboardComponent extends AppPage implements OnInit {
         ]
     };
 
+}
+
+
+export interface TrackInfo {
+    id: string;
+    planDate: string;
+    actualDate: string;
+    eventDescription: string;
+    station: string;
+    status: string;
+    quantity: string;
+    weight: string;
+    hblid: string;
+    datetimeModified: string;
+    datetimeCreated: string;
+    userModified: any;
+    userCreated: any;
+    flightNo: any;
+    type: any;
+    unit: any;
+}
+
+export interface ShipmentTracking {
+    coloaderName: any;
+    flightNo: any;
+    flightDate: any;
+    departure: string;
+    destination: string;
+    status: string;
+    trackInfos: TrackInfo[];
 }

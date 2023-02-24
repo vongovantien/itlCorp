@@ -1,33 +1,40 @@
 <div class="m-portlet form-sarch-company-wrapper">
     <div class="m-portlet__body">
         <div class="m-form">
-            <form #intab="ngForm">
-                <div class="input-group m-input m-input--square-group m-input m-input--square-group--square">
+            <form #outTab="ngForm">
+                <div class="input-group m-input-group m-input-group--square">
                     <div class="input-group-prepend">
                         <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
-                            MAWB
+                            {{searchObject.displayName}}
                         </button>
                         <div class="dropdown-menu">
-                            <ng-container>
-                                <a class="dropdown-item" href="javascript:void(0)">
-                                    MAWB
+                            <ng-container *ngFor="let item of configSearch.settingFields">
+                                <a class="dropdown-item"
+                                    [ngClass]="{ 'active': item.displayName == searchObject.displayName}"
+                                    href="javascript:void(0)" (click)="searchTypeChange(item)"
+                                    attr.id="{{item.fieldName}}ield">
+                                    {{ item.displayName }}
                                 </a>
                             </ng-container>
                         </div>
                     </div>
-                    <input type="text" class="form-control" aria-label="Text input with dropdown button"
-                        name=" searchString">
-
+                    <input type="text" class="form-control" placeholder="Text input with dropdown button"
+                        [(ngModel)]="searchObject.searchString" name="searchString"
+                        (change)="searchObject.searchString = searchObject.searchString.trim()">
                 </div>
             </form>
             <div class="d-flex col-md-auto mt-4">
-                <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase m--margin-right-10 btn--icon">
+                <button type="button"
+                    class="btn {{typeShipment === 'AIR' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase m--margin-right-10 btn--icon"
+                    (click)="onSetTypeShipment('AIR')">
                     <span>
                         <img src="../../../../assets//icons/fly.png" alt="icon" width="25px">
                     </span>
                 </button>
-                <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase btn--icon">
+                <button type="button"
+                    class="btn {{typeShipment === 'SEA' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase btn--icon"
+                    (click)="onSetTypeShipment('SEA')">
                     <span>
                         <img src="../../../../assets//icons/ship.png" alt="icon" width="25px">
                     </span>

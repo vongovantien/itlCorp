@@ -37,7 +37,7 @@ const routes: Routes = [
             {
                 path: '',
                 //component: DashboardComponent
-                loadChildren: () => import('./tracking/tracking.module').then(m => m.TrackingModule),
+                loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
                 data: {
                     name: "Dashboard",
                 }
@@ -45,7 +45,7 @@ const routes: Routes = [
             {
                 path: 'dashboard',
                 //component: DashboardComponent
-                loadChildren: () => import('./tracking/tracking.module').then(m => m.TrackingModule),
+                loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule),
                 data: {
                     name: "Dashboard",
                 }

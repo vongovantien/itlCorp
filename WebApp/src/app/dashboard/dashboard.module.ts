@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { SharedModule } from '../shared/shared.module';
+import { FormSearchTrackingComponent } from './components/form-search-tracking/form-search-tracking.component';
 import { DashboardComponent } from './dashboard.component';
 
 const routing: Routes = [
@@ -18,13 +19,14 @@ const routing: Routes = [
 
 @NgModule({
     declarations: [
-        DashboardComponent
+        DashboardComponent,
+        FormSearchTrackingComponent
     ],
     imports: [
         RouterModule.forChild(routing),
         CommonModule,
         HighchartsChartModule,
-        SharedModule
+        SharedModule,
     ]
 })
 export class DashboardModule { }

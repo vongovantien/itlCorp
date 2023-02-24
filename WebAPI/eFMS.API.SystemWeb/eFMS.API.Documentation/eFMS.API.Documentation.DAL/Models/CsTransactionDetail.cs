@@ -162,6 +162,7 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? WareHouseAnDate { get; set; }
         public DateTime? ReceivedBillTime { get; set; }
         public bool? ShowDim { get; set; }
+        public string TrackingStatus { get; set; }
 
         public virtual CsTransaction Job { get; set; }
     }

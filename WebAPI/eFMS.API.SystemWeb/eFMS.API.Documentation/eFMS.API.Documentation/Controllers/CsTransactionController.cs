@@ -46,6 +46,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICheckPointService checkPointService;
         private readonly ICsStageAssignedService csStageAssignedService;
+        private readonly ICsTransactionDetailService csTransactionDetailService;
 
         /// <summary>
         /// constructor
@@ -59,6 +60,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="checkPoint"></param>
         /// <param name="imageService"></param>
         /// <param name="stageAssignedService"></param>
+        /// <param name="transactionDetailService"></param>
         public CsTransactionController(IStringLocalizer<DocumentationLanguageSub> localizer,
             ICsTransactionService service,
             ICurrentUser user,
@@ -67,7 +69,8 @@ namespace eFMS.API.Documentation.Controllers
             IOptions<ApiServiceUrl> serviceUrl,
             ICheckPointService checkPoint,
             ISysImageService imageService,
-            ICsStageAssignedService stageAssignedService)
+            ICsStageAssignedService stageAssignedService,
+            ICsTransactionDetailService transactionDetailService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
@@ -78,6 +81,7 @@ namespace eFMS.API.Documentation.Controllers
             apiServiceUrl = serviceUrl;
             checkPointService = checkPoint;
             csStageAssignedService = stageAssignedService;
+            csTransactionDetailService = transactionDetailService;
         }
 
         /// <summary>
@@ -678,18 +682,46 @@ namespace eFMS.API.Documentation.Controllers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="hbl"></param>
+        /// <param name="criteria"></param>
         /// <returns></returns>
         [HttpGet("TrackShipmentProgress")]
-        public async Task<IActionResult> TrackShipmentProgress(string hbl)
+        public async Task<IActionResult> TrackShipmentProgress([FromQuery] TrackingShipmentCriteria criteria)
         {
-            var hs = new HandleState();
-            var data = await csTransactionService.TrackShipmentProgress(hbl);
+            if (!CheckExistShipment(criteria))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_NOT_EXIST].Value });
+            }
+            var data = await csTransactionService.TrackShipmentProgress(criteria);
+
             return Ok(data);
         }
 
 
         #region -- METHOD PRIVATE --
+
+        private bool CheckExistShipment(TrackingShipmentCriteria criteria)
+        {
+            bool isExisted = false;
+            switch (criteria.ShipmentType)
+            {
+                case "SEA":
+                    isExisted = csTransactionDetailService.Any(x =>
+                    (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb.Contains(criteria.Mawb)) ||
+                    (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno.Contains(criteria.Hawb)));
+                    break;
+                case "AIR":
+                    isExisted = csTransactionDetailService.Any(x =>
+                    (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb.Contains(criteria.Mawb)) ||
+                    (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno.Contains(criteria.Hawb))
+                    );
+                    break;
+                default:
+                    break;
+            }
+
+            return isExisted;
+        }
+
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {
             model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);

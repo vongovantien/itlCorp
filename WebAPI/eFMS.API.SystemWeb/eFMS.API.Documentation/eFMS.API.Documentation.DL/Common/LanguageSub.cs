@@ -1,16 +1,9 @@
-﻿
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Localization;
-using Microsoft.Extensions.Localization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace eFMS.API.Documentation.DL.Common
+﻿namespace eFMS.API.Documentation.DL.Common
 {
     public class DocumentationLanguageSub
     {
+
+        public static readonly string MSG_SHIPMENT_NOT_EXIST = "MSG_SHIPMENT_NOT_EXIST";
         public static readonly string MSG_JOBNO_EXISTED = "MSG_JOBNO_EXISTED";
         public static readonly string MSG_REFUND_FEE_EXISTED = "MSG_REFUND_FEE_EXISTED";
         public static readonly string MSG_MAWB_EXISTED = "MSG_MAWB_EXISTED";

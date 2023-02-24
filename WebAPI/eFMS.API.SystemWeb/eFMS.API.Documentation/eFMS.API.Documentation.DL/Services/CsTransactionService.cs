@@ -16,6 +16,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
@@ -28,7 +29,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -63,6 +63,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysGroup> groupRepository;
         readonly IContextBase<CatCommodity> commodityRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
+        readonly IContextBase<SysTrackInfo> trackInfoRepository;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
@@ -120,7 +121,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<OpsTransaction> opsTransactionRepo,
             ICsStageAssignedService csStageAssigned,
             IStageService stageService,
-            IContextBase<AccAccountingManagement> accMngt, IConfiguration configuration
+            IContextBase<AccAccountingManagement> accMngt,
+            IContextBase<SysTrackInfo> trackInfoRepo,
+            IConfiguration configuration
             ) : base(repository, mapper)
         {
             currentUser = user;
@@ -163,6 +166,7 @@ namespace eFMS.API.Documentation.DL.Services
             csStageAssignedService = csStageAssigned;
             catStageService = stageService;
             accMngtRepo = accMngt;
+            trackInfoRepository = trackInfoRepo;
             _configuration = configuration;
         }
 
@@ -3782,29 +3786,139 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public async Task<object> TrackShipmentProgress(string hbl)
+        public async Task<TrackingShipmentViewModel> TrackShipmentProgress(TrackingShipmentCriteria criteria)
         {
-            var baseUrl = _configuration.GetValue<string>("TrackingApiKey:Urls");
-            var apiKey = _configuration.GetValue<string>("TrackingApiKey:ApiKey");
             try
             {
-                var newModel = new List<SysFlightInfo>();
-                var model = new Dictionary<string, string>();
-                model.Add("awb_number", hbl);
-
+                var hs = new HandleState();
+                string trackInfo = string.Empty;
+                string statusShipment = string.Empty;
+                DateTime lastEvent = DateTime.Now;
+                var lstTrackInfo = new List<SysTrackInfo>();
+                var trackShipment = new TrackingShipmentViewModel();
                 HttpClient client = new HttpClient();
-                client.DefaultRequestHeaders.Accept
-                    .Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                string jsonContent = JsonConvert.SerializeObject(model);
-                var httpContent = new StringContent(jsonContent.ToString(), Encoding.UTF8, "application/json");
                 client.Timeout = TimeSpan.FromMinutes(5);
-                client.DefaultRequestHeaders.Add("Tracking-Api-Key", apiKey);
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                HttpResponseMessage response = await client.PostAsync(baseUrl, httpContent);
-                var result = await response.Content.ReadAsAsync<object>();
-                var data = result.GetValueBy("data")["track_info"];
+                CsTransactionDetail shipmentExisted = await csTransactionDetailRepo.Where(x =>
+                        (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb.Contains(criteria.Mawb)) ||
+                        (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno.Contains(criteria.Hawb))).FirstOrDefaultAsync();
 
-                return data;
+                switch (criteria.ShipmentType)
+                {
+                    case "AIR":
+                        var baseUrl = _configuration.GetValue<string>("TrackingApiKey:Urls");
+                        var apiKey = _configuration.GetValue<string>("TrackingApiKey:ApiKey");
+                        client.DefaultRequestHeaders.Add("Tracking-Api-Key", apiKey);
+
+                        var payload = new { awb_number = criteria.Mawb };
+                        HttpResponseMessage response = await client.PostAsJsonAsync(baseUrl, payload);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            return trackShipment;
+                        }
+                        var content = await response.Content.ReadAsAsync<ApiResponse>();
+                        trackInfo = JsonConvert.SerializeObject(content.Data["track_info"]);
+                        statusShipment = JsonConvert.SerializeObject(content.Data["status_number"]);
+                        List<TrackInfoModel> dataTracking = JsonConvert.DeserializeObject<List<TrackInfoModel>>(trackInfo);
+
+                        statusShipment = statusShipment == "2" ? DocumentConstants.IN_TRANSIT : (statusShipment == "4" ? DocumentConstants.DONE : null);
+
+                        //kiem tra status tren lo hang la done
+                        if (shipmentExisted.TrackingStatus == DocumentConstants.DONE)
+                        {
+                            var existingTrackInfo = trackInfoRepository.Where(ti => ti.Hblid == shipmentExisted.Id).OrderByDescending(ti => ti.PlanDate);
+                            var listExited = mapper.Map<List<TrackInfoViewModel>>(existingTrackInfo);
+                            var returnData = trackInfoRepository.Get(x => x.Hblid == shipmentExisted.Id).OrderByDescending(x => x.ActualDate);
+
+                            trackShipment.Departure = catPlaceRepo.First(x => x.Id == shipmentExisted.Pol)?.NameVn;
+                            trackShipment.Destination = catPlaceRepo.First(x => x.Id == shipmentExisted.Pod)?.NameVn;
+                            trackShipment.FlightNo = shipmentExisted.FlightNo;
+                            trackShipment.FlightDate = shipmentExisted.FlightDate;
+                            trackShipment.ColoaderName = catPartnerRepo.First(x => x.Id == shipmentExisted.ColoaderId)?.PartnerNameVn;
+                            trackShipment.Status = statusShipment;
+                            trackShipment.trackInfos = _mapper.Map<List<TrackInfoViewModel>>(returnData);
+
+                            foreach (var item in trackShipment.trackInfos)
+                            {
+                                item.StationName = catPlaceRepo.First(x => x.Id == item.Station)?.NameVn;
+                            };
+
+                            return trackShipment;
+                        }
+
+                        //Lô hàng chưa tồn tại thông tin tracking
+                        if (!trackInfoRepository.Any(x => x.Hblid == shipmentExisted.Id))
+                        {
+                            foreach (var item in dataTracking)
+                            {
+                                var data = new SysTrackInfo();
+                                data.Id = Guid.NewGuid();
+                                data.PlanDate = item.Plan_Date;
+                                data.Quantity = item.Piece;
+                                data.Status = statusShipment;
+                                data.EventDescription = item.Event;
+                                data.Station = catPlaceRepo.First(x => x.Code == item.Station)?.Id;
+                                data.Weight = item.Weight;
+                                data.ActualDate = item.Actual_Date;
+                                data.DatetimeCreated = data.DatetimeModified = DateTime.Now;
+                                data.Hblid = shipmentExisted.Id;
+                                lstTrackInfo.Add(data);
+                            }
+                        }
+                        else
+                        {
+                            //Cập nhật thêm thời gian tracking mới 
+                            var maxDateExisted = trackInfoRepository.Where(x => x.Hblid == shipmentExisted.Id).Max(x => x.PlanDate);
+                            var dataTrackingSort = dataTracking.Where(x => x.Plan_Date > maxDateExisted).AsQueryable();
+                            if (dataTrackingSort?.Count() > 0)
+                            {
+                                statusShipment = statusShipment == "2" ? DocumentConstants.IN_TRANSIT : (statusShipment == "4" ? DocumentConstants.DONE : null);
+                                foreach (var item in dataTrackingSort)
+                                {
+                                    var data = new SysTrackInfo();
+                                    data.Id = Guid.NewGuid();
+                                    data.PlanDate = item.Plan_Date;
+                                    data.Quantity = item.Piece;
+                                    data.Status = statusShipment;
+                                    data.EventDescription = item.Event;
+                                    data.Station = catPlaceRepo.First(x => x.Code == item.Station)?.Id;
+                                    data.Weight = item.Weight;
+                                    data.ActualDate = item.Actual_Date;
+                                    data.DatetimeCreated = data.DatetimeModified = DateTime.Now;
+                                    data.Hblid = shipmentExisted.Id;
+                                    lstTrackInfo.Add(data);
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                hs = await trackInfoRepository.AddAsync(lstTrackInfo);
+                shipmentExisted.TrackingStatus = statusShipment;
+                hs = await csTransactionDetailRepo.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
+                if (hs.Success)
+                {
+                    var returnData = trackInfoRepository.Get(x => x.Hblid == shipmentExisted.Id).OrderByDescending(x => x.ActualDate);
+
+                    trackShipment.Status = statusShipment;
+                    trackShipment.Departure = catPlaceRepo.First(x => x.Id == shipmentExisted.Pol)?.NameVn;
+                    trackShipment.Destination = catPlaceRepo.First(x => x.Id == shipmentExisted.Pod)?.NameVn;
+                    trackShipment.FlightNo = shipmentExisted.FlightNo;
+                    trackShipment.FlightDate = shipmentExisted.FlightDate;
+                    trackShipment.ColoaderName = catPartnerRepo.First(x => x.Id == shipmentExisted.ColoaderId)?.PartnerNameVn;
+                    trackShipment.Status = statusShipment;
+                    trackShipment.trackInfos = _mapper.Map<List<TrackInfoViewModel>>(returnData);
+                    foreach (var item in trackShipment.trackInfos)
+                    {
+                        item.StationName = catPlaceRepo.First(x => x.Id == item.Station)?.NameVn;
+                    };
+                }
+
+                return trackShipment;
+
             }
             catch (Exception)
             {
