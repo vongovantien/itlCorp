@@ -65,7 +65,6 @@ export class Contract {
     isExpired: boolean = false;
     isOverLimit: boolean = false;
     isOverDue: boolean = false;
-    isUpdateCreditTermInfo: boolean = false;
 
 
     constructor(data?: any) {
