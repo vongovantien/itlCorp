@@ -71,13 +71,12 @@ namespace eFMS.API.Report.DL.Services
             var cdJob = from cs in jobCs
                         join cd in jobDTCs on cs.Id equals cd.JobId into gr2
                         from g2 in gr2.DefaultIfEmpty()
-                        join ed in edoc on g2.JobId equals ed.JobId into gr1
-                        from g1 in gr1.DefaultIfEmpty()
+                        join ed in edoc on g2.JobId equals ed.JobId
                         join pa in partner on g2.CustomerId equals pa.Id into gr3
                         from g3 in gr3.DefaultIfEmpty()
                         join cl in clearance on g2.Hwbno equals cl.Hblid into gr4
                         from g4 in gr4.DefaultIfEmpty()
-                        join doc in docType on g1.DocumentTypeId equals doc.Id into gr5
+                        join doc in docType on ed.DocumentTypeId equals doc.Id into gr5
                         from g5 in gr5.DefaultIfEmpty()
                         join us in user on cs.UserCreated equals us.Id into gr6
                         from g6 in gr6.DefaultIfEmpty()
@@ -85,9 +84,9 @@ namespace eFMS.API.Report.DL.Services
                         {
                             creator = g6.Username,
                             createDate = cs.DatetimeCreated,
-                            attachPerson = g1.UserCreated,
-                            aliasName = g1.SystemFileName,
-                            attachTime = g1.DatetimeCreated,
+                            attachPerson = ed.UserCreated,
+                            aliasName = ed.SystemFileName,
+                            attachTime = ed.DatetimeCreated,
                             codeCus = g3.AccountNo,
                             customer = g3.PartnerNameEn,
                             customNo = g4.ClearanceNo,
@@ -95,19 +94,18 @@ namespace eFMS.API.Report.DL.Services
                             HBL = g2.Hwbno,
                             MBL = g2.Mawb,
                             jobNo = cs.JobNo,
-                            realFileName = g1.UserFileName,
+                            realFileName = ed.UserFileName,
                             require = g5.Required,
                             taxCode = g3.TaxCode,
                             userExport = currUser,
                         };
             var opsJob = from ops in jobOps
-                         join ed in edoc on ops.Id equals ed.JobId into gr1
-                         from g1 in gr1.DefaultIfEmpty()
+                         join ed in edoc on ops.Id equals ed.JobId 
                          join pa in partner on ops.CustomerId equals pa.Id into gr2
                          from g2 in gr2.DefaultIfEmpty()
                          join cl in clearance on ops.JobNo equals cl.JobNo into gr3
                          from g3 in gr3.DefaultIfEmpty()
-                         join doc in docType on g1.DocumentTypeId equals doc.Id into gr4
+                         join doc in docType on ed.DocumentTypeId equals doc.Id into gr4
                          from g4 in gr4.DefaultIfEmpty()
                          join us in user on ops.UserCreated equals us.Id into gr5
                          from g5 in gr5.DefaultIfEmpty()
@@ -115,9 +113,9 @@ namespace eFMS.API.Report.DL.Services
                          {
                              creator = g5.Username,
                              createDate = ops.DatetimeCreated,
-                             attachPerson = g1.UserCreated,
-                             aliasName = g1.SystemFileName,
-                             attachTime = g1.DatetimeCreated,
+                             attachPerson = ed.UserCreated,
+                             aliasName = ed.SystemFileName,
+                             attachTime = ed.DatetimeCreated,
                              codeCus = g2.AccountNo,
                              customer = g2.PartnerNameEn,
                              customNo = g3.ClearanceNo,
@@ -125,7 +123,7 @@ namespace eFMS.API.Report.DL.Services
                              HBL = ops.Hwbno,
                              MBL = ops.Mblno,
                              jobNo = ops.JobNo,
-                             realFileName = g1.UserFileName,
+                             realFileName = ed.UserFileName,
                              require = g4.Required,
                              taxCode = g2.TaxCode,
                              userExport = currUser,

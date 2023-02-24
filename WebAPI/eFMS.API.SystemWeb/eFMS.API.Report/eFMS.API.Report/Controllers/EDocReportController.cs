@@ -47,7 +47,7 @@ namespace eFMS.API.Report.Controllers
             #endregion -- Ghi Log Report --
 
             var data = edocReportService.QueryDataEDocsReport(criteria);
-            if (data == null)
+            if (data.Count==0)
             {
                 return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
