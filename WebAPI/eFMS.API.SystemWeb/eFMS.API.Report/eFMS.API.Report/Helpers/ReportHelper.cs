@@ -2012,7 +2012,7 @@ namespace eFMS.API.Report.Helpers
                 }
 
                 listKeyData = new Dictionary<string, object>();
-                listKeyData.Add("UserExport", "Print date: " + DateTime.Now.ToString("dd MMM, yyyy HH:ss tt") + ", by: " + listData.FirstOrDefault().userExport);
+                listKeyData.Add("UserExport", "Print date: " + DateTime.Now.ToString("dd MMM, yyyy HH:ss tt") + ", by: " + listData.FirstOrDefault()?.userExport);
                 excel.SetData(listKeyData);
 
                 return excel.ExcelStream();
