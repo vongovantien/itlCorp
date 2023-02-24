@@ -64,7 +64,7 @@ export class ShareContainerImportComponent extends PopupBase implements OnInit {
             parentId = this.mblid;
             isHouseBill = false;
         }
-        if(parentId === null){
+        if(!parentId){
             parentId = "00000000-0000-0000-0000-000000000000"
         }
         this._docRepo.upLoadContainerFile(file.target['files'], parentId, isHouseBill)
