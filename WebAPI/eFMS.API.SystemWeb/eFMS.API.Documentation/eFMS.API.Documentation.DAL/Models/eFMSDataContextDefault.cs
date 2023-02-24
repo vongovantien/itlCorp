@@ -3312,6 +3312,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.SubColoader).HasMaxLength(800);
 
+                entity.Property(e => e.TrackingStatus).HasMaxLength(50);
+
                 entity.Property(e => e.TransactionType)
                     .IsRequired()
                     .HasMaxLength(50)
@@ -3700,8 +3702,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.TotalPp)
                     .HasColumnName("TotalPP")
                     .IsUnicode(false);
-
-                entity.Property(e => e.TrackingStatus).HasMaxLength(50);
 
                 entity.Property(e => e.TransitPlaceBy1).HasMaxLength(250);
 

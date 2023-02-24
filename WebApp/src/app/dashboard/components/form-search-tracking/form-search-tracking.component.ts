@@ -10,6 +10,7 @@ export class FormSearchTrackingComponent extends AppForm {
 
     @Output() keyWord: EventEmitter<any> = new EventEmitter<any>();
     @Output() type: EventEmitter<string> = new EventEmitter<string>();
+    @Output() showBg: EventEmitter<string> = new EventEmitter<string>();
     typeShipment: string = "AIR";
     keySearch: string = '';
     selectedType: any = null;
@@ -32,7 +33,6 @@ export class FormSearchTrackingComponent extends AppForm {
             settingFields: <CommonInterface.IValueDisplay[]>[
                 { displayName: 'MAWB', fieldName: 'mawb' },
                 { displayName: 'HAWB/HBL', fieldName: 'hawb' },
-                { displayName: 'Custom Clearance', fieldName: 'customClearance' },
             ]
         };
         this.getSettings(this.configSearch);
@@ -59,7 +59,9 @@ export class FormSearchTrackingComponent extends AppForm {
         this.typeShipment = type;
         this.type.emit(this.typeShipment)
     }
-
+    onShowLoading(value){
+        this.showBg.emit(value)
+    }
     onSearchValue() {
         if(!!this.searchObject.searchString){
             this.keyWord.emit({

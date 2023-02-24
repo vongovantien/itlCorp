@@ -12,7 +12,7 @@
                             <ng-container *ngFor="let item of configSearch.settingFields">
                                 <a class="dropdown-item"
                                     [ngClass]="{ 'active': item.displayName == searchObject.displayName}"
-                                    href="javascript:void(0)" (click)="searchTypeChange(item)"
+                                    href="javascript:void(0)" (click)="searchTypeChange(item); onShowLoading(true)"
                                     attr.id="{{item.fieldName}}ield">
                                     {{ item.displayName }}
                                 </a>
@@ -21,20 +21,20 @@
                     </div>
                     <input type="text" class="form-control" placeholder="Text input with dropdown button"
                         [(ngModel)]="searchObject.searchString" name="searchString"
-                        (change)="searchObject.searchString = searchObject.searchString.trim()">
+                        (change)="searchObject.searchString = searchObject.searchString.trim(); onShowLoading(true) ">
                 </div>
             </form>
             <div class="d-flex col-md-auto mt-4">
                 <button type="button"
                     class="btn {{typeShipment === 'AIR' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase m--margin-right-10 btn--icon"
-                    (click)="onSetTypeShipment('AIR')">
+                    (click)="onSetTypeShipment('AIR');onShowLoading(true)">
                     <span>
                         <img src="../../../../assets//icons/fly.png" alt="icon" width="25px">
                     </span>
                 </button>
                 <button type="button"
                     class="btn {{typeShipment === 'SEA' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase btn--icon"
-                    (click)="onSetTypeShipment('SEA')">
+                    (click)="onSetTypeShipment('SEA'); onShowLoading(true)">
                     <span>
                         <img src="../../../../assets//icons/ship.png" alt="icon" width="25px">
                     </span>
