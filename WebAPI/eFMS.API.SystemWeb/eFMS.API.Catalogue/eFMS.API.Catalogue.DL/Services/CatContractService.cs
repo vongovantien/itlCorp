@@ -274,7 +274,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.UserCreated = entity.UserCreated;
                     model.OfficeIdContract = entity.OfficeId;
                     model.ContractShipmentType = contract.ShipmentType;
-                    SendMailActiveSuccess(model, string.Empty);
+                    SendMailActiveSuccess(model, string.Empty, false);
                     ClearCache();
                     Get();
                 }
@@ -478,9 +478,16 @@ namespace eFMS.API.Catalogue.DL.Services
 
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
-            if(model.IsUpdateCreditTermInfo == true && model.Active == false)
+            if(entity.Arconfirmed == true && entity.Active == false)
             {
-                entity.Arconfirmed = false;
+                if((entity.TrialCreditLimited != currentContract.TrialCreditLimited) || (entity.TrialCreditDays != currentContract.TrialCreditDays) ||
+                    (entity.PaymentTerm != currentContract.PaymentTerm) || (entity.PaymentTermObh != currentContract.PaymentTermObh) || 
+                    (entity.CreditLimit != currentContract.CreditLimit) || (entity.TrialEffectDate != currentContract.TrialEffectDate) ||
+                    (entity.TrialExpiredDate != currentContract.TrialExpiredDate) || (entity.CreditLimitRate != currentContract.CreditLimitRate) ||
+                    (entity.BaseOn != currentContract.BaseOn))
+                {
+                    entity.Arconfirmed = false;
+                }    
 
             }
             if (entity.ExpiredDate != null)
@@ -529,7 +536,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.ContractShipmentType = entity.ShipmentType;
                     ClearCache();
                     Get();
-                    SendMailActiveSuccess(modelPartner, string.Empty);
+                    SendMailActiveSuccess(modelPartner, string.Empty, entity.Arconfirmed);
                 }
             }
             return hs;
@@ -575,7 +582,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.ContractShipmentType = contract.ShipmentType;
                     ClearCache();
                     Get();
-                    SendMailActiveSuccess(modelPartner, string.Empty);
+                    SendMailActiveSuccess(modelPartner, string.Empty, false);
                 }
 
             }
@@ -779,7 +786,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.UserCreatedContract = objUpdate.UserCreated;
                     model.OfficeIdContract = objUpdate.OfficeId;
                     model.ContractShipmentType = objUpdate.ShipmentType;
-                    SendMailActiveSuccess(model, "active");
+                    SendMailActiveSuccess(model, "active", false);
                 }
             }
             return isUpdateDone;
@@ -1365,7 +1372,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return EmailModel;
         }
 
-        private void SendMailActiveSuccess(CatPartnerModel partner, string type)
+        private void SendMailActiveSuccess(CatPartnerModel partner, string type, bool? contractActive)
         {
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreatedContract).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
@@ -1516,7 +1523,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 // Body
                 body = new StringBuilder(emailTemplate.Body);
                 urlToSend = UrlClone.Replace("Catalogue", "");
-                body.Replace("{{dear}}", (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID) ? "Accountant Team" : "AR Team");
+                body.Replace("{{dear}}", (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID ||
+                    ((partner.ContractType == DataEnums.CONTRACT_TRIAL || partner.ContractType == DataEnums.CONTRACT_OFFICIAL) && contractActive == true)) ? "Accountant Team" : "AR Team");
                 body.Replace("{{title}}", "Customer");
                 body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
                 body.Replace("{{accountNo}}", partner.AccountNo);
@@ -1529,7 +1537,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 body.Replace("{{address}}", address);
                 body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
-                if (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID)
+                if (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID ||
+                    ((partner.ContractType == DataEnums.CONTRACT_TRIAL || partner.ContractType == DataEnums.CONTRACT_OFFICIAL) && contractActive == true))
                 {
                     lstTo = listEmailViewModel.ListAccountant;
                     if (listEmailViewModel.ListCCAccountant != null)

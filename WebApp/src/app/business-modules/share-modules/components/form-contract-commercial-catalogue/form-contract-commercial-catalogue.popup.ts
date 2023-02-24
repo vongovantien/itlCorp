@@ -511,7 +511,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.setError(this.currencyId);
         this.isSubmitted = true;
         this.selectedContract.index = this.indexDetailContract;
-        this.checkUpdateCreditInfo();
         if (!this.checkSubmitData()) {
             return;
         }
@@ -939,24 +938,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate() + trialDays)),
                 endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate() + trialDays)),
             });
-            this.selectedContract.isUpdateCreditTermInfo = true; 
-        }
-    }
-    onUpdateTrialExpiredDate(value: { startDate: any; endDate: any }) {
-        if (!!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate) {
-            this.effectiveDate.setValue({
-                startDate: new Date(new Date(value.startDate).setDate(new Date(value.startDate).getDate())),
-                endDate: new Date(new Date(value.endDate).setDate(new Date(value.endDate).getDate())),
-            });
-            this.selectedContract.isUpdateCreditTermInfo = true; 
-        }
-    }
-    checkUpdateCreditInfo()
-    {
-        if((this.formGroup.controls['trialCreditLimit'].dirty || this.formGroup.controls['paymentTermObh'].dirty || this.formGroup.controls['paymentTerm'].dirty ||
-        this.formGroup.controls['creditLimitRate'].dirty || this.formGroup.controls['creditLimit'].dirty || this.formGroup.controls['trialCreditLimit'].dirty ||
-        this.formGroup.controls['baseOn'].dirty) && this.isUpdate && !this.isCreateNewCommercial) {
-            this.selectedContract.isUpdateCreditTermInfo = true;
         }
     }
     onUpdateEffectiveDate(value: { startDate: any; endDate: any }) {
@@ -1114,13 +1095,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     onARConfirmed() {
         this._progressRef.start();
-        this.checkUpdateCreditInfo();
-        if (this.selectedContract.isUpdateCreditTermInfo === true){
-            this.selectedContract.isRequestApproval = true;
-            const body = new Contract(this.selectedContract);
-            this.updateContract(body)
-            return;
-        } 
         this._catalogueRepo.arConfirmed(this.partnerId, this.selectedContract.id, this.type)
             .pipe(
                 finalize(() => this._progressRef.complete())
