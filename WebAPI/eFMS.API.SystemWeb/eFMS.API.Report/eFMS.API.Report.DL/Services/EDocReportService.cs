@@ -57,7 +57,7 @@ namespace eFMS.API.Report.DL.Services
         {
             var dataShipment = GetDataGeneralReport(criteria);
             var listjob = dataShipment.GroupBy(x => x.JobNo).Select(x => x.FirstOrDefault().JobNo);
-            var lstOPS = listjob.Where(x => x.Contains("LOG")).ToList();
+            var lstOPS = listjob.Where(x => x.Contains("LOG") && !x.Contains("RLOG")).ToList();
             var lstCS = listjob.Where(x => !x.Contains("LOG")).ToList();
             var jobOps = opsRepository.Get(x => lstOPS.Contains(x.JobNo));
             var jobCs = tranRepository.Get(x => lstCS.Contains(x.JobNo));
@@ -69,54 +69,63 @@ namespace eFMS.API.Report.DL.Services
             var user = sysUserRepo.Get();
             var currUser = currentUser.UserName;
             var cdJob = from cs in jobCs
-                        join ed in edoc on cs.Id equals ed.JobId
-                        join cd in jobDTCs on cs.Id equals cd.JobId
-                        join pa in partner on cd.CustomerId equals pa.Id
-                        //join cl in clearance on cs.JobNo equals cl.JobNo
-                        join doc in docType on ed.DocumentTypeId equals doc.Id
-                        join us in user on cs.UserCreated equals us.Id
+                        join cd in jobDTCs on cs.Id equals cd.JobId into gr2
+                        from g2 in gr2.DefaultIfEmpty()
+                        join ed in edoc on g2.JobId equals ed.JobId
+                        join pa in partner on g2.CustomerId equals pa.Id into gr3
+                        from g3 in gr3.DefaultIfEmpty()
+                        join cl in clearance on g2.Hwbno equals cl.Hblid into gr4
+                        from g4 in gr4.DefaultIfEmpty()
+                        join doc in docType on ed.DocumentTypeId equals doc.Id into gr5
+                        from g5 in gr5.DefaultIfEmpty()
+                        join us in user on cs.UserCreated equals us.Id into gr6
+                        from g6 in gr6.DefaultIfEmpty()
                         select new EDocReportResult()
                         {
-                            creator = us.Username,
+                            creator = g6.Username,
                             createDate = cs.DatetimeCreated,
                             attachPerson = ed.UserCreated,
                             aliasName = ed.SystemFileName,
                             attachTime = ed.DatetimeCreated,
-                            codeCus = pa.AccountNo,
-                            customer = pa.PartnerNameEn,
-                            customNo = null,
-                            documentType = doc.NameEn,
-                            HBL = cd.Hwbno,
-                            MBL = cs.Mawb,
+                            codeCus = g3.AccountNo,
+                            customer = g3.PartnerNameEn,
+                            customNo = g4.ClearanceNo,
+                            documentType = g5.NameEn,
+                            HBL = g2.Hwbno,
+                            MBL = g2.Mawb,
                             jobNo = cs.JobNo,
                             realFileName = ed.UserFileName,
-                            require = doc.Required,
-                            taxCode = pa.TaxCode,
+                            require = g5.Required,
+                            taxCode = g3.TaxCode,
                             userExport = currUser,
                         };
             var opsJob = from ops in jobOps
-                         join ed in edoc on ops.Id equals ed.JobId
-                         join pa in partner on ops.CustomerId equals pa.Id
-                         join cl in clearance on ops.JobNo equals cl.JobNo
-                         join doc in docType on ed.DocumentTypeId equals doc.Id
-                         join us in user on ops.UserCreated equals us.Id
+                         join ed in edoc on ops.Id equals ed.JobId 
+                         join pa in partner on ops.CustomerId equals pa.Id into gr2
+                         from g2 in gr2.DefaultIfEmpty()
+                         join cl in clearance on ops.JobNo equals cl.JobNo into gr3
+                         from g3 in gr3.DefaultIfEmpty()
+                         join doc in docType on ed.DocumentTypeId equals doc.Id into gr4
+                         from g4 in gr4.DefaultIfEmpty()
+                         join us in user on ops.UserCreated equals us.Id into gr5
+                         from g5 in gr5.DefaultIfEmpty()
                          select new EDocReportResult()
                          {
-                             creator = us.Username,
+                             creator = g5.Username,
                              createDate = ops.DatetimeCreated,
                              attachPerson = ed.UserCreated,
                              aliasName = ed.SystemFileName,
                              attachTime = ed.DatetimeCreated,
-                             codeCus = pa.AccountNo,
-                             customer = pa.PartnerNameEn,
-                             customNo = cl.ClearanceNo,
-                             documentType = doc.NameEn,
+                             codeCus = g2.AccountNo,
+                             customer = g2.PartnerNameEn,
+                             customNo = g3.ClearanceNo,
+                             documentType = g4.NameEn,
                              HBL = ops.Hwbno,
                              MBL = ops.Mblno,
                              jobNo = ops.JobNo,
                              realFileName = ed.UserFileName,
-                             require = doc.Required,
-                             taxCode = pa.TaxCode,
+                             require = g4.Required,
+                             taxCode = g2.TaxCode,
                              userExport = currUser,
                          };
             var dataList = cdJob.Concat(opsJob);
