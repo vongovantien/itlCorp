@@ -68,14 +68,14 @@ namespace eFMS.API.Report.DL.Services
             var docType = sysattachRepository.Get();
             var user = sysUserRepo.Get();
             var currUser = currentUser.UserName;
-            var cdJob = from cs in jobCs 
-                        join ed in edoc on cs.Id equals ed.JobId into gr1
-                        from g1 in gr1.DefaultIfEmpty()
-                        join cd in jobDTCs on g1.Id equals cd.JobId into gr2
+            var cdJob = from cs in jobCs
+                        join cd in jobDTCs on cs.Id equals cd.JobId into gr2
                         from g2 in gr2.DefaultIfEmpty()
+                        join ed in edoc on g2.JobId equals ed.JobId into gr1
+                        from g1 in gr1.DefaultIfEmpty()
                         join pa in partner on g2.CustomerId equals pa.Id into gr3
                         from g3 in gr3.DefaultIfEmpty()
-                        join cl in clearance on cs.JobNo equals cl.JobNo into gr4
+                        join cl in clearance on g2.Hwbno equals cl.Hblid into gr4
                         from g4 in gr4.DefaultIfEmpty()
                         join doc in docType on g1.DocumentTypeId equals doc.Id into gr5
                         from g5 in gr5.DefaultIfEmpty()
@@ -93,7 +93,7 @@ namespace eFMS.API.Report.DL.Services
                             customNo = g4.ClearanceNo,
                             documentType = g5.NameEn,
                             HBL = g2.Hwbno,
-                            MBL = cs.Mawb,
+                            MBL = g2.Mawb,
                             jobNo = cs.JobNo,
                             realFileName = g1.UserFileName,
                             require = g5.Required,
