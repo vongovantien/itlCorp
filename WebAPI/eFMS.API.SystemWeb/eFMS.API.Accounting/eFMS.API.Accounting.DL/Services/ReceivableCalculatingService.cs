@@ -39,7 +39,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     Console.WriteLine("==================== ReceivableCalculatingBackgroundService ============================");
 
-                }, interval);
+                }, batchSize: 3, maxMessagesInFlight: 10);
             }
             catch (Exception ex)
             {
