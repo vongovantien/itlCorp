@@ -50,8 +50,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     enablePayeeINV: boolean[] = [];
     payFirst: boolean[] = [];
     payFilled: boolean = true;
-    //clearINV: boolean[] = [];
-    //: boolean[] = [];
 
     constructor(
         private _toastService: ToastrService,
@@ -315,6 +313,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 if (this.isUpdate) {
                     this.selectedDocType = event.id;
                 }
+                this.listFile[index].docTitle = event.nameEn;
                 break;
             case 'aliasName':
                 this.listFile[index].aliasName = event;
@@ -323,7 +322,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 this.listFile[index].hblid = event.id;
                 break;
             case 'job':
-                this.listFile[index].jobNo = event.jobNo;
+                this.listFile[index].jobTitle = event.jobId;
                 this.listFile[index].jobId = event.id;
                 break;
             case 'note':
@@ -466,6 +465,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     removeJob(index: number) {
         this.listFile[index].jobNo = null;
         this.listFile[index].jobId = SystemConstants.EMPTY_GUID;
+        this.listFile[index].jobTitle = '';
     }
 
     removePayee(index: number) {
@@ -490,6 +490,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile[index].DocumentId = null;
         this.selectedDocType = null;
         this.enablePayeeINV[index] = false;
+        this.listFile[index].docTitle = '';
         this.removePayee(index);
     }
 
