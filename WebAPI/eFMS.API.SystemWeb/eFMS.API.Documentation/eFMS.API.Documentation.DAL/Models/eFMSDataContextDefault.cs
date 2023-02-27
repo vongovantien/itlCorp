@@ -62,11 +62,11 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<SysCompany> SysCompany { get; set; }
         public virtual DbSet<SysEmailTemplate> SysEmailTemplate { get; set; }
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
-        public virtual DbSet<SysFlightInfo> SysFlightInfo { get; set; }
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysNotifications> SysNotifications { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
+        public virtual DbSet<SysPartnerApi> SysPartnerApi { get; set; }
         public virtual DbSet<SysReportLog> SysReportLog { get; set; }
         public virtual DbSet<SysSentEmailHistory> SysSentEmailHistory { get; set; }
         public virtual DbSet<SysSettingFlow> SysSettingFlow { get; set; }
@@ -3312,6 +3312,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.SubColoader).HasMaxLength(800);
 
+                entity.Property(e => e.TrackingStatus).HasMaxLength(50);
+
                 entity.Property(e => e.TransactionType)
                     .IsRequired()
                     .HasMaxLength(50)
@@ -3700,8 +3702,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.TotalPp)
                     .HasColumnName("TotalPP")
                     .IsUnicode(false);
-
-                entity.Property(e => e.TrackingStatus).HasMaxLength(50);
 
                 entity.Property(e => e.TransitPlaceBy1).HasMaxLength(250);
 
@@ -4448,27 +4448,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<SysFlightInfo>(entity =>
-            {
-                entity.ToTable("sysFlightInfo");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.ArrivalStation).HasMaxLength(50);
-
-                entity.Property(e => e.ArrivalTime).HasColumnType("datetime");
-
-                entity.Property(e => e.DepartStation).HasMaxLength(50);
-
-                entity.Property(e => e.DepartTime).HasColumnType("datetime");
-
-                entity.Property(e => e.PlanArrivalTime).HasColumnType("datetime");
-
-                entity.Property(e => e.PlanDepartTime).HasColumnType("datetime");
-            });
-
             modelBuilder.Entity<SysGroup>(entity =>
             {
                 entity.ToTable("sysGroup");
@@ -4715,6 +4694,33 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<SysPartnerApi>(entity =>
+            {
+                entity.ToTable("sysPartnerAPI");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Company).HasMaxLength(100);
+
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasMaxLength(100);
+
+                entity.Property(e => e.Environment).HasMaxLength(150);
+
+                entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Name).HasMaxLength(50);
+
+                entity.Property(e => e.UserId).HasColumnName("UserID");
+            });
+
             modelBuilder.Entity<SysReportLog>(entity =>
             {
                 entity.ToTable("sysReportLog");
@@ -4858,6 +4864,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.PlanDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Quantity).HasMaxLength(10);
+
+                entity.Property(e => e.Source).HasMaxLength(100);
 
                 entity.Property(e => e.Status).HasMaxLength(10);
 

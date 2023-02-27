@@ -1,20 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import moment from 'moment/moment';
-import Highcharts from 'highcharts/highcharts';
-import { FormGroup } from '@angular/forms';
-import { extend } from 'validator';
-import { AppPage } from '../app.base';
-import { Shipment } from '../shared/models/operation/shipment';
-import { DataService, DestroyService } from '@services';
-import { DocumentationRepo } from '@repositories';
-import { catchError, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { getCurrentUserState } from '@store';
 import { Permission403PopupComponent } from '@common';
 import { ChargeConstants, RoutingConstants } from '@constants';
-import { error } from 'console';
+import { DocumentationRepo } from '@repositories';
+import { DataService, DestroyService } from '@services';
+import Highcharts from 'highcharts/highcharts';
+import { BehaviorSubject } from 'rxjs';
+import { distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
+import { AppPage } from '../app.base';
+import { Shipment } from '../shared/models/operation/shipment';
 // import { Chart } from 'angular-highcharts';
 import { ToastrService } from 'ngx-toastr';
 
@@ -33,11 +27,10 @@ export class DashboardComponent extends AppPage implements OnInit {
     headersShipment: CommonInterface.IHeaderTable[];
     serviceList: CommonInterface.INg2Select[] = [];
 
-    shipmentTracking: ShipmentTracking;
+    shipmentTracking: IShipmentTracking;
     shipmentType: string = "AIR";
-    constructor(private _dataService: DataService,
+    constructor(
         private _documentRepo: DocumentationRepo,
-        private _destroyService: DestroyService,
         private router: Router,
         private _toastService: ToastrService,
     ) {
@@ -210,17 +203,18 @@ export class DashboardComponent extends AppPage implements OnInit {
 
     getType(event) {
         this.shipmentType = event;
-        this.isSubmitted = true;
     }
 
     getValueSearch(obj) {
         this.trackShipmentProgress(obj)
     }
-
+    onChangeLoading(event){
+        this.isSubmitted = event;
+    }
     trackShipmentProgress(obj: any) {
-        this._documentRepo.trackShipmentProgress(obj).pipe(takeUntil(this._destroyService))
+        this._documentRepo.trackShipmentProgress(obj).pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (res: ShipmentTracking) => {
+                (res: IShipmentTracking) => {
                     this.shipmentTracking = res;
                     this.isSubmitted = false;
                 }, (error: any) => {
@@ -561,7 +555,7 @@ export class DashboardComponent extends AppPage implements OnInit {
 }
 
 
-export interface TrackInfo {
+export interface ITrackInfo {
     id: string;
     planDate: string;
     actualDate: string;
@@ -580,12 +574,12 @@ export interface TrackInfo {
     unit: any;
 }
 
-export interface ShipmentTracking {
+export interface IShipmentTracking {
     coloaderName: any;
     flightNo: any;
     flightDate: any;
     departure: string;
     destination: string;
     status: string;
-    trackInfos: TrackInfo[];
+    trackInfos: ITrackInfo[];
 }

@@ -21,5 +21,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string FlightNo { get; set; }
         public string Type { get; set; }
         public string Unit { get; set; }
+        public string Source { get; set; }
     }
 }

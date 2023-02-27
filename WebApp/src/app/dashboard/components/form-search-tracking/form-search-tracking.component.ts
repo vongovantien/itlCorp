@@ -8,8 +8,9 @@ import { AppForm } from 'src/app/app.form';
 })
 export class FormSearchTrackingComponent extends AppForm {
 
-    @Output() keyWord: EventEmitter<any> = new EventEmitter<any>();
-    @Output() type: EventEmitter<string> = new EventEmitter<string>();
+    @Output() onChangeKeyWork: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onChangeType: EventEmitter<string> = new EventEmitter<string>();
+    @Output() onChangeBackGround: EventEmitter<string> = new EventEmitter<string>();
     typeShipment: string = "AIR";
     keySearch: string = '';
     selectedType: any = null;
@@ -32,7 +33,6 @@ export class FormSearchTrackingComponent extends AppForm {
             settingFields: <CommonInterface.IValueDisplay[]>[
                 { displayName: 'MAWB', fieldName: 'mawb' },
                 { displayName: 'HAWB/HBL', fieldName: 'hawb' },
-                { displayName: 'Custom Clearance', fieldName: 'customClearance' },
             ]
         };
         this.getSettings(this.configSearch);
@@ -57,12 +57,14 @@ export class FormSearchTrackingComponent extends AppForm {
 
     onSetTypeShipment(type: string) {
         this.typeShipment = type;
-        this.type.emit(this.typeShipment)
+        this.onChangeType.emit(this.typeShipment)
     }
-
+    onShowLoading(value){
+        this.onChangeBackGround.emit(value)
+    }
     onSearchValue() {
         if(!!this.searchObject.searchString){
-            this.keyWord.emit({
+            this.onChangeKeyWork.emit({
                 [this.searchObject.field]: this.searchObject.searchString,
                 shipmentType: this.typeShipment
             })
