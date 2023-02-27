@@ -1204,13 +1204,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private bool SMhaveADV(string smId)
         {
             var smNo = _setleRepo.Get(x => x.Id.ToString() == smId).FirstOrDefault().SettlementNo;
-            var advDocType = _attachFileTemplateRepo.Get(x => x.AccountingType == "ADV-Settlement").Select(x => x.Id).ToList();
-            var smDocType = _sysImageDetailRepo.Get(x => x.BillingNo == smNo).Select(x => (int)x.DocumentTypeId).ToList();
-            if (advDocType.Intersect(smDocType).Any())
-            {
-                return true;
-            }
-            return false;
+            return _surRepo.Any(x => x.SettlementCode == smNo && x.AdvanceNo != null);
         }
 
         public async Task<HandleState> MappingeDocToShipment(Guid imageId, string billingId, string billingType)
