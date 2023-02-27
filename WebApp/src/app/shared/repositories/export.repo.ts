@@ -508,15 +508,8 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
-    
-    exportAgencyTemplate(body: any){
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingManagementAgencyTemplate`, body, null, null, 'response').pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
-    }
 
-    exportAgencyTemplate(body: any){
+    exportAgencyTemplate(body: any) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingManagementAgencyTemplate`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
