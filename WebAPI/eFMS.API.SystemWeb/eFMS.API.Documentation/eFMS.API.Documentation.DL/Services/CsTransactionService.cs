@@ -3801,6 +3801,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var trackShipment = new TrackingShipmentViewModel();
 
                 CsTransactionDetail hbl = await csTransactionDetailRepo.Where(x =>
+                CsTransactionDetail hbl = await csTransactionDetailRepo.Where(x =>
                         (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb.Contains(criteria.Mawb)) ||
                         (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno.Contains(criteria.Hawb))).FirstOrDefaultAsync();
 
@@ -3846,6 +3847,10 @@ namespace eFMS.API.Documentation.DL.Services
                         //Cập nhật thêm thời gian tracking mới 
                         if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)
                         {
+
+                        //Cập nhật thêm thời gian tracking mới 
+                        if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)
+                        {
                             var maxDateExisted = trackInfoRepository.Where(x => x.Hblid == shipmentExisted.Id).Max(x => x.PlanDate);
                             var dataTrackingSort = dataReponse.Data.TrackInfo.Where(x => x.PlanDate > maxDateExisted);
                             if (dataTrackingSort?.Count() > 0)
@@ -3867,6 +3872,9 @@ namespace eFMS.API.Documentation.DL.Services
                                 }
                             }
                         }
+                        hs = await trackInfoRepository.AddAsync(lstTrackInfo);
+                        shipmentExisted.TrackingStatus = statusShipment;
+                        hs = await DataContext.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
                         hs = await trackInfoRepository.AddAsync(lstTrackInfo);
                         shipmentExisted.TrackingStatus = statusShipment;
                         hs = await DataContext.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
