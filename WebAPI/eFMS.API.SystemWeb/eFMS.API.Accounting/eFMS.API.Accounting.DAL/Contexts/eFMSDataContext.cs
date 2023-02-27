@@ -9,7 +9,7 @@ using System;
 
 namespace eFMS.API.Accounting.Service.Contexts
 {
-    public class eFMSDataContext: eFMSDataContextDefault
+    public class eFMSDataContext : eFMSDataContextDefault
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -26,50 +26,29 @@ namespace eFMS.API.Accounting.Service.Contexts
         }
         public override int SaveChanges()
         {
-            try
-            {
-                var entities = ChangeTracker.Entries();
-                var mongoDb = MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
-                var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
-                var addedList = ChangeTrackerHelper.GetAdded(entities);
-                var deletedList = ChangeTrackerHelper.GetDeleted(entities);
-                var result = base.SaveChanges();
+            var entities = ChangeTracker.Entries();
+            var mongoDb = MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
+            var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
+            var addedList = ChangeTrackerHelper.GetAdded(entities);
+            var deletedList = ChangeTrackerHelper.GetDeleted(entities);
+            var result = base.SaveChanges();
 
-    
-                if (result > 0)
-                {
-                    if (addedList != null)
-                    {
-                        ChangeTrackerHelper.InsertToMongoDb(addedList);
-                    }
-                    if (modifiedList != null)
-                    {
-                        ChangeTrackerHelper.InsertToMongoDb(modifiedList);
-                    }
-                    if (deletedList != null)
-                    {
-                        ChangeTrackerHelper.InsertToMongoDb(deletedList);
-                    }
-                }
-                return result;
-            }
-            catch (Exception ex)
+            if (result > 0)
             {
-                ResponseExModel log = new ResponseExModel
+                if (addedList != null)
                 {
-                    Code = 500,
-                    Message = ex.Message?.ToString(),
-                    Exception = ex.InnerException?.Message?.ToString(),
-                    Success = false,
-                    Source = ex.Source,
-                    Name = ex.GetType().Name,
-                    Body = null,
-                    Path = null,
-                };
-                new LogHelper("SaveChangesError", JsonConvert.SerializeObject(log));
-                throw;
+                    ChangeTrackerHelper.InsertToMongoDb(addedList);
+                }
+                if (modifiedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(modifiedList);
+                }
+                if (deletedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(deletedList);
+                }
             }
-            
+            return result;
         }
     }
 }
