@@ -60,7 +60,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             IContextBase<SysUser> userRepo,
             IContextBase<AcctSoa> soaRepo,
              IContextBase<CsShipmentSurcharge> surRepo,
-             IContextBase<AcctSettlementPayment> settleRepo,
         IContextBase<CsTransactionDetail> tranDeRepo)
         {
             this.currentUser = currentUser;
