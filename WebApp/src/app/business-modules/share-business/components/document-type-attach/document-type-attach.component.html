@@ -42,8 +42,8 @@
                                                 </app-permission-button>
                                             </td>
                                             <td class="">
-                                                <div class="form-group"
-                                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !file.aliasName}">
+                                                <div class="form-group" [title]="file.aliasName" [ngClass]=" {'m-form__group has-danger': isSubmitted &&
+                                                    !file.aliasName}">
                                                     <input class="form-control" placeholder="Aias name"
                                                         [disabled]="file.aliasGenPay" type="text"
                                                         (ngModelChange)="onSelectDataFormInfo($event,i,'aliasName')"
@@ -51,16 +51,16 @@
                                                 </div>
                                             </td>
                                             <td class="disabled">
-                                                <div class="form-group ">
+                                                <div class="form-group " [title]="file.name">
                                                     <input type="text" class="form-control " [ngModel]="file.name"
                                                         disabled>
                                                 </div>
                                             </td>
                                             <td *ngIf="typeFrom==='Settlement'||typeFrom==='Shipment'">
                                                 <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.DocumentId||file
-                                                        .DocumentId===null)) }">
+                                                        .DocumentId===null)) }" [title]="file.docTitle">
                                                     <div class="list-master">
-                                                        <app-combo-grid-virtual-scroll class="index1" [height]="150"
+                                                        <app-combo-grid-virtual-scroll [height]="150"
                                                             [currentActiveItemId]="{field:'id', value: docTypeId}"
                                                             (itemSelected)="onSelectDataFormInfo($event,i, 'docType')"
                                                             [dataSources]="configDocType.dataSource"
@@ -86,7 +86,8 @@
                                             <ng-container *ngIf="typeFrom==='Settlement'">
                                                 <td>
                                                     <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.payee||file.payee===null))
-                                                        &&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
+                                                        &&(file.Code === 'INV' || file.Code === 'OBH_INV') }"
+                                                        [title]="file.payee">
                                                         <div class="list-second">
                                                             <app-combo-grid-virtual-scroll [height]="150"
                                                                 [currentActiveItemId]="{field:'payer', value: file.payee}"
@@ -103,7 +104,8 @@
                                                 <ng-container *ngIf="enablePayeeINV[i]">
                                                     <td>
                                                         <div class="form-group"
-                                                            [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file.inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
+                                                            [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file.inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }"
+                                                            [title]="file.inv">
                                                             <div class="list-second">
                                                                 <app-combo-grid-virtual-scroll [height]="150"
                                                                     [currentActiveItemId]="{field:'invoiceNo', value: file.inv}"
@@ -129,14 +131,14 @@
                                                     <td class="">
                                                         <div class="form-group"
                                                             [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file.inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
-                                                            <input type="text" class="form-control "
+                                                            <input type="text" class="form-control " [title]="file.inv"
                                                                 placeholder="Invoice No" disabled>
                                                         </div>
                                                     </td>
                                                 </ng-container>
 
                                                 <td class="">
-                                                    <div class="form-group"
+                                                    <div class="form-group" [title]="file.payee" [title]="file.series"
                                                         [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.series||file.series===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
                                                         <input type="text" class="form-control " placeholder="Series No"
                                                             [ngModel]="file.series" disabled>
@@ -150,12 +152,12 @@
                                                 </td>
                                             </ng-container>
                                             <td class="disabled" *ngIf="typeFrom==='Shipment'||jobOnSettle">
-                                                <div class="form-group ">
+                                                <div class="form-group " [title]="jobNo">
                                                     <input type="text" class="form-control " [ngModel]="jobNo" disabled>
                                                 </div>
                                             </td>
                                             <td class="disabled" *ngIf="typeFrom!=='Shipment'&&!jobOnSettle">
-                                                <div class="list-master">
+                                                <div class="list-master" [title]="file.jobTitle">
                                                     <app-combo-grid-virtual-scroll [height]="150"
                                                         (itemSelected)="onSelectDataFormInfo($event,i, 'job')"
                                                         [dataSources]="jobDataSource"
@@ -166,8 +168,9 @@
                                                 </div>
                                             </td>
                                             <td class="" *ngIf="typeFrom==='Shipment'">
-                                                <div class="form-group ">
+                                                <div class="form-group " [title]="file.hwbNo">
                                                     <select class="form-control" [(ngModel)]="file.hwbNo"
+                                                        [title]="file.jobNo"
                                                         (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
                                                         <option *ngFor="let hbl of housebills" [ngValue]="hbl">
                                                             {{hbl.hwbno}}
@@ -176,7 +179,7 @@
                                                 </div>
                                             </td>
                                             <td class="">
-                                                <div class="form-group ">
+                                                <div class="form-group " [title]="file.note">
                                                     <input type="text" class="form-control " placeholder="Note"
                                                         (ngModelChange)="onSelectDataFormInfo($event,i,'note')"
                                                         [ngModel]="file.note">
