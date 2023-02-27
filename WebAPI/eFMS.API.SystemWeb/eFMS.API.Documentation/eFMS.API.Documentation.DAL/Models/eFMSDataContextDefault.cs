@@ -55,6 +55,7 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<CsShippingInstruction> CsShippingInstruction { get; set; }
         public virtual DbSet<CsTransaction> CsTransaction { get; set; }
         public virtual DbSet<CsTransactionDetail> CsTransactionDetail { get; set; }
+        public virtual DbSet<CsWorkOrder> CsWorkOrder { get; set; }
         public virtual DbSet<CsWorkOrderPrice> CsWorkOrderPrice { get; set; }
         public virtual DbSet<CsWorkOrderSurcharge> CsWorkOrderSurcharge { get; set; }
         public virtual DbSet<CustomsDeclaration> CustomsDeclaration { get; set; }
@@ -87,7 +88,7 @@ namespace eFMS.API.Documentation.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountReceivable>(entity =>
             {
@@ -3750,6 +3751,57 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasForeignKey(d => d.JobId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_csTransactionDetail_csTransaction");
+            });
+
+            modelBuilder.Entity<CsWorkOrder>(entity =>
+            {
+                entity.ToTable("csWorkOrder");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.AgentId).HasColumnName("AgentID");
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
+                entity.Property(e => e.ConsigneeId).HasColumnName("ConsigneeID");
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
+                entity.Property(e => e.IncotermId).HasColumnName("IncotermID");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
+
+                entity.Property(e => e.PaymentMethod)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PickupPlace).HasMaxLength(500);
+
+                entity.Property(e => e.Pod).HasColumnName("POD");
+
+                entity.Property(e => e.Pol).HasColumnName("POL");
+
+                entity.Property(e => e.SalesmanId).HasColumnName("SalesmanID");
+
+                entity.Property(e => e.ShipmentType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ShipperId).HasColumnName("ShipperID");
             });
 
             modelBuilder.Entity<CsWorkOrderPrice>(entity =>
