@@ -58,6 +58,7 @@ export class SetUnlockRequestJobModel {
     unlockType: string = null;
     userCreated: string = null;
     datetimeCreated: string = null;
+    serviceDate: string = null;
     // * Custom
     isSelected: boolean = false;
     constructor(object?: object) {

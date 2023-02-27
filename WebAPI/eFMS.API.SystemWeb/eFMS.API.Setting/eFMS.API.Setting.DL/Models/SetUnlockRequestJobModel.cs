@@ -7,5 +7,6 @@ namespace eFMS.API.Setting.DL.Models
 {
     public class SetUnlockRequestJobModel : SetUnlockRequestJob
     {
+        public DateTime? ServiceDate { get; set; }
     }
 }
