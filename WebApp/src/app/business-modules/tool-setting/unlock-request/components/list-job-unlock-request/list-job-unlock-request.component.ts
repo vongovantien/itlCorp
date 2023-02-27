@@ -30,6 +30,7 @@ export class UnlockRequestListJobComponent extends AppList implements OnInit {
     ngOnInit(): void {
         this.headers = [
             { title: 'Unlock Name', field: 'unlockName', sortable: true },
+            { title: 'Service Date', field: 'serviceDate', sortable: true },
             { title: 'Reason', field: 'reason', sortable: true }
         ];
     }
