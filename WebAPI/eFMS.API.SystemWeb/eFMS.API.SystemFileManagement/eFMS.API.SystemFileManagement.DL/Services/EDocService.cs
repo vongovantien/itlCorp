@@ -45,7 +45,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private IContextBase<AcctSoa> _soaRepo;
         private IContextBase<SysUser> _userRepo;
         private IContextBase<CsShipmentSurcharge> _surRepo;
-        private IContextBase<AcctSettlementPayment> _settleRepo;
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)_sysImageDetailRepo.DC;
         private readonly Dictionary<string, string> PreviewTemplateCodeMappingAttachTemplateCode = new Dictionary<string, string>();
         public EDocService(IContextBase<SysImage> SysImageRepo,
@@ -80,7 +79,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _userRepo = userRepo;
             _soaRepo = soaRepo;
             _surRepo = surRepo;
-            _setleRepo = setleRepo;
             PreviewTemplateCodeMappingAttachTemplateCode.Add("HBL", "HBL");
             PreviewTemplateCodeMappingAttachTemplateCode.Add("MBL", "MBL");
             PreviewTemplateCodeMappingAttachTemplateCode.Add("DEBIT", "INV");
@@ -1684,6 +1682,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             try
             {
                 var edocs = new List<SysImageDetail>();
+                var settleId = _setleRepo.Get(x => x.SettlementNo == billingNo).FirstOrDefault().Id.ToString();
+                var haveEdoc = SMhaveADV(settleId);
                 switch (billingType)
                 {
                     case "Advance":
@@ -1750,7 +1750,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 if (img != null)
                                 {
                                     var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement");
-                                    var MBLCode = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "MBL" || z.Code == "MAWB") && z.Type == "General")).FirstOrDefault();
+                                    var MBLCode = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "BL" || z.Code == "MAWB") && z.Type == "General")).FirstOrDefault();
                                     if (edocExist.Count() == 0)
                                     {
                                         var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type== "Accountant")).FirstOrDefault();
@@ -1761,7 +1761,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                 var edocFrom = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id).FirstOrDefault();
                                                 var edoc = new SysImageDetail()
                                                 {
-                                                    Id = Guid.NewGuid(),
+                                                    Id = Guid.NewGuid(), 
                                                     BillingNo = billingNo,
                                                     BillingType = "Settlement",
                                                     DatetimeCreated = DateTime.Now,
@@ -1806,7 +1806,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                     if (edocExist.Count() == 0)
                                     {
                                         var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type == "Accountant")).FirstOrDefault();
-                                        var HBLCodes = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "HBL") && z.Type == "General")).ToList();
+                                        var HBLCodes = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "HB") && z.Type == "General")).ToList();
                                         HBLCodes.ToList().ForEach(HBLCode =>
                                         {
                                             if (checEdocType(img.Id, HBLCode.Id))
