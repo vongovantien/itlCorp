@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
-import { getTransactionDetailCsTransactionState } from '../../store';
+import { getTransactionDetailCsTransactionState } from '../../../store';
 import { IEDocFile, IEDocUploadFile, ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
 @Component({
     selector: 'files-attach-v2',

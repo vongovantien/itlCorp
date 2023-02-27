@@ -11,7 +11,7 @@ import { getAdvanceDetailRequestState } from 'src/app/business-modules/accountin
 import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getSOADetailState } from 'src/app/business-modules/accounting/statement-of-account/store/reducers';
 import { PopupBase } from 'src/app/popup.base';
-import { getTransactionLocked, getTransactionPermission } from '../../store';
+import { getTransactionLocked, getTransactionPermission } from '../../../store';
 @Component({
     selector: 'document-type-attach',
     templateUrl: './document-type-attach.component.html',
