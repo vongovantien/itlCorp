@@ -665,33 +665,15 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     if(dateOps.Count() > 0)
                     {
-                        foreach (var itemDate in dateOps)
-                        {
-                            if(itemDate.Id == item.Id)
-                            {
-                                item.ServiceDate = itemDate.ServiceDate;
-                            }
-                        }
+                        item.ServiceDate = dateOps.Find(x => x.Id == item.Id).ServiceDate;
                     }
                     if (dateAdvance.Count() > 0)
                     {
-                        foreach (var itemDate in dateAdvance)
-                        {
-                            if (itemDate.Id == item.Id)
-                            {
-                                item.ServiceDate = itemDate.ServiceDate;
-                            }
-                        }
+                        item.ServiceDate = dateAdvance.Find(x => x.Id == item.Id).ServiceDate;
                     }
                     if (dateSett.Count() > 0)
                     {
-                        foreach (var itemDate in dateSett)
-                        {
-                            if (itemDate.Id == item.Id)
-                            {
-                                item.ServiceDate = itemDate.ServiceDate;
-                            }
-                        }
+                        item.ServiceDate = dateSett.Find(x => x.Id == item.Id).ServiceDate;
                     }
                 }
                 detail.RequesterName = userRepo.Where(x => x.Id == unlockRequest.Requester).FirstOrDefault()?.Username;
