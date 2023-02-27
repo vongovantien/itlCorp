@@ -119,13 +119,6 @@
                                                     </td>
                                                 </ng-container>
                                                 <ng-container *ngIf="!enablePayeeINV[i]">
-                                                    <!-- <td class="">
-                                                        <div class="form-group"
-                                                            [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.payee||file.payee===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
-                                                            <input type="text" class="form-control " placeholder="Payee"
-                                                                [ngModel]="file.series" disabled>
-                                                        </div>
-                                                    </td> -->
                                                     <td class="">
                                                         <div class="form-group"
                                                             [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file.inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">

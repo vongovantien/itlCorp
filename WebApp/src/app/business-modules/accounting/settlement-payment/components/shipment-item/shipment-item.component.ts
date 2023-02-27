@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ReportPreviewComponent } from '@common';
 import { SysImage } from '@models';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
@@ -55,8 +55,9 @@ export class SettlementShipmentItemComponent {
     }
 
     showShipmentAttachFile($event: Event) {
-        this.onViewFiles.emit();
-        return false;
+        // this.onViewFiles.emit();
+        // return false;
+
     }
 }
 

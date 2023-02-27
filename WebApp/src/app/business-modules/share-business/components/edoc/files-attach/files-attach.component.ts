@@ -9,7 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
-import { getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission } from '../../store';
+import { getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission } from '../../../store';
 
 
 @Component({
@@ -97,18 +97,6 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                 this._toastService.warning("maximum file size < 100Mb");
                 return;
             }
-            // this._documentRepo.uploadFileShipment(this.jobId, false, fileList)
-            //     .pipe(catchError(this.catchError))
-            //     .subscribe(
-            //         (res: CommonInterface.IResult) => {
-            //             if (res.status) {
-            //                 this._toastService.success("Upload file successfully!");
-            //                 if (!!this.jobId) {
-            //                     this.getFileShipment(this.jobId);
-            //                 }
-            //             }
-            //         }
-            //     );
             this._systemFileManagerRepo.uploadFile('Document', 'Shipment', this.jobId, fileList)
                 .pipe(catchError(this.catchError))
                 .subscribe(

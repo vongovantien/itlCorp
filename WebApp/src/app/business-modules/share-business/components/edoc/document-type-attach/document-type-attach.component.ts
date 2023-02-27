@@ -21,7 +21,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() jobNo: string = '';
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
     @Input() housebills: any[] = [];
-    //@Input() jobs: any[] = [];
     @Input() billingId: string = '';
     @Input() billingNo: string = '';
     @Input() jobId: string = '';
@@ -50,8 +49,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     enablePayeeINV: boolean[] = [];
     payFirst: boolean[] = [];
     payFilled: boolean = true;
-    //clearINV: boolean[] = [];
-    //: boolean[] = [];
 
     constructor(
         private _toastService: ToastrService,
@@ -108,10 +105,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             this.configDocType.dataSource = this.documentTypes
             console.log(this.documentTypes);
         }
-        // else {
-        //     this.getDocType(true);
-        // }
-
     }
 
     getDocType(isADV: boolean) {
@@ -129,11 +122,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
                         }
                     }
-                    // else {
-                    //     console.log(res);
-                    //     this.documentTypes = res;
-                    //     this.configDocType.dataSource = res;
-                    // }
                 },
             );
     }
@@ -469,7 +457,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     removePayee(index: number) {
-        //this.clearINV[index] = !!this.clearINV[index] ? !this.clearINV[index] : true;
         this.removeINV(index);
     }
 
@@ -482,7 +469,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile[index].aliasName = null;
         this.payFirst[index] = false;
         this.listFile[index].payee = null;
-        //this.clearPayee[index] = !!this.clearPayee[index] ? !this.clearPayee[index] : true;
     }
 
     removeDocType(index: number) {

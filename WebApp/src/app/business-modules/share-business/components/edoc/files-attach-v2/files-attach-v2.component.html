@@ -76,8 +76,7 @@
                                                 <span>{{doc.systemFileName}} </span>
                                             </td>
                                             <td>
-                                                <a class="text-underline htmlLink"
-                                                    (click)="viewEdocFromName(doc)"
+                                                <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
                                                     download>{{doc.userFileName}}
                                                     <icon-file [url]="doc.imageUrl"></icon-file>
                                                 </a>
@@ -85,9 +84,6 @@
                                             <td>
                                                 <span>{{doc.hblNo}}</span>
                                             </td>
-                                            <!-- <td>
-                                                <span>{{doc.source}}</span>
-                                            </td> -->
                                             <td>
                                                 <span>{{doc.note}}</span>
                                             </td>
@@ -116,11 +112,6 @@
         <div class="m-portlet__head pointer">
             <div class="m-portlet__head-caption">
                 <div class="m-portlet__head-title w-100">
-                    <!-- <h3 class="m-portlet__head-text btn-toggle-collapse collapse-toggle" data-toggle="collapse"
-                        [attr.data-target]="'#accountingFile'" aria-expanded="true">
-                        <i class="la la-minus m--margin-right-5"></i>
-                        Accounting File
-                    </h3> -->
                     <div class="row">
                         <div class="col-3">
                             <h3 class="m-portlet__head-text btn-toggle-collapse collapse-toggle" data-toggle="collapse"
@@ -132,17 +123,6 @@
                         <div class="col-9">
                             <div class="row">
                                 <div class="col-6">
-                                    <!-- <div class="m-form m-form--state" [formGroup]="formSearch">
-                                        <div class="input-group m-input m-input--square-group m-input-icon">
-                                            <input type="text" class="form-control" formControlName="aliasSearch"
-                                                placeholder="Enter Alias Name">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-primary" title="Search" (click)="searchBAlias()">
-                                                    <i class="la la-search"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div> -->
                                     <div class="form-group">
                                         <div class="m-input-icon m-input-icon--right">
                                             <input type="text" class="form-control m-input m-input--square"
@@ -156,18 +136,6 @@
                                     </div>
                                 </div>
                                 <div class="col-6 c-button-actions" *ngIf="(typeFrom !== 'Shipment' && !readonly)">
-                                    <!-- <div class="form-group float-right">
-                                        <button type="button"
-                                            class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
-                                            (click)="showDocumentAttach()">
-                                            <span>
-                                                <i class="la la-download"></i>
-                                                <span>
-                                                    Attach Files
-                                                </span>
-                                            </span>
-                                        </button>
-                                    </div> -->
                                     <div class="form-group float-right">
                                         <button type="button"
                                             class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10"
@@ -203,30 +171,11 @@
                                             <a class="dropdown-item pointer" (click)="genFileToSM('INV')">
                                                 <span>Get Files Invoice</span>
                                             </a>
-                                            <!-- <a class="dropdown-item pointer" (click)="genFileSOAToSM()">
-                                                    <span>Get Files SOA</span>
-                                                </a> -->
                                         </app-dropdown>
-                                        <!-- <div class="btn-group" [autoClose]="!isClickSubMenu" dropdown container="body">
-                                                <app-permission-button type="export" title="Get Files" [dpToggle]="dropdownMenu" position="bottomLeft"
-                                                    mode="dropdown">
-                                                </app-permission-button>
-                                            </div> -->
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- <div class="c-button-actions" *ngIf="(typeFrom ==='Settlement' && !readonly)">
-                        <div class="form-group float-right">
-                            <button type="button" class="btn btn-primary m-btn--icon m-btn--uppercase" (click)="getFilesAdvance()">
-                                <span>
-                                    <i class="la la-download"></i>
-                                    <span> Get Files Advance</span>
-                                </span>
-                            </button>
-                        </div>
-                    </div> -->
                     </div>
                 </div>
             </div>
@@ -271,14 +220,10 @@
                                                     <span>{{doc.systemFileName}} </span>
                                                 </td>
                                                 <td>
-                                                    <!-- <a class="text-underline" [href]="doc.imageUrl"
-                                                        target="_blank">{{doc.userFileName}}
-                                                        <icon-file [url]="doc.userFileName"></icon-file>
-                                                    </a> -->
                                                     <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
-                                                    download>{{doc.userFileName}}
-                                                    <icon-file [url]="doc.imageUrl"></icon-file>
-                                                </a>
+                                                        download>{{doc.userFileName}}
+                                                        <icon-file [url]="doc.imageUrl"></icon-file>
+                                                    </a>
                                                 </td>
                                                 <td>
                                                     <span>{{doc.hblNo}}</span>
@@ -286,9 +231,6 @@
                                                 <td>
                                                     <span>{{doc.billingNo}}</span>
                                                 </td>
-                                                <!-- <td>
-                                                    <span>{{doc.source}}</span>
-                                                </td> -->
                                                 <td>
                                                     <span>{{doc.note}}</span>
                                                 </td>
@@ -329,21 +271,16 @@
                                 </th>
                             </thead>
                             <tbody>
-                                <!-- <ng-container *ngFor="let doc of edocByAcc.eDocs; let i = index; trackBy: trackByFn"> -->
                                 <ng-container
                                     *ngFor="let doc of edocByAcc.eDocs| filter: keyword: ['systemFileName','jobNo']; let i = index; trackBy: trackByFn">
                                     <tr [contextMenu]="edocAccountantContext" (onTouch)="onSelectEDoc(doc)"
                                         [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
                                         <td>{{i + 1}}</td>
                                         <td>
-                                            <!-- <a class="text-underline" [href]="doc.imageUrl" target="_blank"
-                                                download>{{doc.systemFileName}}
-                                                <icon-file [url]="doc.userFileName"></icon-file>
-                                            </a> -->
                                             <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
-                                            download>{{doc.systemFileName}}
-                                            <icon-file [url]="doc.imageUrl"></icon-file>
-                                        </a>
+                                                download>{{doc.systemFileName}}
+                                                <icon-file [url]="doc.imageUrl"></icon-file>
+                                            </a>
                                         </td>
                                         <td
                                             *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">
@@ -355,10 +292,6 @@
                                         <td *ngIf="typeFrom!=='Settlement'&&typeFrom!=='Advance'&&typeFrom!=='SOA'">
                                             <span>{{doc.hblNo}}</span>
                                         </td>
-                                        <!-- <td
-                                            *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">
-                                            <span>{{doc.jobNo}}</span>
-                                        </td> -->
                                         <td>
                                             <span>{{doc.note}}</span>
                                         </td>

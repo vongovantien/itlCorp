@@ -6,7 +6,7 @@ import { SystemConstants } from '@constants';
 import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
-import { AccountingRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
@@ -42,12 +42,10 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     jobId: string = '';
     isOps: boolean = false;
     edocByJob: any[] = [];
-    //edocByAcc: any[] = [];
     selectedEdoc: IEDocItem;
     selectedEdoc1: IEDocItem;
     transactionType: string = '';
     housebills: any[] = [];
-    //jobs: any[] = [];
     modifiedDocTypes: any;
     jobNo: string = '';
     private _readonly: boolean = false;
@@ -70,13 +68,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Attach Person', field: 'userCreated', sortable: true },
     ];
 
-    // headersAcc: CommonInterface.IHeaderTable[] = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
-    // { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
-    // { title: 'Job No', field: 'jobNo' },
-    // { title: 'Note', field: 'note' },
-    // { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
-    // { title: 'Attach Person', field: 'userCreated', sortable: true },
-    // ];
     headersAcc: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
         { title: 'Job No', field: 'jobNo' },
@@ -123,7 +114,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         private readonly _toast: ToastrService,
         private readonly _exportRepo: ExportRepo,
         private readonly _sortService: SortService,
-        private readonly _accoutingRepo: AccountingRepo,
         private _documentationRepo: DocumentationRepo,
     ) {
         super();
@@ -217,15 +207,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         console.log(this.selectedEdoc);
     }
 
-    // downloadEdocFromName(doc: any) {
-    //     this.selectedEdoc = Object.assign({}, this.selectedEdoc);
-    //     this.selectedEdoc.sysImageId = doc.sysImageId;
-    //     this.selectedEdoc.imageUrl = doc.imageUrl;
-    //     this.selectedEdoc.systemFileName = doc.ssystemFileName;
-    //     console.log(doc);
-    //     this.downloadEdoc();
-    // }
-
     downloadEdoc() {
         const selectedEdoc = Object.assign({}, this.selectedEdoc);
         if (selectedEdoc.id === selectedEdoc.sysImageId) {
@@ -266,8 +247,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             id: this.selectedEdoc.id,
             docType: docType,
             note: this.selectedEdoc.note,
-            hwbNo: hwbNo,//hblNo
-            hblid: this.selectedEdoc.hblid,//hblNo
+            hwbNo: hwbNo,
+            hblid: this.selectedEdoc.hblid,
             jobNo: this.selectedEdoc.jobNo,
             jobId: this.selectedEdoc.jobId,
             Code: docType?.code,
@@ -383,8 +364,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     viewEdocFromName(edoc: any) {
-        // this.selectedEdoc = Object.assign({}, this.selectedEdoc);
-        // this.selectedEdoc.imageUrl = edoc.imageUrl;
         console.log(edoc);
 
         this.selectedEdoc = edoc;
@@ -430,11 +409,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 
     downloadAllEdoc() {
-        console.log(this.isEdocByAcc);
-
-        // let countEdocJob = _some(this.edocByJob, x => (x.eDocs !== null && x.eDocs?.length > 0));
-        // let countEdocAcc = _some(this.edocByAcc, x => (x.eDocs !== null && x.eDocs?.length > 0));
-        //console.log(this.edocByJob);
         console.log(this.edocByAcc);
         if (this.typeFrom === 'Shipment') {
             if (!this.edocByJob?.some(x => x.eDocs?.length > 0)) {
