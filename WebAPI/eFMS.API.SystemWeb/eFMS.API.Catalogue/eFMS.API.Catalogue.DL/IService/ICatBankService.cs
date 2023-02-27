@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
-    public interface ICatBankService: IRepositoryBaseCache<CatBank,CatBankModel>
+    public interface ICatBankService : IRepositoryBaseCache<CatBank, CatBankModel>
     {
         IQueryable<CatBankModel> GetAll();
         IQueryable<CatBankModel> Paging(CatBankCriteria criteria, int pageNumber, int pageSize, out int rowsCount);
@@ -21,5 +21,6 @@ namespace eFMS.API.Catalogue.DL.IService
         List<CatBankImportModel> CheckValidImport(List<CatBankImportModel> list);
         HandleState Import(List<CatBankImportModel> data);
         Task<IQueryable<CatBankModel>> GetBankByPartnerId(Guid id);
+        Task<HandleState> UpdateBankInfoSyncStatus(BankStatusUpdateModel model);
     }
 }

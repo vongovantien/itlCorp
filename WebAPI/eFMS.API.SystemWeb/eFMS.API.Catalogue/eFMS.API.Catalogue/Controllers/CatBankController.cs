@@ -1,23 +1,23 @@
-﻿using eFMS.API.Catalogue.DL.IService;
+﻿using eFMS.API.Catalogue.DL.Common;
+using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Criteria;
+using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
-using System.Linq;
-using eFMS.IdentityServer.DL.UserManager;
-using eFMS.API.Catalogue.Infrastructure.Middlewares;
-using eFMS.API.Common.Infrastructure.Common;
-using System;
-using System.Threading.Tasks;
-using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Infrastructure.Common;
+using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
+using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -116,7 +116,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatBankModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            if(model.PartnerId == null)
+            if (model.PartnerId == null)
             {
                 var checkExistMessage = CheckExist(string.Empty, model);
                 if (checkExistMessage.Length > 0)
@@ -154,8 +154,8 @@ namespace eFMS.API.Catalogue.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
                 }
             }
-     
-           
+
+
             var hs = catBankService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -206,7 +206,7 @@ namespace eFMS.API.Catalogue.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
             }
@@ -282,6 +282,109 @@ namespace eFMS.API.Catalogue.Controllers
             var data = await catBankService.GetBankByPartnerId(id);
             return Ok(data);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("BankInfoSyncUpdateStatus")]
+        [Authorize]
+        public async Task<IActionResult> UpdateBankInfoSyncStatus(BankStatusUpdateModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var hs = await catBankService.UpdateBankInfoSyncStatus(model);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model.BankInfo };
+            return Ok(result);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut("SyncVoucherToAccountantSystem")]
+        [Authorize]
+        //public async Task<IActionResult> SyncBankAccountToAccountantSystem(List<RequestGuidListModel> request)
+        //{
+        //    var _startDateProgress = DateTime.Now;
+        //    if (!ModelState.IsValid) return BadRequest();
+
+        //    try
+        //    {
+        //        // 1. Login
+        //        HttpResponseMessage responseFromApi = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api/Login", loginInfo, null);
+        //        BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
+
+        //        if (loginResponse.Success == "1")
+        //        {
+        //            // 2. Get Data To Sync.
+        //            List<Guid> Ids = request.Select(x => x.Id).ToList();
+
+        //            List<Guid> IdsAdd = request.Where(action => action.Action == ACTION.ADD).Select(x => x.Id).ToList();
+        //            List<Guid> IdsUpdate = request.Where(action => action.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
+
+        //            List<BravoVoucherModel> listAdd = (IdsAdd.Count > 0) ? accountingService.GetListVoucherToSyncBravo(IdsAdd) : new List<BravoVoucherModel>();
+        //            List<BravoVoucherModel> listUpdate = (IdsUpdate.Count > 0) ? accountingService.GetListVoucherToSyncBravo(IdsUpdate) : new List<BravoVoucherModel>();
+
+        //            HttpResponseMessage resAdd = new HttpResponseMessage();
+        //            HttpResponseMessage resUpdate = new HttpResponseMessage();
+        //            BravoResponseModel responseAddModel = new BravoResponseModel();
+        //            BravoResponseModel responseUpdateModel = new BravoResponseModel();
+
+        //            // 3. Call Bravo to SYNC.
+        //            if (listAdd.Count > 0)
+        //            {
+        //                resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Catalogue/api?func=EFMSBankInfoSyncAdd ", listAdd, loginResponse.TokenKey);
+        //                responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+        //            }
+
+        //            if (listUpdate.Count > 0)
+        //            {
+        //                resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Catalogue/api?func=EFMSBankInfoSyncUpdate ", listUpdate, loginResponse.TokenKey);
+        //                responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
+
+        //                #region -- Ghi Log --
+        //                var modelLog = new SysActionFuncLogModel
+        //                {
+        //                    FuncLocal = "SyncVoucherToAccountantSystem",
+        //                    FuncPartner = "EFMSVoucherDataSyncUpdate",
+        //                    ObjectRequest = JsonConvert.SerializeObject(listUpdate),
+        //                    ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
+        //                    Major = "Nghiệp Vụ Chi Phí",
+        //                    StartDateProgress = _startDateProgress,
+        //                    EndDateProgress = DateTime.Now
+        //                };
+        //                var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+        //                #endregion
+        //            }
+
+        //            // 4. Update STATUS
+        //            if (responseAddModel.Success == "1" || responseUpdateModel.Success == "1")
+        //            {
+        //                HandleState hs = accountingService.SyncListVoucherToBravo(Ids, out Ids);
+        //                string message = HandleError.GetMessage(hs, Crud.Update);
+        //                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Ids };
+        //                if (!hs.Success)
+        //                {
+        //                    return BadRequest(result);
+        //                }
+        //                return Ok(result);
+        //            }
+        //            return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
+        //        }
+        //        new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
+        //        return BadRequest(new ResultHandle { Message = "Sync fail" });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        new LogHelper("eFMS_SYNC_LOG", ex.ToString());
+        //        return BadRequest(new ResultHandle { Message = "Sync fail" });
+        //    }
+        //}
 
         private string CheckExist(string id, CatBankModel model)
         {

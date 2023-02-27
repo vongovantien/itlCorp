@@ -57,62 +57,122 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-6">
-                            <div class="row">
-                                <div class="col-lg-8">
-                                    <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankNameEn.valid || !bankNameEn.value)}">
-                                        <label required>Bank Name</label>
-                                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
-                                            [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
-                                            [displayFields]="displayFieldPort" (remove)="resetFormControl(bankCode)"
-                                            placeholder="Please Select Bank Name" formControlName="bankNameEn">
-                                        </app-combo-grid-virtual-scroll>
-                                        <div class="form-control-feedback" *ngIf="isSubmitted && bankNameEn.invalid">
-                                            Bank Name is required
-                                        </div>
-                                    </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankNameEn.valid || !bankNameEn.value)}">
+                                <label required>Bank Name</label>
+                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
+                                    [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
+                                    [displayFields]="displayFieldPort" (remove)="resetFormControl(bankCode)"
+                                    placeholder="Please Select Bank Name" formControlName="bankNameEn">
+                                </app-combo-grid-virtual-scroll>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && bankNameEn.invalid">
+                                    Bank Name is required
                                 </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label required>Bank Code</label>
-                                        <input disabled type="text" class="form-control" formControlName="bankCode">
-                                    </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <label>Bank Code</label>
+                                <input type="text" class="form-control" formControlName="bankCode">
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (isSubmitted || beneficiaryAddress.dirty)  && !beneficiaryAddress.valid}">
+                                <label required>Beneficiary Address</label>
+                                <input type="text" class="form-control" formControlName="beneficiaryAddress">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && beneficiaryAddress.invalid">
+                                    Beneficiary address is required
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-12">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Note</label>
-                                <textarea class="form-control" cols="30" rows="10" formControlName="note"></textarea>
+                                <textarea class="form-control" cols="30" rows="5" formControlName="note"></textarea>
                             </div>
                         </div>
-                    </div>
-                    <div class="row" *ngIf="isUpdate && !!bankDetail">
-                        <div class="col-6">
-                            <div class="m--align-left">
-                                Created: {{bankDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
-                                &nbsp;
-                                By <span class="text-success">{{bankDetail.userCreatedName}}</span>
+                        <div class="col-md-3">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': (isSubmitted || approvalStatus.dirty)  && !approvalStatus.valid}">
+                                <label>Approval Status</label>
+                                <input type="text" class="form-control" formControlName="approvalStatus">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && approvalStatus.invalid">
+                                    Approval status is required
+                                </div>
                             </div>
                         </div>
-                        <div class="col-6">
-                            <div class="m--align-left">
-                                Modified: {{bankDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
-                                &nbsp;
-                                By <span class="text-success">{{bankDetail.userModifiedName}}</span>
+                        <div class="col-lg-3">
+                            <label></label>
+                            <label></label>
+                            <label></label>
+                            <div class="form-group">
+                                <input style="display:none" type="file" #file (change)="handleFileInput($event)">
+                                <button style="margin-top:5px;" (click)="file.click()" type="button"
+                                    class="btn btn-success  m-btn--icon m-btn--uppercase margin-right-10">
+                                    <span>
+                                        <i class="la la-plus"></i>
+                                        <span>
+                                            Update Files
+                                        </span>
+                                    </span>
+                                </button>
+                                <span class="text-primary">
+                                    {{ !!fileList ? fileList[0].name : null}}
+                                </span>
+                                <br /><br />
+                                <ng-container *ngIf="!isLoading && !!files">
+                                    <li *ngFor="let file of files"><a [href]="file.url" target="_blank"
+                                            [title]="file.name" download>{{file.name}}</a>
+                                        <span class="pointer text-center" *ngIf="!readonly">
+                                            <a title="Delete" (click)="deleteFilePOD(file.name)">
+                                                <i class="la la-times fa-lg text-danger"></i>
+                                            </a>
+                                        </span>
+                                    </li>
+                                </ng-container>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
+            <div class="row" *ngIf="isUpdate && !!bankDetail">
+                <div class="col-6">
+                    <div class="m--align-left">
+                        Created: {{bankDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                        &nbsp;
+                        By <span class="text-success">{{bankDetail.userCreatedName}}</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="m--align-left">
+                        Modified: {{bankDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                        &nbsp;
+                        By <span class="text-success">{{bankDetail.userModifiedName}}</span>
+                    </div>
+                </div>
+            </div>
             <div class="modal-footer m--align-center">
-                <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onSubmit()">
+                <button
+                    *ngIf="bankDetail?.approvalStatus !== 'Processing' && bankDetail?.approvalStatus !== 'Approved'"
+                    class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onSubmit()">
                     <span>
-                        <i class="la la-save"></i>
-                        <span> Save </span>
+                        <i class="la la-download"></i>
+                        <span>
+                            Request Approved
+                        </span>
+                    </span>
+                </button>
+                <button *ngIf="bankDetail?.approvalStatus === 'Approved'"
+                    class="btn btn-info  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onSubmit()">
+                    <span>
+                        <i class="la la-refresh"></i>
+                        <span>
+                            Revise Info
+                        </span>
                     </span>
                 </button>
                 <app-default-button [buttonSetting]="cancelButtonSetting" (click)="close()"></app-default-button>

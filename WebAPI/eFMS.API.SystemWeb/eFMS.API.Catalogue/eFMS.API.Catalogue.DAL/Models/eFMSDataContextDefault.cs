@@ -123,6 +123,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Active).HasDefaultValueSql("('(1)')");
 
+                entity.Property(e => e.ApproveDescription).HasMaxLength(200);
+
+                entity.Property(e => e.ApproveStatus).HasMaxLength(50);
+
                 entity.Property(e => e.BankAccountName).HasMaxLength(500);
 
                 entity.Property(e => e.BankAccountNo).HasMaxLength(50);
@@ -140,6 +144,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsRequired()
                     .HasColumnName("BankName_VN")
                     .HasMaxLength(250);
+
+                entity.Property(e => e.BeneficiaryAddress).HasMaxLength(500);
 
                 entity.Property(e => e.Code)
                     .IsRequired()
@@ -2037,6 +2043,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.SubColoader).HasMaxLength(800);
 
+                entity.Property(e => e.TrackingStatus).HasMaxLength(50);
+
                 entity.Property(e => e.TransactionType)
                     .IsRequired()
                     .HasMaxLength(50)
@@ -3149,6 +3157,10 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.ObjectId)
                     .HasColumnName("ObjectID")
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SyncStatus)
+                    .HasMaxLength(10)
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);

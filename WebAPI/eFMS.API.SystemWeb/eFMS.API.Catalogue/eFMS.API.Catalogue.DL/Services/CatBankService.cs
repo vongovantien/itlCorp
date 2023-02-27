@@ -25,18 +25,21 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IMapper mapper;
+        private readonly IContextBase<CatPartner> catPartnerRepository;
 
         public CatBankService(IContextBase<CatBank> repository,
             ICacheServiceBase<CatBank> cacheService,
             IMapper imapper,
             IContextBase<SysUser> sysUserRepo,
             IStringLocalizer<LanguageSub> localizer,
+            IContextBase<CatPartner> catPartnerRepo,
         ICurrentUser currUser) : base(repository, cacheService, imapper)
         {
             currentUser = currUser;
             sysUserRepository = sysUserRepo;
             stringLocalizer = localizer;
             mapper = imapper;
+            catPartnerRepository = catPartnerRepo;
         }
 
         #region CRUD
@@ -299,7 +302,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public async Task<IQueryable<CatBankModel>> GetBankByPartnerId(Guid id)
         {
-            var data = await DataContext.WhereAsync(x => x.PartnerId == id);
+            var data = await DataContext.WhereAsync(x => x.PartnerId == id && x.ApproveStatus == DataEnums.BANK_APPROVED);
             if (data.Count() == 0)
             {
                 return Enumerable.Empty<CatBankModel>().AsQueryable();
@@ -328,6 +331,34 @@ namespace eFMS.API.Catalogue.DL.Services
             });
 
             return result.AsQueryable();
+        }
+
+        public async Task<HandleState> UpdateBankInfoSyncStatus(BankStatusUpdateModel model)
+        {
+            try
+            {
+                var hs = new HandleState();
+                var partner = await catPartnerRepository.WhereAsync(x => x.AccountNo.Contains(model.PartnerCode));
+                if (partner != null)
+                {
+                    //var listBank = await DataContext.WhereAsync(x => x.PartnerId.ToString() == partner.Id);
+                    //foreach (var item in model.BankInfo)
+                    //{
+                    //    var updateItem = listBank.FirstOrDefault(x => x.BankAccountNo == item.BankAccountno);
+                    //    updateItem.ApproveDescription = item.Description;
+                    //    updateItem.ApproveStatus = item.ApproveStatus;
+                    //    hs = await DataContext.UpdateAsync(updateItem, x => x.Id == updateItem.Id);
+                    //}
+                    return hs;
+                }
+
+                return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

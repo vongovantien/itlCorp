@@ -1,17 +1,18 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, FormGroupDirective } from '@angular/forms';
-import { Bank } from '@models';
+import { Bank, Partner } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
-import { CatalogueRepo, SystemRepo } from '@repositories';
+import { CatalogueRepo, SystemRepo, SystemFileManageRepo } from '@repositories';
 import { GetCatalogueBankAction, getCatalogueBankState } from '@store';
 import { FormValidators } from '@validators';
 import _cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, finalize } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
+import { SysImage } from './../../../../shared/models/system/sysimage';
 
 @Component({
     selector: 'popup-form-bank-commercial-catalogue',
@@ -29,6 +30,8 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     bankNameEn: AbstractControl;
     bankCode: AbstractControl;
     note: AbstractControl;
+    beneficiaryAddress: AbstractControl;
+    approvalStatus: AbstractControl;
 
     bankDetail: Bank;
 
@@ -37,12 +40,16 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     partnerId: string = '';
     bankId: any = null;
     isUpdate: boolean = false;
+    files: any = [];
+    fileList: any = null;
+
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Bank Code' },
         { field: 'bankNameEn', label: 'Bank Name EN' },
     ];
 
-    constructor(private _systemRepo: SystemRepo,
+    constructor(
+        private _systemFileManagementRepo: SystemFileManageRepo,
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
@@ -58,16 +65,36 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         this.banks = this._store.select(getCatalogueBankState);
     }
 
+    // ngAfterViewInit(): void {
+    //     this._store.select(get)
+    //         .pipe(takeUntil(this.ngUnsubscribe))
+    //         .subscribe(
+    //             (res: any) => {
+    //                 if (!!res) {
+    //                     this.setFormValue(res.opstransaction)
+    //                 }
+    //             }
+    //         );
+
+    //     this.cdRef.detectChanges();
+    // }
+
+    setFormValue(data: Partner) {
+        //this.beneficiaryAddress.setValue()
+    }
+
     initForm() {
         this.formGroup = this._fb.group({
             bankAccountNo: [null, FormValidators.required],
             bankAccountName: [null, FormValidators.required],
             bankAddress: [null, FormValidators.required],
             bankNameEn: [null, FormValidators.required],
-            bankCode: [null, FormValidators.required],
+            bankCode: [{ value: null, disabled: true }, FormValidators.required],
             swiftCode: [null],
             note: [null],
-            bankId: [null]
+            bankId: [null],
+            beneficiaryAddress: [null, FormValidators.required],
+            approvalStatus: [{ value: null, disabled: true }]
         });
 
         this.bankAccountNo = this.formGroup.controls['bankAccountNo'];
@@ -77,6 +104,8 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         this.bankNameEn = this.formGroup.controls['bankNameEn'];
         this.bankCode = this.formGroup.controls['bankCode'];
         this.note = this.formGroup.controls['note'];
+        this.beneficiaryAddress = this.formGroup.controls['beneficiaryAddress']
+        this.approvalStatus = this.formGroup.controls['approvalStatus']
     }
 
     getFormData() {
@@ -103,7 +132,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         control.setValue(null);
     }
 
-
     onSelectDataFormInfo(data: any) {
         if (data) {
             this.bankNameEn.setValue(data.bankNameEn);
@@ -129,7 +157,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         this.formGroup.patchValue(_merge(_cloneDeep(data), formValue));
     }
 
-    onSubmit() {
+    onSubmitBankInfo() {
         const mergeObj = this.getFormData();
         if (this.formGroup.valid) {
             if (!!this.partnerId) {
@@ -176,5 +204,40 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     close() {
         this.hide();
         this.isSubmitted = false;
+    }
+
+    getBankInfoFiles(jobId: string) {
+        this.isLoading = true;
+        this._systemFileManagementRepo.getFile('Document', 'Bank', jobId).
+            pipe(catchError(this.catchError), finalize(() => {
+                this._progressRef.complete();
+                this.isLoading = false;
+            }))
+            .subscribe(
+                (res: SysImage[] = []) => {
+                    this.files = res;
+                    this.files.forEach(f => f.extension = f.name.split("/").pop().split('.').pop());
+                }
+            );
+    }
+
+    handleBankInfoFileUpload(event: any){
+        const fileList: FileList[] = event.target['files'];
+        if (fileList.length > 0) {
+            this._progressRef.start();
+            this._systemFileManagementRepo.uploadAttachedFileEdoc('Document', 'Bank', this.bankId, fileList)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success("Upload file successfully!");
+                            if (!!this.bankId) {
+                                this.getBankInfoFiles(this.bankId);
+                            }
+                        }
+                    }
+                );
+        }
+        event.target.value = '';
     }
 }
