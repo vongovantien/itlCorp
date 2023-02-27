@@ -1628,6 +1628,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 catch (Exception ex)
                 {
+                    new LogHelper("SyncListCdNoteToAccountantERROR", ex.ToString() + " ");
                     return new HandleState((object)ex.Message);
                 }
             }
@@ -1684,6 +1685,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 catch (Exception ex)
                 {
+                    new LogHelper("SyncListSoaToAccountantERROR", ex.ToString() + " ");
                     return new HandleState((object)ex.Message);
                 }
                 finally
