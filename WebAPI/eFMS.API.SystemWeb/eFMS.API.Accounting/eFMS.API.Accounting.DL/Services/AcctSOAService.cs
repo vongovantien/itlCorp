@@ -383,7 +383,11 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return new ResultHandle() { Status = false, Message = "Soa have issued combine billing: " + soa.CombineBillingNo + ". Please remove Soa from combine billing before delete Soa." };
             }
-
+            var surchargesSOA = csShipmentSurchargeRepo.Get(x => (soa.Type == "Debit" ? x.Soano : x.PaySoano) == soa.Soano);
+            if(surchargesSOA.Any(x => x.SyncedFrom == "SOA" || x.PaySyncedFrom == "SOA"))
+            {
+                return new ResultHandle() { Status = false, Message = "SOA have synced to accounting system, You cannot delete SOA" };
+            }
             var surcharges = new List<CsShipmentSurcharge>();
 
             //Clear Charge of SOA
