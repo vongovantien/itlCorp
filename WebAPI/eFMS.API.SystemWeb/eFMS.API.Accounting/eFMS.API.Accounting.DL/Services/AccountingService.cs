@@ -13,6 +13,7 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1624,6 +1625,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     var sm = cdNoteRepository.SubmitChanges();
+                    new LogHelper("SyncListCdNoteToAccountant", JsonConvert.SerializeObject(sm));
                     return sm;
                 }
                 catch (Exception ex)
@@ -1681,6 +1683,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
                     }
                     var sm = soaRepository.SubmitChanges();
+                    new LogHelper("SyncListSoaToAccountant", JsonConvert.SerializeObject(sm));
                     return sm;
                 }
                 catch (Exception ex)
@@ -3411,6 +3414,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var hsReceiptSync = AddOrUpdateReceiptSync(receiptSyncs);
 
                     trans.Commit();
+
+                    new LogHelper("SyncListReceiptToAccountant", "ReceitState: " + JsonConvert.SerializeObject(sm) + "\n " + "ReceiptSyncState: " + JsonConvert.SerializeObject(hsReceiptSync));
                     return sm;
                 }
                 catch (Exception ex)
