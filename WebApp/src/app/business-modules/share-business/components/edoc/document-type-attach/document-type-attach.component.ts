@@ -450,7 +450,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                                 this.hide();
                                 this.onSearch.emit(this.transactionType);
                                 this.isSubmitted = false;
-                                this._store.dispatch(UpdateListEdocSettle({ data: true }));
+                                //this._store.dispatch(UpdateListEdocSettle({ data: true }));
                             }
                         }
                     );

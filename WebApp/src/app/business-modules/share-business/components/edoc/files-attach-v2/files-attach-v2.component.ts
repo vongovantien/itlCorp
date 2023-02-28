@@ -9,7 +9,7 @@ import { SortService } from '@services';
 import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
-import { getEdocLoadingState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { UpdateListEdocSettle, getEdocLoadingState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../../store';
 import { IEDocFile, IEDocUploadFile, ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
@@ -166,6 +166,7 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             .subscribe(
                 (res) => {
                     this.getEDoc(this.transactionType);
+                    this._store.dispatch(UpdateListEdocSettle({ data: false }))
                 }
             )
         this.getHblList();
