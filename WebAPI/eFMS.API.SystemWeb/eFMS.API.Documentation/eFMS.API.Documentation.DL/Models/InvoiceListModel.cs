@@ -56,5 +56,6 @@ namespace eFMS.API.Documentation.DL.Models
         public DateTime? InvDueDay { get; set; }
         public Guid? PolId { get; set; }
         public Guid? PodId { get; set; }
+        public string SettleNo { get; set; }
     }
 }

@@ -84,5 +84,6 @@ namespace eFMS.API.ReportData.Models.Accounting
         public string INVCreNo { get; set; }
         public string VatVoucher { get; set; }
         public DateTime? InvDueDay { get; set; }
+        public string SoaSmNo { get; set; }
     }
 }

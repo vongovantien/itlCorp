@@ -34,5 +34,6 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string INVCreNo { get; set; }
         public string VatVoucher { get; set; }
         public DateTime? InvDueDay { get; set; }
+        public string SoaSmNo { get; internal set; }
     }
 }
