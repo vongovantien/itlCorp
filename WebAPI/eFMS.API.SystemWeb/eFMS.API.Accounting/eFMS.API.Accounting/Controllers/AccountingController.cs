@@ -824,7 +824,8 @@ namespace eFMS.API.Accounting.Controllers
                         ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = ids };
                         if (!hs.Success)
                         {
-                            result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = ids };
+                            new LogHelper("eFMS_SYNC_LOG", hs.ToString() + " ");
+                            result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString(), Data = ids };
                             return BadRequest(result);
                         }
                         else
@@ -1024,7 +1025,8 @@ namespace eFMS.API.Accounting.Controllers
                         ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = ids };
                         if (!hs.Success)
                         {
-                            result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = ids };
+                            new LogHelper("eFMS_SYNC_LOG", result.ToString() + " ");
+                            result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString(), Data = ids };
                             return BadRequest(result);
                         }
                         else
@@ -1298,7 +1300,8 @@ namespace eFMS.API.Accounting.Controllers
                         ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = ids };
                         if (!hs.Success)
                         {
-                            result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = ids };
+                            new LogHelper("eFMS_SYNC_LOG", hs.ToString() + " ");
+                            result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString(), Data = ids };
                             return BadRequest(result);
                         }
                         return Ok(result);

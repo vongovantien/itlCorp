@@ -26,15 +26,14 @@ namespace eFMS.API.Accounting.Service.Contexts
         }
         public override int SaveChanges()
         {
-            var entities = ChangeTracker.Entries();
-            var mongoDb = MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
-            var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
-            var addedList = ChangeTrackerHelper.GetAdded(entities);
-            var deletedList = ChangeTrackerHelper.GetDeleted(entities);
-            var result = base.SaveChanges();
-
-            if (result > 0)
+            int result = -1;
+            try
             {
+                var entities = ChangeTracker.Entries();
+                var mongoDb = MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
+                var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
+                var addedList = ChangeTrackerHelper.GetAdded(entities);
+                var deletedList = ChangeTrackerHelper.GetDeleted(entities);
                 if (addedList != null)
                 {
                     ChangeTrackerHelper.InsertToMongoDb(addedList);
@@ -47,6 +46,26 @@ namespace eFMS.API.Accounting.Service.Contexts
                 {
                     ChangeTrackerHelper.InsertToMongoDb(deletedList);
                 }
+            }
+            catch (Exception ex)
+            {
+                ResponseExModel log = new ResponseExModel
+                {
+                    Code = 500,
+                    Message = ex.Message?.ToString(),
+                    Exception = ex.InnerException?.Message?.ToString(),
+                    Success = false,
+                    Source = ex.Source,
+                    Name = ex.GetType().Name,
+                    Body = null,
+                    Path = null,
+                };
+                new LogHelper("SaveChangesError", JsonConvert.SerializeObject(log));
+                throw;
+            }
+            finally
+            {
+                result = base.SaveChanges();
             }
             return result;
         }
