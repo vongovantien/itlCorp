@@ -3801,7 +3801,6 @@ namespace eFMS.API.Documentation.DL.Services
                 var trackShipment = new TrackingShipmentViewModel();
 
                 CsTransactionDetail hbl = await csTransactionDetailRepo.Where(x =>
-                CsTransactionDetail hbl = await csTransactionDetailRepo.Where(x =>
                         (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb.Contains(criteria.Mawb)) ||
                         (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno.Contains(criteria.Hawb))).FirstOrDefaultAsync();
 
@@ -3843,10 +3842,6 @@ namespace eFMS.API.Documentation.DL.Services
                                 lstTrackInfo.Add(data);
                             }
                         }
-
-                        //Cập nhật thêm thời gian tracking mới 
-                        if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)
-                        {
 
                         //Cập nhật thêm thời gian tracking mới 
                         if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)

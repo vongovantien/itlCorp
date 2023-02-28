@@ -205,12 +205,15 @@ export class DashboardComponent extends AppPage implements OnInit {
         this.shipmentType = event;
     }
 
-    getValueSearch(obj) {
+    getValueSearch(obj: any) {
+        console.log(obj)
         this.trackShipmentProgress(obj)
     }
+
     onChangeLoading(event){
         this.isSubmitted = event;
     }
+
     trackShipmentProgress(obj: any) {
         this._documentRepo.trackShipmentProgress(obj).pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(

@@ -50,7 +50,6 @@ export class FormSearchTrackingComponent extends AppForm {
     }
 
     searchTypeChange(field, event) {
-        console.log(field)
         this.searchObject.displayName = field.displayName;
         this.searchObject.field = field.fieldName;
     }
@@ -59,9 +58,11 @@ export class FormSearchTrackingComponent extends AppForm {
         this.typeShipment = type;
         this.onChangeType.emit(this.typeShipment)
     }
+
     onShowLoading(value){
         this.onChangeBackGround.emit(value)
     }
+
     onSearchValue() {
         if(!!this.searchObject.searchString){
             this.onChangeKeyWork.emit({

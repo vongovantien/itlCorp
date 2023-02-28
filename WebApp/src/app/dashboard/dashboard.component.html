@@ -44,7 +44,8 @@
 
 
 <div class="m-subheader">
-    <form-search-tracking (showBg)="onChangeLoading($event)" (type)="getType($event)" (keyWord)="getValueSearch($event)"></form-search-tracking>
+    <form-search-tracking (onChangeBackGround)="onChangeLoading($event)" (onChangeType)="getType($event)"
+        (onChangeKeyWork)="getValueSearch($event)"></form-search-tracking>
 </div>
 
 <ng-container *ngIf="isSubmitted === true">
