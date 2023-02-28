@@ -3411,8 +3411,9 @@ namespace eFMS.API.Documentation.DL.Services
                              join sm in settlementData on sc.SettlementCode equals sm.SettlementNo into smGrps
                              from sm in smGrps.DefaultIfEmpty()
                              where partner.PartnerType == "Agent" && !string.IsNullOrEmpty(acc.SyncStatus) && !string.IsNullOrEmpty(acc.VoucherId)
-                             &&(sc.Type == "OBH" && (String.IsNullOrEmpty(sc.PaySyncedFrom) || sc.PaySyncedFrom != "SOA")) ||
+                             && ((sc.Type == "OBH" && (String.IsNullOrEmpty(sc.PaySyncedFrom) || sc.PaySyncedFrom != "SOA")) ||
                              sc.Type != "OBH" && (String.IsNullOrEmpty(sc.SyncedFrom) || sc.SyncedFrom != "SOA") || (sc.SyncedFrom == "SETTLEMENT" || sc.PaySyncedFrom == "SETTLEMENT")
+                             || (sc.SyncedFrom == "SETTLEMENT" || sc.PaySyncedFrom == "SETTLEMENT") && string.IsNullOrEmpty(sc.Soano) && string.IsNullOrEmpty(sc.CreditNo))
                              select new InvoiceListModel
                              {
                                  JobNo = sc.JobNo,
@@ -3595,7 +3596,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 HblId = cd.HBLId,
                 CdNote = cd.CodeNo,
-                CdNoteType = cd.Type
+                CdNoteType = cd.Type,
+                SoaNo = cd.SoaNo
             }).Select(se => new InvoiceListModel
             {
                 HBLId = se.FirstOrDefault().HBLId,
