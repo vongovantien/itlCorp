@@ -27,6 +27,10 @@
                         </div>
                     </div>
                 </div>
+                <list-file-attach *ngIf="jobOnSettle" [typeFrom]="typeFrom" [jobBase]="jobNo"
+                    [transactionType]="transactionType" [billingId]="billingId" [jobOnSettle]="jobOnSettle"
+                    [isEdocByAcc]="isEdocByAcc" [jobId]="jobId" [jobNo]="jobNo"
+                    [lstEdocExist]="lstEdocExist"></list-file-attach>
                 <div class="row">
                     <div class="col-md-12">
                         <table class="table table-brand table-editable table-fixed-err">
@@ -136,12 +140,12 @@
                                                     </div>
                                                 </td>
                                             </ng-container>
-                                            <td class="disabled" *ngIf="typeFrom==='Shipment'">
+                                            <td class="disabled" *ngIf="typeFrom==='Shipment'||jobOnSettle">
                                                 <div class="form-group ">
                                                     <input type="text" class="form-control " [ngModel]="jobNo" disabled>
                                                 </div>
                                             </td>
-                                            <td class="disabled" *ngIf="typeFrom!=='Shipment'">
+                                            <td class="disabled" *ngIf="typeFrom!=='Shipment'&&!jobOnSettle">
                                                 <div class="list-master">
                                                     <app-combo-grid-virtual-scroll [height]="150"
                                                         (itemSelected)="onSelectDataFormInfo($event,i, 'job')"

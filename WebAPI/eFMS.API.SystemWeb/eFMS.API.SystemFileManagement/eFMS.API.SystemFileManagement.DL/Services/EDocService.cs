@@ -385,7 +385,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     HBLNo = _hblNo,
                     Note = x.Note,
                     TransactionType = transactionType,
-                    DocumentCode = template.Code
+                    DocumentCode = template?.Code
                 };
                 lstImageMD.Add(imageModel);
             });

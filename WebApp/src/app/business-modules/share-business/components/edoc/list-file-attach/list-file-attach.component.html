@@ -1,1 +1,70 @@
-<h1>Helo</h1>
+<!-- * SM - SOA - ADV -->
+<ng-container *ngIf="typeFrom !== 'Shipment'">
+    <div class="m-portlet__body collapse show" id="accountingFile">
+        <div class="m-portlet__body">
+            <div class="table-wrapper table-scrollable">
+                <table class="table table-hover table-editable dataTable table-summary ">
+                    <thead app-table-header [headers]="headersAcc" (onClick)="sortEdoc(doc,i, $event.sortField)">
+                        <th class="m--w-50 first table-actions-col">
+                            No
+                        </th>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let doc of lstEdocExist.eDocs;let i = index; trackBy: trackByFn">
+                            <tr [contextMenu]="listFileContext" (onTouch)="onSelectEDoc(doc)"
+                                [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
+                                <td>{{i + 1}}</td>
+                                <td>
+                                    <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
+                                        download>{{doc.systemFileName}}
+                                        <icon-file [url]="doc.imageUrl"></icon-file>
+                                    </a>
+                                </td>
+                                <td *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">
+                                    <span>{{jobBase}}</span>
+                                </td>
+                                <td>
+                                    <span>{{doc.documentTypeName}}</span>
+                                </td>
+                                <td *ngIf="typeFrom!=='Settlement'&&typeFrom!=='Advance'&&typeFrom!=='SOA'">
+                                    <span>{{doc.hblNo}}</span>
+                                </td>
+                                <td>
+                                    <span>{{doc.note}}</span>
+                                </td>
+                                <td>
+                                    <span>
+                                        {{ doc.datetimeCreated | date:'dd/MM/yyyy HH:mm' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class=" text-success">{{doc.userCreated}}</span>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <tr *ngIf="!(lstEdocExist?.eDocs?.length)" app-table-none-record title="No files found">
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</ng-container>
+
+<app-context-menu #listFileContext (clickOutside)="selectedEdoc = null">
+    <div class="menu-context__item" *ngIf="isView===true" (click)="viewFileEdoc()">
+        <span><i class="la la-eye align-middle text-primary"></i>View</span>
+    </div>
+    <div class="menu-context__item" (click)="downloadEdoc()">
+        <span><i class="la la-download align-middle text-primary"></i>Download</span>
+    </div>
+    <!-- <div class="menu-context__item" (click)="downloadAllEdoc()">
+        <span><i class="la la-cloud align-middle text-primary"></i>Download all items</span>
+    </div> -->
+    <!-- <div class="menu-context__item {{(selectedEdoc?.userCreated === currentUser.userName && !readonly) === false ? 'disabled':''}}"
+        (click)="confirmDelete()">
+        <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
+    </div> -->
+</app-context-menu>
+
+<ng-template inject></ng-template>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { SystemFileManageRepo } from '@repositories';
@@ -8,16 +8,20 @@ import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
-import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { UpdateListEdocSettle, getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getSOADetailState } from 'src/app/business-modules/accounting/statement-of-account/store/reducers';
 import { PopupBase } from 'src/app/popup.base';
 import { getTransactionLocked, getTransactionPermission } from '../../../store';
+import { ShareBussinessListFilesAttachComponent } from '../list-file-attach/list-file-attach.component';
 @Component({
     selector: 'document-type-attach',
     templateUrl: './document-type-attach.component.html',
     styleUrls: ['./document-type-attach.component.scss']
 })
 export class ShareDocumentTypeAttachComponent extends PopupBase implements OnInit {
+
+    @ViewChild(ShareBussinessListFilesAttachComponent) listFileAttach: ShareBussinessListFilesAttachComponent;
+
     @Input() jobNo: string = '';
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
     @Input() housebills: any[] = [];
@@ -30,6 +34,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() typeFrom: string = 'Shipment';
     @Input() docTypeId: number = 0;
 
+    lstEdocExist: any[] = [];
     headers: CommonInterface.IHeaderTable[] = [];
     EdocUploadFile: IEDocUploadFile;
     listFile: any[] = [];
@@ -49,6 +54,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     enablePayeeINV: boolean[] = [];
     payFirst: boolean[] = [];
     payFilled: boolean = true;
+    jobOnSettle: boolean = false;
+    isEdocByAcc: boolean = false;
 
     constructor(
         private _toastService: ToastrService,
@@ -106,6 +113,24 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             console.log(this.documentTypes);
         }
     }
+
+    // getListEdocExist() {
+    //     this._systemFileManagerRepo.getEDocByAccountant(this.billingId, 'Settlement')
+    //         .pipe(
+    //             catchError(this.catchError),
+    //         )
+    //         .subscribe(
+    //             (res: any) => {
+    //                 let data = res;
+    //                 data.eDocs = res.eDocs.filter(x => x.jobNo === this.jobNo || x.jobNo === null);
+    //                 this.lstEdocExist = data;
+    //                 if (res?.eDocs.length > 0) {
+    //                     this.isEdocByAcc = true;
+    //                 }
+    //             },
+    //         );
+    // }
+
 
     getDocType(isADV: boolean) {
         this._systemFileManagerRepo.getDocumentType(this.transactionType)
@@ -379,7 +404,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             this.listFile.forEach(x => {
                 files.push(x);
                 edocFileList.push(({
-                    JobId: this.typeFrom === 'Shipment' ? this.jobId : x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
+                    JobId: this.typeFrom === 'Shipment' || this.jobOnSettle ? this.jobId : x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
                     Code: x.Code,
                     TransactionType: this.transactionType,
                     AliasName: x.aliasName,
@@ -425,6 +450,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                                 this.hide();
                                 this.onSearch.emit(this.transactionType);
                                 this.isSubmitted = false;
+                                this._store.dispatch(UpdateListEdocSettle({ data: true }));
                             }
                         }
                     );
@@ -442,8 +468,10 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                                 this._toastService.success("Upload file successfully!");
                                 this.resetForm();
                                 this.hide();
+                                //this.listFileAttach.getEDoc('Settlement');
                                 this.onSearch.emit(this.transactionType);
                                 this.isSubmitted = false;
+                                this._store.dispatch(UpdateListEdocSettle({ data: true }));
                             }
                         }
                     );

@@ -272,7 +272,7 @@
                             </thead>
                             <tbody>
                                 <ng-container
-                                    *ngFor="let doc of edocByAcc.eDocs| filter: keyword: ['systemFileName','jobNo']; let i = index; trackBy: trackByFn">
+                                    *ngFor="let doc of accEdocData| filter: keyword: ['systemFileName','jobNo']; let i = index; trackBy: trackByFn">
                                     <tr [contextMenu]="edocAccountantContext" (onTouch)="onSelectEDoc(doc)"
                                         [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
                                         <td>{{i + 1}}</td>

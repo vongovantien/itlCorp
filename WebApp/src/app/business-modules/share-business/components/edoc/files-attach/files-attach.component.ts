@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
 import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
-import { DocumentationRepo, SystemFileManageRepo } from '@repositories';
+import { SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
@@ -31,7 +31,6 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
     fileNo: string;
 
     constructor(
-        private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _store: Store<IAppState>,
         private _activedRoute: ActivatedRoute,
