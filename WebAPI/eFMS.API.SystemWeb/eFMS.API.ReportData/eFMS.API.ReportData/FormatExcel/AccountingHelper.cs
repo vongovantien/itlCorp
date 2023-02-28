@@ -5292,7 +5292,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Status", item.Status);
                     listKeyData.Add("Comments", "N/A");
                     listKeyData.Add("VATVoucher", item.VatVoucher);
-
+                    listKeyData.Add("SoaSm", item.SoaSmNo);
                     excel.SetData(listKeyData);
                     rowStart++;
                 }

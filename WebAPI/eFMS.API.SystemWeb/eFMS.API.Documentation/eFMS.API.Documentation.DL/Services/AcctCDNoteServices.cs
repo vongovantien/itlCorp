@@ -3412,7 +3412,8 @@ namespace eFMS.API.Documentation.DL.Services
                              from acc in accGrps.DefaultIfEmpty()
                              join sm in settlementData on sc.SettlementCode equals sm.SettlementNo into smGrps
                              from sm in smGrps.DefaultIfEmpty()
-                             where partner.PartnerType == "Agent" && (sc.Type == "OBH" && (String.IsNullOrEmpty(sc.PaySyncedFrom) || sc.PaySyncedFrom != "SOA")) ||
+                             where partner.PartnerType == "Agent" && !string.IsNullOrEmpty(acc.SyncStatus) && !string.IsNullOrEmpty(acc.VoucherId)
+                             &&(sc.Type == "OBH" && (String.IsNullOrEmpty(sc.PaySyncedFrom) || sc.PaySyncedFrom != "SOA")) ||
                              sc.Type != "OBH" && (String.IsNullOrEmpty(sc.SyncedFrom) || sc.SyncedFrom != "SOA") || (sc.SyncedFrom == "SETTLEMENT" || sc.PaySyncedFrom == "SETTLEMENT")
                              select new InvoiceListModel
                              {
@@ -3446,7 +3447,8 @@ namespace eFMS.API.Documentation.DL.Services
                             join partner in partnerData on cd.PartnerId equals partner.Id
                             join acc in accMangData on sc.AcctManagementId equals acc.Id into accGrps
                             from acc in accGrps.DefaultIfEmpty()
-                            where partner.PartnerType == "Agent" && (String.IsNullOrEmpty(sc.SyncedFrom) || sc.SyncedFrom != "SOA")
+                            where partner.PartnerType == "Agent" && (String.IsNullOrEmpty(sc.SyncedFrom) || sc.SyncedFrom != "SOA") &&
+                            !string.IsNullOrEmpty(acc.SyncStatus) && !string.IsNullOrEmpty(acc.VoucherId)
                             select new InvoiceListModel
                             {
                                 HBLId = trans.Id == Guid.Empty ? ops.Hblid : trans.Id,
@@ -3524,6 +3526,7 @@ namespace eFMS.API.Documentation.DL.Services
                          && ((soa.Type != "Credit" && (soa.SyncedFrom == "SOA") ||
                          soa.Type == "Credit" && (soa.PaySyncedFrom == "SOA")))
                          || (string.IsNullOrEmpty(soa.SyncedFrom) || string.IsNullOrEmpty(soa.SyncedFrom))
+                         && !string.IsNullOrEmpty(acc.SyncStatus) && !string.IsNullOrEmpty(acc.VoucherId)
                          select new InvoiceListModel
                          {
                              JobNo = soa.JobNo,
@@ -3559,7 +3562,7 @@ namespace eFMS.API.Documentation.DL.Services
                              join ops in opstransactionData on sc.Hblid equals ops.Hblid into opsGrps
                              from ops in opsGrps.DefaultIfEmpty()
                              join acc in accMangData on sc.AcctManagementId equals acc.Id
-                             where part.PartnerType == "Agent"
+                             where part.PartnerType == "Agent" && !string.IsNullOrEmpty(acc.SyncStatus) && !string.IsNullOrEmpty(acc.VoucherId)
                              select new InvoiceListModel
                              {
                                  JobNo = sc.JobNo,
@@ -3581,7 +3584,8 @@ namespace eFMS.API.Documentation.DL.Services
                                  InvDueDay = acc.PaymentDueDate,
                                  VoucherIddate = sc.VoucherIddate,
                                  IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
-                                 Status = (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null ? "Issued" : "New"
+                                 Status = (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null ? "Issued" : "New",
+                                 SettleNo = sm.SettlementNo
                              };
 
             var data = new List<InvoiceListModel>();
@@ -3618,6 +3622,7 @@ namespace eFMS.API.Documentation.DL.Services
                 IssuedStatus = se.Any(y => y.IssuedStatus == "Issued Invoice") ? "Issued Invoice" : (se.Any(y => y.IssuedStatus == "Issued Voucher") ? "Issued Voucher" : "New"),
                 VoucherIddate = se.Where(x => x.VoucherIddate != null).FirstOrDefault()?.VoucherIddate,
                 Status = se.Any(x => x.Status == "Issued") ? "Issued" : "New",
+                SettleNo = se.FirstOrDefault().SettleNo,
             }).AsQueryable();
             return result;
         }
@@ -4323,7 +4328,8 @@ namespace eFMS.API.Documentation.DL.Services
                 DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
                 CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
                 VatVoucher = rs.VatVoucher,
-                InvDueDay = rs?.InvDueDay
+                InvDueDay = rs?.InvDueDay,
+                SoaSmNo = rs.SoaNo ?? rs.SettleNo
             });
 
             var res = dataTrans.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
