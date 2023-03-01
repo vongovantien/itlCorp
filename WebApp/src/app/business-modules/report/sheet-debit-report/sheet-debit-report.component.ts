@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { AppList } from "src/app/app.list";
 import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
-import { ExportRepo } from "@repositories";
+import { ExportRepo, ReportManagementRepo } from "@repositories";
 import { CommonEnum } from "@enums";
 import { catchError, finalize } from "rxjs/operators";
 import { ReportInterface } from "src/app/shared/interfaces/report-interface";
@@ -17,7 +17,8 @@ export class SheetDebitReportComponent extends AppList {
     constructor(
         private _progressService: NgProgress,
         private _toastService: ToastrService,
-        private _exportRepo: ExportRepo
+        private _exportRepo: ExportRepo,
+        private _reportRepo: ReportManagementRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -48,15 +49,15 @@ export class SheetDebitReportComponent extends AppList {
 
     exportAccountingPLSheet(data) {
         this._progressRef.start();
-        this._exportRepo.exportAccountingPLSheet(data)
+        this._reportRepo.exportAccountingPLSheet(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
-                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL,response.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    if (response.body != null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
                     }
@@ -66,14 +67,14 @@ export class SheetDebitReportComponent extends AppList {
 
     exportJobProfitAnalysis(data) {
         this._progressRef.start();
-        this._exportRepo.exportJobProfitAnalysis(data)
+        this._reportRepo.exportJobProfitAnalysis(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response != null) {
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
@@ -84,14 +85,14 @@ export class SheetDebitReportComponent extends AppList {
 
     exportSummaryOfCostsIncurred(data) {
         this._progressRef.start();
-        this._exportRepo.exportSummaryOfCostsIncurred(data)
+        this._reportRepo.exportSummaryOfCostsIncurred(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response != null) {
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
@@ -102,14 +103,14 @@ export class SheetDebitReportComponent extends AppList {
 
     exportSummaryOfRevenueIncurred(data) {
         this._progressRef.start();
-        this._exportRepo.exportSummaryOfRevenueIncurred(data)
+        this._reportRepo.exportSummaryOfRevenueIncurred(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response != null) {
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');
@@ -120,14 +121,14 @@ export class SheetDebitReportComponent extends AppList {
 
     exportSummaryOfCostsPartner(data) {
         this._progressRef.start();
-        this._exportRepo.exportCostsByPartner(data)
+        this._reportRepo.exportCostsByPartner(data)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (response: HttpResponse<any>) => {
-                    if (response!=null) {
+                    if (response != null) {
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
                         this._toastService.warning('There is no mawb data to print', '');

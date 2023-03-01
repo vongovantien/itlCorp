@@ -1,15 +1,15 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormValidators } from '@validators';
 import { takeUntil } from 'rxjs/operators';
 
 import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { CountryModel, Partner, ProviceModel } from '@models';
 import { CatalogueRepo } from '@repositories';
-import { AppForm } from 'src/app/app.form';
-
 import { Observable } from 'rxjs';
 import { catchError, finalize, shareReplay } from 'rxjs/operators';
+import { AppForm } from 'src/app/app.form';
 
 @Component({
     selector: 'form-create-commercial',
@@ -104,9 +104,9 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     initForm() {
         this.formGroup = this._fb.group({
             accountNo: [{ value: null, disabled: true }],
-            partnerNameEn: [null, Validators.required],
-            partnerNameVn: [null, Validators.required],
-            shortName: [null, Validators.required],
+            partnerNameEn: [null, FormValidators.required],
+            partnerNameVn: [null, FormValidators.required],
+            shortName: [null, FormValidators.required],
             taxCode: [null, Validators.compose([
                 Validators.maxLength(14),
                 Validators.minLength(8),
@@ -119,10 +119,11 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 Validators.minLength(3),
                 Validators.pattern(SystemConstants.CPATTERN.TAX_CODE),
             ])],
-            addressShippingEn: [null, Validators.required],
-            addressShippingVn: [null, Validators.required],
-            addressVn: [null, Validators.required],
-            addressEn: [null, Validators.required],
+            addressShippingEn: [null, FormValidators.required],
+            addressShippingVn: [null, FormValidators.required],
+            addressVn: [null, FormValidators.required],
+            addressEn: [null, FormValidators.required],
+
             zipCode: [],
             zipCodeShipping: [],
             contactPerson: [],
@@ -348,11 +349,23 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     }
 
     setValueInforCompany() {
-        this.formGroup.controls["partnerNameVn"].setValue(this.inforCompany.partnerNameVn);
-        this.formGroup.controls["partnerNameEn"].setValue(this.inforCompany.partnerNameEn);
-        this.formGroup.controls['addressVn'].setValue(this.inforCompany.addressVn);
-        this.formGroup.controls['addressEn'].setValue(this.inforCompany.addressEn);
-        this.formGroup.controls["addressShippingVn"].setValue(this.inforCompany.addressShippingVn);
-        this.formGroup.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn);
+        if (!this.formGroup.controls["partnerNameVn"].value?.trim() && !!this.inforCompany.partnerNameVn) {
+            this.formGroup.controls["partnerNameVn"].setValue(this.inforCompany.partnerNameVn)
+        }
+        if (!this.formGroup.controls["partnerNameEn"].value?.trim() && !!this.inforCompany.partnerNameEn) {
+            this.formGroup.controls["partnerNameEn"].setValue(this.inforCompany.partnerNameEn)
+        }
+        if (!this.formGroup.controls["addressVn"].value?.trim() && !!this.inforCompany.addressVn) {
+            this.formGroup.controls["addressVn"].setValue(this.inforCompany.addressVn)
+        }
+        if (!this.formGroup.controls["addressEn"].value?.trim() && !!this.inforCompany.addressEn) {
+            this.formGroup.controls["addressEn"].setValue(this.inforCompany.addressEn)
+        }
+        if (!this.formGroup.controls["addressShippingVn"].value?.trim() && !!this.inforCompany.addressShippingVn) {
+            this.formGroup.controls["addressShippingVn"].setValue(this.inforCompany.addressShippingVn)
+        }
+        if (!this.formGroup.controls["addressShippingEn"].value?.trim() && !!this.inforCompany.addressShippingEn) {
+            this.formGroup.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn)
+        }
     }
 }

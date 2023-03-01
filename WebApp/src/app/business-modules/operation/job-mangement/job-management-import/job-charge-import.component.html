@@ -186,7 +186,8 @@
                                         }}</span>
                                 </td>
                                 <td>
-                                    <span> {{item.clearanceNo}} </span>
+                                    <span *ngIf="item.clearanceNoError === null"> {{item.clearanceNo}} </span>
+                                    <span class="m--font-danger" *ngIf="item.clearanceNoError !== null">{{ item.clearanceNoError }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.partnerCodeError === null">{{ item.partnerCode }}</span>

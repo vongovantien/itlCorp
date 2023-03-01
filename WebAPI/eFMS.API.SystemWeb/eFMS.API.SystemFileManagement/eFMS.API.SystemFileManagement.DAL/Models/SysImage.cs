@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -18,5 +17,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? IsTemp { get; set; }
         public string KeyS3 { get; set; }
+        public string SyncStatus { get; set; }
     }
 }

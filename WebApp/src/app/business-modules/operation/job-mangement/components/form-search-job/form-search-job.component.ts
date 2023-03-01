@@ -190,6 +190,9 @@ export class JobManagementFormSearchComponent extends AppForm {
     }
 
     expanded() {
+        if (!this.isSearchAdv) {
+            this.isSearchAdv = true;
+        }
         if (!!this.dataSearch) {
             const advanceSearchForm = {
                 productService: this.productServices.find(p => p === this.dataSearch.productService) || null,

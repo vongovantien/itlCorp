@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
@@ -13,6 +8,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -20,6 +16,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -44,7 +45,8 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICsShipmentSurchargeService surchargeService;
         private readonly ICheckPointService checkPointService;
-
+        private readonly IEDocService _edocService;
+        private readonly IRabbitBus _busControl;
         /// <summary>
         /// 
         /// </summary>
@@ -62,6 +64,8 @@ namespace eFMS.API.Documentation.Controllers
             IOptions<ApiServiceUrl> serviceUrl,
             ICsShipmentSurchargeService surchargeshipment,
             ICheckPointService checkPoint,
+            IEDocService edocService,
+            IRabbitBus _bus,
             Menu menu = Menu.opsJobManagement) : base(curUser, menu)
         {
             stringLocalizer = localizer;
@@ -72,6 +76,8 @@ namespace eFMS.API.Documentation.Controllers
             apiServiceUrl = serviceUrl;
             surchargeService = surchargeshipment;
             checkPointService = checkPoint;
+            _edocService = edocService;
+            _busControl = _bus;
         }
 
         /// <summary>
@@ -279,7 +285,7 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(surchargeIds);
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
@@ -290,12 +296,8 @@ namespace eFMS.API.Documentation.Controllers
 
         private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
         {
-            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
-            string accessToken = Request.Headers["Authorization"].ToString();
-
-            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, accessToken);
-            var response = await resquest.Content.ReadAsAsync<HandleState>();
-            return response;
+            await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, model);
+            return new HandleState();
         }
 
         /// <summary>
@@ -325,10 +327,11 @@ namespace eFMS.API.Documentation.Controllers
             {
                 Response.OnCompleted(async () =>
                 {
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
+                    await _edocService.DeleteEdocByJobId(id);
                 });
             }
             return Ok(result);
@@ -347,7 +350,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPost("CheckAllowConvertJob")]
         [Authorize]
-        public IActionResult CheckAllowConvertJob([FromBody]List<CustomsDeclarationModel> list)
+        public IActionResult CheckAllowConvertJob([FromBody] List<CustomsDeclarationModel> list)
         {
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var result = transactionService.CheckAllowConvertJob(list);
@@ -387,7 +390,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPost("ConvertExistedClearancesToJobs")]
         [Authorize]
-        public IActionResult ConvertExistedClearancesToJobs([FromBody]List<CustomsDeclarationModel> list)
+        public IActionResult ConvertExistedClearancesToJobs([FromBody] List<CustomsDeclarationModel> list)
         {
 
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
@@ -453,7 +456,7 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
@@ -538,6 +541,27 @@ namespace eFMS.API.Documentation.Controllers
         {
             var results = transactionService.GetOutsourcingRegcognising(criteria);
             return Ok(results);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPut("SyncGoodInforToReplicateJob")]
+        public async Task<IActionResult> SyncGoodInforToReplicateJob(Guid jobId)
+        {
+            HandleState hs = await transactionService.SyncGoodInforToReplicateJob(jobId);
+
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

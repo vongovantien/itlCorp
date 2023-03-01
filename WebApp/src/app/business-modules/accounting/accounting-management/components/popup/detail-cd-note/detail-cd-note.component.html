@@ -17,9 +17,23 @@
                             <i class="la la-print"></i>Preview<span class="caret"></span>
                         </button>
                         <div class="dropdown-menu">
-                            <a class="dropdown-item pointer" (click)="previewCdNote('ORIGIN')">Preview with Original</a>
-                            <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
-                            <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('ORIGIN')">Preview with Original</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
+                            </div>
+                            <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
+                                <div class="d-flex justify-content-between ">
+                                    <a class="dropdown-item pointer">Download</a>
+                                    <div class="d-flex align-items-center m--margin-top-5">
+                                        <i class="la la-caret-right font-13"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -338,6 +352,17 @@
         </div>
     </div>
 </div>
+<app-dropdown #exportTpl>
+    <span class="dropdown-item pointer" (click)="exportItem(cdnoteDetail?.cdNote.jobId, cdnoteDetail?.cdNote.code,'PDF')">
+        PDF
+    </span>
+    <span class="dropdown-item pointer" (click)="exportItem(cdnoteDetail?.cdNote.jobId, cdnoteDetail?.cdNote.code,'EXCEL')">
+        EXCEL
+    </span>
+    <span class="dropdown-item pointer" (click)="exportItem(cdnoteDetail?.cdNote.jobId, cdnoteDetail?.cdNote.code,'WORD')">
+        WORD
+    </span>
+</app-dropdown>
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>

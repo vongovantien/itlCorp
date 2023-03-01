@@ -17,14 +17,14 @@
         <div class="e--combogrid_icon">
             <ng-container *ngIf="allowEditing;else readOnlyIconDropdownTpl">
                 <span
-                    (click)="isFocusSearch = true;dropdown.show();clickSearch(); showAngledownIcon = !showAngledownIcon"
+                    (click)="isFocusSearch = true;dropdown.show();clickSearch();onShowedDropDown(); showAngledownIcon = !showAngledownIcon"
                     class="e--combogrid_icon__dropdown" dropdownToggle>
                     <i class="fa fa-angle-down" aria-hidden="true"></i>
                 </span>
             </ng-container>
             <ng-template #readOnlyIconDropdownTpl>
                 <span class="e--combogrid_icon__dropdown"
-                    (click)="isFocusSearch = true;dropdown.show();clickSearch(); showAngledownIcon = !showAngledownIcon">
+                    (click)="isFocusSearch = true;dropdown.show();clickSearch();onShowedDropDown(); showAngledownIcon = !showAngledownIcon">
                     <i class="fa fa-angle-down" aria-hidden="true"></i>
                 </span>
             </ng-template>

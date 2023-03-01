@@ -16,11 +16,30 @@
                             <i class="la la-download"></i>Export<span class="caret"></span>
                         </button>
                         <div class="dropdown-menu" role="menu" aria-labelledby="button-nested">
-                            <a class="dropdown-item pointer" (click)="preview(false)">Preview with USD/VND</a>
-                            <a class="dropdown-item pointer" (click)="preview(true)">Preview with Original</a>
-                            <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
-                            <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
-                            <a class="dropdown-item pointer" (click)="exportCDNote()">Export Excel Template</a>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="preview(false)">Preview with USD/VND</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="preview(true)">Preview with Original</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('USD')">Preview with USD</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('VND')">Preview with Local</a>
+                            </div>
+                            <div>
+                                <a class="dropdown-item pointer" (click)="previewCdNote('USD')">WP Template</a>
+                            </div>
+                            <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover"
+                                ClickStopPropagation>
+                                <div class="d-flex justify-content-between ">
+                                    <a class="dropdown-item pointer">Download</a>
+                                    <div class="d-flex align-items-center m--margin-top-5">
+                                        <i class="la la-caret-right font-13"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -305,7 +324,20 @@
         </div>
     </div>
 </div>
-
+<app-dropdown #exportTpl>
+    <span class="dropdown-item pointer"
+        (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'PDF')">
+        PDF
+    </span>
+    <span class="dropdown-item pointer"
+        (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'EXCEL')">
+        EXCEL
+    </span>
+    <span class="dropdown-item pointer"
+        (click)="exportItem(CdNoteDetail?.cdNote.jobId, CdNoteDetail?.cdNote.code,'WORD')">
+        WORD
+    </span>
+</app-dropdown>
 <ops-cd-note-add-popup (onUpdate)="onUpdateCdNote($event)"></ops-cd-note-add-popup>
 
 <ng-template inject></ng-template>

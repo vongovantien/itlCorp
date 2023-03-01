@@ -1,19 +1,19 @@
-﻿using eFMS.API.Common;
+﻿using eFMS.API.Accounting.DL.Common;
+using eFMS.API.Accounting.DL.IService;
+using eFMS.API.Accounting.DL.Models;
+using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.Infrastructure.Middlewares;
+using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using System.Linq;
-using eFMS.API.Accounting.Infrastructure.Middlewares;
-using eFMS.API.Accounting.DL.Common;
-using eFMS.API.Accounting.DL.Models;
-using eFMS.API.Accounting.DL.IService;
-using eFMS.API.Accounting.DL.Models.Criteria;
-using eFMS.API.Common.Infrastructure.Common;
 using System.Collections.Generic;
-using ITL.NetCore.Common;
-using eFMS.API.Accounting.Service.Models;
+using System.Linq;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -30,6 +30,8 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IAcctSOAService acctSOAService;
         private readonly ICurrentUser currentUser;
         private readonly IAccAccountReceivableService accountReceivableService;
+        private readonly IEDocService _edocService;
+        private readonly IRabbitBus _busControl;
 
         /// <summary>
         /// constructor
@@ -37,12 +39,14 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="user"></param>
-        public AcctSOAController(IStringLocalizer<LanguageSub> localizer, IAcctSOAService service, ICurrentUser user, IAccAccountReceivableService accountReceivable)
+        public AcctSOAController(IStringLocalizer<LanguageSub> localizer, IAcctSOAService service, ICurrentUser user, IAccAccountReceivableService accountReceivable, IEDocService edocService, IRabbitBus _bus)
         {
             stringLocalizer = localizer;
             acctSOAService = service;
             currentUser = user;
             accountReceivableService = accountReceivable;
+            _edocService = edocService;
+            _busControl = _bus;
         }
 
         /// <summary>
@@ -58,7 +62,7 @@ namespace eFMS.API.Accounting.Controllers
             currentUser.Action = "AddAcctSoaPayment";
             if (!ModelState.IsValid) return BadRequest();
             HandleState hsCheckPoint = acctSOAService.ValidateCheckPointPartnerSOA(model);
-            if(!hsCheckPoint.Success)
+            if (!hsCheckPoint.Success)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = hsCheckPoint.Message.ToString() });
 
@@ -80,16 +84,17 @@ namespace eFMS.API.Accounting.Controllers
                 result = new ResultHandle { Status = hs.Status, Message = hs.Message, Data = model };
                 Response.OnCompleted(async () =>
                 {
-                    if (hs.Data != null)
-                    {
-                        // Update table acctCreditManagementAR
-                        await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Add");
-                    }
+                    //if (hs.Data != null)
+                    //{
+                    //    // Update table acctCreditManagementAR
+                    //    await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Add");
+                    //}
 
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
+
                     }
                 });
             }
@@ -111,7 +116,7 @@ namespace eFMS.API.Accounting.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             var isAllowUpdate = acctSOAService.CheckUpdatePermission(model.Id);
-            if(isAllowUpdate == false)
+            if (isAllowUpdate == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
@@ -133,16 +138,16 @@ namespace eFMS.API.Accounting.Controllers
                 result = new ResultHandle { Status = hs.Status, Message = hs.Message, Data = model };
                 Response.OnCompleted(async () =>
                 {
-                    if (hs.Data != null)
-                    {
-                        await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Update");
-                    }
+                    //if (hs.Data != null)
+                    //{
+                    //    await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Update");
+                    //}
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
-
+                    // await _edocService.GenerateEdocSOA(model);
                 });
             }
             return Ok(result);
@@ -206,15 +211,12 @@ namespace eFMS.API.Accounting.Controllers
                 result = new ResultHandle { Status = hs.Status, Message = hs.Message };
                 Response.OnCompleted(async () =>
                 {
-                    if (hs.Data != null)
-                    {
-                        await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, soaNo, "Delete");
-                    }
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(soaNo, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
+                    await _edocService.DeleteEdocByBillingNo(soaNo);
                 });
             }
             return Ok(result);
@@ -403,9 +405,9 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="officeId">soaNo that want to retrieve officeId</param>
         /// <returns></returns>
         [HttpGet("GetDataExportAirFrieghtBySOANo")]
-        public IActionResult GetDataExportAirFrieghtBySOANo(string soaNo,string officeId)
+        public IActionResult GetDataExportAirFrieghtBySOANo(string soaNo, string officeId)
         {
-            var data = acctSOAService.GetSoaAirFreightBySoaNo(soaNo,officeId);
+            var data = acctSOAService.GetSoaAirFreightBySoaNo(soaNo, officeId);
             return Ok(data);
         }
 
@@ -516,7 +518,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             currentUser.Action = "UpdateAdjustDebitValue";
             var dt = acctSOAService.UpdateAdjustDebitValue(model);
-            if(dt.Success)
+            if (dt.Success)
             {
                 Response.OnCompleted(async () =>
                 {
@@ -524,7 +526,7 @@ namespace eFMS.API.Accounting.Controllers
                     modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.CODE, model.Action);
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
                 });
             }

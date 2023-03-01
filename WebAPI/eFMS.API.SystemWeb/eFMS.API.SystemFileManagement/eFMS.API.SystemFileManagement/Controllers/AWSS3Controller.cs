@@ -28,7 +28,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
         private IAWSS3Service _aWSS3Service;
         private IContextBase<SysImage> _sysImageRepo;
 
-        public AWSS3Controller(IAWSS3Service aWSS3Service, IContextBase<SysImage> SysImageRepo) 
+        public AWSS3Controller(IAWSS3Service aWSS3Service, IContextBase<SysImage> SysImageRepo)
         {
             _aWSS3Service = aWSS3Service;
             _sysImageRepo = SysImageRepo;
@@ -78,7 +78,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
             FileUploadModel model = new FileUploadModel
             {
                 Files = fFiles,
-                 FolderName = folder,
+                FolderName = folder,
                 Id = id,
                 Child = child,
                 ModuleName = moduleName
@@ -127,16 +127,25 @@ namespace eFMS.API.SystemFileManagement.Controllers
         }
 
         [HttpGet("GetAttachedFiles/{moduleName}/{folder}/{id}")]
-        public async Task<IActionResult> GetFiles(string moduleName,string folder, Guid id, string child = null)
+        public async Task<IActionResult> GetFiles(string moduleName, string folder, Guid id, string child = null)
         {
-            List<SysImage> result = await _aWSS3Service.GetFileSysImage(moduleName,folder,id,child);  
+            List<SysImage> result = await _aWSS3Service.GetFileSysImage(moduleName, folder, id, child);
             return Ok(result);
         }
 
         [HttpDelete("DeleteAttachedFile/{moduleName}/{folder}/{id}")]
         public async Task<IActionResult> DeleteAttachedFile(string moduleName, string folder, Guid id)
         {
-            HandleState hs = await _aWSS3Service.DeleteFile(moduleName,folder, id);
+            HandleState hs = await _aWSS3Service.DeleteFile(moduleName, folder, id);
+            if (hs.Success)
+                return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
+            return BadRequest(hs);
+        }
+
+        [HttpDelete("DeleteFileS3/{moduleName}/{folder}/{id}/{objId}")]
+        public async Task<IActionResult> DeleteFileS3(string moduleName, string folder, Guid id,Guid objId)
+        {
+            HandleState hs = await _aWSS3Service.DeleteFileS3(moduleName, folder, id,objId);
             if (hs.Success)
                 return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
             return BadRequest(hs);
@@ -167,7 +176,8 @@ namespace eFMS.API.SystemFileManagement.Controllers
             {
                 var document = _aWSS3Service.DownloadFileAsync(moduleName, folder, objId, fileName).Result;
                 return File(document, "application/octet-stream", fileName);
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ex);
             }
@@ -196,6 +206,5 @@ namespace eFMS.API.SystemFileManagement.Controllers
                 return BadRequest(ex);
             }
         }
-
     }
 }

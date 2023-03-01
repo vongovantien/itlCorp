@@ -1,12 +1,15 @@
 import { ModalDirective, ModalOptions } from "ngx-bootstrap/modal";
 import { AppPage } from "src/app/app.base";
-import { ViewChild, Directive } from "@angular/core";
+import { ViewChild, Directive, ViewChildren, QueryList } from "@angular/core";
 import { FormControl, AbstractControl, ValidationErrors } from "@angular/forms";
+import { ComboGridVirtualScrollComponent } from "./shared/common/combo-grid-virtual-scroll/combo-grid-virtual-scroll.component";
 import { delayTime } from "@decorators";
+import { InjectViewContainerRefDirective } from "./shared/directives/inject-view-container-ref.directive";
 
 @Directive()
 export abstract class PopupBase extends AppPage {
-
+    @ViewChildren(ComboGridVirtualScrollComponent) comboGrids: QueryList<ComboGridVirtualScrollComponent>;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
     @ViewChild("popup") popup: ModalDirective;
 
     options: ModalOptions = {
@@ -126,4 +129,6 @@ export abstract class PopupBase extends AppPage {
     trimInputValue(control: FormControl | AbstractControl, value: string) {
         control.setValue(value != null ? value.trim() : value);
     }
+
+
 }

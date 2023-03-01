@@ -46,9 +46,12 @@
                             [ngClass]="{'m-form__group has-danger': isSubmitted &&  !HAWBNo.valid }">
                             <label required>HAWB No</label>
                             <div class="pos-rel">
-                                <ng-select [items]="housebillList" class="custom" [clearable]="true" bindLabel="hwbno"
+                                <ng-select [items]="houseBillList" class="custom" [clearable]="true" bindLabel="hwbno"
                                     formControlName="HAWBNo" [multiple]="true" (change)="selectedHAWBNo($event)">
                                 </ng-select>
+                            </div>
+                            <div class="form-control-feedback" *ngIf="isSubmitted && !HAWBNo.valid">
+                                HAWB No is required !
                             </div>
                         </div>
                     </div>

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using eFMS.API.Common;
+﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
@@ -13,15 +6,21 @@ using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
-using eFMS.API.Documentation.DL.Services;
-using eFMS.API.Documentation.Service.Models;
 using eFMS.API.ForPartner.DL.Models.Receivable;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -42,7 +41,8 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IAccAccountReceivableService AccAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICsStageAssignedService csStageAssignedService;
-
+        private readonly IEDocService edocService;
+        private readonly IRabbitBus _busControl;
         public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer,
             ICsTransactionDetailService service,
             ICurrentUser user,
@@ -50,8 +50,9 @@ namespace eFMS.API.Documentation.Controllers
             ICsTransactionService csTransaction,
             IAccAccountReceivableService AccAccountReceivable,
             IOptions<ApiServiceUrl> serviceUrl,
-            ICsStageAssignedService stageAssignedService
-
+            ICsStageAssignedService stageAssignedService,
+            IEDocService EDocService,
+            IRabbitBus _bus
             )
         {
             stringLocalizer = localizer;
@@ -62,6 +63,9 @@ namespace eFMS.API.Documentation.Controllers
             AccAccountReceivableService = AccAccountReceivable;
             apiServiceUrl = serviceUrl;
             csStageAssignedService = stageAssignedService;
+            edocService = EDocService;
+            _busControl = _bus;
+
         }
 
         [HttpGet("CheckPermission/{id}")]
@@ -166,6 +170,8 @@ namespace eFMS.API.Documentation.Controllers
                     if (modelReceivableList.Count > 0)
                     {
                         await CalculatorReceivable(modelReceivableList);
+                        //del edoc
+                        edocService.DeleteEdocByHBLId(id);
                     }
                 });
             }
@@ -198,7 +204,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPut]
         [Route("Update")]
         [Authorize]
-        public IActionResult Update(CsTransactionDetailModel model)
+        public async Task<IActionResult> Update(CsTransactionDetailModel model)
         {
             var currentHBL = csTransactionDetailService.First(x => x.Id == model.Id);
             currentUser.Action = "UpdateCSTransactionDetail";
@@ -221,7 +227,7 @@ namespace eFMS.API.Documentation.Controllers
             }
 
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var hs = csTransactionDetailService.UpdateTransactionDetail(model);
+            var hs = await csTransactionDetailService.UpdateTransactionDetail(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -233,7 +239,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (hs.Success)
                 {
-                    var handleStage = await csStageAssignedService.SetMutipleStageAssigned(currentHBL, null, model.JobId, model.Id, true);
+                    var handleStage = await csStageAssignedService.SetMultipleStageAssigned(currentHBL, null, model.JobId, model.Id, true);
                 }
 
             });
@@ -410,6 +416,14 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(data);
         }
 
+        [HttpPost("Query")]
+        [Authorize]
+        public async Task<IActionResult> Query(CsTransactionDetailCriteria criteria)
+        {
+            var data = await csTransactionDetailService.QueryData(criteria);
+            return Ok(data);
+        }
+
         [HttpPost("GetListHouseBillAscHBL")]
         [Authorize]
         public IActionResult GetListHouseBillAscHBL(CsTransactionDetailCriteria criteria)
@@ -514,9 +528,9 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpGet("PreviewAirImptAuthorisedLetter")]
-        public IActionResult PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign)
+        public IActionResult PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign, string language)
         {
-            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetter(housbillId, printSign);
+            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetter(housbillId, printSign, language);
             return Ok(result);
         }
 
@@ -622,12 +636,8 @@ namespace eFMS.API.Documentation.Controllers
 
         private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
         {
-            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
-            string accessToken = Request.Headers["Authorization"].ToString();
-
-            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, accessToken);
-            var response = await resquest.Content.ReadAsAsync<HandleState>();
-            return response;
+            await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, model);
+            return new HandleState();
         }
 
         [HttpPut]

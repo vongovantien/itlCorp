@@ -55,7 +55,7 @@ export class AdvancePayment {
     departmentName: string = null;
     advanceFor: string = null;
     dueDate: string = '';
-    
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
@@ -84,9 +84,9 @@ export class AdvancePaymentRequest {
     userModified: string = '';
     datetimeModified: string = '';
     statusPayment: string = '';
-
+    shipmentId: string = "00000000-0000-0000-0000-000000000000";
     surcharge: Surcharge[] = [];
-    
+
     isSelected?: boolean;
 
     constructor(object?: any) {

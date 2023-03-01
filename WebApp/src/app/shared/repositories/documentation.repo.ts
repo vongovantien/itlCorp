@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { ApiService } from "../services";
-import { environment } from "src/environments/environment";
-import { catchError, map } from "rxjs/operators";
 import { throwError } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { environment } from "src/environments/environment";
+import { ApiService } from "../services";
 
 @Injectable({ providedIn: 'root' })
 export class DocumentationRepo {
@@ -519,6 +519,13 @@ export class DocumentationRepo {
         );
     }
 
+    updateMultipleProofOfDelivery(body: any = {}) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/updateMultipleProofOfDelivery`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     // uploadFileProofOfDelivery(hblId: string, body: any) {
     //     return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/uploadFileProofOfDelivery/${hblId}`, body, 'files').pipe(
     //         map((data: any) => data)
@@ -551,8 +558,8 @@ export class DocumentationRepo {
         );
     }
 
-    previewDeliveryOrder(hblId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/PreviewDeliveryOrder`, { hblid: hblId }).pipe(
+    previewDeliveryOrder(hblId: string, language: string = '') {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/PreviewDeliveryOrder`, { hblid: hblId, language: language }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -593,8 +600,8 @@ export class DocumentationRepo {
         );
     }
 
-    previewAirImportAuthorizeLetter1(id: string, withSign: boolean) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirImptAuthorisedLetter`, { housbillId: id, printSign: withSign }).pipe(
+    previewAirImportAuthorizeLetter1(id: string, withSign: boolean, language: string = '') {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirImptAuthorisedLetter`, { housbillId: id, printSign: withSign, language: language  }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -603,7 +610,7 @@ export class DocumentationRepo {
     }
 
     previewAirImportAuthorizeLetter2(id: string, withSign: boolean) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/AirImptAuthorisedLetter_Consign`, { housbillId: id, printSign: withSign }).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/AirImptAuthorisedLetter_Consign`, { housbillId: id, printSign: withSign}).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -1265,8 +1272,26 @@ export class DocumentationRepo {
         );
     }
 
-    trackShipmentProgress(params: any) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/TrackShipmentProgress`, params).pipe(
+    getHBLOfJob(body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/Query`, body)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
+    }
+
+    syncGoodInforToReplicateJob(jobId: string, body: any = {}) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/SyncGoodInforToReplicateJob`, body, {jobId: jobId}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    addMultipleStageToJob(jobId: string, body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsStageAssigned/AddMultipleStage`, body, { jobId: jobId }).pipe(
+            catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }

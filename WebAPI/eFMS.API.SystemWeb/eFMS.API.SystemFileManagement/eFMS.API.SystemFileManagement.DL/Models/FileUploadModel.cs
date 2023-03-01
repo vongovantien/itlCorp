@@ -1,14 +1,10 @@
-﻿using eFMS.API.SystemFileManagement.Service.Models;
-using eFMS.API.Common.Models;
+﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Http;
-using System.IO;
 
 namespace eFMS.API.SystemFileManagement.DL.Models
 {
-    public class FileUploadModel 
+    public class FileUploadModel
     {
         public List<IFormFile> Files { get; set; }
         public string FolderName { get; set; }

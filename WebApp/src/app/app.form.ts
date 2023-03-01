@@ -23,6 +23,7 @@ export abstract class AppForm extends AppPage {
     isCollapsed: boolean = true;
     isDuplicate: boolean = false;
     isReadonly: any = false;
+    isSearchAdv: boolean = false;
 
     selectedRange: any;
 
@@ -39,8 +40,6 @@ export abstract class AppForm extends AppPage {
         },
         typeButton: ButtonType.save,
     };
-
-    accepctFilesUpload = 'image/*,.txt,.pdf,.doc,.xlsx,.xls';
 
     digitDecimal: number = 5;
 

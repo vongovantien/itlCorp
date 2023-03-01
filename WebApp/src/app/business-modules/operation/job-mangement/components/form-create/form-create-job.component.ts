@@ -1,19 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { AppForm } from '@app';
+import { ComboGridVirtualScrollComponent, InfoPopupComponent } from '@common';
+import { ChargeConstants, JobConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { CommodityGroup, Customer, LinkAirSeaModel, PortIndex, User } from '@models';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
-import { CommodityGroup, Customer, PortIndex, User, LinkAirSeaModel } from '@models';
 import { IShareBussinessState } from '@share-bussiness';
-import { GetCataloguePortAction, getCataloguePortState, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueCarrierState, getCatalogueAgentState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState } from '@store';
-import { CommonEnum } from '@enums';
-import { ComboGridVirtualScrollComponent, InfoPopupComponent } from '@common';
-import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
+import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState, getMenuUserSpecialPermissionState, getCurrentUserState } from '@store';
 import { FormValidators } from '@validators';
-import { AppForm } from '@app';
 
-import { Observable } from 'rxjs';
-import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'job-mangement-form-create',
@@ -42,6 +42,10 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     commodityGroupId: AbstractControl;
     shipmentType: AbstractControl;
     salemansId: AbstractControl;
+    eta: AbstractControl;
+    deliveryDate: AbstractControl;
+    suspendTime: AbstractControl;
+    clearanceDate: AbstractControl;
 
     productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
@@ -77,7 +81,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         { field: 'employeeNameEn', label: 'Full Name' }
     ];
 
-    userLogged: User;
+    userLogged: SystemInterface.IClaimUser;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -91,8 +95,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     }
 
     ngOnInit() {
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
 
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this._store.dispatch(new GetCatalogueCarrierAction());
@@ -104,11 +107,20 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.agents = this._store.select(getCatalogueAgentState);
         this.commodityGroups = this._store.select(getCatalogueCommodityGroupState);
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-        // this.salesmans = this._systemRepo.getSystemUsers({ active: true });
         this.users = this._systemRepo.getListSystemUser();
 
+        this._store.select(getCurrentUserState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.userLogged = res;
+                    }
+                }
+            )
         this.initForm();
     }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'supplier':
@@ -152,6 +164,9 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             case 'salesman':
                 this.salemansId.setValue(data.id);
                 break;
+            case 'billingOps':
+                this.billingOpsId.setValue(data.id);
+                break;
             default:
                 break;
         }
@@ -186,7 +201,13 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             billingOpsId: [this.userLogged.id, Validators.required],
             salemansId: [null, Validators.required],
             isReplicate: [false],
-            noProfit: [false]
+            noProfit: [false],
+            eta: [null],
+            deliveryDate: [null],
+            suspendTime: [null, Validators.compose([
+                Validators.maxLength(150),
+            ])],
+            clearanceDate: [null],
 
         }, { validator: FormValidators.comparePort });
 
@@ -205,7 +226,10 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.billingOpsId = this.formCreate.controls['billingOpsId'];
         this.shipmentType = this.formCreate.controls['shipmentType'];
         this.salemansId = this.formCreate.controls['salemansId'];
-
+        this.eta = this.formCreate.controls['eta'];
+        this.deliveryDate = this.formCreate.controls['deliveryDate'];
+        this.suspendTime = this.formCreate.controls['suspendTime'];
+        this.clearanceDate = this.formCreate.controls['clearanceDate'];
     }
 
     getASInfoToLink() {

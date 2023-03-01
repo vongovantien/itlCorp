@@ -252,7 +252,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
         }
         this.selectedShipmentData = this.configShipment.dataSource.filter((i: OperationInteface.IShipment) => i.hblid === data.hblid)[0];
-        this.selectedShipment = { field: 'jobId', value: data.jobId };
+        this.selectedShipment = { field: 'hblid', value: data.hblid };
 
         if (!!this.selectedShipmentData) {
             this.customDeclarations = this.filterCDByShipment(this.selectedShipmentData);

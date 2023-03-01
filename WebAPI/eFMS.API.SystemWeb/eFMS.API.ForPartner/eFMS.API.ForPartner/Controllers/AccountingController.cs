@@ -22,6 +22,7 @@ using eFMS.API.Common.Helpers;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using eFMS.API.ForPartner.Service.Models;
 using eFMS.API.ForPartner.DL.Models.Payable;
+using eFMS.API.Infrastructure.RabbitMQ;
 
 namespace eFMS.API.ForPartner.Controllers
 {
@@ -40,6 +41,7 @@ namespace eFMS.API.ForPartner.Controllers
         private readonly IOptions<ApiUrl> apiUrl;
         private readonly IAccountPayableService accPayableService;
         private readonly IAccountReceivableService accReceivableService;
+        private readonly IRabbitBus bus;
 
         /// <summary>
         /// Accounting Contructor
@@ -49,6 +51,7 @@ namespace eFMS.API.ForPartner.Controllers
             IActionFuncLogService actionFuncLog,
             IAccountPayableService payableService,
             IAccountReceivableService accReceivable,
+            IRabbitBus _bus,
             IOptions<ApiUrl> aUrl)
         {
             accountingManagementService = service;
@@ -57,6 +60,7 @@ namespace eFMS.API.ForPartner.Controllers
             apiUrl = aUrl;
             accPayableService = payableService;
             accReceivableService = accReceivable;
+            bus = _bus;
         }
 
         /// <summary>
@@ -259,9 +263,12 @@ namespace eFMS.API.ForPartner.Controllers
                         //Tính công nợ sau khi tạo mới hóa đơn thành công
                         var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
                         var modelReceivable = accReceivableService.GetObjectReceivableBySurchargeId(surchargeIds);
-                        await CalculatorReceivable(modelReceivable);
+                        // await CalculatorReceivable(modelReceivable);
+                        await bus.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivable);
+
                         if (Id != Guid.Empty)
                         {
+
                             await InsertDebitInvoiceAr(Id);
                         }
                     });
@@ -317,7 +324,7 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 ReferenceNo = model.PreReferenceNo
             };
-            var hsDeleteInvoice = accountingManagementService.DeleteInvoice(invoiceToDelete, apiKey, out Guid IdDelete);
+            var hsDeleteInvoice = accountingManagementService.DeleteInvoice(invoiceToDelete, apiKey, out AccAccountingManagement invoice);
             if (!hsDeleteInvoice.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = hsDeleteInvoice.Success, Message = string.Format("{0}. Xóa hóa đơn cũ thất bại", hsDeleteInvoice.Message.ToString()), Data = model };
@@ -370,12 +377,19 @@ namespace eFMS.API.ForPartner.Controllers
                     Response.OnCompleted(async () =>
                     {
                         //Tính công nợ sau khi replace invoice thành công
-                        var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
-                        var modelReceivable = accReceivableService.GetObjectReceivableBySurchargeId(surchargeIds);
-                        await CalculatorReceivable(modelReceivable);
-                        if (IdDelete != Guid.Empty)
+                        //var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
+                        //var modelReceivable = accReceivableService.GetObjectReceivableBySurchargeId(surchargeIds);
+                        //await CalculatorReceivable(modelReceivable);
+                        if (invoice.Id != Guid.Empty)
                         {
-                            await DeleteDebitInvoiceAr(IdDelete);
+                            List<ObjectReceivableModel> modelReceivable = new List<ObjectReceivableModel> {
+                                new ObjectReceivableModel {
+                                    Office = invoice.OfficeId,
+                                    PartnerId = invoice.PartnerId,
+                                    Service = invoice.ServiceType
+                                }
+                            };
+                            await bus.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivable);
                         }
                         if (Id != Guid.Empty)
                         {
@@ -408,7 +422,7 @@ namespace eFMS.API.ForPartner.Controllers
             }
             if (!ModelState.IsValid) return BadRequest();
 
-            var hs = accountingManagementService.DeleteInvoice(model, apiKey, out Guid Id);
+            var hs = accountingManagementService.DeleteInvoice(model, apiKey, out AccAccountingManagement invoice);
             string _message = hs.Success ? "Hủy hóa đơn thành công" : string.Format("{0}. Hủy hóa đơn thất bại", hs.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
@@ -435,15 +449,23 @@ namespace eFMS.API.ForPartner.Controllers
                     Response.OnCompleted(async () =>
                     {
                         //Tính công nợ sau khi cancel invoice thành công
-                        var surchargeIds = accountingManagementService.GetSurchargeIdsByRefNoInvoice(model.ReferenceNo);
-                        var modelReceivable = accReceivableService.GetObjectReceivableBySurchargeId(surchargeIds);
-                        await CalculatorReceivable(modelReceivable);
-                        if(Id != Guid.Empty)
+                        // var surchargeIds = accountingManagementService.GetSurchargeIdsByRefNoInvoice(model.ReferenceNo);
+                        // var modelReceivable = accReceivableService.GetObjectReceivableBySurchargeId(surchargeIds);
+                        // await CalculatorReceivable(modelReceivable);
+
+                        if(invoice.Id != Guid.Empty)
                         {
-                            await DeleteDebitInvoiceAr(Id);
+                            await DeleteDebitInvoiceAr(invoice.Id);
+                            List<ObjectReceivableModel> modelReceivable = new List<ObjectReceivableModel> {
+                                new ObjectReceivableModel {
+                                    Office = invoice.OfficeId,
+                                    PartnerId = invoice.PartnerId,
+                                    Service = invoice.ServiceType
+                                }
+                            };
+                            await bus.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivable);
                         }
                     });
-
                 }
             }
         }
@@ -678,7 +700,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="hash">Hash Value</param>s
         /// <returns></returns>
         [HttpPost("InsertPayablePayment")]
-        public IActionResult InsertPayablePayment(List<AccAccountPayableModel> model, [Required] string apiKey, [Required] string hash)
+        public async Task<IActionResult> InsertPayablePayment(List<AccAccountPayableModel> model, [Required] string apiKey, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
             if (!accountingManagementService.ValidateApiKey(apiKey))
@@ -697,7 +719,7 @@ namespace eFMS.API.ForPartner.Controllers
                 return Ok(_result);
             }
 
-            var hs = accPayableService.InsertAccountPayablePayment(model, apiKey);
+            var hs = await accPayableService.InsertAccountPayablePayment(model, apiKey);
 
             string _message = hs.Success ? "Ghi nhận giảm trừ công nợ thành công" : string.Format("{0}. Ghi nhận giảm trừ công nợ thất bại", hs.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
@@ -816,11 +838,15 @@ namespace eFMS.API.ForPartner.Controllers
             }
             if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
-            HandleState hs = await accountingManagementService.InsertVoucher(model, apiKey);
+            ResultHandle hs = await accountingManagementService.InsertVoucher(model, apiKey);
 
-            string _message = hs.Success ? "Tạo mới voucher thành công" : string.Format("{0}. Tạo mới voucher thất bại", hs.Message.ToString());
+            string _message = "Tạo mới voucher thành công";
+            if (!hs.Status)
+            {
+                _message = string.Format("{0}. Tạo mới voucher thất bại", hs.Message?.ToString());
+            }
 
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+            ResultHandle result = new ResultHandle { Status = hs.Status, Message = _message, Data = model };
 
             var _endDateProgress = DateTime.Now;
             #region -- Ghi Log --
@@ -829,16 +855,18 @@ namespace eFMS.API.ForPartner.Controllers
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion
 
-            if (hs.Success)
+            if (hs.Status)
             {
                 Response.OnCompleted(async () =>
                 {
-                    HandleState payableHandle = await accPayableService.InsertAccPayable(model);
+                    HandleState payableHandle = await accPayableService.InsertAccPayable(model, (List<AccAccountingManagement>)hs.Data);
+
+                    HandleState hsCredit = await accPayableService.AddCreditMangagement(model);
                 });
             }
-           
+
             return Ok(result);
-          
+
         }
 
         /// <summary>

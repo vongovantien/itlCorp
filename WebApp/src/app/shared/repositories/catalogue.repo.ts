@@ -1,9 +1,9 @@
-import { Injectable } from "@angular/core";
-import { ApiService } from "../services";
-import { environment } from "src/environments/environment";
-import { throwError, BehaviorSubject } from "rxjs";
-import { catchError, map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { BehaviorSubject, throwError } from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { environment } from "src/environments/environment";
+import { ApiService } from "../services";
 
 @Injectable({ providedIn: 'root' })
 export class CatalogueRepo {
@@ -1384,13 +1384,38 @@ export class CatalogueRepo {
 
     }
 
-    GetListSalemanByShipmentType(partnerId: string, transactionType: string, shipmentType: string) {
+    GetListSalemanByShipmentType(partnerId: string, transactionType: string, shipmentType: string, officeId: string = null) {
+        if (!!officeId) {
+            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetListSaleman`, { partnerId: partnerId, transactionType: transactionType, shipmentType: shipmentType, office: officeId });
+        }
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetListSaleman`, { partnerId: partnerId, transactionType: transactionType, shipmentType: shipmentType });
-
     }
 
     getInForCompanyByTaxCode(taxCode: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetPartnerByTaxCode/${taxCode}`);
 
+    }
+
+    getListBankByPartnerById(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/GetBankByPartnerId/${id}`);
+
+    }
+
+    getDetailBankById(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/GetDetailById/${id}`);
+
+    }
+
+    updateEmailContract(id: string, email: string) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/UpdateEmailContract`, null, { id: id, email: email }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        )
+    }
+
+    getStandChargeByType(criteria: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStandardCharge/GetBy`, criteria);
     }
 }

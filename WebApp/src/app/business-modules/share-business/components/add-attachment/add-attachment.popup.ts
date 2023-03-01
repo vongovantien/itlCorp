@@ -1,13 +1,15 @@
-import { PopupBase } from "src/app/popup.base";
-import { OnInit, Component, Output, EventEmitter, ViewChild } from "@angular/core";
-import { DocumentationRepo, SystemFileManageRepo } from "@repositories";
-import { ToastrService } from "ngx-toastr";
-import { NgProgress } from "@ngx-progressbar/core";
-import { IAppState } from "@store";
-import { Store } from "@ngrx/store";
-import { takeUntil, catchError, finalize } from "rxjs/operators";
-import { Params, ActivatedRoute } from "@angular/router";
+import { Component, EventEmitter, OnInit, Output, QueryList, ViewChildren } from "@angular/core";
+import { ActivatedRoute, Params } from "@angular/router";
 import { ConfirmPopupComponent } from "@common";
+import { SystemConstants } from "@constants";
+import { ContextMenuDirective } from "@directives";
+import { Store } from "@ngrx/store";
+import { NgProgress } from "@ngx-progressbar/core";
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from "@repositories";
+import { IAppState } from "@store";
+import { ToastrService } from "ngx-toastr";
+import { catchError, finalize, takeUntil } from "rxjs/operators";
+import { PopupBase } from "src/app/popup.base";
 
 
 @Component({
@@ -20,8 +22,8 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
     jobId: string;
     files: IShipmentAttachFile[] = [];
     @Output() onAdd: EventEmitter<any> = new EventEmitter<any>();
-    @ViewChild('confirmDelete') confirmDeletePopup: ConfirmPopupComponent;
     selectedFile: IShipmentAttachFile;
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -30,6 +32,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         private _activedRoute: ActivatedRoute,
         private _store: Store<IAppState>,
         private _systemFileManagerRepo: SystemFileManageRepo,
+        private _exportRepo: ExportRepo
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -46,8 +49,8 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
                 }
             });
         this.headers = [
-            { title: 'Attach File', field: 'name' },
-            { title: '', field: '' }
+            { title: 'File Name', field: 'name' },
+            { title: 'Attach Person', field: 'userCreated' }
         ];
     }
 
@@ -70,19 +73,7 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         const fileList: FileList[] = event.target['files'];
         if (fileList.length > 0) {
             this._progressRef.start();
-            // this._documentRepo.uploadFileShipment(this.jobId, true, fileList)
-            //     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            //     .subscribe(
-            //         (res: CommonInterface.IResult) => {
-            //             if (res.status) {
-            //                 this._toastService.success("Upload file successfully!");
-            //                 if (!!this.jobId) {
-            //                     this.getFileShipment(this.jobId);
-            //                 }
-            //             }
-            //         }
-            //     );
-            this._systemFileManagerRepo.uploadFile('Document', 'Shipment', this.jobId, fileList)
+            this._systemFileManagerRepo.uploadAttachedFileEdoc('Document', 'Shipment', this.jobId, fileList)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
@@ -115,6 +106,8 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         if (lstFiles.length === 0) {
             return;
         }
+        console.log(lstFiles);
+
         this.onAdd.emit(lstFiles);
         this.hide();
     }
@@ -130,8 +123,12 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
     deleteFile(file: IShipmentAttachFile) {
         if (!!file) {
             this.selectedFile = file;
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'Are you sure to delete this file ?',
+                labelCancel: 'No',
+                labelConfirm: 'Yes'
+            }, () => { this.onDeleteFile(); });
         }
-        this.confirmDeletePopup.show();
     }
 
     getFileShipmentUrls() {
@@ -139,7 +136,6 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
     }
 
     onDeleteFile() {
-        this.confirmDeletePopup.hide();
         this._systemFileManagerRepo.deleteFile('Document', 'Shipment', this.jobId, this.selectedFile.name)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
@@ -156,6 +152,68 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
             );
     }
 
+    selectFileItem(file: IShipmentAttachFile) {
+        this.selectedFile = file;
+        this.selectedFile.isChecked = !this.selectedFile.isChecked;
+    }
+    onSelectFileMenuContext(file: IShipmentAttachFile) {
+        this.selectedFile = file;
+        this.clearMenuContext(this.queryListMenuContext);
+        console.log(this.selectedFile);
+
+    }
+
+    // viewFile() {
+    //     const extension = this.selectedFile.url.split('.').pop();
+    //     if (['xlsx'].includes(extension)) {
+    //         this._exportRepo.previewExport(this.selectedFile.url);
+    //     } else {
+    //         this._exportRepo.downloadExport(this.selectedFile.url);
+    //     }
+    // }
+    viewEdocFromName(imageUrl: string) {
+        this.selectedFile = Object.assign({}, this.selectedFile);
+        this.selectedFile.url = imageUrl;
+        this.viewFile();
+    }
+
+    viewFile() {
+        if (!this.selectedFile.url) {
+            return;
+        }
+        const extension = this.selectedFile.url.split('.').pop();
+        if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
+            this._exportRepo.previewExport(this.selectedFile.url);
+        }
+        else if (['html', 'htm'].includes(extension)) {
+            console.log();
+            this._systemFileManagerRepo.getFileEdocHtml(this.selectedFile.url).subscribe(
+                (res: any) => {
+                    window.open('', '_blank').document.write(res.body);
+                }
+            )
+        }
+        else {
+            this._exportRepo.downloadExport(this.selectedFile.url);
+        }
+    }
+
+    download() {
+        const selectedEdoc = Object.assign({}, this.selectedFile);
+        this._systemFileManagerRepo.getFileEdoc(selectedEdoc.id).subscribe(
+            (data) => {
+                const extention = selectedEdoc.url.split('.').pop();
+                this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.url + '.' + extention);
+            }
+        )
+        //this._exportRepo.downloadExport(this.selectedFile.url);
+    }
+
+    selectFile() {
+        this.onAdd.emit([this.selectedFile]);
+        console.log(this.selectedFile);
+        this.hide();
+    }
 }
 interface IShipmentAttachFile {
     id: string;

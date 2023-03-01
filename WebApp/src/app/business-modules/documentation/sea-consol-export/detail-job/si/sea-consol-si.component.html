@@ -24,7 +24,7 @@
             </div>
         </div>
         <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
-            <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="confirmRefresh.show()">
+            <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="showRefreshPopup()">
                 <span>
                     <i class="la la-refresh"></i>
                     <span>
@@ -59,12 +59,8 @@
     </div>
 </div>
 
-<confirm-popup #confirmRefresh body="All manually entered data will be refresh. Are you sure you want to perform this
-action?" (onSubmit)="confirmRefresh.hide(); refresh()"></confirm-popup>
 
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
+<ng-template inject></ng-template>
 
 <ul class="m-nav-sticky fms-shipment-sidebar">
     <li class="m-nav-sticky__item">

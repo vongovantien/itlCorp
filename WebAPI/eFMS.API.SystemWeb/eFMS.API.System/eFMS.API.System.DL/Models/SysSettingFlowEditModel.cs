@@ -14,6 +14,7 @@ namespace eFMS.API.System.Models
         public SysSettingFlowModel AccountReceivable { get; set; }
         public SysSettingFlowModel ReplicateOffice { get; set; }
         public SysSettingFlowModel AccountPayable { get; set; }
+        public SysSettingFlowModel Opex { get; set; }
     }
 
 }

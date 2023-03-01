@@ -1,6 +1,5 @@
 ﻿using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
-using System;
 
 namespace eFMS.API.Common.Infrastructure.Common
 {
@@ -34,7 +33,7 @@ namespace eFMS.API.Common.Infrastructure.Common
                     message = hs.Exception.Message;
                     break;
                 default:
-                    if(hs.Message != null)
+                    if (hs.Message != null)
                     {
                         message = hs.Message.ToString();
                     }

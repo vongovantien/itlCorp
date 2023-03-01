@@ -8,6 +8,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -46,8 +47,8 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICheckPointService checkPointService;
         private readonly ICsStageAssignedService csStageAssignedService;
-        private readonly ICsTransactionDetailService csTransactionDetailService;
-
+        private readonly IEDocService _edocService;
+        private readonly IRabbitBus _busControl;
         /// <summary>
         /// constructor
         /// </summary>
@@ -69,8 +70,9 @@ namespace eFMS.API.Documentation.Controllers
             IOptions<ApiServiceUrl> serviceUrl,
             ICheckPointService checkPoint,
             ISysImageService imageService,
-            ICsStageAssignedService stageAssignedService,
-            ICsTransactionDetailService transactionDetailService)
+            IEDocService edocService,
+            IRabbitBus _bus,
+            ICsStageAssignedService stageAssignedService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
@@ -81,7 +83,8 @@ namespace eFMS.API.Documentation.Controllers
             apiServiceUrl = serviceUrl;
             checkPointService = checkPoint;
             csStageAssignedService = stageAssignedService;
-            csTransactionDetailService = transactionDetailService;
+            _edocService= edocService;
+            _busControl = _bus;
         }
 
         /// <summary>
@@ -319,7 +322,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (hs.Success)
                 {
-                    var handleStage = await csStageAssignedService.SetMutipleStageAssigned(null, currentJob, model.Id, Guid.Empty);
+                    var handleStage = await csStageAssignedService.SetMultipleStageAssigned(null, currentJob, model.Id, Guid.Empty);
                 }
 
             });
@@ -488,6 +491,7 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         await CalculatorReceivable(modelReceivableList);
                     }
+                    await _edocService.DeleteEdocByJobId(id);
                 });
             }
             return Ok(result);
@@ -551,13 +555,9 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
-        {
-            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
-            string accessToken = Request.Headers["Authorization"].ToString();
-
-            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, accessToken);
-            var response = await resquest.Content.ReadAsAsync<HandleState>();
-            return response;
+        {        
+            await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, model);
+            return new HandleState();
         }
 
         [Authorize]
@@ -678,25 +678,6 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <returns></returns>
-        [HttpGet("TrackShipmentProgress")]
-        public async Task<IActionResult> TrackShipmentProgress([FromQuery] TrackingShipmentCriteria criteria)
-        {
-            if (!CheckExistShipment(criteria))
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_NOT_EXIST].Value });
-            }
-            var data = await csTransactionService.TrackShipmentProgress(criteria);
-
-            return Ok(data);
-        }
-
-
         #region -- METHOD PRIVATE --
 
         private bool CheckExistShipment(TrackingShipmentCriteria criteria)

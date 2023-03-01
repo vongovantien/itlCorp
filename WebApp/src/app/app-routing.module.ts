@@ -30,9 +30,7 @@ const routes: Routes = [
         data: {
             name: "Home",
         },
-        resolve: {
-            checkMenu: MenuResolveGuard
-        },
+
         children: [
             {
                 path: '',
@@ -69,7 +67,7 @@ const routes: Routes = [
                 loadChildren: () => import('./business-modules/accounting/accounting.module').then(m => m.AccountingModule),
                 data: {
                     name: "Accounting",
-                }
+                },
             },
             {
                 path: 'documentation',
@@ -84,7 +82,6 @@ const routes: Routes = [
                 data: {
                     name: "Logistics",
                 },
-
             },
             {
                 path: 'report',

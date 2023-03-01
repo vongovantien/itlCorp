@@ -37,6 +37,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatIncotermModel, CatIncoterm>();
             CreateMap<CatChargeIncoterm, CatChargeIncotermModel>();
             CreateMap<CatPotentialModel, CatPotential>();
+            CreateMap<CatStandardChargeModel, CatStandardCharge>();
+            CreateMap<CatStandardChargeImportModel, CatStandardCharge>();
 
             //map to entity model
             CreateMap<CatPartnerChargeModel, CatPartnerCharge>();
@@ -54,6 +56,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatPotential, CatPotentialModel>();
             CreateMap<CatPartnerEmail, CatPartnerEmailModel>();
             CreateMap<CatBank, CatBankModel>();
+            CreateMap<CatStandardCharge, CatStandardChargeModel>();
 
         }
     }

@@ -11,10 +11,9 @@ import {
     ContainerAction, ContainerActionTypes, ShareJobDetailComponent
 } from '@share-bussiness';
 import { InfoPopupComponent } from '@common';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { CsTransaction, Container } from '@models';
 import { CommonEnum } from '@enums';
-import { AppForm } from '@app';
 import { RoutingConstants } from '@constants';
 
 import { ShareSeaServiceFormCreateSeaExportComponent } from '../../share-sea/components/form-create-sea-export/form-create-sea-export.component';
@@ -44,8 +43,10 @@ export class SeaConsolExportCreateJobComponent extends ShareJobDetailComponent i
         protected _actionStoreSubject: ActionsSubject,
         protected _cdr: ChangeDetectorRef,
         protected _store: Store<fromShareBusiness.IShareBussinessState>,
+        protected _exportRepo: ExportRepo,
+        protected _fileMngt: SystemFileManageRepo
     ) {
-        super(_toastService, _documenRepo, _store);
+        super(_router, _toastService, _documenRepo, _store, _exportRepo, _fileMngt);
         this.requestCancel = this.gotoList;
     }
 

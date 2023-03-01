@@ -6,6 +6,14 @@ by editing this MSBuild file. In order to learn more about this please visit htt
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <_PublishTargetUrl>\\VTC-EFMS-WEBAPI\inetpub\eFMS-API\ReportManagement</_PublishTargetUrl>
+    <_PublishTargetUrl>\\10.17.28.45\inetpub\eFMS-API\ReportManagement</_PublishTargetUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <File Include="FormatExcel/CellAddress.cs">
+      <publishTime>12/09/2022 10:30:10</publishTime>
+    </File>
+    <File Include="FormatExcel/ExcelExport.cs">
+      <publishTime>12/09/2022 10:30:10</publishTime>
+    </File>
+  </ItemGroup>
 </Project>

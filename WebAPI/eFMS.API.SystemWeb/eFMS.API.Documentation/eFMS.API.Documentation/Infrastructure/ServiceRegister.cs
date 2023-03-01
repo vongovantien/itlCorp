@@ -14,6 +14,8 @@ using eFMS.API.Shipment.Infrastructure.Filters;
 using System.Reflection;
 using System.IO;
 using System;
+using eFMS.API.Infrastructure.RabbitMQ;
+using Microsoft.Extensions.Configuration;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -55,7 +57,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ICsLinkChargeService, CsLinkChargeService>();
             services.AddTransient<ICsStageAssignedService, CsStageAssignedService>();
             services.AddTransient<IStageService, StageService>();
-
+            services.AddTransient<IEDocService, EDocService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
@@ -97,6 +99,5 @@ namespace eFMS.API.Shipment.Infrastructure
                 });
             return services;
         }
-        
     }
 }

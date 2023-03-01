@@ -1,7 +1,7 @@
 <div class="h-100vh m--margin-bottom-100" style="overflow-y: scroll;">
     <div class="m-portlet">
         <div class="m-portlet__body">
-            <div class="m-form m-form--label-align-right m--margin-bottom-10">
+            <div class="m-form m-form--label-align-right m--margin-bottom-11">
                 <div class="row align-items-center">
                     <div class="col-lg-4 order-2 order-lg-1">
                         <div class="form-group">
@@ -86,6 +86,11 @@
                                 <span>SOA</span>
                             </th>
                             <th class="sorting"
+                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'status'), 'sorting_desc': (!isDesc && sortKey == 'status') }"
+                            (click)="sortCdNotes('status')">
+                            <span>Status</span>
+                            </th>
+                            <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'syncStatus'), 'sorting_desc': (!isDesc && sortKey == 'syncStatus') }"
                                 (click)="sortCdNotes('syncStatus')">
                                 <span>Sync Status</span>
@@ -101,24 +106,25 @@
                         <ng-container *ngIf="!isLoading && !!cdNoteGroups.length">
                             <ng-container *ngFor="let cdNoteGroup of cdNoteGroups;  let i = index; trackBy: trackByFn">
                                 <tr class="collapse-toggle-row tgroup">
-                                    <td colspan="10">
+                                    <td colspan="11">
                                         <label class="btn-toggle-collapse m--font-danger" title="view more"
                                             data-toggle="collapse" [attr.data-target]="'#id-cd-00' + i">
                                             <i class="la la-minus-square"></i>
                                         </label>
-                                        <span class="tgroup-title m--margin-right-10">No {{(i+1)}}</span>&nbsp;<span
+                                        <span class="tgroup-title m--margin-right-11">No {{(i+1)}}</span>&nbsp;<span
                                             class="tgroup-title">Partner Name:</span>&nbsp;<span
                                             class="tgroup-title">{{cdNoteGroup.partnerNameEn}}</span>
                                     </td>
                                 </tr>
                                 <tr class="collapse-panel-row">
-                                    <td colspan="10">
+                                    <td colspan="11">
                                         <div class="collapse show" [id]="'id-cd-00' + i">
                                             <table
                                                 class="table   table-striped table-brand table-collapse-group dataTable">
                                                 <tbody>
                                                     <tr
-                                                        *ngFor="let cdNote of cdNoteGroup.listCDNote; let j = index; trackBy: trackByFn">
+                                                        *ngFor="let cdNote of cdNoteGroup.listCDNote; let j = index; trackBy: trackByFn"
+                                                        [contextMenu]="CdContextMenu" (onTouch)="onSelectCdNote(cdNote)">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions">
                                                                 <label class="m-checkbox" style="display: inline;">
@@ -151,7 +157,7 @@
                                                                 (click)="openPopupDetail(cdNote.jobId, cdNote.code)">{{cdNote.code}}</a>
                                                             <ng-container [ngSwitch]="cdNote.status">
                                                                 <span *ngSwitchCase="'Unpaid'"
-                                                                    class="badge badge-info m--margin-left-10">
+                                                                    class="badge badge-info m--margin-left-11">
                                                                     Prepaid
                                                                 </span>
                                                             </ng-container>
@@ -219,7 +225,57 @@
         </div>
     </div>
 </div>
+<app-context-menu #CdContextMenu (clickOutside)="selectedCdNote = null">
+    <div class="menu-context__item" [dpToggle]="previewTpl" position="rightTop" trigger="hover" ClickStopPropagation>
+        <div class="d-flex justify-content-between ">
+            <div>
+                <i class="la la-print text-primary"></i>
+                <span> Preview </span>
+                <span class="font-weight-bold">{{selectedCdNote?.code}}</span>
+            </div>
+            <div class="d-flex align-items-center m--margin-top-5">
+                <i class="la la-caret-right font-13"></i>
+            </div>
+        </div>
+        
+    </div>
+    <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
+        <div class="d-flex justify-content-between ">
+            <div>
+                <i class="la la-download text-primary"></i>
+                <span> Export </span>
+                <span class="font-weight-bold">{{selectedCdNote?.code}}</span>
+            </div>
+            <div class="d-flex align-items-center m--margin-top-5">
+                <i class="la la-caret-right font-13"></i>
+            </div>
+        </div>
+    </div>
+</app-context-menu>
 
+<app-dropdown #previewTpl>
+    <span class="dropdown-item pointer" (click)="previewItem(selectedCdNote?.jobId, selectedCdNote?.code, 'ORIGIN')">
+        Original
+    </span>
+    <span class="dropdown-item pointer" (click)="previewItem(selectedCdNote?.jobId, selectedCdNote?.code, 'VND')">
+        VND
+    </span>
+    <span class="dropdown-item pointer" (click)="previewItem(selectedCdNote?.jobId, selectedCdNote?.code, 'USD')">
+        USD
+    </span>
+</app-dropdown>
+
+<app-dropdown #exportTpl>
+    <span class="dropdown-item pointer" (click)="exportItem(selectedCdNote?.jobId, selectedCdNote?.code,'PDF')">
+        PDF
+    </span>
+    <span class="dropdown-item pointer" (click)="exportItem(selectedCdNote?.jobId, selectedCdNote?.code,'EXCEL')">
+        EXCEL
+    </span>
+    <span class="dropdown-item pointer" (click)="exportItem(selectedCdNote?.jobId, selectedCdNote?.code,'WORD')">
+        WORD
+    </span>
+</app-dropdown>
 <ops-cd-note-detail (onDeleted)="onDeletedCdNote()"></ops-cd-note-detail>
 
 <ops-cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"></ops-cd-note-add-popup>

@@ -187,7 +187,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             )
             .subscribe(
                 (agreement: any) => {
-                    if (!!agreement) {
+                    if (!!agreement && this.paymentMethod.value?.includes('Advance')) {
                         this.cusAdvanceAmountVnd.setValue(agreement.customerAdvanceAmountVnd);
                         this.cusAdvanceAmountUsd.setValue(agreement.customerAdvanceAmountUsd);
                     }

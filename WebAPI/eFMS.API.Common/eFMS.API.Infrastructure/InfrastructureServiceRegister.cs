@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Infrastructure.Authorizations;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -54,19 +55,24 @@ namespace eFMS.API.Infrastructure
                 options.eFMSConnection
                     = configuration.GetSection("ConnectionStrings:eFMSConnection").Value;
             });
-            services.Configure<WebUrl>(option => {
+            services.Configure<WebUrl>(option =>
+            {
                 option.Url = configuration.GetSection("WebUrl").Value;
             });
-            services.Configure<ApiUrl>(option => {
+            services.Configure<ApiUrl>(option =>
+            {
                 option.Url = configuration.GetSection("ApiUrl").Value;
             });
-            services.Configure<ESBUrl>(option => {
+            services.Configure<ESBUrl>(option =>
+            {
                 option.Url = configuration.GetSection("ESB").Value;
             });
-            services.Configure<MsWebHookUrl>(option => {
+            services.Configure<MsWebHookUrl>(option =>
+            {
                 option.Url = configuration.GetSection("MsWebHookUrl").Value;
             });
-            services.Configure<AuthenticationSetting>(authSetting => {
+            services.Configure<AuthenticationSetting>(authSetting =>
+            {
 
                 authSetting.PartnerShareKey
                     = configuration.GetSection("Authentication:PartnerShareKey").Value;
@@ -143,6 +149,17 @@ namespace eFMS.API.Infrastructure
             };
 
             services.AddSingleton(localizationOptions);
+            return services;
+        }
+        public static IServiceCollection SetUpRabbitMq(this IServiceCollection services, IConfiguration Configuration)
+        {
+            string _host = Configuration.GetSection("Rabbit:HostName")?.Value;
+            var _port = int.Parse(Configuration.GetSection("Rabbit:Port")?.Value);
+            string _password = Configuration.GetSection("Rabbit:Password")?.Value;
+            string _username = Configuration.GetSection("Rabbit:Username")?.Value;
+            string _vitualHost = Configuration.GetSection("Rabbit:VirtualHost")?.Value;
+
+            services.AddSingleton(sp => RabbitMQHelper.CreateBus(_host, _port, _vitualHost, _username, _password));
             return services;
         }
     }

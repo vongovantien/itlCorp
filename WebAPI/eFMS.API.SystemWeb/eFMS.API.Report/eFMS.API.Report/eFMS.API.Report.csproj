@@ -11,6 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EPPlus" Version="5.6.4" />
+    <PackageReference Include="EPPlus.Core.Extensions" Version="2.4.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="LocalizationCultureCore" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -56,6 +58,87 @@
 
   <ItemGroup>
     <Folder Include="Resources\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="FormatExcel\CellAddress.cs">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="FormatExcel\ExcelExport.cs">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="FormatExcel\TemplateExport\AccountingPLSheet.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\AccountPayable\AP_Account_Template.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\AccountPayable\AP_Standart_Report.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\AccountReceivable\AR_DebitDetail_Template.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\AccountReceivable\AR_SUMMARY_TEMPLATE.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\AccountReceivable\AR_SUMMARY_TEMPLATE_NO_ARGEEMENT.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\AccountReceivable\CombingBillingByJobUSD.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\AccountReceivable\CombingBillingByJobVND.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\AccountReceivable\DebitAmountDetailByContract.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\AccountReceivable\Receipt_Advance_Report _Teamplate.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\AccountReceivable\Statement_of_Receivable-Agency.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\AccountReceivable\Statement_of_Receivable-Customer.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\Commission-OPS-VND.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\Commission-PR.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\Incentive.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\Outsourcing Recognising Template.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\PHIEU-CAN-ACS-Template.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\PHIEU-CAN-NCTS-ALS-Template.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\SettlePayment\Settlement-Detail Template.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\SettlePayment\Settlement-General-Preview.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\Shipment-Oustanding-Debit-Template.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\Shipment-Overview-FCL.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FormatExcel\TemplateExport\ShipmentOverviewLCL.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

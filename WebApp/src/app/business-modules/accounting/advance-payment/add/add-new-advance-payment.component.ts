@@ -25,7 +25,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
     @ViewChild(ListAdvancePaymentCarrierComponent) listAdvancePaymentCarrierComponent: ListAdvancePaymentCarrierComponent;
     @ViewChild(AdvancePaymentFormCreateComponent, { static: true }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
-    
+
     params: any;
     ACTION: string = '';
     isAdvCarrier: boolean = false;
@@ -42,7 +42,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
 
     }
 
-    ngOnInit() { 
+    ngOnInit() {
         combineLatest([
             this._activedRoute.params,
             this._activedRoute.queryParams
@@ -50,7 +50,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
             map(([p, d]) => ({ ...p, ...d }))
         ).subscribe(
             (res: any) => {
-                if(!!res.action && res.action === 'carrier'){
+                if (!!res.action && res.action === 'carrier') {
                     this.isAdvCarrier = true;
                     this.formCreateComponent.isAdvCarrier = this.isAdvCarrier;
                 }
@@ -66,7 +66,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 item.requestCurrency = currency;
             }
             this.listRequestAdvancePaymentComponent.currency = currency;
-        }else{
+        } else {
             for (const item of this.listAdvancePaymentCarrierComponent.listAdvanceCarrier) {
                 item.requestCurrency = currency;
                 item.currencyId = currency;
@@ -75,18 +75,18 @@ export class AdvancePaymentAddNewComponent extends AppPage {
         }
     }
 
-    changeAdvanceFor(data: string){
-        if(this.isAdvCarrier){
+    changeAdvanceFor(data: string) {
+        if (this.isAdvCarrier) {
             this.listAdvancePaymentCarrierComponent.getListShipment(data);
         }
     }
 
-    checkInvalidListAdvanceRequest(){
+    checkInvalidListAdvanceRequest() {
         this.formCreateComponent.isSubmitted = true;
-        if(!this.formCreateComponent.dueDate.value || !this.formCreateComponent.dueDate.value.startDate){
+        if (!this.formCreateComponent.dueDate.value || !this.formCreateComponent.dueDate.value.startDate) {
             return true;
         }
-        if(!this.isAdvCarrier){
+        if (!this.isAdvCarrier) {
             if (!this.listRequestAdvancePaymentComponent.listRequestAdvancePayment.length) {
                 this._toastService.warning(`Advance Payment don't have any request in this period, Please check it again! `, '');
                 return true;
@@ -95,17 +95,17 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                 this._toastService.warning(`Total Advance Amount by cash is not exceed 100.000.000 VND `, '');
                 return true;
             }
-        }else{
+        } else {
             this.listAdvancePaymentCarrierComponent.isSubmitted = true;
-            
+
             if (!this.listAdvancePaymentCarrierComponent.listAdvanceCarrier.length) {
                 this._toastService.warning(`Advance Payment don't have any detail in this period, Please check it again! `, '');
                 return true;
             }
-            if(!this.formCreateComponent.payee.value){
+            if (!this.formCreateComponent.payee.value) {
                 return true;
             }
-            if(!this.listAdvancePaymentCarrierComponent.checkValidate()){
+            if (!this.listAdvancePaymentCarrierComponent.checkValidate()) {
                 return true;
             }
             if (!this.checkValidateAmountAdvance()) {
@@ -133,7 +133,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                         if (!res.status) {
                             this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
                                 title: 'Warning',
-                                body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                                body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
                                 class: 'bg-danger'
                             });
                             return EMPTY;
@@ -174,7 +174,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
                     if (!res.status) {
                         this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
                             title: 'Warning',
-                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable: </br>" + res.message,
                             class: 'bg-danger'
                         });
                         return EMPTY;

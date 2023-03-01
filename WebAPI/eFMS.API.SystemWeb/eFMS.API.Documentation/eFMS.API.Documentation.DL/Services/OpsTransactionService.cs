@@ -1,35 +1,34 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.ReportResults;
+using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.Models;
-using eFMS.IdentityServer.DL.UserManager;
-using ITL.NetCore.Common;
-using ITL.NetCore.Connection.BL;
-using ITL.NetCore.Connection.EF;
-using Microsoft.Extensions.Localization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.IService;
-using eFMS.API.Common.Models;
-using eFMS.API.Common;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using eFMS.API.Common.Helpers;
-using System.Data.Common;
-using eFMS.API.Documentation.Service.Contexts;
-using eFMS.API.Documentation.Service.ViewModels;
+using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
-using System.Linq.Expressions;
+using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using eFMS.API.Documentation.DL.Helpers;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
-using eFMS.API.ForPartner.DL.Models.Receivable;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -79,6 +78,9 @@ namespace eFMS.API.Documentation.DL.Services
         private IDatabaseUpdateService databaseUpdateService;
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IContextBase<AccAccountingManagement> accMngtRepo;
+        private readonly IOptions<ApiUrl> apiUrl;
+
+        private readonly ICsStageAssignedService csStageAssignedService;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository,
             IMapper mapper,
@@ -117,7 +119,9 @@ namespace eFMS.API.Documentation.DL.Services
             IDatabaseUpdateService _databaseUpdateService,
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<CsTransactionDetail> transactionDetail,
-            IContextBase<AccAccountingManagement> accMngt
+            IContextBase<AccAccountingManagement> accMngt,
+            IOptions<ApiUrl> aUrl,
+            ICsStageAssignedService csStageAssigned
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -160,6 +164,8 @@ namespace eFMS.API.Documentation.DL.Services
             surChargeRepository = surChargeRepo;
             transactionDetailRepository = transactionDetail;
             accMngtRepo = accMngt;
+            apiUrl = aUrl;
+            csStageAssignedService = csStageAssigned;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -273,7 +279,7 @@ namespace eFMS.API.Documentation.DL.Services
                 entityReplicate.GetType().GetProperty(item.Name).SetValue(entityReplicate, item.GetValue(originJob, null), null);
             }
 
-            entityReplicate.DatetimeCreated = originJob.DatetimeCreated;
+            entityReplicate.DatetimeCreated = DateTime.Now;
             entityReplicate.UserCreated = currentUser.UserID;
             entityReplicate.UserModified = currentUser.UserID;
             entityReplicate.DatetimeModified = DateTime.Now;
@@ -357,42 +363,38 @@ namespace eFMS.API.Documentation.DL.Services
         private OpsTransaction GetOpsTransactionToGenerateJobNo(SysOffice office)
         {
             OpsTransaction currentShipment = null;
-            if (office != null)
+            switch (office.Code)
             {
-                if (office.Code == "ITLHAN")
-                {
+                case "ITLHAN":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                          && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                          && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: HAN -> H [15202]
-                }
-                else if (office.Code == "ITLDAD")
-                {
+                    break;
+                case "ITLDAD":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
-                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
-                }
-                else
-                {
+                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                        && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
+                                                        .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
+                    break;
+                case "ITLCAM":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
-                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
-                                                         && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
-                }
-            }
-            else
-            {
-                currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
+                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                        && x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-"))
+                                                        .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                    break;
+                default:
+                    currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                      && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                      && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                     && !x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-")
                                                      && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                      .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                    break;
             }
             return currentShipment;
         }
@@ -400,16 +402,19 @@ namespace eFMS.API.Documentation.DL.Services
         private string SetPrefixJobIdByOfficeCode(string officeCode)
         {
             string prefixCode = string.Empty;
-            if (!string.IsNullOrEmpty(officeCode))
+            switch (officeCode)
             {
-                if (officeCode == "ITLHAN")
-                {
-                    prefixCode = "H"; //HAN- >> H
-                }
-                else if (officeCode == "ITLDAD")
-                {
-                    prefixCode = "D"; //DAD- >> D
-                }
+                case "ITLHAN":
+                    prefixCode = "H";
+                    break;
+                case "ITLDAD":
+                    prefixCode = "D";
+                    break;
+                case "ITLCAM":
+                    prefixCode = "C";
+                    break;
+                default:
+                    break;
             }
             return prefixCode;
         }
@@ -439,6 +444,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                 CatPartner customer = partnerRepository.Get(x => x.Id == details.CustomerId).FirstOrDefault();
                 details.CustomerName = customer?.ShortName;
+                details.CustomerAccountNo = customer?.AccountNo;
+
+                CatPlace place = placeRepository.Get(x => x.Id == details.ClearanceLocation).FirstOrDefault();
+                details.PlaceNameCode = place?.Code;
 
                 details.UserCreatedName = userRepository.Get(x => x.Id == details.UserCreated).FirstOrDefault()?.Username;
                 details.UserModifiedName = userRepository.Get(x => x.Id == details.UserModified).FirstOrDefault()?.Username;
@@ -885,15 +894,29 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                   && x.SaleService.Contains("CL")
-                   && x.Active == true
-                   && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                   && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                   )?.FirstOrDefault();
+                       && x.SaleService.Contains("CL")
+                       && x.Active == true
+                       && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
                     if (customerContract == null)
                     {
                         string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                        string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
+                        return new HandleState(errorContract);
+                    }
+                    string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
+                    if (customerContract.IsExpired == true)
+                    {
+                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                        return new HandleState(errorContract);
+                    }
+                    if (customerContract.IsOverDue == true)
+                    {
+                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                        return new HandleState(errorContract);
+                    }
+                    if (customerContract.IsOverLimit == true)
+                    {
+                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
                         return new HandleState(errorContract);
                     }
                 }
@@ -991,6 +1014,8 @@ namespace eFMS.API.Documentation.DL.Services
                 SumCbm = model.Cbm,
                 Shipper = model.Shipper,
                 Consignee = model.Consignee,
+                Eta = model.Eta,
+                ClearanceDate = model.ClearanceDate,
                 BillingOpsId = currentUser.UserID,
                 GroupId = currentUser.GroupId,
                 DepartmentId = currentUser.DepartmentId,
@@ -1000,7 +1025,7 @@ namespace eFMS.API.Documentation.DL.Services
                 UserCreated = currentUser.UserID, //currentUser.UserID;
                 DatetimeModified = DateTime.Now,
                 UserModified = currentUser.UserID,
-                ShipmentType = customerContract.ShipmentType== "Nominated" ? "Nominated" : "Freehand",
+                ShipmentType = customerContract.ShipmentType == "Nominated" ? "Nominated" : "Freehand",
             };
 
             CatPartner customer = new CatPartner();
@@ -1140,18 +1165,34 @@ namespace eFMS.API.Documentation.DL.Services
                         && x.SaleService.Contains("CL")
                         && x.Active == true
                         && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                    } else
+                    }
+                    else
                     {
                         customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
                        && x.SaleService.Contains("CL")
                        && x.Active == true
-                       && x.OfficeId.Contains(currentUser.OfficeID.ToString())
-                       && (x.IsExpired != true && x.IsOverDue != true && x.IsOverLimit != true)
-                       )?.FirstOrDefault();
+                       && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+
                         if (customerContract == null)
                         {
                             string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                            string errorContract = String.Format("Customer {0} not have any agreements for service in office {1}", customer.ShortName, officeName);
+                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
+                            return new HandleState(errorContract);
+                        }
+                        string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
+                        if (customerContract.IsExpired == true)
+                        {
+                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                            return new HandleState(errorContract);
+                        }
+                        if (customerContract.IsOverDue == true)
+                        {
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
+                            return new HandleState(errorContract);
+                        }
+                        if (customerContract.IsOverLimit == true)
+                        {
+                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
                             return new HandleState(errorContract);
                         }
                     }
@@ -1348,6 +1389,10 @@ namespace eFMS.API.Documentation.DL.Services
                     Hblid = cd.Hblid,
                     Mblid = cd.Mblid,
                     NetWeight = cd.NetWeight,
+                    GrossWeight = cd.GrossWeight,
+                    Pcs = cd.Pcs,
+                    Cbm = cd.Cbm,
+                    UnitCode = cd.UnitCode,
                     Note = cd.Note,
                     AccountNo = cd.AccountNo,
                     PartnerTaxCode = cd.PartnerTaxCode,
@@ -1409,14 +1454,16 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         surchargeRepository.Delete(x => x.Id == item.Id, false);
                     }
-                    var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo);
+                    //Xóa job OPS xóa luôn tờ khai rep
+                    var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo && x.Source == "Replicate");
                     if (clearances != null)
                     {
                         foreach (var item in clearances)
                         {
-                            item.JobNo = null;
-                            item.ConvertTime = null;
-                            customDeclarationRepository.Update(item, x => x.Id == item.Id, false);
+                            //item.JobNo = null;
+                            //item.ConvertTime = null;
+                            //customDeclarationRepository.Update(item, x => x.Id == item.Id, false);
+                            customDeclarationRepository.Delete(x => x.Id == item.Id, false);
                         }
                     }
                 }
@@ -1518,9 +1565,9 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new FormPLsheetReportParameter
             {
                 Contact = currentUser.UserName,
-                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyName = sysOfficeRepo.Get(x => x.Id == shipment.OfficeId).FirstOrDefault().BranchNameEn,
                 CompanyDescription = string.Empty,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress1 = sysOfficeRepo.Get(x => x.Id == shipment.OfficeId).FirstOrDefault().AddressEn,
                 CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
                 Website = DocumentConstants.COMPANY_WEBSITE,
                 CurrDecimalNo = 2,
@@ -1638,6 +1685,14 @@ namespace eFMS.API.Documentation.DL.Services
                     dataSources.Add(surchargeRpt);
                 }
             }
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "FormPLsheet_" + shipment.JobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(dataSources);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -2168,6 +2223,7 @@ namespace eFMS.API.Documentation.DL.Services
                     item.PaySyncedFrom = null;
                     item.ReferenceNo = null;
                     item.ExchangeDate = DateTime.Now;
+                    item.AdvanceNoFor = null;
 
                     #region -- Tính lại giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                     //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
@@ -2498,7 +2554,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         entityReplicate.GetType().GetProperty(item.Name).SetValue(entityReplicate, item.GetValue(job, null), null);
                     }
-                    entityReplicate.DatetimeCreated = job.DatetimeCreated;
+                    entityReplicate.DatetimeCreated = DateTime.Now;
                     entityReplicate.UserCreated = currentUser.UserID;
                     entityReplicate.UserModified = currentUser.UserID;
                     entityReplicate.DatetimeModified = DateTime.Now;
@@ -2557,25 +2613,30 @@ namespace eFMS.API.Documentation.DL.Services
                         }
 
                         // copy assignment
-                        var assign = opsStageAssignedRepository.Get(x => x.JobId == job.Id)?.FirstOrDefault();
-                        if (assign != null)
+                        var assign = opsStageAssignedRepository.Get(x => x.JobId == job.Id);
+                        if (assign?.Count() > 0)
                         {
-                            var opsAssignProp = assign.GetType().GetProperties();
-                            OpsStageAssigned newOpsAssigned = new OpsStageAssigned();
-
-                            foreach (var prop in opsAssignProp)
+                            var listStage = new List<CsStageAssignedModel>();
+                            foreach (var item in assign)
                             {
-                                newOpsAssigned.GetType().GetProperty(prop.Name).SetValue(newOpsAssigned, prop.GetValue(assign, null), null);
+                                var opsAssignProp = item.GetType().GetProperties();
+                                CsStageAssignedModel newOpsAssigned = new CsStageAssignedModel();
+                                foreach (var prop in opsAssignProp)
+                                {
+                                    newOpsAssigned.GetType().GetProperty(prop.Name).SetValue(newOpsAssigned, prop.GetValue(item, null), null);
+                                }
+
+                                newOpsAssigned.DatetimeCreated = DateTime.Now;
+                                newOpsAssigned.DatetimeModified = DateTime.Now;
+                                newOpsAssigned.UserCreated = currentUser.UserID;
+                                newOpsAssigned.UserModified = currentUser.UserID;
+                                newOpsAssigned.Id = Guid.NewGuid();
+                                newOpsAssigned.JobId = entityReplicate.Id;
+
+                                listStage.Add(newOpsAssigned);
                             }
+                            HandleState hsAssign = await csStageAssignedService.AddMultipleStageAssigned(job.Id, listStage);
 
-                            newOpsAssigned.DatetimeCreated = DateTime.Now;
-                            newOpsAssigned.DatetimeModified = DateTime.Now;
-                            newOpsAssigned.UserCreated = currentUser.UserID;
-                            newOpsAssigned.UserModified = currentUser.UserID;
-                            newOpsAssigned.Id = Guid.NewGuid();
-                            newOpsAssigned.JobId = entityReplicate.Id;
-
-                            HandleState hsAssign = opsStageAssignedRepository.Add(newOpsAssigned);
                         }
                     }
                 };
@@ -2651,12 +2712,13 @@ namespace eFMS.API.Documentation.DL.Services
                 if (p != null) { p.SetValue(surcharge, item.GetValue(chargeBuy, null), null); }
             }
 
+            var datetimeCR = new DateTime(2023, 1, 1); // [CR:18726] update 8 -> 10% from 1/1/2023
             surcharge.Id = Guid.NewGuid();
             surcharge.Type = DocumentConstants.CHARGE_SELL_TYPE;
             surcharge.ChargeId = chargeBuy.DebitCharge ?? Guid.Empty;
 
-            surcharge.Quantity = 1;
-            surcharge.Vatrate = 8;
+            surcharge.Quantity = chargeBuy.ServiceDate.Value < datetimeCR ? 1 : chargeBuy.Quantity;
+            surcharge.Vatrate = chargeBuy.ServiceDate.Value < datetimeCR ? 8 : 10; // [CR:18726] update 8 -> 10% from 1/1/2023
 
             surcharge.Soano = null;
             surcharge.PaySoano = null;
@@ -2686,7 +2748,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (chargeBuy.CurrencyId == "VND")
             {
-                var per = (double)chargeBuy.Total / (double)0.76;
+                var per = (chargeBuy.ServiceDate.Value < datetimeCR ? (double)chargeBuy.Total  : (double)chargeBuy.UnitPrice) / (double)0.76;
                 surcharge.UnitPrice = NumberHelper.RoundNumber((decimal)per / 10000, 0) * 10000;
                 surcharge.NetAmount = surcharge.UnitPrice * surcharge.Quantity;
                 surcharge.Total = surcharge.NetAmount + ((surcharge.NetAmount * surcharge.Vatrate) / 100) ?? 0;
@@ -2814,6 +2876,40 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
+        }
+
+        public async Task<HandleState> SyncGoodInforToReplicateJob(Guid jobId)
+        {
+            var hs = new HandleState();
+            var job = await DataContext.Get(x => x.Id == jobId && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+            if (job != null)
+            {
+                var repJob = await DataContext.Get(x => x.Id == job.ReplicatedId && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+                if (job != null && repJob != null)
+                {
+                    repJob.SumNetWeight = job.SumNetWeight;
+                    repJob.SumPackages = job.SumPackages;
+                    repJob.SumCbm = job.SumCbm;
+                    repJob.SumContainers = job.SumContainers;
+                    repJob.SumGrossWeight = job.SumGrossWeight;
+                    repJob.PackageTypeId = job.PackageTypeId;
+                    repJob.ContainerDescription = job.ContainerDescription;
+
+                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id, false);
+                    if (hs.Success)
+                    {
+                        var listConOfJob = await csMawbcontainerRepository.GetAsync(x => x.Mblid == job.Id);
+                        var listCont = mapper.Map<List<CsMawbcontainerModel>>(listConOfJob);
+                        listCont.ForEach(x => x.Id = Guid.Empty);
+                        hs = mawbcontainerService.UpdateMasterBill(listCont, job.ReplicatedId ?? Guid.Empty);
+                    }
+                    hs = DataContext.SubmitChanges();
+
+                    return hs;
+                }
+            }
+
+            return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_REPLICATE_NOT_EXISTS].Value);
         }
 
         private List<sp_GetOutsourcingRegcognising> GetOutsourcingRegcognising(string JobNos)

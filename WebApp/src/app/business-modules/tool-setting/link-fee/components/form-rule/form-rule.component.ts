@@ -1,18 +1,18 @@
-import { Component, OnInit, Output, EventEmitter, Input, ViewChild } from '@angular/core';
-import { PopupBase } from 'src/app/popup.base';
+import { formatDate } from '@angular/common';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Charge, Partner } from '@models';
+import { NgProgress } from '@ngx-progressbar/core';
 import { SettingRepo } from '@repositories';
-import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
+import { DataService } from '@services';
 import { ToastrService } from 'ngx-toastr';
-import { Charge, Partner, Tariff, User } from '@models';
+import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
+import { PopupBase } from 'src/app/popup.base';
+import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
+import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { RuleLinkFee } from 'src/app/shared/models/tool-setting/rule-link-fee';
 import { CatalogueRepo } from 'src/app/shared/repositories';
-import { catchError, distinctUntilChanged, map } from 'rxjs/operators';
-import { DataService } from '@services';
 import { SystemConstants } from 'src/constants/system.const';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { formatDate } from '@angular/common';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { NgProgress } from '@ngx-progressbar/core';
 
 @Component({
     selector: 'form-rule',
@@ -111,7 +111,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
             .subscribe((value: any) => {
                 this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
             });
-        
+
     }
 
     initBasicData() {

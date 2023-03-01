@@ -14,13 +14,13 @@ export const initialState: ISOAReducerState = {
     isLoaded: false,
     isLoading: false,
     dataSearch: {},
-    pagingData: { page: 1, pageSize: 15 }
+    pagingData: { page: 1, pageSize: 30 }
 };
 
 export const SOAMangReducer = createReducer(
     initialState,
     on(actions.SearchListSOA, (state: ISOAReducerState, payload: any) => ({
-        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 15 }
+        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 30 }
     })),
     on(actions.LoadListSOA, (state: ISOAReducerState, payload: CommonInterface.IParamPaging) => ({
         ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size }

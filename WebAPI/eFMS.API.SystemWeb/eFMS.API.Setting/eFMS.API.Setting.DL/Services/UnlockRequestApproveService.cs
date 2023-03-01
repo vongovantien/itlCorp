@@ -872,7 +872,7 @@ namespace eFMS.API.Setting.DL.Services
                             if (!string.IsNullOrEmpty(unlockRequest.RequestUser))
                             {
                                 unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_LEADERAPPROVED;
-                                approve.LeaderApr = userCurrent;
+                                approve.LeaderApr = approve.Leader = userCurrent;
                                 approve.LeaderAprDate = DateTime.Now;
                                 approve.LevelApprove = SettingConstants.LEVEL_LEADER;
                                 userApproveNext = managerLevel.UserId;
@@ -947,7 +947,7 @@ namespace eFMS.API.Setting.DL.Services
                             if (!string.IsNullOrEmpty(approve.LeaderApr) || leaderLevel.Role == SettingConstants.ROLE_NONE || leaderLevel.Role == SettingConstants.ROLE_AUTO)
                             {
                                 unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_MANAGERAPPROVED;
-                                approve.ManagerApr = userCurrent;
+                                approve.ManagerApr = approve.Manager = userCurrent;
                                 approve.ManagerAprDate = DateTime.Now;
                                 approve.LevelApprove = SettingConstants.LEVEL_MANAGER;
                                 userApproveNext = accountantLevel.UserId;
@@ -1013,7 +1013,7 @@ namespace eFMS.API.Setting.DL.Services
                             if (!string.IsNullOrEmpty(approve.ManagerApr) || managerLevel.Role == SettingConstants.ROLE_NONE || managerLevel.Role == SettingConstants.ROLE_AUTO)
                             {
                                 unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
-                                approve.AccountantApr = userCurrent;
+                                approve.AccountantApr = approve.Accountant = userCurrent;
                                 approve.AccountantAprDate = DateTime.Now;
                                 approve.LevelApprove = SettingConstants.LEVEL_ACCOUNTANT;
                                 userApproveNext = buHeadLevel.UserId;
@@ -1074,17 +1074,17 @@ namespace eFMS.API.Setting.DL.Services
                         {
                             if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
                             {
-                                approve.LeaderApr = userCurrent;
+                                approve.LeaderApr = approve.Leader = userCurrent;
                                 approve.LeaderAprDate = DateTime.Now;
                             }
                             if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
                             {
-                                approve.ManagerApr = userCurrent;
+                                approve.ManagerApr = approve.Manager = userCurrent;
                                 approve.ManagerAprDate = DateTime.Now;
                             }
                             if (!string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
                             {
-                                approve.AccountantApr = userCurrent;
+                                approve.AccountantApr = approve.Accountant = userCurrent;
                                 approve.AccountantAprDate = DateTime.Now;
                             }
                         }
@@ -1093,7 +1093,7 @@ namespace eFMS.API.Setting.DL.Services
                             if (!string.IsNullOrEmpty(approve.AccountantApr) || accountantLevel.Role == SettingConstants.ROLE_NONE || accountantLevel.Role == SettingConstants.ROLE_AUTO || buHeadLevel.Role == SettingConstants.ROLE_SPECIAL)
                             {
                                 unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
-                                approve.BuheadApr = userCurrent;
+                                approve.BuheadApr = approve.Buhead = userCurrent;
                                 approve.BuheadAprDate = DateTime.Now;
                                 approve.LevelApprove = SettingConstants.LEVEL_BOD;
                             }
@@ -2032,7 +2032,7 @@ namespace eFMS.API.Setting.DL.Services
         {
             foreach (var job in jobs)
             {
-                var ops = opsTransactionRepo.Get(x => x.JobNo == job).FirstOrDefault();
+                var ops = opsTransactionRepo.Get(x => x.JobNo == job && x.CurrentStatus != "Canceled").FirstOrDefault();
                 if (ops != null)
                 {
                     if (type == "Shipment")

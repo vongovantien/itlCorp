@@ -34,6 +34,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     status: AbstractControl;
     typeReceipt: AbstractControl;
     class: AbstractControl;
+    paymentMethod: AbstractControl;
 
     customerIDs: Observable<Customer[]>;
     creators: Observable<User[]>;
@@ -55,6 +56,21 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         AccountingConstants.RECEIPT_CLASS.PAY_OBH,
         AccountingConstants.RECEIPT_CLASS.NET_OFF];
 
+    paymentMethods: string[] = [
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.CASH,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.BANK,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_BANK,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_CASH,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.OBH_INTERNAL,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.EXTRA,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER
+    ];
+    
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
@@ -85,7 +101,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             status: [],
             syncStatus: [],
             typeReceipt: [],
-            class: []
+            class: [],
+            paymentMethod: []
         });
         this.refNo = this.formSearch.controls['refNo'];
         this.paymentType = this.formSearch.controls['paymentType'];
@@ -97,6 +114,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.typeReceipt = this.formSearch.controls['typeReceipt'];
         this.status = this.formSearch.controls['status'];
         this.class = this.formSearch.controls['class'];
+        this.paymentMethod = this.formSearch.controls['paymentMethod'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -124,7 +142,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             syncStatus: this.syncStatus.value,
             status: this.status.value,
             typeReceipt: this.typeReceipt.value,
-            class: this.class.value
+            class: this.class.value,
+            paymentMethod: this.paymentMethod.value
         };
         //this._listReceipt.onSearchCPs(body);
         this._store.dispatch(SearchListCustomerPayment(body))
@@ -142,6 +161,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.syncStatus.reset();
         this.status.reset();
         this.class.reset();
+        this.paymentMethod.reset();
 
         this._store.dispatch(SearchListCustomerPayment({}))
     }
@@ -164,10 +184,12 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
                             status: data.status ? data.status : null,
                             syncStatus: data.syncStatus ? data.syncStatus : null,
                             typeReceipt: data.typeReceipt ? data.typeReceipt : null,
-                            class: data.class ? data.class : null
+                            class: data.class ? data.class : null,
+                            paymentMethod: data.paymentMethod ? data.paymentMethod : null
                         };
 
                         this.formSearch.patchValue(formData);
+                        console.log(data);
                     }
                 }
             );
@@ -186,4 +208,5 @@ export interface IAcctReceiptCriteria {
     status: string;
     typeReceipt: string;
     class: string;
+    paymentMethod: string;
 }

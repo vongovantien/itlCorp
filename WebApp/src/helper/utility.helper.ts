@@ -1,6 +1,6 @@
 import { SystemConstants } from "src/constants/system.const";
 import { ChargeConstants } from "@constants";
-import { CommonEnum } from "@enums";
+import { CommonEnum, TransactionTypeEnum } from "@enums";
 import { Observable, fromEvent, merge, combineLatest } from "rxjs";
 import { distinctUntilChanged, filter, share } from "rxjs/operators";
 
@@ -217,6 +217,22 @@ export class UtilityHelper {
         ]).get(type)[0];
     }
 
+    getTransationTypeByEnum(type: TransactionTypeEnum) {
+        return new Map([
+            [CommonEnum.TransactionTypeEnum.AirExport, [ChargeConstants.AE_CODE]],
+            [CommonEnum.TransactionTypeEnum.AirImport, [ChargeConstants.AI_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaFCLExport, [ChargeConstants.SFE_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaFCLImport, [ChargeConstants.SFI_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaLCLExport, [ChargeConstants.SLE_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaLCLImport, [ChargeConstants.SLI_CODE]],
+            [CommonEnum.TransactionTypeEnum.CustomLogistic, [ChargeConstants.CL_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaConsolExport, [ChargeConstants.SCE_CODE]],
+            [CommonEnum.TransactionTypeEnum.SeaConsolImport, [ChargeConstants.SCI_CODE]],
+            [CommonEnum.TransactionTypeEnum.InlandTrucking, [ChargeConstants.IT_CODE]],
+
+        ]).get(type)[0];
+    }
+
     getServiceName(type: string) {
         return new Map([
             [ChargeConstants.AE_CODE, [ChargeConstants.AE_DES]],
@@ -249,8 +265,8 @@ export class UtilityHelper {
 
     getChargeType(type: string) {
         return new Map([
-            ['BUY', [CommonEnum.CHARGE_TYPE.DEBIT]],
-            ['SELL', [CommonEnum.CHARGE_TYPE.CREDIT]],
+            ['BUY', [CommonEnum.CHARGE_TYPE.CREDIT]],
+            ['SELL', [CommonEnum.CHARGE_TYPE.DEBIT]],
             ['OBH', [CommonEnum.CHARGE_TYPE.OBH]],
         ]).get(type)[0];
     }
@@ -317,22 +333,22 @@ export class UtilityHelper {
             if (jobNo.indexOf('AI') > - 1) {
                 transactionType = ChargeConstants.AI_CODE;
             }
-            if (jobNo.indexOf('FE') > - 1) {
+            if (jobNo.indexOf('EF') > - 1) {
                 transactionType = ChargeConstants.SFE_CODE;
             }
-            if (jobNo.indexOf('FI') > - 1) {
+            if (jobNo.indexOf('IF') > - 1) {
                 transactionType = ChargeConstants.SFI_CODE;
             }
-            if (jobNo.indexOf('LE') > - 1) {
+            if (jobNo.indexOf('EL') > - 1) {
                 transactionType = ChargeConstants.SLE_CODE;
             }
-            if (jobNo.indexOf('LI') > - 1) {
+            if (jobNo.indexOf('IL') > - 1) {
                 transactionType = ChargeConstants.SLI_CODE;
             }
-            if (jobNo.indexOf('CE') > - 1) {
+            if (jobNo.indexOf('EC') > - 1) {
                 transactionType = ChargeConstants.SCE_CODE;
             }
-            if (jobNo.indexOf('CI') > - 1) {
+            if (jobNo.indexOf('IC') > - 1) {
                 transactionType = ChargeConstants.SCI_CODE;
             }
         }

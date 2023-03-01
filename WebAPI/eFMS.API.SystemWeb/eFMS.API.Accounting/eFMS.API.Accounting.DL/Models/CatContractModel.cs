@@ -6,5 +6,6 @@ namespace eFMS.API.Accounting.DL.Models
     public class CatContractModel : CatContract
     {
         public List<string> Customers { get; set; }
+        public string PaymentTermChanged { get; set; }
     }
 }

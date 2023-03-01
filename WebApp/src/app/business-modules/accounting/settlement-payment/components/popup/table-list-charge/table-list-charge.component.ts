@@ -139,7 +139,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
         this._store.dispatch(new GetCatalogueUnitAction());
 
-        this.getMasterCharges();
+        // this.getMasterCharges();
         this.getShipmentCommonData();
         this.getCustomDecleration();
         this.initForm();
@@ -234,11 +234,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.listUnits = this._store.select(getCatalogueUnitState);
     }
 
-    getMasterCharges(serviceTypeId: string = null, isChangeService: boolean = false) {
+    getMasterCharges(officeId: string = null, serviceTypeId: string = null, isChangeService: boolean = false) {
         forkJoin([
-            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: serviceTypeId }),
-            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OBH, serviceTypeId: serviceTypeId }),
-            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OTHER, serviceTypeId: serviceTypeId }),
+            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: serviceTypeId, officeId: officeId }),
+            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OBH, serviceTypeId: serviceTypeId, officeId: officeId }),
+            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OTHER, serviceTypeId: serviceTypeId, officeId: officeId }),
         ]).pipe(
             map(([chargeCredit, chargeOBH, chargeOther]) => {
                 return [...chargeCredit, ...chargeOBH, ...chargeOther];
@@ -284,13 +284,16 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected && !chg.hadIssued); // Update shipment for selected charges without issued
         let notSelectedCharges = this.charges.filter((chg: Surcharge) => selectedCharges.filter(x => x.id === chg.id).length === 0);
         if (!!selectedCharges.length) {
-            if (this.utility.getServiceType(selectedCharges[0].jobId) !== this.utility.getServiceType(data.jobId)) {
-                this.getMasterCharges(this.serviceTypeId, true);
+            if (this.utility.getServiceType(selectedCharges[0].jobId) !== data.service) {
+                this.getMasterCharges(this.selectedShipment.officeId, this.serviceTypeId, true);
             }
             if (selectedCharges[0].hblid !== data.hblid) {
                 selectedCharges.forEach((charge: Surcharge) => {
                     charge.isChangeShipment = true;
                     charge.id = SystemConstants.EMPTY_GUID;
+                    if (charge.chargeId === SystemConstants.EMPTY_GUID) {
+                        charge.chargeId = null;
+                    }
                 });
             }
             for (const charge of selectedCharges) {
@@ -302,8 +305,13 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 charge.hbl = this.selectedShipment.hbl;
                 charge.hblid = this.selectedShipment.hblid;
                 charge.advanceNo = charge.originAdvanceNo = this.advanceNo.value;
+                if (charge.chargeId === SystemConstants.EMPTY_GUID) {
+                    charge.chargeId = null;
+                }
             }
             this.charges = [...selectedCharges, ...notSelectedCharges];
+        } else {
+            this.getMasterCharges(this.selectedShipment.officeId, this.serviceTypeId);
         }
     }
 
@@ -322,7 +330,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             let notSelectedCharges = this.charges.filter((chg: Surcharge) => selectedCharges.filter(x => x.id === chg.id).length === 0);
             if (!!selectedCharges.length) {
                 if (this.utility.getServiceType(selectedCharges[0].jobId) !== this.utility.getServiceType((data as CustomDeclaration).jobNo)) {
-                    this.getMasterCharges(this.serviceTypeId, true);
+                    this.getMasterCharges(this.selectedCD.officeId, this.serviceTypeId, true);
                 }
                 if (selectedCharges[0].hblid !== data.hblid) {
                     selectedCharges.forEach((charge: Surcharge) => {
@@ -343,6 +351,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 }
 
                 this.charges = [...selectedCharges, ...notSelectedCharges]
+            } else {
+                this.getMasterCharges(this.selectedCD.officeId, this.serviceTypeId);
             }
 
             this.getAdvances(data.jobNo, data.hblid, true, this.settlementCode);
@@ -364,7 +374,18 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 if (this.charges.length > 0) {
                     let selectedCharges = this.charges.filter((chg: Surcharge) => chg.isSelected); // Update selected charges
                     let notSelectedCharges = this.charges.filter((chg: Surcharge) => !chg.isSelected);
-                    selectedCharges.forEach((chg: Surcharge) => chg.invoiceDate = null);
+                    selectedCharges.forEach((chg: Surcharge) => {
+                        chg.invoiceDate = null;
+                        if (!chg.chargeId) {
+                            chg.chargeId = SystemConstants.EMPTY_GUID;
+                        }
+                        if (chg.unitId === null || chg.unitId === undefined) {
+                            chg.unitId = 0;
+                        }
+                        if (chg.id === null) {
+                            chg.id = SystemConstants.EMPTY_GUID;
+                        }
+                    });
                     this._accountingRepo.checkAllowUpdateDirectCharges(selectedCharges)
                         .subscribe(
                             (res: any) => {
@@ -462,9 +483,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                         switchMap((units: Unit[]) => of(units.find(u => u.id === data.unitId))),
                     ).subscribe(
                         (unit: Unit) => {
-                            chargeItem.unitId = unit.id;
-                            chargeItem.unitPrice = data.unitPrice;
-                            chargeItem.unitName = unit.unitNameEn;
+                            chargeItem.unitId = unit?.id || null;
+                            chargeItem.unitPrice = data?.unitPrice;
+                            chargeItem.unitName = unit?.unitNameEn || null;
 
                             this.calculateTotal(chargeItem.vatrate, chargeItem.quantity, chargeItem.unitPrice, chargeItem);
                         }
@@ -923,6 +944,7 @@ interface IAdvanceShipment {
     amount: number;
     requestCurrency: string;
     advanceNo: string;
+    officeId: string;
 }
 
 

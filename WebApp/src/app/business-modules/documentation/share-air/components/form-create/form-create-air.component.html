@@ -15,18 +15,18 @@
                             <label required>MAWB No </label>
                             <input class="form-control" formControlName="mawb" (blur)="onBlurGetAirline($event)"
                                 placeholder="xxx-xxxxxxxx">
-                            <!-- <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && isCheckedActive === false &&
+                            <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && isCheckedActive === false &&
                             mawb.errors | equalError:'pattern':''">
                                 MAWB must be xxx-xxxxxxxx
                             </div>
                             <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && mawb.errors | equalError:'invalidMawb'
                             ">
-                                MAWB inputted is not correct format
+                                MAWB inputted is not the correct format
                             </div>
                             <div class="form-control-feedback" *ngIf="(isSubmitted || mawb.dirty) && mawb.errors | equalError:'invalidSpecial'
                             ">
-                                MAWB No must be not have special charater!
-                            </div> -->
+                                MAWB No must not have a special character
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -83,9 +83,9 @@
                     <div class="col-md-4">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-group" [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value) 
-                                    || (isSubmitted && type !== 'import' && !etd.value) 
-                                    || (isSubmitted && type !== 'import' && !etd.valid) 
+                                <div class="form-group" [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value)
+                                    || (isSubmitted && type !== 'import' && !etd.value)
+                                    || (isSubmitted && type !== 'import' && !etd.valid)
                                     || (isSubmitted && !!etd.value && !etd.value.startDate && type !== 'import')}">
                                     <label>ETD
                                         <span class="text-danger" *ngIf="type !== 'import'">(*)</span>
@@ -102,10 +102,10 @@
                                 </div>
                             </div>
                             <div class="col-md-6 eta-date-picker">
-                                <div class="form-group" [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) 
-                                    || (isSubmitted && type === 'import' && !eta.value) 
-                                    || (isSubmitted && type === 'import' && !eta.valid) 
-                                    || (isSubmitted && !!eta.value && !eta.value.startDate && type === 'import') 
+                                <div class="form-group" [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value)
+                                    || (isSubmitted && type === 'import' && !eta.value)
+                                    || (isSubmitted && type === 'import' && !eta.valid)
+                                    || (isSubmitted && !!eta.value && !eta.value.startDate && type === 'import')
                                     || (isSubmitted && formGroup.errors | equalError:'validateEta_Etd')}">
                                     <label>ETA
                                         <span class="text-danger" *ngIf="type === 'import'">(*)</span>
@@ -127,8 +127,8 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger': 
-                        (isSubmitted && type !== 'import' && !pol.value) 
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger':
+                        (isSubmitted && type !== 'import' && !pol.value)
                         || (formGroup.errors | equalError:'invalidPort')}">
                             <label>A.O.L - Departure
                                 <span class="text-danger" *ngIf="type !== 'import'">(*)</span>
@@ -144,7 +144,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group" [ngClass]="{'m-form__group has-danger':
-                            (isSubmitted && type === 'import' && !pod.value) 
+                            (isSubmitted && type === 'import' && !pod.value)
                             || (formGroup.errors | equalError:'invalidPort')}">
                             <label>A.O.D - Destination
                                 <span class="text-danger" *ngIf="type === 'import'">(*)</span>
@@ -374,7 +374,7 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label>No HAWB</label>
                                             <div>
@@ -382,7 +382,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label>No MAWB</label>
                                             <div>
@@ -390,8 +390,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
+                                    <div class="col-md-4">
+                                        <div class="form-group" *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                                             <label>
                                                 No Profit
                                             </label>

@@ -246,10 +246,21 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
     }
 
     getCharge() {
-        this._catalogueRepo.getCharges({ active: true, serviceTypeId: ChargeConstants.AI_CODE, type: CommonEnum.CHARGE_TYPE.DEBIT })
-            .pipe(catchError(this.catchError))
+        this._store.select(getTransactionDetailCsTransactionState)
+            .pipe(
+                switchMap((shipmentDetail: CsTransaction) => {
+                    return this._catalogueRepo.getCharges({
+                        active: true,
+                        serviceTypeId: ChargeConstants.AI_CODE,
+                        type: CommonEnum.CHARGE_TYPE.DEBIT,
+                        officeId: shipmentDetail?.officeId
+                    })
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
             .subscribe(
                 (charges: Charge[]) => {
+                    console.log(charges);
                     this.listCharges = charges;
                 }
             );

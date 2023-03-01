@@ -1,21 +1,23 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { OperationRepo } from '@repositories';
+import { takeUntil } from 'rxjs/operators';
 
 import { AppForm } from '@app';
-import { ShareBussinessContainerListPopupComponent, IShareBussinessState, GetContainerSuccessAction, getContainerSaveState } from '@share-bussiness';
-import { OpsTransaction, Customer, PortIndex, Warehouse, User, CommodityGroup, Unit, Container } from '@models';
-import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
-import { Store } from '@ngrx/store';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
-import { CommonEnum } from '@enums';
-import { FormValidators } from '@validators';
-import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
+import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
+import { CommonEnum } from '@enums';
+import { CommodityGroup, Container, CustomDeclaration, Customer, OpsTransaction, PortIndex, Unit, User, Warehouse } from '@models';
+import { Store } from '@ngrx/store';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
+import { getContainerSaveState, GetContainerSuccessAction, IShareBussinessState, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
+import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState, GetCatalogueWarehouseAction, getCatalogueWarehouseState, getMenuUserSpecialPermissionState } from '@store';
+import { FormValidators } from '@validators';
 
-import { Observable, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
+import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
     selector: 'job-mangement-form-edit',
@@ -64,6 +66,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     shipmentType: AbstractControl;
     note: AbstractControl;
     noProfit: AbstractControl;
+    eta: AbstractControl;
+    deliveryDate: AbstractControl;
+    suspendTime: AbstractControl;
+    clearanceDate: AbstractControl;
 
     productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
@@ -101,12 +107,13 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     containers: Observable<any>;
     salesmanName: string = null;
-
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
+        private _operationRepo: OperationRepo,
         protected _documentRepo: DocumentationRepo,
         private _store: Store<IShareBussinessState>,
         private _systemRepo: SystemRepo,
+        private _toastService: ToastrService,
         private _toaster: ToastrService) {
         super();
     }
@@ -141,8 +148,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.warehouses = this._store.select(getCatalogueWarehouseState);
         this.commodityGroups = this._store.select(getCatalogueCommodityGroupState);
         this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
-
         this.containers = this._store.select(getContainerSaveState);
+
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+
         this.initForm();
     }
 
@@ -181,9 +190,12 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             packageTypeId: this.opsTransaction.packageTypeId,
             shipmentType: this.opsTransaction.shipmentType,
             note: this.opsTransaction.note,
-            noProfit: this.opsTransaction.noProfit
+            noProfit: this.opsTransaction.noProfit,
+            eta: !!this.opsTransaction.eta ? { startDate: new Date(this.opsTransaction.eta), endDate: new Date(this.opsTransaction.eta) } : null,
+            deliveryDate: !!this.opsTransaction.deliveryDate ? { startDate: new Date(this.opsTransaction.deliveryDate), endDate: new Date(this.opsTransaction.deliveryDate) } : null,
+            clearanceDate: !!this.opsTransaction.clearanceDate ? { startDate: new Date(this.opsTransaction.clearanceDate), endDate: new Date(this.opsTransaction.clearanceDate) } : null,
+            suspendTime: this.opsTransaction.suspendTime,
         });
-
         this.customerName = this.opsTransaction.customerName;
         this.shipmentInfo = this.opsTransaction.serviceNo;
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
@@ -235,13 +247,19 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             shipmentType: [null, Validators.required],
             sumGrossWeight: [null],
             sumNetWeight: [null],
-            sumContainers: [null],
-            sumPackages: [null],
+            sumContainers: [null, Validators.max(5000000)],
+            sumPackages: [null, Validators.max(5000000)],
             sumCbm: [null],
             containerDescription: [null],
             packageTypeId: [null],
             note: [null],
-            noProfit: [false]
+            noProfit: [false],
+            eta: [null],
+            deliveryDate: [null],
+            suspendTime: [null, Validators.compose([
+                Validators.maxLength(150),
+            ])],
+            clearanceDate: [null],
         }, { validator: FormValidators.comparePort });
 
         this.jobNo = this.formEdit.controls['jobNo'];
@@ -278,10 +296,18 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.shipmentType = this.formEdit.controls['shipmentType'];
         this.note = this.formEdit.controls['note'];
         this.noProfit = this.formEdit.controls['noProfit'];
+        this.eta = this.formEdit.controls['eta'];
+        this.deliveryDate = this.formEdit.controls['deliveryDate'];
+        this.suspendTime = this.formEdit.controls['suspendTime'];
+        this.clearanceDate = this.formEdit.controls['clearanceDate'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
+            case 'shipmentMode':
+                this.shipmentInfo = null;
+                this.shipmentNo = null;
+                break;
             case 'supplier':
                 this.supplierId.setValue(data.id);
                 break;
@@ -338,7 +364,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                 this.salemansId.setValue(data.id);
                 this.salesmanName = data.username;
                 break;
-            case 'fieldOps':    
+            case 'fieldOps':
                 this.fieldOpsId.setValue(data.id);
                 break;
             case 'billingOps':
@@ -358,38 +384,44 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     }
 
     getASInfoToLink() {
-        if (!this.hwbno.value || !this.mblno.value) {
-            this._toaster.warning("MBL No and HBL No is empty. Please complete first!");
-            return;
-        }
+        if (!this.shipmentInfo) {
+            if (!this.hwbno.value || !this.mblno.value) {
+                this._toaster.warning("MBL No and HBL No is empty. Please complete first!");
+                return;
+            }
 
-        if (!this.productService.value || !this.serviceMode.value || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
-            this._toaster.warning("Service's not valid to link. Please select another!");
-        } else {
-            this._documentRepo.getASTransactionInfo(this.jobNo.value, this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
-                .pipe(catchError(this.catchError))
-                .subscribe((res: ILinkAirSeaInfoModel) => {
-                    if (!!res?.jobNo) {
-                        this.shipmentNo = res.jobNo;
-                        this.shipmentInfo = res.jobNo;
-                        this.formEdit.patchValue({
-                            sumGrossWeight: res.gw,
-                            sumCbm: res.cw,
-                            sumPackages: res.packageQty
-                        });
+            if (!this.productService.value || !this.serviceMode.value || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
+                this._toaster.warning("Service's not valid to link. Please select another!");
+            } else {
+                this._documentRepo.getASTransactionInfo(this.jobNo.value, this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
+                    .pipe(catchError(this.catchError))
+                    .subscribe((res: ILinkAirSeaInfoModel) => {
+                        if (!!res?.jobNo) {
+                            this.shipmentNo = res.jobNo;
+                            this.shipmentInfo = res.jobNo;
+                            this.formEdit.patchValue({
+                                sumGrossWeight: res.gw,
+                                sumCbm: res.cw,
+                                sumPackages: res.packageQty
+                            });
 
-                        if (res.containers) {
-                            res.containers.forEach(c => {
-                                c.id = SystemConstants.EMPTY_GUID;
-                            })
-                            this._store.dispatch(new GetContainerSuccessAction(res.containers));
+                            if (res.containers) {
+                                res.containers.forEach(c => {
+                                    c.id = SystemConstants.EMPTY_GUID;
+                                })
+                                this._store.dispatch(new GetContainerSuccessAction(res.containers));
+                            }
+                        } else {
+                            this.shipmentNo = null;
+                            this.shipmentInfo = null;
+                            this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
                         }
-                    } else {
-                        this.shipmentNo = null;
-                        this.shipmentInfo = null;
-                        this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
-                    }
-                });
+                    });
+            }
+        }
+        else {
+            this.shipmentNo = null;
+            this.shipmentInfo = null;
         }
     }
 
@@ -398,10 +430,10 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
         this.billingOpsId.setValue(this.userLogged.id);
     }
-    
-    getSalesmanList(data: any){
-        this.shipmentType.setValue(data); 
-        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
+
+    getSalesmanList(data: any) {
+        this.shipmentType.setValue(data);
+        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value, this.opsTransaction.officeId)
             .subscribe(
                 (res: any) => {
                     if (!!res) {
@@ -422,9 +454,60 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                         this.salemansId.setValue(null);
                     }
                 }
-            );          
+            );
+    }
+
+    syncGoodInforToReplicateJob() {
+        this._documentRepo.syncGoodInforToReplicateJob(this.opsTransaction.id).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+        ).subscribe((res: any) => {
+            if (res.status) {
+                this._toastService.success(res.message);
+
+            } else {
+                this._toastService.error(res.message);
+            }
+        });
+    }
+
+    setGoodsInForValue(res: CustomDeclaration[]) {
+        if (!!res) {
+            let gw = 0;
+            let nw = 0;
+            let containerQty = 0;
+            let packagesQty = 0;
+            let sumCbm = 0;
+            res.forEach(s => {
+                sumCbm += s.cbm;
+                nw += s.netWeight;
+                containerQty += s.qtyCont;
+                gw += s.grossWeight;
+                packagesQty += s.pcs;
+            });
+            this.formEdit.patchValue({
+                sumCbm: sumCbm !== 0 ? sumCbm.toFixed(3) : null,
+                sumNetWeight: nw !== 0 ? nw.toFixed(3) : null,
+                sumContainers: containerQty !== 0 ? containerQty : null,
+                sumPackages: packagesQty !== 0 ? packagesQty : null,
+                sumGrossWeight: gw !== 0 ? gw.toFixed(3) : null,
+                packageTypeId: res[0].unitCodeId !== 0 ? res[0].unitCodeId : null,
+            });
+        }
+    }
+
+    getDataFromDeclaration() {
+        this._operationRepo.getListImportedInJob(this.opsTransaction.jobNo).pipe(
+            takeUntil(this.ngUnsubscribe),
+            catchError(this.catchError),
+        ).subscribe(
+            (res: CustomDeclaration[]) => {
+                this.setGoodsInForValue(res)
+            }
+        );
     }
 }
+
 export interface ILinkAirSeaInfoModel {
     hblId: string;
     jobId: string;

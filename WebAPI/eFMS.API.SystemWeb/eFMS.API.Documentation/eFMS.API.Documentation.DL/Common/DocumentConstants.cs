@@ -2,10 +2,15 @@
 {
     public static class DocumentConstants
     {
+        //Stage from constants
+        public const string FROM_USER = "User";
+        public const string FROM_SYSTEM = "System";
+
         //Document stage code
         public static readonly string UPDATE_ATA_CODE = "U_ATA";
         public static readonly string UPDATE_ATD_CODE = "U_ATD";
         public static readonly string UPDATE_ICT_CODE = "U_ICT";
+        public static readonly string UPDATE_POD_CODE = "U_POD";
 
         public static readonly string SEND_POD_CODE = "S_POD";
         public static readonly string SEND_PA_CODE = "S_PA";
@@ -23,6 +28,7 @@
         public const string UPDATE_ATA = "UPDATE_ATA";
         public const string UPDATE_ATD = "UPDATE_ATD";
         public const string UPDATE_INCOTERM = "UPDATE_INCOTERM";
+        public const string UPDATE_POD = "UPDATE_POD";
 
         public const string SEND_POD = "SEND_POD";
         public const string SEND_PA = "SEND_PA";

@@ -1,37 +1,35 @@
-import { Component, ViewChild, QueryList, ViewChildren } from '@angular/core';
-import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
-import { Store } from '@ngrx/store';
+import { Component, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Router } from '@angular/router';
 import { RoutingConstants } from '@constants';
+import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
+import { ToastrService } from 'ngx-toastr';
 
 import { AppList } from '@app';
+import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent, ReportPreviewComponent } from '@common';
+import { AccountingConstants, SystemConstants } from '@constants';
+import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
+import { AdvancePayment, AdvancePaymentRequest, User } from '@models';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
-import { AdvancePayment, AdvancePaymentRequest, User } from '@models';
-import { AccountingConstants, SystemConstants } from '@constants';
-import { IAppState, getMenuUserSpecialPermissionState } from '@store';
-import { ConfirmPopupComponent, Permission403PopupComponent, InfoPopupComponent, ReportPreviewComponent } from '@common';
-import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
+import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 
 
-import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 import { AdvancePaymentFormsearchComponent } from './components/form-search-advance-payment/form-search-advance-payment.component';
 import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
+import { UpdatePaymentVoucherPopupComponent } from './components/popup/update-payment-voucher/update-payment-voucher.popup';
 
-import { catchError, finalize, map, takeUntil, withLatestFrom, concatMap } from 'rxjs/operators';
-import {
-    LoadListAdvancePayment,
-    getAdvancePaymentListState,
-    getAdvancePaymentSearchParamsState,
-    getAdvancePaymentListLoadingState,
-    getAdvancePaymentListPagingState
-} from './store';
-import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
-import { of, forkJoin } from 'rxjs';
-import { delayTime } from '@decorators';
 import { HttpResponse } from '@angular/common/http';
+import { delayTime } from '@decorators';
+import { forkJoin, of } from 'rxjs';
+import { catchError, concatMap, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
+import {
+    getAdvancePaymentListLoadingState,
+    getAdvancePaymentListPagingState, getAdvancePaymentListState,
+    getAdvancePaymentSearchParamsState, LoadListAdvancePayment, LoadListAdvancePaymentSuccess
+} from './store';
 
 @Component({
     selector: 'app-advance-payment',
@@ -135,7 +133,27 @@ export class AdvancePaymentComponent extends AppList {
                     this.page = data.page;
                     this.pageSize = data.pageSize;
 
-                    this.requestLoadListAdvancePayment();
+                    //* Handle Cached.
+                    if (!!this.advancePayments.length && !!this.dataSearch?.referenceNos?.length) {
+                        let resultsCached = [];
+
+                        resultsCached = this.advancePayments.filter(x => this.dataSearch.referenceNos.includes(x.advanceNo));
+
+                        if (resultsCached.length >= this.dataSearch?.referenceNos?.length) {
+                            const response: CommonInterface.IResponsePaging = {
+                                data: resultsCached,
+                                page: 1,
+                                size: this.pageSize,
+                                totalItems: resultsCached.length
+                            };
+                            this._store.dispatch(LoadListAdvancePaymentSuccess(response));
+                            return;
+                        } else {
+                            this.requestLoadListAdvancePayment();
+                        }
+                    } else {
+                        this.requestLoadListAdvancePayment();
+                    }
                 }
             );
 
@@ -481,7 +499,7 @@ export class AdvancePaymentComponent extends AppList {
                         const mapV: { lang: string, id: string }[] = Array(advanceSyncList.length).fill(value).map((value, i) => {
                             return { lang: value === 1 ? 'VN' : 'ENG', id: advSyncIds[i] }
                         })
-                        const source = mapV.map(x => this._exportRepo.exportAdvancePaymentDetail(x.id, x.lang))
+                        const source = mapV.map(x => this._exportRepo.exportAdvancePaymentDetail(x.id, x.lang, 'eDOC'))
                         return forkJoin(source);
                     }
                     return of(false);
@@ -620,7 +638,8 @@ export class AdvancePaymentComponent extends AppList {
                 concatMap((value: any) => {
                     if (!!value) {
                         const lang: string = value === 1 ? 'VN' : 'ENG';
-                        return this._exportRepo.exportAdvancePaymentDetail(adv.id, lang);
+                        return this._exportRepo.exportAdvancePaymentDetail(adv.id, lang, 'eDOC');
+
                     }
                     return of(false);
                 }),

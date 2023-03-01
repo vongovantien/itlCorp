@@ -151,7 +151,7 @@
                                         <span></span>
                                     </label>
                                     <span>
-                                        <a class="pointer" (click)="previewDebitNote(debitNo.code)">{{debitNo.code}}</a>
+                                        <a class="pointer" (click)="previewDebitNote(debitNo)">{{debitNo.code}}</a>
                                     </span>
                                 </ng-container>
                             </ng-container>
@@ -184,7 +184,7 @@
                         </div>
                     </div>
                     <div class="form-group m-form__group"
-                        *ngIf="isPreAlert && (serviceId === 'AE' || serviceId === 'SFE' || serviceId === 'SLE')">
+                        *ngIf="isPreAlert && (serviceId === 'AE' || serviceId === 'SFE' || serviceId === 'SLE' || serviceId === 'SCE')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsManifest else NotManifest">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
@@ -236,8 +236,7 @@
                                         <span></span>
                                     </label>
                                     <span>
-                                        <a class="pointer"
-                                            (click)="previewCDNoteExport(debitNo.code)">{{debitNo.code}}</a>
+                                        <a class="pointer" (click)="previewCDNoteExport(debitNo)">{{debitNo.code}}</a>
                                     </span>
                                 </ng-container>
                             </ng-container>
@@ -253,7 +252,7 @@
                     </div>
 
                     <div class="form-group m-form__group"
-                        *ngIf="isSI && (serviceId === 'SFE' || serviceId === 'SLE')">
+                        *ngIf="isSI && (serviceId === 'SFE' || serviceId === 'SLE' || serviceId === 'SCE')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsSISummary else NotSISummary">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
@@ -318,8 +317,7 @@
                         <div class="m-checkbox-inline">
                             <ng-container *ngIf="isExitsDO else NotDO">
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
-                                    <input type="checkbox" [(ngModel)]="isCheckedDO"
-                                        (change)="onChangeCheckBox()">
+                                    <input type="checkbox" [(ngModel)]="isCheckedDO" (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
                                 <span style='margin-right: 20px;' *ngIf="isDO">
@@ -333,7 +331,7 @@
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
                                     style="display: initial; margin-right: 40px;">
                                     <input type="checkbox" disabled="true">
-                                        {{isDO ? 'Delivery Order' : 'Authorize Letter'}}
+                                    {{isDO ? 'Delivery Order' : 'Authorize Letter'}}
                                     <span></span>
                                 </label>
                             </ng-template>
@@ -346,8 +344,7 @@
                         <div class="m-checkbox-inline">
                             <ng-container>
                                 <label class="m-checkbox m-checkbox--bold" style="display: initial;">
-                                    <input type="checkbox" [(ngModel)]="isCheckedDO"
-                                        (change)="onChangeCheckBox()">
+                                    <input type="checkbox" [(ngModel)]="isCheckedDO" (change)="onChangeCheckBox()">
                                     <span></span>
                                 </label>
                                 <span style='margin-right: 20px;'>
@@ -359,21 +356,20 @@
 
                     <!-- Send HBL -->
                     <div class="form-group m-form__group"
-                        *ngIf="isSendHbl && (serviceId === 'SFE' || serviceId === 'SLE' || serviceId === 'AE')">
+                        *ngIf="isSendHbl && (serviceId === 'SFE' || serviceId === 'SLE' || serviceId === 'AE' || serviceId === 'SCE')">
                         <div class="m-checkbox-inline">
                             <ng-container *ngFor="let hbl of hawbDetails">
-                                    <label class="m-checkbox m-checkbox--bold"
-                                        style="display: initial;margin-left: 20px;">
-                                        <input type="checkbox" [(ngModel)]="hbl.isCheckedHawb"
-                                            (change)="onChangeCheckBox()">
-                                        <span></span>
-                                    </label>
-                                    <span *ngIf="serviceId === 'AE'">
-                                        <a class="pointer" (click)="previewHawb(hbl.id)">{{hbl.hwbno}}</a>
-                                    </span>
-                                    <span *ngIf="serviceId !== 'AE'">
-                                        <a class="pointer" (click)="previewHBL(hbl.id)">{{hbl.hwbno}}</a>
-                                    </span>
+                                <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px;">
+                                    <input type="checkbox" [(ngModel)]="hbl.isCheckedHawb"
+                                        (change)="onChangeCheckBox()">
+                                    <span></span>
+                                </label>
+                                <span *ngIf="serviceId === 'AE'">
+                                    <a class="pointer" (click)="previewHawb(hbl.id)">{{hbl.hwbno}}</a>
+                                </span>
+                                <span *ngIf="serviceId !== 'AE'">
+                                    <a class="pointer" (click)="previewHBL(hbl.id)">{{hbl.hwbno}}</a>
+                                </span>
                             </ng-container>
                         </div>
                     </div>
@@ -428,15 +424,5 @@
 </div>
 
 <add-attachment-popup (onAdd)="onAddFile($event)"></add-attachment-popup>
-
-<form class="hidden" #formReportPDF target="framePDF" method="POST" [action]="srcReportPDF | safe:'resourceUrl'">
-    <input name="crystal" type="hidden" [value]="valuePDF">
-</form>
-<iframe style="display: none;" #framePDF id="framePDF" name="framePDF" src="" type="application/pdf" height="1080px"
-    width="100%" allowfullscreen frameborder="0"></iframe>
-
-<!-- <ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container> -->
 
 <ng-template inject></ng-template>

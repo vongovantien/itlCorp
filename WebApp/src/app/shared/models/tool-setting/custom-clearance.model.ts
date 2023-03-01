@@ -35,7 +35,7 @@ export class CustomClearance {
     userCreatedName: string;
     datetimeCreated: Date = null;
     datetimeModified: null;
-    customerName: null;
+    customerName: string = null;
     importCountryName: string;
     exportCountryName: string;
     gatewayName: string;
@@ -44,6 +44,7 @@ export class CustomClearance {
     shipper: string;
     consignee: string;
     accountNo: string;
+    eta: any = null;
 
     permission: PermissionShipment = new PermissionShipment();
 

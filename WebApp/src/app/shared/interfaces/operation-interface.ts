@@ -11,6 +11,7 @@ namespace OperationInteface {
         service?: string;
         customNo?: string;
         advanceNo?: string;
+        officeId?: string;
     }
 
     export interface IInputShipment {

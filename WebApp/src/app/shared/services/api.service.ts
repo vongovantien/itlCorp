@@ -1,6 +1,7 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { SystemConstants } from 'src/constants/system.const';
+import { IEDocFile, IEDocUploadFile } from './../../business-modules/share-business/components/document-type-attach/document-type-attach.component';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -73,13 +74,16 @@ export class ApiService {
         return this._http.put(this.setUrl(url), formData, options);
     }
 
-    postFormData(url: string, formData: any) {
+    postFormData(url: string, formData: any, observe: any = 'body', responseType: any = 'json') {
         const options = {
             headers: new HttpHeaders({
                 'Content-Type': 'application/x-www-form-urlencoded',
-            })
+            }),
         };
-        return this._http.post(this.setUrl(url), formData);
+        return this._http.post(this.setUrl(url), formData, {
+            observe: observe,
+            responseType: responseType
+        });
 
     }
 
@@ -109,6 +113,21 @@ export class ApiService {
         }
     }
 
+    getTextFile(url: string = '', params?: any, headers: any = {}, observe: 'body' | 'response' | any = 'body') {
+        return this._http.get(url, {
+            params,
+            headers: Object.assign({}, this._headers, headers),
+            responseType: 'text',
+            observe: observe
+        });
+    }
+
+    downloadEdocFile(url: string) {
+        return this._http.get(this.setUrl(url), {
+            responseType: 'blob'
+        });
+    }
+
     get(url: string = '', params?: any, headers: any = {}, isBaseHref: boolean = true) {
         return this._http.get(isBaseHref ? this.setUrl(url) : url, {
             params,
@@ -118,5 +137,60 @@ export class ApiService {
 
     delete(url: string, params?: any, headers?: any) {
         return this._http.delete(this.setUrl(url), { params, headers });
+    }
+
+    putEDocFile(url: string, edoc: IEDocUploadFile, files: any) {
+        if (edoc.EDocFiles.length === 0) {
+            return;
+        }
+        const formData = new FormData();
+        formData.append('edocUploadModel.ModuleName', edoc.ModuleName);
+        formData.append('edocUploadModel.FolderName', edoc.FolderName);
+        formData.append('edocUploadModel.Id', edoc.Id);
+        let edocFile: IEDocFile[] = [];
+        for (let i = 0; i < edoc.EDocFiles.length; i++) {
+            let edocFileItem: IEDocFile = ({
+                AliasName: edoc.EDocFiles[i].AliasName,
+                BillingNo: edoc.EDocFiles[i].BillingNo,
+                BillingType: edoc.EDocFiles[i].BillingType,
+                Code: edoc.EDocFiles[i].Code,
+                DocumentId: edoc.EDocFiles[i].DocumentId,
+                HBL: edoc.EDocFiles[i].HBL,
+                JobId: edoc.EDocFiles[i].JobId,
+                TransactionType: edoc.EDocFiles[i].TransactionType,
+                FileName: edoc.EDocFiles[i].FileName,
+                Note: edoc.EDocFiles[i].Note,
+                BillingId: edoc.EDocFiles[i].BillingId,
+                Id: edoc.EDocFiles[i].Id,
+                AccountingType: edoc.EDocFiles[i].AccountingType
+            });
+            edocFile.push(edocFileItem);
+        }
+        console.log(edocFile);
+        for (let i = 0; i < edocFile.length; i++) {
+            formData.append(`edocUploadModel.EDocFiles[${i}][AliasName]`, edocFile[i].AliasName);
+            formData.append(`edocUploadModel.EDocFiles[${i}][BillingNo]`, edocFile[i].BillingNo);
+            formData.append(`edocUploadModel.EDocFiles[${i}][BillingType]`, edocFile[i].BillingType);
+            formData.append(`edocUploadModel.EDocFiles[${i}][Code]`, edocFile[i].Code);
+            formData.append(`edocUploadModel.EDocFiles[${i}][DocumentId]`, edocFile[i].DocumentId);
+            formData.append(`edocUploadModel.EDocFiles[${i}][HBL]`, edocFile[i].HBL);
+            formData.append(`edocUploadModel.EDocFiles[${i}][JobId]`, edocFile[i].JobId);
+            formData.append(`edocUploadModel.EDocFiles[${i}][TransactionType]`, edocFile[i].TransactionType);
+            formData.append(`edocUploadModel.EDocFiles[${i}][FileName]`, edocFile[i].FileName);
+            formData.append(`edocUploadModel.EDocFiles[${i}][Note]`, edocFile[i].Note);
+            formData.append(`edocUploadModel.EDocFiles[${i}][BillingId]`, edocFile[i].BillingId);
+            formData.append(`edocUploadModel.EDocFiles[${i}][AccountingType]`, edocFile[i].AccountingType);
+        }
+        for (const file of files) {
+            formData.append('files', file);
+        }
+        const options = {
+            params: null,
+            reportProgress: true,
+            headers: new HttpHeaders({
+                'accept': 'application/json'
+            })
+        };
+        return this._http.put(this.setUrl(url), formData, options);
     }
 }

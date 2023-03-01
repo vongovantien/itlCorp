@@ -1,10 +1,12 @@
-﻿using eFMS.API.Documentation.DL.Common;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +19,7 @@ namespace eFMS.API.Documentation.DL.Services
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)csSurchargeRepository.DC;
 
         private readonly ICurrentUser currentUser;
+        private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IContextBase<AccAccountingManagement> accAccountMngtRepository;
         private readonly IContextBase<CatPartner> catPartnerRepository;
@@ -39,6 +42,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly Guid? BH = Guid.Empty;
 
         public CheckPointService(ICurrentUser currUser,
+            IStringLocalizer<LanguageSub> localizer,
             IContextBase<SysUser> sysUserRepository,
             IContextBase<AccAccountingManagement> accAccountMngtRepository,
             IContextBase<CatPartner> catPartnerRepository,
@@ -55,6 +59,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysSettingFlow> sysSettingFlow
             )
         {
+            this.stringLocalizer = localizer;
             this.currentUser = currUser;
             this.sysUserRepository = sysUserRepository;
             this.accAccountMngtRepository = accAccountMngtRepository;
@@ -189,7 +194,7 @@ namespace eFMS.API.Documentation.DL.Services
             var surcharges = csSurchargeRepository.Get(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.Hblid == HblId);
             if (surcharges.Count() == 0)
             {
-                return false;
+                return true; // Không có phí nếu hợp đồng prepaid trước đó false.
             }
 
             var hasIssuedDebit = surcharges.Any(x => string.IsNullOrEmpty(x.DebitNo));
@@ -318,7 +323,7 @@ namespace eFMS.API.Documentation.DL.Services
             CatContract contract;
             int errorCode = -1;
 
-            if (partner.PartnerMode == "Internal")
+            if (partner.PartnerMode == "Internal" || partner.PartnerType == "Agent")
             {
                 return result;
             }
@@ -367,16 +372,26 @@ namespace eFMS.API.Documentation.DL.Services
 
                     if (contractCurrent == null)
                     {
-                        return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
+                        contractCurrent = GetContractByPartnerId(criteria.PartnerId, criteria.SalesmanId);
+                        partner = catPartnerRepository.First(x => x.Id == currentPartner);
+                        if(contractCurrent == null)
+                        {
+                            return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
+                        }
                     }
 
-                    if(contractCurrent.ContractType == "Prepaid") // check hợp đồng hiện tại trước khi đổi sales, đổi customer.
+                    if(contractCurrent.ContractType == "Prepaid") // check hợp đồng hiện tại trước khi đổi sales, đổi customer
                     {
-                        isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId, currentPartner, criteria.TransactionType);
-                        if (!isValid)
+                        if (currentPartner != criteria.PartnerId || currentSaleman != criteria.SalesmanId)
                         {
-                            return new HandleState((object)string.Format(@"Contract of {0} is Prepaid has issued debit/invoice. Cannot change to another customer or salesman",
-                            partner?.ShortName));
+                            // không cho đổi customer nếu đang là prepaid nếu đã issue debit/ inv
+                            isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId, currentPartner, criteria.TransactionType);
+                            if (!isValid)
+                            {
+                                return new HandleState((object)string.Format(@"Contract of {0} is Prepaid has issued debit/invoice. Cannot change to another customer or salesman",
+                                partner?.ShortName));
+                            }
+
                         }
                         currentSaleman = criteria.SalesmanId;
                         currentPartner = criteria.PartnerId;
@@ -428,23 +443,31 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (contract == null)
             {
-                return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
+                string officeName = sysOfficeRepository.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
+                string mess = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], partner.ShortName, officeName);
+                return new HandleState((object)mess);
             }
 
             switch (contract.ContractType)
             {
                 case "Cash":
-                    if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE || checkPointType == CHECK_POINT_TYPE.HBL || checkPointType == CHECK_POINT_TYPE.SHIPMENT)
-                    {
-                        isValid = true;
-                        break;
-                    }
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType))
                     {
-                        isValid = ValidateCheckPointCashContractPartner(criteria.PartnerId, criteria.HblId, criteria.TransactionType, criteria.SettlementCode, CHECK_POINT_TYPE.SURCHARGE);
+                        if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                        {
+                            isValid = true;
+                            break;
+                        } else if (contract.IsOverDue == true)
+                        {
+                            isValid = false;
+                        } else
+                        {
+                            isValid = true;
+                        }
+                        // isValid = ValidateCheckPointCashContractPartner(criteria.PartnerId, criteria.HblId, criteria.TransactionType, criteria.SettlementCode, CHECK_POINT_TYPE.SURCHARGE);
                     }
                     else isValid = true;
-                    if (!isValid) errorCode = 1;
+                    if (!isValid) errorCode = 2;
 
                     break;
                 case "Trial":
@@ -513,7 +536,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else isValid = true;
                     break;
                 case "Prepaid":
-                    if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL)
+                    if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL || checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                     {
                         isValid = ValidateCheckPointPrepaidContractPartner(criteria.HblId, criteria.PartnerId, criteria.TransactionType);
                     } else
@@ -587,20 +610,24 @@ namespace eFMS.API.Documentation.DL.Services
             if (string.IsNullOrEmpty(saleman))
             {
                 contract = contractRepository.Get(x => x.PartnerId == partnerId
+                                       && x.OfficeId.ToLower().Contains(currentUser.OfficeID.ToString().ToLower())
                                        && x.Active == true).OrderBy(x => x.ContractType)
                                        .FirstOrDefault();
             }
             else
             {
-                var contracts = contractRepository.Get(x => x.PartnerId == partnerId && x.Active == true);
-                if (contracts.Count() > 1)
-                {
-                    contract = contracts.FirstOrDefault(x => x.SaleManId == saleman);
-                }
-                else
-                {
-                    contract = contracts.FirstOrDefault();
-                }
+                contract = contractRepository.Get(x => x.PartnerId == partnerId 
+                && x.Active == true
+                && x.OfficeId.ToLower().Contains(currentUser.OfficeID.ToString().ToLower())
+                && x.SaleManId == saleman)?.FirstOrDefault();
+                //if (contracts.Count() > 1)
+                //{
+                //    contract = contracts.FirstOrDefault(x => x.SaleManId == saleman);
+                //}
+                //else
+                //{
+                //    contract = contracts.FirstOrDefault();
+                //}
             }
             return contract;
         }

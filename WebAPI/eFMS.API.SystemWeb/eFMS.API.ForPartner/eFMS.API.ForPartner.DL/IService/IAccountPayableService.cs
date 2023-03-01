@@ -10,11 +10,12 @@ namespace eFMS.API.ForPartner.DL.IService
 {
     public interface IAccountPayableService: IRepositoryBase<AccAccountPayable, AccountPayableModel>
     {
-        Task<HandleState> InsertAccPayable(VoucherSyncCreateModel model);
+        Task<HandleState> InsertAccPayable(VoucherSyncCreateModel model, List<AccAccountingManagement> accountingDatas);
         bool IsPayableHasPayment(VoucherSyncDeleteModel model);
         string CheckIsValidPayable(List<AccAccountPayableModel> accountPayables);
-        HandleState InsertAccountPayablePayment(List<AccAccountPayableModel> accountPayables, string apiKey);
+        Task<HandleState> InsertAccountPayablePayment(List<AccAccountPayableModel> accountPayables, string apiKey);
         HandleState CancelAccountPayablePayment(List<CancelPayablePayment> accountPayables, string apiKey);
         Task<HandleState> DeleteAccountPayable(VoucherSyncDeleteModel accountPayables, string apiKey);
+        Task<HandleState> AddCreditMangagement(VoucherSyncCreateModel model);
     }
 }

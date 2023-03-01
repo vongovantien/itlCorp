@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -233,6 +234,14 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true,
                 IsLandscape = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = parameter.ManifestNo!=null? parameter.ManifestNo + ".pdf": "SeaCargoManifest.pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
+
+            result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -326,6 +335,15 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true,
                 IsLandscape = true
             };
+
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName =model.RefNo!=null? model.RefNo+".pdf":"SeaImportCargoManifest_" + transaction.JobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
+
+            result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(manifests);
             result.AddSubReport("ContainerDetail", containers);
             result.FormatType = ExportFormatType.PortableDocFormat;
@@ -384,7 +402,8 @@ namespace eFMS.API.Documentation.DL.Services
                         SecondDest = item.TransitPlaceTo1?.ToUpper(),
                         ThirdDest = item.TransitPlaceTo2?.ToUpper(),
                         Notify = transaction.TransactionType == "AE" ? item.Notify?.ToUpper() : item.NotifyPartyDescription?.ToUpper(),
-                        AirFreight = item.FreightPayment
+                        AirFreight = item.FreightPayment,
+                        ShippingMask = item.ShippingMark
                     };
                     manifests.Add(manifest);
                 }
@@ -418,6 +437,13 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true,
                 IsLandscape = true
             };
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = model.RefNo!=null?model.RefNo+"/pdf":"AirCargoManifest_" + transaction.JobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
+
+            result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -509,10 +535,10 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
-            result.PathReportGenerate = _pathReportGenerate;
+            var reportName = _manifest.RefNo!=null?_manifest.RefNo+".pdf":"AirCargoManifest_" + transaction.JobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
 
+            result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
@@ -603,10 +629,10 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "SeaCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
-            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
-            result.PathReportGenerate = _pathReportGenerate;
+            var reportName = _manifest.RefNo != null?_manifest.RefNo+".pdf": "SeaCargoManifest_" + transaction.JobNo + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
 
+            result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(manifests);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);

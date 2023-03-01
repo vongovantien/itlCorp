@@ -1,31 +1,30 @@
+import { formatDate } from "@angular/common";
 import {
-    Component,
-    ViewChild,
-    ChangeDetectionStrategy,
-    ChangeDetectorRef,
+    ChangeDetectorRef, Component,
+    ViewChild
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { formatDate } from "@angular/common";
 import { ToastrService } from "ngx-toastr";
+import { LoadAdvanceDetailSuccess } from './../store/actions/advance-payment.action';
 
 import { AppPage } from "@app";
-import { AccountingRepo, ExportRepo } from "@repositories";
-import { AdvancePayment, AdvancePaymentRequest, SysImage } from "@models";
 import { InfoPopupComponent, ReportPreviewComponent } from "@common";
 import { RoutingConstants } from "@constants";
 import { delayTime } from "@decorators";
 import { ICrystalReport } from "@interfaces";
+import { AdvancePayment, AdvancePaymentRequest, SysImage } from "@models";
+import { AccountingRepo, ExportRepo } from "@repositories";
 
 import { AdvancePaymentFormCreateComponent } from "../components/form-create-advance-payment/form-create-advance-payment.component";
 import { AdvancePaymentListRequestComponent } from "../components/list-advance-payment-request/list-advance-payment-request.component";
 
-import { catchError, concatMap, map, takeUntil } from "rxjs/operators";
-import isUUID from "validator/lib/isUUID";
 import { InjectViewContainerRefDirective } from "@directives";
-import { combineLatest, EMPTY } from "rxjs";
-import { ListAdvancePaymentCarrierComponent } from "../components/list-advance-payment-carrier/list-advance-payment-carrier.component";
-import { getCurrentUserState, IAppState } from "@store";
 import { Store } from "@ngrx/store";
+import { IAppState } from "@store";
+import { combineLatest, EMPTY } from "rxjs";
+import { catchError, concatMap, map } from "rxjs/operators";
+import isUUID from "validator/lib/isUUID";
+import { ListAdvancePaymentCarrierComponent } from "../components/list-advance-payment-carrier/list-advance-payment-carrier.component";
 
 @Component({
     selector: "app-advance-payment-detail",
@@ -53,6 +52,8 @@ export class AdvancePaymentDetailComponent
     folderModuleName: string = "Advance";
     statusApproval: string = "";
     isAdvCarrier: boolean = false;
+
+    advNo: string = '';
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -86,6 +87,8 @@ export class AdvancePaymentDetailComponent
                 }
             }
         );
+
+
     }
 
     @delayTime(1000)
@@ -118,11 +121,14 @@ export class AdvancePaymentDetailComponent
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
+                    console.log(res);
                     if (!res) {
                         this._toastService.warning("Advance Payment not found");
                         this.back();
                         return;
                     }
+                    this.advNo = res.advanceNo;
+                    this._store.dispatch(LoadAdvanceDetailSuccess(res));
                     this.advancePayment = new AdvancePayment(res);
                     switch (this.advancePayment.statusApproval) {
                         case "New":
@@ -298,7 +304,7 @@ export class AdvancePaymentDetailComponent
                         if (!res.status) {
                             this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
                                 title: 'Warning',
-                                body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                                body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
                                 class: 'bg-danger'
                             });
                             return EMPTY;
@@ -354,7 +360,7 @@ export class AdvancePaymentDetailComponent
 
     checkInvalidListAdvanceRequest() {
         this.formCreateComponent.isSubmitted = true;
-        if((!this.formCreateComponent.dueDate.value || !this.formCreateComponent.dueDate.value.startDate) || (!['New','Denied'].includes(this.formCreateComponent.statusApproval.value) && !this.formCreateComponent.formCreate.valid)){
+        if ((!this.formCreateComponent.dueDate.value || !this.formCreateComponent.dueDate.value.startDate) || (!['New', 'Denied'].includes(this.formCreateComponent.statusApproval.value) && !this.formCreateComponent.formCreate.valid)) {
             return true;
         }
         if (!this.isAdvCarrier) {
@@ -412,7 +418,7 @@ export class AdvancePaymentDetailComponent
                     if (!res.status) {
                         this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
                             title: 'Warning',
-                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments violate the regulations on fees:</br>" + res.message,
+                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
                             class: 'bg-danger'
                         });
                     }

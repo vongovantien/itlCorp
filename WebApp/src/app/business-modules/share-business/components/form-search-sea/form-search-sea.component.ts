@@ -88,7 +88,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
                     if (!!Object.keys(criteria).length && criteria.transactionType === this.transaction) {
                         this.dataSearch = criteria;
 
-                        ['jobNo', 'mawb', 'hwbno', 'soaNo', 'containerNo','creditDebitNo'].some(i => {
+                        ['jobNo', 'mawb', 'hwbno', 'soaNo', 'containerNo', 'creditDebitNo'].some(i => {
                             if (!!this.dataSearch[i]) {
                                 this.filterType.setValue(this.filterTypes.find(d => d.value === i));
                                 this.searchText.setValue(this.dataSearch[i]);
@@ -197,7 +197,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
             userCreated: this.creator.value,
             fromDate: (!!this.createdDate.value && !!this.createdDate.value.startDate) ? formatDate(this.createdDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: (!!this.createdDate.value && !!this.createdDate.value.endDate) ? formatDate(this.createdDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            transactionType: null,
+            transactionType: this.transaction,
             fromServiceDate: (!!this.serviceDate.value && !!this.serviceDate.value.startDate) ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toServiceDate: (!!this.serviceDate.value && !!this.serviceDate.value.endDate) ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null
         };
@@ -232,6 +232,9 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     }
 
     expanded() {
+        if (!this.isSearchAdv) {
+            this.isSearchAdv = true;
+        }
         if (!!this.dataSearch) {
             const advanceSearchForm = {
                 customer: this.dataSearch.customerId,

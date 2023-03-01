@@ -969,6 +969,8 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.AlertAtd).HasColumnName("AlertATD");
+
                 entity.Property(e => e.ApplyPartner)
                     .HasMaxLength(50)
                     .IsUnicode(false);

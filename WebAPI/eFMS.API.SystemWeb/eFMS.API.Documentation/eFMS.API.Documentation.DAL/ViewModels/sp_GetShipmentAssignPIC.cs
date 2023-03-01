@@ -15,5 +15,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string CarrierId { get; set; }
         public Guid HBLID { get; set; }
         public string Service { get; set; }
+        public Guid OfficeId { get; set; }
     }
 }

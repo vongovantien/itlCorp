@@ -40,6 +40,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatPotential> CatPotential { get; set; }
         public virtual DbSet<CatServiceType> CatServiceType { get; set; }
         public virtual DbSet<CatStage> CatStage { get; set; }
+        public virtual DbSet<CatStandardCharge> CatStandardCharge { get; set; }
         public virtual DbSet<CatTransportationMode> CatTransportationMode { get; set; }
         public virtual DbSet<CatUnit> CatUnit { get; set; }
         public virtual DbSet<CsManifest> CsManifest { get; set; }
@@ -122,6 +123,14 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Active).HasDefaultValueSql("('(1)')");
 
+                entity.Property(e => e.BankAccountName).HasMaxLength(500);
+
+                entity.Property(e => e.BankAccountNo).HasMaxLength(50);
+
+                entity.Property(e => e.BankAddress).HasMaxLength(500);
+
+                entity.Property(e => e.BankId).HasColumnName("BankID");
+
                 entity.Property(e => e.BankNameEn)
                     .IsRequired()
                     .HasColumnName("BankName_EN")
@@ -142,6 +151,14 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
+
+                entity.Property(e => e.Source).HasMaxLength(20);
+
+                entity.Property(e => e.SwiftCode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -208,6 +225,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.Offices).HasMaxLength(250);
 
                 entity.Property(e => e.ProductDept)
                     .HasMaxLength(50)
@@ -547,7 +566,7 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
 
                 entity.Property(e => e.EmailAddress)
-                    .HasMaxLength(50)
+                    .HasMaxLength(1000)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
@@ -1369,6 +1388,66 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatStandardCharge>(entity =>
+            {
+                entity.ToTable("catStandardCharge");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ChargeId).HasColumnName("ChargeID");
+
+                entity.Property(e => e.CurrencyId)
+                    .HasColumnName("CurrencyID")
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Notes).HasMaxLength(500);
+
+                entity.Property(e => e.Office).HasMaxLength(100);
+
+                entity.Property(e => e.Quantity).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.QuantityType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Service).HasMaxLength(50);
+
+                entity.Property(e => e.ServiceType).HasMaxLength(50);
+
+                entity.Property(e => e.TransactionType).HasMaxLength(10);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UnitId).HasColumnName("UnitID");
+
+                entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Vatrate)
+                    .HasColumnName("VATRate")
+                    .HasColumnType("decimal(18, 4)");
             });
 
             modelBuilder.Entity<CatTransportationMode>(entity =>
@@ -2446,6 +2525,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
+
                 entity.Property(e => e.ExportCountryCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2553,6 +2636,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
 
+                entity.Property(e => e.Hblno)
+                    .HasColumnName("HBLNo")
+                    .HasMaxLength(20);
+
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
                 entity.Property(e => e.MainPersonInCharge)
@@ -2570,6 +2657,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.StageId).HasColumnName("StageID");
 
                 entity.Property(e => e.Status).HasMaxLength(20);
+
+                entity.Property(e => e.Type).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -2598,6 +2687,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ClearanceDate).HasColumnType("datetime");
+
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
@@ -2625,7 +2716,13 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DeliveryDate).HasColumnType("datetime");
+
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.Eta)
+                    .HasColumnName("ETA")
+                    .HasColumnType("datetime");
 
                 entity.Property(e => e.FieldOpsId)
                     .HasColumnName("FieldOpsID")
@@ -2748,6 +2845,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("SupplierID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SuspendTime).HasMaxLength(150);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
