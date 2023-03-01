@@ -96,6 +96,14 @@
                 </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
+                <button (click)="onCheckConnect()"
+                *ngIf="!!isAllowUpdate && !!isShowDetail" 
+                        class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <i class="la la-check"></i>
+                            <span> Test Connection </span>
+                        </span>
+                    </button>
                 <ng-container *ngIf="!!isAllowUpdate">
                     <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveEcus()">
                     </app-default-button>

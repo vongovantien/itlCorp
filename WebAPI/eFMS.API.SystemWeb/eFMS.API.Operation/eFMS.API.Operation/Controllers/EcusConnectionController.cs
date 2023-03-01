@@ -10,6 +10,7 @@ using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.Infrastructure.Middlewares;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -270,6 +271,28 @@ namespace eFMS.API.Operation.Controllers
         {
             var results = ecusConnectionService.GetDataEcusByUser(userId, serverName, dbusername, dbpassword, database);
             return Ok(results);
+        }
+
+        [HttpGet]
+        [Route("CheckConnectionServer")]
+        [Authorize]
+        public IActionResult CheckConnectionServer(string serverName)
+        {
+            PermissionRange permissionRange;
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingEcusConnection);
+
+            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
+            if (permissionRange == PermissionRange.None)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+            HandleState hs = ecusConnectionService.CheckConnectionServer(serverName);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }
