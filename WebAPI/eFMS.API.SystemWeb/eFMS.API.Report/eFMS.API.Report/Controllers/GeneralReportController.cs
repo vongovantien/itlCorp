@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Report.DL.Common;
@@ -154,7 +155,7 @@ namespace eFMS.API.Report.Controllers
             #endregion -- Ghi Log Report --
 
             var data = generalReportService.QueryDataGeneralReport(criteria);
-            if (data == null)
+            if (data.Count()==0)
             {
                 return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
@@ -168,7 +169,6 @@ namespace eFMS.API.Report.Controllers
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;
         }
-
         private void HeaderResponse(string fileName)
         {
             Response.Headers.Add("efms-file-name", fileName);
