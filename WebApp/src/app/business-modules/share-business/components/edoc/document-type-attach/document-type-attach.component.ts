@@ -448,7 +448,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             if (res.status) {
                                 this._toastService.success("Upload file successfully!");
                                 this.resetForm();
-                                this.hide(); s
+                                this.hide();
                                 this.onSearch.emit(this.transactionType);
                                 this.isSubmitted = false;
                                 this._store.dispatch(UpdateListEdocSettle({ data: true }));
