@@ -235,8 +235,13 @@ namespace eFMS.API.Documentation.DL.Services
                             var opsInfo = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                             // Insert Replicate Data
                             entityReplicate.JobNo += opsInfo.JobNo;
-                            databaseUpdateService.InsertDataToDB(entityReplicate);
+                            addResult = databaseUpdateService.InsertDataToDB(entityReplicate);
                             result = new HandleState(addResult.Status, (object)addResult.Message);
+                            if (model.CsMawbcontainers?.Count > 0 && result.Success)
+                            {
+                                var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, entityReplicate.Id);
+                                model.CsMawbcontainers.ForEach(x => x.Id = Guid.Empty);
+                            }
                         }
                     }
                     else
@@ -251,6 +256,10 @@ namespace eFMS.API.Documentation.DL.Services
                         OpsTransaction entity = mapper.Map<OpsTransaction>(opsInfo);
                         result = new HandleState(addResult.Status, (object)addResult.Message);
                     }
+                    if (model.CsMawbcontainers?.Count > 0 && result.Success)
+                    {
+                        var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -258,12 +267,6 @@ namespace eFMS.API.Documentation.DL.Services
                     result = new HandleState(ex.Message);
                 }
             }
-            if (model.CsMawbcontainers?.Count > 0 && result.Success)
-            {
-                var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
-            }
-
-
             return result;
         }
 
@@ -2761,7 +2764,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (chargeBuy.CurrencyId == "VND")
             {
-                var per = (chargeBuy.ServiceDate.Value < datetimeCR ? (double)chargeBuy.Total  : (double)chargeBuy.UnitPrice) / (double)0.76;
+                var per = (chargeBuy.ServiceDate.Value < datetimeCR ? (double)chargeBuy.Total : (double)chargeBuy.UnitPrice) / (double)0.76;
                 surcharge.UnitPrice = NumberHelper.RoundNumber((decimal)per / 10000, 0) * 10000;
                 surcharge.NetAmount = surcharge.UnitPrice * surcharge.Quantity;
                 surcharge.Total = surcharge.NetAmount + ((surcharge.NetAmount * surcharge.Vatrate) / 100) ?? 0;
