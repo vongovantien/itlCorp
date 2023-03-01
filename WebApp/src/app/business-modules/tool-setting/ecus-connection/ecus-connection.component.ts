@@ -142,7 +142,6 @@ export class EcusConnectionComponent extends AppList implements OnInit {
                                         this.formEcus.groupId = res.groupId;
 
                                         this.formEcus.isAllowUpdate = res.permission.allowUpdate;
-                                        this.formEcus.isShowDetail = res.isShowDetail;
                                         this.formEcus.show();
                                     }
                                 }

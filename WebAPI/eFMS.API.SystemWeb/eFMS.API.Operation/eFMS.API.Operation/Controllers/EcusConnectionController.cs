@@ -275,19 +275,10 @@ namespace eFMS.API.Operation.Controllers
 
         [HttpGet]
         [Route("CheckConnectionServer")]
-        [Authorize]
         public IActionResult CheckConnectionServer(string serverName)
         {
-            PermissionRange permissionRange;
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingEcusConnection);
-
-            permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }
             HandleState hs = ecusConnectionService.CheckConnectionServer(serverName);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString() };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "The connection to ECUS has failed!" };
             if (!hs.Success)
             {
                 return BadRequest(result);

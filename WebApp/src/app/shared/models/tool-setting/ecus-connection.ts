@@ -26,7 +26,6 @@ export class EcusConnection {
     officeId: string = null;
     departmentId: number = null;
     groupId: number = null;
-    isShowDetail: boolean = false;
 
     constructor(object?: any) {
         const self = this;

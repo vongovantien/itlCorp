@@ -42,7 +42,6 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
     title: string = 'Add new Ecus';
 
     isAllowUpdate: boolean = true;
-    isShowDetail: boolean = false;
     constructor(
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
@@ -154,7 +153,10 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
                     this.hide();
                     return;
                 }
-                this._toast.error(res.message);
+                else
+                {
+                    this._toast.error(res.message);
+                }
             });
     }
 }

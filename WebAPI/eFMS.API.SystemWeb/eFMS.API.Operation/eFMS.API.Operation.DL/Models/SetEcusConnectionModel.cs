@@ -9,7 +9,6 @@ namespace eFMS.API.Operation.DL.Models
         public string Fullname { get; set; }
         public string UserCreatedName { get; set; }
         public string UserModifiedName { get; set; }
-        public bool? isShowDetail { get; set; }
         public PermissionAllowBase Permission { get; set; }
     }
 }

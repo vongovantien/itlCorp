@@ -55,7 +55,6 @@ namespace eFMS.API.Operation.DL.Services
             result.Username = users.FirstOrDefault(x => x.Id == result.UserId)?.Username;
             result.UserCreatedName = users.FirstOrDefault(x => x.Id == result.UserCreated)?.Username;
             result.UserModifiedName = users.FirstOrDefault(x => x.Id == result.UserModified)?.Username;
-            result.isShowDetail = true;
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
                 UserCreated = result.UserCreated,
