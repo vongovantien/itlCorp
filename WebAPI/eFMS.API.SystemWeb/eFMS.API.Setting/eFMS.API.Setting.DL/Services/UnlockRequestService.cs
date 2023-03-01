@@ -111,7 +111,8 @@ namespace eFMS.API.Setting.DL.Services
             {
                 UnlockName = s.AdvanceNo,
                 Job = s.AdvanceNo,
-                UnlockType = UnlockTypeEx.GetUnlockType(criteria.UnlockTypeNum)
+                UnlockType = UnlockTypeEx.GetUnlockType(criteria.UnlockTypeNum),
+                ServiceDate = s.RequestDate
             });
             return data.ToList();
         }
@@ -125,7 +126,8 @@ namespace eFMS.API.Setting.DL.Services
             {
                 UnlockName = s.SettlementNo,
                 Job = s.SettlementNo,
-                UnlockType = UnlockTypeEx.GetUnlockType(criteria.UnlockTypeNum)
+                UnlockType = UnlockTypeEx.GetUnlockType(criteria.UnlockTypeNum),
+                ServiceDate = s.RequestDate
             });
             return data.ToList();
         }
@@ -140,13 +142,15 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     UnlockName = s.JobNo,
                     Job = s.JobNo,
-                    UnlockType = _unlockType
+                    UnlockType = _unlockType,
+                    ServiceDate = s.ServiceDate
                 });
                 var dataDoc = transRepo.Get(x => criteria.JobIds.Where(w => !string.IsNullOrEmpty(w)).Contains(x.JobNo) && x.OfficeId == currentUser.OfficeID).Select(s => new SetUnlockRequestJobModel()
                 {
                     UnlockName = s.JobNo,
                     Job = s.JobNo,
-                    UnlockType = _unlockType
+                    UnlockType = _unlockType,
+                    ServiceDate = s.ServiceDate
                 });
                 var dataMerge = dataOps.Union(dataDoc);
                 return dataMerge.ToList();
@@ -158,13 +162,15 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     UnlockName = s.JobNo + " - " + s.Mblno,
                     Job = s.JobNo,
-                    UnlockType = _unlockType
+                    UnlockType = _unlockType,
+                    ServiceDate = s.ServiceDate
                 });
                 var dataDoc = transRepo.Get(x => criteria.Mbls.Where(w => !string.IsNullOrEmpty(w)).Contains(x.Mawb) && x.OfficeId == currentUser.OfficeID).Select(s => new SetUnlockRequestJobModel()
                 {
                     UnlockName = s.JobNo + " - " + s.Mawb,
                     Job = s.JobNo,
-                    UnlockType = _unlockType
+                    UnlockType = _unlockType,
+                    ServiceDate = s.ServiceDate
                 });
                 var dataMerge = dataOps.Union(dataDoc);
                 return dataMerge.ToList();
@@ -178,7 +184,9 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     UnlockName = s.Key.JobNo + " - " + string.Join(", ", s.Select(l => l.ClearanceNo)),
                     Job = s.Key.JobNo,
-                    UnlockType = _unlockType
+                    UnlockType = _unlockType,
+                    ServiceDate = opsTransactionRepo.Get(x => x.JobNo == s.Key.JobNo && x.CurrentStatus != "Canceled").FirstOrDefault().ServiceDate
+
                 });
                 return dataOpsGroup.ToList();
             }
@@ -628,7 +636,46 @@ namespace eFMS.API.Setting.DL.Services
             if (unlockRequest != null)
             {
                 var unlockJob = setUnlockRequestJobRepo.Get(x => x.UnlockRequestId == id).ToList();
+                var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != "Canceled");
+                var acctAdvance = advancePaymentRepo.Get();
+                var accSett = settlementPaymentRepo.Get();
+                var dateOps = (from job in unlockJob
+                                   join ops in opsTrans on job.Job equals ops.JobNo
+                                   select new SetUnlockRequestJobModel
+                                   {
+                                       Id = job.Id,
+                                       ServiceDate = ops.ServiceDate
+                                   }).ToList();
+                var dateAdvance = (from job in unlockJob
+                                   join accA in acctAdvance on job.Job equals accA.AdvanceNo
+                                   select new SetUnlockRequestJobModel
+                                   {
+                                       Id = job.Id,
+                                       ServiceDate = accA.RequestDate
+                                   }).ToList();
+                var dateSett = (from job in unlockJob
+                                    join accS in accSett on job.Job equals accS.SettlementNo
+                                    select new SetUnlockRequestJobModel
+                                    {
+                                        Id = job.Id,
+                                        ServiceDate = accS.RequestDate
+                                    }).ToList();
                 detail.Jobs = mapper.Map<List<SetUnlockRequestJobModel>>(unlockJob);
+                foreach (var item in detail.Jobs)
+                {
+                    if(dateOps.Count() > 0)
+                    {
+                        item.ServiceDate = dateOps.Find(x => x.Id == item.Id).ServiceDate;
+                    }
+                    if (dateAdvance.Count() > 0)
+                    {
+                        item.ServiceDate = dateAdvance.Find(x => x.Id == item.Id).ServiceDate;
+                    }
+                    if (dateSett.Count() > 0)
+                    {
+                        item.ServiceDate = dateSett.Find(x => x.Id == item.Id).ServiceDate;
+                    }
+                }
                 detail.RequesterName = userRepo.Where(x => x.Id == unlockRequest.Requester).FirstOrDefault()?.Username;
                 detail.UserNameCreated = userRepo.Where(x => x.Id == unlockRequest.UserCreated).FirstOrDefault()?.Username;
                 detail.UserNameModified = userRepo.Where(x => x.Id == unlockRequest.UserModified).FirstOrDefault()?.Username;
