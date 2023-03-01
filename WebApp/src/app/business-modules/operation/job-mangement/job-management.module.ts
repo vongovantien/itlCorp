@@ -17,6 +17,7 @@ import { JobManagementChargeImportComponent } from './job-management-import/job-
 import { JobManagementLinkFeeComponent } from '../job-management-link-fee/job-management-link-fee.component';
 import { LinkChargeJobRepPopupComponent } from './components/popup/link-charge-from-jobRep-popup/link-charge-from-job-rep.popup';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { ShareBussinessModule } from '../../share-business/share-bussines.module';
 
 
 const routing: Routes = [
@@ -65,6 +66,7 @@ const LIB = [
     imports: [
         RouterModule.forChild(routing),
         SharedModule,
+        ShareBussinessModule,
         ...LIB
     ],
     exports: [],
