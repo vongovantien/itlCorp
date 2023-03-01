@@ -356,7 +356,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var user = users.Where(x => x.Id == settle.Requester).FirstOrDefault();
                             var employee = user == null ? null : employees.Where(x => x.Id == user.EmployeeId).FirstOrDefault();
                             var partner = partners.Where(x => x.Id == settle.Payee).FirstOrDefault();
-                            item.CustomerName = partner != null ? partner.ShortName : employee.EmployeeNameVn;
+                            item.CustomerName = partner != null ? partner.PartnerNameVn : employee.EmployeeNameVn;
                             // CustomerCode = partner != null ? partner.AccountNo : (!string.IsNullOrEmpty(employee.PersonalId) ? employee.PersonalId : employee.StaffCode),
                             item.CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode; //[06/01/2021]
                             item.PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod;
