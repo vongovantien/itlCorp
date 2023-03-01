@@ -27,6 +27,9 @@
                         </div>
                     </div>
                 </div>
+                <list-file-attach *ngIf="jobOnSettle" [typeFrom]="typeFrom" [jobNo]="jobNo"
+                    [transactionType]="transactionType" [billingId]="billingId" [jobOnSettle]="jobOnSettle"
+                    [isEdocByAcc]="isEdocByAcc" [jobId]="jobId" [lstEdocExist]="lstEdocExist"></list-file-attach>
                 <div class="row">
                     <div class="col-md-12">
                         <table class="table table-brand table-editable table-fixed-err">
@@ -121,13 +124,6 @@
                                                     </td>
                                                 </ng-container>
                                                 <ng-container *ngIf="!enablePayeeINV[i]">
-                                                    <!-- <td class="">
-                                                        <div class="form-group"
-                                                            [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.payee||file.payee===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
-                                                            <input type="text" class="form-control " placeholder="Payee"
-                                                                [ngModel]="file.series" disabled>
-                                                        </div>
-                                                    </td> -->
                                                     <td class="">
                                                         <div class="form-group"
                                                             [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.inv||file.inv===null))&&(file.Code === 'INV' || file.Code === 'OBH_INV') }">
@@ -152,12 +148,12 @@
                                                 </td>
                                             </ng-container>
                                             <td class="disabled" *ngIf="typeFrom==='Shipment'||jobOnSettle">
-                                                <div class="form-group " [title]="jobNo">
+                                                <div class="form-group ">
                                                     <input type="text" class="form-control " [ngModel]="jobNo" disabled>
                                                 </div>
                                             </td>
                                             <td class="disabled" *ngIf="typeFrom!=='Shipment'&&!jobOnSettle">
-                                                <div class="list-master" [title]="file.jobTitle">
+                                                <div class="list-master">
                                                     <app-combo-grid-virtual-scroll [height]="150"
                                                         (itemSelected)="onSelectDataFormInfo($event,i, 'job')"
                                                         [dataSources]="jobDataSource"

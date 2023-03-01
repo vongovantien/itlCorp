@@ -3,9 +3,9 @@ import { ReportPreviewComponent } from '@common';
 import { SysImage } from '@models';
 import { Store } from '@ngrx/store';
 import { takeUntil } from 'rxjs/operators';
+import { getSettlementPaymentDetailState, ISettlementPaymentState } from '../store';
 import { AppPage } from 'src/app/app.base';
-import { ShareDocumentTypeAttachComponent } from 'src/app/business-modules/share-business/components/document-type-attach/document-type-attach.component';
-import { ISettlementPaymentState, getSettlementPaymentDetailState } from '../store';
+import { ShareDocumentTypeAttachComponent } from 'src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
 @Component({
@@ -25,6 +25,7 @@ export class SettlementShipmentItemComponent extends AppPage {
     @Output() onViewFiles: EventEmitter<any> = new EventEmitter<any>();
 
     @Input() data: ISettlementShipmentGroup = null;
+    lstEdocExist: any[] = [];
 
     initCheckbox: boolean = false;
     isCheckAll: boolean = false;
@@ -89,7 +90,36 @@ export class SettlementShipmentItemComponent extends AppPage {
     }
 
     showShipmentAttachFile($event: Event) {
+        // this.documentAttach.headers = [
+        //     { title: 'Alias Name', field: 'aliasName', width: 200 },
+        //     { title: 'Real File Name', field: 'realFilename' },
+        //     { title: 'Document Type', field: 'docType', required: true },
+        //     { title: 'Payee', field: 'payee' },
+        //     { title: 'Invoice No', field: 'invoiceNo' },
+        //     { title: 'Series No', field: 'seriesNo' },
+        //     { title: 'Job Ref', field: 'jobRef' },
+        //     { title: 'Note', field: 'note' },
+        // ]
+
+        // this.documentAttach.isUpdate = false;
+        // this.documentAttach.jobOnSettle = true;
+        // this.documentAttach.jobNo = this.data.jobId;
+        // this.documentAttach.jobId = this.data.shipmentId;
+        // this._store.select(getSettlementPaymentDetailState)
+        //     .pipe(takeUntil(this.ngUnsubscribe))
+        //     .subscribe((res) => {
+        //         if (res) {
+        //             this.documentAttach.billingId = res.settlement.id;
+        //             this.documentAttach.billingNo = res.settlement.settlementNo
+        //             //this.documentAttach.getListEdocExist();
+        //         }
+        //     })
+        // this.documentAttach.show();
+        $event.stopPropagation();
+        $event.preventDefault();
+
         this.onViewFiles.emit();
+
         return false;
     }
 }

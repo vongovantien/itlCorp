@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { SystemFileManageRepo } from '@repositories';
@@ -8,21 +8,24 @@ import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
-import { UpdateListEDoc, getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { UpdateListEdocSettle, getGrpChargeSettlementPaymentDetailState, UpdateListEDoc } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getSOADetailState } from 'src/app/business-modules/accounting/statement-of-account/store/reducers';
 import { PopupBase } from 'src/app/popup.base';
-import { getTransactionLocked, getTransactionPermission } from '../../store';
+import { getTransactionLocked, getTransactionPermission } from '../../../store';
+import { ShareListFilesAttachComponent } from '../list-file-attach/list-file-attach.component';
 @Component({
     selector: 'document-type-attach',
     templateUrl: './document-type-attach.component.html',
     styleUrls: ['./document-type-attach.component.scss']
 })
 export class ShareDocumentTypeAttachComponent extends PopupBase implements OnInit {
-    @Input() jobNo: string = '';
-    @Input() jobOnSettle: boolean = false; // * Job to attach File on Settle
+
+    @ViewChild(ShareListFilesAttachComponent) listFileAttach: ShareListFilesAttachComponent;
+
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
+
+    @Input() jobNo: string = '';
     @Input() housebills: any[] = [];
-    //@Input() jobs: any[] = [];
     @Input() billingId: string = '';
     @Input() billingNo: string = '';
     @Input() jobId: string = '';
@@ -31,14 +34,15 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() selectedTrantype: any = null;
     @Input() typeFrom: string = 'Shipment';
     @Input() docTypeId: number = 0;
+    @Input() documentTypes: any[] = [];
 
+    lstEdocExist: any[] = [];
     headers: CommonInterface.IHeaderTable[] = [];
     EdocUploadFile: IEDocUploadFile;
     listFile: any[] = [];
     isUpdate: boolean = false;
     detailDocId: number;
     formData: IEDocUploadFile;
-    @Input() documentTypes: any[] = [];
     isSubmitted: boolean = false;
     configJob: CommonInterface.IComboGirdConfig | any = {};
     configPayee: CommonInterface.IComboGirdConfig | any = {};
@@ -51,6 +55,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     enablePayeeINV: boolean[] = [];
     payFirst: boolean[] = [];
     payFilled: boolean = true;
+    jobOnSettle: boolean = false;
+    isEdocByAcc: boolean = false;
 
     constructor(
         private _toastService: ToastrService,
@@ -63,6 +69,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     ngOnInit(): void {
+        //this.listFileAttach.getEDoc(this.typeFrom);
         this.getJobList();
         this.transactionType = this.typeFrom;
         this.configJob = Object.assign({}, this.configComoBoGrid, {
@@ -107,10 +114,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             this.configDocType.dataSource = this.documentTypes
             console.log(this.documentTypes);
         }
-        // else {
-        //     this.getDocType(true);
-        // }
-
     }
 
     getDocType(isADV: boolean) {
@@ -121,18 +124,11 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                         if (isADV) {
                             this.documentTypes = res.filter(x => x.accountingType === 'ADV-Settlement');
                             this.configDocType.dataSource = res.filter(x => x.accountingType === 'ADV-Settlement');
-
                         } else {
                             this.documentTypes = res.filter(x => x.accountingType === 'Settlement');
                             this.configDocType.dataSource = res.filter(x => x.accountingType === 'Settlement');
-
                         }
                     }
-                    // else {
-                    //     console.log(res);
-                    //     this.documentTypes = res;
-                    //     this.configDocType.dataSource = res;
-                    // }
                 },
             );
     }
@@ -278,7 +274,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             }
         }
         event.target.value = ''
-
     }
 
     getDocumentType() {
@@ -436,6 +431,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                                 this.hide();
                                 this.onSearch.emit(this.transactionType);
                                 this.isSubmitted = false;
+                                this._store.dispatch(UpdateListEdocSettle({ data: true }));
                             }
                         }
                     );
@@ -458,6 +454,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                                 this.hide();
                                 this.onSearch.emit(this.transactionType);
                                 this.isSubmitted = false;
+                                this._store.dispatch(UpdateListEdocSettle({ data: true }));
                             }
                         }
                     );
@@ -491,7 +488,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     removePayee(index: number) {
-        //this.clearINV[index] = !!this.clearINV[index] ? !this.clearINV[index] : true;
         this.removeINV(index);
     }
 
@@ -504,7 +500,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
         this.listFile[index].aliasName = null;
         this.payFirst[index] = false;
         this.listFile[index].payee = null;
-        //this.clearPayee[index] = !!this.clearPayee[index] ? !this.clearPayee[index] : true;
     }
 
     removeDocType(index: number) {
@@ -526,6 +521,7 @@ export interface IEDocUploadFile {
     EDocFiles: IEDocFile[],
     Id: string,
 }
+
 export interface IEDocFile {
     JobId: string,
     Code: string,

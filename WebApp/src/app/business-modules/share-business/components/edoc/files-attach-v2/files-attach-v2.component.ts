@@ -1,12 +1,10 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { ConfirmPopupComponent } from '@common';
 import { SystemConstants } from '@constants';
-import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
-import { AccountingRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
@@ -14,52 +12,37 @@ import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { UpdateListEDoc, getUpdateListEDoc } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
-import { getTransactionDetailCsTransactionState } from '../../store';
+import { getTransactionDetailCsTransactionState } from '../../../store';
 import { IEDocFile, IEDocUploadFile, ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
+import { AppShareEDocBase } from '../edoc.base';
+import { ShareListFilesAttachComponent } from '../list-file-attach/list-file-attach.component';
 @Component({
     selector: 'files-attach-v2',
     templateUrl: './files-attach-v2.component.html',
     styleUrls: ['./files-attach-v2.component.scss']
 })
 
-export class ShareBussinessAttachFileV2Component extends AppList implements OnInit {
-    @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
-    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
-    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
+export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implements OnInit {
 
-    @Input() typeFrom: string = 'Shipment';
-    @Input() billingId: string = '';
-    @Input() billingNo: string = '';
+    @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
+    @ViewChild(ShareListFilesAttachComponent) listFileAttach: ShareListFilesAttachComponent;
+
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
+
     get readonly(): boolean {
         return this._readonly;
     }
 
-    @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
-
     documentTypes: any[] = [];
-    jobId: string = '';
     isOps: boolean = false;
-    edocByJob: any[] = [];
-    //edocByAcc: any[] = [];
-    selectedEdoc: IEDocItem;
-    selectedEdoc1: IEDocItem;
-    transactionType: string = '';
     housebills: any[] = [];
-    //jobs: any[] = [];
     modifiedDocTypes: any;
-    jobNo: string = '';
     private _readonly: boolean = false;
     isView: boolean = true;
     elementInput: HTMLElement = null;
     isEdocByJob: boolean = false;
-    isEdocByAcc: boolean = false;
-    edocByAcc: IEdocAcc[] = [({
-        documentType: null,
-        eDocs: [],
-    })];
     docTypeId: number = 0;
 
     headersGen: CommonInterface.IHeaderTable[] = [
@@ -71,13 +54,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Attach Person', field: 'userCreated', sortable: true },
     ];
 
-    // headersAcc: CommonInterface.IHeaderTable[] = [{ title: 'Alias Name', field: 'userFileName', sortable: true },
-    // { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
-    // { title: 'Job No', field: 'jobNo' },
-    // { title: 'Note', field: 'note' },
-    // { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
-    // { title: 'Attach Person', field: 'userCreated', sortable: true },
-    // ];
     headersAcc: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
         { title: 'Job No', field: 'jobNo' },
@@ -86,7 +62,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
         { title: 'Attach Person', field: 'userCreated', sortable: true },
     ];
-
 
     headerAttach: any[] = [
         { title: 'Alias Name', field: 'aliasName', width: 300 },
@@ -118,16 +93,15 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
 
 
     constructor(
-        private readonly _systemFileRepo: SystemFileManageRepo,
-        private readonly _activedRoute: ActivatedRoute,
-        private readonly _store: Store<IAppState>,
-        private readonly _toast: ToastrService,
-        private readonly _exportRepo: ExportRepo,
-        private readonly _sortService: SortService,
-        private readonly _accoutingRepo: AccountingRepo,
-        private _documentationRepo: DocumentationRepo,
+        protected readonly _systemFileRepo: SystemFileManageRepo,
+        protected readonly _activedRoute: ActivatedRoute,
+        protected readonly _store: Store<IAppState>,
+        protected readonly _toast: ToastrService,
+        protected readonly _exportRepo: ExportRepo,
+        protected readonly _sortService: SortService,
+        protected _documentationRepo: DocumentationRepo,
     ) {
-        super();
+        super(_toast, _systemFileRepo, _exportRepo);
         this.requestSort = this.sortEdoc;
     }
 
@@ -163,8 +137,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                             this.transactionType = 'CL';
                             this.getDocumentType('CL');
                             this.getEDoc('CL');
-                            this.jobNo = res.opstransaction.jobNo;
-                            this.isLocked = res.opstransaction.isLocked;
+                            this.jobNo = res.opstransaction?.jobNo;
+                            this.isLocked = res.opstransaction?.isLocked;
                         }
                     );
             }
@@ -225,35 +199,9 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             this.isView = false;
         }
         this.clearMenuContext(this.queryListMenuContext);
-        console.log(this.selectedEdoc);
     }
 
-    // downloadEdocFromName(doc: any) {
-    //     this.selectedEdoc = Object.assign({}, this.selectedEdoc);
-    //     this.selectedEdoc.sysImageId = doc.sysImageId;
-    //     this.selectedEdoc.imageUrl = doc.imageUrl;
-    //     this.selectedEdoc.systemFileName = doc.ssystemFileName;
-    //     console.log(doc);
-    //     this.downloadEdoc();
-    // }
 
-    downloadEdoc() {
-        const selectedEdoc = Object.assign({}, this.selectedEdoc);
-        if (selectedEdoc.id === selectedEdoc.sysImageId) {
-            this._systemFileRepo.getFileEdoc(selectedEdoc.sysImageId).subscribe(
-                (data) => {
-                    const extention = selectedEdoc.imageUrl.split('.').pop();
-                    this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.systemFileName + '.' + extention);
-                }
-            )
-        }
-        this._systemFileRepo.getFileEdoc(selectedEdoc.sysImageId).subscribe(
-            (data) => {
-                const extention = selectedEdoc.imageUrl.split('.').pop();
-                this.downLoadFile(data, SystemConstants.FILE_EXCEL, selectedEdoc.systemFileName + '.' + extention);
-            }
-        )
-    }
 
     editEdoc() {
         if (this.typeFrom === 'Settlement') {
@@ -277,8 +225,8 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
             id: this.selectedEdoc.id,
             docType: docType,
             note: this.selectedEdoc.note,
-            hwbNo: hwbNo,//hblNo
-            hblid: this.selectedEdoc.hblid,//hblNo
+            hwbNo: hwbNo,
+            hblid: this.selectedEdoc.hblid,
             jobNo: this.selectedEdoc.jobNo,
             jobId: this.selectedEdoc.jobId,
             Code: docType?.code,
@@ -293,34 +241,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         this.documentAttach.show();
     }
 
-    confirmDelete() {
-        let messageDelete = `Do you want to delete this Attach File ? `;
-        let itemDelete = this.selectedEdoc.id;
-        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
-            title: 'Delete Attach File',
-            body: messageDelete,
-            labelConfirm: 'Yes',
-            classConfirmButton: 'btn-danger',
-            iconConfirm: 'la la-trash',
-            center: true
-        }, () => this.deleteEdoc(itemDelete))
-    }
-
-    deleteEdoc(id: string = '') {
-        this._systemFileRepo.deleteEdoc(id)
-            .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res.status) {
-                        this._toast.success("Delete Sucess")
-                        this.getEDoc(this.transactionType);
-                    }
-                },
-            );
-    }
-
     getDocumentType(transactionType: string) {
         this._systemFileRepo.getDocumentType(transactionType)
             .pipe(
@@ -333,47 +253,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     this.documentAttach.configDocType.dataSource = res;
                 },
             );
-    }
-
-    // getDocTypeFromAttDoc(advAmount: number) {
-    //     console.log(advAmount);
-
-    //     //this.documentAttach.advAmount = this.advAmount;
-    //     //this.documentAttach.getDocumentType('Settlement');
-    //     this.documentAttach.filterDocTypeSettle(advAmount);
-    // }
-
-    getEDoc(transactionType: string) {
-        if (this.typeFrom === 'Shipment') {
-            this._systemFileRepo.getEDocByJob(this.jobId, this.transactionType)
-                .pipe(
-                    catchError(this.catchError),
-                )
-                .subscribe(
-                    (res: any[]) => {
-                        this.edocByJob = res.filter(x => x.documentType.type !== 'Accountant');
-                        this.edocByAcc = res.filter(x => x.documentType.type === 'Accountant');
-                        this.onChange.emit(res);
-                    },
-                );
-        } else {
-            this._systemFileRepo.getEDocByAccountant(this.billingId, transactionType)
-                .pipe(
-                    catchError(this.catchError),
-                )
-                .subscribe(
-                    (res: any) => {
-                        this.edocByAcc = res;
-                        console.log(res);
-                        if (res.eDocs.length > 0) {
-                            this.isEdocByAcc = true
-                        }
-                        this.onChange.emit(res);
-                    },
-                );
-        }
-        console.log(this.edocByAcc);
-
     }
 
     showDocumentAttach() {
@@ -400,42 +279,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         }
     }
 
-    viewEdocFromName(edoc: any) {
-        // this.selectedEdoc = Object.assign({}, this.selectedEdoc);
-        // this.selectedEdoc.imageUrl = edoc.imageUrl;
-        console.log(edoc);
-
-        this.selectedEdoc = edoc;
-        this.viewFileEdoc();
-    }
-
-    viewFileEdoc() {
-        console.log(this.selectedEdoc);
-
-        if (!this.selectedEdoc.imageUrl) {
-            return;
-        }
-        const extension = this.selectedEdoc.imageUrl.split('.').pop();
-        console.log(extension);
-
-        if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
-            this._exportRepo.previewExport(this.selectedEdoc.imageUrl);
-        }
-        else if (['html', 'htm'].includes(extension)) {
-            console.log();
-            this._systemFileRepo.getFileEdocHtml(this.selectedEdoc.imageUrl).subscribe(
-                (res: any) => {
-                    window.open('', '_blank').document.write(res.body);
-                }
-            )
-        }
-        else if (['pdf', 'txt', 'png', 'jpeg', 'jpg'].includes(extension.toLowerCase())) {
-            this._exportRepo.downloadExport(this.selectedEdoc.imageUrl);
-        } else {
-            this.downloadEdoc();
-        }
-    }
-
     sortEdoc(type: string, index: number, sort: string): void {
         if (!type) return;
         this.setSortBy(sort, this.sort !== sort ? true : !this.order);
@@ -445,37 +288,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         } else {
             this.edocByAcc[index].eDocs = this._sortService.sort(this.edocByAcc[index].eDocs, sort, this.order);
         }
-    }
-
-    downloadAllEdoc() {
-        console.log(this.isEdocByAcc);
-
-        // let countEdocJob = _some(this.edocByJob, x => (x.eDocs !== null && x.eDocs?.length > 0));
-        // let countEdocAcc = _some(this.edocByAcc, x => (x.eDocs !== null && x.eDocs?.length > 0));
-        //console.log(this.edocByJob);
-        console.log(this.edocByAcc);
-        if (this.typeFrom === 'Shipment') {
-            if (!this.edocByJob?.some(x => x.eDocs?.length > 0)) {
-                return this._toast.warning("No data to Export");
-            }
-        }
-        else {
-            if (!this.isEdocByAcc) {
-                return this._toast.warning("No data to Export");
-            }
-        }
-        let model = {
-            folderName: this.typeFrom,
-            objectId: this.typeFrom === 'Shipment' ? this.jobId : this.billingId,
-            chillId: null,
-            fileName: this.typeFrom === 'Shipment' ? this.jobNo : this.billingNo
-        }
-        this._systemFileRepo.dowloadallEDoc(model)
-            .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, "application/zip", model.fileName);
-                }
-            )
     }
 
     chooseFile(event: any) {
@@ -511,7 +323,6 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         event.target.value = ''
         this.uploadEDoc(listFile);
     }
-
 
     // ** UPLOAD PER FILE ON CONTEXT MENU LIST EDOC ON JOB
     uploadEDoc(listFile: any[]) {
@@ -571,35 +382,5 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
     }
 }
 
-interface IEdocAcc {
-    documentType: any;
-    eDocs: any[];
-}
 
-interface IEDocItem {
-    billingNo: string;
-    billingType: string;
-    datetimeCreated: Date;
-    datetimeModified: Date;
-    departmentId: number;
-    documentTypeId: number;
-    expiredDate: number;
-    groupId: number;
-    hblNo: string;
-    hblid: string;
-    id: string;
-    imageUrl: string;
-    jobId: string;
-    jobNo: string;
-    note: string;
-    officeId: string;
-    source: string;
-    sysImageId: string;
-    systemFileName: string;
-    userCreated: string;
-    userFileName: string;
-    userModified: string;
-    documentTypeName: string;
-    transactionType: string;
-    documentCode: string;
-}
+
