@@ -27,6 +27,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -3879,10 +3880,9 @@ namespace eFMS.API.Documentation.DL.Services
                         shipmentExisted.TrackingStatus = statusShipment;
                         hs = await DataContext.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
                         hs = await trackInfoRepository.AddAsync(lstTrackInfo);
-                        shipmentExisted.TrackingStatus = statusShipment;
-                        hs = await DataContext.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
 
                         var returnData = trackInfoRepository.Get(x => x.Hblid == shipmentExisted.Id).OrderByDescending(x => x.ActualDate);
+
                         //Reponse data
                         trackShipment.trackInfos = _mapper.Map<List<TrackInfoViewModel>>(returnData);
                         trackShipment.Status = statusShipment;

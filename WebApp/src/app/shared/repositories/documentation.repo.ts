@@ -1295,4 +1295,10 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+
+    trackShipmentProgress(params: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/TrackShipmentProgress`, params).pipe(
+            map((data: any) => data)
+        );
+    }
 }

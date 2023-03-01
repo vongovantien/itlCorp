@@ -108,5 +108,5 @@
   "MSG_CLEARANCE_IS_OVERDUE": "{0} - {1} {2} agreement of {3} has Overdued, please check it again!",
   "MSG_CLEARANCE_IS_OVERLIMIT": "{0} - {1} {2} agreement of {3} is Over Credit Limit {4}% , please check it again!",
   "MSG_CHARGE_CODE_WRONG_OFFICE": "Charge {0} not exist in office {1}",
-  "MSG_CUSTOM_NO_NOT_EXIST_JOB": "Custom No does not exist in {0}"
+  "MSG_CUSTOM_NO_NOT_EXIST_JOB": "Custom No does not exist in {0}",
 }

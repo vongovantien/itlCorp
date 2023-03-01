@@ -1,6 +1,5 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -21,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
@@ -49,6 +47,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICsStageAssignedService csStageAssignedService;
         private readonly IEDocService _edocService;
         private readonly IRabbitBus _busControl;
+        private readonly ICsTransactionDetailService csTransactionDetailService;
         /// <summary>
         /// constructor
         /// </summary>
@@ -72,7 +71,8 @@ namespace eFMS.API.Documentation.Controllers
             ISysImageService imageService,
             IEDocService edocService,
             IRabbitBus _bus,
-            ICsStageAssignedService stageAssignedService)
+            ICsStageAssignedService stageAssignedService,
+            ICsTransactionDetailService transactionDetailService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
@@ -83,8 +83,9 @@ namespace eFMS.API.Documentation.Controllers
             apiServiceUrl = serviceUrl;
             checkPointService = checkPoint;
             csStageAssignedService = stageAssignedService;
-            _edocService= edocService;
+            _edocService = edocService;
             _busControl = _bus;
+            csTransactionDetailService = transactionDetailService;
         }
 
         /// <summary>
@@ -555,7 +556,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
-        {        
+        {
             await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, model);
             return new HandleState();
         }
@@ -678,6 +679,26 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("TrackShipmentProgress")]
+        public async Task<IActionResult> TrackShipmentProgress([FromQuery] TrackingShipmentCriteria model)
+        {
+            if (!CheckExistShipment(model))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_NOT_EXIST].Value });
+            }
+
+            var data = await csTransactionService.TrackShipmentProgress(model);
+
+            return Ok(data);
+        }
+
         #region -- METHOD PRIVATE --
 
         private bool CheckExistShipment(TrackingShipmentCriteria criteria)
@@ -687,14 +708,13 @@ namespace eFMS.API.Documentation.Controllers
             {
                 case "SEA":
                     isExisted = csTransactionDetailService.Any(x =>
-                    (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb.Contains(criteria.Mawb)) ||
-                    (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno.Contains(criteria.Hawb)));
+                    (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb == criteria.Mawb) ||
+                    (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno == criteria.Hawb));
                     break;
                 case "AIR":
                     isExisted = csTransactionDetailService.Any(x =>
-                    (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb.Contains(criteria.Mawb)) ||
-                    (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno.Contains(criteria.Hawb))
-                    );
+                    (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb == criteria.Mawb) ||
+                    (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno == criteria.Hawb));
                     break;
                 default:
                     break;

@@ -52,9 +52,15 @@ namespace eFMS.API.Shipment
             services.AddCustomSwagger();
             services.AddHostedService<ScopedAlertHostedService>();
             services.AddScoped<IScopedProcessingAlertService, ScopedProcessingAlertService>();
-            services.Configure<ApiServiceUrl>(option => {
+            services.Configure<ApiServiceUrl>(option =>
+            {
                 option.ApiUrlAccounting = Configuration.GetSection("ApiUrlAccounting").Value;
                 option.ApiUrlExport = Configuration.GetSection("ApiUrlExport").Value;
+            });
+            services.Configure<TrackingApi>(option =>
+            {
+                option.ApiName = Configuration.GetSection("TrackingApi:TrackingMore:ApiName").Value;
+                option.Url = Configuration.GetSection("TrackingApi:TrackingMore:Url").Value;
             });
             services.SetUpRabbitMq(Configuration);
         }
