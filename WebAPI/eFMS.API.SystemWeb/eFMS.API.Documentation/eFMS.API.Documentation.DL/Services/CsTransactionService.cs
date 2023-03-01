@@ -3876,7 +3876,6 @@ namespace eFMS.API.Documentation.DL.Services
                                 }
                             }
                         }
-                        hs = await trackInfoRepository.AddAsync(lstTrackInfo);
                         shipmentExisted.TrackingStatus = statusShipment;
                         hs = await DataContext.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
                         hs = await trackInfoRepository.AddAsync(lstTrackInfo);
