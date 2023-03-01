@@ -3392,13 +3392,14 @@ namespace eFMS.API.Documentation.DL.Services
                     return null;
                 }
             }
+
             // Gom tren trans
             var accsoaData = acctSoaRepo.Get();
             var partnerData = partnerRepositoty.Get();
-            var accMangData = accountingManagementRepository.Get(x => string.IsNullOrEmpty(criteria.PartnerId) || x.PartnerId == criteria.PartnerId);
+            var accMangData = accountingManagementRepository.Get();
             var transactionDetailData = trandetailRepositoty.Get();
             var opstransactionData = opstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
-            var surchargeData = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo));
+            var surchargeData = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.SettlementCode));
             var creditData = from cd in cdNoteData
                              join sc in surchargeData on cd.Code equals sc.CreditNo
                              join ops in opstransactionData on sc.Hblid equals ops.Hblid into opsGrps
@@ -3408,14 +3409,13 @@ namespace eFMS.API.Documentation.DL.Services
                              join partner in partnerData on cd.PartnerId equals partner.Id
                              join acc in accMangData on sc.AcctManagementId equals acc.Id into accGrps
                              from acc in accGrps.DefaultIfEmpty()
-                             join sm in settlementData on sc.SettlementCode equals sm.SettlementNo into smGrps
-                             from sm in smGrps.DefaultIfEmpty()
                              where partner.PartnerType == "Agent" && !string.IsNullOrEmpty(sc.SyncedFrom) && !string.IsNullOrEmpty(acc.VoucherId)
-                             || (sc.SyncedFrom == "SETTLEMENT" || sc.PaySyncedFrom == "SETTLEMENT") && string.IsNullOrEmpty(sc.Soano) && string.IsNullOrEmpty(sc.CreditNo)
+                             || ((sc.SyncedFrom == "SETTLEMENT" || sc.PaySyncedFrom == "SETTLEMENT") && string.IsNullOrEmpty(sc.Soano) && string.IsNullOrEmpty(sc.CreditNo))
                              select new InvoiceListModel
                              {
                                  JobNo = sc.JobNo,
                                  IssuedDate = sc.DatetimeCreated,
+                                 SettleNo = sc.SettlementCode,
                                  Type = cd.Type,
                                  CodeNo = sc.CreditNo,
                                  HBLId = trans.Id,
@@ -3445,7 +3445,8 @@ namespace eFMS.API.Documentation.DL.Services
                             join partner in partnerData on cd.PartnerId equals partner.Id
                             join acc in accMangData on sc.AcctManagementId equals acc.Id into accGrps
                             from acc in accGrps.DefaultIfEmpty()
-                            where partner.PartnerType == "Agent" && (!string.IsNullOrEmpty(sc.SyncedFrom)
+                            where partner.PartnerType == "Agent" && (String.IsNullOrEmpty(sc.SyncedFrom) || sc.SyncedFrom != "SOA") &&
+                            (!string.IsNullOrEmpty(sc.SyncedFrom)
                             && !string.IsNullOrEmpty(acc.VoucherId))
                             select new InvoiceListModel
                             {
@@ -3518,8 +3519,6 @@ namespace eFMS.API.Documentation.DL.Services
                          from ops in opstransGrps.DefaultIfEmpty()
                          join acc in accMangData on soa.AcctManagementId equals acc.Id into accGrps1
                          from acc in accGrps1.DefaultIfEmpty()
-                         join sm in settlementData on soa.SettlementCode equals sm.SettlementNo into smGrps
-                         from sm in smGrps.DefaultIfEmpty()
                          where part.PartnerType == "Agent"
                          && ((soa.Type != "Credit" && (soa.SyncedFrom == "SOA") ||
                          soa.Type == "Credit" && (soa.PaySyncedFrom == "SOA")))
@@ -3549,17 +3548,19 @@ namespace eFMS.API.Documentation.DL.Services
                          };
 
             // Case settle
-            var settleData = from sc in surchargeData
-                             join sm in settlementData on sc.SettlementCode equals sm.SettlementNo into smGrps
-                             from sm in smGrps.DefaultIfEmpty()
-                             join part in partnerData on sm.Payee equals part.Id into partGroup
+            var surchargeDataSettle = surchargeRepository.Get(x => x.PaymentObjectId == criteria.PartnerId && (!string.IsNullOrEmpty(x.SyncedFrom))
+                             && (string.IsNullOrEmpty(x.DebitNo) && string.IsNullOrEmpty(x.CreditNo))
+                             && (string.IsNullOrEmpty(x.Soano) && string.IsNullOrEmpty(x.PaySoano)));
+            var settleData = from sc in surchargeDataSettle
+                             join acc in accMangData on sc.AcctManagementId equals acc.Id
+                             join part in partnerData on sc.PaymentObjectId equals part.Id into partGroup
                              from part in partGroup.DefaultIfEmpty()
+                             join sm in settlementData on sc.SettlementCode equals sm.SettlementNo
                              join trans in transactionDetailData on sc.Hblid equals trans.Id into transGrps
                              from trans in transGrps.DefaultIfEmpty()
                              join ops in opstransactionData on sc.Hblid equals ops.Hblid into opsGrps
                              from ops in opsGrps.DefaultIfEmpty()
-                             join acc in accMangData on sc.AcctManagementId equals acc.Id
-                             where part.PartnerType == "Agent" && !string.IsNullOrEmpty(sc.SyncedFrom) && !string.IsNullOrEmpty(acc.VoucherId)
+                             where part.PartnerType == "Agent" && !string.IsNullOrEmpty(acc.VoucherId)
                              select new InvoiceListModel
                              {
                                  JobNo = sc.JobNo,
@@ -3582,7 +3583,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  VoucherIddate = sc.VoucherIddate,
                                  IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
                                  Status = (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null ? "Issued" : "New",
-                                 SettleNo = sm.SettlementNo
+                                 SettleNo = sc.SettlementCode
                              };
 
             var data = new List<InvoiceListModel>();
@@ -4327,7 +4328,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
                 VatVoucher = rs.VatVoucher,
                 InvDueDay = rs?.InvDueDay,
-                SoaSmNo = rs.SoaNo ?? rs.SettleNo
+                SoaSmNo = rs.SettleNo ?? rs.SoaNo
             });
 
             var res = dataTrans.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
