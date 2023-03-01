@@ -9,11 +9,11 @@ import { SortService } from '@services';
 import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
-import { UpdateListEdocSettle, getEdocLoadingState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../../store';
 import { IEDocFile, IEDocUploadFile, ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
 import { AppShareEDocBase } from '../edoc.base';
+import { ShareListFilesAttachComponent } from '../list-file-attach/list-file-attach.component';
 @Component({
     selector: 'files-attach-v2',
     templateUrl: './files-attach-v2.component.html',
@@ -21,15 +21,18 @@ import { AppShareEDocBase } from '../edoc.base';
 })
 
 export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implements OnInit {
-    @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
 
+    @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
+    @ViewChild(ShareListFilesAttachComponent) listFileAttach: ShareListFilesAttachComponent;
 
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
+
     get readonly(): boolean {
         return this._readonly;
     }
+
     documentTypes: any[] = [];
     isOps: boolean = false;
     housebills: any[] = [];
@@ -38,8 +41,6 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
     isView: boolean = true;
     elementInput: HTMLElement = null;
     isEdocByJob: boolean = false;
-    isLoadEdoc: boolean = false;
-
     docTypeId: number = 0;
 
     headersGen: CommonInterface.IHeaderTable[] = [
@@ -59,7 +60,6 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
         { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
         { title: 'Attach Person', field: 'userCreated', sortable: true },
     ];
-
 
     headerAttach: any[] = [
         { title: 'Alias Name', field: 'aliasName', width: 300 },
@@ -161,14 +161,6 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
                     this.currentUser = res;
                 }
             )
-        this._store.select(getEdocLoadingState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res) => {
-                    this.getEDoc(this.transactionType);
-                    this._store.dispatch(UpdateListEdocSettle({ data: false }))
-                }
-            )
         this.getHblList();
     }
 
@@ -195,7 +187,6 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             this.isView = false;
         }
         this.clearMenuContext(this.queryListMenuContext);
-        console.log(this.selectedEdoc);
     }
 
 
@@ -321,7 +312,6 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
         event.target.value = ''
         this.uploadEDoc(listFile);
     }
-
 
     // ** UPLOAD PER FILE ON CONTEXT MENU LIST EDOC ON JOB
     uploadEDoc(listFile: any[]) {

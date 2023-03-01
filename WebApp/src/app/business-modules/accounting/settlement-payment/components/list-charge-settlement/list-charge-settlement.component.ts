@@ -26,7 +26,8 @@ import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
+import { ShareDocumentTypeAttachComponent } from "src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component";
+import { ISettlementPaymentState, UpdateListEdocSettle, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -56,6 +57,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
     @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>;
+    @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
 
     groupShipments: ISettlementShipmentGroup[] = [];
     headers: CommonInterface.IHeaderTable[];
@@ -720,12 +722,32 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             )
     }
 
-    viewShipmentAttachFile(index: number) {
-        this.selectedGroupShipmentIndex = index;
-        this.shipmentFilePopup.shipmentGroups = this.groupShipments[index];
-        this.shipmentFilePopup.files = this.shipmentFilePopup.shipmentGroups.files;
+    viewShipmentAttachFile(data: any) {
+        this.documentAttach.headers = [
+            { title: 'Alias Name', field: 'aliasName', width: 200 },
+            { title: 'Real File Name', field: 'realFilename' },
+            { title: 'Document Type', field: 'docType', required: true },
+            { title: 'Payee', field: 'payee' },
+            { title: 'Invoice No', field: 'invoiceNo' },
+            { title: 'Series No', field: 'seriesNo' },
+            { title: 'Job Ref', field: 'jobRef' },
+            { title: 'Note', field: 'note' },
+        ]
 
-        this.shipmentFilePopup.show();
+        this.documentAttach.isUpdate = false;
+        this.documentAttach.jobOnSettle = true;
+        this._store.select(getSettlementPaymentDetailState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res) => {
+                if (res) {
+                    this.documentAttach.billingId = res.settlement.id;
+                    this.documentAttach.billingNo = res.settlement.settlementNo
+                }
+            })
+        this.documentAttach.jobNo = data.jobId;
+        this._store.dispatch(UpdateListEdocSettle({ data: true }));
+        this.documentAttach.show();
+        console.log(data);
 
     }
 

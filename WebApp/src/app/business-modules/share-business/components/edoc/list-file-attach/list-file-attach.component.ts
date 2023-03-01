@@ -6,7 +6,8 @@ import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositori
 import { SortService } from '@services';
 import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
+import { UpdateListEdocSettle, getEdocLoadingState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { AppShareEDocBase } from '../edoc.base';
 
 
@@ -14,11 +15,12 @@ import { AppShareEDocBase } from '../edoc.base';
     selector: 'list-file-attach',
     templateUrl: './list-file-attach.component.html',
 })
-export class ShareBussinessListFilesAttachComponent extends AppShareEDocBase implements OnInit {
+export class ShareListFilesAttachComponent extends AppShareEDocBase implements OnInit {
 
-    @Input() lstEdocExist: any;
-    @Input() jobBase: string = '';
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
+
+    @Input() transactionType: string = '';
+    @Input() readonly: boolean = false;
 
     constructor(
         protected readonly _systemFileRepo: SystemFileManageRepo,
@@ -40,7 +42,14 @@ export class ShareBussinessListFilesAttachComponent extends AppShareEDocBase imp
                     this.currentUser = res;
                 }
             )
-        this.getListEdocExist();
+        this._store.select(getEdocLoadingState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res) => {
+                    this.getEDoc(this.transactionType);
+                    this._store.dispatch(UpdateListEdocSettle({ data: false }))
+                }
+            )
     }
 
     onSelectEDoc(edoc: any) {
@@ -52,24 +61,5 @@ export class ShareBussinessListFilesAttachComponent extends AppShareEDocBase imp
             this.isView = false;
         }
         this.clearMenuContext(this.queryListMenuContext);
-        console.log(this.selectedEdoc);
     }
-
-    getListEdocExist() {
-        this._systemFileRepo.getEDocByAccountant(this.billingId, 'Settlement')
-            .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-                    let data = res;
-                    data.eDocs = res.eDocs.filter(x => x.jobNo === this.jobNo || x.jobNo === null);
-                    this.lstEdocExist = data;
-                    if (res?.eDocs.length > 0) {
-                        this.isEdocByAcc = true;
-                    }
-                },
-            );
-    }
-
 }

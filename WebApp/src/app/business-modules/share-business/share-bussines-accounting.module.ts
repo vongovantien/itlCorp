@@ -5,13 +5,13 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ShareDocumentTypeAttachComponent } from './components/edoc/document-type-attach/document-type-attach.component';
 import { ShareBussinessAttachFileV2Component } from './components/edoc/files-attach-v2/files-attach-v2.component';
-import { ShareBussinessListFilesAttachComponent } from './components/edoc/list-file-attach/list-file-attach.component';
+import { ShareListFilesAttachComponent } from './components/edoc/list-file-attach/list-file-attach.component';
 
 @NgModule({
     declarations: [
         ShareBussinessAttachFileV2Component,
         ShareDocumentTypeAttachComponent,
-        ShareBussinessListFilesAttachComponent
+        ShareListFilesAttachComponent
     ],
     imports: [
         CommonModule,
@@ -22,7 +22,7 @@ import { ShareBussinessListFilesAttachComponent } from './components/edoc/list-f
     exports: [
         ShareBussinessAttachFileV2Component,
         ShareDocumentTypeAttachComponent,
-        ShareBussinessListFilesAttachComponent
+        ShareListFilesAttachComponent
     ],
     providers: [],
 })

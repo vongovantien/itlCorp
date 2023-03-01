@@ -10,27 +10,38 @@ import { catchError } from "rxjs/operators";
 
 @Directive()
 export abstract class AppShareEDocBase extends AppList {
+    @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
+    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
 
+    @Input() typeFrom: string = 'Shipment';
+    @Input() isEdocByAcc: boolean = false;
+    @Input() jobNo: string = '';
+    @Input() billingId: string = '';
+    @Input() billingNo: string = '';
+    @Input() jobOnSettle: boolean = false;
+
+    transactionType: string = '';
+    edocByJob: any[] = [];
+    jobId: string = '';
+    selectedEdoc1: IEDocItem;
     selectedEdoc: IEDocItem;
+    lstEdocExist: any[] = [];
+    isView: boolean = true;
     edocByAcc: IEdocAcc[] = [({
         documentType: null,
         eDocs: [],
     })];
-    @Input() typeFrom: string = 'Shipment';
-    @Input() isEdocByAcc: boolean = false;
-    edocByJob: any[] = [];
-    jobId: string = '';
-    @Input() jobNo: string = '';
-    @Input() billingId: string = '';
-    @Input() billingNo: string = '';
-    transactionType: string = '';
-    @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
-    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
-    selectedEdoc1: IEDocItem;
-    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
-    accEdocData: any[] = [];
 
-    isView: boolean = true;
+    headersAcc: CommonInterface.IHeaderTable[] = [
+        { title: 'Alias Name', field: 'systemFileName', sortable: true },
+        { title: 'Job No', field: 'jobNo' },
+        { title: 'Document Type Name', field: 'documentTypeName', sortable: true },
+        { title: 'Note', field: 'note' },
+        { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
+        { title: 'Attach Person', field: 'userCreated', sortable: true },
+    ];
+
     constructor(
         protected readonly _toast: ToastrService,
         protected readonly _systemFileRepo: SystemFileManageRepo,
@@ -61,8 +72,6 @@ export abstract class AppShareEDocBase extends AppList {
     }
 
     viewEdocFromName(edoc: any) {
-        console.log(edoc);
-
         this.selectedEdoc = edoc;
         this.viewFileEdoc();
     }
@@ -94,8 +103,6 @@ export abstract class AppShareEDocBase extends AppList {
     }
 
     viewFileEdoc() {
-        console.log(this.selectedEdoc);
-
         if (!this.selectedEdoc.imageUrl) {
             return;
         }
@@ -169,7 +176,11 @@ export abstract class AppShareEDocBase extends AppList {
                 .subscribe(
                     (res: any) => {
                         this.edocByAcc = res;
-                        this.accEdocData = res.eDocs;
+                        if (this.jobOnSettle) {
+                            this.lstEdocExist = res.eDocs.filter(x => x.jobNo === this.jobNo || x.jobNo === null);
+                        } else {
+                            this.lstEdocExist = res.eDocs;
+                        }
                         console.log(res);
                         if (res.eDocs.length > 0) {
                             this.isEdocByAcc = true
@@ -181,6 +192,7 @@ export abstract class AppShareEDocBase extends AppList {
     }
 
 }
+
 export interface IEdocAcc {
     documentType: any;
     eDocs: any[];
