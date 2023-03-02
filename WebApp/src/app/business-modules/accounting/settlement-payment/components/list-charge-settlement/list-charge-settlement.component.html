@@ -78,7 +78,7 @@
                     <accordion [isAnimated]="true">
                         <accordion-group *ngFor="let item of groupShipments; let i = index; trackBy: trackByFn"
                             [isOpen]="openAllCharge" class="m--margin-bottom-20">
-                            <shipment-item #headingShipmentGroup accordion-heading [data]="item"
+                            <shipment-item #headingShipmentGroup accordion-heading [data]="item" readOnly
                                 (onClick)="onClickHeadingShipment(item)"
                                 (onCheck)="onCheckBoxShipmentItemInGroupShipment($event, i)"
                                 (onPrintPlUSD)="previewPLsheet(item,'USD')" (onPrintPlVND)="previewPLsheet(item, 'VND')"

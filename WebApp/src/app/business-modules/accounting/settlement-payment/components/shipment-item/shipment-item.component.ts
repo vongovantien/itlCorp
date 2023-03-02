@@ -1,3 +1,4 @@
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ReportPreviewComponent } from '@common';
 import { SysImage } from '@models';
@@ -23,10 +24,19 @@ export class SettlementShipmentItemComponent extends AppPage {
     @Output() onViewFiles: EventEmitter<any> = new EventEmitter<any>();
 
     @Input() data: ISettlementShipmentGroup = null;
-    lstEdocExist: any[] = [];
 
     initCheckbox: boolean = false;
     isCheckAll: boolean = false;
+
+    @Input() set readOnly(val: any) {
+        this._readonly = coerceBooleanProperty(val);
+    }
+
+    private _readonly: boolean = false;
+
+    get readonly(): boolean {
+        return this._readonly;
+    }
 
     constructor(
         private _store: Store<ISettlementPaymentState>,
@@ -60,31 +70,6 @@ export class SettlementShipmentItemComponent extends AppPage {
     }
 
     showShipmentAttachFile($event: Event) {
-        // this.documentAttach.headers = [
-        //     { title: 'Alias Name', field: 'aliasName', width: 200 },
-        //     { title: 'Real File Name', field: 'realFilename' },
-        //     { title: 'Document Type', field: 'docType', required: true },
-        //     { title: 'Payee', field: 'payee' },
-        //     { title: 'Invoice No', field: 'invoiceNo' },
-        //     { title: 'Series No', field: 'seriesNo' },
-        //     { title: 'Job Ref', field: 'jobRef' },
-        //     { title: 'Note', field: 'note' },
-        // ]
-
-        // this.documentAttach.isUpdate = false;
-        // this.documentAttach.jobOnSettle = true;
-        // this.documentAttach.jobNo = this.data.jobId;
-        // this.documentAttach.jobId = this.data.shipmentId;
-        // this._store.select(getSettlementPaymentDetailState)
-        //     .pipe(takeUntil(this.ngUnsubscribe))
-        //     .subscribe((res) => {
-        //         if (res) {
-        //             this.documentAttach.billingId = res.settlement.id;
-        //             this.documentAttach.billingNo = res.settlement.settlementNo
-        //             //this.documentAttach.getListEdocExist();
-        //         }
-        //     })
-        // this.documentAttach.show();
         $event.stopPropagation();
         $event.preventDefault();
 
