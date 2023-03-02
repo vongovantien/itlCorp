@@ -107,8 +107,8 @@ namespace eFMS.API.Infrastructure.RabbitMQ
                     _channel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
                     semaphore.Release();
                 }
-               
-               
+
+
             };
             _channel.BasicQos(0, (ushort)batchSize, false);
             _channel.BasicConsume(queue, false, consumer);

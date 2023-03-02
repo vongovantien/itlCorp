@@ -2,8 +2,6 @@
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
-using eFMS.API.Accounting.DL.Models.SettlementPayment;
-using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -16,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -39,8 +38,9 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IAccAccountReceivableService accountReceivableService;
-        private readonly IEDocService _edocService;
+        private readonly IEdocService _edocSevice;
         private string typeApproval = "Advance";
+        private readonly IOptions<ApiUrl> apiServiceUrl;
 
         /// <summary>
         /// Contructor
@@ -49,14 +49,22 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="service"></param>
         /// <param name="user"></param>
         /// <param name="hostingEnvironment"></param>
-        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IEDocService edocService, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment, IAccAccountReceivableService accountReceivable)
+        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer,
+            IAcctAdvancePaymentService service,
+            ICurrentUser user,
+            IHostingEnvironment hostingEnvironment,
+            IAccAccountReceivableService accountReceivable,
+            IEdocService edocSevice,
+            IOptions<ApiUrl> _apiServiceUrl
+            )
         {
             stringLocalizer = localizer;
             acctAdvancePaymentService = service;
             currentUser = user;
             _hostingEnvironment = hostingEnvironment;
             accountReceivableService = accountReceivable;
-            _edocService = edocService;
+            apiServiceUrl = _apiServiceUrl;
+            _edocSevice = edocSevice;
         }
 
         /// <summary>
@@ -326,11 +334,6 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(result);
             }
 
-            Response.OnCompleted(async () =>
-            {
-                await _edocService.DeleteEdocByBillingNo(advanceNo);
-            });
-
             return Ok(result);
         }
 
@@ -449,10 +452,16 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
-            //else
-            //{
-            //    await _edocService.GenerateEdocAdvance(model);
-            //}
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
+                    var edocModel = _edocSevice.MapAdvanceRequest(model);
+                    var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
+                });
+
+            }
             return Ok(result);
         }
 

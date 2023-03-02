@@ -760,7 +760,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService,eFMS.API.Accounting.DL.IService.IEDocService,eFMS.API.Infrastructure.RabbitMQ.IRabbitBus)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService,eFMS.API.Infrastructure.RabbitMQ.IRabbitBus)">
             <summary>
             Contructor
             </summary>
@@ -984,7 +984,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSOAService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService,eFMS.API.Accounting.DL.IService.IEDocService,eFMS.API.Infrastructure.RabbitMQ.IRabbitBus)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSOAService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService,eFMS.API.Infrastructure.RabbitMQ.IRabbitBus)">
             <summary>
             constructor
             </summary>
