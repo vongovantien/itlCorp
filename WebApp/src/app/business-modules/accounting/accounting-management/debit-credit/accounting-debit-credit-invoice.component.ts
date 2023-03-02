@@ -304,11 +304,11 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             );
     }
     exportAgencyTemplate() {
-        if (this.dataSearch.partnerId == null) {
-            return this._toastService.error('Please select partner!');
+        if (this.dataSearch.partnerId == null ) {
+            return this._toastService.warning('Please select partner!');
         }
-        if (this.dataSearch.issuedDate == null){
-            return this._toastService.error('Please select Issue Date!');
+        if (this.dataSearch.issuedDate == null || this.dataSearch.issuedDate == ""){
+            return this._toastService.warning('Please select Issue Date!');
         }
         this._progressRef.start();
         this._exportRepo.exportAgencyTemplate(this.dataSearch)
