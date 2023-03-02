@@ -2993,8 +2993,7 @@ namespace eFMS.API.Documentation.DL.Services
                           join chg in chargeSoa on soa.Soano equals chg.Soano
                           join trans in transactionData on chg.JobNo equals trans.JobNo into transGrp
                           from trans in transGrp.DefaultIfEmpty()
-                          join tranDs in transactionDetailData on trans.Id equals tranDs.JobId into tranDsGrp
-                          from tranDs in tranDsGrp.DefaultIfEmpty()
+                          
                           join ops in opstransactionData on chg.JobNo equals ops.JobNo into opsGrp
                           from ops in opsGrp.DefaultIfEmpty()
                           join acc in accMangData on chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId equals acc.Id into accGrp
@@ -3009,7 +3008,7 @@ namespace eFMS.API.Documentation.DL.Services
                               HBLId = chg.Hblid,
                               JobNo = chg.JobNo,
                               MBLNo = chg.Mblno,
-                              HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : chg.Hblno,
+                              HBLNo = chg.Hblno,
                               Total = chg.Total,
                               Currency = chg.CurrencyId,
                               IssuedDate = soa.DatetimeCreated, //export date
@@ -3036,8 +3035,6 @@ namespace eFMS.API.Documentation.DL.Services
                              join chg in chargePSoa on soa.Soano equals chg.PaySoano
                              join trans in transactionData on chg.JobNo equals trans.JobNo into transGrp
                              from trans in transGrp.DefaultIfEmpty()
-                             join tranDs in transactionDetailData on trans.Id equals tranDs.JobId into tranDsGrp
-                             from tranDs in tranDsGrp.DefaultIfEmpty()
                              join ops in opstransactionData on chg.JobNo equals ops.JobNo into opsGrp
                              from ops in opsGrp.DefaultIfEmpty()
                              join acc in accMangData on chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId equals acc.Id into accGrp
@@ -3052,7 +3049,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  HBLId = chg.Hblid,
                                  JobNo = chg.JobNo,
                                  MBLNo = chg.Mblno,
-                                 HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : chg.Hblno,
+                                 HBLNo =chg.Hblno,
                                  Total = chg.Total,
                                  Currency = chg.CurrencyId,
                                  IssuedDate = soa.DatetimeCreated, //export date
@@ -3184,14 +3181,8 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             }
             var accMangData = accountingManagementRepository.Get(x => string.IsNullOrEmpty(criteria.PartnerId) || x.PartnerId == criteria.PartnerId);
-            var transactionDetailData = trandetailRepositoty.Get();
-            var opstransactionData = opstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
             var creditData = from cdNote in cdNoteData
                              join chg in charges on cdNote.Code equals chg.CreditNo
-                             join tranDs in transactionDetailData on cdNote.JobId equals tranDs.JobId into tranDsGrp
-                             from tranDs in tranDsGrp.DefaultIfEmpty()
-                             join ops in opstransactionData on cdNote.JobId equals ops.Id into opsGrp
-                             from ops in opsGrp.DefaultIfEmpty()
                              join acc in accMangData on chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId equals acc.Id into accGrp
                              from acc in accGrp.DefaultIfEmpty()
                              select new InvoiceListModel
@@ -3203,7 +3194,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  BillingType = "CdNote",
                                  HBLId = chg.Hblid,
                                  JobNo = chg.JobNo,
-                                 HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : chg.Hblno,
+                                 HBLNo = chg.Hblno,
                                  MBLNo = chg.Mblno,
                                  Total = chg.Total,
                                  Currency = chg.CurrencyId,
@@ -3233,10 +3224,6 @@ namespace eFMS.API.Documentation.DL.Services
                              };
             var debitData = from cdNote in cdNoteData
                             join chg in charges on cdNote.Code equals chg.DebitNo
-                            join tranDs in transactionDetailData on cdNote.JobId equals tranDs.JobId into tranDsGrp
-                            from tranDs in tranDsGrp.DefaultIfEmpty()
-                            join ops in opstransactionData on cdNote.JobId equals ops.Id into opsGrp
-                            from ops in opsGrp.DefaultIfEmpty()
                             join acc in accMangData on chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId equals acc.Id into accGrp
                             from acc in accGrp.DefaultIfEmpty()
                             select new InvoiceListModel
@@ -3248,7 +3235,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 BillingType = "CdNote",
                                 HBLId = chg.Hblid,
                                 JobNo = chg.JobNo,
-                                HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : chg.Hblno,
+                                HBLNo = chg.Hblno,
                                 MBLNo = chg.Mblno,
                                 Total = chg.Total,
                                 Currency = chg.CurrencyId,
@@ -3343,7 +3330,8 @@ namespace eFMS.API.Documentation.DL.Services
 
             var charges = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo));
             var surchargeDataSoa = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.Soano));
-            var settlementData = acctSettlementPaymentGroupRepo.Get();
+            var settlementData = acctSettlementPaymentGroupRepo.Get(x=> x.RequestDate.Value >= criteria.FromExportDate.Value.Date && x.RequestDate.Value.Date <= criteria.ToExportDate.Value.Date);
+
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
@@ -3428,10 +3416,10 @@ namespace eFMS.API.Documentation.DL.Services
                                  POD = trans.PodDescription,
                                  PolId = ops.Pol,
                                  PodId = ops.Pod,
-                                 TotalAmountUsd = string.IsNullOrEmpty(sc.SettlementCode) ? (sc.AmountUsd + sc.VatAmountUsd) : acc.TotalAmountUsd,
+                                 TotalAmountUsd = (sc.AmountUsd + sc.VatAmountUsd) ?? acc.TotalAmountUsd,
                                  ChargeWeight = trans.ChargeWeight,
                                  ChargeGroup = sc.ChargeGroup,
-                                 VatVoucher = sc.InvoiceNo,
+                                 VatVoucher = string.IsNullOrEmpty(sc.InvoiceNo) ? sc.VoucherId : sc.InvoiceNo,
                                  PaymentStatus = acc.PaymentStatus,
                                  InvDueDay = acc.PaymentDueDate,
                                  VoucherIddate = sc.VoucherIddate,
@@ -3481,8 +3469,7 @@ namespace eFMS.API.Documentation.DL.Services
                          from sc in soagrp.DefaultIfEmpty()
                          join sc2 in surchargeDataSoa on soa.Soano equals sc2.Soano into soagrp2
                          from sc2 in soagrp2.DefaultIfEmpty()
-                         where (string.IsNullOrEmpty(sc.DebitNo) && string.IsNullOrEmpty(sc.CreditNo)) ||
-                         (string.IsNullOrEmpty(sc2.DebitNo) && string.IsNullOrEmpty(sc2.CreditNo))
+                         where (string.IsNullOrEmpty(sc.CreditNo) && (string.IsNullOrEmpty(sc2.DebitNo)))
                          select new
                          {
                              Soano = soa.Soano,
@@ -3575,7 +3562,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  POD = trans.PodDescription,
                                  PolId = ops.Pol,
                                  PodId = ops.Pod,
-                                 TotalAmountUsd = acc.TotalAmountUsd,
+                                 TotalAmountUsd = sc.AmountUsd + sc.VatAmountUsd,
                                  ChargeWeight = trans.ChargeWeight,
                                  ChargeGroup = sc.ChargeGroup,
                                  VatVoucher = string.IsNullOrEmpty(sc.InvoiceNo) ? sm.VoucherNo : sc.InvoiceNo,
