@@ -326,11 +326,6 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(result);
             }
 
-            Response.OnCompleted(async () =>
-            {
-                await _edocService.DeleteEdocByBillingNo(advanceNo);
-            });
-
             return Ok(result);
         }
 
@@ -449,10 +444,6 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
-            //else
-            //{
-            //    await _edocService.GenerateEdocAdvance(model);
-            //}
             return Ok(result);
         }
 

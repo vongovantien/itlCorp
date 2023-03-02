@@ -48,7 +48,6 @@ namespace eFMS.API.Accounting.Infrastructure
             services.AddTransient<IDatabaseUpdateService, DatabaseUpdateService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddTransient<IAccountingPrePaidPaymentService, AccountingPrePaidPaymentService>();
-            services.AddTransient<IEDocService, EDocService>();
             services.AddScoped<IAccAccountReceivableHostedService, AccAccountReceivableHostedService>();
             services.AddHostedService<ReceivableCalculatingBackgroundService>();
         }

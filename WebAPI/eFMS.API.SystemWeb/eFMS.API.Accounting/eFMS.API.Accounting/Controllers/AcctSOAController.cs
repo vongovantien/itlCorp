@@ -138,16 +138,11 @@ namespace eFMS.API.Accounting.Controllers
                 result = new ResultHandle { Status = hs.Status, Message = hs.Message, Data = model };
                 Response.OnCompleted(async () =>
                 {
-                    //if (hs.Data != null)
-                    //{
-                    //    await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Update");
-                    //}
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
                         await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
-                    // await _edocService.GenerateEdocSOA(model);
                 });
             }
             return Ok(result);
@@ -216,7 +211,6 @@ namespace eFMS.API.Accounting.Controllers
                     {
                         await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
-                    await _edocService.DeleteEdocByBillingNo(soaNo);
                 });
             }
             return Ok(result);
