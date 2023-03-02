@@ -3422,6 +3422,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  CodeNo = sc.CreditNo,
                                  HBLId = trans.Id,
                                  MBLNo = sc.Mblno,
+                                 SoaNo= string.IsNullOrEmpty(sc.Soano) ? sc.PaySoano : sc.Soano,
                                  FlexID = cd.FlexId,
                                  POL = trans.PolDescription,
                                  POD = trans.PodDescription,
@@ -3447,9 +3448,7 @@ namespace eFMS.API.Documentation.DL.Services
                             join partner in partnerData on cd.PartnerId equals partner.Id
                             join acc in accMangData on sc.AcctManagementId equals acc.Id into accGrps
                             from acc in accGrps.DefaultIfEmpty()
-                            where partner.PartnerType == "Agent" && (String.IsNullOrEmpty(sc.SyncedFrom) || sc.SyncedFrom != "SOA") &&
-                            (!string.IsNullOrEmpty(sc.SyncedFrom)
-                            && !string.IsNullOrEmpty(acc.VoucherId))
+                            where partner.PartnerType == "Agent" && (!string.IsNullOrEmpty(sc.SyncedFrom) && !string.IsNullOrEmpty(acc.VoucherId))
                             select new InvoiceListModel
                             {
                                 HBLId = trans.Id == Guid.Empty ? ops.Hblid : trans.Id,
@@ -3469,7 +3468,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 ChargeGroup = sc.ChargeGroup,
                                 VatVoucher = sc.VoucherId,
                                 InvDueDay = acc.PaymentDueDate,
-                                SoaNo = sc.Soano,
+                                SoaNo = string.IsNullOrEmpty(sc.Soano) ? sc.PaySoano : sc.Soano,
                                 VoucherIddate = sc.VoucherIddate,
                                 Status = (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null ? "Issued" : "New",
                                 IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
@@ -3579,7 +3578,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  TotalAmountUsd = acc.TotalAmountUsd,
                                  ChargeWeight = trans.ChargeWeight,
                                  ChargeGroup = sc.ChargeGroup,
-                                 VatVoucher = sc.InvoiceNo,
+                                 VatVoucher = string.IsNullOrEmpty(sc.InvoiceNo) ? sm.VoucherNo : sc.InvoiceNo,
                                  PaymentStatus = acc.PaymentStatus,
                                  InvDueDay = acc.PaymentDueDate,
                                  VoucherIddate = sc.VoucherIddate,
@@ -4330,7 +4329,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
                 VatVoucher = rs.VatVoucher,
                 InvDueDay = rs?.InvDueDay,
-                SoaSmNo = rs.SettleNo ?? rs.SoaNo
+                SoaSmNo = string.IsNullOrEmpty(rs.SettleNo) ? rs.SoaNo : rs.SettleNo
             });
 
             var res = dataTrans.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
