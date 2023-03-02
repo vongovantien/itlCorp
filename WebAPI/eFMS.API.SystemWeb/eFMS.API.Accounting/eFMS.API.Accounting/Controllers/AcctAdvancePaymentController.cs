@@ -2,18 +2,13 @@
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
-using eFMS.API.Accounting.DL.Models.SettlementPayment;
-using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
-using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
-using IdentityModel.Client;
 using ITL.NetCore.Common;
-using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -25,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.Controllers
@@ -70,7 +64,7 @@ namespace eFMS.API.Accounting.Controllers
             _hostingEnvironment = hostingEnvironment;
             accountReceivableService = accountReceivable;
             apiServiceUrl = _apiServiceUrl;
-            _edocSevice=edocSevice;
+            _edocSevice = edocSevice;
         }
 
         /// <summary>
@@ -451,7 +445,7 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-           
+
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
@@ -464,8 +458,7 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
                     var edocModel = _edocSevice.MapAdvanceRequest(model);
-                    //var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel,null);
-                    var updateEdoc = await HttpClientService.PutAPI("https://localhost:44329/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
+                    var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
                 });
 
             }

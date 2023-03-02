@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
+using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -16,17 +17,23 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<AcctAdvanceRequest> _advRequest;
         readonly IContextBase<OpsTransaction> _opsTran;
         readonly IContextBase<CsTransaction> _csTran;
+        readonly IContextBase<AcctSettlementPayment> _settle;
+        readonly IContextBase<CsShipmentSurcharge> _surcharge;
         public EDocService(
             IContextBase<SysImageDetail> repository, 
             IContextBase<AcctAdvanceRequest> advRequest,
             IContextBase<OpsTransaction> opsTran,
             IContextBase<CsTransaction> csTran,
+            IContextBase<AcctSettlementPayment> settle,
+            IContextBase<CsShipmentSurcharge> surcharge,
             IMapper mapper
             ) : base(repository, mapper)
         {
             _advRequest= advRequest;
             _opsTran= opsTran;
             _csTran= csTran;
+            _settle= settle;
+            _surcharge= surcharge;
         }
 
         public EdocAccUpdateModel MapAdvanceRequest(AcctAdvancePaymentModel model)
@@ -41,6 +48,24 @@ namespace eFMS.API.Accounting.DL.Services
                 BillingNo = model.AdvanceNo,
                 BillingType = "Advance",
                 ListAdd = ConvertJobdetail(lstAdd),
+                ListDel = lstDel,
+            };
+            return edocModel;
+        }
+
+        public EdocAccUpdateModel MapSettleCharge(CreateUpdateSettlementModel model)
+        {
+            var lstEdocSettleCurr = DataContext.Get(x => x.BillingNo == model.Settlement.SettlementNo).Select(x=>x.JobId);
+            var lstSettleChargeCurr = _surcharge.Get(x => x.SettlementCode == model.Settlement.SettlementNo).Select(x=>x.JobNo).ToList();
+            var lstSettleEdocId = ConvertJobdetail(lstSettleChargeCurr).Select(x=>x.JobId);
+            var lstSettleEdoc = ConvertJobdetail(lstSettleChargeCurr);
+            var lstDel = DataContext.Get(x => x.BillingNo == model.Settlement.SettlementNo && !lstSettleEdocId.Contains(x.JobId)).Select(x => x.Id).ToList();
+            var lstAdd = lstSettleEdoc.Where(x => lstEdocSettleCurr.Contains(x.JobId)).ToList();
+            var edocModel = new EdocAccUpdateModel()
+            {
+                BillingNo = model.Settlement.SettlementNo,
+                BillingType = "Settlement",
+                ListAdd = lstAdd,
                 ListDel = lstDel,
             };
             return edocModel;
