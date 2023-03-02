@@ -97,9 +97,10 @@
                                     <span>
                                         Container List
                                     </span>
-                                    <ng-container *ngIf="(containers | async).length > 0">
+                                    <ng-container *ngIf="containers?.length > 0">
                                         <span
-                                            class="m-badge m-badge--warning m-badge--rounded text-white font-weight-bold">{{containers?.length}}</span>
+                                            class="m-badge m-badge--warning m-badge--rounded text-white font-weight-bold">{{containers?.length}}
+                                        </span>
                                     </ng-container>
                                 </span>
                             </button>
@@ -117,3 +118,4 @@
     [labelConfirm]="'Yes'" (onSubmit)="onRefresh()" [title]="'Alert'"
     [iconConfirm]="'la la-refresh'">
 </confirm-popup>
+
