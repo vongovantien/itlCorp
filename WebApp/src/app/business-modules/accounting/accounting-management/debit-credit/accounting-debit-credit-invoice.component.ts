@@ -307,7 +307,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
         if (this.dataSearch.partnerId == null ) {
             return this._toastService.warning('Please select partner!');
         }
-        if (this.dataSearch.issuedDate == null || this.dataSearch.issuedDate == ""){
+        if (this.dataSearch.fromExportDate == null){
             return this._toastService.warning('Please select Issue Date!');
         }
         this._progressRef.start();
