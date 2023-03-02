@@ -259,77 +259,10 @@
             </div>
         </ng-container>
         <!-- * SM - SOA - ADV -->
-        <<<<<<<
-            HEAD:WebApp/src/app/business-modules/share-business/components/files-attach-v2/files-attach-v2.component.html
-            <ng-container *ngIf="typeFrom !== 'Shipment'">
-            <div class="m-portlet__body collapse show" id="accountingFile">
-                <div class="m-portlet__body">
-                    <div class="table-wrapper table-scrollable">
-                        <table class="table table-hover table-editable dataTable table-summary ">
-                            <thead app-table-header [headers]="headersAcc"
-                                (onClick)="sortEdoc(doc,i, $event.sortField)">
-                                <th class="m--w-50 first table-actions-col">
-                                    No
-                                </th>
-                            </thead>
-                            <tbody>
-                                <!-- <ng-container *ngFor="let doc of edocByAcc.eDocs; let i = index; trackBy: trackByFn"> -->
-                                <ng-container
-                                    *ngFor="let doc of edocByAcc.eDocs| filter: keyword: ['systemFileName','jobNo']; let i = index; trackBy: trackByFn">
-                                    <tr [contextMenu]="edocAccountantContext" (onTouch)="onSelectEDoc(doc)"
-                                        [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
-                                        <td>{{i + 1}}</td>
-                                        <td>
-                                            <!-- <a class="text-underline" [href]="doc.imageUrl" target="_blank"
-                                                download>{{doc.systemFileName}}
-                                                <icon-file [url]="doc.userFileName"></icon-file>
-                                            </a> -->
-                                            <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
-                                                download>{{doc.systemFileName}}
-                                                <icon-file [url]="doc.imageUrl"></icon-file>
-                                            </a>
-                                        </td>
-                                        <td
-                                            *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">
-                                            <span>{{doc.jobNo}}</span>
-                                        </td>
-                                        <td>
-                                            <span>{{doc.documentTypeName}}</span>
-                                        </td>
-                                        <td *ngIf="typeFrom!=='Settlement'&&typeFrom!=='Advance'&&typeFrom!=='SOA'">
-                                            <span>{{doc.hblNo}}</span>
-                                        </td>
-                                        <!-- <td
-                                            *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">
-                                            <span>{{doc.jobNo}}</span>
-                                        </td> -->
-                                        <td>
-                                            <span>{{doc.note}}</span>
-                                        </td>
-                                        <td>
-                                            <span>
-                                                {{ doc.datetimeCreated | date:'dd/MM/yyyy HH:mm' }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class=" text-success">{{doc.userCreated}}</span>
-                                        </td>
-                                    </tr>
-                                </ng-container>
-                                <tr *ngIf="!(edocByAcc?.eDocs?.length)" app-table-none-record title="No files found">
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            </ng-container>
-            =======
-            <list-file-attach [typeFrom]="typeFrom" [transactionType]="transactionType" [billingId]="billingId"
-                [readonly]="readonly" [jobOnSettle]="jobOnSettle" [isEdocByAcc]="isEdocByAcc"
-                [jobNo]="jobNo"></list-file-attach>
-            >>>>>>>
-            origin/peod/hotfix/18673-addFilePerJobSettle:WebApp/src/app/business-modules/share-business/components/edoc/files-attach-v2/files-attach-v2.component.html
+        <list-file-attach [typeFrom]="typeFrom" [transactionType]="transactionType" [billingId]="billingId"
+            [readonly]="readonly" [jobOnSettle]="jobOnSettle" [isEdocByAcc]="isEdocByAcc"
+            [jobNo]="jobNo"></list-file-attach>
+
     </div>
 </div>
 <document-type-attach [typeFrom]="typeFrom" (onSearch)="getEDoc($event)" [jobId]="jobId" [jobNo]="jobNo"
