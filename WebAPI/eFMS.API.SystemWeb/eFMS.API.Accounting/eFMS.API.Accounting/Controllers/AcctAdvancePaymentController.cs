@@ -39,7 +39,6 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IAccAccountReceivableService accountReceivableService;
-        private readonly IEDocService _edocService;
         private string typeApproval = "Advance";
 
         /// <summary>
@@ -49,14 +48,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="service"></param>
         /// <param name="user"></param>
         /// <param name="hostingEnvironment"></param>
-        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IEDocService edocService, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment, IAccAccountReceivableService accountReceivable)
+        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment, IAccAccountReceivableService accountReceivable)
         {
             stringLocalizer = localizer;
             acctAdvancePaymentService = service;
             currentUser = user;
             _hostingEnvironment = hostingEnvironment;
             accountReceivableService = accountReceivable;
-            _edocService = edocService;
         }
 
         /// <summary>

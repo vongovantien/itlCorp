@@ -39,7 +39,6 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IMapper mapper;
         private string typeApproval = "Settlement";
         private IAccAccountReceivableService accountReceivableService;
-        private readonly IEDocService _eDocService;
         private readonly IRabbitBus _busControl;
 
 
@@ -54,7 +53,6 @@ namespace eFMS.API.Accounting.Controllers
             IAcctSettlementPaymentService service,
             ICurrentUser user, IMapper _mapper,
             IAccAccountReceivableService accountReceivable,
-            IEDocService eDocService,
             IRabbitBus _bus
             )
         {
@@ -63,7 +61,6 @@ namespace eFMS.API.Accounting.Controllers
             currentUser = user;
             mapper = _mapper;
             accountReceivableService = accountReceivable;
-            _eDocService = eDocService;
             _busControl = _bus;
         }
 
