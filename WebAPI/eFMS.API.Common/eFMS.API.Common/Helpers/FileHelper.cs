@@ -125,7 +125,7 @@ namespace eFMS.API.Common.Helpers
             using (var client = new HttpClient())
             {
                 using (var result = await client.GetAsync(url))
-                { 
+                {
                     if (result.IsSuccessStatusCode)
                     {
                         return await result.Content.ReadAsByteArrayAsync();
