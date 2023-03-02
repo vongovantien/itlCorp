@@ -10,6 +10,7 @@ using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.DL.Models.Ecus;
 using eFMS.API.Operation.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
@@ -17,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.NetworkInformation;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -53,7 +55,6 @@ namespace eFMS.API.Operation.DL.Services
             result.Username = users.FirstOrDefault(x => x.Id == result.UserId)?.Username;
             result.UserCreatedName = users.FirstOrDefault(x => x.Id == result.UserCreated)?.Username;
             result.UserModifiedName = users.FirstOrDefault(x => x.Id == result.UserModified)?.Username;
-
             BaseUpdateModel baseModel = new BaseUpdateModel
             {
                 UserCreated = result.UserCreated,
@@ -317,6 +318,32 @@ namespace eFMS.API.Operation.DL.Services
             if (code == 403) return false;
 
             return true;
+        }
+
+        public HandleState CheckConnectionServer(string serverName)
+        {
+            HandleState result = new HandleState();
+            string mess = null;
+            bool isConnect = false;
+            try
+            {
+                using (var ping = new Ping())
+                {
+                    var reply = ping.Send(serverName);
+                    mess = reply.Status.ToString();
+                    if (reply != null && reply.Status == IPStatus.Success)
+                    {
+                        isConnect = true;
+                        return result;
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                result = new HandleState(ex.Message);
+                return result;
+            }
+            return new HandleState((object)mess);
         }
     }
 }

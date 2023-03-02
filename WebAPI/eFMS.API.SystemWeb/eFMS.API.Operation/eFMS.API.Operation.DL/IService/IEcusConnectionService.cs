@@ -3,6 +3,7 @@ using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.DL.Models.Ecus;
 using eFMS.API.Operation.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,6 @@ namespace eFMS.API.Operation.DL.IService
 
         bool CheckAllowPermissionAction(int id, PermissionRange permissionRange);
         List<D_OLA> GetDataOlaEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string dbname);
+        HandleState CheckConnectionServer(string serverName);
     }
 }

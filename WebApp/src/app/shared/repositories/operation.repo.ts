@@ -87,7 +87,9 @@ export class OperationRepo {
                 map((data: any) => data)
             );
     }
-
+    checkConnectServer(serverName: string) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/EcusConnection/CheckConnectionServer`, {serverName: serverName});
+    }
     importCustomClearanceFromEcus() {
         return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/ImportClearancesFromEcus`, {}).pipe(
             catchError((error) => throwError(error)),
