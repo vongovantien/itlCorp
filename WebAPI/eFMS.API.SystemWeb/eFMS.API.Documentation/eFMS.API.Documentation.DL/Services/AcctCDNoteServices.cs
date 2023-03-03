@@ -3532,7 +3532,7 @@ namespace eFMS.API.Documentation.DL.Services
                              TotalAmountUsd = string.IsNullOrEmpty(soa.SettlementCode) ? (soa.AmountUsd + soa.VatAmountUsd) : acc.TotalAmountUsd,
                              ChargeWeight = trans.ChargeWeight,
                              ChargeGroup = soa.ChargeGroup,
-                             VatVoucher = soa.InvoiceNo,
+                             VatVoucher = string.IsNullOrEmpty(soa.InvoiceNo) ? soa.VoucherId : soa.InvoiceNo,
                              PaymentStatus = acc.PaymentStatus,
                              InvDueDay = acc.PaymentDueDate,
                              VoucherIddate = soa.VoucherIddate,
