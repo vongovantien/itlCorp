@@ -145,7 +145,7 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
     onCheckConnect() {
         const valueForm = this.formGroup.getRawValue();
         const ecus: EcusConnection = new EcusConnection(valueForm);
-        this._operationRepo.checkConnectServer(ecus.serverName).subscribe(
+        this._operationRepo.checkConnectServer(ecus.serverName, ecus.dbname, ecus.dbusername, ecus.dbpassword).subscribe(
             (res: CommonInterface.IResult) => {
                 if (res.status) {
                     this._toast.success("Connect Successful!");

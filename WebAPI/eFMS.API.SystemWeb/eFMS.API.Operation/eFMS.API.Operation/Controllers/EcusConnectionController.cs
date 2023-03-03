@@ -275,9 +275,9 @@ namespace eFMS.API.Operation.Controllers
 
         [HttpGet]
         [Route("CheckConnectionServer")]
-        public IActionResult CheckConnectionServer(string serverName)
+        public IActionResult CheckConnectionServer(string serverName, string dbName, string userName, string pw)
         {
-            HandleState hs = ecusConnectionService.CheckConnectionServer(serverName);
+            HandleState hs = ecusConnectionService.CheckConnectionServer(serverName, dbName, userName, pw);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "The connection to ECUS has failed!" };
             if (!hs.Success)
             {
