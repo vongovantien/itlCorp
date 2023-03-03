@@ -71,6 +71,25 @@ namespace eFMS.API.Accounting.DL.Services
             return edocModel;
         }
 
+        public EdocAccUpdateModel MapSOACharge(AcctSoaModel model)
+        {
+            var surIds=model.Surcharges.Select(x=>x.surchargeId).ToList();
+            var surCharges = _surcharge.Get(x => surIds.Contains(x.Id)).Select(x=>x.JobNo).ToList();
+            var surJobId = ConvertJobdetail(surCharges).Select(x => x.JobId);
+            var surJob = ConvertJobdetail(surCharges);
+            var currEdocId = DataContext.Get(x => x.BillingNo == model.Soano).Select(x => x.JobId);
+            var lstDel = DataContext.Get(x => x.BillingNo == model.Soano && !surJobId.Contains(x.JobId)).Select(x=>x.Id).ToList();
+            var lstAdd = surJob.Where(x=>!currEdocId.Contains(x.JobId)).ToList();
+            var edocModel = new EdocAccUpdateModel()
+            {
+                BillingNo = model.Soano,
+                BillingType = "SOA",
+                ListAdd = lstAdd,
+                ListDel = lstDel,
+            };
+            return edocModel;
+        }
+
         private List<EdocJobModel> ConvertJobdetail(List<string> jobNos)
         {
             var result=new List<EdocJobModel>();
