@@ -3511,7 +3511,7 @@ namespace eFMS.API.Documentation.DL.Services
                          from ops in opstransGrps.DefaultIfEmpty()
                          join acc in accMangData on soa.AcctManagementId equals acc.Id into accGrps1
                          from acc in accGrps1.DefaultIfEmpty()
-                         where part.PartnerType == "Agent" && !string.IsNullOrEmpty(soa.SyncedFrom) && !string.IsNullOrEmpty(soa.VoucherId)
+                         where part.PartnerType == "Agent" && !string.IsNullOrEmpty(soa.VoucherId)
                          && ((soa.Type != "Credit" && (soa.SyncedFrom == "SOA") ||
                          soa.Type == "Credit" && (soa.PaySyncedFrom == "SOA")))
                          || !(string.IsNullOrEmpty(soa.SyncedFrom) || !string.IsNullOrEmpty(soa.PaySyncedFrom))
@@ -3529,7 +3529,7 @@ namespace eFMS.API.Documentation.DL.Services
                              POD = trans.PodDescription,
                              PolId = ops.Pol,
                              PodId = ops.Pod,
-                             TotalAmountUsd = string.IsNullOrEmpty(soa.SettlementCode) ? (soa.AmountUsd + soa.VatAmountUsd) : acc.TotalAmountUsd,
+                             TotalAmountUsd = soa.AmountUsd + soa.VatAmountUsd,
                              ChargeWeight = trans.ChargeWeight,
                              ChargeGroup = soa.ChargeGroup,
                              VatVoucher = string.IsNullOrEmpty(soa.InvoiceNo) ? soa.VoucherId : soa.InvoiceNo,
