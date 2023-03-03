@@ -7,5 +7,6 @@ namespace eFMS.API.Accounting.DL.IService
     {
         EdocAccUpdateModel MapAdvanceRequest(AcctAdvancePaymentModel model);
         EdocAccUpdateModel MapSettleCharge(CreateUpdateSettlementModel model);
+        EdocAccUpdateModel MapSOACharge(AcctSoaModel model);
     }
 }
