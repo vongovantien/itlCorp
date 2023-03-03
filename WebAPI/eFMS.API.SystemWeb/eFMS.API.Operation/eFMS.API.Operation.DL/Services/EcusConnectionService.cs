@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Data.SqlClient;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -320,7 +321,7 @@ namespace eFMS.API.Operation.DL.Services
             return true;
         }
 
-        public HandleState CheckConnectionServer(string serverName)
+        public HandleState CheckConnectionServer(string serverName,string dbName, string userName, string pw)
         {
             HandleState result = new HandleState();
             string mess = null;
@@ -334,11 +335,38 @@ namespace eFMS.API.Operation.DL.Services
                     if (reply != null && reply.Status == IPStatus.Success)
                     {
                         isConnect = true;
-                        return result;
                     }
+                    if (!!isConnect)
+                    {
+                        string connectionString = $"Server={serverName};Database={dbName};User Id={userName};Password={pw};";
+
+                        using (SqlConnection connection = new SqlConnection(connectionString))
+                        {
+                            try
+                            {
+                                connection.Open();
+
+                                if (connection.State == ConnectionState.Open)
+                                {
+                                    return result;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                result = new HandleState(ex.Message);
+                                return result;
+                            }
+                            finally
+                            {
+                                connection.Close();
+                            }
+
+                        }
+                    }
+
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 result = new HandleState(ex.Message);
                 return result;

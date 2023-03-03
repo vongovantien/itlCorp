@@ -19,6 +19,6 @@ namespace eFMS.API.Operation.DL.IService
 
         bool CheckAllowPermissionAction(int id, PermissionRange permissionRange);
         List<D_OLA> GetDataOlaEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string dbname);
-        HandleState CheckConnectionServer(string serverName);
+        HandleState CheckConnectionServer(string serverName, string dbName, string userName, string pw);
     }
 }
