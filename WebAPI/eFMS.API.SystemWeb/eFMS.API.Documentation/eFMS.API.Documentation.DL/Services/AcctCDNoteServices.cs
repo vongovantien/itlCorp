@@ -3330,7 +3330,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var charges = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo));
             var surchargeDataSoa = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.Soano));
-            var settlementData = acctSettlementPaymentGroupRepo.Get(x=> x.RequestDate.Value >= criteria.FromExportDate.Value.Date && x.RequestDate.Value.Date <= criteria.ToExportDate.Value.Date);
+            var settlementData = acctSettlementPaymentGroupRepo.Get(x=> x.RequestDate.Value.Date >= criteria.FromExportDate.Value.Date && x.RequestDate.Value.Date <= criteria.ToExportDate.Value.Date);
 
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
@@ -3469,10 +3469,12 @@ namespace eFMS.API.Documentation.DL.Services
                          from sc in soagrp.DefaultIfEmpty()
                          join sc2 in surchargeDataSoa on soa.Soano equals sc2.Soano into soagrp2
                          from sc2 in soagrp2.DefaultIfEmpty()
-                         where (string.IsNullOrEmpty(sc.CreditNo) && (string.IsNullOrEmpty(sc2.DebitNo)))
+                         where (string.IsNullOrEmpty(sc.DebitNo) && string.IsNullOrEmpty(sc.CreditNo)) ||
+                         (string.IsNullOrEmpty(sc2.DebitNo) && string.IsNullOrEmpty(sc2.CreditNo))
                          select new
                          {
                              Soano = soa.Soano,
+                             CreDebitNo = sc2.DebitNo ?? sc.CreditNo,
                              HblId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.Hblid : sc.Hblid,
                              HblNo = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.Hblno : sc.Hblno,
                              AcctManagementId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.AcctManagementId : sc.AcctManagementId,
@@ -3510,10 +3512,11 @@ namespace eFMS.API.Documentation.DL.Services
                          where part.PartnerType == "Agent"
                          && ((soa.Type != "Credit" && (soa.SyncedFrom == "SOA") ||
                          soa.Type == "Credit" && (soa.PaySyncedFrom == "SOA")))
-                         || !(string.IsNullOrEmpty(soa.SyncedFrom) || !string.IsNullOrEmpty(soa.SyncedFrom))
+                         || !(string.IsNullOrEmpty(soa.SyncedFrom) || !string.IsNullOrEmpty(soa.PaySyncedFrom))
                          select new InvoiceListModel
                          {
                              JobNo = soa.JobNo,
+                             CodeNo = soa.CreDebitNo,
                              SoaNo = soa.Soano,
                              IssuedDate = soa.DatetimeCreated,
                              Type = soa.Type,
@@ -3584,7 +3587,8 @@ namespace eFMS.API.Documentation.DL.Services
                 HblId = cd.HBLId,
                 CdNote = cd.CodeNo,
                 CdNoteType = cd.Type,
-                SoaNo = cd.SoaNo
+                SoaNo = cd.SoaNo,
+                SettleNo= cd.SettleNo
             }).Select(se => new InvoiceListModel
             {
                 HBLId = se.FirstOrDefault().HBLId,
