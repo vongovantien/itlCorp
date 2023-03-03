@@ -3327,7 +3327,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             var charges = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo));
-            var surchargeDataSoa = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.Soano));
+            var surchargeDataSoa = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.VoucherId) && !string.IsNullOrEmpty(x.SyncedFrom)) && !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.Soano));
             var settlementData = acctSettlementPaymentGroupRepo.Get(x=> x.RequestDate.Value.Date >= criteria.FromExportDate.Value.Date && x.RequestDate.Value.Date <= criteria.ToExportDate.Value.Date);
 
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
@@ -3387,7 +3387,8 @@ namespace eFMS.API.Documentation.DL.Services
             var accMangData = accountingManagementRepository.Get();
             var transactionDetailData = trandetailRepositoty.Get();
             var opstransactionData = opstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
-            var surchargeData = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.SettlementCode));
+            var surchargeData = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.SyncedFrom) && !string.IsNullOrEmpty(x.VoucherId)) && !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo) 
+            || !string.IsNullOrEmpty(x.SettlementCode));
             var creditData = from cd in cdNoteData
                              join sc in surchargeData on cd.Code equals sc.CreditNo
                              join ops in opstransactionData on sc.Hblid equals ops.Hblid into opsGrps
@@ -3397,8 +3398,8 @@ namespace eFMS.API.Documentation.DL.Services
                              join partner in partnerData on cd.PartnerId equals partner.Id
                              join acc in accMangData on sc.AcctManagementId equals acc.Id into accGrps
                              from acc in accGrps.DefaultIfEmpty()
-                             where partner.PartnerType == "Agent" && !string.IsNullOrEmpty(sc.SyncedFrom) && !string.IsNullOrEmpty(acc.VoucherId)
-                             || ((sc.SyncedFrom == "SETTLEMENT" || sc.PaySyncedFrom == "SETTLEMENT") && string.IsNullOrEmpty(sc.Soano) && string.IsNullOrEmpty(sc.CreditNo))
+                             where partner.PartnerType == "Agent" && !string.IsNullOrEmpty(acc.VoucherId) && string.IsNullOrEmpty(sc.PaySoano)
+                             || ((sc.SyncedFrom == "SETTLEMENT" || sc.PaySyncedFrom == "SETTLEMENT") && string.IsNullOrEmpty(sc.PaySoano) && string.IsNullOrEmpty(sc.CreditNo))
                              select new InvoiceListModel
                              {
                                  JobNo = sc.JobNo,
@@ -3434,7 +3435,8 @@ namespace eFMS.API.Documentation.DL.Services
                             join partner in partnerData on cd.PartnerId equals partner.Id
                             join acc in accMangData on sc.AcctManagementId equals acc.Id into accGrps
                             from acc in accGrps.DefaultIfEmpty()
-                            where partner.PartnerType == "Agent" && (!string.IsNullOrEmpty(sc.SyncedFrom) && !string.IsNullOrEmpty(acc.VoucherId))
+                            where partner.PartnerType == "Agent" && string.IsNullOrEmpty(sc.Soano) && (!string.IsNullOrEmpty(sc.SyncedFrom) 
+                            && !string.IsNullOrEmpty(acc.VoucherId))
                             select new InvoiceListModel
                             {
                                 HBLId = trans.Id == Guid.Empty ? ops.Hblid : trans.Id,
@@ -3507,7 +3509,7 @@ namespace eFMS.API.Documentation.DL.Services
                          from ops in opstransGrps.DefaultIfEmpty()
                          join acc in accMangData on soa.AcctManagementId equals acc.Id into accGrps1
                          from acc in accGrps1.DefaultIfEmpty()
-                         where part.PartnerType == "Agent"
+                         where part.PartnerType == "Agent" && !string.IsNullOrEmpty(soa.SyncedFrom) && !string.IsNullOrEmpty(soa.VoucherId)
                          && ((soa.Type != "Credit" && (soa.SyncedFrom == "SOA") ||
                          soa.Type == "Credit" && (soa.PaySyncedFrom == "SOA")))
                          || !(string.IsNullOrEmpty(soa.SyncedFrom) || !string.IsNullOrEmpty(soa.PaySyncedFrom))
