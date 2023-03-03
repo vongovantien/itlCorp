@@ -3414,7 +3414,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  POD = trans.PodDescription,
                                  PolId = ops.Pol,
                                  PodId = ops.Pod,
-                                 TotalAmountUsd = (sc.AmountUsd + sc.VatAmountUsd) ?? acc.TotalAmountUsd,
+                                 TotalAmountUsd = (sc.AmountUsd + sc.VatAmountUsd),
                                  ChargeWeight = trans.ChargeWeight,
                                  ChargeGroup = sc.ChargeGroup,
                                  VatVoucher = string.IsNullOrEmpty(sc.InvoiceNo) ? sc.VoucherId : sc.InvoiceNo,
@@ -4314,7 +4314,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
                 VatVoucher = rs.VatVoucher,
                 InvDueDay = rs?.InvDueDay,
-                SoaSmNo = string.IsNullOrEmpty(rs.SettleNo) ? rs.SoaNo : rs.SettleNo
+                SoaSmNo = string.IsNullOrEmpty(rs.SoaNo) ? rs.SettleNo : rs.SoaNo
             });
 
             var res = dataTrans.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
