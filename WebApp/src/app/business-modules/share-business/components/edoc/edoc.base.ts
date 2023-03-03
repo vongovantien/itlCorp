@@ -5,25 +5,29 @@ import { AppList } from "src/app/app.list";
 import { ConfirmPopupComponent } from "@common";
 import { SystemConstants } from '@constants';
 import { ContextMenuDirective, InjectViewContainerRefDirective } from "@directives";
+import { Store } from "@ngrx/store";
 import { ExportRepo, SystemFileManageRepo } from "@repositories";
+import { IAppState } from "@store";
 import { catchError } from "rxjs/operators";
+import { UpdateListEdocSettle } from "src/app/business-modules/accounting/settlement-payment/components/store";
 
 @Directive()
 export abstract class AppShareEDocBase extends AppList {
     @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
+
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
 
     @Input() typeFrom: string = 'Shipment';
     @Input() isEdocByAcc: boolean = false;
     @Input() jobNo: string = '';
+    @Input() jobId: string = '';
     @Input() billingId: string = '';
     @Input() billingNo: string = '';
     @Input() jobOnSettle: boolean = false;
 
     transactionType: string = '';
     edocByJob: any[] = [];
-    jobId: string = '';
     selectedEdoc1: IEDocItem;
     selectedEdoc: IEDocItem;
     lstEdocExist: any[] = [];
@@ -46,6 +50,7 @@ export abstract class AppShareEDocBase extends AppList {
         protected readonly _toast: ToastrService,
         protected readonly _systemFileRepo: SystemFileManageRepo,
         protected readonly _exportRepo: ExportRepo,
+        protected readonly _store: Store<IAppState>,
     ) {
         super();
     }
@@ -141,18 +146,34 @@ export abstract class AppShareEDocBase extends AppList {
     }
 
     deleteEdoc(id: string = '') {
-        this._systemFileRepo.deleteEdoc(id)
-            .pipe(
-                catchError(this.catchError),
-            )
-            .subscribe(
-                (res: any) => {
-                    if (res.status) {
-                        this._toast.success("Delete Sucess")
-                        this.getEDoc(this.transactionType);
-                    }
-                },
-            );
+        if (this.jobOnSettle) {
+            this._systemFileRepo.deleteEdoc(id, this.jobId)
+                .pipe(
+                    catchError(this.catchError),
+                )
+                .subscribe(
+                    (res: any) => {
+                        if (res.status) {
+                            this._toast.success("Delete Sucess")
+                            this.getEDoc(this.transactionType);
+                        }
+                    },
+                );
+        } else {
+            this._systemFileRepo.deleteEdoc(id, SystemConstants.EMPTY_GUID)
+                .pipe(
+                    catchError(this.catchError),
+                )
+                .subscribe(
+                    (res: any) => {
+                        if (res.status) {
+                            this._toast.success("Delete Sucess")
+                            this.getEDoc(this.transactionType);
+                        }
+                    },
+                );
+        }
+        this._store.dispatch(UpdateListEdocSettle({ data: true }))
     }
 
     getEDoc(transactionType: string) {

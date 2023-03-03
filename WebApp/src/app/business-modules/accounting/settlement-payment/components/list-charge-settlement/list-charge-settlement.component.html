@@ -276,7 +276,7 @@
 </div>
 
 <payment-management-popup></payment-management-popup>
-<document-type-attach [typeFrom]="'Settlement'"></document-type-attach>
+<document-type-attach [typeFrom]="'Settlement'" [readonly]="_readonly"></document-type-attach>
 
 <shipment-attach-file (onChange)="onChangeShipmentGroupAttachFile($event)" [readOnly]="readonly"></shipment-attach-file>
 

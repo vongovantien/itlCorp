@@ -8,7 +8,7 @@ import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
-import { UpdateListEdocSettle, getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getSOADetailState } from 'src/app/business-modules/accounting/statement-of-account/store/reducers';
 import { PopupBase } from 'src/app/popup.base';
 import { getTransactionLocked, getTransactionPermission } from '../../../store';
@@ -35,6 +35,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() typeFrom: string = 'Shipment';
     @Input() docTypeId: number = 0;
     @Input() documentTypes: any[] = [];
+    @Input() readonly: boolean = false;
 
     lstEdocExist: any[] = [];
     headers: CommonInterface.IHeaderTable[] = [];
@@ -69,7 +70,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     ngOnInit(): void {
-        //this.listFileAttach.getEDoc(this.typeFrom);
+        console.log(this.readonly);
+
         this.getJobList();
         this.transactionType = this.typeFrom;
         this.configJob = Object.assign({}, this.configComoBoGrid, {
@@ -104,8 +106,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 takeUntil(this.ngUnsubscribe)
             )
                 .subscribe(
-                    (data) => {
-                        if (!!data) {
+                    (data: any[]) => {
+                        if (!!data && data.length > 0) {
                             this.getDocType(data.some(x => x.advanceNo !== null))
                         }
                     }
@@ -431,7 +433,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                                 this.hide();
                                 this.onSearch.emit(this.transactionType);
                                 this.isSubmitted = false;
-                                this._store.dispatch(UpdateListEdocSettle({ data: true }));
                             }
                         }
                     );
@@ -451,7 +452,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                                 this.hide();
                                 this.onSearch.emit(this.transactionType);
                                 this.isSubmitted = false;
-                                this._store.dispatch(UpdateListEdocSettle({ data: true }));
                             }
                         }
                     );

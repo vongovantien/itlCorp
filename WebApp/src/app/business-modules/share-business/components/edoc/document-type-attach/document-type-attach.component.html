@@ -9,7 +9,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row" *ngIf="!isUpdate">
+                <div class="row" *ngIf="!isUpdate&&!readonly">
                     <div class="col-md-12">
                         <div class="text-center">
                             <div class="dropzone">
@@ -27,8 +27,8 @@
                         </div>
                     </div>
                 </div>
-                <list-file-attach *ngIf="jobOnSettle" [typeFrom]="typeFrom" [jobNo]="jobNo"
-                    [transactionType]="transactionType" [billingId]="billingId" [jobOnSettle]="jobOnSettle"
+                <list-file-attach *ngIf="jobOnSettle" [typeFrom]="typeFrom" [jobNo]="jobNo" [jobOnSettle]="jobOnSettle"
+                    [transactionType]="transactionType" [billingId]="billingId" [readonly]="readonly"
                     [isEdocByAcc]="isEdocByAcc" [jobId]="jobId" [lstEdocExist]="lstEdocExist"></list-file-attach>
                 <div class="row">
                     <div class="col-md-12">
