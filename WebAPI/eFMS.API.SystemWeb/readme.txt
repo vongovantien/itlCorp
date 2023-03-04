@@ -29,3 +29,6 @@ Scaffold-DbContext "Server=192.168.0.120; Database=eFMS_20220617; User ID=eFMS-A
 
 * Report
 Scaffold-DbContext "Server=192.168.0.120; Database=eFMS_20220617; User ID=eFMS-Admin; Password=eFMS@dm!n20" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContextDefault -Project eFMS.API.Report.Service -Force -Table AcctCdnote, CatChargeGroup, CatCurrencyExchange, CatDepartment, CatPartner, CatPlace, CatUnit, CsMawbcontainer, CsShipmentSurcharge, CsTransaction, CsTransactionDetail, OpsTransaction, SysCompany, SysEmployee, SysGroup, catDepartment, SysOffice, SysReportLog, SysUserLevel, SysUser, CustomsDeclaration, CatCharge, CatIncoterm, CatCommodity, CatCommodityGroup, sysImageDetail, sysAttachFileTemplate
+
+* Console
+Scaffold-DbContext "Server=192.168.0.120; Database=eFMS_20220617; User ID=eFMS-Admin; Password=eFMS@dm!n20" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Entities -Context eFMSDataContextDefault -Project eFMSConsoleService -Force -Table AcctCdnote

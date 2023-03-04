@@ -187,3 +187,6 @@ WebAPI/eFMS.API.SystemWeb/eFMS.API.SystemFileManagement/eFMS.API.SystemFileManag
 /WebAPI/eFMS.API.SystemWeb/eFMS.API.Report/eFMS.API.Report.DL/obj
 /WebAPI/eFMS.API.SystemWeb/eFMS.API.Report/eFMS.API.Report.Service/bin
 /WebAPI/eFMS.API.SystemWeb/eFMS.API.Report/eFMS.API.Report.Service/obj
+
+WebAPI/eFMS.ConsoleService/.vs
+WebAPI/eFMS.ConsoleService/eFMS.ConsoleService/obj/
