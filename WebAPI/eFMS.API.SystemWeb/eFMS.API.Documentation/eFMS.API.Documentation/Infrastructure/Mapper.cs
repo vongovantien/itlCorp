@@ -60,6 +60,11 @@ namespace eFMS.API.Shipment.Infrastructure
 
             CreateMap<CsShipmentSurchargeImportModel, CsShipmentSurcharge>();
             CreateMap<sp_GetShipmentAssignPIC, Shipments>();
+
+            CreateMap<CsWorkOrder, CsWorkOrderModel>().ReverseMap();
+            CreateMap<CsWorkOrder, CsWorkOrderViewModel>().ReverseMap();
+            CreateMap<CsWorkOrderPrice, CsWorkOrderPriceModel>().ReverseMap();
+            CreateMap<CsWorkOrderSurcharge, CsWorkOrderSurchargeModel>().ReverseMap();
         }
     }
 }
