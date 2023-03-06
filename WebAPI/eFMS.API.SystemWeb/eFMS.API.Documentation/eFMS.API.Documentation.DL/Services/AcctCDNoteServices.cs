@@ -2949,7 +2949,7 @@ namespace eFMS.API.Documentation.DL.Services
                 soaQuery = soaQuery.Where(x => x.DatetimeCreated.Value.Date >= criteria.FromExportDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToExportDate.Value.Date);
             }
             var charges = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)) && (string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)));// lấy surcharge chỉ issued soa
-            if (!string.IsNullOrEmpty(criteria.ReferenceNos) && string.IsNullOrWhiteSpace(criteria.ReferenceNos))
+            if (!string.IsNullOrEmpty(criteria.ReferenceNos) && !string.IsNullOrWhiteSpace(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
                 var surchargesCdNote = charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.Soano) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)).Select(s => s.Soano).ToList();
@@ -2965,7 +2965,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             if (string.IsNullOrEmpty(criteria.ReferenceNos)
-                || string.IsNullOrWhiteSpace(criteria.ReferenceNos)
+                && string.IsNullOrWhiteSpace(criteria.ReferenceNos)
                 && string.IsNullOrEmpty(criteria.PartnerId)
                 && criteria.IssuedDate == null
                 && string.IsNullOrEmpty(criteria.CreatorId)
@@ -3161,7 +3161,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             if (string.IsNullOrEmpty(criteria.ReferenceNos)
-                || string.IsNullOrWhiteSpace(criteria.ReferenceNos)
+                && string.IsNullOrWhiteSpace(criteria.ReferenceNos)
                 && string.IsNullOrEmpty(criteria.PartnerId)
                 && criteria.IssuedDate == null
                 && string.IsNullOrEmpty(criteria.CreatorId)
@@ -3351,7 +3351,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             if (string.IsNullOrEmpty(criteria.ReferenceNos)
-                || string.IsNullOrWhiteSpace(criteria.ReferenceNos)
+                && string.IsNullOrWhiteSpace(criteria.ReferenceNos)
                 && string.IsNullOrEmpty(criteria.PartnerId)
                 && criteria.IssuedDate == null
                 && string.IsNullOrEmpty(criteria.CreatorId)
@@ -3448,7 +3448,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 PodId = ops.Pod,
                                 PaymentStatus = acc.PaymentStatus,
                                 ChargeWeight = trans.ChargeWeight ?? ops.SumChargeWeight,
-                                TotalAmountUsd = sc.AmountUsd,
+                                TotalAmountUsd = (sc.AmountUsd + sc.VatAmountUsd),
                                 ChargeGroup = sc.ChargeGroup,
                                 VatVoucher = sc.VoucherId,
                                 InvDueDay = acc.PaymentDueDate,
