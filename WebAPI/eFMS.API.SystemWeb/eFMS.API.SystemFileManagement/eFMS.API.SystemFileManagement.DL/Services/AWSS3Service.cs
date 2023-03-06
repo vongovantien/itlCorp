@@ -95,7 +95,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 DeleteObjectRequest request = new DeleteObjectRequest
                 {
                     BucketName = _bucketName,
-                    Key = it.KeyS3,
+                    Key = key,
                 };
 
                 DeleteObjectResponse rsDelete = await _client.DeleteObjectAsync(request);
@@ -420,7 +420,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         image.ObjectId = filecCoppyModel.destKey.ToLower();
                         image.Url = _apiUrl.Value.Url.ToString() + "/file/api/v1/en-Us/AWSS3/OpenFile/" + filecCoppyConvert.destKey + image.Name;
                         var updateImg = await _sysImageRepo.UpdateAsync(image,x=>x.Id==image.Id);
-                        if (updateImg == null)
+                        if (!updateImg.Success)
                         {
                             return new HandleState(false, "Update Image Error");
                         }

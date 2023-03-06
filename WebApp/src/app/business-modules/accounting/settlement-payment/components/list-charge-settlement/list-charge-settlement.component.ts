@@ -252,7 +252,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     this.selectedIndexSurcharge = indexSurcharge;
                 }
             }
-            if (surcharge.linkChargeId) {
+            if (surcharge.linkChargeId && !surcharge.isFromShipment) {
                 this._toastService.warning('Charge already linked charge');
                 return;
             }
@@ -333,7 +333,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     return;
                 }
 
-                let checks: any[] = groupShipment.chargeSettlements.filter((x: any) => x.isSelected && x.linkChargeId);
+                let checks: any[] = groupShipment.chargeSettlements.filter((x: any) => x.isSelected && x.linkChargeId && !x.isFromShipment);
                 if (!!checks.length) {
                     this._toastService.warning('Charge already linked charge');
                     return;
@@ -356,7 +356,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 return;
             }
 
-            let checkChargeLinks: Surcharge[] = surchargeSelected.filter((surcharge: Surcharge) => surcharge.isSelected && surcharge.linkChargeId);
+            let checkChargeLinks: Surcharge[] = surchargeSelected.filter((surcharge: Surcharge) => surcharge.isSelected && surcharge.linkChargeId && !surcharge.isFromShipment);
             if (!!checkChargeLinks.length) {
                 this._toastService.warning('Charge already linked charge');
                 return;
@@ -490,7 +490,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         if (!charge) {
             return;
         }
-        if (charge.linkChargeId) {
+        if (charge.linkChargeId && !charge.isFromShipment) {
             this._toastService.warning('Charge already linked charge');
             return;
         }

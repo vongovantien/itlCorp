@@ -377,7 +377,7 @@
                                                 type="text" class="form-control m-input m-input--square"
                                                 ngxDaterangepickerMd
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                                [singleDatePicker]="true" name="daterange" [autoApply]="true"
+                                                [singleDatePicker]="true" name="daterange" [autoApply]="true"                                                
                                                 formControlName="trialExpiredDate" [minDate]="minDateExpiredTrial"
                                                 readonly />
                                             <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -589,7 +589,7 @@
                             <span> Save </span>
                         </span>
                     </button>
-                    <button (click)="((contractType.value ==='Trial' || contractType.value ==='Official') && selectedContract?.arconfirmed === true) ? onARConfirmed() : onSubmit(true) "
+                    <button (click)="onSubmit(true)"
                         *ngIf="(((menuSpecialPermission | async | specialPermission: 'ActiveContract') === false && !selectedContract.active && !isCreateNewCommercial) )  "
                         class="btn btn-brand m-btn--square m-btn--icon m-btn--uppercase m--margin-right-10">
                         <span>

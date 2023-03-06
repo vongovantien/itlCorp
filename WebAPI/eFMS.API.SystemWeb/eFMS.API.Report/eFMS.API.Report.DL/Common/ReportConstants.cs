@@ -19,6 +19,7 @@ namespace eFMS.API.Report.DL.Common
 
         // Template Name
         public const string AP_Account_Template = "AP_Account_Template.xlsx";
+        public const string Edoc_Report_Template = "Template-Report-eDOC.xlsx";
         public const string AP_Standart_Report = "AP_Standart_Report.xlsx";
         public const string AR_DebitDetail_Template = "AR_DebitDetail_Template.xlsx";
         public const string AR_SUMMARY_TEMPLATE = "AR_SUMMARY_TEMPLATE.xlsx";
