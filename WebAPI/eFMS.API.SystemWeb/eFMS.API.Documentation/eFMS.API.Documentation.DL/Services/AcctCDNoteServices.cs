@@ -2948,8 +2948,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 soaQuery = soaQuery.Where(x => x.DatetimeCreated.Value.Date >= criteria.FromExportDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToExportDate.Value.Date);
             }
-            var charges = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)));// lấy surcharge chỉ issued soa
-            if (!string.IsNullOrEmpty(criteria.ReferenceNos) && !string.IsNullOrWhiteSpace(criteria.ReferenceNos))
+            var charges = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)) && (string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)));// lấy surcharge chỉ issued soa
+            if (!string.IsNullOrEmpty(criteria.ReferenceNos) && string.IsNullOrWhiteSpace(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
                 var surchargesCdNote = charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.Soano) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)).Select(s => s.Soano).ToList();
@@ -2965,6 +2965,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             if (string.IsNullOrEmpty(criteria.ReferenceNos)
+                || string.IsNullOrWhiteSpace(criteria.ReferenceNos)
                 && string.IsNullOrEmpty(criteria.PartnerId)
                 && criteria.IssuedDate == null
                 && string.IsNullOrEmpty(criteria.CreatorId)
@@ -3160,6 +3161,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             if (string.IsNullOrEmpty(criteria.ReferenceNos)
+                || string.IsNullOrWhiteSpace(criteria.ReferenceNos)
                 && string.IsNullOrEmpty(criteria.PartnerId)
                 && criteria.IssuedDate == null
                 && string.IsNullOrEmpty(criteria.CreatorId)
@@ -3330,7 +3332,7 @@ namespace eFMS.API.Documentation.DL.Services
             var surchargeDataSoa = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.VoucherId) && !string.IsNullOrEmpty(x.SyncedFrom)) && !string.IsNullOrEmpty(x.PaySoano) || !string.IsNullOrEmpty(x.Soano));
             var settlementData = acctSettlementPaymentGroupRepo.Get(x=> x.RequestDate.Value.Date >= criteria.FromExportDate.Value.Date && x.RequestDate.Value.Date <= criteria.ToExportDate.Value.Date);
 
-            if (!string.IsNullOrEmpty(criteria.ReferenceNos))
+            if (!string.IsNullOrEmpty(criteria.ReferenceNos) && !string.IsNullOrWhiteSpace(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
                 var surchargesCdNote = charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.DebitNo)).Select(s => s.DebitNo).ToList();
@@ -3349,6 +3351,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             if (string.IsNullOrEmpty(criteria.ReferenceNos)
+                || string.IsNullOrWhiteSpace(criteria.ReferenceNos)
                 && string.IsNullOrEmpty(criteria.PartnerId)
                 && criteria.IssuedDate == null
                 && string.IsNullOrEmpty(criteria.CreatorId)
@@ -3402,7 +3405,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  CodeNo = sc.CreditNo,
                                  HBLId = trans.Id,
                                  MBLNo = sc.Mblno,
-                                 SoaNo= string.IsNullOrEmpty(sc.Soano) ? sc.PaySoano : sc.Soano,
+                                 SoaNo= sc.PaySoano,
                                  FlexID = cd.FlexId,
                                  POL = trans.PolDescription,
                                  POD = trans.PodDescription,
@@ -3487,7 +3490,7 @@ namespace eFMS.API.Documentation.DL.Services
                              PaySyncedFrom = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.PaySyncedFrom : sc.PaySyncedFrom,
                              SettlementCode = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.SettlementCode : sc.SettlementCode,
                          };
-            if (!string.IsNullOrEmpty(criteria.ReferenceNos))
+            if (!string.IsNullOrEmpty(criteria.ReferenceNos) && !string.IsNullOrWhiteSpace(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
                 soaGrp = soaGrp.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.HblNo || a == x.Soano || a==x.CreDebitNo));
