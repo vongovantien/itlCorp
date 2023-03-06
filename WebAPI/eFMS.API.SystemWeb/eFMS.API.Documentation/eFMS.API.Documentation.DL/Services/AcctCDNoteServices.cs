@@ -3347,14 +3347,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     query = query.And(x => refNos.Any(a => a == x.Code));
                 }
-                if (surchargesSoa.Any())
-                {
-                    querySoa = querySoa.And(x => refNos.Any(a => a == x.Soano) || surchargesSoa.Any(a => a == x.Soano)); 
-                }
-                else
-                {
-                    querySoa = querySoa.And(x => refNos.Any(a => a == x.Soano));
-                }
+                
             }
 
             if (string.IsNullOrEmpty(criteria.ReferenceNos)
@@ -3499,7 +3492,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
-                soaGrp = soaGrp.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.HblNo || a == x.Soano));
+                soaGrp = soaGrp.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.HblNo || a == x.Soano || a==x.CreDebitNo));
             }
             // case soa
             var soadat = from soa in soaGrp
