@@ -277,8 +277,11 @@ namespace eFMS.API.Report.DL.Services
             List<GeneralExportShipmentOverviewResult> lstShipment = new List<GeneralExportShipmentOverviewResult>();
             var dataShipment = GetDataGeneralReport(criteria);
             if (!dataShipment.Any()) return lstShipment.AsQueryable();
-            var lstSurchage = surCharge.Get();
-            var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
+            //var lstSurchage = surCharge.Get();
+            //var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
+            var hblIds = dataShipment.Select(x => x.HblId).Distinct().ToList();
+            var LstSurcharge = surCharge.Get(x => hblIds.Contains(x.Hblid)).ToList();
+
             var PlaceList = catPlaceRepo.Get();
             var PartnerList = catPartnerRepo.Get();
             var LookupPartner = PartnerList.ToLookup(x => x.Id);
@@ -374,9 +377,10 @@ namespace eFMS.API.Report.DL.Services
                 decimal? _totalSellAmountHandling = 0;
                 decimal? _totalSellAmountOther = 0;
                 decimal? _totalSellCustom = 0;
+                var chargeList = LstSurcharge.Where(x => x.Hblid == item.HblId);
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeSell = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE);
+                    var _chargeSell = chargeList.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE);
                     foreach (var charge in _chargeSell)
                     {
                         var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
@@ -469,7 +473,7 @@ namespace eFMS.API.Report.DL.Services
                 decimal? _totalBuyCustom = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeBuy = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE);
+                    var _chargeBuy = chargeList.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE);
                     foreach (var charge in _chargeBuy)
                     {
                         var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
@@ -573,7 +577,7 @@ namespace eFMS.API.Report.DL.Services
                 decimal? _obh = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeObh = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_OBH_TYPE);
+                    var _chargeObh = chargeList.Where(x => x.Type == ReportConstants.CHARGE_OBH_TYPE);
                     foreach (var charge in _chargeObh)
                     {
                         _obh += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency);
