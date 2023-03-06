@@ -1,0 +1,126 @@
+<div class="row">
+    <div class="m-portlet col-lg-12 bg-secondary m--padding-top-10 m--padding-bottom-10">
+        <div class="m-portlet__head alert-block__heading pointer bg-warning">
+            <div class="m-portlet__head-caption">
+                <div class="m-portlet__head-title w-100">
+                    <h3 class="m-portlet__head-text">
+                        {{type === 'BUY' ? 'Buying': 'Selling'}}
+                        <span class="badge badge-success">{{surcharges.length}}</span>
+                    </h3>
+                </div>
+            </div>
+        </div>
+        <div class="m-portlet__body bg-white">
+            <div class="table-wrapper table-editable table-horizontal" id="work-order-list-table"
+                style="height:200px; max-height: 300px;">
+                <table class="table table-bordered dataTable-edit">
+                    <thead app-table-header [headers]="headers" class="thead-light"
+                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                        <th class="m--w-50 first table-actions-col">
+                            Actions
+                        </th>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="!!surcharges.length">
+                            <ng-container *ngFor="let surcharge of surcharges; let i = index; trackBy: trackByFn">
+                                <tr class="collapse-toggle-row">
+                                    <td class="table-actions-col">
+                                        <div class="table-actions">
+                                            <button class="btn m-btn--icon m-btn--icon-only m--font-success"
+                                                title="Duplicate" (click)="duplicateCharge(i)"><i
+                                                    class="la la-copy"></i>
+                                            </button>
+                                            <button type="button" (click)="deleteCharge(i)"
+                                                class="btn m-btn--icon m-btn--icon-only m--font-danger" title="Remove">
+                                                <i class="la la-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <!-- <ng-select [items]="partnerTypes" class="custom" placeholder="Please select"
+                                            bindLabel="title" bindValue="value" [clearable]="false"
+                                            [(ngModel)]="surcharge.partnerType">
+                                        </ng-select> -->
+                                        <select class="form-control border" [(ngModel)]="surcharge.partnerType">
+                                            <option *ngFor="let crrcy of partnerTypes; trackBy: trackByFn"
+                                                [ngValue]="crrcy.value">
+                                                {{crrcy.title}}</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="form-group"
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!surcharge.chargeId) }">
+                                            <div class="list-master-unit">
+                                                <app-combo-grid-virtual-scroll #comboGridCharge
+                                                    [currentActiveItemId]="{field:'id', value: surcharge.chargeId}"
+                                                    (itemSelected)="onSelectDataTableInfo($event.id, surcharge, 'chargeId')"
+                                                    [selectedDisplayFields]="['chargeNameEn']"
+                                                    [dataSources]="charges | async"
+                                                    [displayFields]="configComboGridCharge" [height]="150"
+                                                    placeholder="Please Select" (remove)="surcharge.chargeId = null"
+                                                    [disabled]="!!surcharge.readonly" [clearable]="false">
+                                                </app-combo-grid-virtual-scroll>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="form-group "
+                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !surcharge.unitPrice}">
+                                            <ng-container *ngIf="surcharge.readonly else unitPrice">
+                                                <input type="number" class="form-control" disabled
+                                                    [value]="surcharge.unitPrice" autoFormatCurrency>
+                                            </ng-container>
+                                            <ng-template #unitPrice>
+                                                <input type="number" class="form-control"
+                                                    [(ngModel)]="surcharge.unitPrice" placeholder="Unit Price"
+                                                    autoFormatCurrency>
+                                            </ng-template>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <select class="form-control border" [(ngModel)]="surcharge.currencyId">
+                                            <option *ngFor="let crrcy of ['VND','USD']; trackBy: trackByFn"
+                                                [ngValue]="crrcy">
+                                                {{crrcy}}</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <ng-container *ngIf="surcharge.readonly else vatrate">
+                                                <input type="number" class="form-control" disabled
+                                                    [value]="surcharge.vatrate" autoFormatCurrency>
+                                            </ng-container>
+                                            <ng-template #vatrate>
+                                                <input type="number" class="form-control"
+                                                    [(ngModel)]="surcharge.vatrate" placeholder="%" autoFormatCurrency>
+                                            </ng-template>
+                                        </div>
+                                    </td>
+                                    <ng-container *ngIf="surcharge.type === 'BUY'">
+                                        <td align="center">
+                                            <app-switch [(ngModel)]="surcharge.kickBack"
+                                                [disabled]="!!surcharge.readonly ? 'disabled': null">
+                                            </app-switch>
+                                        </td>
+                                    </ng-container>
+
+                                </tr>
+                            </ng-container>
+                        </ng-container>
+                        <tr *ngIf="!(isLoading | async) && !surcharges.length" app-table-none-record>
+                        </tr>
+                        <tr *ngIf="(isLoading | async)" app-table-row-loading></tr>
+                        <tr>
+                            <td colspan="1" class="fixed-side ng-star-inserted">
+                                <a title="Add" class="btn m-btn--icon m-btn--icon-only m--font-primary"
+                                    (click)="addCharge()">
+                                    <i class="fa fa-plus-circle fa-2x"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

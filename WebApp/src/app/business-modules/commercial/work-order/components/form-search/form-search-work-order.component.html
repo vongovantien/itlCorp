@@ -1,0 +1,57 @@
+<div class="m-portlet">
+    <div class="m-portlet__body">
+        <div [formGroup]="form" class="row m-form m-form--state">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label for="">Reference No</label>
+                    <textarea rows="5" class="form-control" formControlName="referenceNo" placeholder="Reference No">
+                    </textarea>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="">Product Service</label>
+                            <ng-select [items]="productServices" formControlName="transactionType" class="custom"
+                                placeholder="All">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="">Customer</label>
+                            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event.id, 'partnerId')"
+                                (remove)="resetFormControl(partnerId)"
+                                [currentActiveItemId]="{field:'id', value: partnerId.value}"
+                                [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
+                                [displayFields]="displayFieldsPartner" placeholder="Select Partner">
+                            </app-combo-grid-virtual-scroll>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="">Salesman</label>
+                            <app-combo-grid-virtual-scroll
+                                (itemSelected)="onSelectDataFormInfo($event.id, 'salesmanId')"
+                                (remove)="resetFormControl(salesmanId)"
+                                [currentActiveItemId]="{field:'id', value: salesmanId.value}"
+                                [selectedDisplayFields]="['username']" [dataSources]="salesmans | async"
+                                [displayFields]="[{ field: 'username', label: 'User Name' }, { field: 'employeeNameVn', label: 'Full Name' }]"
+                                placeholder="Select salesman">
+                            </app-combo-grid-virtual-scroll>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label for="">Status</label>
+                            <ng-select [items]="productServices" formControlName="transactionType" class="custom"
+                                placeholder="All">
+                            </ng-select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

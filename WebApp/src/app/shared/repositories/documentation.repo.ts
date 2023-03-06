@@ -601,7 +601,7 @@ export class DocumentationRepo {
     }
 
     previewAirImportAuthorizeLetter1(id: string, withSign: boolean, language: string = '') {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirImptAuthorisedLetter`, { housbillId: id, printSign: withSign, language: language  }).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirImptAuthorisedLetter`, { housbillId: id, printSign: withSign, language: language }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -610,7 +610,7 @@ export class DocumentationRepo {
     }
 
     previewAirImportAuthorizeLetter2(id: string, withSign: boolean) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/AirImptAuthorisedLetter_Consign`, { housbillId: id, printSign: withSign}).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/AirImptAuthorisedLetter_Consign`, { housbillId: id, printSign: withSign }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -1283,7 +1283,7 @@ export class DocumentationRepo {
     }
 
     syncGoodInforToReplicateJob(jobId: string, body: any = {}) {
-        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/SyncGoodInforToReplicateJob`, body, {jobId: jobId}).pipe(
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/SyncGoodInforToReplicateJob`, body, { jobId: jobId }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -1294,5 +1294,18 @@ export class DocumentationRepo {
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
+    }
+
+    getListWorkOrder(page?: number, size?: number, body: any = {}) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsWorkOrder/Paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }, { "hideSpinner": "true" })
+        }
+    }
+
+    addWorkOrder(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsWorkOrder`, body);
     }
 }

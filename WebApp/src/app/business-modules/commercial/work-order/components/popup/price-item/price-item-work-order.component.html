@@ -1,0 +1,204 @@
+<div class="modal fade form-contract-commercial-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center justify-content-between p-1">
+                    <h5 class="modal-title" style="margin-right:10px;">
+                        New Price List
+                    </h5>
+                    <button type="button" class="close" aria-label="Close" (click)="hide()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div [formGroup]="form" class="row m-form m-form--state">
+                    <div class="col-lg-4">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!partnerId.valid) }">
+                            <label required>Co-loader</label>
+                            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                                (remove)="partnerId.setValue(null)"
+                                [currentActiveItemId]="{field:'id', value: partnerId.value}"
+                                [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
+                                [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false">
+                            </app-combo-grid-virtual-scroll>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!quantityRange.valid) }">
+                                    <label required>Quantity Range</label>
+                                    <ng-select [items]="quantityRanges" formControlName="quantityRange" class="custom"
+                                        placeholder="Please select" bindLabel="title" bindValue="value"
+                                        [clearable]="false">
+                                    </ng-select>
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label>From</label>
+                                    <input type="text" class="form-control" formControlName="fromValue"
+                                        placeholder="From...">
+                                </div>
+                            </div>
+                            <div class="col-lg-2">
+                                <div class="form-group">
+                                    <label>To</label>
+                                    <input type="text" class="form-control" formControlName="toValue"
+                                        placeholder="To...">
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!unitId.valid) }">
+                                    <label required>Unit</label>
+                                    <ng-select [items]="units | async" formControlName="unitId" class="custom"
+                                        placeholder="Please select" bindLabel="code"
+                                        (change)="onSelectDataFormInfo($event, 'unit')" bindValue="id"
+                                        [clearable]="false">
+                                    </ng-select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row m--padding-10">
+                    <div class="table-wrapper table-editable" id="work-order-list-table"
+                        style="max-width: 1000px; margin: 0px auto">
+                        <table class="table table-bordered dataTable-edit table-secondary">
+                            <thead app-table-header [headers]="headers"
+                                (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                            </thead>
+                            <tbody>
+                                <ng-container *ngIf="!!frieghtCharges.length">
+                                    <ng-container
+                                        *ngFor="let charge of frieghtCharges; let i = index; trackBy: trackByFn">
+                                        <tr class="m-form--state m-form">
+                                            <td class="text-underline text-primary font-weight-bold"
+                                                tooltip="{{charge.chargeCodeBuying + ' / ' + charge.chargeCodeSelling}}">
+                                                {{charge.chargeName}}
+                                            </td>
+                                            <td>
+                                                <div class="row">
+                                                    <div class="col-lg-8 p-r-none ">
+                                                        <div class="form-group "
+                                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.unitPriceBuying}">
+                                                            <ng-container *ngIf="charge.readonly else unitPriceBuying">
+                                                                <input type="number" class="form-control" disabled
+                                                                    [value]="charge.unitPriceBuying" autoFormatCurrency>
+                                                            </ng-container>
+                                                            <ng-template #unitPriceBuying>
+                                                                <input type="number" class="form-control"
+                                                                    [(ngModel)]="charge.unitPriceBuying"
+                                                                    placeholder="Unit Price" autoFormatCurrency>
+                                                            </ng-template>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 p-l-none">
+                                                        <div class="form-group">
+                                                            <select class="form-control border"
+                                                                [(ngModel)]="charge.currencyIdBuying">
+                                                                <option *ngFor="let crrcy of ['VND','USD']"
+                                                                    [ngValue]="crrcy">
+                                                                    {{crrcy}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="row">
+                                                    <div class="col-lg-8 p-r-none ">
+                                                        <div class="form-group "
+                                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !charge.unitPriceSelling}">
+                                                            <ng-container *ngIf="charge.readonly else unitPriceSelling">
+                                                                <input type="number" class="form-control" disabled
+                                                                    [value]="charge.unitPriceSelling"
+                                                                    autoFormatCurrency>
+                                                            </ng-container>
+                                                            <ng-template #unitPriceSelling>
+                                                                <input type="number" class="form-control"
+                                                                    [(ngModel)]="charge.unitPriceSelling"
+                                                                    placeholder="Unit Price" autoFormatCurrency>
+                                                            </ng-template>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-4 p-l-none">
+                                                        <div class="form-group">
+                                                            <select class="form-control border"
+                                                                [(ngModel)]="charge.currencyIdSelling">
+                                                                <option *ngFor="let crrcy of ['VND','USD']"
+                                                                    [ngValue]="crrcy">
+                                                                    {{crrcy}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <ng-container *ngIf="charge.readonly else vatSelling">
+                                                        <input type="number" class="form-control" disabled
+                                                            [value]="charge.vatSelling" autoFormatCurrency>
+                                                    </ng-container>
+                                                    <ng-template #vatSelling>
+                                                        <input type="number" class="form-control"
+                                                            [(ngModel)]="charge.vatSelling" placeholder="%"
+                                                            autoFormatCurrency>
+                                                    </ng-template>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <ng-container *ngIf="charge.readonly else vatBuying">
+                                                        <input type="number" class="form-control" disabled
+                                                            [value]="charge.vatBuying" autoFormatCurrency>
+                                                    </ng-container>
+                                                    <ng-template #vatBuying>
+                                                        <input type="number" class="form-control"
+                                                            [(ngModel)]="charge.vatBuying" placeholder="%"
+                                                            autoFormatCurrency>
+                                                    </ng-template>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="form-group">
+                                                    <ng-container *ngIf="charge.readonly else notes">
+                                                        <input type="text" class="form-control" disabled
+                                                            [value]="charge.notes">
+                                                    </ng-container>
+                                                    <ng-template #notes>
+                                                        <input type="text" class="form-control"
+                                                            [(ngModel)]="charge.notes" placeholder="...">
+                                                    </ng-template>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                </ng-container>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <surcharge-list-work-order type="BUY" [transactionType]="transactionType" [(surcharges)]="buyings"
+                    [submitted]="isSubmitted"></surcharge-list-work-order>
+                <surcharge-list-work-order type="SELL" [transactionType]="transactionType" [(surcharges)]="sellings"
+                    [submitted]="isSubmitted"></surcharge-list-work-order>
+            </div>
+            <div class=" modal-footer m--align-center">
+                <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onSubmit()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span> Save </span>
+                    </span>
+                </button>
+                <app-default-button [buttonSetting]="cancelButtonSetting" (click)="hide()">
+                </app-default-button>
+            </div>
+        </div>
+    </div>
+</div>
