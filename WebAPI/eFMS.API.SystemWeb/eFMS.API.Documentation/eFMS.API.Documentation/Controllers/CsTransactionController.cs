@@ -47,7 +47,6 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICsStageAssignedService csStageAssignedService;
         private readonly IEDocService _edocService;
         private readonly IRabbitBus _busControl;
-        private readonly ICsTransactionDetailService csTransactionDetailService;
         /// <summary>
         /// constructor
         /// </summary>
@@ -60,7 +59,6 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="checkPoint"></param>
         /// <param name="imageService"></param>
         /// <param name="stageAssignedService"></param>
-        /// <param name="transactionDetailService"></param>
         public CsTransactionController(IStringLocalizer<DocumentationLanguageSub> localizer,
             ICsTransactionService service,
             ICurrentUser user,
@@ -71,8 +69,7 @@ namespace eFMS.API.Documentation.Controllers
             ISysImageService imageService,
             IEDocService edocService,
             IRabbitBus _bus,
-            ICsStageAssignedService stageAssignedService,
-            ICsTransactionDetailService transactionDetailService)
+            ICsStageAssignedService stageAssignedService)
         {
             stringLocalizer = localizer;
             csTransactionService = service;
@@ -85,7 +82,6 @@ namespace eFMS.API.Documentation.Controllers
             csStageAssignedService = stageAssignedService;
             _edocService = edocService;
             _busControl = _bus;
-            csTransactionDetailService = transactionDetailService;
         }
 
         /// <summary>
@@ -700,29 +696,6 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         #region -- METHOD PRIVATE --
-
-        private bool CheckExistShipment(TrackingShipmentCriteria criteria)
-        {
-            bool isExisted = false;
-            switch (criteria.ShipmentType)
-            {
-                case "SEA":
-                    isExisted = csTransactionDetailService.Any(x =>
-                    (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb == criteria.Mawb) ||
-                    (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno == criteria.Hawb));
-                    break;
-                case "AIR":
-                    isExisted = csTransactionDetailService.Any(x =>
-                    (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb == criteria.Mawb) ||
-                    (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno == criteria.Hawb));
-                    break;
-                default:
-                    break;
-            }
-
-            return isExisted;
-        }
-
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {
             model.TransactionType = DataTypeEx.GetType(model.TransactionTypeEnum);
