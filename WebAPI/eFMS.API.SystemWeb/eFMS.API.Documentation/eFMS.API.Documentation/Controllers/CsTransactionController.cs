@@ -1,6 +1,5 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -21,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
@@ -82,7 +80,7 @@ namespace eFMS.API.Documentation.Controllers
             apiServiceUrl = serviceUrl;
             checkPointService = checkPoint;
             csStageAssignedService = stageAssignedService;
-            _edocService= edocService;
+            _edocService = edocService;
             _busControl = _bus;
         }
 
@@ -554,7 +552,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
-        {        
+        {
             await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, model);
             return new HandleState();
         }
@@ -677,6 +675,7 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {

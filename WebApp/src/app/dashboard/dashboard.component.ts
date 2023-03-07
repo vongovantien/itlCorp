@@ -1,20 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import moment from 'moment/moment';
-import Highcharts from 'highcharts/highcharts';
-import { FormGroup } from '@angular/forms';
-import { extend } from 'validator';
-import { AppPage } from '../app.base';
-import { Shipment } from '../shared/models/operation/shipment';
-import { DataService } from '@services';
-import { DocumentationRepo } from '@repositories';
-import { catchError, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { getCurrentUserState } from '@store';
 import { Permission403PopupComponent } from '@common';
 import { ChargeConstants, RoutingConstants } from '@constants';
+import { DocumentationRepo } from '@repositories';
+import { DataService, DestroyService } from '@services';
+import Highcharts from 'highcharts/highcharts';
+import { BehaviorSubject } from 'rxjs';
+import { distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
+import { AppPage } from '../app.base';
+import { Shipment } from '../shared/models/operation/shipment';
 // import { Chart } from 'angular-highcharts';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'app-dashboard',
@@ -31,16 +27,19 @@ export class DashboardComponent extends AppPage implements OnInit {
     headersShipment: CommonInterface.IHeaderTable[];
     serviceList: CommonInterface.INg2Select[] = [];
 
-    constructor(private _dataService: DataService,
+    shipmentTracking: IShipmentTracking;
+    shipmentType: string = "AIR";
+    constructor(
         private _documentRepo: DocumentationRepo,
-        private router: Router
+        private router: Router,
+        private _toastService: ToastrService,
     ) {
         super();
         // this.keepCalendarOpeningWithRange = true;
         // this.selectedDate = Date.now();
         // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
-
+    isSubmitted: Boolean = true;
     ngOnInit() {
         this.initBasicData();
         // * Search autocomplete shipment.
@@ -106,36 +105,36 @@ export class DashboardComponent extends AppPage implements OnInit {
         }
     }
 
-    checkPermission(service: string, shipmentId: string, productService: string){
-        if(service==='OPS'){
+    checkPermission(service: string, shipmentId: string, productService: string) {
+        if (service === 'OPS') {
             this._documentRepo.checkViewDetailPermission(shipmentId)
-            .subscribe(
-                (res: boolean) =>{
-                    if(res){
-                        this.gotoActionLink(productService);
-                    }else{
-                        this.permissionPopup.show();
+                .subscribe(
+                    (res: boolean) => {
+                        if (res) {
+                            this.gotoActionLink(productService);
+                        } else {
+                            this.permissionPopup.show();
+                        }
                     }
-                }
-            )
+                )
         }
-        else if(service==='CS'){
+        else if (service === 'CS') {
             this._documentRepo.checkDetailShippmentPermission(shipmentId)
-            .subscribe(
-                (res: boolean) =>{
-                    if(res){
-                        this.gotoActionLink(productService);
-                    }else{
-                        this.permissionPopup.show();
+                .subscribe(
+                    (res: boolean) => {
+                        if (res) {
+                            this.gotoActionLink(productService);
+                        } else {
+                            this.permissionPopup.show();
+                        }
                     }
-                }
-            )
+                )
         }
     }
 
-    gotoActionLink(service: string){
-        switch(service){
-            case  ChargeConstants.AE_CODE:
+    gotoActionLink(service: string) {
+        switch (service) {
+            case ChargeConstants.AE_CODE:
                 //return this.router.navigate([`home/documentation/air-export/${this.selectedShipment.id}`]);
                 return this.router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.selectedShipment.id}`]);
             case ChargeConstants.AI_CODE:
@@ -198,12 +197,36 @@ export class DashboardComponent extends AppPage implements OnInit {
 
     }
 
-
-
     onClickOutsideShipmentName() {
         this._isShowAutoComplete.next(false);
     }
-   //https://www.npmjs.com/package/angular-highcharts
+
+    getType(event) {
+        this.shipmentType = event;
+    }
+
+    getValueSearch(obj: any) {
+        console.log(obj)
+        this.trackShipmentProgress(obj)
+    }
+
+    onChangeLoading(event){
+        this.isSubmitted = event;
+    }
+
+    trackShipmentProgress(obj: any) {
+        this._documentRepo.trackShipmentProgress(obj).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: IShipmentTracking) => {
+                    this.shipmentTracking = res;
+                    this.isSubmitted = false;
+                }, (error: any) => {
+                    this.isSubmitted = true;
+                });
+    }
+
+
+    //https://www.npmjs.com/package/angular-highcharts
     // chart: Chart;
 
     // //draw chart by month
@@ -532,4 +555,34 @@ export class DashboardComponent extends AppPage implements OnInit {
         ]
     };
 
+}
+
+
+export interface ITrackInfo {
+    id: string;
+    planDate: string;
+    actualDate: string;
+    eventDescription: string;
+    station: string;
+    status: string;
+    quantity: string;
+    weight: string;
+    hblid: string;
+    datetimeModified: string;
+    datetimeCreated: string;
+    userModified: any;
+    userCreated: any;
+    flightNo: any;
+    type: any;
+    unit: any;
+}
+
+export interface IShipmentTracking {
+    coloaderName: any;
+    flightNo: any;
+    flightDate: any;
+    departure: string;
+    destination: string;
+    status: string;
+    trackInfos: ITrackInfo[];
 }
