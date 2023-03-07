@@ -56,8 +56,16 @@ namespace eFMS.API.Documentation.DL.Services
                 var trackShipment = new TrackingShipmentViewModel();
 
                 CsTransactionDetail hbl = await transactionDetailRepository.Where(x =>
-                        (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb.Contains(criteria.Mawb)) ||
-                        (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno.Contains(criteria.Hawb))).FirstOrDefaultAsync();
+                        (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb == criteria.Mawb.Trim()) ||
+                        (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno == criteria.Hawb.Trim())).FirstOrDefaultAsync();
+
+
+                CsTransactionDetail hbl = await transactionRepository.Get()
+                        .Join(transactionDetailRepository.Get(), trans => trans.Mawb, transDetail => transDetail.Mawb, (trans, transDetail) => new { trans, transDetail })
+                        .Where(x =>
+                        (!string.IsNullOrEmpty(criteria.Mawb) && x.trans.Mawb == criteria.Mawb.Trim()) ||
+                        (!string.IsNullOrEmpty(criteria.Hawb) && x.transDetail.Hwbno == criteria.Hawb.Trim()))
+                        .Select(x => x.transDetail).FirstOrDefaultAsync();
 
                 switch (criteria.ShipmentType)
                 {
@@ -154,22 +162,29 @@ namespace eFMS.API.Documentation.DL.Services
 
         public bool CheckExistShipment(TrackingShipmentCriteria criteria)
         {
-            bool isExisted = false;
+            IQueryable<CsTransactionDetail> query = null;
             switch (criteria.ShipmentType)
             {
-                case "SEA":
-                    isExisted = transactionDetailRepository.Any(x =>
-                    (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb == criteria.Mawb) ||
-                    (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno == criteria.Hawb));
-                    break;
                 case "AIR":
-                    isExisted = transactionDetailRepository.Any(x =>
-                    (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb == criteria.Mawb) ||
-                    (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno == criteria.Hawb));
+
+                    query = transactionRepository.Get()
+                        .Join(transactionDetailRepository.Get(), trans => trans.Mawb, transDetail => transDetail.Mawb, (trans, transDetail) => new { trans, transDetail })
+                        .Where(x => !string.IsNullOrEmpty(x.trans.Mawb) && (x.trans.TransactionType == "AE" || x.trans.TransactionType == "AI"))
+                        .Select(x => x.transDetail);
+                    break;
+                case "SEA":
+                    query = transactionRepository.Get()
+                        .Join(transactionDetailRepository.Get(), trans => trans.Mawb, transDetail => transDetail.Mawb, (trans, transDetail) => new { trans, transDetail })
+                        .Where(x => !string.IsNullOrEmpty(x.trans.Mawb) && (x.trans.TransactionType != "AE" && x.trans.TransactionType != "AI"))
+                        .Select(x => x.transDetail);
                     break;
                 default:
                     break;
             }
+
+            bool isExisted = query.Any(x =>
+                 (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb == criteria.Mawb.Trim()) ||
+                 (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno == criteria.Hawb.Trim()));
 
             return isExisted;
         }
