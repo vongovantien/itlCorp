@@ -1744,7 +1744,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 if (img != null)
                                 {
                                     var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement");
-                                    //var MBLCode = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "BL" || z.Code == "MAWB") && z.Type == "General")).FirstOrDefault();
+                                    var MBLCode = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "BL" || z.Code == "MB") && z.Type == "General")).FirstOrDefault();
                                     if (edocExist.Count() == 0)
                                     {
                                         int docTypeId = 0;
@@ -1752,16 +1752,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         //var tranType= _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type == "Accountant")).FirstOrDefault();
                                         if (advSM != null)
                                         {
-                                            docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "AD - SM")).FirstOrDefault().Id;
+                                            docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "AD-SM")).FirstOrDefault().Id;
                                         }
                                         else
                                         {
                                             docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "SM"&&z.AccountingType== "Settlement")).FirstOrDefault().Id;
                                         }
-                                        //if (MBLCode!= null)
-                                        //{
-                                        //    if (checEdocType(img.Id, MBLCode.Id))
-                                        //    {
+                                        if (MBLCode != null)
+                                        {
+                                            if (checEdocType(img.Id, MBLCode.Id))
+                                            {
                                                 var edocFrom = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id).FirstOrDefault();
                                                 var edoc = new SysImageDetail()
                                                 {
@@ -1787,9 +1787,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                     GenEdocId=edocFrom.Id
                                                 };
                                                 edocs.Add(edoc);
-                                            //}
-                                    //    }
-                                    }
+                                                }
+                                            }
+                                        }
                                 }
                             });
                         });
@@ -1816,13 +1816,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         //var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type == "Accountant")).FirstOrDefault();
                                         if (advSM != null)
                                         {
-                                            docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "AD - SM")).FirstOrDefault().Id;
+                                            docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "AD-SM")).FirstOrDefault().Id;
                                         }
                                         else
                                         {
                                             docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "SM" && z.AccountingType == "Settlement")).FirstOrDefault().Id;
                                         }
-                                        var HBLCodes = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "HB") && z.Type == "General")).ToList();
+                                        var HBLCodes = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "HB"||z.Code=="BL") && z.Type == "General")).ToList();
                                         HBLCodes.ToList().ForEach(HBLCode =>
                                         {
                                             if (checEdocType(img.Id, HBLCode.Id))
