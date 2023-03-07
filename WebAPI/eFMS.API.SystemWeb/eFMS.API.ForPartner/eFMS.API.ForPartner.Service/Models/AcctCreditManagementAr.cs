@@ -36,5 +36,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public string TransactionType { get; set; }
         public string AccountNo { get; set; }
         public string SerieNo { get; set; }
+        public string PaymentStatus { get; set; }
     }
 }

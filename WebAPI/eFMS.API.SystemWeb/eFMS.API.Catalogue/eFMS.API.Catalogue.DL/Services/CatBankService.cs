@@ -2,6 +2,7 @@
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Models.CatalogueBank;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
@@ -10,6 +11,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
@@ -23,6 +25,7 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
+        private readonly IContextBase<SysImage> sysImageRepository;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IMapper mapper;
         private readonly IContextBase<CatPartner> catPartnerRepository;
@@ -33,6 +36,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysUser> sysUserRepo,
             IStringLocalizer<LanguageSub> localizer,
             IContextBase<CatPartner> catPartnerRepo,
+            IContextBase<SysImage> sysImageRepo,
         ICurrentUser currUser) : base(repository, cacheService, imapper)
         {
             currentUser = currUser;
@@ -40,6 +44,7 @@ namespace eFMS.API.Catalogue.DL.Services
             stringLocalizer = localizer;
             mapper = imapper;
             catPartnerRepository = catPartnerRepo;
+            sysImageRepository = sysImageRepo;
         }
 
         #region CRUD
@@ -50,6 +55,7 @@ namespace eFMS.API.Catalogue.DL.Services
             bank.DatetimeCreated = bank.DatetimeModified = DateTime.Now;
             bank.Active = true;
             bank.UserCreated = bank.UserModified = currentUser.UserID;
+            bank.ApproveStatus = "New";
             var result = DataContext.Add(bank, false);
             DataContext.SubmitChanges();
             if (result.Success)
@@ -78,6 +84,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.Code = model.Code;
                 entity.Note = model.Note;
                 entity.Active = model.Active;
+                entity.BeneficiaryAddress = model.BeneficiaryAddress;
+                entity.ApproveStatus = model.ApproveStatus;
 
                 if (entity.Active == false)
                     entity.InactiveOn = DateTime.Now;
@@ -302,63 +310,68 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public async Task<IQueryable<CatBankModel>> GetBankByPartnerId(Guid id)
         {
-            var data = await DataContext.WhereAsync(x => x.PartnerId == id && x.ApproveStatus == DataEnums.BANK_APPROVED);
+            var data = await DataContext.WhereAsync(x => x.PartnerId == id);
             if (data.Count() == 0)
             {
                 return Enumerable.Empty<CatBankModel>().AsQueryable();
             }
 
-            var result = data.Select(x => new CatBankModel
-            {
-                Id = x.Id,
-                Code = x.Code,
-                BankNameEn = x.BankNameEn,
-                BankNameVn = x.BankNameVn,
-                UserCreated = x.UserCreated,
-                DatetimeCreated = x.DatetimeCreated,
-                UserModified = x.UserModified,
-                DatetimeModified = x.DatetimeModified,
-                Active = x.Active,
-                BankId = x.BankId,
-                PartnerId = x.PartnerId,
-                InactiveOn = x.InactiveOn,
-                BankAccountNo = x.BankAccountNo,
-                BankAddress = x.BankAddress,
-                BankAccountName = x.BankAccountName,
-                Note = x.Note,
-                Source = x.Source,
-                SwiftCode = x.SwiftCode
-            });
+            var result = _mapper.Map<List<CatBankModel>>(data);
 
             return result.AsQueryable();
         }
 
-        public async Task<HandleState> UpdateBankInfoSyncStatus(BankStatusUpdateModel model)
+        public async Task<BankInForModel> GetModelBankInfoToSync(CatBankModel model, ACTION action)
         {
-            try
+            var hs = new HandleState();
+            switch (action)
             {
-                var hs = new HandleState();
-                var partner = await catPartnerRepository.WhereAsync(x => x.AccountNo.Contains(model.PartnerCode));
-                if (partner != null)
+                case ACTION.ADD:
+                    if (!DataContext.Any(x => x.Id == model.Id))
+                    {
+                        model.Id = Guid.NewGuid();
+                        model.ApproveStatus = "New";
+                        model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
+                        model.UserCreated = model.UserModified = currentUser.UserID;
+                        hs = await DataContext.AddAsync(model);
+                    }
+
+                    break;
+                case ACTION.UPDATE:
+                    model.DatetimeModified = DateTime.Now;
+                    model.UserModified = currentUser.UserID;
+                    model.ApproveStatus = model.ApproveStatus == "Approved" || model.ApproveStatus == "Revise" ? "Revise" : "Processing";
+                    hs = DataContext.Update(model, x => x.Id == model.Id);
+                    break;
+                default:
+                    break;
+            }
+            CatPartner partner = await catPartnerRepository.Get(x => x.Id == model.PartnerId.ToString()).FirstOrDefaultAsync();
+
+            var files = sysImageRepository.Get(x => x.ObjectId == model.Id.ToString())
+                .Select(x => new AttachedDocument
                 {
-                    //var listBank = await DataContext.WhereAsync(x => x.PartnerId.ToString() == partner.Id);
-                    //foreach (var item in model.BankInfo)
-                    //{
-                    //    var updateItem = listBank.FirstOrDefault(x => x.BankAccountNo == item.BankAccountno);
-                    //    updateItem.ApproveDescription = item.Description;
-                    //    updateItem.ApproveStatus = item.ApproveStatus;
-                    //    hs = await DataContext.UpdateAsync(updateItem, x => x.Id == updateItem.Id);
-                    //}
-                    return hs;
-                }
+                    AttachDocDate = x.DateTimeCreated,
+                    AttachDocName = x.Name,
+                    AttachDocPath = x.Url,
+                }).ToList();
 
-                return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
-            }
-            catch (Exception)
+            var bank = new BankDetail();
+            bank.BankName = model.BankNameVn;
+            bank.BankCode = model.Code;
+            bank.BankAccountNo = model.BankAccountNo;
+            bank.SwiftCode = model.SwiftCode;
+            bank.Address = model.BankAddress;
+
+            var result = new BankInForModel();
+            result.CustomerCode = partner.AccountNo;
+            result.Details = bank;
+            if (files?.Count > 0)
             {
-
-                throw;
+                result.AtchDocInfo = files;
             }
+
+            return result;
         }
     }
 }

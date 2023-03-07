@@ -96,13 +96,11 @@
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (isSubmitted || approvalStatus.dirty)  && !approvalStatus.valid}">
+                            <div class="form-group">
                                 <label>Approval Status</label>
-                                <input type="text" class="form-control" formControlName="approvalStatus">
-                                <div class="form-control-feedback" *ngIf="isSubmitted && approvalStatus.invalid">
-                                    Approval status is required
-                                </div>
+                                <input type="text"
+                                    class="form-control m-input m-input--square text-{{approveStatus.value | classStatusApproval}}"
+                                    formControlName="approveStatus">
                             </div>
                         </div>
                         <div class="col-lg-3">
@@ -110,9 +108,10 @@
                             <label></label>
                             <label></label>
                             <div class="form-group">
-                                <input style="display:none" type="file" #file (change)="handleFileInput($event)">
-                                <button style="margin-top:5px;" (click)="file.click()" type="button"
-                                    class="btn btn-success  m-btn--icon m-btn--uppercase margin-right-10">
+                                <input style="display:none" type="file" #file
+                                    (change)="handleBankInfoFileUpload($event)">
+                                <button *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved' && bankDetail.approveStatus !== 'New'" style="margin-top:5px;" (click)="file.click()"
+                                    type="button" class="btn btn-success  m-btn--icon m-btn--uppercase margin-right-10">
                                     <span>
                                         <i class="la la-plus"></i>
                                         <span>
@@ -128,7 +127,7 @@
                                     <li *ngFor="let file of files"><a [href]="file.url" target="_blank"
                                             [title]="file.name" download>{{file.name}}</a>
                                         <span class="pointer text-center" *ngIf="!readonly">
-                                            <a title="Delete" (click)="deleteFilePOD(file.name)">
+                                            <a title="Delete" (click)="onDeleteBankInfoFile(file.name)">
                                                 <i class="la la-times fa-lg text-danger"></i>
                                             </a>
                                         </span>
@@ -138,36 +137,44 @@
                         </div>
                     </div>
                 </form>
-            </div>
-            <div class="row" *ngIf="isUpdate && !!bankDetail">
-                <div class="col-6">
-                    <div class="m--align-left">
-                        Created: {{bankDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
-                        &nbsp;
-                        By <span class="text-success">{{bankDetail.userCreatedName}}</span>
+                <div class="row" *ngIf="isUpdate && !!bankDetail">
+                    <div class="col-6">
+                        <div class="m--align-left">
+                            Created: {{bankDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                            &nbsp;
+                            By <span class="text-success">{{bankDetail.userCreatedName}}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="col-6">
-                    <div class="m--align-left">
-                        Modified: {{bankDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
-                        &nbsp;
-                        By <span class="text-success">{{bankDetail.userModifiedName}}</span>
+                    <div class="col-6">
+                        <div class="m--align-left">
+                            Modified: {{bankDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                            &nbsp;
+                            By <span class="text-success">{{bankDetail.userModifiedName}}</span>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer m--align-center">
-                <button
-                    *ngIf="bankDetail?.approvalStatus !== 'Processing' && bankDetail?.approvalStatus !== 'Approved'"
-                    class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onSubmit()">
+                <button *ngIf="bankDetail?.approveStatus !== 'Processing' && bankDetail?.approveStatus !== 'Approved'"
+                    class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onSubmitBankInfo()">
                     <span>
-                        <i class="la la-download"></i>
+                        <i class="la la-save"></i>
                         <span>
-                            Request Approved
+                            Save
                         </span>
                     </span>
                 </button>
-                <button *ngIf="bankDetail?.approvalStatus === 'Approved'"
-                    class="btn btn-info  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onSubmit()">
+                <button *ngIf="bankDetail?.approveStatus !== 'Processing' && bankDetail?.approveStatus !== 'Approved'"
+                    class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onSendBankInfoToAccountantSystem()">
+                    <span>
+                        <i class="la la-download"></i>
+                        <span>
+                            Save & Send Request Approval
+                        </span>
+                    </span>
+                </button>
+                <button *ngIf="bankDetail?.approveStatus === 'Approved'"
+                    class="btn btn-info  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onReviseBankInfo()">
                     <span>
                         <i class="la la-refresh"></i>
                         <span>
@@ -180,3 +187,4 @@
         </div>
     </div>
 </div>
+<ng-template inject></ng-template>

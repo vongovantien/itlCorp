@@ -1418,4 +1418,8 @@ export class CatalogueRepo {
     getStandChargeByType(criteria: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStandardCharge/GetBy`, criteria);
     }
+
+    syncBankInfoToAccountantSystem(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/SyncBankInfoToAccountantSystem`, body);
+    }
 }

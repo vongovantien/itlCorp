@@ -10,9 +10,11 @@ import _cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
 import { SysImage } from './../../../../shared/models/system/sysimage';
+import { ConfirmPopupComponent } from '@common';
+import { CatalogueConstants, SystemConstants } from '@constants';
 
 @Component({
     selector: 'popup-form-bank-commercial-catalogue',
@@ -20,6 +22,7 @@ import { SysImage } from './../../../../shared/models/system/sysimage';
 })
 export class FormBankCommercialCatalogueComponent extends PopupBase implements OnInit {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
+    selectedFile: any;
 
     formGroup: FormGroup;
     formDirective: FormGroupDirective;
@@ -31,9 +34,9 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     bankCode: AbstractControl;
     note: AbstractControl;
     beneficiaryAddress: AbstractControl;
-    approvalStatus: AbstractControl;
+    approveStatus: AbstractControl;
 
-    bankDetail: Bank;
+    bankDetail: Bank = null;
 
     id: string = '';
     banks: Observable<Bank[]>;
@@ -65,24 +68,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         this.banks = this._store.select(getCatalogueBankState);
     }
 
-    // ngAfterViewInit(): void {
-    //     this._store.select(get)
-    //         .pipe(takeUntil(this.ngUnsubscribe))
-    //         .subscribe(
-    //             (res: any) => {
-    //                 if (!!res) {
-    //                     this.setFormValue(res.opstransaction)
-    //                 }
-    //             }
-    //         );
-
-    //     this.cdRef.detectChanges();
-    // }
-
-    setFormValue(data: Partner) {
-        //this.beneficiaryAddress.setValue()
-    }
-
     initForm() {
         this.formGroup = this._fb.group({
             bankAccountNo: [null, FormValidators.required],
@@ -94,7 +79,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
             note: [null],
             bankId: [null],
             beneficiaryAddress: [null, FormValidators.required],
-            approvalStatus: [{ value: null, disabled: true }]
+            approveStatus: [{ value: null, disabled: true }]
         });
 
         this.bankAccountNo = this.formGroup.controls['bankAccountNo'];
@@ -105,7 +90,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         this.bankCode = this.formGroup.controls['bankCode'];
         this.note = this.formGroup.controls['note'];
         this.beneficiaryAddress = this.formGroup.controls['beneficiaryAddress']
-        this.approvalStatus = this.formGroup.controls['approvalStatus']
+        this.approveStatus = this.formGroup.controls['approveStatus']
     }
 
     getFormData() {
@@ -138,10 +123,10 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
             this.bankCode.setValue(data.code);
             this.bankId = data.id
         }
-
     }
 
     updateFormValue(data: Bank) {
+        console.log(data)
         this.bankDetail = data
         const formValue = {
             bankId: !!data.bankId ? data.bankId : null,
@@ -151,10 +136,13 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
             swiftCode: !!data.swiftCode ? data.swiftCode : null,
             bankNameEn: !!data.bankNameEn ? data.bankNameEn : null,
             bankCode: !!data.code ? data.code : null,
+            approveStatus: !!data.approveStatus ? data.approveStatus : null,
+            beneficiaryAddress: !!data.beneficiaryAddress ? data.beneficiaryAddress : null,
             source: !!data.source ? data.source : null,
             note: !!data.note ? data.note : null,
         };
         this.formGroup.patchValue(_merge(_cloneDeep(data), formValue));
+        this.getBankInfoFiles(this.bankDetail.id);
     }
 
     onSubmitBankInfo() {
@@ -201,14 +189,79 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         }
     }
 
+    getFileName(data: CommonInterface.IResult[], id: string) {
+        let url: string = '';
+        data.forEach(x => {
+            const smId: string[] = x.data.match(SystemConstants.CPATTERN.GUID)
+            if (smId[0] === id) {
+                url = x.data;
+            }
+        })
+
+        return url;
+    }
+
+    onSendBankInfoToAccountantSystem(): void {
+        if (this.formGroup.valid) {
+            this.isSubmitted = true;
+            const objBank = _merge(_cloneDeep(this.bankDetail), this.formGroup.getRawValue());
+            const body = {
+                partnerBank: objBank,
+                action: !!this.bankDetail && this.bankDetail.approveStatus !== CatalogueConstants.STATUS_APPROVAL.NEW ? 'UPDATE' : 'ADD',
+            }
+            this._catalogueRepo.syncBankInfoToAccountantSystem(body)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res) => {
+                        if (((res as CommonInterface.IResult)?.status)) {
+                            this._toastService.success("Sync Data to Accountant System Successful");
+                            this.onRequest.emit(true);
+                            this.hide();
+                        } else {
+                            this._toastService.error("Sync Data Fail");
+                        }
+                    },
+                    (error) => {
+                        console.error(error);
+                    }
+                )
+        }
+    }
+
+    onReviseBankInfo(): void {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Are you sure to revise this bank information ?',
+            labelCancel: 'No',
+            labelConfirm: 'Yes'
+        }, () => {
+            const body = this.bankDetail
+            body.approveStatus = CatalogueConstants.STATUS_APPROVAL.REVISE;
+            this._catalogueRepo.updateBank(body)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            this.bankDetail.approveStatus = CatalogueConstants.STATUS_APPROVAL.REVISE;
+                            this.approveStatus.setValue(CatalogueConstants.STATUS_APPROVAL.REVISE);
+                            this.onRequest.emit(true);
+                        }
+                        else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                )
+        });
+    }
+
     close() {
         this.hide();
         this.isSubmitted = false;
     }
 
-    getBankInfoFiles(jobId: string) {
+    getBankInfoFiles(id: string) {
         this.isLoading = true;
-        this._systemFileManagementRepo.getFile('Document', 'Bank', jobId).
+        this._systemFileManagementRepo.getFile('Document', 'PartnerBank', id).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -221,23 +274,53 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
             );
     }
 
-    handleBankInfoFileUpload(event: any){
+    handleBankInfoFileUpload(event: any) {
+        console.log(this.bankId)
+        if (!!this.bankId) {
+            this.bankId = '00000000-0000-0000-0000-000000000000'
+        }
         const fileList: FileList[] = event.target['files'];
         if (fileList.length > 0) {
             this._progressRef.start();
-            this._systemFileManagementRepo.uploadAttachedFileEdoc('Document', 'Bank', this.bankId, fileList)
+            this._systemFileManagementRepo.uploadAttachedFileEdoc('Catalogue', 'PartnerBank', this.bankDetail.id, fileList)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success("Upload file successfully!");
-                            if (!!this.bankId) {
-                                this.getBankInfoFiles(this.bankId);
-                            }
+                            this.getBankInfoFiles(this.bankDetail.id);
                         }
                     }
                 );
         }
         event.target.value = '';
+    }
+
+    onDeleteBankInfoFile(file: any) {
+        if (!!file) {
+            this.selectedFile = file;
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'Are you sure to delete this file ?',
+                labelCancel: 'No',
+                labelConfirm: 'Yes'
+            }, () => { this.handleDeleteBankInfoFile(); });
+        }
+    }
+
+    handleDeleteBankInfoFile() {
+        this._systemFileManagementRepo.deleteFile('Catalogue', 'PartnerBank', this.bankDetail.id, this.selectedFile.name)
+            .pipe(catchError(this.catchError), finalize(() => {
+                this.isLoading = false;
+            }))
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this._toastService.success("File deleted successfully!");
+                        this.handleBankInfoFileUpload(this.bankDetail.id);
+                    } else {
+                        this._toastService.error("some thing wrong");
+                    }
+                }
+            );
     }
 }

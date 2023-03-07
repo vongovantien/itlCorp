@@ -1,22 +1,20 @@
 ﻿
-using Microsoft.Extensions.DependencyInjection;
-
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Swashbuckle.AspNetCore.Swagger;
-using System.Collections.Generic;
-using System.Reflection;
-using System.IO;
-using System;
-using eFMS.API.ForPartner.Infrastructure.Filters;
-using Microsoft.Extensions.Localization;
-using ITL.NetCore.Connection.EF;
-using LocalizationCultureCore.StringLocalizer;
-using eFMS.API.ForPartner.Service.Contexts;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Service;
+using eFMS.API.ForPartner.Infrastructure.Filters;
+using eFMS.API.ForPartner.Service.Contexts;
+using ITL.NetCore.Connection.EF;
+using LocalizationCultureCore.StringLocalizer;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
+using Swashbuckle.AspNetCore.Swagger;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace eFMS.API.ForPartner.Infrastructure
 {
@@ -38,6 +36,7 @@ namespace eFMS.API.ForPartner.Infrastructure
             services.AddTransient<IAccountPayableService, AccountPayableService>();
             services.AddTransient<IAccountingPaymentService, AccAccountingPaymentService>();
             services.AddTransient<IAccountReceivableService, AccountReceivableService>();
+            services.AddTransient<ICatBankService, CatBankService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
@@ -77,7 +76,7 @@ namespace eFMS.API.ForPartner.Infrastructure
                                 TermsOfService = @"https://logtechub.com"
                             });
                     }
-                    
+
                     options.DocumentFilter<SwaggerAddEnumDescriptions>();
                     var security = new Dictionary<string, IEnumerable<string>>{
                         { "Bearer", new string[] { }},

@@ -12,7 +12,7 @@ export class Bank {
     userCreatedName: string = '';
     userModifiedName: string = '';
     beneficiaryAddress: string = '';
-    approvalStatus: string = '';
+    approveStatus: string = '';
     swiftCode: string = '';
     bankAccountNo: string = '';
     bankAddress: string = '';

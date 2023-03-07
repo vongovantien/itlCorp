@@ -1,9 +1,7 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
-using eFMS.API.SystemFileManagement.DL.Services;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
@@ -16,7 +14,6 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.Controllers
@@ -183,12 +180,12 @@ namespace eFMS.API.SystemFileManagement.Controllers
         }
 
         [HttpGet("GenEdocFromBilling")]
-        public async Task<IActionResult> GenEdocFromBilling(string BillingNo,string BillingType)
+        public async Task<IActionResult> GenEdocFromBilling(string BillingNo, string BillingType)
         {
             HandleState hs = await _edocService.GenEdocByBilling(BillingNo, BillingType);
             if (hs.Success)
                 return Ok(new ResultHandle { Message = "Get File Successfully", Status = true });
-            if(hs.Exception.Message== "Not found file")
+            if (hs.Exception.Message == "Not found file")
             {
                 return Ok(new ResultHandle { Message = "Not found file", Status = false });
             }
@@ -199,6 +196,18 @@ namespace eFMS.API.SystemFileManagement.Controllers
         {
             var result = _edocService.CheckAllowSettleEdocSendRequest(billingId);
             return Ok(result);
+        }
+
+        [HttpPut("UploadEdoc")]
+        //[Authorize]
+        public async Task<IActionResult> UploadEdocBankInfo([FromForm] EDocUploadModel edocUploadModel, List<IFormFile> files, string type)
+        {
+            HandleState hs = await _edocService.PostEDocAsync(edocUploadModel, files, type);
+            if (hs.Success)
+            {
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
+            }
+            return BadRequest(hs);
         }
     }
 }
