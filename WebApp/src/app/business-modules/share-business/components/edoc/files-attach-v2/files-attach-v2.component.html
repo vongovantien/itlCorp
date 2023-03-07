@@ -147,13 +147,12 @@
                                                 </span>
                                             </span>
                                         </button>
-                                        <button type="button" class="btn btn-primary m-btn--icon m-btn--uppercase"
-                                            [dpToggle]="dropdownMenu" position="bottomLeft" mode="dropdown"
+                                        <button type="button" class="btn btn-primary m-btn--uppercase dropdown-toggle"
+                                            [dpToggle]="dropdownMenu" position="bottomCenter" mode="dropdown"
                                             *ngIf="typeFrom==='Settlement'">
-                                            <span>
-                                                <i class="la la-download"></i>
-                                                <span> Get Files</span>
-                                            </span>
+                                            <i class="la la-download"></i>
+                                            Get File
+                                            <span class="caret"></span>
                                         </button>
                                         <app-dropdown #dropdownMenu>
                                             <a class="dropdown-item pointer" (click)="genFileToSM('Advance')">
