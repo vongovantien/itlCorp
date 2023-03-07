@@ -102,7 +102,7 @@ export class CommissionIncentiveReportComponent extends AppList implements ICrys
         .subscribe(
             (response: HttpResponse<any>) => {
               if (response!=null) {
-                this.downLoadFile(response, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
+                this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
               } else {
                 this._toastService.warning("No data to download. Please try again.");
               }

@@ -595,7 +595,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (cdNote.CurrencyId != entity.CurrencyId)
                 {
                     //Quy đổi tỉ giá currency CD Note về currency Local
-                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, model.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    var _exchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, model.DatetimeCreated, entity.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
                     entity.ExchangeRate = _exchangeRate;
                 }
                 else
