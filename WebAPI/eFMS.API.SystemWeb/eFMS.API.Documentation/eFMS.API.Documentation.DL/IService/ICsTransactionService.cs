@@ -40,7 +40,7 @@ namespace eFMS.API.Documentation.DL.IService
         Task<HandleState> CreateFileZip(FileDowloadZipModel m);
         string CheckHasHBLUpdateNominatedtoFreehand(CsTransactionEditModel model, bool isUpdate);
         HandleState UpdateJobStatus(ChargeShipmentStatusModel model);
-        Task<TrackingShipmentViewModel> TrackShipmentProgress(TrackingShipmentCriteria criteria);
+
     }
     public class FileDowloadZipModel
     {

@@ -1297,7 +1297,7 @@ export class DocumentationRepo {
     }
 
     trackShipmentProgress(params: any) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/TrackShipmentProgress`, params).pipe(
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/ShipmentTracking/TrackShipmentProgress`, params).pipe(
             map((data: any) => data)
         );
     }

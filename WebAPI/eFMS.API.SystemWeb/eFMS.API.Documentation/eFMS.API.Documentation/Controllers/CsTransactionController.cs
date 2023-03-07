@@ -676,25 +676,6 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
-        [Authorize]
-        [HttpGet("TrackShipmentProgress")]
-        public async Task<IActionResult> TrackShipmentProgress([FromQuery] TrackingShipmentCriteria model)
-        {
-            if (!CheckExistShipment(model))
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_NOT_EXIST].Value });
-            }
-
-            var data = await csTransactionService.TrackShipmentProgress(model);
-
-            return Ok(data);
-        }
-
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {

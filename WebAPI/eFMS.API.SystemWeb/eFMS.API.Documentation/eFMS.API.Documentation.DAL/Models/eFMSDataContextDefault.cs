@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -810,6 +812,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("ID")
                     .HasDefaultValueSql("(newid())");
 
+                entity.Property(e => e.AccountNo).HasMaxLength(150);
+
                 entity.Property(e => e.AmountUsd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.AmountVnd).HasColumnType("decimal(18, 4)");
@@ -860,17 +864,27 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PaymentStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ReferenceNo).HasMaxLength(100);
 
                 entity.Property(e => e.RemainUsd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.RemainVnd).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.SerieNo).HasMaxLength(150);
+
                 entity.Property(e => e.Source)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.SurchargeId).IsUnicode(false);
+
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Type)
                     .HasMaxLength(15)
@@ -881,6 +895,12 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.VoucherDate).HasColumnType("datetime");
+
+                entity.Property(e => e.VoucherNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
             });
@@ -4889,21 +4909,21 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.PlanDate).HasColumnType("datetime");
 
-                entity.Property(e => e.Quantity).HasMaxLength(10);
+                entity.Property(e => e.Quantity).HasMaxLength(50);
 
                 entity.Property(e => e.Source).HasMaxLength(100);
 
-                entity.Property(e => e.Status).HasMaxLength(10);
+                entity.Property(e => e.Status).HasMaxLength(50);
 
-                entity.Property(e => e.Type).HasMaxLength(20);
+                entity.Property(e => e.Type).HasMaxLength(50);
 
-                entity.Property(e => e.Unit).HasMaxLength(20);
+                entity.Property(e => e.Unit).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 
                 entity.Property(e => e.UserModified).HasMaxLength(50);
 
-                entity.Property(e => e.Weight).HasMaxLength(10);
+                entity.Property(e => e.Weight).HasMaxLength(50);
             });
 
             modelBuilder.Entity<SysUser>(entity =>

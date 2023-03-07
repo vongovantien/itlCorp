@@ -55,7 +55,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<sp_GetDataExportAccountant, CsShipmentSurcharge>();
             CreateMap<SysReportLogModel, SysReportLog>();
             CreateMap<CatStageModel, CatStage>();
-            CreateMap<SysTrackInfo, TrackInfoViewModel>();
+            CreateMap<SysTrackInfo, SysTrackInfoModel>();
             CreateMap<CsShipmentSurchargeImportModel, CsShipmentSurcharge>();
             CreateMap<sp_GetShipmentAssignPIC, Shipments>();
         }

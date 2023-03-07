@@ -2,7 +2,7 @@
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class TrackInfoViewModel : SysTrackInfo
+    public class SysTrackInfoModel : SysTrackInfo
     {
         public string StationName { get; set; }
     }
