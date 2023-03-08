@@ -17,7 +17,6 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
@@ -75,8 +74,6 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICsStageAssignedService csStageAssignedService;
         private readonly IStageService catStageService;
         private readonly IContextBase<AccAccountingManagement> accMngtRepo;
-
-        private readonly IContextBase<SysPartnerApi> sysPartnerApiRepository;
         public CsTransactionService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -118,11 +115,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<OpsTransaction> opsTransactionRepo,
             ICsStageAssignedService csStageAssigned,
             IStageService stageService,
-            IContextBase<AccAccountingManagement> accMngt,
-            IContextBase<SysTrackInfo> trackInfoRepo,
-            IOptions<TrackingApi> trackingApi,
-            IContextBase<SysPartnerApi> sysPartnerApiRepo,
-            IConfiguration configuration
+            IContextBase<AccAccountingManagement> accMngt
             ) : base(repository, mapper)
         {
             currentUser = user;
@@ -165,7 +158,6 @@ namespace eFMS.API.Documentation.DL.Services
             csStageAssignedService = csStageAssigned;
             catStageService = stageService;
             accMngtRepo = accMngt;
-            sysPartnerApiRepository = sysPartnerApiRepo;
         }
 
         #region -- INSERT & UPDATE --
