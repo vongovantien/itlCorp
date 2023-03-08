@@ -1678,7 +1678,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (string.IsNullOrEmpty(item.VatPartnerId))
                 {
-                    item.VatPartnerTaxCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_VAT_PARTER_CODE_NOT_EXIST]);
+                    item.VatPartnerTaxCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_VAT_PARTER_CODE_EMPTY]);
                     item.IsValid = false;
                 }
                 else

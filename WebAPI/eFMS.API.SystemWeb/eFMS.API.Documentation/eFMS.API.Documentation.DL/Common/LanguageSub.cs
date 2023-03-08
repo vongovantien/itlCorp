@@ -90,6 +90,7 @@
         public static readonly string MSG_MBLNO_NOT_EXIST = "MSG_MBLNO_NOT_EXIST";
         public static readonly string MSG_PARTER_CODE_NOT_EXIST = "MSG_PARTER_CODE_NOT_EXIST";
         public static readonly string MSG_VAT_PARTER_CODE_NOT_EXIST = "MSG_VAT_PARTER_CODE_NOT_EXIST";
+        public static readonly string MSG_VAT_PARTER_CODE_EMPTY = "MSG_VAT_PARTER_CODE_EMPTY";
         public static readonly string MSG_CHARGE_CODE_NOT_EXIST = "MSG_CHARGE_CODE_NOT_EXIST";
         public static readonly string MSG_UNIT_NOT_EXIST = "MSG_UNIT_NOT_EXIST";
         public static readonly string MSG_TYPE_NOT_VALID = "MSG_TYPE_NOT_VALID";
