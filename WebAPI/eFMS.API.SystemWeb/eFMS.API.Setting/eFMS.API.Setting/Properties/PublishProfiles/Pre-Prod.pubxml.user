@@ -7,6 +7,8 @@ by editing this MSBuild file. In order to learn more about this please visit htt
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
     <_PublishTargetUrl>\\192.168.0.120\inetpub\efms-api\Setting</_PublishTargetUrl>
+    <History>True|2022-12-26T07:53:22.7099336Z;True|2022-12-26T13:41:31.3722933+07:00;True|2022-12-26T12:06:42.0263779+07:00;True|2022-12-26T11:01:21.0554838+07:00;</History>
+    <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
     <File Include="appsettings.Dev.json">

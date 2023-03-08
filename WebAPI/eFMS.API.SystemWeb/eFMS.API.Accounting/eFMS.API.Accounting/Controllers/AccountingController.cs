@@ -25,6 +25,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using eFMS.API.Infrastructure.RabbitMQ;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -43,6 +44,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ISysImageService sysFileService;
         public IBackgroundTaskQueue _queue { get; }
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly IRabbitBus _busControl;
 
         public AccountingController(
             IStringLocalizer<LanguageSub> localizer,
@@ -52,7 +54,8 @@ namespace eFMS.API.Accounting.Controllers
             ICurrentUser currUser,
             ISysImageService SysImageService,
             IBackgroundTaskQueue queue, 
-            IServiceScopeFactory serviceScopeFactory
+            IServiceScopeFactory serviceScopeFactory,
+            IRabbitBus busControl
             )
         {
             stringLocalizer = localizer;
@@ -69,7 +72,23 @@ namespace eFMS.API.Accounting.Controllers
             sysFileService = SysImageService;
             _queue = queue;
             _serviceScopeFactory = serviceScopeFactory;
+            _busControl = busControl;
         }
+        [HttpPost("PublishRabbitFromAccounting")]
+        public async Task<IActionResult> PublishRabbitFromAccounting(string message)
+        {
+            var models = new List<ObjectReceivableModel> {
+                new ObjectReceivableModel
+                {
+                    Office = Guid.Parse("33facfe3-304e-4460-8705-a25f6292b11a"),
+                    PartnerId = "15f38925-f6ce-4ebb-bee6-c81ab09da4b8",
+                    Service = "CL"
+                }
+            };
+            await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, models);
+            return Ok(new { Messages = "Push Rabbit Success" });
+        }
+
         [HttpGet]
         public IActionResult Get()
         {
@@ -803,7 +822,8 @@ namespace eFMS.API.Accounting.Controllers
                         ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = ids };
                         if (!hs.Success)
                         {
-                            result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = ids };
+                            new LogHelper("eFMS_SYNC_LOG", hs.ToString() + " ");
+                            result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString(), Data = ids };
                             return BadRequest(result);
                         }
                         else
@@ -1003,7 +1023,8 @@ namespace eFMS.API.Accounting.Controllers
                         ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = ids };
                         if (!hs.Success)
                         {
-                            result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = ids };
+                            new LogHelper("eFMS_SYNC_LOG", result.ToString() + " ");
+                            result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString(), Data = ids };
                             return BadRequest(result);
                         }
                         else
@@ -1275,7 +1296,8 @@ namespace eFMS.API.Accounting.Controllers
                         ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = ids };
                         if (!hs.Success)
                         {
-                            result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = ids };
+                            new LogHelper("eFMS_SYNC_LOG", hs.ToString() + " ");
+                            result = new ResultHandle { Status = hs.Success, Message = hs.Message?.ToString(), Data = ids };
                             return BadRequest(result);
                         }
                         return Ok(result);

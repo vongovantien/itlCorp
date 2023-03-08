@@ -663,7 +663,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return new HandleState();
         }
 
-        public HandleState DeleteInvoice(InvoiceInfo model, string apiKey, out Guid Id)
+        public HandleState DeleteInvoice(InvoiceInfo model, string apiKey, out AccAccountingManagement invoice)
         {
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
@@ -674,7 +674,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.Action = "DeleteInvoice";
 
             var hsDeleteInvoice = DeleteInvoice(model, currentUser, out AccAccountingManagement data);
-            Id = data.Id;
+            invoice = data;
             return hsDeleteInvoice;
         }
 
@@ -844,12 +844,6 @@ namespace eFMS.API.ForPartner.DL.Service
                         var smDebitNote = acctCdNoteRepo.SubmitChanges();
                         var smSur = surchargeRepo.SubmitChanges();
                         var sm = DataContext.SubmitChanges();
-
-                        // Tính lại công nợ của hđ vừa hủy từ bravo.
-                        //if(sm.Success)
-                        //{
-                        //    CalculatorInvoiceReceivable(data);
-                        //}
 
                         trans.Commit();
                     }
@@ -2006,9 +2000,9 @@ namespace eFMS.API.ForPartner.DL.Service
                     var _id = Guid.Empty;
                     Guid.TryParse(id, out _id);
                     var receiptSync = receiptSyncRepository.Get(x => x.Id == _id).FirstOrDefault();
-                    if (receiptSync == null) return new HandleState((object)"Không tìm thấy phiếu thu");
+                    if (receiptSync == null) return new HandleState();
                     var receipt = receiptRepository.Get(x => x.Id == receiptSync.ReceiptId).FirstOrDefault();
-                    if (receipt == null) return new HandleState((object)"Không tìm thấy phiếu thu");
+                    if (receipt == null) return new HandleState();
 
                     receiptSync.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     receiptSync.UserModified = currentUser.UserID;

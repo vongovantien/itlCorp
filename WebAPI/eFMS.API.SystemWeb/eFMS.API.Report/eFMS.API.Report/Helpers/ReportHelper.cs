@@ -3,6 +3,7 @@ using eFMS.API.Common.Helpers;
 using eFMS.API.Report.DL.Common;
 using eFMS.API.Report.DL.Models;
 using eFMS.API.Report.FormatExcel;
+using eFMS.IdentityServer.DL.UserManager;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System;
@@ -40,7 +41,6 @@ namespace eFMS.API.Report.Helpers
             }
             catch (Exception ex)
             {
-                new LogHelper("ExportAccountingPlSheet", "" + ex.ToString());
             }
             return null;
         }
@@ -220,6 +220,7 @@ namespace eFMS.API.Report.Helpers
             }
             catch (Exception ex)
             {
+                new LogHelper("BindingDataAccountingPLSheetExportExcelError", ex.Message?.ToString());
                 return null;
             }
         }
@@ -1954,6 +1955,75 @@ namespace eFMS.API.Report.Helpers
                 return null;
             }
         }
+
+        /// <summary>
+        /// Generate file PL sheet report
+        /// </summary>
+        /// <param name="listData"></param>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        public Stream BindingDataEDocReport(List<EDocReportResult> listData, GeneralReportCriteria criteria)
+        {
+            try
+            {
+                var listResult = listData.GroupBy(x => x.realFileName).ToList().OrderBy(x=>x.FirstOrDefault().jobNo);
+                FileInfo f = new FileInfo(Path.Combine(ReportConstants.PathOfTemplateExcel, ReportConstants.Edoc_Report_Template));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                // Set logo company
+                //Image image = Image.FromFile(CrystalEx.GetLogoITL());
+                //excel.SetPicture(image, "Logo", 1, 1);
+                DateTime? _fromDate = criteria.CreatedDateFrom != null ? criteria.CreatedDateFrom : criteria.ServiceDateFrom;
+                DateTime? _toDate = criteria.CreatedDateTo != null ? criteria.CreatedDateTo : criteria.ServiceDateTo;
+                var listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("DateRange", "From: " + _fromDate.Value.ToString("dd MMM, yyyy") + " to: " + _toDate.Value.ToString("dd MMM, yyyy"));
+                excel.SetData(listKeyData);
+                int rowStart = 9;
+                int rowCount = 1;
+                excel.StartDetailTable = rowStart;
+                foreach (var result in listResult)
+                {
+                    var item = result.FirstOrDefault();
+                    listKeyData = new Dictionary<string, object>();
+                    excel.SetDataTable();
+                    listKeyData.Add("No", rowCount);
+                    listKeyData.Add("JobNo", item.jobNo);
+                    listKeyData.Add("CodeCus", item.codeCus);
+                    listKeyData.Add("TaxCode", item.taxCode);
+                    listKeyData.Add("Customer", item.customer);
+                    listKeyData.Add("MBL", item.MBL);
+                    listKeyData.Add("HBL", item.HBL);
+                    listKeyData.Add("CustomNo", item.customNo);
+                    listKeyData.Add("CreateDate", item.createDate?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("Creator", item.creator);
+                    listKeyData.Add("AliasName", item.aliasName);
+                    listKeyData.Add("RealFileName", item.realFileName);
+                    listKeyData.Add("DocType", item.documentType);
+                    listKeyData.Add("Require", item.require);
+                    listKeyData.Add("AttachTime", item.attachTime?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("AttachPerson", item.attachPerson);
+                    excel.SetData(listKeyData);
+                    rowStart++;
+                    rowCount++;
+                }
+
+                listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("UserExport", "Print date: " + DateTime.Now.ToString("dd MMM, yyyy HH:ss tt") + ", by: " + listData.FirstOrDefault()?.userExport);
+                excel.SetData(listKeyData);
+
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                new LogHelper("BindingDataEdocExportExcelError", ex.Message?.ToString());
+                return null;
+            }
+        }
+
 
         public Stream BidingGeneralLCLExport(IQueryable<GeneralExportShipmentOverviewFCLResult> data, GeneralReportCriteria criteria, string fileName)
         {

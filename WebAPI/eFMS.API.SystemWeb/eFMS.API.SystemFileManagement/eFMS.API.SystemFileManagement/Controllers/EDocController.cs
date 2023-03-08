@@ -16,6 +16,7 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.Controllers
@@ -192,6 +193,12 @@ namespace eFMS.API.SystemFileManagement.Controllers
                 return Ok(new ResultHandle { Message = "Not found file", Status = false });
             }
             return BadRequest(hs);
+        }
+        [HttpGet("CheckAllowSettleEdocSendRequest")]
+        public async Task<IActionResult> CheckAllowSettleEdocSendRequest(Guid billingId)
+        {
+            var result = _edocService.CheckAllowSettleEdocSendRequest(billingId);
+            return Ok(result);
         }
     }
 }

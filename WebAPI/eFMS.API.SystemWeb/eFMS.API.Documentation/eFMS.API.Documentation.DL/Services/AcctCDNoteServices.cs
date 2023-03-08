@@ -2944,7 +2944,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 soaQuery = soaQuery.Where(x => x.DatetimeCreated.Value.Date >= criteria.FromExportDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToExportDate.Value.Date);
             }
-            var charges = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)) && (string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)));// lấy surcharge chỉ issued soa
+            var charges = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano))&& (string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)));// lấy surcharge chỉ issued soa
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
@@ -2993,8 +2993,7 @@ namespace eFMS.API.Documentation.DL.Services
                           from tranDs in tranDsGrp.DefaultIfEmpty()
                           join ops in opstransactionData on chg.JobNo equals ops.JobNo into opsGrp
                           from ops in opsGrp.DefaultIfEmpty()
-                          join acc in accMangData on chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId equals acc.Id into accGrp
-                          from acc in accGrp.DefaultIfEmpty()
+                          join acc in accMangData on chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId equals acc.Id 
                           select new InvoiceListModel
                           {
                               Id = soa.Id,
@@ -3036,8 +3035,7 @@ namespace eFMS.API.Documentation.DL.Services
                              from tranDs in tranDsGrp.DefaultIfEmpty()
                              join ops in opstransactionData on chg.JobNo equals ops.JobNo into opsGrp
                              from ops in opsGrp.DefaultIfEmpty()
-                             join acc in accMangData on chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId equals acc.Id into accGrp
-                             from acc in accGrp.DefaultIfEmpty()
+                             join acc in accMangData on (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) equals acc.Id 
                              select new InvoiceListModel
                              {
                                  Id = soa.Id,
@@ -3148,8 +3146,9 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
-                var surchargesCdNote = charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.DebitNo)).Select(s => s.DebitNo).ToList();
-                surchargesCdNote.AddRange(charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.CreditNo)).Select(s => s.CreditNo).ToList());
+                var surchargesCdNote = charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno || a == x.Soano) && !string.IsNullOrEmpty(x.DebitNo)).Select(s => s.DebitNo).ToList();
+                surchargesCdNote.AddRange(charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno || a == x.PaySoano) && !string.IsNullOrEmpty(x.CreditNo)).Select(s => s.CreditNo).ToList());
+
                 if (surchargesCdNote.Count > 0)
                 {
                     query = query.And(x => refNos.Any(a => a == x.Code) || surchargesCdNote.Any(a => a == x.Code));
@@ -3208,7 +3207,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  Status = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) != null ? "Issued" : "New",
                                  InvoiceNo = chg.InvoiceNo,
                                  VoucherId = chg.VoucherId,
-                                 IssuedStatus = (!string.IsNullOrEmpty(chg.InvoiceNo) && chg.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(chg.VoucherId) && (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) != null) ? "Issued Voucher" : "New",
+                                 IssuedStatus = cdNote.Status=="Issued Voucher" ? cdNote.Status : (!string.IsNullOrEmpty(chg.InvoiceNo) && chg.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(chg.VoucherId) && (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) != null) ? "Issued Voucher" : "New",
                                  SyncStatus = cdNote.SyncStatus,
                                  LastSyncDate = cdNote.LastSyncDate,
                                  DatetimeModified = cdNote.DatetimeModified,
@@ -3249,7 +3248,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 Status = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) != null ? "Issued" : "New",
                                 InvoiceNo = chg.InvoiceNo,
                                 VoucherId = chg.VoucherId,
-                                IssuedStatus = (!string.IsNullOrEmpty(chg.InvoiceNo) && chg.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(chg.VoucherId) && (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) != null) ? "Issued Voucher" : "New",
+                                IssuedStatus = (!string.IsNullOrEmpty(chg.InvoiceNo) && chg.AcctManagementId != null) ? "Issued Invoice" : "New",
                                 SyncStatus = cdNote.SyncStatus,
                                 LastSyncDate = cdNote.LastSyncDate,
                                 DatetimeModified = cdNote.DatetimeModified,
