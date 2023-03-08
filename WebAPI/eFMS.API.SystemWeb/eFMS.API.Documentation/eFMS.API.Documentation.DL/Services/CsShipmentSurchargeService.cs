@@ -1676,18 +1676,10 @@ namespace eFMS.API.Documentation.DL.Services
                     item.VatError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_VAT_EMPTY]);
                     item.IsValid = false;
                 }
-                if (string.IsNullOrEmpty(item.VatPartnerId))
+                if (!string.IsNullOrEmpty(item.VatPartnerId) && !partnerRepository.Any(x => x.TaxCode == item.VatPartnerId))
                 {
-                    item.VatPartnerTaxCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_VAT_PARTER_CODE_EMPTY]);
+                    item.VatPartnerTaxCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_VAT_PARTER_CODE_NOT_EXIST], item.VatPartnerId);
                     item.IsValid = false;
-                }
-                else
-                {
-                    if (!partnerRepository.Any(x => x.TaxCode == item.VatPartnerId))
-                    {
-                        item.VatPartnerTaxCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_VAT_PARTER_CODE_NOT_EXIST], item.VatPartnerId);
-                        item.IsValid = false;
-                    }
                 }
                 //if (!item.TotalAmount.HasValue)
                 //{
