@@ -603,7 +603,7 @@ namespace eFMS.API.Documentation.Controllers
                 List<CsShipmentSurchargeImportModel> list = new List<CsShipmentSurchargeImportModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
-                    string ExchangeDate = worksheet.Cells[row, 12].Value?.ToString().Trim();
+                    string ExchangeDate = worksheet.Cells[row, 13].Value?.ToString().Trim();
                     DateTime? dateToPase = null;
                     if (DateTime.TryParse(ExchangeDate, out temp))
                     {
@@ -619,7 +619,7 @@ namespace eFMS.API.Documentation.Controllers
                         }
                     }
 
-                    string InvoiceDate = worksheet.Cells[row, 15].Value?.ToString().Trim();
+                    string InvoiceDate = worksheet.Cells[row, 16].Value?.ToString().Trim();
                     DateTime? dateToPaseInvoice = null;
 
                     if (!string.IsNullOrEmpty(InvoiceDate))
@@ -640,9 +640,9 @@ namespace eFMS.API.Documentation.Controllers
                     }
               
                     double? UnitPrice = worksheet.Cells[row, 9].Value != null ? (double?)worksheet.Cells[row, 9].Value : (double?)null;
-                    double? Vatrate = worksheet.Cells[row, 11].Value != null ? (double?)worksheet.Cells[row, 11].Value : (double?)null;
+                    double? Vatrate = worksheet.Cells[row, 12].Value != null ? (double?)worksheet.Cells[row, 12].Value : (double?)null;
                     //double? TotalAmount = worksheet.Cells[row, 11].Value != null ? (double?)worksheet.Cells[row, 11].Value : (double?)null;
-                    double? FinalExchangeRate = worksheet.Cells[row, 13].Value != null ? (double?)worksheet.Cells[row, 13].Value : (double?)null;
+                    double? FinalExchangeRate = worksheet.Cells[row, 14].Value != null ? (double?)worksheet.Cells[row, 14].Value : (double?)null;
                     var surcharge = new CsShipmentSurchargeImportModel
                     {
                         IsValid = true,
@@ -656,15 +656,16 @@ namespace eFMS.API.Documentation.Controllers
                         Unit = worksheet.Cells[row, 8].Value?.ToString().Trim(),
                         UnitPrice = (decimal?)UnitPrice,
                         CurrencyId = worksheet.Cells[row, 10].Value?.ToString().Trim(),
+                        VatPartnerId = worksheet.Cells[row,11].Value?.ToString().Trim(),
                         Vatrate = (decimal?)Vatrate,
                         //TotalAmount = (decimal?)TotalAmount,
                         ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
                         FinalExchangeRate = (decimal?)FinalExchangeRate, 
-                        InvoiceNo = worksheet.Cells[row, 14].Value?.ToString().Trim(),
+                        InvoiceNo = worksheet.Cells[row, 15].Value?.ToString().Trim(),
                         InvoiceDate = !string.IsNullOrEmpty(InvoiceDate) ? dateToPaseInvoice : (DateTime?)null,
-                        SeriesNo = worksheet.Cells[row, 16].Value?.ToString().Trim(),
-                        Type = worksheet.Cells[row, 17].Value?.ToString().Trim(),
-                        Notes = worksheet.Cells[row, 18].Value?.ToString().Trim(),
+                        SeriesNo = worksheet.Cells[row, 17].Value?.ToString().Trim(),
+                        Type = worksheet.Cells[row, 18].Value?.ToString().Trim(),
+                        Notes = worksheet.Cells[row, 19].Value?.ToString().Trim(),
                     };
                     list.Add(surcharge);
                 }
