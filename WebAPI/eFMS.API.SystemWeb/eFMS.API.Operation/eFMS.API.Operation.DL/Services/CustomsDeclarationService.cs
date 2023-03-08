@@ -399,9 +399,9 @@ namespace eFMS.API.Operation.DL.Services
                     if (currentUser.OfficeID.ToString().ToLower().Equals(item.Id.ToString().ToLower()))
                     {
                         data = data.Where(x => x.JobNo == null && x.Source == "Replicate");
-                    }
-                }
-                data = data.Where(x => x.JobNo == null && x.Source == "eFMS");
+                    }    
+                }    
+                data = data.Where(x => x.JobNo == null && x.Source != "Replicate");
             }
             rowsCount = data.Count();
             if (rowsCount == 0) return returnList;
