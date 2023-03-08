@@ -41,7 +41,6 @@ namespace eFMS.API.Documentation.DL.Services
             placeRepository = placeRepo;
             partnerRepository = partnerRepo;
             _trackingApi = trackingApi;
-
         }
 
         public async Task<TrackingShipmentViewModel> TrackShipmentProgress(TrackingShipmentCriteria criteria)
@@ -54,11 +53,6 @@ namespace eFMS.API.Documentation.DL.Services
                 DateTime lastEvent = DateTime.Now;
                 var lstTrackInfo = new List<SysTrackInfo>();
                 var trackShipment = new TrackingShipmentViewModel();
-
-                CsTransactionDetail hbl = await transactionDetailRepository.Where(x =>
-                        (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb == criteria.Mawb.Trim()) ||
-                        (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno == criteria.Hawb.Trim())).FirstOrDefaultAsync();
-
 
                 CsTransactionDetail hbl = await transactionRepository.Get()
                         .Join(transactionDetailRepository.Get(), trans => trans.Mawb, transDetail => transDetail.Mawb, (trans, transDetail) => new { trans, transDetail })
@@ -77,6 +71,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var payload = new TrackingMoreRequestModel { AwbNumber = shipmentExisted.Mawb };
                         List<KeyValuePair<string, string>> headers = new List<KeyValuePair<string, string>>();
                         headers.Add(new KeyValuePair<string, string>("Tracking-Api-Key", partnerApi.ApiKey));
+
                         HttpResponseMessage request = await HttpClientService.PostAPI(baseUrl, payload, null, headers);
                         if (!request.IsSuccessStatusCode)
                         {
