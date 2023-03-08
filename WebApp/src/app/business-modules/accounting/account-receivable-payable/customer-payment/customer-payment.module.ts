@@ -30,9 +30,9 @@ const routing: Routes = [
     {
         path: '', data: { name: '' }, children: [
             { path: '', component: ARCustomerPaymentComponent },
-            { path: 'receipt/combine/new', component: ARCustomerPaymentCreateReciptCombineComponent, data: { type: 'new' } },
-            { path: 'receipt/combine/existing', component: ARCustomerPaymentCreateReciptCombineComponent, data: { type: 'EXISTING', name: 'Receipt Combine' }, },
-            { path: 'receipt/:type/new', component: ARCustomerPaymentCreateReciptComponent, data: { type: 'NEW', name: 'Receipt Combine' } },
+            { path: 'receipt/:type/new', component: ARCustomerPaymentCreateReciptComponent, data: { name: 'New' } },
+            { path: 'receipt/:id', component: ARCustomerPaymentDetailReceiptComponent },
+            { path: 'receipt/combine/new-combine', component: ARCustomerPaymentCreateReciptCombineComponent, data: { type: 'new' } },
         ]
     },
 
