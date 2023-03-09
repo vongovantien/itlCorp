@@ -12,6 +12,7 @@ import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { UpdateListEDoc, getUpdateListEDoc } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { UpdateListEdocSettle } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../../store';
 import { IEDocFile, IEDocUploadFile, ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
@@ -45,6 +46,7 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
     elementInput: HTMLElement = null;
     isEdocByJob: boolean = false;
     docTypeId: number = 0;
+    haveAdv: boolean = false;
 
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
@@ -174,6 +176,17 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
                     this.currentUser = res;
                 }
             )
+        this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
+            takeUntil(this.ngUnsubscribe)
+        )
+            .subscribe(
+                (data) => {
+                    if (!!data) {
+                        this.haveAdv = data.some(x => x.advanceNo !== null);
+                    }
+                }
+            );
+
         this.getHblList();
     }
 

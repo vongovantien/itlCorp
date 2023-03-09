@@ -161,10 +161,12 @@
                                             <a class="dropdown-item pointer" (click)="genFileToSM('SOA')">
                                                 <span>Get Files SOA</span>
                                             </a>
-                                            <a class="dropdown-item pointer" (click)="genFileToSM('MBL')">
+                                            <a class="dropdown-item pointer" *ngIf="!haveAdv"
+                                                (click)="genFileToSM('MBL')">
                                                 <span>Get Files MasterBill</span>
                                             </a>
-                                            <a class="dropdown-item pointer" (click)="genFileToSM('HBL')">
+                                            <a class="dropdown-item pointer" *ngIf="!haveAdv"
+                                                (click)="genFileToSM('HBL')">
                                                 <span>Get Files HouseBill</span>
                                             </a>
                                             <a class="dropdown-item pointer" (click)="genFileToSM('INV')">
