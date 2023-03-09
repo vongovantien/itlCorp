@@ -115,6 +115,7 @@
     height: 100px;
     background-color: #34BFA3;
 }
+
 .track-router {
     box-sizing: border-box;
     border-radius: 50%;
@@ -125,6 +126,7 @@
     top: -2;
     z-index: 1;
 }
+
 .track-router-start {
     background: #FFFFFF;
     border: 3px solid #3966B6;
@@ -132,4 +134,39 @@
 
 .track-progress-router {
     background: #3966B6;
+}
+
+.btn-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+
+    padding: 3px 30px;
+    border-radius: 8px;
+    min-width: 80px;
+}
+
+.btn-icon {
+    width: 25px;
+    height: 25px;
+    display: inline-block !important;
+
+    &-fly {
+        background: url("../../assets/icons/fly.png");
+        background-position: center;
+        background-size: cover;
+    }
+
+    &-sea {
+        background: url("../../assets/icons/ship.png");
+        background-position: center;
+        background-size: cover;
+    }
+
+    &-track {
+        background: url("../../assets/icons/routing.png");
+        background-position: center;
+        background-size: cover;
+    }
+
 }
