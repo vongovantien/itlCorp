@@ -46,7 +46,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             if (!shipmentTrackingService.CheckExistShipment(model))
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_NOT_EXIST].Value });
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_NOT_EXIST].Value });
             }
 
             var data = await shipmentTrackingService.TrackShipmentProgress(model);
