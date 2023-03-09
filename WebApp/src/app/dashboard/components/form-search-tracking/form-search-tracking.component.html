@@ -26,21 +26,21 @@
             </form>
             <div class="d-flex col-md-auto mt-4">
                 <button type="button"
-                    class="btn {{typeShipment === 'AIR' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase m--margin-right-10 btn--tracking__icon"
+                    class="btn {{typeShipment === 'AIR' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase m--margin-right-10 btn-container"
                     (click)="onSetTypeShipment('AIR');onShowLoading(true)">
                     <span>
                         <img src="assets/icons/fly.png" alt="icon" width="25px">
                     </span>
                 </button>
                 <button disabled type="button"
-                    class="btn {{typeShipment === 'SEA' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase btn--tracking__icon"
+                    class="btn {{typeShipment === 'SEA' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase btn-container"
                     (click)="onSetTypeShipment('SEA'); onShowLoading(true)">
                     <span>
                         <img src="assets/icons/ship.png" alt="icon" width="25px">
                     </span>
                 </button>
                 <div class="ml-auto">
-                    <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase btn--tracking__icon"
+                    <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase btn-container"
                         (click)="onSearchValue()">
                         <img src="assets/icons/routing.png" alt="icon" width="25px">
                         Track
