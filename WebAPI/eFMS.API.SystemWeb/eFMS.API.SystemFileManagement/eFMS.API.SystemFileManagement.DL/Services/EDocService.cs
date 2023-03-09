@@ -912,7 +912,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         //}
 
 
-        public async Task<HandleState> DeleteEdoc(Guid edocId)
+        public async Task<HandleState> DeleteEdoc(Guid edocId, Guid jobId)
         {
             HandleState result = new HandleState();
             try
