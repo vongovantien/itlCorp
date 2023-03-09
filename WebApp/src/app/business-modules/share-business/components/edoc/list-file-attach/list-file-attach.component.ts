@@ -42,14 +42,19 @@ export class ShareListFilesAttachComponent extends AppShareEDocBase implements O
                     this.currentUser = res;
                 }
             )
-        this._store.select(getEdocLoadingState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res) => {
-                    this.getEDoc(this.transactionType);
-                    this._store.dispatch(UpdateListEdocSettle({ data: false }))
-                }
-            )
+        if (this.transactionType === "Settlement") {
+            this._store.select(getEdocLoadingState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res) => {
+                        this.getEDoc(this.transactionType);
+                        this._store.dispatch(UpdateListEdocSettle({ data: false }))
+                    }
+                )
+        } else {
+            this.getEDoc(this.transactionType);
+        }
+
     }
 
     onSelectEDoc(edoc: any) {
