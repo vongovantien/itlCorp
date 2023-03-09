@@ -375,54 +375,54 @@ namespace eFMS.API.Catalogue.DL.Services
         private string GetContractServicesName(string ContractService)
         {
             string ContractServicesName = string.Empty;
-            var ContractServiceArr = ContractService.Split(";").ToArray();
-            if (ContractServiceArr.Any())
-            {
-                foreach (var item in ContractServiceArr)
-                {
-                    switch (item)
-                    {
-                        case "AE":
-                            ContractServicesName += "AE; ";
-                            break;
-                        case "AI":
-                            ContractServicesName += "AI; ";
-                            break;
-                        case "SCE":
-                            ContractServicesName += "SCE; ";
-                            break;
-                        case "SCI":
-                            ContractServicesName += "SCI; ";
-                            break;
-                        case "SFE":
-                            ContractServicesName += "SFE; ";
-                            break;
-                        case "SLE":
-                            ContractServicesName += "SLE; ";
-                            break;
-                        case "SLI":
-                            ContractServicesName += "SLI; ";
-                            break;
-                        case "CL":
-                            ContractServicesName += "CL; ";
-                            break;
-                        case "IT":
-                            ContractServicesName += "IT; ";
-                            break;
-                        case "SFI":
-                            ContractServicesName += "SFI; ";
-                            break;
-                        default:
-                            ContractServicesName = "AE; AI; SCE; SCI; SFE; SLE; SLI; CL; IT  ";
-                            break;
-                    }
-                }
+            ContractServicesName = ContractService.Replace(";", "; ");
+            //var ContractServiceArr = ContractService.Split(";").ToArray();
 
-            }
-            if (!string.IsNullOrEmpty(ContractServicesName))
-            {
-                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
-            }
+            //    foreach (var item in ContractServiceArr)
+            //    {
+            //        switch (item)
+            //        {
+            //            case "AE":
+            //                ContractServicesName += "AE; ";
+            //                break;
+            //            case "AI":
+            //                ContractServicesName += "AI; ";
+            //                break;
+            //            case "SCE":
+            //                ContractServicesName += "SCE; ";
+            //                break;
+            //            case "SCI":
+            //                ContractServicesName += "SCI; ";
+            //                break;
+            //            case "SFE":
+            //                ContractServicesName += "SFE; ";
+            //                break;
+            //            case "SLE":
+            //                ContractServicesName += "SLE; ";
+            //                break;
+            //            case "SLI":
+            //                ContractServicesName += "SLI; ";
+            //                break;
+            //            case "CL":
+            //                ContractServicesName += "CL; ";
+            //                break;
+            //            case "IT":
+            //                ContractServicesName += "IT; ";
+            //                break;
+            //            case "SFI":
+            //                ContractServicesName += "SFI; ";
+            //                break;
+            //            default:
+            //                ContractServicesName = "AE; AI; SCE; SCI; SFE; SLE; SLI; CL; IT  ";
+            //                break;
+            //        }
+            //    }
+
+            //}
+            //if (!string.IsNullOrEmpty(ContractServicesName))
+            //{
+            //    ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
+            //}
             return ContractServicesName;
         }
 
