@@ -303,4 +303,28 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
                 },
             );
     }
+    exportAgencyTemplate() {
+        if (this.dataSearch.partnerId == null ) {
+            return this._toastService.warning('Please select partner!');
+        }
+        if (this.dataSearch.fromExportDate == null){
+            return this._toastService.warning('Please select Issue Date!');
+        }
+        this._progressRef.start();
+        this._exportRepo.exportAgencyTemplate(this.dataSearch)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: HttpResponse<any>) => {
+                    if (response != null && response.body != null) {
+                        this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    } else {
+                        this._toastService.error('There is no data to export!');
+                    }
+                },
+            );
+    }
+
 }
