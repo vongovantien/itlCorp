@@ -91,8 +91,8 @@ export class SystemFileManageRepo {
         );
     }
 
-    deleteEdoc(edocId: string) {
-        return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/DeleteEDoc/${edocId}`).pipe(
+    deleteEdoc(edocId: string, jobId: string) {
+        return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/DeleteEDoc/${edocId}/${jobId}`).pipe(
             map((data: any) => data)
         );
     }

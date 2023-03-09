@@ -55,10 +55,10 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentFilePopup: SettlementShipmentAttachFilePopupComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
-    @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>;
-    @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
+    @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>
 
     groupShipments: ISettlementShipmentGroup[] = [];
     headers: CommonInterface.IHeaderTable[];
@@ -749,10 +749,9 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 }
             })
         this.documentAttach.jobNo = data.jobId;
+        this.documentAttach.jobId = data.shipmentId;
         this._store.dispatch(UpdateListEdocSettle({ data: true }));
         this.documentAttach.show();
-        console.log(data);
-
     }
 
     onChangeShipmentGroupAttachFile(files: SysImage[]) {

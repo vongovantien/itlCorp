@@ -31,7 +31,7 @@ export class ShareListFilesAttachComponent extends AppShareEDocBase implements O
         protected readonly _sortService: SortService,
         protected _documentationRepo: DocumentationRepo,
     ) {
-        super(_toast, _systemFileRepo, _exportRepo);
+        super(_toast, _systemFileRepo, _exportRepo, _store);
     }
 
     ngOnInit(): void {

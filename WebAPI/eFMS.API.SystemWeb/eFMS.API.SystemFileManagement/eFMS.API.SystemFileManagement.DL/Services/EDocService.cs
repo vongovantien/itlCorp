@@ -849,47 +849,88 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return _sysImageDetailRepo.Any(x => x.GenEdocId == genId);
         }
 
-        public async Task<HandleState> DeleteEdoc(Guid edocId)
+        public async Task<HandleState> DeleteEdoc(Guid edocId,Guid jobId)
         {
             HandleState result = new HandleState();
             try
             {
                 var edoc = _sysImageDetailRepo.Get(x => x.Id == edocId).FirstOrDefault();
-                if (edoc == null)
+                if (jobId==Guid.Empty)
                 {
-                    var imageOther = _sysImageRepo.Get(x => x.Id == edocId).FirstOrDefault();
-                    if (imageOther != null)
+                    if (edoc == null)
                     {
-                        var rsDelete = deleteFile(imageOther.KeyS3);
-                        if (rsDelete != null)
+                        var imageOther = _sysImageRepo.Get(x => x.Id == edocId).FirstOrDefault();
+                        if (imageOther != null)
                         {
-                            result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
+                            var rsDelete = deleteFile(imageOther.KeyS3);
+                            if (rsDelete != null)
+                            {
+                                result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
+                            }
                         }
                     }
-                }
-                if (edoc != null)
-                {
-                    if (edoc.Source == "Shipment")
+                    if (edoc != null)
                     {
-                        if (checkHaveGenEdoc(edocId))
+                        if (edoc.Source == "Shipment")
+                        {
+                            if (checkHaveGenEdoc(edocId))
+                            {
+                                await _sysImageDetailRepo.DeleteAsync(x => x.Id == edoc.Id);
+                                await _sysImageDetailRepo.DeleteAsync(x => x.GenEdocId == edoc.Id);
+                                var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+                                var rsDelete = deleteFile(image.KeyS3);
+                                if (rsDelete != null)
+                                    if (edoc.Id != Guid.Empty)
+                                    {
+                                        result = await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
+                                    }
+                                    else
+                                    {
+                                        result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
+                                    }
+                            }
+                            else
+                            {
+                                var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+                                var rsDelete = deleteFile(image.KeyS3);
+                                if (rsDelete != null)
+                                    if (edoc.Id != Guid.Empty)
+                                    {
+                                        result = await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
+                                    }
+                                    else
+                                    {
+                                        result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
+                                    }
+                                if (result.Success && edoc.Id != Guid.Empty)
+                                {
+                                    await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocId);
+                                }
+                            }
+
+                        }
+                        else if (edoc.GenEdocId != null)
                         {
                             await _sysImageDetailRepo.DeleteAsync(x => x.Id == edoc.Id);
-                            await _sysImageDetailRepo.DeleteAsync(x => x.GenEdocId == edoc.Id);
-                            var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                            var rsDelete = deleteFile(image.KeyS3);
-                            if (rsDelete != null)
-                                if (edoc.Id != Guid.Empty)
+                            var edocExist = _sysImageDetailRepo.Get(x => x.SysImageId == edoc.SysImageId).FirstOrDefault();
+                            if (edocExist == null)
+                            {
+                                var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+                                if (image != null)
                                 {
-                                    result = await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
+                                    var rsDelete = deleteFile(image.KeyS3);
+                                    if (rsDelete != null)
+                                    {
+                                        result = await _sysImageRepo.DeleteAsync(x => x.Id == image.Id);
+                                    }
                                 }
-                                else
-                                {
-                                    result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
-                                }
+                            }
                         }
                         else
                         {
                             var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+                            var edocShipment = _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).ToList();
+                            var edocIds = edocShipment.Select(x => x.Id);
                             var rsDelete = deleteFile(image.KeyS3);
                             if (rsDelete != null)
                                 if (edoc.Id != Guid.Empty)
@@ -902,48 +943,23 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 }
                             if (result.Success && edoc.Id != Guid.Empty)
                             {
-                                await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocId);
+                                await _sysImageDetailRepo.DeleteAsync(x => edocIds.Contains(x.Id));
                             }
                         }
-
                     }
-                    else if (edoc.GenEdocId != null)
+                }
+                else
+                {
+                    var edocExist = _sysImageDetailRepo.Get(x => x.SysImageId == edoc.SysImageId).ToList();
+                    if(edocExist != null)
                     {
-                        await _sysImageDetailRepo.DeleteAsync(x => x.Id == edoc.Id);
-                        var edocExist = _sysImageDetailRepo.Get(x => x.SysImageId == edoc.SysImageId).FirstOrDefault();
-                        if (edocExist == null)
+                        if (edocExist.Count == 1)
                         {
-                            var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                            if (image != null)
-                            {
-                                var rsDelete = deleteFile(image.KeyS3);
-                                if (rsDelete != null)
-                                {
-                                    result = await _sysImageRepo.DeleteAsync(x => x.Id == image.Id);
-                                }
-                            }
+                            await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
                         }
                     }
-                    else
-                    {
-                        var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                        var edocShipment = _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).ToList();
-                        var edocIds = edocShipment.Select(x => x.Id);
-                        var rsDelete = deleteFile(image.KeyS3);
-                        if (rsDelete != null)
-                            if (edoc.Id != Guid.Empty)
-                            {
-                                result = await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
-                            }
-                            else
-                            {
-                                result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
-                            }
-                        if (result.Success && edoc.Id != Guid.Empty)
-                        {
-                            await _sysImageDetailRepo.DeleteAsync(x => edocIds.Contains(x.Id));
-                        }
-                    }
+                    var edocDelId = edocExist.Where(x => x.JobId == jobId).FirstOrDefault().Id;
+                    result = await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocDelId);
                 }
                 return result;
             }

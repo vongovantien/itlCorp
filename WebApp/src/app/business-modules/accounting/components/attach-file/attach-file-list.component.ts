@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output
 import { ActivatedRoute, Params } from '@angular/router';
 import { AppForm } from '@app';
 import { ConfirmPopupComponent } from '@common';
+import { SystemConstants } from '@constants';
 import { InjectViewContainerRefDirective } from '@directives';
 import { SysImage } from '@models';
 import { SystemFileManageRepo } from '@repositories';
@@ -122,7 +123,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
     }
 
     onDeleteFile(id: string) {
-        this._fileRepo.deleteEdoc(id)
+        this._fileRepo.deleteEdoc(id, SystemConstants.EMPTY_GUID)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
