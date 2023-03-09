@@ -44,7 +44,7 @@ export class DashboardComponent extends AppPage implements OnInit {
         this.initBasicData();
         // * Search autocomplete shipment.
         this.term$.pipe(
-            filter(x=>x.length>=2),
+            filter(x => x.length >= 2),
             distinctUntilChanged(),
             this.autocomplete(500, ((keyword: string = '') => {
                 if (!!keyword) {
@@ -71,19 +71,19 @@ export class DashboardComponent extends AppPage implements OnInit {
     }
 
     initBasicData() {
-        this.headersShipment= [
-                { title: 'Job ID', field: 'jobNo' },
-                { title: 'MBL No', field: 'mblNo' },
-                { title: 'HBL No', field: 'hwbNo' },
-                { title: 'Service', field: 'productService' },
-                { title: 'Shipper', field: 'shipper' },
-                { title: 'Consignee', field: 'consignee' },
-                { title: 'Person In Charge', field: 'personInCharge' },
-                { title: 'Sales Man', field: 'saleMan' },
-                { title: 'Service Date', field: 'serviceDate' },
-                { title: 'Create Date', field: 'datetimeCreated' },
-                { title: 'Modified Date', field: 'datetimeModified' },
-            ];
+        this.headersShipment = [
+            { title: 'Job ID', field: 'jobNo' },
+            { title: 'MBL No', field: 'mblNo' },
+            { title: 'HBL No', field: 'hwbNo' },
+            { title: 'Service', field: 'productService' },
+            { title: 'Shipper', field: 'shipper' },
+            { title: 'Consignee', field: 'consignee' },
+            { title: 'Person In Charge', field: 'personInCharge' },
+            { title: 'Sales Man', field: 'saleMan' },
+            { title: 'Service Date', field: 'serviceDate' },
+            { title: 'Create Date', field: 'datetimeCreated' },
+            { title: 'Modified Date', field: 'datetimeModified' },
+        ];
 
     }
 
@@ -96,7 +96,7 @@ export class DashboardComponent extends AppPage implements OnInit {
             case 'shipment':
                 this._isShowAutoComplete.next(false);
                 this.selectedShipment = new Shipment(data);
-                this.checkPermission(data.service,data.id,data.productService);
+                this.checkPermission(data.service, data.id, data.productService);
                 break;
             default:
                 break;
@@ -207,11 +207,16 @@ export class DashboardComponent extends AppPage implements OnInit {
 
     getValueSearch(obj: any) {
         console.log(obj)
-        this.trackShipmentProgress(obj)
+        this.onShipmentTracking(obj)
     }
 
-    onChangeLoading(event){
+    onChangeLoading(event) {
         this.isSubmitted = event;
+    }
+
+    onShipmentTracking(obj: any) {
+        this.isLoading = true
+        this.trackShipmentProgress(obj)
     }
 
     trackShipmentProgress(obj: any) {
@@ -220,8 +225,11 @@ export class DashboardComponent extends AppPage implements OnInit {
                 (res: IShipmentTracking) => {
                     this.shipmentTracking = res;
                     this.isSubmitted = false;
+                    this.isLoading = false;
                 }, (error: any) => {
+                    console.log(error)
                     this.isSubmitted = true;
+                    this.isLoading = false;
                 });
     }
 

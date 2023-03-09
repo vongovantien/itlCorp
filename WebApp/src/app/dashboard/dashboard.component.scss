@@ -115,6 +115,7 @@
     height: 100px;
     background-color: #34BFA3;
 }
+
 .track-router {
     box-sizing: border-box;
     border-radius: 50%;
@@ -125,6 +126,7 @@
     top: -2;
     z-index: 1;
 }
+
 .track-router-start {
     background: #FFFFFF;
     border: 3px solid #3966B6;
@@ -132,4 +134,22 @@
 
 .track-progress-router {
     background: #3966B6;
+}
+
+.loader-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+    background-color: #3966b6 ;
+    opacity: 0.4;
+}
+
+.loader-container img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
