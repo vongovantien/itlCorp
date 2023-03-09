@@ -3,9 +3,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewCh
 import { ReportPreviewComponent } from '@common';
 import { SysImage } from '@models';
 import { Store } from '@ngrx/store';
-import { takeUntil } from 'rxjs/operators';
 import { AppPage } from 'src/app/app.base';
-import { ISettlementPaymentState, getEdocLoadingState } from '../store';
+import { ISettlementPaymentState } from '../store';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
 @Component({
@@ -47,14 +46,6 @@ export class SettlementShipmentItemComponent extends AppPage {
     }
 
     ngOnInit() {
-        this._store.select(getEdocLoadingState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res) => {
-                    console.log(res);
-                    //this._store.dispatch(UpdateListEdocSettle({ reload: false, count: 0 }))
-                }
-            )
     }
 
     showPaymentManagement($event: Event): any {
