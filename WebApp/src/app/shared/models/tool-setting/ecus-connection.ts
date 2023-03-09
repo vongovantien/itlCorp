@@ -27,7 +27,6 @@ export class EcusConnection {
     departmentId: number = null;
     groupId: number = null;
 
-
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
