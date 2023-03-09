@@ -136,7 +136,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 2);
                     }
                 }
-                saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
+                saleman.SaleServiceName = saleman.SaleService.Replace(";", "; ");
                 saleman.Username = item.user.Username;
                 saleman.CreatorCompanyId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.CompanyId == currentUser.CompanyID).Select(t => t.CompanyId).FirstOrDefault();
                 saleman.CreatorOfficeId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.OfficeId == currentUser.OfficeID).Select(t => t.OfficeId).FirstOrDefault();
@@ -375,54 +375,54 @@ namespace eFMS.API.Catalogue.DL.Services
         private string GetContractServicesName(string ContractService)
         {
             string ContractServicesName = string.Empty;
-            ContractServicesName = ContractService.Replace(";", "; ");
-            //var ContractServiceArr = ContractService.Split(";").ToArray();
+            var ContractServiceArr = ContractService.Split(";").ToArray();
+            if (ContractServiceArr.Any())
+            {
+                foreach (var item in ContractServiceArr)
+                {
+                    switch (item)
+                    {
+                        case "AE":
+                            ContractServicesName += "Air Export; ";
+                            break;
+                        case "AI":
+                            ContractServicesName += "Air Import; ";
+                            break;
+                        case "SCE":
+                            ContractServicesName += "Sea Consol Export; ";
+                            break;
+                        case "SCI":
+                            ContractServicesName += "Sea Consol Import; ";
+                            break;
+                        case "SFE":
+                            ContractServicesName += "Sea FCL Export; ";
+                            break;
+                        case "SLE":
+                            ContractServicesName += "Sea LCL Export; ";
+                            break;
+                        case "SLI":
+                            ContractServicesName += "Sea LCL Import; ";
+                            break;
+                        case "CL":
+                            ContractServicesName += "Custom Logistic; ";
+                            break;
+                        case "IT":
+                            ContractServicesName += "Trucking; ";
+                            break;
+                        case "SFI":
+                            ContractServicesName += "Sea FCL Import; ";
+                            break;
+                        default:
+                            ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
+                            break;
+                    }
+                }
 
-            //    foreach (var item in ContractServiceArr)
-            //    {
-            //        switch (item)
-            //        {
-            //            case "AE":
-            //                ContractServicesName += "AE; ";
-            //                break;
-            //            case "AI":
-            //                ContractServicesName += "AI; ";
-            //                break;
-            //            case "SCE":
-            //                ContractServicesName += "SCE; ";
-            //                break;
-            //            case "SCI":
-            //                ContractServicesName += "SCI; ";
-            //                break;
-            //            case "SFE":
-            //                ContractServicesName += "SFE; ";
-            //                break;
-            //            case "SLE":
-            //                ContractServicesName += "SLE; ";
-            //                break;
-            //            case "SLI":
-            //                ContractServicesName += "SLI; ";
-            //                break;
-            //            case "CL":
-            //                ContractServicesName += "CL; ";
-            //                break;
-            //            case "IT":
-            //                ContractServicesName += "IT; ";
-            //                break;
-            //            case "SFI":
-            //                ContractServicesName += "SFI; ";
-            //                break;
-            //            default:
-            //                ContractServicesName = "AE; AI; SCE; SCI; SFE; SLE; SLI; CL; IT  ";
-            //                break;
-            //        }
-            //    }
-
-            //}
-            //if (!string.IsNullOrEmpty(ContractServicesName))
-            //{
-            //    ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
-            //}
+            }
+            if (!string.IsNullOrEmpty(ContractServicesName))
+            {
+                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
+            }
             return ContractServicesName;
         }
 

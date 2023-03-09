@@ -113,15 +113,15 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     contractTypes: Array<string> = ["Trial", "Official", "Parent Contract", "Cash", "Guarantee", "Prepaid"];
     serviceTypes: CommonInterface.INg2Select[] = [
         { id: "All", text: "All" },
-        { id: "AI", text: "AI" },
-        { id: "AE", text: "AE" },
-        { id: "SCE", text: "SCE" },
-        { id: "SCI", text: "SCI" },
-        { id: "SFE", text: "SFE" },
-        { id: "SLE", text: "SLE" },
-        { id: "SFI", text: "SFI" },
-        { id: "SLI", text: "SLI" },
-        { id: "CL", text: "CL" }
+        { id: "AI", text: "Air Import" },
+        { id: "AE", text: "Air Export" },
+        { id: "SCE", text: "Sea Consol Export" },
+        { id: "SCI", text: "Sea Consol Impor" },
+        { id: "SFE", text: "Sea FCL Export" },
+        { id: "SLE", text: "Sea LCL Export" },
+        { id: "SFI", text: "Sea FCL Import" },
+        { id: "SLI", text: "Sea LCL Import" },
+        { id: "CL", text: "Custom Logistic" }
     ];
 
 
