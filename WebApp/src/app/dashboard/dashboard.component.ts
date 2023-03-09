@@ -206,33 +206,27 @@ export class DashboardComponent extends AppPage implements OnInit {
     }
 
     getValueSearch(obj: any) {
-        console.log(obj)
-        this.onShipmentTracking(obj)
+        this.trackShipmentProgress(obj)
     }
 
     onChangeLoading(event) {
         this.isSubmitted = event;
     }
 
-    onShipmentTracking(obj: any) {
-        this.isLoading = true
-        this.trackShipmentProgress(obj)
-    }
-
     trackShipmentProgress(obj: any) {
+        this.isLoading = true
         this._documentRepo.trackShipmentProgress(obj).pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: IShipmentTracking) => {
-                    this.shipmentTracking = res;
-                    this.isSubmitted = false;
-                    this.isLoading = false;
-                }, (error: any) => {
-                    console.log(error)
-                    this.isSubmitted = true;
-                    this.isLoading = false;
-                });
+        .subscribe(
+            (res: IShipmentTracking) => {
+                this.shipmentTracking = res;
+                this.isSubmitted = false;
+                this.isLoading = false;
+            }, (error: any) => {
+                console.log(error)
+                this.isSubmitted = true;
+                this.isLoading = false;
+            });
     }
-
 
     //https://www.npmjs.com/package/angular-highcharts
     // chart: Chart;
