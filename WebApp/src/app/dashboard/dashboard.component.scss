@@ -136,37 +136,20 @@
     background: #3966B6;
 }
 
-.btn-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-
-    padding: 3px 30px;
-    border-radius: 8px;
-    min-width: 80px;
+.loader-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+    background-color: #3966b6 ;
+    opacity: 0.4;
 }
 
-.btn-icon {
-    width: 25px;
-    height: 25px;
-    display: inline-block !important;
-
-    &-fly {
-        background: url("../../assets/icons/fly.png");
-        background-position: center;
-        background-size: cover;
-    }
-
-    &-sea {
-        background: url("../../assets/icons/ship.png");
-        background-position: center;
-        background-size: cover;
-    }
-
-    &-track {
-        background: url("../../assets/icons/routing.png");
-        background-position: center;
-        background-size: cover;
-    }
-
+.loader-container img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
