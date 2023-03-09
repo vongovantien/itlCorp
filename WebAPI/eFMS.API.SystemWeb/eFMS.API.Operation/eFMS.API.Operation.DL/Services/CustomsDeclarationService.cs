@@ -389,7 +389,7 @@ namespace eFMS.API.Operation.DL.Services
             }
             else if (Imported == false)
             {
-                if (currentUser.OfficeID.Equals(officeOutsource.Where(x => x.Id == currentUser.OfficeID).FirstOrDefault()))
+                if (officeOutsource.Where(x => x.Id == currentUser.OfficeID).FirstOrDefault() != null)
                 {
                     data = data.Where(x => x.JobNo == null && x.Source == "Replicate");
                 }
