@@ -199,5 +199,14 @@ namespace eFMS.API.SystemFileManagement.Controllers
             }
             return Ok(hs);
         }
+
+        [HttpDelete("DeleteEDocAcc")]
+        public async Task<IActionResult> DeleteEDocAcc(string billingNo)
+        {
+            HandleState hs = await _edocService.DeleteEdocAcc(billingNo);
+            if (hs.Success)
+                return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
+            return BadRequest(hs);
+        }
     }
 }

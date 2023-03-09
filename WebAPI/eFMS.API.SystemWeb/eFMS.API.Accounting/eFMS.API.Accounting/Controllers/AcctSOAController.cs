@@ -221,6 +221,8 @@ namespace eFMS.API.Accounting.Controllers
                     {
                         await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
+                    Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
+                    var deleteEdoc = HttpClientService.DeleteApi(urlEdoc + "File/api/v1/vi/EDoc/DeleteEDocAcc?billingNo=" + soaId , null);
                 });
             }
             return Ok(result);
