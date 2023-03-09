@@ -21,6 +21,7 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
 using static eFMS.API.Common.Helpers.FileHelper;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
 {
@@ -849,7 +850,69 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return _sysImageDetailRepo.Any(x => x.GenEdocId == genId);
         }
 
-        public async Task<HandleState> DeleteEdoc(Guid edocId,Guid jobId)
+        public async Task<HandleState> DeleteEdocAcc(string billingNo)
+        {
+            try
+            {
+                var edocs = _sysImageDetailRepo.Get(x => x.BillingNo == billingNo).ToList();
+                var imageIds = edocs.GroupBy(x => x.SysImageId).Select(x => x.FirstOrDefault().SysImageId).ToList();
+                var images = await _sysImageRepo.GetAsync(x => imageIds.Contains(x.Id));
+                var delImgDetail = await _sysImageDetailRepo.DeleteAsync(x => x.BillingNo == billingNo);
+                if (delImgDetail.Success)
+                {
+                    images.ForEach(img =>
+                    {
+                        if (img != null)
+                        {
+                            var delImg = _sysImageRepo.Delete(x => x.Id == img.Id);
+                            if (delImg.Success)
+                            {
+                                deleteFile(img.KeyS3);
+                            }
+                        }
+                    });
+                }
+                return new HandleState(true, "Delete Edoc Success!");
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+        //Delete with Other case
+        //private async Task<bool> DeleteImage(string billingNo, string billingType)
+        //{
+        //    var images = new List<SysImage>();
+        //    switch(billingType)
+        //    {
+        //        case "Settlement":
+        //            var settleId = _setleRepo.Get(x => x.SettlementNo == billingNo).FirstOrDefault().Id;
+        //            images = _sysImageRepo.Get(x => x.ObjectId == settleId.ToString()).ToList();
+        //            break;
+        //        case "SOA":
+        //            var soaNo = _soaRepo.Get(x => x.Soano == billingNo).FirstOrDefault().Id;
+        //            images = _sysImageRepo.Get(x => x.ObjectId == billingNo).ToList();
+        //            break;
+        //        case "Advance":
+        //            var advId = _advRepo.Get(x => x.AdvanceNo == billingNo).FirstOrDefault().Id;
+        //            images = _sysImageRepo.Get(x => x.ObjectId == advId.ToString()).ToList();
+        //            break;
+        //        default: break;
+        //    }
+
+        //    images.ForEach(async img =>
+        //    {
+        //        var del = await _sysImageRepo.DeleteAsync(x => x.Id == img.Id);
+        //        if (del.Success)
+        //        {
+        //            deleteFile(img.KeyS3);
+        //        }
+        //    });
+        //    return true;
+        //}
+
+
+        public async Task<HandleState> DeleteEdoc(Guid edocId)
         {
             HandleState result = new HandleState();
             try

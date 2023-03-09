@@ -2,11 +2,13 @@
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -333,7 +335,14 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
-
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
+                    var deleteEdoc = HttpClientService.DeleteApi(urlEdoc + "File/api/v1/vi/EDoc/DeleteEDocAcc?billingNo=" + advanceNo, null);
+                });
+            }
             return Ok(result);
         }
 
