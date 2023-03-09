@@ -383,37 +383,37 @@ namespace eFMS.API.Catalogue.DL.Services
                     switch (item)
                     {
                         case "AE":
-                            ContractServicesName += "Air Export; ";
+                            ContractServicesName += "AE; ";
                             break;
                         case "AI":
-                            ContractServicesName += "Air Import; ";
+                            ContractServicesName += "AI; ";
                             break;
                         case "SCE":
-                            ContractServicesName += "Sea Consol Export; ";
+                            ContractServicesName += "SCE; ";
                             break;
                         case "SCI":
-                            ContractServicesName += "Sea Consol Import; ";
+                            ContractServicesName += "SCI; ";
                             break;
                         case "SFE":
-                            ContractServicesName += "Sea FCL Export; ";
+                            ContractServicesName += "SFE; ";
                             break;
                         case "SLE":
-                            ContractServicesName += "Sea LCL Export; ";
+                            ContractServicesName += "SLE; ";
                             break;
                         case "SLI":
-                            ContractServicesName += "Sea LCL Import; ";
+                            ContractServicesName += "SLI; ";
                             break;
                         case "CL":
-                            ContractServicesName += "Custom Logistic; ";
+                            ContractServicesName += "CL; ";
                             break;
                         case "IT":
-                            ContractServicesName += "Trucking; ";
+                            ContractServicesName += "IT; ";
                             break;
                         case "SFI":
-                            ContractServicesName += "Sea FCL Import; ";
+                            ContractServicesName += "SFI; ";
                             break;
                         default:
-                            ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
+                            ContractServicesName = "AE; AI; SCE; SCI; SFE; SLE; SLI; CL; IT  ";
                             break;
                     }
                 }
