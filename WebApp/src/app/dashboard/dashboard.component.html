@@ -108,10 +108,10 @@
                     <div class="m-portlet__head-title w-100">
                         <h3 class="m-portlet__head-text">
                             <ng-container *ngIf="shipmentType === 'AIR'; else iconTrack">
-                                <img src="../../../../assets/icons/fly.png" alt="icon" width="25px">
+                                <span class="btn-icon btn-icon-fly"></span>
                             </ng-container>
                             <ng-template #iconTrack>
-                                <img src="../../../../assets/icons/ship.png" alt="icon" width="25px">
+                                <span class="btn-icon btn-icon-sea"></span>
                             </ng-template>
                             Track and Trace
                         </h3>
@@ -130,14 +130,14 @@
                         <div *ngIf="last">
                             <p class="track-router">
                                 <ng-container *ngIf="shipmentType === 'AIR'; else iconTrack">
-                                    <img src="../../../../assets/icons/fly.png" alt="icon" width="30px">
+                                    <span class="btn-icon btn-icon-fly" style="width: 30px;"></span>
                                 </ng-container>
                                 <ng-template #iconTrack>
-                                    <img src="../../../../assets//icons/ship.png" alt="icon" width="30px">
+                                    <span class="btn-icon btn-icon-sea" style="width: 30px;"></span>
                                 </ng-template>
                             </p>
                         </div>
-                        <ng-container *ngIf="!first && !last">
+                        <ng-container *ngIf=" !first && !last">
                             <p class="track-router track-progress-router"></p>
                         </ng-container>
                         <div *ngIf="!last" class="line-progress-vertical">
