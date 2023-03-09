@@ -116,7 +116,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         { id: "AI", text: "Air Import" },
         { id: "AE", text: "Air Export" },
         { id: "SCE", text: "Sea Consol Export" },
-        { id: "SCI", text: "Sea Consol Impor" },
+        { id: "SCI", text: "Sea Consol Import" },
         { id: "SFE", text: "Sea FCL Export" },
         { id: "SLE", text: "Sea LCL Export" },
         { id: "SFI", text: "Sea FCL Import" },
