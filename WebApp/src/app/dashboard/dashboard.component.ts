@@ -219,7 +219,7 @@ export class DashboardComponent extends AppPage implements OnInit {
         this._documentRepo.trackShipmentProgress(obj).pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: CommonInterface.IResult | any) => {
-                    if (!!res && !res.status) {
+                    if (!!res?.message) {
                         this._toastService.warning(res.message);
                         this.isSubmitted = true;
                     }
