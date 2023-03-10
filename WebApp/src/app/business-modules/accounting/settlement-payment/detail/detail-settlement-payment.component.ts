@@ -128,12 +128,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     updateSettlement() {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
-
-
         if (!this.checkValidSettle()) {
             return;
         }
@@ -160,7 +154,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        // this.attachRef.getHblList();
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId, 'LIST');
                     } else {
@@ -226,8 +219,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         bankCode: this.settlementPayment.settlement.bankCode,
                         dueDate: !!this.settlementPayment.settlement.dueDate ? { startDate: new Date(this.settlementPayment.settlement.dueDate), endDate: new Date(this.settlementPayment.settlement.dueDate) } : null
                     });
-                    // this.formCreateSurcharge.getBeneficiaryInfo();
-
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
 
@@ -246,9 +237,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     if (this.settlementPayment.settlement.settlementType === 'EXISTING') {
                         this.requestSurchargeListComponent.isExistingSettlement = true;
                     }
-                    // if (this.requestSurchargeListComponent.groupShipments.length) {
-                    //     this.requestSurchargeListComponent.openAllCharge.next(true);
-                    // }
                 },
                 () => {
                     this._store.dispatch(LoadDetailSettlePaymentFail());
@@ -274,10 +262,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     saveAndSendRequest() {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
         if (!this.checkValidSettle()) {
             return;
         }
@@ -364,11 +348,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     previewSettlementPayment() {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
-
         this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.settlementNo)
             .pipe(catchError(this.catchError))
             .subscribe(
@@ -393,10 +372,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     exportSettlementPayment(language: string, typeExp: string) {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
 
         this._exportRepo.exportSettlementPaymentDetail(this.settlementPayment.settlement.id, language)
             .pipe(
@@ -414,10 +389,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     exportSettlementPaymentTemplate(language: string, typeExp: string) {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
 
         this._exportRepo.exportSettlementPaymentDetailTemplate(this.settlementPayment.settlement.id, language)
             .pipe(
@@ -436,10 +407,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
 
 
     exportGeneralPreview(typeExp: string) {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
-        //     return;
-        // }
 
         this._exportRepo.exportGeneralSettlementPayment(this.settlementPayment.settlement.id)
             .pipe(
@@ -461,12 +428,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         this.componentRef.instance.frm.nativeElement.submit();
         this.componentRef.instance.ShowWithDelay(); // Gọi method có delay này để ViewChild Popup nó get đc
     }
-
-    // regetEdoc(event: boolean) {
-    //     if (event) {
-    //         this.attachList.getEDoc("Settlement");
-    //     }
-    // }
 }
 
 export interface ISettlementPaymentData {

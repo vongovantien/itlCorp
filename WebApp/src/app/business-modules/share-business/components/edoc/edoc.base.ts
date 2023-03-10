@@ -14,6 +14,8 @@ import { LoadListEDocSettle } from "src/app/business-modules/accounting/settleme
 @Directive()
 export abstract class AppShareEDocBase extends AppList {
     @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
+    @Output() onChangeListAttach: EventEmitter<any[]> = new EventEmitter<any[]>();
+
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
 
@@ -179,17 +181,19 @@ export abstract class AppShareEDocBase extends AppList {
 
     getEDoc(transactionType: string) {
         if (this.typeFrom === 'Shipment') {
-            this._systemFileRepo.getEDocByJob(this.jobId, this.transactionType)
-                .pipe(
-                    catchError(this.catchError),
-                )
-                .subscribe(
-                    (res: any[]) => {
-                        this.edocByJob = res.filter(x => x.documentType.type !== 'Accountant');
-                        this.edocByAcc = res.filter(x => x.documentType.type === 'Accountant');
-                        this.onChange.emit(res);
-                    },
-                );
+            if (this.jobId !== null && this.jobId !== '') {
+                this._systemFileRepo.getEDocByJob(this.jobId, this.transactionType)
+                    .pipe(
+                        catchError(this.catchError),
+                    )
+                    .subscribe(
+                        (res: any[]) => {
+                            this.edocByJob = res.filter(x => x.documentType.type !== 'Accountant');
+                            this.edocByAcc = res.filter(x => x.documentType.type === 'Accountant');
+                            this.onChange.emit(res);
+                        },
+                    );
+            }
         } else {
             this._systemFileRepo.getEDocByAccountant(this.billingId, transactionType)
                 .pipe(
@@ -206,6 +210,7 @@ export abstract class AppShareEDocBase extends AppList {
                         }
                         else {
                             this.lstEdocExist = res.eDocs;
+                            this.onChangeListAttach.emit(res);
                         }
                     },
                 );

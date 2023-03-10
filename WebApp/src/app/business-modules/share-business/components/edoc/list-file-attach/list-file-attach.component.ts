@@ -22,6 +22,7 @@ export class ShareListFilesAttachComponent extends AppShareEDocBase implements O
     @Input() transactionType: string = '';
     @Input() readonly: boolean = false;
 
+
     constructor(
         protected readonly _systemFileRepo: SystemFileManageRepo,
         protected readonly _activedRoute: ActivatedRoute,
@@ -42,22 +43,24 @@ export class ShareListFilesAttachComponent extends AppShareEDocBase implements O
                     this.currentUser = res;
                 }
             )
-        if (this.transactionType === "Settlement") {
-            this.requestListEDocSettle();
-            this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: any) => {
-                        if (this.jobOnSettle) {
-                            this.lstEdocExist = res.filter(x => x.jobNo === this.jobNo || x.jobNo === null);
-                        } else {
-                            this.lstEdocExist = res;
+        if (this.transactionType !== 'Shipment') {
+            if (this.transactionType === "Settlement") {
+                this.requestListEDocSettle();
+                this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
+                    .subscribe(
+                        (res: any) => {
+                            if (this.jobOnSettle) {
+                                this.lstEdocExist = res.filter(x => x.jobNo === this.jobNo || x.jobNo === null);
+                            } else {
+                                this.lstEdocExist = res;
+                            }
                         }
-                    }
-                );
+                    );
 
-        }
-        else {
-            this.getEDoc(this.transactionType);
+            }
+            else {
+                this.getEDoc(this.transactionType);
+            }
         }
     }
 

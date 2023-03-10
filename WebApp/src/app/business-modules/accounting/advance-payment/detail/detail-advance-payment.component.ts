@@ -12,7 +12,7 @@ import { InfoPopupComponent, ReportPreviewComponent } from "@common";
 import { RoutingConstants } from "@constants";
 import { delayTime } from "@decorators";
 import { ICrystalReport } from "@interfaces";
-import { AdvancePayment, AdvancePaymentRequest, SysImage } from "@models";
+import { AdvancePayment, AdvancePaymentRequest } from "@models";
 import { AccountingRepo, ExportRepo } from "@repositories";
 
 import { AdvancePaymentFormCreateComponent } from "../components/form-create-advance-payment/form-create-advance-payment.component";
@@ -48,7 +48,7 @@ export class AdvancePaymentDetailComponent
     actionList: string = "update";
     approveInfo: any = null;
 
-    attachFiles: SysImage[] = [];
+    attachFiles: any[] = [];
     folderModuleName: string = "Advance";
     statusApproval: string = "";
     isAdvCarrier: boolean = false;
@@ -496,4 +496,5 @@ export class AdvancePaymentDetailComponent
             this.listAdvancePaymentCarrierComponent.configDisplayShipment(data);
         }
     }
+
 }

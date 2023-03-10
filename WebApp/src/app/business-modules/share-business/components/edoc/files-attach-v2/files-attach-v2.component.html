@@ -260,8 +260,8 @@
         </ng-container>
         <!-- * SM - SOA - ADV -->
         <list-file-attach [typeFrom]="typeFrom" [transactionType]="transactionType" [billingId]="billingId"
-            [readonly]="readonly" [jobOnSettle]="jobOnSettle" [isEdocByAcc]="isEdocByAcc"
-            [jobNo]="jobNo"></list-file-attach>
+            (onChangeListAttach)="emitAttach($event)" [readonly]="readonly" [jobOnSettle]="jobOnSettle"
+            [isEdocByAcc]="isEdocByAcc" [jobNo]="jobNo"></list-file-attach>
     </div>
 </div>
 <document-type-attach [typeFrom]="typeFrom" (onSearchEdoc)="getListEdoc($event)" [jobId]="jobId" [jobNo]="jobNo"

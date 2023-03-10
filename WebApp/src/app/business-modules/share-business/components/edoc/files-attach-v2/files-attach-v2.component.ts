@@ -32,12 +32,12 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
     get readonly(): boolean {
         return this._readonly;
     }
+    private _readonly: boolean = false;
 
     documentTypes: any[] = [];
     isOps: boolean = false;
     housebills: any[] = [];
     modifiedDocTypes: any;
-    private _readonly: boolean = false;
     isView: boolean = true;
     elementInput: HTMLElement = null;
     isEdocByJob: boolean = false;
@@ -366,6 +366,11 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
 
     getListEdoc(event: any) {
         this.listFileAttach.getEDoc(event);
+        this.getEDoc(this.transactionType);
+    }
+
+    emitAttach(event: any) {
+        this.onChange.emit(event);
     }
 }
 
