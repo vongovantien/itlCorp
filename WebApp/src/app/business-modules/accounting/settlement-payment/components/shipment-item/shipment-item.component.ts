@@ -3,8 +3,9 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewCh
 import { ReportPreviewComponent } from '@common';
 import { SysImage } from '@models';
 import { Store } from '@ngrx/store';
+import { takeUntil } from 'rxjs/operators';
 import { AppPage } from 'src/app/app.base';
-import { ISettlementPaymentState } from '../store';
+import { ISettlementPaymentState, getListEdocState } from '../store';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
 @Component({
@@ -46,6 +47,15 @@ export class SettlementShipmentItemComponent extends AppPage {
     }
 
     ngOnInit() {
+        console.log(this.data);
+        this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    console.log(res.filter(x => x.jobNo === null || x.jobNo === this.data.jobId));
+
+                    this.countFile = res.filter(x => x.jobNo === null || x.jobNo === this.data.jobId).length;
+                }
+            );
     }
 
     showPaymentManagement($event: Event): any {

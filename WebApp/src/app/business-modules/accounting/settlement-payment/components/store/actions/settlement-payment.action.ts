@@ -13,7 +13,8 @@ export enum SettlementPaymentActionTypes {
     GET_DETAIL_FAIL = '[SettlementPayment] Get Detail Fail',
     UPDATE_LIST_NO_GROUP_SURCHARGE = '[SettlementPayment] Update No Group List Surcharge',
     UPDATE_LIST_EDOC = '[SettlementPayment] Update List Edoc',
-
+    LOAD_LIST_EDOC = '[SettlementPayment] Load List EDoc',
+    LOAD_LIST_EDOC_SUCCESS = '[SettlementPayment] Load List EDoc Success',
 };
 
 type searchType = ISearchSettlePayment;
@@ -27,4 +28,12 @@ export const LoadDetailSettlePayment = createAction(SettlementPaymentActionTypes
 export const LoadDetailSettlePaymentSuccess = createAction(SettlementPaymentActionTypes.GET_DETAIL_SUCCESS, props<ISettlementPaymentData>());
 export const LoadDetailSettlePaymentFail = createAction(SettlementPaymentActionTypes.GET_DETAIL_FAIL);
 export const UpdateListNoGroupSurcharge = createAction(SettlementPaymentActionTypes.UPDATE_LIST_NO_GROUP_SURCHARGE, props<{ data: Surcharge[] }>());
-export const UpdateListEdocSettle = createAction(SettlementPaymentActionTypes.UPDATE_LIST_NO_GROUP_SURCHARGE, props<{ data: boolean }>());
+//export const UpdateListEdocSettle = createAction(SettlementPaymentActionTypes.UPDATE_LIST_EDOC, props<{ data: any[] }>());
+
+export const LoadListEDocSettle = createAction(SettlementPaymentActionTypes.LOAD_LIST_EDOC, props<IEDocSettleSearch>());
+export const LoadListEDocSettleSuccess = createAction(SettlementPaymentActionTypes.LOAD_LIST_EDOC_SUCCESS, props<{ data: any[] }>());
+
+export interface IEDocSettleSearch {
+    billingId: string;
+    transactionType: string
+}

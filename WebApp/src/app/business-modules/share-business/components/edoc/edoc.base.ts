@@ -9,12 +9,11 @@ import { Store } from "@ngrx/store";
 import { ExportRepo, SystemFileManageRepo } from "@repositories";
 import { IAppState } from "@store";
 import { catchError } from "rxjs/operators";
-import { UpdateListEdocSettle } from "src/app/business-modules/accounting/settlement-payment/components/store";
+import { LoadListEDocSettle } from "src/app/business-modules/accounting/settlement-payment/components/store";
 
 @Directive()
 export abstract class AppShareEDocBase extends AppList {
     @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
-
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
 
@@ -82,7 +81,6 @@ export abstract class AppShareEDocBase extends AppList {
     }
 
     downloadAllEdoc() {
-        console.log(this.edocByAcc);
         if (this.typeFrom === 'Shipment') {
             if (!this.edocByJob?.some(x => x.eDocs?.length > 0)) {
                 return this._toast.warning("No data to Export");
@@ -112,13 +110,11 @@ export abstract class AppShareEDocBase extends AppList {
             return;
         }
         const extension = this.selectedEdoc.imageUrl.split('.').pop();
-        console.log(extension);
 
         if (['xlsx', 'docx', 'doc', 'xls'].includes(extension)) {
             this._exportRepo.previewExport(this.selectedEdoc.imageUrl);
         }
         else if (['html', 'htm'].includes(extension)) {
-            console.log();
             this._systemFileRepo.getFileEdocHtml(this.selectedEdoc.imageUrl).subscribe(
                 (res: any) => {
                     window.open('', '_blank').document.write(res.body);
@@ -156,6 +152,9 @@ export abstract class AppShareEDocBase extends AppList {
                         if (res.status) {
                             this._toast.success("Delete Sucess")
                             this.getEDoc(this.transactionType);
+                            if (this.transactionType === "Settlement") {
+                                this.requestListEDocSettle();
+                            }
                         }
                     },
                 );
@@ -168,12 +167,14 @@ export abstract class AppShareEDocBase extends AppList {
                     (res: any) => {
                         if (res.status) {
                             this._toast.success("Delete Sucess")
+                            if (this.transactionType === "Settlement") {
+                                this.requestListEDocSettle();
+                            }
                             this.getEDoc(this.transactionType);
                         }
                     },
                 );
         }
-        this._store.dispatch(UpdateListEdocSettle({ data: true }))
     }
 
     getEDoc(transactionType: string) {
@@ -197,22 +198,27 @@ export abstract class AppShareEDocBase extends AppList {
                 .subscribe(
                     (res: any) => {
                         this.edocByAcc = res;
-                        if (this.jobOnSettle) {
-                            this.lstEdocExist = res.eDocs.filter(x => x.jobNo === this.jobNo || x.jobNo === null);
-                        } else {
+                        this.onChange.emit(res);
+                        if (this.transactionType === "Settlement") {
+                            if (res.eDocs.length > 0) {
+                                this.isEdocByAcc = true
+                            }
+                        }
+                        else {
                             this.lstEdocExist = res.eDocs;
                         }
-                        console.log(res);
-                        if (res.eDocs.length > 0) {
-                            this.isEdocByAcc = true
-                        }
-                        this.onChange.emit(res);
                     },
                 );
         }
     }
 
+    requestListEDocSettle() {
+        this._store.dispatch(LoadListEDocSettle({ transactionType: this.transactionType, billingId: this.billingId }));
+    }
+
 }
+
+
 
 export interface IEdocAcc {
     documentType: any;

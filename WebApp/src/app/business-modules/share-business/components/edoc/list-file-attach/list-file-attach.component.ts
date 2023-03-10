@@ -7,7 +7,7 @@ import { SortService } from '@services';
 import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
-import { UpdateListEdocSettle, getEdocLoadingState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { getListEdocState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { AppShareEDocBase } from '../edoc.base';
 
 
@@ -43,18 +43,22 @@ export class ShareListFilesAttachComponent extends AppShareEDocBase implements O
                 }
             )
         if (this.transactionType === "Settlement") {
-            this._store.select(getEdocLoadingState)
-                .pipe(takeUntil(this.ngUnsubscribe))
+            this.requestListEDocSettle();
+            this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe(
-                    (res) => {
-                        this.getEDoc(this.transactionType);
-                        this._store.dispatch(UpdateListEdocSettle({ data: false }))
+                    (res: any) => {
+                        if (this.jobOnSettle) {
+                            this.lstEdocExist = res.filter(x => x.jobNo === this.jobNo || x.jobNo === null);
+                        } else {
+                            this.lstEdocExist = res;
+                        }
                     }
-                )
-        } else {
+                );
+
+        }
+        else {
             this.getEDoc(this.transactionType);
         }
-
     }
 
     onSelectEDoc(edoc: any) {

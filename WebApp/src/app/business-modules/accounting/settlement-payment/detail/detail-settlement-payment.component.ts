@@ -3,8 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { ISettlementPaymentState, getListEdocState } from '../components/store/reducers/index';
 import { SettlementPayment } from './../../../../shared/models/accouting/settlement-payment';
-import { ISettlementPaymentState } from './../components/store/reducers/index';
 
 import { AppPage } from '@app';
 import { InfoPopupComponent, ReportPreviewComponent } from '@common';
@@ -42,6 +42,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     settlementId: string = '';
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
+    totalEDoc: number = 0;
 
     attachFiles: any[] = [];
     folderModuleName: string = 'Settlement';
@@ -73,12 +74,23 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                 }
             });
         this.userLogged$ = this._store.select(getCurrentUserState);
+        this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    this.totalEDoc = res.length;
+                }
+            );
+
     }
 
     onChangeCurrency(currency: string) {
         if (!!this.requestSurchargeListComponent) {
             this.requestSurchargeListComponent.changeCurrency(currency);
         }
+    }
+
+    updateAttachFile(event: any) {
+        this.attachFiles = event;
     }
 
     getBodySettlement() {
