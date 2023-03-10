@@ -43,6 +43,27 @@ namespace eFMS.API.Documentation.DL.Services
             _trackingApi = trackingApi;
         }
 
+        private List<SysTrackInfo> GetTrackInfoList(Guid? hblId, IEnumerable<TrackInfo> trackInfos, string source)
+        {
+            var trackInfoList = new List<SysTrackInfo>();
+            foreach (var item in trackInfos)
+            {
+                var data = new SysTrackInfo();
+                data.Id = Guid.NewGuid();
+                data.PlanDate = item.PlanDate;
+                data.Quantity = item.Piece;
+                data.EventDescription = item.Event;
+                data.Station = placeRepository.First(x => x.Code == item.Station)?.Id;
+                data.Weight = item.Weight;
+                data.ActualDate = item.ActualDate;
+                data.DatetimeCreated = data.DatetimeModified = DateTime.Now;
+                data.JobId = hblId;
+                data.Source = source;
+                trackInfoList.Add(data);
+            }
+
+            return trackInfoList;
+        }
         public async Task<TrackingShipmentViewModel> TrackShipmentProgress(TrackingShipmentCriteria criteria)
         {
             try
@@ -80,57 +101,31 @@ namespace eFMS.API.Documentation.DL.Services
                         var dataReponse = await request.Content.ReadAsAsync<TrackingMoreReponseModel>();
                         statusShipment = dataReponse.Data.StatusNumber == 2 ? DocumentConstants.IN_TRANSIT : (dataReponse.Data.StatusNumber == 4 ? DocumentConstants.DONE : null);
 
-                        //Lô hàng chưa tồn tại thông tin tracking
-                        if (!DataContext.Any(x => x.Hblid == shipmentExisted.Id))
-                        {
-                            foreach (var item in dataReponse.Data.TrackInfo)
-                            {
-                                var data = new SysTrackInfo();
-                                data.Id = Guid.NewGuid();
-                                data.PlanDate = item.PlanDate;
-                                data.Quantity = item.Piece;
-                                data.EventDescription = item.Event;
-                                data.Station = placeRepository.First(x => x.Code == item.Station)?.Id;
-                                data.Weight = item.Weight;
-                                data.ActualDate = item.ActualDate;
-                                data.DatetimeCreated = data.DatetimeModified = DateTime.Now;
-                                data.Hblid = shipmentExisted.Id;
-                                data.Source = partnerApi.Name;
-                                lstTrackInfo.Add(data);
-                            }
-                        }
 
-                        //Cập nhật thêm thời gian tracking mới 
+
                         if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)
                         {
-                            var maxDateExisted = DataContext.Where(x => x.Hblid == shipmentExisted.Id).Max(x => x.PlanDate);
-                            var dataTrackingSort = dataReponse.Data.TrackInfo.Where(x => x.PlanDate > maxDateExisted);
-                            if (dataTrackingSort?.Count() > 0)
+                            if (!DataContext.Any(x => x.JobId == shipmentExisted.Id))
                             {
-                                foreach (var item in dataTrackingSort)
+                                lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataReponse.Data.TrackInfo, partnerApi.Name);
+                            }
+                            else
+                            {
+                                var maxDateExisted = DataContext.Where(x => x.JobId == shipmentExisted.Id).Max(x => x.PlanDate);
+                                var dataTrackingSort = dataReponse.Data.TrackInfo.Where(x => x.PlanDate > maxDateExisted);
+                                if (dataTrackingSort?.Any() == true)
                                 {
-                                    var data = new SysTrackInfo();
-                                    data.Id = Guid.NewGuid();
-                                    data.PlanDate = item.PlanDate;
-                                    data.Quantity = item.Piece;
-                                    data.EventDescription = item.Event;
-                                    data.Station = placeRepository.First(x => x.Code == item.Station)?.Id;
-                                    data.Weight = item.Weight;
-                                    data.ActualDate = item.ActualDate;
-                                    data.DatetimeCreated = data.DatetimeModified = DateTime.Now;
-                                    data.Hblid = shipmentExisted.Id;
-                                    data.Source = partnerApi.Name;
-                                    lstTrackInfo.Add(data);
+                                    lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, partnerApi.Name);
                                 }
                             }
+                            shipmentExisted.TrackingStatus = statusShipment;
+                            hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
+                            hs = await DataContext.AddAsync(lstTrackInfo);
                         }
-                        shipmentExisted.TrackingStatus = statusShipment;
-                        hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
-                        hs = await DataContext.AddAsync(lstTrackInfo);
 
-                        var returnData = DataContext.Get(x => x.Hblid == shipmentExisted.Id).OrderByDescending(x => x.ActualDate);
+                        var returnData = DataContext.Get(x => x.JobId == shipmentExisted.Id).OrderBy(x => x.ActualDate);
 
-                        //Reponse data
+                        //Response data
                         trackShipment.trackInfos = _mapper.Map<List<SysTrackInfoModel>>(returnData);
                         trackShipment.Status = statusShipment;
                         trackShipment.Departure = placeRepository.First(x => x.Id == shipmentExisted.Pol)?.NameVn;

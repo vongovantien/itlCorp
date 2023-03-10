@@ -4903,7 +4903,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.FlightNo).HasMaxLength(50);
 
-                entity.Property(e => e.Hblid).HasColumnName("HBLID");
+                entity.Property(e => e.JobId).HasColumnName("JobID");
 
                 entity.Property(e => e.PlanDate).HasColumnType("datetime");
 
