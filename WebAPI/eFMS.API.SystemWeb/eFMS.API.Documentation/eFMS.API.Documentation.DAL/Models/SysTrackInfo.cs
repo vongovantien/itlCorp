@@ -13,7 +13,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string Status { get; set; }
         public string Quantity { get; set; }
         public string Weight { get; set; }
-        public Guid? Hblid { get; set; }
+        public Guid? JobId { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
