@@ -161,8 +161,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="form-group"
-                        [ngClass]="{ 'm-form__group has-danger': isSubmitted && partnerGroup.invalid }">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': isSubmitted && partnerGroup.invalid }">
                         <label class="form-control-label" for="">
                             Category <span class="m--font-danger">(*)</span>
                         </label>
@@ -175,6 +174,17 @@
                             Category is required
                         </div>
                     </div>
+                    <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': isSubmitted && identityNo.invalid }">
+                        <label>Identity No</label>
+                        <input type="text" class="form-control" formControlName="identityNo">
+                        <div [ngClass]="'text-danger'"
+                            *ngIf="(isSubmitted && ((identityNo.errors | equalError:'maxlength') || (identityNo.errors | equalError:'minlength')))">
+                            Identity No include 8 - 15 characters!
+                        </div>
+                        <div [ngClass]="'text-danger'" *ngIf="isSubmitted && identityNo.errors  | equalError:'pattern'">
+                            Identity No invalid
+                        </div>
+                    </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group">
@@ -184,11 +194,22 @@
                         <input type="text" name="coLoaderCode" class="form-control" formControlName="coLoaderCode"
                             [attr.disabled]="this.active.value === true ? 'disabled' : null" />
                     </div>
-                    <div classs="form-group" *ngIf="isUpdate">
-                        <div class="text-left text-underline m--margin-top-10">
-                            <a (click)="showOtherCharge()" class="pointer font-weight-bold">Other
-                                Charge</a>
+                    <div class="form-group">
+                        <label>ID Date</label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true" name="daterange"
+                                [autoApply]="true" formControlName="dateId" readonly />
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label>ID Place</label>
+                        <input type="text" class="form-control" formControlName="placeId">
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -201,6 +222,12 @@
                                     [disabled]="(menuSpecialPermission | async | specialPermission: 'ActivePartner') === true  ? null : 'disabled'"
                                     placeholder="Select credit payment">
                                 </ng-select>
+                            </div>
+                            <div classs="form-group" *ngIf="isUpdate">
+                                <div class="text-left text-underline m--margin-top-10">
+                                    <a (click)="showOtherCharge()" class="pointer font-weight-bold">Other
+                                        Charge</a>
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4" *ngIf="isUpdate">

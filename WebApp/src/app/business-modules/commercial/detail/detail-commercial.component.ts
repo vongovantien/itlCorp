@@ -171,7 +171,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             provinceShippingId: partner.provinceShippingId,
             partnerLocation: partner.partnerLocation,
             parentId: this.isAddSubPartner ? partner.id : partner.parentId,
-            bankAccountName: partner.bankAccountName
+            bankAccountName: partner.bankAccountName,
+            identityNo: partner.identityNo,
+            dateId: !!partner.dateId ? { startDate: new Date(partner.dateId), endDate: new Date(partner.dateId) } : null,
+            placeId: partner.placeId
         });
         if (this.formCommercialComponent.partnerId !== partner.parentId) {
             this.formCommercialComponent.isDisabled = false;

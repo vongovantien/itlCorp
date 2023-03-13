@@ -20,6 +20,7 @@ import { RoutingConstants, SystemConstants } from '@constants';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 import _merge from 'lodash/merge';
 import { CommercialEmailListComponent } from 'src/app/business-modules/commercial/components/email/commercial-email-list.component';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-partner-data-add',
@@ -332,6 +333,7 @@ export class AddPartnerDataComponent extends AppList {
         };
 
         const mergeObj = Object.assign(_merge(formBody, cloneObject));
+        mergeObj.dateId = !!mergeObj.dateId ? (mergeObj.dateId.startDate !== null ? formatDate(mergeObj.dateId.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         //merge clone & this.partner.
         const mergeObjPartner = Object.assign(_merge(this.partner, mergeObj));
         console.log(mergeObjPartner);
