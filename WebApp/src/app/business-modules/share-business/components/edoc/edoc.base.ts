@@ -207,6 +207,7 @@ export abstract class AppShareEDocBase extends AppList {
                             if (res.eDocs.length > 0) {
                                 this.isEdocByAcc = true
                             }
+                            this.requestListEDocSettle();
                         }
                         else {
                             this.lstEdocExist = res.eDocs;

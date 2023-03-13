@@ -354,7 +354,8 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             .subscribe(
                 (res: any) => {
                     if (res.status) {
-                        this.getEDoc(this.transactionType);
+                        //this.getEDoc(this.transactionType);
+                        this.listFileAttach.requestListEDocSettle();
                         this._toast.success(res.message);
                     }
                     else {
