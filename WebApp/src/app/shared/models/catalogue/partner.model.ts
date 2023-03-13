@@ -74,7 +74,7 @@ export class Partner {
     partnerEmails: PartnerEmail[] = [];
 
     identityNo: string = '';
-    dateId: string = '';
+    dateId: any = '';
     placeId: string = '';
 
     partnerType: string = '';
