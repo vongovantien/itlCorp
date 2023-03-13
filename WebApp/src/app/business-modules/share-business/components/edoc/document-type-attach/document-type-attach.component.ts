@@ -8,7 +8,7 @@ import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
-import { UpdateListEdocSettle, getGrpChargeSettlementPaymentDetailState, UpdateListEDoc } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { LoadListEDocSettle, getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getSOADetailState } from 'src/app/business-modules/accounting/statement-of-account/store/reducers';
 import { PopupBase } from 'src/app/popup.base';
 import { getTransactionLocked, getTransactionPermission } from '../../../store';
@@ -22,7 +22,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     @ViewChild(ShareListFilesAttachComponent) listFileAttach: ShareListFilesAttachComponent;
 
-    @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onSearchEdoc: EventEmitter<any> = new EventEmitter<any>();
 
     @Input() jobNo: string = '';
     @Input() housebills: any[] = [];
@@ -70,8 +70,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     ngOnInit(): void {
-        console.log(this.readonly);
-
         this.getJobList();
         this.transactionType = this.typeFrom;
         this.configJob = Object.assign({}, this.configComoBoGrid, {
@@ -114,8 +112,11 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 );
         } else {
             this.configDocType.dataSource = this.documentTypes
-            console.log(this.documentTypes);
         }
+    }
+
+    updateListFileItem() {
+        this.listFileAttach.filterJob(this.jobNo);
     }
 
     getDocType(isADV: boolean) {
@@ -232,8 +233,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     chooseFile(event: any) {
-        console.log(this.documentTypes);
-        console.log(this.configDocType.dataSource);
         this.getJobList();
         const fileList = event.target['files'];
         const files: any[] = event.target['files'];
@@ -290,6 +289,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 },
             );
     }
+
     onSelectDataFormInfo(event: any, index: number, type: string) {
         switch (type) {
             case 'docType':
@@ -337,7 +337,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 this.listFile[index].aliasName = this.listFile[index].Code + '_' + this.listFile[index].payee + ('_' + this.listFile[index].inv === null ? '' : this.listFile[index]?.inv);
                 break;
             case 'inv':
-                console.log(this.listFile[index]);
                 this.listFile[index].aliasGenPay = true;
                 this.listFile[index].inv = event.invoiceNo;
                 this.listFile[index].series = event.series;
@@ -353,12 +352,14 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 break;
         }
     }
+
     resetForm() {
         this.listFile?.splice(0, this.listFile.length);
         this.enablePayeeINV = [];
         this.payFirst = [];
         this.payFilled = true;
     }
+
     removeFile(index: number) {
         this.listFile?.splice(index, 1);
     }
@@ -430,10 +431,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             if (res.status) {
                                 this._toastService.success("Upload file successfully!");
                                 this.resetForm();
-                                this.hide();
-                                this.onSearch.emit(this.transactionType);
                                 this.isSubmitted = false;
-                                this._store.dispatch(UpdateListEdocSettle({ data: true }))
                             }
                         }
                     );
@@ -448,38 +446,19 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
-                                if (this.jobOnSettle) {
-                                    this._store.dispatch(UpdateListEDoc({ data: true }));
-                                }
                                 this._toastService.success("Upload file successfully!");
                                 this.resetForm();
                                 this.hide();
-                                this.onSearch.emit(this.transactionType);
                                 this.isSubmitted = false;
-                                this._store.dispatch(UpdateListEdocSettle({ data: true }))
+                                if (this.transactionType === "Settlement") {
+                                    this._store.dispatch(LoadListEDocSettle({ transactionType: this.transactionType, billingId: this.billingId }));
+                                } else {
+                                    this.onSearchEdoc.emit(this.transactionType);
+                                }
                             }
                         }
                     );
             }
-        } else {
-            if (edocFileList.find(x => x.DocumentId === undefined || x.AliasName === '')) {
-
-                this._toastService.warning("Please fill all field!");
-                return;
-            }
-            this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files, this.typeFrom)
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (res: CommonInterface.IResult) => {
-                        if (res.status) {
-                            this._toastService.success("Upload file successfully!");
-                            this.resetForm();
-                            this.hide();
-                            this.onSearch.emit(this.transactionType);
-                            this.isSubmitted = false;
-                        }
-                    }
-                );
         }
     }
 

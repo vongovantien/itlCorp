@@ -974,20 +974,26 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         }
                         else if (edoc.GenEdocId != null)
                         {
-                            await _sysImageDetailRepo.DeleteAsync(x => x.Id == edoc.Id);
-                            var edocExist = _sysImageDetailRepo.Get(x => x.SysImageId == edoc.SysImageId).FirstOrDefault();
-                            if (edocExist == null)
-                            {
-                                var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                                if (image != null)
-                                {
-                                    var rsDelete = deleteFile(image.KeyS3);
-                                    if (rsDelete != null)
-                                    {
-                                        result = await _sysImageRepo.DeleteAsync(x => x.Id == image.Id);
-                                    }
-                                }
-                            }
+                            var images = _sysImageDetailRepo.Get(x => x.BillingNo == edoc.BillingNo && x.GenEdocId != null && x.SysImageId==edoc.SysImageId).ToList();
+                            var edocIds = images.Select(x => x.Id).ToList();
+                            //var imageIds = images.Select(x => x.SysImageId).ToList();
+                            var delEdoc = await _sysImageDetailRepo.DeleteAsync(x => edocIds.Contains(x.Id));
+                            //if (delEdoc.Success)
+                            //{
+                            //    var imageRoot = _sysImageRepo.Get(x => imageIds.Contains(x.Id)).ToList();
+                            //    imageRoot.ForEach(async image =>
+                            //    {
+                            //        var rsDelete = deleteFile(image.KeyS3);
+                            //        if (rsDelete != null)
+                            //        {
+                            //            result = await _sysImageRepo.DeleteAsync(x => x.Id == image.Id);
+                            //        }
+                            //        else
+                            //        {
+                            //            result = new HandleState("Can't Delete File Source on S3");
+                            //        }
+                            //    });
+                            //}
                         }
                         else
                         {

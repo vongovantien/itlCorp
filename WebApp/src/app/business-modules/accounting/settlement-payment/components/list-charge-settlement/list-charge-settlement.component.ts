@@ -28,7 +28,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ISettlementPaymentData } from "../../detail/detail-settlement-payment.component";
 import { ShareDocumentTypeAttachComponent } from "src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component";
-import { ISettlementPaymentState, UpdateListEdocSettle, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
+import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -84,7 +84,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     detailSettlement: Observable<any>;
     isLoadingSurchargeList: boolean = false;
     isLoadingGroupShipment: boolean = false;
-    settlementPayment: ISettlementPaymentData;
+
+    listEdoc: any[] = [];
     constructor(
         private readonly _sortService: SortService,
         private readonly _toastService: ToastrService,
@@ -128,9 +129,9 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
         this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState);
         this.detailSettlement = this._store.select(getSettlementPaymentDetailState);
-        console.log(this.detailSettlement);
 
     }
+
 
     updateListSurcharge() {
         this._store.dispatch(UpdateListNoGroupSurcharge({ data: this.surcharges }));
@@ -750,7 +751,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             })
         this.documentAttach.jobNo = data.jobId;
         this.documentAttach.jobId = data.shipmentId;
-        this._store.dispatch(UpdateListEdocSettle({ data: true }));
+        this.documentAttach.updateListFileItem();
         this.documentAttach.show();
     }
 

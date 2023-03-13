@@ -7,7 +7,7 @@ import { SortService } from '@services';
 import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
-import { UpdateListEdocSettle, getEdocLoadingState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { getListEdocState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { AppShareEDocBase } from '../edoc.base';
 
 
@@ -21,6 +21,7 @@ export class ShareListFilesAttachComponent extends AppShareEDocBase implements O
 
     @Input() transactionType: string = '';
     @Input() readonly: boolean = false;
+
 
     constructor(
         protected readonly _systemFileRepo: SystemFileManageRepo,
@@ -42,18 +43,29 @@ export class ShareListFilesAttachComponent extends AppShareEDocBase implements O
                     this.currentUser = res;
                 }
             )
-        if (this.transactionType === "Settlement") {
-            this._store.select(getEdocLoadingState)
-                .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res) => {
-                        this.getEDoc(this.transactionType);
-                        this._store.dispatch(UpdateListEdocSettle({ data: false }))
-                    }
-                )
-        } else {
-            this.getEDoc(this.transactionType);
+        if (this.transactionType !== 'Shipment') {
+            if (this.transactionType === "Settlement") {
+                this.requestListEDocSettle();
+                this.filterJob(null);
+            }
+            else {
+                this.getEDoc(this.transactionType);
+            }
         }
+    }
+
+    filterJob(jobNo: string) {
+        this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (this.jobOnSettle && jobNo !== null) {
+                        console.log(this.jobOnSettle, this.jobNo);
+                        this.lstEdocExist = res.filter(x => x.jobNo === jobNo || x.jobNo === null);
+                    } else {
+                        this.lstEdocExist = res;
+                    }
+                }
+            );
 
     }
 

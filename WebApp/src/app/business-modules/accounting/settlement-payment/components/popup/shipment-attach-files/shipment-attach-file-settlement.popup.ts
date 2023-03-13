@@ -10,7 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { ISettlementShipmentGroup } from '../../shipment-item/shipment-item.component';
 import { ISettlementPaymentState } from '../../store';
-import { getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from './../../store/reducers/index';
+import { getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../../store/reducers/index';
 
 @Component({
     selector: 'shipment-attach-file',

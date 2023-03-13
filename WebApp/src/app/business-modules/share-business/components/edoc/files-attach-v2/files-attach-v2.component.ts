@@ -1,5 +1,5 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { SystemConstants } from '@constants';
 import { CsTransaction } from '@models';
@@ -9,9 +9,6 @@ import { SortService } from '@services';
 import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
-import { AppList } from 'src/app/app.list';
-import { UpdateListEDoc, getUpdateListEDoc } from 'src/app/business-modules/accounting/settlement-payment/components/store';
-import { UpdateListEdocSettle } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../../store';
@@ -28,7 +25,7 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
 
     @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
     @ViewChild(ShareListFilesAttachComponent) listFileAttach: ShareListFilesAttachComponent;
-
+    @Output() onChange: EventEmitter<any[]> = new EventEmitter<any[]>();
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
@@ -36,12 +33,12 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
     get readonly(): boolean {
         return this._readonly;
     }
+    private _readonly: boolean = false;
 
     documentTypes: any[] = [];
     isOps: boolean = false;
     housebills: any[] = [];
     modifiedDocTypes: any;
-    private _readonly: boolean = false;
     isView: boolean = true;
     elementInput: HTMLElement = null;
     isEdocByJob: boolean = false;
@@ -159,16 +156,7 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
             { title: 'Attach Person', field: 'userCreated', sortable: true },
         ];
-        this._store.select(getUpdateListEDoc)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((res: any) => {
-                console.log(res);
-                if (res) {
-                    this.getEDoc(this.typeFrom);
-                    this._store.dispatch(UpdateListEDoc({ data: false }));
-                }
-            }
-            )
+
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -247,7 +235,6 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             tranType: this.selectedEdoc.transactionType,
             AccountingType: null
         })
-        console.log(docType);
         this.docTypeId = docType.id;
         this.documentAttach.detailDocId = this.selectedEdoc.departmentId;
         this.documentAttach.selectedTrantype = this.selectedEdoc.transactionType;
@@ -262,7 +249,6 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             )
             .subscribe(
                 (res: any[]) => {
-                    console.log(res);
                     this.documentTypes = res;
                     this.documentAttach.configDocType.dataSource = res;
                 },
@@ -285,8 +271,6 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
 
     setDocTypeSelected(docType: any) {
         this.selectedEdoc1 = Object.assign({});
-        console.log(docType);
-
         if (docType !== null) {
             this.selectedEdoc1.documentTypeId = docType?.documentType.id;
             this.selectedEdoc1.documentCode = docType?.documentType.code;
@@ -305,8 +289,6 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
     }
 
     chooseFile(event: any) {
-        console.log(this.selectedEdoc1);
-
         const fileList = event.target['files'];
         const files: any[] = event.target['files'];
         let docType = this.selectedEdoc1?.documentTypeId;
@@ -385,8 +367,8 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             .subscribe(
                 (res: any) => {
                     if (res.status) {
-                        this.getEDoc(this.transactionType);
-                        this._store.dispatch(UpdateListEdocSettle({ data: true }))
+                        //this.getEDoc(this.transactionType);
+                        this.listFileAttach.requestListEDocSettle();
                         this._toast.success(res.message);
                     }
                     else {
@@ -394,6 +376,15 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
                     }
                 },
             );
+    }
+
+    getListEdoc(event: any) {
+        this.listFileAttach.getEDoc(event);
+        this.getEDoc(this.transactionType);
+    }
+
+    emitAttach(event: any) {
+        this.onChange.emit(event);
     }
 }
 

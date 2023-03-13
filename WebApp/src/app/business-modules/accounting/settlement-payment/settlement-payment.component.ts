@@ -1,40 +1,40 @@
-import { LoadListSettlePayment, LoadListSettlePaymentSuccess } from './components/store/actions/settlement-payment.action';
-import { takeUntil, withLatestFrom, concatMap, switchAll } from 'rxjs/operators';
-import { getSettlementPaymentListState, getSettlementPaymentSearchParamsState, getSettlementPaymentListPagingState, getSettlementPaymentListLoadingState } from './components/store/reducers/index';
-import { InjectViewContainerRefDirective } from './../../../shared/directives/inject-view-container-ref.directive';
-import { Component, ViewChild, QueryList, ViewChildren, TemplateRef } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Component, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { concatMap, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { InjectViewContainerRefDirective } from './../../../shared/directives/inject-view-container-ref.directive';
+import { LoadListSettlePayment, LoadListSettlePaymentSuccess } from './components/store/actions/settlement-payment.action';
+import { getSettlementPaymentListLoadingState, getSettlementPaymentListPagingState, getSettlementPaymentListState, getSettlementPaymentSearchParamsState } from './components/store/reducers/index';
 
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
-import { IAppState, getMenuUserSpecialPermissionState } from '@store';
-import { RoutingConstants, AccountingConstants, SystemConstants } from '@constants';
 import { AppList } from '@app';
-import { AccountingRepo, ExportRepo } from '@repositories';
-import { SortService } from '@services';
-import { User, SettlementPayment, PartnerOfAcctManagementResult, SettleRequestsPayment } from '@models';
 import {
     ConfirmPopupComponent,
-    Permission403PopupComponent,
     InfoPopupComponent,
+    Permission403PopupComponent,
     ReportPreviewComponent
 } from '@common';
+import { AccountingConstants, RoutingConstants, SystemConstants } from '@constants';
 import { delayTime } from '@decorators';
 import { ICrystalReport } from '@interfaces';
+import { PartnerOfAcctManagementResult, SettleRequestsPayment, SettlementPayment, User } from '@models';
+import { AccountingRepo, ExportRepo } from '@repositories';
+import { SortService } from '@services';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 
 import { SelectRequester } from '../accounting-management/store';
 import { ShareAccountingManagementSelectRequesterPopupComponent } from '../components/select-requester/select-requester.popup';
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 
-import { catchError, finalize, map, } from 'rxjs/operators';
-import { ContextMenuDirective } from '@directives';
-import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
-import { of, forkJoin } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { ContextMenuDirective } from '@directives';
 import _ from 'lodash';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { forkJoin, of } from 'rxjs';
+import { catchError, finalize, map, } from 'rxjs/operators';
+import { AccountingSelectAttachFilePopupComponent } from '../components/select-attach-file/select-attach-file.popup';
 @Component({
     selector: 'app-settlement-payment',
     templateUrl: './settlement-payment.component.html',
@@ -444,7 +444,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
         this.showPopupDynamicRender<ConfirmPopupComponent>(
             ConfirmPopupComponent,
-            this.confirmPopupContainerRef.viewContainerRef,    // ? View ContainerRef chứa UI popup khi render 
+            this.confirmPopupContainerRef.viewContainerRef,    // ? View ContainerRef chứa UI popup khi render
             {
                 body: `Are you sure you want to sync:<br/> <span class="font-weight-bold">${_.chunk(settlementSyncList.map(x => x.settlementNo), 3).join('<br/>')}</span> <br/>to accountant system ?`,   // ? Config confirm popup
                 iconConfirm: 'la la-cloud-upload',

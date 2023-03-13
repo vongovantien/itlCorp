@@ -30,11 +30,10 @@
                     <tab>
                         <ng-template tabHeading>
                             <span class="m--margin-right-10">Attach files</span>
-                            <span class="badge badge-success"
-                                *ngIf="attachFiles.eDocs?.length > 0">{{attachFiles.eDocs?.length}}</span>
+                            <span class="badge badge-success" *ngIf="totalEDoc > 0">{{totalEDoc}}</span>
                         </ng-template>
                         <files-attach-v2 [typeFrom]="'Settlement'" [billingId]="settlementId"
-                            [billingNo]="settlementCode" (onChange)="attachFiles = $event">
+                            [billingNo]="settlementCode" (onChange)="updateAttachFile($event)">
                         </files-attach-v2>
                     </tab>
                 </tabset>
