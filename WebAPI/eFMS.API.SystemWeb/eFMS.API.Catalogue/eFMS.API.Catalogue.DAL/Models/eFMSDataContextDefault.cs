@@ -935,7 +935,7 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.IdentityNo)
-                    .HasMaxLength(50)
+                    .HasMaxLength(15)
                     .IsUnicode(false);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");

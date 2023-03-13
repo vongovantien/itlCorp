@@ -106,8 +106,7 @@
                         <label>Identity No</label>
                         <input type="text" class="form-control" formControlName="identityNo">
                         <div [ngClass]="'text-danger'"
-                            *ngIf="(isSubmitted && ((identityNo.errors | equalError:'maxlength') || (identityNo.errors | equalError:'minlength')))||
-                                ((identityNo.errors | equalError:'maxlength') || (identityNo.errors | equalError:'minlength'))">
+                            *ngIf="(isSubmitted && ((identityNo.errors | equalError:'maxlength') || (identityNo.errors | equalError:'minlength'))) ">
                             Identity No include 8 - 15 characters!
                         </div>
                         <div [ngClass]="'text-danger'" *ngIf="isSubmitted && identityNo.errors  | equalError:'pattern'">
