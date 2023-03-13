@@ -101,9 +101,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         modelAdd.contracts = [...this.contractList.contracts];
         modelAdd.partnerEmails = [...this.partnerEmailList.partnerEmails];
         modelAdd.isRequestApproval = isRequestApproval;
-        modelAdd.identityNo = this.formCreate.identityNo.value ? this.formCreate.identityNo.value : null;
         modelAdd.dateId = this.formCreate.dateId.value ? (this.formCreate.dateId.value.startDate !== null ? formatDate(this.formCreate.dateId.value.startDate, 'yyyy-MM-dd', 'en') : null) : null;
-        modelAdd.placeId = this.formCreate.placeId.value ? this.formCreate.placeId.value : null;
         this.saveCustomerCommercial(modelAdd);
     }
 
