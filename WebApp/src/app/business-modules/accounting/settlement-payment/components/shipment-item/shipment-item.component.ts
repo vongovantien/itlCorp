@@ -1,5 +1,5 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ReportPreviewComponent } from '@common';
 import { SysImage } from '@models';
 import { Store } from '@ngrx/store';
@@ -11,7 +11,7 @@ import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-
 @Component({
     selector: 'shipment-item',
     templateUrl: './shipment-item.component.html',
-    //changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class SettlementShipmentItemComponent extends AppPage {

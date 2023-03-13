@@ -33,7 +33,7 @@
                             <span class="badge badge-success" *ngIf="totalEDoc > 0">{{totalEDoc}}</span>
                         </ng-template>
                         <files-attach-v2 [typeFrom]="'Settlement'" [billingId]="settlementId"
-                            [billingNo]="settlementCode" (onChange)="updateAttachFile($event)">
+                            [billingNo]="settlementCode">
                         </files-attach-v2>
                     </tab>
                 </tabset>

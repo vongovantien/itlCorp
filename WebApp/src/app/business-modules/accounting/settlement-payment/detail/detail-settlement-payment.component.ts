@@ -89,9 +89,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         }
     }
 
-    updateAttachFile(event: any) {
-        this.attachFiles = event;
-    }
 
     getBodySettlement() {
         const settlement = {
