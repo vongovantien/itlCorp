@@ -1,5 +1,5 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ReportPreviewComponent } from '@common';
 import { SysImage } from '@models';
 import { Store } from '@ngrx/store';
@@ -11,7 +11,7 @@ import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-
 @Component({
     selector: 'shipment-item',
     templateUrl: './shipment-item.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    //changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class SettlementShipmentItemComponent extends AppPage {
@@ -47,13 +47,10 @@ export class SettlementShipmentItemComponent extends AppPage {
     }
 
     ngOnInit() {
-        console.log(this.data);
         this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: any) => {
-                    console.log(res.filter(x => x.jobNo === null || x.jobNo === this.data.jobId));
-
-                    this.countFile = res.filter(x => x.jobNo === null || x.jobNo === this.data.jobId).length;
+                    this.countFile = JSON.parse(JSON.stringify(res.filter(x => x.jobNo === null || x.jobNo === this.data.jobId).length));
                 }
             );
     }
