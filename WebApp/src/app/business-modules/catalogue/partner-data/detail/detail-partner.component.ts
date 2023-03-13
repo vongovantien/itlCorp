@@ -27,6 +27,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { UserCreatePopupComponent } from '../components/user-create-popup/user-create-popup.component';
+import { formatDate } from '@angular/common';
 
 
 @Component({
@@ -444,6 +445,7 @@ export class PartnerDetailComponent extends AppList {
         console.log("formBody: ", formBody);
         console.log("clone: ", cloneObject);
         const mergeObj = Object.assign(_merge(formBody, cloneObject));
+        mergeObj.dateId = !!mergeObj.dateId ? (mergeObj.dateId.startDate !== null ? formatDate(mergeObj.dateId.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         // merge clone & this.partner.
         const mergeObjPartner = Object.assign(_merge(this.partner, mergeObj));
 
