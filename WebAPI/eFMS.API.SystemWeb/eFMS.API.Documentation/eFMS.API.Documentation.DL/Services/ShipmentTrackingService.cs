@@ -74,34 +74,45 @@ namespace eFMS.API.Documentation.DL.Services
                 DateTime lastEvent = DateTime.Now;
                 var lstTrackInfo = new List<SysTrackInfo>();
                 var trackShipment = new TrackingShipmentViewModel();
-
-                CsTransactionDetail hbl = await transactionRepository.Get()
-                        .Join(transactionDetailRepository.Get(), trans => trans.Mawb, transDetail => transDetail.Mawb, (trans, transDetail) => new { trans, transDetail })
-                        .Where(x =>
-                        (!string.IsNullOrEmpty(criteria.Mawb) && x.trans.Mawb == criteria.Mawb.Trim()) ||
-                        (!string.IsNullOrEmpty(criteria.Hawb) && x.transDetail.Hwbno == criteria.Hawb.Trim()))
-                        .Select(x => x.transDetail).FirstOrDefaultAsync();
-
+                CsTransaction shipmentExisted = new CsTransaction();
                 switch (criteria.ShipmentType)
                 {
                     case "AIR":
-                        CsTransaction shipmentExisted = await transactionRepository.Where(x => x.Id == hbl.JobId && (x.TransactionType == "AI" || x.TransactionType == "AE")).FirstOrDefaultAsync();
-                        var partnerApi = new SysPartnerApi();
-                        partnerApi = partnerApiRepository.First(x => x.Name.Contains(_trackingApi.Value.ApiName));
+                        if (!string.IsNullOrEmpty(criteria.Hawb))
+                        {
+                            var hbl = await transactionDetailRepository.Where(x => string.IsNullOrEmpty(criteria.Hawb) || x.Hwbno == criteria.Hawb.Trim()).FirstAsync();
+                            shipmentExisted = await transactionRepository.Where(x => x.Id == hbl.JobId && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
+                                                && (criteria.ShipmentType == "AIR" && (x.TransactionType == "AE" || x.TransactionType == "AI"))).FirstAsync();
+                        }
+                        else
+                        {
+                            shipmentExisted = await transactionRepository.Where(x => string.IsNullOrEmpty(criteria.Mawb) || x.Mawb == criteria.Mawb.Trim()
+                                                && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
+                                                && (criteria.ShipmentType == "AIR" && (x.TransactionType == "AE" || x.TransactionType == "AI"))).FirstAsync();
+                        }
+
+                        SysPartnerApi partnerApi = partnerApiRepository.First(x => x.Name.Contains(_trackingApi.Value.ApiName));
                         var baseUrl = _trackingApi.Value.Url;
                         var payload = new TrackingMoreRequestModel { AwbNumber = shipmentExisted.Mawb };
-                        List<KeyValuePair<string, string>> headers = new List<KeyValuePair<string, string>>();
-                        headers.Add(new KeyValuePair<string, string>("Tracking-Api-Key", partnerApi.ApiKey));
+                        var headers = new List<KeyValuePair<string, string>>
+                        {
+                            new KeyValuePair<string, string>("Tracking-Api-Key", partnerApi.ApiKey)
+                        };
 
-                        HttpResponseMessage request = await HttpClientService.PostAPI(baseUrl, payload, null, headers);
+                        var request = await HttpClientService.PostAPI(baseUrl, payload, null, headers);
+
+                        trackShipment.Departure = placeRepository.First(x => x.Id == shipmentExisted.Pol)?.NameVn;
+                        trackShipment.Destination = placeRepository.First(x => x.Id == shipmentExisted.Pod)?.NameVn;
+                        trackShipment.FlightNo = shipmentExisted.FlightVesselName;
+                        trackShipment.FlightDate = shipmentExisted.FlightDate;
+                        trackShipment.ColoaderName = partnerRepository.First(x => x.Id == shipmentExisted.ColoaderId)?.PartnerNameVn;
+
                         if (!request.IsSuccessStatusCode)
                         {
                             return trackShipment;
                         }
                         var dataReponse = await request.Content.ReadAsAsync<TrackingMoreReponseModel>();
                         statusShipment = dataReponse.Data.StatusNumber == 2 ? DocumentConstants.IN_TRANSIT : (dataReponse.Data.StatusNumber == 4 ? DocumentConstants.DONE : null);
-
-
 
                         if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)
                         {
@@ -124,16 +135,10 @@ namespace eFMS.API.Documentation.DL.Services
                         }
 
                         var returnData = DataContext.Get(x => x.JobId == shipmentExisted.Id).OrderBy(x => x.ActualDate);
-
-                        //Response data
-                        trackShipment.trackInfos = _mapper.Map<List<SysTrackInfoModel>>(returnData);
+                        trackShipment.TrackInfos = _mapper.Map<List<SysTrackInfoModel>>(returnData);
                         trackShipment.Status = statusShipment;
-                        trackShipment.Departure = placeRepository.First(x => x.Id == shipmentExisted.Pol)?.NameVn;
-                        trackShipment.Destination = placeRepository.First(x => x.Id == shipmentExisted.Pod)?.NameVn;
-                        trackShipment.FlightNo = shipmentExisted.FlightVesselName;
-                        trackShipment.FlightDate = shipmentExisted.FlightDate;
-                        trackShipment.ColoaderName = partnerRepository.First(x => x.Id == shipmentExisted.ColoaderId)?.PartnerNameVn;
-                        foreach (var item in trackShipment.trackInfos)
+
+                        foreach (var item in trackShipment.TrackInfos)
                         {
                             item.StationName = placeRepository.First(x => x.Id == item.Station)?.NameVn;
                         };
@@ -152,32 +157,27 @@ namespace eFMS.API.Documentation.DL.Services
 
         public bool CheckExistShipment(TrackingShipmentCriteria criteria)
         {
-            IQueryable<CsTransactionDetail> query = null;
-            switch (criteria.ShipmentType)
+            bool isExisted = false;
+            if (string.IsNullOrEmpty(criteria.Mawb) && string.IsNullOrEmpty(criteria.Hawb))
             {
-                case "AIR":
-
-                    query = transactionRepository.Get()
-                        .Join(transactionDetailRepository.Get(), trans => trans.Mawb, transDetail => transDetail.Mawb, (trans, transDetail) => new { trans, transDetail })
-                        .Where(x => !string.IsNullOrEmpty(x.trans.Mawb) && (x.trans.TransactionType == "AE" || x.trans.TransactionType == "AI"))
-                        .Select(x => x.transDetail);
-                    break;
-                case "SEA":
-                    query = transactionRepository.Get()
-                        .Join(transactionDetailRepository.Get(), trans => trans.Mawb, transDetail => transDetail.Mawb, (trans, transDetail) => new { trans, transDetail })
-                        .Where(x => !string.IsNullOrEmpty(x.trans.Mawb) && (x.trans.TransactionType != "AE" && x.trans.TransactionType != "AI"))
-                        .Select(x => x.transDetail);
-                    break;
-                default:
-                    break;
+                return false;
             }
 
-            bool isExisted = query.Any(x =>
-                 (!string.IsNullOrEmpty(criteria.Mawb) && x.Mawb == criteria.Mawb.Trim()) ||
-                 (!string.IsNullOrEmpty(criteria.Hawb) && x.Hwbno == criteria.Hawb.Trim()));
-
-            return isExisted;
+            if (!string.IsNullOrEmpty(criteria.Hawb))
+            {
+                var hbl = transactionDetailRepository.Where(x => string.IsNullOrEmpty(criteria.Hawb) || x.Hwbno == criteria.Hawb.Trim())?.FirstOrDefault();
+                if (hbl != null)
+                {
+                    isExisted = transactionRepository.Any(x => x.Id == hbl.JobId && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
+                                   && ((criteria.ShipmentType == "AIR" && (x.TransactionType == "AE" || x.TransactionType == "AI"))
+                    || (criteria.ShipmentType == "SEA" && !(x.TransactionType == "AE" || x.TransactionType == "AI"))));
+                }
+                return isExisted;
+            }
+            return transactionRepository.Any(x => string.IsNullOrEmpty(criteria.Mawb) || x.Mawb == criteria.Mawb.Trim()
+                                && x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED
+                                && ((criteria.ShipmentType == "AIR" && (x.TransactionType == "AE" || x.TransactionType == "AI"))
+                                 || (criteria.ShipmentType == "SEA" && !(x.TransactionType == "AE" || x.TransactionType == "AI"))));
         }
-
     }
 }
