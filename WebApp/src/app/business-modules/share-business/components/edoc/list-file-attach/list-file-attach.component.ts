@@ -46,22 +46,27 @@ export class ShareListFilesAttachComponent extends AppShareEDocBase implements O
         if (this.transactionType !== 'Shipment') {
             if (this.transactionType === "Settlement") {
                 this.requestListEDocSettle();
-                this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
-                    .subscribe(
-                        (res: any) => {
-                            if (this.jobOnSettle) {
-                                this.lstEdocExist = res.filter(x => x.jobNo === this.jobNo || x.jobNo === null);
-                            } else {
-                                this.lstEdocExist = res;
-                            }
-                        }
-                    );
-
+                this.filterJob(null);
             }
             else {
                 this.getEDoc(this.transactionType);
             }
         }
+    }
+
+    filterJob(jobNo: string) {
+        this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (this.jobOnSettle && jobNo !== null) {
+                        console.log(this.jobOnSettle, this.jobNo);
+                        this.lstEdocExist = res.filter(x => x.jobNo === jobNo || x.jobNo === null);
+                    } else {
+                        this.lstEdocExist = res;
+                    }
+                }
+            );
+
     }
 
     onSelectEDoc(edoc: any) {

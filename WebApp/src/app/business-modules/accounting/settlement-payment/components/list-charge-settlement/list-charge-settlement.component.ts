@@ -751,7 +751,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             })
         this.documentAttach.jobNo = data.jobId;
         this.documentAttach.jobId = data.shipmentId;
-        //this._store.dispatch(UpdateListEdocSettle({ data: true }));
+        this.documentAttach.updateListFileItem();
         this.documentAttach.show();
     }
 
