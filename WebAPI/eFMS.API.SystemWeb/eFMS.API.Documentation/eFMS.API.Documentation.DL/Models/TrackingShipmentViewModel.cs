@@ -11,7 +11,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string Departure { get; set; }
         public string Destination { get; set; }
         public string Status { get; set; }
-        public List<SysTrackInfoModel> trackInfos { get; set; }
+        public List<SysTrackInfoModel> TrackInfos { get; set; }
 
     }
 }
