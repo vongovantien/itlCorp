@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.DL.Models
 {
-    public class TrackingMoreReponseModel
+    public class TrackingMoreResponseModel
     {
         public Meta Meta { get; set; }
         public Data Data { get; set; }
@@ -60,8 +60,8 @@ namespace eFMS.API.Documentation.DL.Models
         public List<string> FlightWayStation { get; set; }
         [JsonProperty("last_event")]
         public string LastEvent { get; set; }
-        [JsonProperty("flight_info")]
-        public Dictionary<string, FlightInfo> FlightInfo { get; set; }
+        [JsonProperty("flight_info_new")]
+        public List<TrackInfo> FlightInfo { get; set; }
         [JsonProperty("track_info")]
         public List<TrackInfo> TrackInfo { get; set; }
     }
