@@ -5,6 +5,7 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -26,6 +27,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatPartner> partnerRepository;
         private readonly IContextBase<CatPlace> placeRepository;
         private readonly IOptions<TrackingApi> _trackingApi;
+        private readonly ICurrentUser _currentUser;
 
         public ShipmentTrackingService(IContextBase<SysTrackInfo> repository, IMapper mapper,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
@@ -33,6 +35,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysPartnerApi> partnerApiRepo,
             IContextBase<CatPartner> partnerRepo,
             IContextBase<CatPlace> placeRepo,
+            ICurrentUser currentUser,
             IOptions<TrackingApi> trackingApi) : base(repository, mapper)
         {
             transactionDetailRepository = transactionDetailRepo;
@@ -41,6 +44,7 @@ namespace eFMS.API.Documentation.DL.Services
             placeRepository = placeRepo;
             partnerRepository = partnerRepo;
             _trackingApi = trackingApi;
+            _currentUser = currentUser;
         }
 
         private List<SysTrackInfo> GetTrackInfoList(Guid? hblId, IEnumerable<TrackInfo> trackInfos, string source)
@@ -58,6 +62,9 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ActualDate = item.ActualDate;
                 data.FlightNo = item.FlightNumber;
                 data.DatetimeCreated = data.DatetimeModified = DateTime.Now;
+                data.UserCreated = data.UserModified = _currentUser.UserID;
+                data.Type = "AIR";
+                data.Status = item.Status;
                 data.JobId = hblId;
                 data.Source = source;
                 trackInfoList.Add(data);
