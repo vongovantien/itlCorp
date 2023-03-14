@@ -123,18 +123,20 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                             else
                             {
-                                var maxDateExisted = DataContext.Where(x => x.JobId == shipmentExisted.Id).Max(x => x.PlanDate);
-                                var dataTrackingSort = dataResponse.Data.TrackInfo.Where(x => x.PlanDate > maxDateExisted);
+                                var dataExisted = DataContext.Count(x => x.JobId == shipmentExisted.Id);
+                                var dataTrackingSort = dataResponse.Data.TrackInfo.OrderBy(x => x.ActualDate).Skip(dataExisted);
                                 if (dataTrackingSort?.Any() == true)
                                 {
                                     lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, partnerApi.Name);
                                 }
                             }
-                            shipmentExisted.TrackingStatus = statusShipment;
-                            hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
-                            hs = await DataContext.AddAsync(lstTrackInfo);
+                            if (lstTrackInfo.Count() > 0)
+                            {
+                                shipmentExisted.TrackingStatus = statusShipment;
+                                hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
+                                hs = await DataContext.AddAsync(lstTrackInfo);
+                            }
                         }
-
                         var returnData = DataContext.Get(x => x.JobId == shipmentExisted.Id).OrderBy(x => x.ActualDate);
                         trackShipment.TrackInfos = _mapper.Map<List<SysTrackInfoModel>>(returnData);
                         trackShipment.Status = statusShipment;
