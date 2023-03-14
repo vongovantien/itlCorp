@@ -36,20 +36,16 @@ namespace eFMS.API.Accounting.Service.Contexts
                 var deletedList = ChangeTrackerHelper.GetDeleted(entities);
                 if (addedList != null)
                 {
-                    if (addedList != null)
-                    {
-                        ChangeTrackerHelper.InsertToMongoDb(addedList);
-                    }
-                    if (modifiedList != null)
-                    {
-                        ChangeTrackerHelper.InsertToMongoDb(modifiedList);
-                    }
-                    if (deletedList != null)
-                    {
-                        ChangeTrackerHelper.InsertToMongoDb(deletedList);
-                    }
+                    ChangeTrackerHelper.InsertToMongoDb(addedList);
                 }
-                return result;
+                if (modifiedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(modifiedList);
+                }
+                if (deletedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(deletedList);
+                }
             }
             catch (Exception ex)
             {
