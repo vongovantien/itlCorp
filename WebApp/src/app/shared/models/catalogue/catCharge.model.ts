@@ -20,6 +20,7 @@ export class Charge {
     productDept: string = null;
     mode: string = null;
     creditCharge: string = null;
+    offices: string = null;
 
     constructor(data?: any) {
         const self = this;

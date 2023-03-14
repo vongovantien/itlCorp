@@ -42,7 +42,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string Status { get; set; }
         public string AgreementType { get; set; }
         public List<int> DepartmentIds { get; set; }
-        public Guid? OfficeId { get; set; }
+        public List<Guid?> OfficeIds { get; set; }
         public DateTime? IssueDateFrom { get; set; }
         public DateTime? IssueDateTo { get; set; }
         public DateTime? ServiceDateFrom { get; set; }

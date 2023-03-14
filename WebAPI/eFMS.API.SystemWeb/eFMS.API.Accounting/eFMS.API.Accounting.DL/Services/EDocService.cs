@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
+using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common.Helpers;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -22,10 +24,12 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CsShipmentSurcharge> surchargetRepo;
         private readonly IContextBase<OpsTransaction> opsTranRepo;
         private readonly IContextBase<CsTransactionDetail> cstranDeRepo;
-        private readonly IContextBase<CsTransaction> _csTranRepo;
+        private readonly IContextBase<CsTransaction> csTranRepo;
         private readonly IContextBase<SysImage> sysImageRepo;
         private readonly IContextBase<AcctSettlementPayment> settleRepo;
         private readonly IContextBase<SysAttachFileTemplate> attachRepo;
+        private readonly IContextBase<AcctAdvancePayment> advRepo;
+        private readonly ICurrentUser currentUser;
         public EDocService(
             IContextBase<SysImageDetail> repository,
             IContextBase<AcctApproveSettlement> acctApproveSettlementRepository,
@@ -36,6 +40,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CsTransaction> tranrepository,
             IContextBase<AcctSettlementPayment> settleRepository,
             IContextBase<SysAttachFileTemplate> attachRepository,
+            IContextBase<AcctAdvancePayment> advRepository,
+            ICurrentUser currentUserRepo,
         IMapper mapper) : base(repository, mapper)
         {
             acctApproveSettlementRepo = acctApproveSettlementRepository;
@@ -43,9 +49,11 @@ namespace eFMS.API.Accounting.DL.Services
             opsTranRepo = opsTranRepoitory;
             cstranDeRepo = cstranDeRepository;
             sysImageRepo = sysImageRepository;
-            _csTranRepo = tranrepository;
+            csTranRepo = tranrepository;
             settleRepo = settleRepository;
             attachRepo = attachRepository;
+            advRepo = advRepository;
+            currentUser = currentUserRepo;
         }
 
         public async Task<HandleState> GenerateEdocSettlement(CreateUpdateSettlementModel model)
@@ -63,7 +71,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        jobCharge.Add(_csTranRepo.Get(z => z.JobNo == x.JobNo).FirstOrDefault().Id);
+                        jobCharge.Add(csTranRepo.Get(z => z.JobNo == x.JobNo).FirstOrDefault().Id);
                     }
 
                 });
@@ -80,7 +88,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        jobAdd.Add(_csTranRepo.Get(z => z.JobNo == x.JobId).FirstOrDefault().Id);
+                        jobAdd.Add(csTranRepo.Get(z => z.JobNo == x.JobId).FirstOrDefault().Id);
                     }
                 });
                 if (jobDel.Count() > 0)
@@ -180,7 +188,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else
             {
-                var cs = _csTranRepo.Get(x => x.Id == z).FirstOrDefault();
+                var cs = csTranRepo.Get(x => x.Id == z).FirstOrDefault();
                 var csDoc = await attachRepo.GetAsync(x => x.Code == "OT" && x.TransactionType == cs.TransactionType && x.Type == "Accountant");
                 return csDoc.FirstOrDefault().Id;
             }
@@ -200,5 +208,18 @@ namespace eFMS.API.Accounting.DL.Services
         {
             throw new NotImplementedException();
         }
+
+        private Guid GetJobId(string JobNo,string JobType)
+        {
+            if (JobType == "CL")
+            {
+                var jobOps=  opsTranRepo.Get(x => x.JobNo == JobNo);
+                return jobOps.FirstOrDefault().Id;
+            }
+            var jobCs =  csTranRepo.Get(x => x.JobNo == JobNo);
+            return jobCs.FirstOrDefault().Id;
+        }
+
+        
     }
 }

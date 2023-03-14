@@ -66,7 +66,7 @@
                         <label>Payee:</label>
                         <ng-container *ngIf="!readonlyForm else tplPayeeReadOnly">
                             <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:payee.value}"
-                                (itemSelected)="payee.setValue($event.id); getBeneficiaryInfo();onSelectDataFormInfo($event, 'payee')"
+                                (itemSelected)="payee.setValue($event.id);getBeneficiaryInfo()"
                                 [dataSources]="customers" [displayFields]="[
                             { field: 'shortName', label: 'Name ABBR' },
                             { field: 'partnerNameEn', label: 'Name EN' },
@@ -169,7 +169,7 @@
                                         (itemSelected)="onSelectDataFormInfo($event, 'bankName'); mapBankCode($event.code)"
                                         [dataSources]="banks | async" formControlName="bankNameDescription"
                                         [displayFields]="displayFieldBank" [selectedDisplayFields]="['bankNameEn']"
-                                        allowFreeText [disabled]="isDisabled" placeholder="Select partner"
+                                        allowFreeText [disabled]="isDisabled" placeholder="Please Select Bank Name"
                                         (remove)="resetFormControl(bankName);resetFormControl(bankNameDescription)">
                                     </app-combo-grid-virtual-scroll>
                                 </ng-container>
@@ -190,13 +190,13 @@
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAccountNo.dirty)  && !bankAccountNo.valid}">
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && !bankAccountNo.valid}">
                                         <label class=" form-control-label">
                                             Bank Account No:
                                         </label>
-                                        <ng-container
-                                            *ngIf="paymentMethod.value.value === 'Bank' || paymentMethod.value.value === 'Other'; else bankTpl">
-                                            <app-combo-grid-virtual-scroll (showedDropdown)="getBankAccountPayee(false)"
+                                        <ng-container *ngIf="paymentMethod.value.value !== 'Cash'; else bankTemplate">
+                                            <app-combo-grid-virtual-scroll [tooltip]="bankAccountNo.value"
+                                                (showedDropdown)="getBankAccountPayee(false)"
                                                 (itemSelected)="onSelectDataFormInfo($event, 'bankAccountNo')"
                                                 [selectedDisplayFields]="['bankAccountNo']" [dataSources]="bankAccount"
                                                 [displayFields]="displayFieldBankAccount"
@@ -205,7 +205,7 @@
                                                 formControlName="bankAccountNo">
                                             </app-combo-grid-virtual-scroll>
                                         </ng-container>
-                                        <ng-template #bankTpl>
+                                        <ng-template #bankTemplate>
                                             <input type="text" class="form-control" formControlName="bankAccountNo">
                                         </ng-template>
                                     </div>

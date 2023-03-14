@@ -9,8 +9,7 @@
                     <label class="form-control-label" for="">
                         Job ID
                     </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Job ID" name="jobNo"
-                        disabled=true formControlName="jobNo">
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Job ID" name="jobNo" formControlName="jobNo">
                 </div>
             </div>
             <div class="col-lg-4">
@@ -151,7 +150,7 @@
                         </div>
                     </div>
                     <ng-select class="custom" [clearable]="false" [items]="shipmentModes" placeholder="Please select"
-                        formControlName="shipmentMode">
+                        formControlName="shipmentMode" (change)="onSelectDataFormInfo($event, 'shipmentMode')">
                     </ng-select>
                     <div class="form-control-feedback"
                         *ngIf="(shipmentMode.dirty && !shipmentMode.valid) || (isSubmitted && !shipmentMode.valid)">
@@ -423,7 +422,7 @@
                         </div>
                     </div>
                     <div class="col-lg-4 app-switch-custom">
-                        <div class="form-group">
+                        <div class="form-group" *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                             <label class="form-control-label">
                                 No Profit
                             </label>
@@ -555,7 +554,7 @@
                     <label class="form-control-label" for="">
                         Detail of container & Packages
                     </label>
-                    <textarea disabled formControlName="containerDescription" name="containerDescription"
+                    <textarea formControlName="containerDescription" name="containerDescription"
                         class="form-control"></textarea>
                 </div>
             </div>

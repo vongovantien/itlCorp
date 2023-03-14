@@ -72,26 +72,26 @@ namespace eFMS.API.Report.Controllers
         public async Task<IActionResult> ExportAccountingPlSheet(GeneralReportCriteria criteria)
         {
             #region -- Ghi Log Report --
-            var reportLogModel = new SysReportLogModel
-            {
-                ReportName = ReportConstants.Accountant_PL_Sheet,
-                ObjectParameter = JsonConvert.SerializeObject(criteria),
-                Type = ReportConstants.Export_Excel
-            };
+            //var reportLogModel = new SysReportLogModel
+            //{
+            //    ReportName = ReportConstants.Accountant_PL_Sheet,
+            //    ObjectParameter = JsonConvert.SerializeObject(criteria),
+            //    Type = ReportConstants.Export_Excel
+            //};
+            new LogHelper("ExportAccountingPlSheet", JsonConvert.SerializeObject(criteria));
             #endregion -- Ghi Log Report --
             var data = accountingReport.GetDataAccountingPLSheet(criteria);
             if (data == null)
             {
-                return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
+                return Ok(null);
+                //return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
-            new LogHelper("ExportAccountingPlSheet", "" + data.Count().ToString());
-            var stream = new ReportHelper().GenerateAccountingPLSheetExcel(data, criteria, null);
+            //var stream = new ReportHelper().GenerateAccountingPLSheetExcel(data, criteria, null);
+            var stream = new ReportHelper().BindingDataAccountingPLSheetExportExcel(data, criteria);
             if (stream == null)
             {
-                new LogHelper("Stream null");
                 return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
-            new LogHelper("Stream not null");
             FileContentResult fileContent = new Helpers.FileHelper().ExportExcel(null, stream, "Accounting PL Sheet" + criteria.Currency);
             HeaderResponse(fileContent.FileDownloadName);
             return fileContent;

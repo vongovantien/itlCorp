@@ -22,5 +22,7 @@ namespace eFMS.API.SystemFileManagement.DL.IService
         //Task<HandleState> OpenEdocFile(string moduleName, string folder, Guid objId, string aliasName);
         Task<HandleState> OpenFile(Guid Id);
         Task<HandleState> CreateEDocZip(FileDowloadZipModel model);
+        Task<HandleState> GenEdocByBilling(string billingNo, string billingType);
+        bool CheckAllowSettleEdocSendRequest(Guid settleId);
     }
 }

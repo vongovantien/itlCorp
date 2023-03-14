@@ -89,20 +89,20 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group"
-                    [ngClass]="{'m-form__group has-danger': (isSubmitted || bankAccountNo.dirty)  && !bankAccountNo.valid}">
+                <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted  && !bankAccountNo.valid}">
                     <label class="form-control-label">
                         Bank Account No:
                     </label>
-                    <ng-container *ngIf="paymentMethod.value === 'Bank'; else bankTpl">
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event)"
+                    <ng-container *ngIf="paymentMethod.value !== 'Cash'; else bankTemplate">
+                        <app-combo-grid-virtual-scroll [tooltip]="bankAccountNo.value"
+                            (itemSelected)="onSelectDataBankInfo($event, 'bankAccountNo')"
                             [selectedDisplayFields]="['bankAccountNo']" [dataSources]="bankAccount"
                             [displayFields]="displayFieldBankAccount" (remove)="resetFormControl(bankAccountNo)"
                             (showedDropdown)="getBankAccountPayee(false)" placeholder="Please Select Bank Account No"
                             allowFreeText formControlName="bankAccountNo">
                         </app-combo-grid-virtual-scroll>
                     </ng-container>
-                    <ng-template #bankTpl>
+                    <ng-template #bankTemplate>
                         <input type="text" class="form-control" formControlName="bankAccountNo">
                     </ng-template>
                 </div>
@@ -122,7 +122,7 @@
                         Bank Name:
                     </label>
                     <ng-container *ngIf="!readonlyForm; else bankTpl">
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event)"
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataBankInfo($event, 'bankName')"
                             [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
                             [displayFields]="displayFieldBank" (remove)="resetFormControl(bankName)"
                             placeholder="Please Select Bank Name" allowFreeText formControlName="bankName">

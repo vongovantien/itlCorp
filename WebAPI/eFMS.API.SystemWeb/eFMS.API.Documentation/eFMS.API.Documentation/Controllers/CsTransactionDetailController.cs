@@ -7,6 +7,7 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.ForPartner.DL.Models.Receivable;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -41,6 +42,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly ICsStageAssignedService csStageAssignedService;
         private readonly IEDocService edocService;
+        private readonly IRabbitBus _busControl;
         public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer,
             ICsTransactionDetailService service,
             ICurrentUser user,
@@ -49,7 +51,8 @@ namespace eFMS.API.Documentation.Controllers
             IAccAccountReceivableService AccAccountReceivable,
             IOptions<ApiServiceUrl> serviceUrl,
             ICsStageAssignedService stageAssignedService,
-             IEDocService EDocService
+            IEDocService EDocService,
+            IRabbitBus _bus
             )
         {
             stringLocalizer = localizer;
@@ -61,6 +64,8 @@ namespace eFMS.API.Documentation.Controllers
             apiServiceUrl = serviceUrl;
             csStageAssignedService = stageAssignedService;
             edocService = EDocService;
+            _busControl = _bus;
+
         }
 
         [HttpGet("CheckPermission/{id}")]
@@ -523,9 +528,9 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpGet("PreviewAirImptAuthorisedLetter")]
-        public IActionResult PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign)
+        public IActionResult PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign, string language)
         {
-            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetter(housbillId, printSign);
+            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetter(housbillId, printSign, language);
             return Ok(result);
         }
 
@@ -631,12 +636,8 @@ namespace eFMS.API.Documentation.Controllers
 
         private async Task<HandleState> CalculatorReceivable(List<ObjectReceivableModel> model)
         {
-            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
-            string accessToken = Request.Headers["Authorization"].ToString();
-
-            HttpResponseMessage resquest = await HttpClientService.PutAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculateDebitAmount", model, accessToken);
-            var response = await resquest.Content.ReadAsAsync<HandleState>();
-            return response;
+            await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, model);
+            return new HandleState();
         }
 
         [HttpPut]

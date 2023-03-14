@@ -182,7 +182,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         });
 
         if (!!this.customDeclaration.serviceType) {
-            if (this.customDeclaration.serviceType === 'Air' || this.customDeclaration.serviceType === 'Express') {
+            if (this.customDeclaration.serviceType === 'Air' || this.customDeclaration.serviceType === 'Express' || this.customDeclaration.serviceType === 'Sea Consol') {
                 this.isDisableCargo = true;
                 this.cargoType.disable();
             } else {
@@ -226,7 +226,7 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
             case 'service-type':
                 const serviceType = event;
                 if (!!serviceType) {
-                    if (serviceType === 'Air' || serviceType === 'Express') {
+                    if (serviceType === 'Air' || serviceType === 'Express' || serviceType === 'Sea Consol') {
                         this.isDisableCargo = true;
                         this.formGroup.controls['cargoType'].setValue(null);
                         this.formGroup.controls['cargoType'].disable();

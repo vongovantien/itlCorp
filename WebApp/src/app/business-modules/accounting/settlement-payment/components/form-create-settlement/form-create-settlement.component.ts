@@ -189,20 +189,14 @@ export class SettlementFormCreateComponent extends AppForm {
 
     getBeneficiaryInfo() {
         if (!!this.payee.value) {
-            if (this.paymentMethod.value === this.methods[1] || this.paymentMethod.value === this.methods[3]) {
-                const beneficiary = this.getPartnerById(this.payee.value);
-                if (!!beneficiary) {
-                    this.beneficiaryName.setValue(beneficiary.partnerNameVn);
-                    this.bankAccountNo.setValue(beneficiary.bankAccountNo);
-                    this.setBankInfo(beneficiary);
-                }
+            if (this.paymentMethod.value !== this.methods[0]) {
                 this.getBankAccountPayee(true);
             } else {
                 this.resetBankInfo();
             }
         } else {
             this.resetBankInfo();
-            if (this.paymentMethod.value === this.methods[1]) {
+            if (this.paymentMethod.value === this.methods[1] || this.paymentMethod.value === this.methods[2]) {
                 if (!!this.userLogged) {
                     this.beneficiaryName.setValue(this.userLogged.nameVn);
                     this.bankAccountNo.setValue(this.userLogged.bankAccountNo);
@@ -247,27 +241,34 @@ export class SettlementFormCreateComponent extends AppForm {
                 this.bankNameDescription.setValue(data.bankNameEn)
                 this.mapBankCode(data.code)
                 break;
-            case 'payee':
-                this.getBankAccountPayee(true);
-                break;
         }
     }
 
     getBankAccountPayee(isSetBank: Boolean) {
-        console.log("abc")
-        console.log(!!this.payee.value && (this.paymentMethod.value.value === 'Bank' || this.paymentMethod.value.value === 'Other'))
-        if (!!this.payee.value && (this.paymentMethod.value.value === 'Bank' || this.paymentMethod.value.value === 'Other')) {
+        if (!!this.payee.value && this.paymentMethod.value.value !== 'Cash') {
             this._catalogueRepo.getListBankByPartnerById(this.payee.value)
                 .pipe(catchError(this.catchError), finalize(() => {
                     this.isLoading = false;
                 })).subscribe(
                     (res: any[]) => {
-                        this.bankAccount = res;
-                        if (isSetBank === true && !!res && res.length > 0) {
-                            this.bankAccountNo.setValue(res[0].bankAccountNo);
-                            this.bankNameDescription.setValue(res[0].bankNameEn);
-                            this.bankName.setValue(res[0].bankNameEn);
-                            this.mapBankCode(res[0].code);
+                        if (!!res && res.length > 0) {
+                            this.bankAccount = res;
+                            if (isSetBank === true) {
+                                this.bankAccountNo.setValue(res[0].bankAccountNo);
+                                this.bankNameDescription.setValue(res[0].bankNameEn);
+                                this.bankName.setValue(res[0].bankNameEn);
+                                this.beneficiaryName.setValue(res[0].bankAccountName)
+                                this.mapBankCode(res[0].code);
+                            }
+                        }
+                        else {
+                            this.bankAccount = [];
+                            const beneficiary = this.getPartnerById(this.payee.value);
+                            if (!!beneficiary) {
+                                this.beneficiaryName.setValue(beneficiary.bankAccountName);
+                                this.bankAccountNo.setValue(beneficiary.bankAccountNo);
+                                this.setBankInfo(beneficiary);
+                            }
                         }
                     });
         }

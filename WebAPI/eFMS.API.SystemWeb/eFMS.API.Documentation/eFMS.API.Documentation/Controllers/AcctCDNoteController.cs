@@ -52,19 +52,6 @@ namespace eFMS.API.Documentation.Controllers
             currentUser.Action = "AddNewCDNote";
             if (!ModelState.IsValid) return BadRequest();
 
-            //if(model.Type != DocumentConstants.CDNOTE_TYPE_CREDIT)
-            //{
-            //    string transctionType = model.TransactionTypeEnum == TransactionTypeEnum.CustomLogistic ? "CL" : "DOC";
-            //    Guid _hblId = model.listShipmentSurcharge.First()?.Hblid ?? Guid.Empty;
-
-            //    HandleState validatePartnerCheckpoint = checkPointService.ValidateCheckPointPartnerDebitNote(model.PartnerId, _hblId, transctionType);
-
-            //    if(validatePartnerCheckpoint.Success == false)
-            //    {
-            //        return Ok(new ResultHandle { Status = validatePartnerCheckpoint.Success, Message = validatePartnerCheckpoint.Message?.ToString() });
-            //    }
-            //}
-          
             HandleState hs = cdNoteServices.AddNewCDNote(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -359,6 +346,21 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult GetDataAcctMngtDebCretInvExport(CDNoteCriteria criteria)
         {
             var result = cdNoteServices.GetDataAcctMngtDebCretInvExport(criteria);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get invoice - cd note by agency template
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetDataAcctMngtAgencyExport")]
+        [Authorize]
+        public IActionResult GetDataAcctMngtAgencyExport(CDNoteCriteria criteria)
+        {
+            var result = cdNoteServices.GetDataAcctMngtAgencyExport(criteria);
+            if (result == null || result.Count() == 0) { return BadRequest(); };
             return Ok(result);
         }
     }

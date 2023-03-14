@@ -133,5 +133,21 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
+        <member name="M:eFMS.API.Report.Helpers.ReportHelper.BindingDataAccountingPLSheetExportExcel(System.Linq.IQueryable{eFMS.API.Report.DL.Models.AccountingPlSheetExportResult},eFMS.API.Report.DL.Models.GeneralReportCriteria)">
+            <summary>
+            Generate file PL sheet report
+            </summary>
+            <param name="listData"></param>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Report.Helpers.ReportHelper.BindingDataEDocReport(System.Collections.Generic.List{eFMS.API.Report.DL.Models.EDocReportResult},eFMS.API.Report.DL.Models.GeneralReportCriteria)">
+            <summary>
+            Generate file PL sheet report
+            </summary>
+            <param name="listData"></param>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

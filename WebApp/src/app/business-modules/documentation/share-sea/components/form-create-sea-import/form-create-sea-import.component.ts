@@ -11,7 +11,7 @@ import { getTransactionDetailCsTransactionState, ITransactionState } from '@shar
 import { FormValidators } from '@validators';
 import { JobConstants, SystemConstants } from '@constants';
 
-import { GetCatalogueAgentAction, GetCatalogueCarrierAction, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueAgentState, getCataloguePortState } from '@store';
+import { GetCatalogueAgentAction, GetCatalogueCarrierAction, GetCataloguePortAction, getCatalogueCarrierState, getCatalogueAgentState, getCataloguePortState, getMenuUserSpecialPermissionState } from '@store';
 
 
 import { Observable } from 'rxjs';
@@ -91,6 +91,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
     }
 
     ngOnInit() {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
 
         this._store.dispatch(new GetCatalogueAgentAction());
         this._store.dispatch(new GetCatalogueCarrierAction(CommonEnum.PartnerGroupEnum.CARRIER));

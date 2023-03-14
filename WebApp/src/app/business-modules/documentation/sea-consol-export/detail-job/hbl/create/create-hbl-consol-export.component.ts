@@ -13,7 +13,9 @@ import {
     ShareBusinessImportHouseBillDetailComponent,
     ShareBussinessHBLGoodSummaryFCLComponent,
     getTransactionPermission,
-    ShareBusinessAttachListHouseBillComponent
+    ShareBusinessAttachListHouseBillComponent,
+    getTransactionState,
+    ITransactionState
 } from 'src/app/business-modules/share-business';
 
 import * as fromShareBussiness from './../../../../../share-business/store';
@@ -43,7 +45,7 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
     jobId: string;
     containers: Container[] = [];
     selectedHbl: CsTransactionDetail;
-
+    shipmentType: string;
     constructor(
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
@@ -128,6 +130,13 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
 
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
+        this._store.select(getTransactionState)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
+            (res: ITransactionState) => {
+                this.shipmentType = res.cstransaction.shipmentType;
+            }
+        );
         const formData = {
             id: SystemConstants.EMPTY_GUID,
             jobId: this.jobId,
@@ -190,6 +199,7 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
             contSealNo: this.goodSummaryComponent.containerDescription,
             chargeWeight: this.goodSummaryComponent.totalChargeWeight,
             attachList: this.attachListComponent.attachList,
+            shipmentType: this.shipmentType,
         };
 
         return formData;

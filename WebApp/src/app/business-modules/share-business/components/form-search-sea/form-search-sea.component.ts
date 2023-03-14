@@ -88,7 +88,7 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
                     if (!!Object.keys(criteria).length && criteria.transactionType === this.transaction) {
                         this.dataSearch = criteria;
 
-                        ['jobNo', 'mawb', 'hwbno', 'soaNo', 'containerNo','creditDebitNo'].some(i => {
+                        ['jobNo', 'mawb', 'hwbno', 'soaNo', 'containerNo', 'creditDebitNo'].some(i => {
                             if (!!this.dataSearch[i]) {
                                 this.filterType.setValue(this.filterTypes.find(d => d.value === i));
                                 this.searchText.setValue(this.dataSearch[i]);
@@ -232,6 +232,9 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     }
 
     expanded() {
+        if (!this.isSearchAdv) {
+            this.isSearchAdv = true;
+        }
         if (!!this.dataSearch) {
             const advanceSearchForm = {
                 customer: this.dataSearch.customerId,

@@ -1384,9 +1384,11 @@ export class CatalogueRepo {
 
     }
 
-    GetListSalemanByShipmentType(partnerId: string, transactionType: string, shipmentType: string) {
+    GetListSalemanByShipmentType(partnerId: string, transactionType: string, shipmentType: string, officeId: string = null) {
+        if (!!officeId) {
+            return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetListSaleman`, { partnerId: partnerId, transactionType: transactionType, shipmentType: shipmentType, office: officeId });
+        }
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/GetListSaleman`, { partnerId: partnerId, transactionType: transactionType, shipmentType: shipmentType });
-
     }
 
     getInForCompanyByTaxCode(taxCode: string) {
@@ -1413,7 +1415,7 @@ export class CatalogueRepo {
         )
     }
 
-    getStandChargeByType(type: string, transactionType: string) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStandardCharge/GetBy`, { type: type, transactionType: transactionType });
+    getStandChargeByType(criteria: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStandardCharge/GetBy`, criteria);
     }
 }

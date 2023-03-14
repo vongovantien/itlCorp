@@ -42,6 +42,7 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<SysUser> userRepository;
         private readonly IContextBase<CatPartner> customerRepository;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
+        private readonly IContextBase<SysOffice> sysOfficeRepository;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
@@ -57,6 +58,7 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<SysUser> userRepo,
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
+            IContextBase<SysOffice> sysOffice,
         IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
@@ -72,6 +74,7 @@ namespace eFMS.API.Operation.DL.Services
             customerRepository = customerRepo;
             csShipmentSurchargeRepo = csShipmentSurcharge;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
+            sysOfficeRepository = sysOffice;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -379,13 +382,21 @@ namespace eFMS.API.Operation.DL.Services
 
 
             var data = Get().Where(query);
+            var officeOutsource = sysOfficeRepository.Get(x => x.OfficeType == "OutSource");
             if (Imported == true)
             {
                 data = data.Where(x => x.JobNo != null);
             }
             else if (Imported == false)
             {
-                data = data.Where(x => x.JobNo == null);
+                if (officeOutsource.Where(x => x.Id == currentUser.OfficeID).FirstOrDefault() != null)
+                {
+                    data = data.Where(x => x.JobNo == null && x.Source == "Replicate");
+                }
+                else
+                {
+                    data = data.Where(x => x.JobNo == null && x.Source != "Replicate");
+                }
             }
             rowsCount = data.Count();
             if (rowsCount == 0) return returnList;
@@ -471,14 +482,18 @@ namespace eFMS.API.Operation.DL.Services
                     var clearance = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
                     if (clearance != null)
                     {
-                        clearance.JobNo = item.JobNo;
-                        clearance.ConvertTime = item.ConvertTime;
-                        clearance.DatetimeModified = DateTime.Now;
-                        clearance.UserModified = currentUser.UserID;
+                       clearance.JobNo = item.JobNo;
+                       clearance.ConvertTime = item.ConvertTime;
+                       clearance.DatetimeModified = DateTime.Now;
+                       clearance.UserModified = currentUser.UserID;
                     }
                     DataContext.Update(clearance, x => x.Id == item.Id, false);
+                    if(item.isDelete == true && item.Source == "Replicate")
+                    {
+                        DataContext.Delete(x => x.Id == item.Id);
+                    }
                 }
-                DataContext.SubmitChanges();
+                result = DataContext.SubmitChanges();
             }
             catch (Exception ex)
             {
@@ -1555,7 +1570,7 @@ namespace eFMS.API.Operation.DL.Services
                         return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
                     }
 
-                    var opsJobReplicate = opsTransactionRepo.Get(x => x.Id == opsJob.ReplicatedId)?.FirstOrDefault();
+                    var opsJobReplicate = opsTransactionRepo.Get(x => x.Id == opsJob.ReplicatedId && x.CurrentStatus != "Canceled")?.FirstOrDefault();
                     if (opsJobReplicate == null)
                     {
                         return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));

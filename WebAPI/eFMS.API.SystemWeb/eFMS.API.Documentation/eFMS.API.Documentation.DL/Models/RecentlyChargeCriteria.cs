@@ -14,5 +14,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string AgentId { get; set; }    // MBL
         public string ChargeType { get; set; } // BUY/SEL
         public string ColoaderId { get; set; } // MBL
+        public string SalesmanId { get; set; }
     }
 }

@@ -673,21 +673,21 @@ namespace eFMS.API.Documentation.DL.Services
                 numOrder += 1;
             }
 
-            if (_housebills == null || _housebills.Count() == 0)
-            {
-                var _content = template.Content;
-                _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                _content = _content.Replace("{{Hwbno}}", string.Empty);
-                _content = _content.Replace("{{FreightPayment}}", string.Empty);
-                _content = _content.Replace("{{Shipper}}", string.Empty);
-                _content = _content.Replace("{{Consignee}}", string.Empty);
-                _content = _content.Replace("{{Qty}}", string.Empty);
-                _content = _content.Replace("{{GW}}", string.Empty + "(KGS)");
-                _content = _content.Replace("{{CW}}", string.Empty + "(KGS)");
-                _content = _content.Replace("{{Incoterm}}", string.Empty);
-                _content = _content.Replace("{{NQGoods}}", string.Empty);
-                contenEmail += _content;
-            }
+            //if (_housebills == null || _housebills.Count() == 0)
+            //{
+            //    var _content = template.Content;
+            //    _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
+            //    _content = _content.Replace("{{Hwbno}}", string.Empty);
+            //    _content = _content.Replace("{{FreightPayment}}", string.Empty);
+            //    _content = _content.Replace("{{Shipper}}", string.Empty);
+            //    _content = _content.Replace("{{Consignee}}", string.Empty);
+            //    _content = _content.Replace("{{Qty}}", string.Empty);
+            //    _content = _content.Replace("{{GW}}", string.Empty + "(KGS)");
+            //    _content = _content.Replace("{{CW}}", string.Empty + "(KGS)");
+            //    _content = _content.Replace("{{Incoterm}}", string.Empty);
+            //    _content = _content.Replace("{{NQGoods}}", string.Empty);
+            //    contenEmail += _content;
+            //}
 
             _body = _body.Replace("{{Content}}", contenEmail);
             _body = _body.Replace("{{PO}}", string.Empty);
@@ -1424,20 +1424,20 @@ namespace eFMS.API.Documentation.DL.Services
                     numOrder += 1;
                 }
 
-                if (_housebills == null || _housebills.Count() == 0)
-                {
-                    var _content = emailTemplate.Content;
-                    _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                    _content = _content.Replace("{{ContainerDetail}}", string.Empty);
-                    _content = _content.Replace("{{Total}}", string.Empty);
-                    _content = _content.Replace("{{GW}}", string.Empty);
-                    _content = _content.Replace("{{CBM}}", string.Empty);
-                    _content = _content.Replace("{{HBL}}", string.Empty);
-                    _content = _content.Replace("{{Shipper}}", string.Empty);
-                    _content = _content.Replace("{{Cnee}}", string.Empty);
-                    _content = _content.Replace("{{Notify}}", string.Empty);
-                    contentEmail += _content;
-                }
+                //if (_housebills == null || _housebills.Count() == 0)
+                //{
+                //    var _content = emailTemplate.Content;
+                //    _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
+                //    _content = _content.Replace("{{ContainerDetail}}", string.Empty);
+                //    _content = _content.Replace("{{Total}}", string.Empty);
+                //    _content = _content.Replace("{{GW}}", string.Empty);
+                //    _content = _content.Replace("{{CBM}}", string.Empty);
+                //    _content = _content.Replace("{{HBL}}", string.Empty);
+                //    _content = _content.Replace("{{Shipper}}", string.Empty);
+                //    _content = _content.Replace("{{Cnee}}", string.Empty);
+                //    _content = _content.Replace("{{Notify}}", string.Empty);
+                //    contentEmail += _content;
+                //}
                 _body = _body.Replace("{{Content}}", contentEmail);
             }
             else
@@ -1501,20 +1501,20 @@ namespace eFMS.API.Documentation.DL.Services
                     contentEmail += _content;
                     numOrder += 1;
                 }
-                if (_housebills == null || _housebills.Count() == 0)
-                {
-                    var _content = emailTemplate.Content;
-                    _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
-                    _content = _content.Replace("{{ContainerDetail}}", string.Empty);
-                    _content = _content.Replace("{{Total}}", string.Empty);
-                    _content = _content.Replace("{{GW}}", string.Empty);
-                    _content = _content.Replace("{{CBM}}", string.Empty);
-                    _content = _content.Replace("{{HBL}}", string.Empty);
-                    _content = _content.Replace("{{Shipper}}", string.Empty);
-                    _content = _content.Replace("{{Cnee}}", string.Empty);
-                    _content = _content.Replace("{{Notify}}", string.Empty);
-                    contentEmail += _content;
-                }
+                //if (_housebills == null || _housebills.Count() == 0)
+                //{
+                //    var _content = emailTemplate.Content;
+                //    _content = _content.Replace("{{NumOrder}}", numOrder + ". ");
+                //    _content = _content.Replace("{{ContainerDetail}}", string.Empty);
+                //    _content = _content.Replace("{{Total}}", string.Empty);
+                //    _content = _content.Replace("{{GW}}", string.Empty);
+                //    _content = _content.Replace("{{CBM}}", string.Empty);
+                //    _content = _content.Replace("{{HBL}}", string.Empty);
+                //    _content = _content.Replace("{{Shipper}}", string.Empty);
+                //    _content = _content.Replace("{{Cnee}}", string.Empty);
+                //    _content = _content.Replace("{{Notify}}", string.Empty);
+                //    contentEmail += _content;
+                //}
 
                 _body = _body.Replace("{{Content}}", contentEmail);
             }

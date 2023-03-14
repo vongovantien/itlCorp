@@ -1,20 +1,20 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from '@app';
 import { ComboGridVirtualScrollComponent, InfoPopupComponent } from '@common';
-import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
+import { ChargeConstants, JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { CommodityGroup, Customer, LinkAirSeaModel, PortIndex, User } from '@models';
-import { Store } from '@ngrx/store';
+import { CommodityGroup, Customer, LinkAirSeaModel, PortIndex, Unit, User } from '@models';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
-import { IShareBussinessState } from '@share-bussiness';
-import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState } from '@store';
+import { ClearContainerAction, getContainerSaveState, IShareBussinessState, ShareBussinessContainerListPopupComponent } from '@share-bussiness';
+import { GetCatalogueAgentAction, getCatalogueAgentState, GetCatalogueCarrierAction, getCatalogueCarrierState, GetCatalogueCommodityGroupAction, getCatalogueCommodityGroupState, GetCataloguePortAction, getCataloguePortState, getMenuUserSpecialPermissionState, getCurrentUserState } from '@store';
 import { FormValidators } from '@validators';
 
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-
+import { catchError, takeUntil } from 'rxjs/operators';
+import { Container } from './../../../../../shared/models/document/container.model';
 @Component({
     selector: 'job-mangement-form-create',
     templateUrl: './form-create-job.component.html'
@@ -22,6 +22,7 @@ import { catchError } from 'rxjs/operators';
 
 export class JobManagementFormCreateComponent extends AppForm implements OnInit {
     @ViewChild('comboGridCustomerCpn') comboGridCustomerCpn: ComboGridVirtualScrollComponent;
+    @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
 
     formCreate: FormGroup;
 
@@ -47,6 +48,15 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     suspendTime: AbstractControl;
     clearanceDate: AbstractControl;
 
+    sumGrossWeight: AbstractControl;
+    sumNetWeight: AbstractControl;
+    sumContainers: AbstractControl;
+    packageTypeId: AbstractControl;
+    sumCbm: AbstractControl;
+    sumPackages: AbstractControl;
+    note: AbstractControl;
+    containerDescription: AbstractControl;
+
     productServices: string[] = JobConstants.COMMON_DATA.PRODUCTSERVICE;
     serviceModes: string[] = JobConstants.COMMON_DATA.SERVICEMODES;
     shipmentModes: string[] = JobConstants.COMMON_DATA.SHIPMENTMODES;
@@ -63,6 +73,9 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
 
     jobLinkAirSeaNo: string = '';
     jobLinkAirSeaInfo: LinkAirSeaModel;
+
+    packageTypes: Observable<Unit[]>;
+    containers: Container[];
 
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Port Code' },
@@ -81,7 +94,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         { field: 'employeeNameEn', label: 'Full Name' }
     ];
 
-    userLogged: User;
+    userLogged: SystemInterface.IClaimUser;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -90,13 +103,13 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         private _store: Store<IShareBussinessState>,
         private _fb: FormBuilder,
         private _toaster: ToastrService,
+        protected _actionStoreSubject: ActionsSubject,
     ) {
         super();
     }
 
     ngOnInit() {
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
 
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this._store.dispatch(new GetCatalogueCarrierAction());
@@ -108,11 +121,26 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.agents = this._store.select(getCatalogueAgentState);
         this.commodityGroups = this._store.select(getCatalogueCommodityGroupState);
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-        // this.salesmans = this._systemRepo.getSystemUsers({ active: true });
         this.users = this._systemRepo.getListSystemUser();
-
+        this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
+        this._store.dispatch(new ClearContainerAction());
+        this._store.select(getContainerSaveState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res: any) => {
+                if (!!res) {
+                    this.containers = res;
+                }
+            })
+        this._store.select(getCurrentUserState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res: any) => {
+                if (!!res) {
+                    this.userLogged = res;
+                }
+            })
         this.initForm();
     }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'supplier':
@@ -200,6 +228,14 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                 Validators.maxLength(150),
             ])],
             clearanceDate: [null],
+            sumGrossWeight: [null],
+            sumNetWeight: [null],
+            sumContainers: [null],
+            sumPackages: [null],
+            packageTypeId: [null],
+            sumCbm: [null],
+            note: [null],
+            containerDescription: [{ value: null, disabled: true }]
 
         }, { validator: FormValidators.comparePort });
 
@@ -222,6 +258,13 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.deliveryDate = this.formCreate.controls['deliveryDate'];
         this.suspendTime = this.formCreate.controls['suspendTime'];
         this.clearanceDate = this.formCreate.controls['clearanceDate'];
+        this.sumGrossWeight = this.formCreate.controls['sumGrossWeight'];
+        this.sumNetWeight = this.formCreate.controls['sumNetWeight'];
+        this.sumContainers = this.formCreate.controls['sumContainers'];
+        this.sumPackages = this.formCreate.controls['sumPackages'];
+        this.packageTypeId = this.formCreate.controls['packageTypeId'];
+        this.sumCbm = this.formCreate.controls['sumCbm']
+        this.containerDescription = this.formCreate.controls['containerDescription'];
     }
 
     getASInfoToLink() {
@@ -282,5 +325,9 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                     }
                 );
         }
+    }
+
+    showListContainer() {
+        this.containerPopup.show();
     }
 }

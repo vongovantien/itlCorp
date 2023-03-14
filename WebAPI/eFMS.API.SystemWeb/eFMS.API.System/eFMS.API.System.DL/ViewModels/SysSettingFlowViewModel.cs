@@ -13,6 +13,7 @@ namespace eFMS.API.System.DL.ViewModels
         public SysSettingFlow Account { get; set; }
         public SysSettingFlow ReplicateOffice { get; set; }
         public SysSettingFlow AccountPayable { get; set; }
+        public SysSettingFlow Opex { get; set; }
 
     }
 }

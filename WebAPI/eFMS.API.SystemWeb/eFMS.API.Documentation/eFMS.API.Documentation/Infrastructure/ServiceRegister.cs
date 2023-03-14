@@ -14,6 +14,8 @@ using eFMS.API.Shipment.Infrastructure.Filters;
 using System.Reflection;
 using System.IO;
 using System;
+using eFMS.API.Infrastructure.RabbitMQ;
+using Microsoft.Extensions.Configuration;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -97,6 +99,5 @@ namespace eFMS.API.Shipment.Infrastructure
                 });
             return services;
         }
-        
     }
 }

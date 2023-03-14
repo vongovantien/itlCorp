@@ -1,15 +1,15 @@
-import { AppList } from "src/app/app.list";
-import { Component, ViewChild } from "@angular/core";
-import { SortService } from "@services";
-import { NgProgress } from "@ngx-progressbar/core";
-import { ToastrService } from "ngx-toastr";
-import { ReportManagementRepo } from "@repositories";
-import { catchError, finalize, map } from "rxjs/operators";
-import { LoadingPopupComponent } from "@common";
-import { NgxSpinnerService } from "ngx-spinner";
-import { SystemConstants } from "@constants";
-import { of } from "rxjs";
 import { HttpResponse } from "@angular/common/http";
+import { Component, ViewChild } from "@angular/core";
+import { LoadingPopupComponent } from "@common";
+import { SystemConstants } from "@constants";
+import { NgProgress } from "@ngx-progressbar/core";
+import { ReportManagementRepo } from "@repositories";
+import { SortService } from "@services";
+import { NgxSpinnerService } from "ngx-spinner";
+import { ToastrService } from "ngx-toastr";
+import { of } from "rxjs";
+import { catchError, finalize, map } from "rxjs/operators";
+import { AppList } from "src/app/app.list";
 
 @Component({
     selector: 'app-general-report',
@@ -60,7 +60,7 @@ export class GeneralReportComponent extends AppList {
     }
 
     onSearchGeneralReport(data: any) {
-        this.page = 1; // reset page.        
+        this.page = 1; // reset page.
         if (Object.keys(data).length !== 0) {
             this.dataSearch = data;
             this.searchGeneralReport();
@@ -156,6 +156,27 @@ export class GeneralReportComponent extends AppList {
             this._spinner.hide();
             this.loadingPopupComponent.show();
             this._report.exportStandardGeneralReport(this.dataSearch)
+                .pipe(
+                    catchError(() => of(this.loadingPopupComponent.downloadFail())),
+                    finalize(() => this._progressRef.complete())
+                )
+                .subscribe(
+                    (response: HttpResponse<any>) => {
+                        this.startDownloadReport(response.body, response.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    },
+                );
+        }
+    }
+
+    exportEDocReport() {
+        if (this.dataList.length === 0) {
+            this._toastService.warning('No Data To View, Please Re-Apply Report');
+            return;
+        } else {
+            this.isClickSubMenu = false;
+            this._spinner.hide();
+            this.loadingPopupComponent.show();
+            this._report.exportEDocReport(this.dataSearch)
                 .pipe(
                     catchError(() => of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())

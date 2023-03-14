@@ -44,5 +44,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string Department { get; set; }
         public string JobStatus { get; set; }
         public PermissionAllowBase Permission { get; set; }
+        public new string ShipmentType { get; set; }
     }
 }

@@ -1,22 +1,22 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { AppPage } from '@app';
-import { Surcharge } from '@models';
-import { AccountingRepo } from '@repositories';
-import { ToastrService } from 'ngx-toastr';
 import { RoutingConstants } from '@constants';
+import { Surcharge } from '@models';
+import { AccountingRepo, SystemFileManageRepo } from '@repositories';
 import { DataService } from '@services';
+import { ToastrService } from 'ngx-toastr';
 
-import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
+import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 
-import { catchError, concatMap, finalize } from 'rxjs/operators';
 import { InfoPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
-import { EMPTY } from 'rxjs';
+import { EMPTY, of } from 'rxjs';
+import { catchError, concatMap, finalize, takeUntil } from 'rxjs/operators';
 @Component({
     selector: 'app-settle-payment-new',
     templateUrl: './add-settle-payment.component.html'
@@ -27,13 +27,15 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     @ViewChild(SettlementListChargeComponent) requestSurchargeListComponent: SettlementListChargeComponent;
     @ViewChild(SettlementFormCreateComponent) formCreateSurcharge: SettlementFormCreateComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
 
     constructor(
         private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private cdRef: ChangeDetectorRef,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _systemFileRepo: SystemFileManageRepo
     ) {
         super();
     }
@@ -141,15 +143,11 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             );
     }
 
+
     saveAndSendRequest() {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
         if (!this.checkValidSettle()) {
             return;
         }
-
         this.formatInvoiceDateSurcharge();
         const body: IDataSettlement = {
             settlement: this.getDataForm(),
@@ -157,49 +155,50 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         };
 
         let settlementResult: any = {};
+
         this._accountingRepo.checkValidToSendRequestSettle(body)
             .pipe(catchError(this.catchError), finalize(() => this.isLoading = false),
                 concatMap((res: CommonInterface.IResult) => {
                     if (!res.status && !!res.message) {
-                        this._toastService.warning(res.message, '', { enableHtml: true });
-                        return;
+                        return of(res);
                     }
-                    else {
-                        return this._accountingRepo.checkIfInvalidFeeShipmentSettle(body).pipe(
-                            catchError(this.catchError),
-                            concatMap((res: CommonInterface.IResult) => {
-                                if (!res.status) {
-                                    this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
-                                        title: 'Warning',
-                                        body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
-                                        class: 'bg-danger'
-                                    });
-                                    return EMPTY;
-                                } else {
-                                    return this._accountingRepo.saveAndSendRequestSettlemntPayment(body).pipe(
-                                        catchError(this.catchError),
-                                        concatMap((res: CommonInterface.IResult) => {
-                                            if (!res.status) {
-                                                this._toastService.warning(res.message, '', { enableHtml: true });
-                                                this.requestSurchargeListComponent.selectedIndexSurcharge = null;
-                                            } else {
-                                                settlementResult = res.data.settlement;
-                                                let approve: any = {
-                                                    settlementNo: settlementResult.settlementNo,
-                                                    requester: settlementResult.requester
-                                                }
-                                                return this._accountingRepo.updateAndSendMailApprovalSettlement(approve);
-                                            }
-                                        })
-                                    );
-                                }
-                            })
-                        );
-                    }
+                    return this._accountingRepo.checkIfInvalidFeeShipmentSettle(body);
                 }
-                ))
+                ),
+                concatMap((res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        res.data = 1;
+                        return of(res);
+                    }
+                    return this._accountingRepo.saveAndSendRequestSettlemntPayment(body);
+                }
+                ),
+                concatMap((res: CommonInterface.IResult) => {
+                    if (!res.status) {
+                        this.requestSurchargeListComponent.selectedIndexSurcharge = null;
+                        return of(res);
+                    } else {
+                        settlementResult = res.data.settlement;
+                        let approve: any = {
+                            settlementNo: settlementResult.settlementNo,
+                            requester: settlementResult.requester
+                        }
+                        return this._accountingRepo.updateAndSendMailApprovalSettlement(approve);
+                    }
+                }),
+                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe),
+            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
+                    if (res.data === 1) {
+                        this.showPopupDynamicRender(InfoPopupComponent, this.reportContainerRef.viewContainerRef, {
+                            title: 'Warning',
+                            body: "<b>You Can't Create Advance/Settlement For These Shipments!</b> because the following shipments unprofitable:</br>" + res.message,
+                            class: 'bg-danger'
+                        });
+                        return;
+                    }
                     if (!res.status) {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
@@ -207,7 +206,6 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                         this._toastService.success(`${settlementResult.settlementNo}`, ' Send request successfully');
                         this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${settlementResult.id}/approve`]);
                     }
-                    this.requestSurchargeListComponent.selectedIndexSurcharge = null;
                 },
                 (error) => {
                     if (error instanceof HttpErrorResponse) {
@@ -218,6 +216,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                 }
             );
     }
+
 
     getDataForm() {
         const dataSettle = {

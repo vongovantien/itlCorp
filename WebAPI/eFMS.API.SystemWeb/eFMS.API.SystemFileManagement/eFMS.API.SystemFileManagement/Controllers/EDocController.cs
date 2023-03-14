@@ -1,7 +1,9 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
+using eFMS.API.SystemFileManagement.DL.Services;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
@@ -14,6 +16,7 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.Controllers
@@ -177,6 +180,25 @@ namespace eFMS.API.SystemFileManagement.Controllers
             if (hs.Success)
                 return File((byte[])hs.Message, "application/zip", m.FileName);
             return BadRequest(hs);
+        }
+
+        [HttpGet("GenEdocFromBilling")]
+        public async Task<IActionResult> GenEdocFromBilling(string BillingNo,string BillingType)
+        {
+            HandleState hs = await _edocService.GenEdocByBilling(BillingNo, BillingType);
+            if (hs.Success)
+                return Ok(new ResultHandle { Message = "Get File Successfully", Status = true });
+            if(hs.Exception.Message== "Not found file")
+            {
+                return Ok(new ResultHandle { Message = "Not found file", Status = false });
+            }
+            return BadRequest(hs);
+        }
+        [HttpGet("CheckAllowSettleEdocSendRequest")]
+        public async Task<IActionResult> CheckAllowSettleEdocSendRequest(Guid billingId)
+        {
+            var result = _edocService.CheckAllowSettleEdocSendRequest(billingId);
+            return Ok(result);
         }
     }
 }

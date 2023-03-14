@@ -235,8 +235,13 @@ namespace eFMS.API.Documentation.DL.Services
                             var opsInfo = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                             // Insert Replicate Data
                             entityReplicate.JobNo += opsInfo.JobNo;
-                            databaseUpdateService.InsertDataToDB(entityReplicate);
+                            addResult = databaseUpdateService.InsertDataToDB(entityReplicate);
                             result = new HandleState(addResult.Status, (object)addResult.Message);
+                            if (model.CsMawbcontainers?.Count > 0 && result.Success)
+                            {
+                                var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, entityReplicate.Id);
+                                model.CsMawbcontainers.ForEach(x => x.Id = Guid.Empty);
+                            }
                         }
                     }
                     else
@@ -251,6 +256,10 @@ namespace eFMS.API.Documentation.DL.Services
                         OpsTransaction entity = mapper.Map<OpsTransaction>(opsInfo);
                         result = new HandleState(addResult.Status, (object)addResult.Message);
                     }
+                    if (model.CsMawbcontainers?.Count > 0 && result.Success)
+                    {
+                        var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -258,12 +267,6 @@ namespace eFMS.API.Documentation.DL.Services
                     result = new HandleState(ex.Message);
                 }
             }
-            if (model.CsMawbcontainers?.Count > 0 && result.Success)
-            {
-                var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
-            }
-
-
             return result;
         }
 
@@ -363,42 +366,38 @@ namespace eFMS.API.Documentation.DL.Services
         private OpsTransaction GetOpsTransactionToGenerateJobNo(SysOffice office)
         {
             OpsTransaction currentShipment = null;
-            if (office != null)
+            switch (office.Code)
             {
-                if (office.Code == "ITLHAN")
-                {
+                case "ITLHAN":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                          && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                          && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: HAN -> H [15202]
-                }
-                else if (office.Code == "ITLDAD")
-                {
+                    break;
+                case "ITLDAD":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
-                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
-                }
-                else
-                {
+                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                        && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
+                                                        .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
+                    break;
+                case "ITLCAM":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
-                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
-                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
-                                                         && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
-                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
-                }
-            }
-            else
-            {
-                currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
+                                                        && x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                                                        && x.DatetimeCreated.Value.Year == DateTime.Now.Year
+                                                        && x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-"))
+                                                        .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                    break;
+                default:
+                    currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                      && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                      && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                     && !x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-")
                                                      && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                      .OrderByDescending(x => x.JobNo).FirstOrDefault();
+                    break;
             }
             return currentShipment;
         }
@@ -406,16 +405,19 @@ namespace eFMS.API.Documentation.DL.Services
         private string SetPrefixJobIdByOfficeCode(string officeCode)
         {
             string prefixCode = string.Empty;
-            if (!string.IsNullOrEmpty(officeCode))
+            switch (officeCode)
             {
-                if (officeCode == "ITLHAN")
-                {
-                    prefixCode = "H"; //HAN- >> H
-                }
-                else if (officeCode == "ITLDAD")
-                {
-                    prefixCode = "D"; //DAD- >> D
-                }
+                case "ITLHAN":
+                    prefixCode = "H";
+                    break;
+                case "ITLDAD":
+                    prefixCode = "D";
+                    break;
+                case "ITLCAM":
+                    prefixCode = "C";
+                    break;
+                default:
+                    break;
             }
             return prefixCode;
         }
@@ -445,6 +447,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                 CatPartner customer = partnerRepository.Get(x => x.Id == details.CustomerId).FirstOrDefault();
                 details.CustomerName = customer?.ShortName;
+                details.CustomerAccountNo = customer?.AccountNo;
+
+                CatPlace place = placeRepository.Get(x => x.Id == details.ClearanceLocation).FirstOrDefault();
+                details.PlaceNameCode = place?.Code;
 
                 details.UserCreatedName = userRepository.Get(x => x.Id == details.UserCreated).FirstOrDefault()?.Username;
                 details.UserModifiedName = userRepository.Get(x => x.Id == details.UserModified).FirstOrDefault()?.Username;
@@ -1451,14 +1457,29 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         surchargeRepository.Delete(x => x.Id == item.Id, false);
                     }
-                    var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo);
-                    if (clearances != null)
+                    //Xóa job OPS rep xóa luôn tờ khai rep
+                    if(job.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE)
                     {
-                        foreach (var item in clearances)
+                        var clearancesRep = customDeclarationRepository.Get(x => x.JobNo == job.JobNo && x.Source == "Replicate");
+                        if (clearancesRep != null)
                         {
-                            item.JobNo = null;
-                            item.ConvertTime = null;
-                            customDeclarationRepository.Update(item, x => x.Id == item.Id, false);
+                            foreach (var item in clearancesRep)
+                            {
+                                customDeclarationRepository.Delete(x => x.Id == item.Id, false);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo);
+                        if (clearances != null)
+                        {
+                            foreach (var item in clearances)
+                            {
+                                item.JobNo = null;
+                                item.ConvertTime = null;
+                                customDeclarationRepository.Update(item, x => x.Id == item.Id, false);
+                            }
                         }
                     }
                 }
@@ -1560,9 +1581,9 @@ namespace eFMS.API.Documentation.DL.Services
             var parameter = new FormPLsheetReportParameter
             {
                 Contact = currentUser.UserName,
-                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyName = sysOfficeRepo.Get(x => x.Id == shipment.OfficeId).FirstOrDefault().BranchNameEn,
                 CompanyDescription = string.Empty,
-                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress1 = sysOfficeRepo.Get(x => x.Id == shipment.OfficeId).FirstOrDefault().AddressEn,
                 CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
                 Website = DocumentConstants.COMPANY_WEBSITE,
                 CurrDecimalNo = 2,
@@ -2707,12 +2728,13 @@ namespace eFMS.API.Documentation.DL.Services
                 if (p != null) { p.SetValue(surcharge, item.GetValue(chargeBuy, null), null); }
             }
 
+            var datetimeCR = new DateTime(2023, 1, 1); // [CR:18726] update 8 -> 10% from 1/1/2023
             surcharge.Id = Guid.NewGuid();
             surcharge.Type = DocumentConstants.CHARGE_SELL_TYPE;
             surcharge.ChargeId = chargeBuy.DebitCharge ?? Guid.Empty;
 
-            surcharge.Quantity = 1;
-            surcharge.Vatrate = 8;
+            surcharge.Quantity = chargeBuy.ServiceDate.Value < datetimeCR ? 1 : chargeBuy.Quantity;
+            surcharge.Vatrate = chargeBuy.ServiceDate.Value < datetimeCR ? 8 : 10; // [CR:18726] update 8 -> 10% from 1/1/2023
 
             surcharge.Soano = null;
             surcharge.PaySoano = null;
@@ -2742,7 +2764,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (chargeBuy.CurrencyId == "VND")
             {
-                var per = (double)chargeBuy.Total / (double)0.76;
+                var per = (chargeBuy.ServiceDate.Value < datetimeCR ? (double)chargeBuy.Total : (double)chargeBuy.UnitPrice) / (double)0.76;
                 surcharge.UnitPrice = NumberHelper.RoundNumber((decimal)per / 10000, 0) * 10000;
                 surcharge.NetAmount = surcharge.UnitPrice * surcharge.Quantity;
                 surcharge.Total = surcharge.NetAmount + ((surcharge.NetAmount * surcharge.Vatrate) / 100) ?? 0;
@@ -2872,11 +2894,10 @@ namespace eFMS.API.Documentation.DL.Services
             return result.Where(x => x.ReplicateJob.Count() > 0).ToList();
         }
 
-        public async Task<HandleState> SyncGoodInforToReplicateJob(string jobNo)
+        public async Task<HandleState> SyncGoodInforToReplicateJob(Guid jobId)
         {
             var hs = new HandleState();
-
-            var job = await DataContext.Get(x => x.JobNo == jobNo && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
+            var job = await DataContext.Get(x => x.Id == jobId && x.ReplicatedId != null && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
             if (job != null)
             {
                 var repJob = await DataContext.Get(x => x.Id == job.ReplicatedId && x.CurrentStatus != TermData.Canceled).FirstOrDefaultAsync();
@@ -2888,12 +2909,21 @@ namespace eFMS.API.Documentation.DL.Services
                     repJob.SumContainers = job.SumContainers;
                     repJob.SumGrossWeight = job.SumGrossWeight;
                     repJob.PackageTypeId = job.PackageTypeId;
+                    repJob.ContainerDescription = job.ContainerDescription;
 
-                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id);
+                    hs = DataContext.Update(repJob, x => x.Id == repJob.Id, false);
+                    if (hs.Success)
+                    {
+                        var listConOfJob = await csMawbcontainerRepository.GetAsync(x => x.Mblid == job.Id);
+                        var listCont = mapper.Map<List<CsMawbcontainerModel>>(listConOfJob);
+                        listCont.ForEach(x => x.Id = Guid.Empty);
+                        hs = mawbcontainerService.UpdateMasterBill(listCont, job.ReplicatedId ?? Guid.Empty);
+                    }
+                    hs = DataContext.SubmitChanges();
+
                     return hs;
                 }
             }
-
 
             return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_REPLICATE_NOT_EXISTS].Value);
         }

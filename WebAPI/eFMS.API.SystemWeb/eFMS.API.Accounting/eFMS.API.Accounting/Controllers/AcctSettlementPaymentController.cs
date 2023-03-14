@@ -5,11 +5,13 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
+using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -38,6 +40,8 @@ namespace eFMS.API.Accounting.Controllers
         private string typeApproval = "Settlement";
         private IAccAccountReceivableService accountReceivableService;
         private readonly IEDocService _eDocService;
+        private readonly IRabbitBus _busControl;
+
 
         /// <summary>
         /// Contructor
@@ -50,7 +54,8 @@ namespace eFMS.API.Accounting.Controllers
             IAcctSettlementPaymentService service,
             ICurrentUser user, IMapper _mapper,
             IAccAccountReceivableService accountReceivable,
-            IEDocService eDocService
+            IEDocService eDocService,
+            IRabbitBus _bus
             )
         {
             stringLocalizer = localizer;
@@ -59,6 +64,7 @@ namespace eFMS.API.Accounting.Controllers
             mapper = _mapper;
             accountReceivableService = accountReceivable;
             _eDocService = eDocService;
+            _busControl = _bus;
         }
 
         /// <summary>
@@ -205,7 +211,7 @@ namespace eFMS.API.Accounting.Controllers
                     acctSettlementPaymentService.UpdateSurchargeSettle(new List<ShipmentChargeSettlement>(), settlementNo, "Delete");
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                         await _eDocService.DeleteEdocByBillingNo(settlementNo);
                     }
                 });
@@ -448,7 +454,7 @@ namespace eFMS.API.Accounting.Controllers
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Settlement.SettlementNo, "SETTLEMENT");
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
                 });
             }
@@ -517,7 +523,7 @@ namespace eFMS.API.Accounting.Controllers
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Settlement.SettlementNo, "SETTLEMENT");
                     if (modelReceivableList.Count > 0)
                     {
-                        await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                        await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
                 });
             }
@@ -742,7 +748,7 @@ namespace eFMS.API.Accounting.Controllers
                 List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(approve.SettlementNo, "SETTLEMENT");
                 if (modelReceivableList.Count > 0)
                 {
-                    await accountReceivableService.CalculatorReceivableDebitAmountAsync(modelReceivableList);
+                    await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                 }
                 // Check auto rate fees of settlement 
                 await acctSettlementPaymentService.AutoRateReplicateFromSettle(approve.Id);
