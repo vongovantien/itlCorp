@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewCh
 import { ReportPreviewComponent } from '@common';
 import { SysImage } from '@models';
 import { Store } from '@ngrx/store';
-import { takeUntil } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 import { AppPage } from 'src/app/app.base';
 import { ISettlementPaymentState, getListEdocState } from '../store';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
@@ -28,7 +29,7 @@ export class SettlementShipmentItemComponent extends AppPage {
 
     initCheckbox: boolean = false;
     isCheckAll: boolean = false;
-    countFile: number = 0;
+    countFile$: Observable<number>;
 
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
@@ -47,12 +48,15 @@ export class SettlementShipmentItemComponent extends AppPage {
     }
 
     ngOnInit() {
-        this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: any) => {
-                    this.countFile = JSON.parse(JSON.stringify(res.filter(x => x.jobNo === null || x.jobNo === this.data.jobId).length));
-                }
-            );
+        this.countFile$ = this._store.select(getListEdocState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                map(
+                    (d) => {
+                        return d.filter(x => x.jobNo === this.data.jobId || x.jobNo === null).length
+                    }
+                ),
+            )
     }
 
     showPaymentManagement($event: Event): any {
