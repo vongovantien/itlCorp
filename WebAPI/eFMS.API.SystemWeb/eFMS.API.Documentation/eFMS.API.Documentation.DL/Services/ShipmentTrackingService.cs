@@ -56,6 +56,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Station = placeRepository.First(x => x.Code == item.Station)?.Id;
                 data.Weight = item.Weight;
                 data.ActualDate = item.ActualDate;
+                data.FlightNo = item.FlightNumber;
                 data.DatetimeCreated = data.DatetimeModified = DateTime.Now;
                 data.JobId = hblId;
                 data.Source = source;
@@ -107,23 +108,23 @@ namespace eFMS.API.Documentation.DL.Services
                         trackShipment.FlightDate = shipmentExisted.FlightDate;
                         trackShipment.ColoaderName = partnerRepository.First(x => x.Id == shipmentExisted.ColoaderId)?.PartnerNameVn;
 
-                        if (!request.IsSuccessStatusCode)
+                        var dataResponse = await request.Content.ReadAsAsync<TrackingMoreResponseModel>();
+                        if (!request.IsSuccessStatusCode || dataResponse?.Data == null)
                         {
                             return trackShipment;
                         }
-                        var dataReponse = await request.Content.ReadAsAsync<TrackingMoreReponseModel>();
-                        statusShipment = dataReponse.Data.StatusNumber == 2 ? DocumentConstants.IN_TRANSIT : (dataReponse.Data.StatusNumber == 4 ? DocumentConstants.DONE : null);
+                        statusShipment = dataResponse.Data.StatusNumber == 2 ? DocumentConstants.IN_TRANSIT : (dataResponse.Data.StatusNumber == 4 ? DocumentConstants.DONE : null);
 
                         if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)
                         {
                             if (!DataContext.Any(x => x.JobId == shipmentExisted.Id))
                             {
-                                lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataReponse.Data.TrackInfo, partnerApi.Name);
+                                lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataResponse.Data.TrackInfo, partnerApi.Name);
                             }
                             else
                             {
                                 var maxDateExisted = DataContext.Where(x => x.JobId == shipmentExisted.Id).Max(x => x.PlanDate);
-                                var dataTrackingSort = dataReponse.Data.TrackInfo.Where(x => x.PlanDate > maxDateExisted);
+                                var dataTrackingSort = dataResponse.Data.TrackInfo.Where(x => x.PlanDate > maxDateExisted);
                                 if (dataTrackingSort?.Any() == true)
                                 {
                                     lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, partnerApi.Name);
@@ -137,7 +138,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var returnData = DataContext.Get(x => x.JobId == shipmentExisted.Id).OrderBy(x => x.ActualDate);
                         trackShipment.TrackInfos = _mapper.Map<List<SysTrackInfoModel>>(returnData);
                         trackShipment.Status = statusShipment;
-
+                        trackShipment.FlightNo = dataResponse.Data.FlightInfo.Any() ? string.Join(", ", dataResponse.Data.FlightInfo.Select(f => f.FlightNumber).Distinct()) : shipmentExisted.FlightVesselName;
                         foreach (var item in trackShipment.TrackInfos)
                         {
                             item.StationName = placeRepository.First(x => x.Id == item.Station)?.NameVn;
