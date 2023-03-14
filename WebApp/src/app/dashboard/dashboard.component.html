@@ -124,7 +124,7 @@
             <div class="m-portlet__body">
                 <div *ngFor="let item of shipmentTracking.trackInfos; let first = first; let last = last;" class="row">
                     <div class="col-md-5 m--padding-right-20">
-                        <p class="text-right text-info">{{item.planDate| date: 'HH:mm dd/MM/yyyy'}}</p>
+                        <p class="text-right text-info">{{item.actualDate | date: 'HH:mm dd/MM/yyyy'}}</p>
                     </div>
                     <div class="col-md-1">
                         <div *ngIf="first">
