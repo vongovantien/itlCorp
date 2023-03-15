@@ -379,6 +379,9 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
     }
 
     getListEdoc(event: any) {
+        if (this.typeFrom === 'Settlement') {
+            this.listFileAttach.requestListEDocSettle();
+        }
         this.listFileAttach.getEDoc(event);
         this.getEDoc(this.transactionType);
     }

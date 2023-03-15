@@ -156,6 +156,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId, 'LIST');
                         this.attachRef.getDocumentType('Settlement');
+                        this.attachRef.getListEdoc('Settlement');
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
@@ -168,6 +169,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     }
                 }
             );
+
     }
 
     getDetailSettlement(settlementId: string, typeCharge: string) {
@@ -341,6 +343,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     else {
                         this._toastService.success(`${settlementResult.settlementNo}`, ' Send request successfully');
                         this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${settlementResult.id}/approve`]);
+                        this.attachRef.getListEdoc('Settlement');
                     }
                 },
                 (error) => {

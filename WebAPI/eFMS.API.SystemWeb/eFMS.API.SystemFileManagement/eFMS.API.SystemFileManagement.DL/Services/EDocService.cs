@@ -556,6 +556,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     var image = _sysImageRepo.Get(z => z.Id == x.FirstOrDefault().SysImageId).FirstOrDefault();
                     var jobDetail = GetJobDetail(x.FirstOrDefault().JobId, x.FirstOrDefault().Hblid, x.FirstOrDefault().DocumentTypeId);
+                    var countItem=x.GroupBy(z=>z.JobId).Count();
                     var edoc = new SysImageDetailModel()
                     {
                         Id = x.FirstOrDefault().Id,
@@ -573,10 +574,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
                         Note = x.FirstOrDefault().Note,
-                        HBLNo = x.Count() > 1 ? null : jobDetail.HBLNo,
-                        JobNo = x.Count() > 1 ? null : jobDetail.JobNo,
-                        Hblid = x.Count() > 1 ? Guid.Empty : jobDetail.HBLId,
-                        JobId = x.Count() > 1 ? Guid.Empty : jobDetail.JobId,
+                        HBLNo = countItem > 1 ? null : jobDetail.HBLNo,
+                        JobNo = countItem > 1 ? null : jobDetail.JobNo,
+                        Hblid = countItem > 1 ? Guid.Empty : jobDetail.HBLId,
+                        JobId = countItem > 1 ? Guid.Empty : jobDetail.JobId,
                         DocumentTypeName = _attachFileTemplateRepo.Get(y => y.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().NameEn,
                         TransactionType = jobDetail?.TransactionType
                     };
@@ -673,6 +674,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     var image = _sysImageRepo.Get(z => z.Id == x.FirstOrDefault().SysImageId).FirstOrDefault();
                     var jobDetail = GetJobDetail(x.FirstOrDefault().JobId, x.FirstOrDefault().Hblid, x.FirstOrDefault().DocumentTypeId);
+                    var countItem = x.GroupBy(z => z.JobId).Count();
                     var edoc = new SysImageDetailModel()
                     {
                         Id = x.FirstOrDefault().Id,
@@ -691,8 +693,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
                         Note = x.FirstOrDefault().Note,
-                        HBLNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
-                        JobNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
+                        HBLNo = countItem > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
+                        JobNo = countItem > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
                     };
                     lstEdoc.Add(edoc);
                 }
@@ -750,6 +752,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     var image = _sysImageRepo.Get(z => z.Id == x.FirstOrDefault().SysImageId).FirstOrDefault();
                     var jobDetail = GetJobDetail(x.FirstOrDefault().JobId, x.FirstOrDefault().Hblid, x.FirstOrDefault().DocumentTypeId);
+                    var countItem = x.GroupBy(z => z.JobId).Count();
                     var edoc = new SysImageDetailModel()
                     {
                         Id = x.FirstOrDefault().Id,
@@ -768,8 +771,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
                         Note = x.FirstOrDefault().Note,
-                        HBLNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
-                        JobNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
+                        HBLNo = countItem > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
+                        JobNo = countItem > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
                     };
                     lstEdoc.Add(edoc);
                 }
