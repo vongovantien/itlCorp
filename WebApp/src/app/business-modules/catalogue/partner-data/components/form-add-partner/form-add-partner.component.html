@@ -176,7 +176,8 @@
                     </div>
                     <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': isSubmitted && identityNo.invalid }">
                         <label>Identity No</label>
-                        <input type="text" class="form-control" formControlName="identityNo">
+                        <input type="text" class="form-control" formControlName="identityNo"
+                        [attr.disabled]="this.active.value === true ? 'disabled' : null">
                         <div [ngClass]="'text-danger'"
                             *ngIf="(isSubmitted && ((identityNo.errors | equalError:'maxlength') || (identityNo.errors | equalError:'minlength')))">
                             Identity No include 8 - 15 characters!
@@ -199,17 +200,22 @@
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true" name="daterange"
-                                [autoApply]="true" formControlName="dateId" readonly />
+                                [autoApply]="true" formControlName="dateId" readonly 
+                                [attr.disabled]="this.active.value === true ? 'disabled' : null">
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-calendar"></i>
                                 </span>
                             </span>
-                        </div>
+                            <ng-container *ngIf="!!dateId.value && !!dateId.value.startDate && this.active.value === false">
+                                <span class=" m-input-icon_clear"  (click)="resetFormControl()"><i class="la la-times"></i></span>
+                            </ng-container>
+                        </div> 
                     </div>
                     <div class="form-group">
                         <label>ID Place</label>
-                        <input type="text" class="form-control" formControlName="placeId">
+                        <input type="text" class="form-control" formControlName="placeId"
+                        [attr.disabled]="this.active.value === true ? 'disabled' : null">
                     </div>
                 </div>
                 <div class="col-lg-4">
