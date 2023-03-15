@@ -292,12 +292,8 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         modelAdd.partnerType = this.partner.partnerType;
         modelAdd.partnerGroup = this.partner.partnerGroup;
         modelAdd.datetimeCreated = this.partner.datetimeCreated;
-        if (!!this.partner.dateId) {
-            modelAdd.dateId = !!modelAdd.dateId?.startDate ? formatDate(modelAdd.dateId.startDate, 'yyyy-MM-dd', 'en') : (formatDate(new Date(modelAdd.dateId), 'yyyy-MM-dd', 'en'));
-        }
-        else {
-            modelAdd.dateId = !!modelAdd.dateId && modelAdd.dateId.startDate !== null ? formatDate(modelAdd.dateId.startDate, 'yyyy-MM-dd', 'en') : null;
-        }
+        modelAdd.dateId = (modelAdd.dateId === null || modelAdd.dateId?.startDate === null) ? null : (!!modelAdd.dateId ? (!!modelAdd.dateId.startDate ? formatDate(modelAdd.dateId.startDate, 'yyyy-MM-dd', 'en'):  formatDate(new Date(modelAdd.dateId), 'yyyy-MM-dd', 'en')) : null);
+
         // * Update catalogue partner data.
         modelAdd.roundUpMethod = this.partner.roundUpMethod;
         modelAdd.applyDim = this.partner.applyDim;
