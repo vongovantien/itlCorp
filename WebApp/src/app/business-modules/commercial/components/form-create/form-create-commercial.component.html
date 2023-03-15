@@ -123,7 +123,7 @@
                                 formControlName="dateId" readonly 
                                 [attr.disabled]="this.isActive === true ? 'disabled' : null">
                             <ng-container *ngIf="!!dateId.value && !!dateId.value.startDate && !this.isActive">
-                                <span class=" m-input-icon_clear" (click)="resetFormControl()"><i class="la la-times"></i></span>
+                                <span class=" m-input-icon_clear" (click)="resetFormControlDateId()"><i class="la la-times"></i></span>
                             </ng-container>
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>

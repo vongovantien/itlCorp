@@ -659,7 +659,7 @@ export class FormAddPartnerComponent extends AppForm {
             this.partnerForm.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn)
         }
     }
-    resetFormControl()
+    resetFormControlDateId()
     {
         this.dateId.setValue(null);
     }
