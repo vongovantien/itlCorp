@@ -2102,7 +2102,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         public async Task<HandleState> UpdateEdocByAcc(EdocAccUpdateModel model)
         {
-            var hsDel = await _sysImageDetailRepo.DeleteAsync(x => x.BillingNo == model.BillingNo && model.ListDel.Contains(x.Id));
+            var hsDel = new HandleState();
+            var result=  new HandleState(true,"Update EDoc Success");
+            if (model.ListDel.Count == 0)
+            {
+                hsDel = new HandleState(true,"Don't have Edoc to Delete");
+            }
+            else
+            {
+                hsDel = await _sysImageDetailRepo.DeleteAsync(x => x.BillingNo == model.BillingNo && model.ListDel.Contains((Guid)x.JobId));
+            }
             if (hsDel.Success)
             {
                 var listEdoc = new List<SysImageDetail>();
@@ -2129,15 +2138,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         listEdoc.Add(edoc);
                     });
                 });
-                var hsAdd = await _sysImageDetailRepo.AddAsync(listEdoc, false);
-                if (hsAdd.Success)
+                result = await _sysImageDetailRepo.AddAsync(listEdoc);
+                if (!result.Success)
                 {
-                    var result = _sysImageDetailRepo.SubmitChanges();
-                    return result;
+                    result = new HandleState("Add Edoc Wrrong");
                 }
-                return new HandleState("Add Edoc Wrrong");
             }
-            return new HandleState("Del Edoc Wrrong");
+            return result;
         }
     }
 }

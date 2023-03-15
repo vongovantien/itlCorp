@@ -5,8 +5,8 @@ namespace eFMS.API.Accounting.DL.IService
 {
     public interface IEdocService
     {
-        EdocAccUpdateModel MapAdvanceRequest(AcctAdvancePaymentModel model);
-        EdocAccUpdateModel MapSettleCharge(CreateUpdateSettlementModel model);
-        EdocAccUpdateModel MapSOACharge(AcctSoaModel model);
+        EdocAccUpdateModel MapAdvanceRequest(string advNo);
+        EdocAccUpdateModel MapSettleCharge(string settleNo);
+        EdocAccUpdateModel MapSOACharge(string soaNo);
     }
 }

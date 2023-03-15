@@ -519,8 +519,8 @@ namespace eFMS.API.Accounting.Controllers
                         await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
                     Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
-                    var edocModel = _edocService.MapSettleCharge(model);
-                    var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel,null);
+                    var edocModel = _edocService.MapSettleCharge(model.Settlement.SettlementNo);
+                    var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
                 });
             }
             return Ok(result);

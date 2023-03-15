@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
+using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
@@ -36,55 +37,54 @@ namespace eFMS.API.Accounting.DL.Services
             _surcharge= surcharge;
         }
 
-        public EdocAccUpdateModel MapAdvanceRequest(AcctAdvancePaymentModel model)
+        public EdocAccUpdateModel MapAdvanceRequest(string AdvNo)
         {
-            var lstAdd = model.AdvanceRequests.Where(x => x.Id == Guid.Empty).Select(x => x.JobId).ToList();
-            var requestUpdate = model.AdvanceRequests.Where(x => x.Id != Guid.Empty).Select(x => x.JobId).ToList();
-            var lstCurrADV = _advRequest.Get(x => x.AdvanceNo == model.AdvanceNo).Select(x => x.JobId).ToList();
-            var lstCurrId=ConvertJobdetail(lstCurrADV).Select(x=>x.JobId).ToList();
-            var lstDel = DataContext.Get(x=>x.BillingNo==model.AdvanceNo && !lstCurrId.Contains(x.JobId)).Select(x=>x.Id).ToList();
+                var lstCurrADV = _advRequest.Get(x => x.AdvanceNo == AdvNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId).ToList();
+                var lstCurrEDoc=DataContext.Get(x=>x.BillingNo== AdvNo).GroupBy(x=>x.JobId).Select(x=>x.FirstOrDefault().JobId).ToList();
+                var lstCurrEDocStr = DataContext.Get(x => x.BillingNo == AdvNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId.ToString()).ToList();
+                var lstAdd = lstCurrADV.Where(x => !lstCurrEDocStr.Contains(x)).Select(x=>x.ToString()).ToList();
+                var lstDel= lstCurrEDoc.Where(x=> !lstCurrADV.Contains(x.ToString())).ToList();
+                var edocModel = new EdocAccUpdateModel()
+                {
+                    BillingNo = AdvNo,
+                    BillingType = "Advance",
+                    ListAdd = ConvertJobdetail(lstAdd),
+                    ListDel = lstDel,
+                };
+                return edocModel;
+        }
+
+        public EdocAccUpdateModel MapSettleCharge(string settleNo)
+        {
+            var lstCurrSetNo= _surcharge.Get(x => x.SettlementCode == settleNo).GroupBy(x=>x.JobNo).Select(x => x.FirstOrDefault().JobNo).ToList();
+            var lstCurrSet = ConvertJobdetail(lstCurrSetNo).GroupBy(x => x.JobId.ToString()).Select(x=>x.FirstOrDefault().JobId.ToString());
+            var lstCurrEDoc= DataContext.Get(x => x.BillingNo == settleNo).GroupBy(x=>x.JobId).Select(x => x.FirstOrDefault().JobId).ToList();
+            var lstCurrEDocStr = DataContext.Get(x => x.BillingNo == settleNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId.ToString()).ToList();
+            var lstDel = lstCurrEDoc.Where(x => !lstCurrSet.Contains(x.ToString())).ToList();
+            var lstAdd = lstCurrSetNo.Where(x => !lstCurrEDocStr.Contains(x)).ToList();
             var edocModel = new EdocAccUpdateModel()
             {
-                BillingNo = model.AdvanceNo,
-                BillingType = "Advance",
+                BillingNo = settleNo,
+                BillingType = "Settlement",
                 ListAdd = ConvertJobdetail(lstAdd),
                 ListDel = lstDel,
             };
             return edocModel;
         }
 
-        public EdocAccUpdateModel MapSettleCharge(CreateUpdateSettlementModel model)
+        public EdocAccUpdateModel MapSOACharge(string soaNo)
         {
-            var lstEdocSettleCurr = DataContext.Get(x => x.BillingNo == model.Settlement.SettlementNo).Select(x=>x.JobId);
-            var lstSettleChargeCurr = _surcharge.Get(x => x.SettlementCode == model.Settlement.SettlementNo).Select(x=>x.JobNo).ToList();
-            var lstSettleEdocId = ConvertJobdetail(lstSettleChargeCurr).Select(x=>x.JobId);
-            var lstSettleEdoc = ConvertJobdetail(lstSettleChargeCurr);
-            var lstDel = DataContext.Get(x => x.BillingNo == model.Settlement.SettlementNo && !lstSettleEdocId.Contains(x.JobId)).Select(x => x.Id).ToList();
-            var lstAdd = lstSettleEdoc.Where(x => lstEdocSettleCurr.Contains(x.JobId)).ToList();
+            var lstCurrSOANo = _surcharge.Get(x => x.Soano == soaNo||x.PaySoano==soaNo).GroupBy(x => x.JobNo).Select(x => x.FirstOrDefault().JobNo).ToList();
+            var lstCurrSOA = ConvertJobdetail(lstCurrSOANo).GroupBy(x => x.JobId.ToString()).Select(x => x.FirstOrDefault().JobId.ToString());
+            var lstCurrEDoc = DataContext.Get(x => x.BillingNo == soaNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId).ToList();
+            var lstCurrEDocStr = DataContext.Get(x => x.BillingNo == soaNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId.ToString()).ToList();
+            var lstDel = lstCurrEDoc.Where(x => !lstCurrSOA.Contains(x.ToString())).ToList();
+            var lstAdd = lstCurrSOANo.Where(x => !lstCurrEDocStr.Contains(x)).ToList();
             var edocModel = new EdocAccUpdateModel()
             {
-                BillingNo = model.Settlement.SettlementNo,
-                BillingType = "Settlement",
-                ListAdd = lstAdd,
-                ListDel = lstDel,
-            };
-            return edocModel;
-        }
-
-        public EdocAccUpdateModel MapSOACharge(AcctSoaModel model)
-        {
-            var surIds=model.Surcharges.Select(x=>x.surchargeId).ToList();
-            var surCharges = _surcharge.Get(x => surIds.Contains(x.Id)).Select(x=>x.JobNo).ToList();
-            var surJobId = ConvertJobdetail(surCharges).Select(x => x.JobId);
-            var surJob = ConvertJobdetail(surCharges);
-            var currEdocId = DataContext.Get(x => x.BillingNo == model.Soano).Select(x => x.JobId);
-            var lstDel = DataContext.Get(x => x.BillingNo == model.Soano && !surJobId.Contains(x.JobId)).Select(x=>x.Id).ToList();
-            var lstAdd = surJob.Where(x=>!currEdocId.Contains(x.JobId)).ToList();
-            var edocModel = new EdocAccUpdateModel()
-            {
-                BillingNo = model.Soano,
+                BillingNo = soaNo,
                 BillingType = "SOA",
-                ListAdd = lstAdd,
+                ListAdd = ConvertJobdetail(lstAdd),
                 ListDel = lstDel,
             };
             return edocModel;
