@@ -155,7 +155,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 Validators.minLength(8),
                 Validators.pattern(SystemConstants.CPATTERN.NUMBER),
             ])],
-            dateId: [],
+            dateId: null,
             placeId: []
         });
 
@@ -382,9 +382,5 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         if (!this.formGroup.controls["addressShippingEn"].value?.trim() && !!this.inforCompany.addressShippingEn) {
             this.formGroup.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn)
         }
-    }
-    resetFormControlDateId()
-    {
-        this.dateId.setValue(null);
     }
 }
