@@ -462,14 +462,10 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(result);
             }
             else
-            {
-                Response.OnCompleted(async () =>
-                {
+            
                     Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
                     var edocModel = _edocSevice.MapAdvanceRequest(model.AdvanceNo);
                     var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
-                });
-
             }
             return Ok(result);
         }
