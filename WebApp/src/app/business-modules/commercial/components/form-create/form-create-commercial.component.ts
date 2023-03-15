@@ -382,7 +382,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             this.formGroup.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn)
         }
     }
-    resetFormControl()
+    resetFormControlDateId()
     {
         this.dateId.setValue(null);
     }
