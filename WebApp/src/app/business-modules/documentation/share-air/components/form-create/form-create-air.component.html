@@ -357,7 +357,7 @@
                                             ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
                                             readonly formControlName="ata" (remove)="resetFormControl(ata)" calendar
-                                            [allowRemove]="!!ata.value && !!ata.value.startDate" />
+                                            [maxDate]="maxDate" [allowRemove]="!!ata.value && !!ata.value.startDate" />
                                     </div>
                                 </div>
                             </div>
@@ -391,7 +391,8 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <div class="form-group" *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
+                                        <div class="form-group"
+                                            *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                                             <label>
                                                 No Profit
                                             </label>
