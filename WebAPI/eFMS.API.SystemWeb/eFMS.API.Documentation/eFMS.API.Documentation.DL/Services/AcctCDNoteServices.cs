@@ -3498,6 +3498,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             // case soa
             var soadat = from soa in soaGrp
+                         join cd in cdNoteData on soa.CreDebitNo equals cd.Code
                          join part in partnerData on soa.Customer equals part.Id into partGroup
                          from part in partGroup.DefaultIfEmpty()
                          join trans in transactionDetailData on soa.HblId equals trans.Id into transGrps
@@ -3519,7 +3520,7 @@ namespace eFMS.API.Documentation.DL.Services
                              Type = soa.Type,
                              HBLId = soa.HblId,
                              MBLNo = soa.Mblno,
-                             FlexID = trans.FlexId,
+                             FlexID = string.IsNullOrEmpty(trans.FlexId) ? cd.FlexId : trans.FlexId,
                              POL = trans.PolDescription,
                              POD = trans.PodDescription,
                              PolId = ops.Pol,
