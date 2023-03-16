@@ -2153,26 +2153,50 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType && x.AccountingType == billingType).FirstOrDefault();
         }
 
+        private List<Guid?> FilterEdocForJob(string billingNo)
+        {
+            var result = new List<Guid?>();
+            var imageForJob = _sysImageDetailRepo.Get(x => x.BillingNo == billingNo).GroupBy(x => x.SysImageId);
+            imageForJob.ToList().ForEach(x =>
+            {
+                if (x.Count() > 1)
+                {
+                    result.Add(x.FirstOrDefault().SysImageId);
+                }
+            });
+            return result;
+        }
+
         private List<SysImage> GetListImageByAcc(string billingType, string billingNo)
         {
+            var imgIds = FilterEdocForJob(billingNo);
             switch (billingType)
             {
                 case "Settlement":
                     var settlId = _setleRepo.Get(x => x.SettlementNo == billingNo).FirstOrDefault().Id;
-                    return _sysImageRepo.Get(x => x.ObjectId == settlId.ToString()).ToList();
+                    return _sysImageRepo.Get(x => x.ObjectId == settlId.ToString() && imgIds.Contains(x.Id)).ToList();
                 case "Advance":
                     var advId = _advRepo.Get(x => x.AdvanceNo == billingNo).FirstOrDefault().Id;
-                    return _sysImageRepo.Get(x => x.ObjectId == advId.ToString()).ToList();
+                    return _sysImageRepo.Get(x => x.ObjectId == advId.ToString() && imgIds.Contains(x.Id)).ToList();
                 case "SOA":
                     var soaId = _soaRepo.Get(x => x.Soano == billingNo).FirstOrDefault().Id;
-                    return _sysImageRepo.Get(x => x.ObjectId == soaId.ToString()).ToList();
+                    return _sysImageRepo.Get(x => x.ObjectId == soaId.ToString() && imgIds.Contains(x.Id)).ToList();
                 default: return null;
             }
         }
 
         public async Task<HandleState> UpdateEdocByAcc(EdocAccUpdateModel model)
         {
-            var hsDel = await _sysImageDetailRepo.DeleteAsync(x => x.BillingNo == model.BillingNo && model.ListDel.Contains(x.Id));
+            var hsDel = new HandleState();
+            var result=  new HandleState(true,"Update EDoc Success");
+            if (model.ListDel.Count == 0)
+            {
+                hsDel = new HandleState(true,"Don't have Edoc to Delete");
+            }
+            else
+            {
+                hsDel = await _sysImageDetailRepo.DeleteAsync(x => x.BillingNo == model.BillingNo && model.ListDel.Contains((Guid)x.JobId));
+            }
             if (hsDel.Success)
             {
                 var listEdoc = new List<SysImageDetail>();
@@ -2199,15 +2223,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         listEdoc.Add(edoc);
                     });
                 });
-                var hsAdd = await _sysImageDetailRepo.AddAsync(listEdoc, false);
-                if (hsAdd.Success)
+                result = await _sysImageDetailRepo.AddAsync(listEdoc);
+                if (!result.Success)
                 {
-                    var result = _sysImageDetailRepo.SubmitChanges();
-                    return result;
+                    result = new HandleState("Add Edoc Wrrong");
                 }
-                return new HandleState("Add Edoc Wrrong");
             }
-            return new HandleState("Del Edoc Wrrong");
+            return result;
         }
     }
 }

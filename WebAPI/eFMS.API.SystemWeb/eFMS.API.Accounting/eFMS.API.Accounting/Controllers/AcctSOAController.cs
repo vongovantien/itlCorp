@@ -150,10 +150,10 @@ namespace eFMS.API.Accounting.Controllers
                     {
                         await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
-                    Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
-                    var edocModel = _edocService.MapSOACharge(model);
-                    var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
                 });
+                Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
+                var edocModel = _edocService.MapSOACharge(model.Soano);
+                var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
             }
             return Ok(result);
         }
