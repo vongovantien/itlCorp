@@ -2083,19 +2083,34 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType && x.AccountingType == billingType).FirstOrDefault();
         }
 
+        private List<Guid?> FilterEdocForJob(string billingNo)
+        {
+            var result = new List<Guid?>();
+            var imageForJob = _sysImageDetailRepo.Get(x => x.BillingNo == billingNo).GroupBy(x => x.SysImageId);
+            imageForJob.ToList().ForEach(x =>
+            {
+                if (x.Count() > 1)
+                {
+                    result.Add(x.FirstOrDefault().SysImageId);
+                }
+            });
+            return result;
+        }
+
         private List<SysImage> GetListImageByAcc(string billingType, string billingNo)
         {
+            var imgIds = FilterEdocForJob(billingNo);
             switch (billingType)
             {
                 case "Settlement":
                     var settlId = _setleRepo.Get(x => x.SettlementNo == billingNo).FirstOrDefault().Id;
-                    return _sysImageRepo.Get(x => x.ObjectId == settlId.ToString()).ToList();
+                    return _sysImageRepo.Get(x => x.ObjectId == settlId.ToString() && imgIds.Contains(x.Id)).ToList();
                 case "Advance":
                     var advId = _advRepo.Get(x => x.AdvanceNo == billingNo).FirstOrDefault().Id;
-                    return _sysImageRepo.Get(x => x.ObjectId == advId.ToString()).ToList();
+                    return _sysImageRepo.Get(x => x.ObjectId == advId.ToString() && imgIds.Contains(x.Id)).ToList();
                 case "SOA":
                     var soaId = _soaRepo.Get(x => x.Soano == billingNo).FirstOrDefault().Id;
-                    return _sysImageRepo.Get(x => x.ObjectId == soaId.ToString()).ToList();
+                    return _sysImageRepo.Get(x => x.ObjectId == soaId.ToString() && imgIds.Contains(x.Id)).ToList();
                 default: return null;
             }
         }
