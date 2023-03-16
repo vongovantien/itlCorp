@@ -86,8 +86,9 @@ namespace eFMS.API.Report.Controllers
                 return Ok(null);
                 //return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
             }
-            //var stream = new ReportHelper().GenerateAccountingPLSheetExcel(data, criteria, null);
-            var stream = new ReportHelper().BindingDataAccountingPLSheetExportExcel(data, criteria);
+            new LogHelper("ExportAccountingPlSheet", "" + data.Count().ToString());
+            var stream = new ReportHelper().GenerateAccountingPLSheetExcel(data, criteria, null);
+            //var stream = new ReportHelper().BindingDataAccountingPLSheetExportExcel(data, criteria);
             if (stream == null)
             {
                 return new Helpers.FileHelper().ExportExcel(null, new MemoryStream(), "");
