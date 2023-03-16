@@ -345,7 +345,7 @@
                                             ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
                                             readonly formControlName="atd" (remove)="resetFormControl(atd)" calendar
-                                            [allowRemove]="!!atd.value && !!atd.value.startDate" />
+                                            [allowRemove]="!!atd.value && !!atd.value.startDate" [maxDate]="maxDate"/>
                                     </div>
                                 </div>
                             </div>
