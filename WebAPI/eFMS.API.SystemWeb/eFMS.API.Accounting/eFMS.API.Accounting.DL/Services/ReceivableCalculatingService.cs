@@ -26,6 +26,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
+                TimeSpan interval = TimeSpan.FromSeconds(45);
                 new LogHelper("ReceivableCalculatingBackgroundService", "RUNNING at " + DateTime.Now);
                 await _busControl.ReceiveAsync<List<ObjectReceivableModel>>(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, async (models) =>
                 {
@@ -38,7 +39,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     Console.WriteLine("==================== ReceivableCalculatingBackgroundService ============================");
 
-                });
+                }, batchSize: 3, maxMessagesInFlight: 10);
             }
             catch (Exception ex)
             {

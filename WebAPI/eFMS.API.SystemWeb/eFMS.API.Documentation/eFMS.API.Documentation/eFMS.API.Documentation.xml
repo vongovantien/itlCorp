@@ -131,6 +131,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.GetDataAcctMngtAgencyExport(eFMS.API.Documentation.DL.Models.Criteria.CDNoteCriteria)">
+            <summary>
+            get invoice - cd note by agency template
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsAirWayBillController">
             <summary>
             
