@@ -2083,7 +2083,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         }
                                     });
                                 });
-                                //}
                             }
                         });
                         break;
@@ -2167,22 +2166,27 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return result;
         }
 
-        private List<SysImage> GetListImageByAcc(string billingType, string billingNo)
+        private List<SysImageDetail> GetListImageByAcc(string billingType, string billingNo)
         {
             var imgIds = FilterEdocForJob(billingNo);
+            var images = new List<Guid>();
             switch (billingType)
             {
                 case "Settlement":
                     var settlId = _setleRepo.Get(x => x.SettlementNo == billingNo).FirstOrDefault().Id;
-                    return _sysImageRepo.Get(x => x.ObjectId == settlId.ToString() && imgIds.Contains(x.Id)).ToList();
+                    images = _sysImageRepo.Get(x => x.ObjectId == settlId.ToString() && imgIds.Contains(x.Id)).Select(x=>x.Id).ToList();
+                    break;
                 case "Advance":
                     var advId = _advRepo.Get(x => x.AdvanceNo == billingNo).FirstOrDefault().Id;
-                    return _sysImageRepo.Get(x => x.ObjectId == advId.ToString() && imgIds.Contains(x.Id)).ToList();
+                    images = _sysImageRepo.Get(x => x.ObjectId == advId.ToString() && imgIds.Contains(x.Id)).Select(x => x.Id).ToList();
+                    break;
                 case "SOA":
                     var soaId = _soaRepo.Get(x => x.Soano == billingNo).FirstOrDefault().Id;
-                    return _sysImageRepo.Get(x => x.ObjectId == soaId.ToString() && imgIds.Contains(x.Id)).ToList();
+                    images = _sysImageRepo.Get(x => x.ObjectId == soaId.ToString() && imgIds.Contains(x.Id)).Select(x => x.Id).ToList();
+                    break;
                 default: return null;
             }
+            return _sysImageDetailRepo.Get(x => images.Contains((Guid)x.SysImageId)).GroupBy(x => x.SysImageId).Select(x => x.FirstOrDefault()).ToList();
         }
 
         public async Task<HandleState> UpdateEdocByAcc(EdocAccUpdateModel model)
@@ -2205,20 +2209,20 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     model.ListAdd.ForEach(x =>
                     {
-                        var docType = GetDocType(x.TransactionType, model.BillingType);
+                        //var docType = GetDocType(x.TransactionType, model.BillingType);
                         var edoc = new SysImageDetail()
                         {
                             Id = Guid.NewGuid(),
                             BillingNo = model.BillingNo,
                             BillingType = model.BillingType,
                             DatetimeCreated = DateTime.Now,
-                            DocumentTypeId = docType.Id,
+                            DocumentTypeId = img.DocumentTypeId,
                             JobId = x.JobId,
                             Source = model.BillingType,
-                            SystemFileName = docType.Code + "_" + Path.GetFileNameWithoutExtension(img.Name),
-                            SysImageId = img.Id,
-                            UserCreated = currentUser.UserName,
-                            UserFileName = img.Name,
+                            SystemFileName = img.SystemFileName,
+                            SysImageId = img.SysImageId,
+                            UserCreated = img.UserCreated,
+                            UserFileName = img.UserFileName,
                         };
                         listEdoc.Add(edoc);
                     });
