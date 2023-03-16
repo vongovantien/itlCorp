@@ -114,7 +114,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="Select ATA" readonly
-                                        formControlName="arrivalDate"
+                                        formControlName="arrivalDate" [maxDate]="maxDate"
                                         (remove)="resetFormControl(formCreate.controls['arrivalDate'])" calendar
                                         [allowRemove]="!!formCreate.controls['arrivalDate'].value && !!formCreate.controls['arrivalDate'].value.startDate" />
                                 </div>
@@ -140,7 +140,8 @@
                         <app-combo-grid-virtual-scroll allowFreeText
                             (itemSelected)="onSelectDataFormInfo($event, 'pol')" [selectedDisplayFields]="['nameEn']"
                             [dataSources]="ports | async" placeholder="Select Departure Airport"
-                            [loading]="isLoadingPort | async" (remove)="resetFormControl(pol); resetFormControl(polDescription)"
+                            [loading]="isLoadingPort | async"
+                            (remove)="resetFormControl(pol); resetFormControl(polDescription)"
                             [displayFields]="displayFieldPort" formControlName="polDescription">
                         </app-combo-grid-virtual-scroll>
                     </div>

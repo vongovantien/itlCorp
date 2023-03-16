@@ -10,9 +10,9 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value) 
-                            || (isSubmitted && !etd.value) 
-                            || (isSubmitted && !etd.valid) 
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value)
+                            || (isSubmitted && !etd.value)
+                            || (isSubmitted && !etd.valid)
                             || (isSubmitted && !etd.value.startDate)}">
                             <label required>ETD</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
@@ -110,7 +110,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':  isSubmitted && 
+                            [ngClass]="{'m-form__group has-danger':  isSubmitted &&
                             ((formGroup.errors | equalError:'invalidPort') || (!!podDescription.value && !pod.value)) }">
                             <label>Port of Destination (POD)</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
@@ -227,7 +227,7 @@
                                     [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                     [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
                                     formControlName="ata" calendar [allowRemove]="!!ata.value && !!ata.value.startDate"
-                                    (remove)="resetFormControl(ata)" />
+                                    [maxDate]="maxDate" (remove)="resetFormControl(ata)" />
                             </div>
                         </div>
                     </div>
@@ -244,7 +244,8 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group"*ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
+                                <div class="form-group"
+                                    *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                                     <label>
                                         No Profit
                                     </label>
