@@ -123,7 +123,7 @@
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true" name="daterange" [autoApply]="true"
                                 formControlName="dateId" readonly 
                                 [attr.disabled]="this.isActive === true ? 'disabled' : null">
-                            <ng-container *ngIf="!!dateId.value && this.isActive === false">
+                            <ng-container *ngIf="dateId?.value?.startDate !== null && this.isActive === false">
                                 <span class=" m-input-icon_clear" (click)="resetFormControl(dateId)"><i class="la la-times"></i></span>
                             </ng-container>
                             <span class="m-input-icon__icon m-input-icon__icon--right">
