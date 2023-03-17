@@ -145,7 +145,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var payload = new TrackingMoreRequestModel { AwbNumber = shipmentExisted.Mawb };
                         var headers = new List<KeyValuePair<string, string>>
                         {
-                            new KeyValuePair<string, string>("Tracking-Api-Key", partnerApi.ApiKey)
+                             new KeyValuePair<string, string>("Tracking-Api-Key", partnerApi.ApiKey)
                         };
 
                         var request = await HttpClientService.PostAPI(baseUrl, payload, null, headers);
@@ -177,7 +177,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     }
                                 }
 
-                                shipmentExisted.TrackingStatus = statusShipment != string.Empty ? statusShipment : null;
+                                shipmentExisted.TrackingStatus = statusShipment != string.Empty ? statusShipment : shipmentExisted.TrackingStatus;
                                 hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
                             }
                         }
@@ -189,7 +189,7 @@ namespace eFMS.API.Documentation.DL.Services
                         trackShipment.Destination = placeRepository.First(x => x.Id == shipmentExisted.Pod)?.NameVn;
                         trackShipment.FlightDate = shipmentExisted.FlightDate;
                         trackShipment.ColoaderName = partnerRepository.First(x => x.Id == shipmentExisted.ColoaderId)?.PartnerNameVn;
-                        trackShipment.Status = statusShipment;
+                        trackShipment.Status = shipmentExisted.TrackingStatus;
                         trackShipment.FlightNo = returnData.Any() == true ? string.Join(", ", returnData.Where(x => !string.IsNullOrEmpty(x.FlightNo) && x.FlightNo != "-").Select(x => x.FlightNo).Distinct()) : shipmentExisted.FlightVesselName;
                         foreach (var item in trackShipment.TrackInfos)
                         {
