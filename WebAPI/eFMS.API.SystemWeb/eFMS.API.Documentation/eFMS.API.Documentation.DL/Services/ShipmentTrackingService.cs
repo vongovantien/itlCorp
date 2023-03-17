@@ -140,12 +140,12 @@ namespace eFMS.API.Documentation.DL.Services
                                                 && (criteria.ShipmentType == "AIR" && (x.TransactionType == "AE" || x.TransactionType == "AI"))).FirstAsync();
                         }
 
-                        //SysPartnerApi partnerApi = partnerApiRepository.First(x => x.Name.Contains(_trackingApi.Value.ApiName));
+                        SysPartnerApi partnerApi = partnerApiRepository.First(x => x.Name.Contains(_trackingApi.Value.ApiName));
                         var baseUrl = _trackingApi.Value.Url;
                         var payload = new TrackingMoreRequestModel { AwbNumber = shipmentExisted.Mawb };
                         var headers = new List<KeyValuePair<string, string>>
                         {
-                            new KeyValuePair<string, string>("Tracking-Api-Key", "xs2pcepz-ek7p-01ol-fhds-6ivds4elzpc")
+                             new KeyValuePair<string, string>("Tracking-Api-Key", partnerApi.ApiKey)
                         };
 
                         var request = await HttpClientService.PostAPI(baseUrl, payload, null, headers);
@@ -160,7 +160,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                                     if (!DataContext.Any(x => x.JobId == shipmentExisted.Id))
                                     {
-                                        lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataResponse.Data.TrackInfo, "");
+                                        lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataResponse.Data.TrackInfo, partnerApi.Name);
                                     }
                                     else
                                     {
@@ -168,7 +168,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         var dataTrackingSort = dataResponse.Data.TrackInfo.OrderBy(x => x.ActualDate).Skip(dataExisted);
                                         if (dataTrackingSort?.Any() == true)
                                         {
-                                            lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, "");
+                                            lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, partnerApi.Name);
                                         }
                                     }
                                     if (lstTrackInfo.Count() > 0)
