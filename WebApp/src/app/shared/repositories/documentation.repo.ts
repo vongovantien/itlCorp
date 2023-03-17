@@ -1305,7 +1305,35 @@ export class DocumentationRepo {
         }
     }
 
+    getDetailWorkOrder(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/${id}`, null, { "hideSpinner": "true" });
+    }
+
     addWorkOrder(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsWorkOrder`, body);
+    }
+
+    deleteWorkOrder(id: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/${id}`);
+    }
+
+    updateWorkOrder(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsWorkOrder`, body);
+    }
+
+    setActiveInActiveWorkOrder(body: { id: string, active: boolean }) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/SetActiveInactive`, body);
+    }
+
+    deletePriceItem(id: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/Price/${id}`);
+    }
+
+    checkAllowDeleteWorkOrder(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/CheckAllowDelete/${id}`);
+    }
+
+    checkAllowDetailWorkOrder(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/CheckAllowDetail/${id}`);
     }
 }

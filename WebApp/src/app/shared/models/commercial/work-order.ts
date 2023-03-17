@@ -1,3 +1,5 @@
+import { PermissionShipment } from "../document/permissionShipment";
+
 export class WorkOrder {
     id: string = null;
     transactionType: string = null;
@@ -36,6 +38,7 @@ export class WorkOrder {
     departmentId: number = null;
     officeId: string = null;
     companyId: string = null;
+    notes: string = null;
 
     constructor(object?: Object) {
         const self = this;
@@ -46,7 +49,12 @@ export class WorkOrder {
         }
     }
 }
-
+export class WorkOrderModel extends WorkOrder {
+    userNameCreated: string;
+    userNameModified: string;
+    partnerName: string;
+    transactionTypeName: string;
+}
 export class WorkOrderPrice {
     id: string = null;
     workOrderId: string = null;
@@ -54,8 +62,8 @@ export class WorkOrderPrice {
     partnerId: string = null;
     unitPriceBuying: number = 0;
     unitPriceSelling: number = 0;
-    vatRateBuying: number = 0;
-    vatRateSelling: number = 0;
+    vatrateBuying: number = 0;
+    vatrateSelling: number = 0;
     notes: string = null;
     currencyIdBuying: string = 'VND';
     currencyIdSelling: string = 'VND';
@@ -78,6 +86,18 @@ export class WorkOrderPrice {
     }
 }
 
+export class WorkOrderPriceModel extends WorkOrderPrice {
+    chargeCodeBuying: string;
+    chargeCodeSelling: string;
+    unitCode: string;
+    partnerName: string;
+    surcharges: WorkOrderSurchargeModel[];
+    transactionType: string
+
+    //* custom
+    mode: string;
+}
+
 export class WorkOrderSurcharge {
     id: string = null;
     chargeId: string = null;
@@ -87,7 +107,13 @@ export class WorkOrderSurcharge {
     partnerType: string = null;
     unitPrice: number = 0;
     vatRate: number = null;
-    kickBack: boolean;
+    kickBack: boolean = null;
+    type: string = null;
+    currencyId: string = null;
+    datetimeCreated: Date = null;
+    datetimeModified: Date = null;
+    userCreated: string = null;
+    userModified: string = null;
 
     constructor(object?: Object) {
         const self = this;
@@ -97,4 +123,38 @@ export class WorkOrderSurcharge {
             }
         }
     }
+}
+
+export class WorkOrderSurchargeModel extends WorkOrderSurcharge {
+    partnerName: string;
+    chargeName: string;
+}
+
+export class WorkOrderViewUpdateModel extends WorkOrderModel {
+    polName: string;
+    podName: string;
+    salesmanName: string;
+    agentName: string;
+    consigneeName: string;
+    shipperName: string;
+    permission: PermissionShipment;
+    listPrice: WorkOrderPriceModel[]
+}
+
+export class WorkOrderViewModel {
+    id: string;
+    userNameCreated: string;
+    userNameModified: string;
+    partnerName: string;
+    salesmanName: string;
+    polCode: string;
+    podCode: string;
+    approvedStatus: string;
+    status: string;
+    code: string;
+    service: string;
+    datetimeCreated: Date;
+    datetimeModified: Date;
+    source: string;
+    active: boolean;
 }

@@ -1,10 +1,11 @@
 import { Injectable } from "@angular/core";
 import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { DocumentationRepo } from "@repositories";
-import { LoadListWorkOrderSuccess, LoadListWorkOrderFail, WorkOrderActionTypes } from "../actions";
+import { LoadListWorkOrderSuccess, LoadListWorkOrderFail, WorkOrderActionTypes, LoadDetailWorkOrderSuccess, LoadDetailWorkOrderFail, DeletePriceItemWorkOrderSuccess, DeletePriceItemWorkOrderFail } from "../actions";
 import { map, catchError, switchMap } from "rxjs/operators";
 import { Observable, of } from "rxjs";
 import { Action } from "@ngrx/store";
+import { WorkOrderViewUpdateModel } from "@models";
 
 @Injectable()
 export class WorkOrderEffects {
@@ -25,4 +26,30 @@ export class WorkOrderEffects {
                     )
             )
         ));
+
+    // getDetailWorkOrderEffect$: Observable<Action> = createEffect(() => this.actions$
+    //     .pipe(
+    //         ofType(WorkOrderActionTypes.LOAD_DETAIL),
+    //         switchMap(
+    //             (param: { id: string }) => this._documentationRepo.getDetailWorkOrder(param.id)
+    //                 .pipe(
+    //                     catchError(() => of(LoadDetailWorkOrderFail())),
+    //                     map((data: WorkOrderViewUpdateModel) => LoadDetailWorkOrderSuccess(data)),
+    //                 )
+    //         )
+    //     ));
+
+    deletePriceItemWorkOrderEffect$: Observable<Action> = createEffect(() => this.actions$
+        .pipe(
+            ofType(WorkOrderActionTypes.DELETE_PRICE_ITEM),
+            switchMap(
+                (param: { index: number, id: string }) => this._documentationRepo.deletePriceItem(param.id)
+                    .pipe(
+                        catchError(() => of(DeletePriceItemWorkOrderFail())),
+                        map((data: WorkOrderViewUpdateModel) => DeletePriceItemWorkOrderSuccess({ index: param.index })),
+                    )
+            )
+        ));
 }
+
+

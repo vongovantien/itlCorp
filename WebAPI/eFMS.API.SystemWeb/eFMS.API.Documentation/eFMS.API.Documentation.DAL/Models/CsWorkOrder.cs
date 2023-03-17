@@ -33,6 +33,8 @@ namespace eFMS.API.Documentation.Service.Models
         public string CrmquotationNo { get; set; }
         public string SysMappingId { get; set; }
         public string Source { get; set; }
+        public string SyncedStatus { get; set; }
+        public string ReasonReject { get; set; }
         public bool? Active { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }
@@ -42,5 +44,6 @@ namespace eFMS.API.Documentation.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public string Notes { get; set; }
     }
 }

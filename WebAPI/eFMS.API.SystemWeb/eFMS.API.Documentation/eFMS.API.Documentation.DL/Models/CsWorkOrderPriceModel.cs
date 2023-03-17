@@ -10,5 +10,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string ChargeCodeSelling { get; set; }
         public string UnitCode { get; set; }
         public string PartnerName { get; set; }
+        public string TransactionType { get; set; }
     }
 }

@@ -7,11 +7,11 @@ import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { CommercialFormCreateWorkOrderComponent } from '../components/form-create/form-create-work-order.component';
-import { InitPriceListWorkOrder } from '../store/actions';
+import { InitPriceListWorkOrder, InitWorkOrder } from '../store/actions';
 import { IWorkOrderMngtState, WorkOrderListPricestate } from '../store/reducers';
 import _merge from 'lodash/merge'
 import { DocumentationRepo } from '@repositories';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 
 @Component({
     selector: ' app-create-work-order',
@@ -19,37 +19,48 @@ import { SystemConstants } from '@constants';
 })
 export class CommercialCreateWorkOrderComponent extends AppForm implements OnInit {
 
-    transactionType: string;
     @ViewChild(CommercialFormCreateWorkOrderComponent) formWorkOrder: CommercialFormCreateWorkOrderComponent;
 
+    transactionType: string;
     prices: WorkOrderPrice[] = [];
+    workOrderId: string = SystemConstants.EMPTY_GUID;
 
     constructor(
-        private readonly _activedRouter: ActivatedRoute,
-        private readonly _store: Store<IWorkOrderMngtState>,
-        private readonly _toast: ToastrService,
-        private readonly _documentationRepo: DocumentationRepo
+        protected readonly _router: Router,
+        protected readonly _activedRouter: ActivatedRoute,
+        protected readonly _store: Store<IWorkOrderMngtState>,
+        protected readonly _toast: ToastrService,
+        protected readonly _documentationRepo: DocumentationRepo
     ) {
         super();
     }
 
     ngOnInit(): void {
+        this._store.dispatch(InitWorkOrder());
+        this._store.dispatch(InitPriceListWorkOrder({ data: [] }));
+
+        this.listenParams();
+        this.listenPriceList();
+
+        this.initSubmitClickSubscription((action: string) => { this.submitWorkOrder(action) });
+    }
+
+    listenParams() {
         this._activedRouter.params
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data: any) => {
-                    console.log(data);
                     this.transactionType = data?.transactionType;
+                    console.log(this.transactionType);
                 }
             );
+    }
 
-        this._store.dispatch(InitPriceListWorkOrder({ data: [] }));
-
+    listenPriceList() {
         this._store.select(WorkOrderListPricestate)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res) => {
-                    console.log(res);
                     this.prices = res;
                 }
             )
@@ -61,16 +72,22 @@ export class CommercialCreateWorkOrderComponent extends AppForm implements OnIni
 
     sendRequest() { }
 
-    save() {
+    submitWorkOrder(action: string) {
         this.formWorkOrder.isSubmitted = true;
         if (!this.formWorkOrder.form.valid) {
             this._toast.warning(this.invalidFormText);
             return;
         }
+
+        if (!this.prices.length) {
+            this._toast.warning('Please add price list');
+            return;
+        }
+
         const form = this.formWorkOrder.form.getRawValue();
 
         const formData = {
-            id: SystemConstants.EMPTY_GUID,
+            id: this.workOrderId,
             effectiveDate: !!form.effectiveDate && !!form.effectiveDate.startDate ? formatDate(form.effectiveDate.startDate, 'yyyy-MM-dd', 'en') : null,
             expiredDate: !!form.expiredDate && !!form.expiredDate.startDate ? formatDate(form.expiredDate.startDate, 'yyyy-MM-dd', 'en') : null,
         };
@@ -79,19 +96,29 @@ export class CommercialCreateWorkOrderComponent extends AppForm implements OnIni
 
         const body = {
             ...workOrder,
-            ListPrice: this.prices
+            listPrice: this.prices
         }
         console.log(body);
+
+        this.saveWorkOrder(body);
+    }
+
+    saveWorkOrder(body) {
         this._documentationRepo.addWorkOrder(body)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        // this._store.dispatch(ResetInvoiceList());
+                        this._router.navigate([`${RoutingConstants.COMMERCIAL.WO}/${res.data.id}`]);
                         this._toast.success(res.message);
                         return;
                     }
                     this._toast.error(res.message);
                 }
             )
+    }
 
+    gotoList() {
+        this._router.navigate([`${RoutingConstants.COMMERCIAL.WO}`]);
     }
 }

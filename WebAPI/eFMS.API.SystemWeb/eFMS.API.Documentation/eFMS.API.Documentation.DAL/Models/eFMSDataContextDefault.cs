@@ -3824,6 +3824,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.SyncedStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.SysMappingId)
                     .HasColumnName("SysMappingID")
                     .HasMaxLength(50);
@@ -3914,7 +3918,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.CurrencyId)
                     .HasColumnName("CurrencyID")
-                    .HasMaxLength(50);
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 

@@ -1,8 +1,10 @@
-﻿using eFMS.API.Common.Models;
+﻿using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Provider.Services.IService;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -19,9 +21,13 @@ namespace eFMS.API.Documentation.DL.IService
         //IQueryable<CsWorkOrder> Query(WorkOrderCriteria criteria);
         //IQueryable<CsWorkOrderModel> Paging(WorkOrderCriteria criteria, int page, int size, out int totalItem);
         Task<IQueryable<CsWorkOrder>> QueryAsync(WorkOrderCriteria criteria);
+        Task<IQueryable<CsWorkOrder>> QueryAsync(WorkOrderCriteria criteria, ICurrentUser currenUser, PermissionRange range);
         Task<ResponsePagingModel<CsWorkOrderViewModel>> PagingAsync(WorkOrderCriteria criteria, int page, int size);
         Task<HandleState> SaveWorkOrder(WorkOrderRequest model);
-        HandleState Delete(Guid id);
-        CsWorkOrderModel GetById(Guid id);
+        Task<HandleState> UpdateWorkOrder(WorkOrderRequest model);
+        Task<HandleState> Delete(Guid id);
+        Task<HandleState> DeletePrice(Guid id);
+        Task<HandleState> SetActiveInactive(ActiveInactiveRequest request);
+        CsWorkOrderViewUpdateModel GetById(Guid id);
     }
 }

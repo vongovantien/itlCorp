@@ -2,12 +2,19 @@
     <div class="m-portlet__body">
         <div
             class="d-flex justify-content-between align-items-center font-15 font-weight-bold m--padding-top-10 m--padding-bottom-10">
-            <div>Price List</div>
-            <div class="m--align-right">
-                <button class="btn btn-success" type="button" (click)="openAddNewPrice()">
-                    <i class="la la-plus"></i>Add New
-                </button>
-            </div>
+            <h4>
+                Price List
+                <ng-container *ngIf="!!(prices | async).length">
+                    <span class="badge badge-info">{{(prices | async).length}}</span>
+                </ng-container>
+            </h4>
+            <ng-container *ngIf="!(isReadonly | async)">
+                <div class="m--align-right">
+                    <button class="btn btn-success" type="button" (click)="openAddNewPrice()">
+                        <i class="la la-plus"></i>Add New
+                    </button>
+                </div>
+            </ng-container>
         </div>
         <div class="table-wrapper" id="work-order-list-table">
             <table class="table table-brand dataTable">
@@ -26,32 +33,33 @@
                                         <button class="btn btn-success btn-sm m-btn--icon m-btn--icon-only"
                                             title="Detail" (click)="updatePriceItem(i)"><i class="la la-edit"></i>
                                         </button>
-                                        <button type="button" (click)="deletePriceItem(i)"
-                                            class="btn btn-danger btn-sm m-btn--icon m-btn--icon-only" title="Remove">
-                                            <i class="la la-trash"></i>
-                                        </button>
+                                        <ng-container *ngIf="!(isReadonly | async)">
+                                            <button type="button" (click)="deletePriceItem(item, i)"
+                                                class="btn btn-danger btn-sm m-btn--icon m-btn--icon-only"
+                                                title="Remove">
+                                                <i class="la la-trash"></i>
+                                            </button>
+                                        </ng-container>
                                     </div>
                                 </td>
                                 <td class="text-primary">{{item.partnerName}}</td>
-                                <td class="">
-                                    {{item.weightFromRange}}
-                                    -
-                                    {{item.weightToRange}}
-                                    <span class="m--margin-left-10">{{item.unitCode}}</span>
+                                <td>
+                                    {{ [item.quantityFromRange, item.quantityToRange] | quantityRange }}
                                 </td>
-                                <td class="">
-                                    {{item?.unitPriceSelling |
-                                    number: '.0-2'}}
-                                    <span class="m--margin-left-10 font-weight-bold">
-                                        {{item?.currencyIdSelling}}
-                                    </span>
-                                    -
-                                    {{item?.unitPriceBuying |
-                                    number: '.0-2'}}
+                                <td>{{item.unitCode}}</td>
+                                <td>
+                                    {{item?.unitPriceBuying | number: '.0-2'}}
                                     <span class="m--margin-left-10 font-weight-bold">
                                         {{item?.currencyIdBuying}}
                                     </span>
                                 </td>
+                                <td class="">
+                                    {{item?.unitPriceSelling | number: '.0-2'}}
+                                    <span class="m--margin-left-10 font-weight-bold">
+                                        {{item?.currencyIdSelling}}
+                                    </span>
+                                </td>
+                                <td>{{item.notes}}</td>
                             </tr>
                         </ng-container>
                     </ng-container>
@@ -64,3 +72,5 @@
 </div>
 
 <price-item-work-order-popup></price-item-work-order-popup>
+
+<ng-template inject></ng-template>

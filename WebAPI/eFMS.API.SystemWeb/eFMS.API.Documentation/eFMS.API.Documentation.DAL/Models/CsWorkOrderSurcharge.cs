@@ -14,7 +14,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string PartnerType { get; set; }
         public decimal? UnitPrice { get; set; }
         public decimal? Vatrate { get; set; }
-        public byte[] CurrencyId { get; set; }
+        public string CurrencyId { get; set; }
         public bool? KickBack { get; set; }
         public string UserCreated { get; set; }
         public string UserModified { get; set; }

@@ -12,20 +12,12 @@
             <div class="col-12">
                 <div class="m--align-center m--margin-top-20">
                     <div class="c-button-actions">
-                        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="save()">
+                        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
+                            (click)="submitClick('save')">
                             <span>
                                 <i class="la la-save"></i>
                                 <span>
                                     Save
-                                </span>
-                            </span>
-                        </button>
-                        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
-                            (click)="sendRequest()">
-                            <span>
-                                <i class="la la-download"></i>
-                                <span>
-                                    Send Request
                                 </span>
                             </span>
                         </button>
@@ -37,3 +29,5 @@
         </div>
     </div>
 </div>
+
+<ng-template inject></ng-template>

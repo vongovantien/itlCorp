@@ -1,8 +1,9 @@
+import { WorkOrderViewModel } from "@models";
 import { Action, createReducer, on } from "@ngrx/store";
 import * as WorkOrderActions from "./../actions";
 
 export interface IWorkOrderListState {
-    data: any[],
+    data: WorkOrderViewModel[],
     totalItems: number
     dataSearch: any,
     isLoading: boolean
@@ -31,9 +32,7 @@ export const reducer = createReducer(
     on(WorkOrderActions.LoadListWorkOrderFail, (state: IWorkOrderListState) => ({
         ...state, isLoading: false, isLoaded: true
     })),
-    on(WorkOrderActions.InitPriceListWorkOrder, (state: IWorkOrderListState, payload: { type: string, data: any[] }) => ({
-        ...state, detail: { listPrice: payload.data }
-    }))
+
 );
 
 export function workOrderListReducer(state: IWorkOrderListState | undefined, action: Action) {

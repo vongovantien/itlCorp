@@ -19,6 +19,8 @@ import { reducers } from './store/reducers';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { EffectsModule } from '@ngrx/effects';
 import { effects } from './store';
+import { CommercialWorkOrderDetailComponent } from './detail-work-order/detail-work-order.component';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 
 const routing: Routes = [
     {
@@ -27,6 +29,7 @@ const routing: Routes = [
                 path: '', component: CommercialWorkOrderComponent,
             },
             { path: 'new/:transactionType', component: CommercialCreateWorkOrderComponent, data: { name: 'New' } },
+            { path: ':id', component: CommercialWorkOrderDetailComponent, data: { name: 'New' } },
         ]
     }
 ];
@@ -35,6 +38,7 @@ const routing: Routes = [
     declarations: [
         CommercialWorkOrderComponent,
         CommercialCreateWorkOrderComponent,
+        CommercialWorkOrderDetailComponent,
         CommercialPriceListWorkOrderComponent,
         CommercialFormSearchWorkOrderComponent,
         CommercialFormCreateWorkOrderComponent,
@@ -54,6 +58,7 @@ const routing: Routes = [
         ModalModule.forChild(),
         StoreModule.forFeature('work-order', reducers),
         EffectsModule.forFeature(effects),
+        CollapseModule.forRoot()
 
     ],
     exports: [],

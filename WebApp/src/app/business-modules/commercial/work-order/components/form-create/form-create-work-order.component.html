@@ -7,8 +7,10 @@
             <form [formGroup]="form" class="row m-form m-form--state">
                 <div class="col-4">
                     <div class="form-group">
-                        <label for="">Work Order No</label>
-                        <input type="text" class="form-control" formControlName="workOrderNo">
+                        <label for="">
+                            Work Order No
+                        </label>
+                        <input type="text" class="form-control font-17" formControlName="workOrderNo">
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -21,8 +23,9 @@
                             (remove)="resetFormControl(partnerId)"
                             [currentActiveItemId]="{field:'id', value: partnerId.value, hardValue: partnerName}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
-                            [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
-                            [disabled]="isReadonly">
+                            [loading]="isLoadingPartner" [displayFields]="displayFieldsPartner"
+                            placeholder="Select Partner" [clearable]="false" [disabled]="isReadonly"
+                            textColor="text-primary">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -36,8 +39,10 @@
                             (remove)="resetFormControl(salesmanId)"
                             [currentActiveItemId]="{field:'id', value: salesmanId.value, hardValue: partnerName}"
                             [selectedDisplayFields]="['username']" [dataSources]="salesmans | async"
+                            [loading]="(isLoadingUser | async)"
                             [displayFields]="[{ field: 'username', label: 'User Name' }, { field: 'employeeNameVn', label: 'Full Name' }]"
-                            placeholder="Select salesman" [clearable]="false" [disabled]="isReadonly">
+                            placeholder="Select salesman" [clearable]="false" [disabled]="isReadonly"
+                            textColor="text-success">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -48,7 +53,7 @@
                             [currentActiveItemId]="{ field: 'id', value: shipperId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(shipperId)"
-                            placeholder="Select shipper">
+                            placeholder="Select shipper" v>
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="shipperDescription"></textarea>
@@ -61,7 +66,7 @@
                             [currentActiveItemId]="{ field: 'id', value: consigneeId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(consigneeId)"
-                            placeholder="Select consignee">
+                            placeholder="Select consignee" [disabled]="isReadonly">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="consigneeDescription"></textarea>
@@ -74,7 +79,7 @@
                             [currentActiveItemId]="{ field: 'id', value: agentId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(agentId)"
-                            placeholder="Select agent">
+                            placeholder="Select agent" [disabled]="isReadonly">
                         </app-combo-grid-virtual-scroll>
                         <textarea rows="7" class="form-control m-input m-input--square"
                             formControlName="agentDescription"></textarea>
@@ -85,7 +90,6 @@
                         [ngClass]="{'m-form__group has-danger':(isSubmitted || pol.dirty) && !pol.valid }">
                         <label required>Departure</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
-                            [currentActiveItemId]="{ field: 'id', value: pol.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                             [displayFields]="displayFieldsPort" [loading]="isLoadingPort | async"
                             (remove)="resetFormControl(pol)" placeholder="Select departure" [clearable]="false"
@@ -98,7 +102,6 @@
                         [ngClass]="{'m-form__group has-danger':(isSubmitted || pod.dirty) && (!pod.valid || (form.errors | equalError:'invalidPort') )}">
                         <label required>Destination</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
-                            [currentActiveItemId]="{ field: 'id', value: pod.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                             [displayFields]="displayFieldsPort" [loading]="isLoadingPort | async"
                             (remove)="resetFormControl(pod)" placeholder="Select destination" [clearable]="false"
@@ -199,7 +202,14 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea rows="5" class="form-control" formControlName="notes"></textarea>
+                    </div>
+                </div>
             </form>
+            <ng-content select="div.infoCreateModified"></ng-content>
         </div>
     </div>
 </div>

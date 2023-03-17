@@ -4,29 +4,32 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { PopupBase } from '@app';
 import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { Partner, Unit } from '@models';
+import { Partner, Unit, WorkOrderPriceModel, WorkOrderSurchargeModel } from '@models';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo } from '@repositories';
+import { GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
 import { ToastrService } from 'ngx-toastr';
-import { Observable } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable, merge } from 'rxjs';
+import { filter, pluck, takeUntil } from 'rxjs/operators';
 import {
+    AddPriceItemWorkOrder,
     AddPriceItemWorkOrderSuccess,
     IWorkOrderMngtState,
-    UpdatePriceItemWorkOrderSuccess
+    ResetUpdatePriceItemWorkOrder,
+    SelectPriceItemWorkOrder,
+    UpdatePriceItemWorkOrder,
+    UpdatePriceItemWorkOrderSuccess,
+    workOrderDetailIsReadOnlyState,
+    workOrderDetailTransationTypeState,
+    WorkOrderPriceItemUpdateModeState
 }
     from '../../../store';
-import { ISurchargeWorkOrder } from '../../surcharge-list/surcharge-list-work-order.component';
 
 @Component({
     selector: 'price-item-work-order-popup',
     templateUrl: './price-item-work-order.component.html',
 })
 export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implements OnInit {
-
-    @Output() onAdd: EventEmitter<IPriceWorkOrder> = new EventEmitter<IPriceWorkOrder>();
-    @Output() onUpdate: EventEmitter<IPriceWorkOrder> = new EventEmitter<IPriceWorkOrder>();
-
     transactionType: string;
 
     partners: Observable<Partner[]>;
@@ -34,16 +37,21 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
 
     units: Observable<Unit[]>;
     selectedUnitCode: string;
-
+    types: CommonInterface.ICommonTitleValue[] = [
+        { title: 'AIR', value: 'AIR' },
+        { title: 'FCL', value: 'FCL' },
+        { title: 'LCL', value: 'LCL' },
+        { title: 'Other', value: 'OTHER' }
+    ];
     quantityRanges: CommonInterface.ICommonTitleValue[] = [
         {
-            title: '< 20', value: { from: null, to: 19 }
+            title: '< 20', value: { from: null, to: 20 }
         },
         {
             title: '20 - 40', value: { from: 20, to: 40 }
         },
         {
-            title: '> 40', value: { from: 41, to: null }
+            title: '> 40', value: { from: 40, to: null }
         }
     ];
 
@@ -53,6 +61,7 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
     fromValue: AbstractControl;
     toValue: AbstractControl;
     quantityRange: AbstractControl;
+    type: AbstractControl;
 
     displayFieldsPartner = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
@@ -69,10 +78,14 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
         [ChargeConstants.CL_CODE, ['BO_COF_OPS', 'SO_COF_OPS']],
 
     ]);
-    buyings: any[] = [];
-    sellings: any[] = [];
+    buyings: WorkOrderSurchargeModel[] = [];
+    sellings: WorkOrderSurchargeModel[] = [];
 
     ACTION: CommonType.ACTION_FORM;
+
+    id: string;
+    workOrderId: string;
+    title = 'New Price List';
 
     constructor(
         private readonly _fb: FormBuilder,
@@ -97,16 +110,71 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
 
         this.initForm();
 
-        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
-        this.units = this._catalogueRepo.getUnit({ active: true });
+        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this._store.dispatch(new GetCatalogueUnitAction());
+        this.units = this._store.select(getCatalogueUnitState);
 
-        this._activedRouter.params
+        /*
+            ? Subsribe to get transctionType: 
+            * from Param for Creating page
+            * from Selector from Detail page
+        */
+        merge(
+            this._activedRouter.params.pipe(pluck('transactionType')),
+            this._store.select(workOrderDetailTransationTypeState)
+        ).pipe(
+            filter(x => !!x),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(
+            (transactionType: string) => {
+                this.transactionType = transactionType;
+            }
+        )
+
+        // * Listen Update Price Item.
+        this._store.select(WorkOrderPriceItemUpdateModeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (params: Params) => {
-                    this.transactionType = params?.transactionType;
+                (res: WorkOrderPriceModel) => {
+                    if (!!res) {
+                        console.log(res);
+                        this.selectedUnitCode = res.unitCode;
+                        this.selectedPartnerName = res.partnerName;
+                        this.id = res.id;
+                        this.workOrderId = res.workOrderId;
+
+                        this.form.patchValue({
+                            partnerId: res.partnerId,
+                            unitId: res.unitId,
+                            quantityRange: { from: res.quantityFromRange, to: res.quantityToRange },
+                            type: res.type
+                        });
+
+                        this.frieghtCharges.length = 0;
+                        this.frieghtCharges.push({
+                            chargeName: `${this.getFreightChargeName(this.transactionType)}`,
+                            chargeCodeBuying: this.freightChargeMappingDefaults.get(this.transactionType)[0],
+                            chargeCodeSelling: this.freightChargeMappingDefaults.get(this.transactionType)[1],
+                            unitPriceSelling: res.unitPriceSelling,
+                            unitPriceBuying: res.unitPriceBuying,
+                            vatSelling: res.vatrateSelling,
+                            vatBuying: res.vatrateBuying,
+                            currencyIdBuying: this.transactionType.includes('A') ? 'USD' : 'VND',
+                            currencyIdSelling: this.transactionType.includes('A') ? 'USD' : 'VND',
+                            notes: res.notes,
+                            chargeIdbuying: res.chargeIdBuying,
+                            chargeIdSelling: res.chargeIdSelling,
+                        });
+
+                        this.buyings = (res.surcharges || []).filter(x => x.type === "BUY");
+                        this.sellings = (res.surcharges || []).filter(x => x.type === "SELL");
+                    }
                 }
             )
+
+        this.isReadonly = this._store.select(workOrderDetailIsReadOnlyState);
+
+
     }
 
     initFreightCharge(transactionType: string) {
@@ -133,6 +201,7 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
             case 'AI':
                 return 'Air Freight'
             case 'CL':
+            case 'TK':
                 return 'Custom Fee'
             default:
                 return 'Ocean Freight'
@@ -146,6 +215,7 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
             quantityRange: [null, Validators.required],
             fromValue: [{ value: null, disabled: true }],
             toValue: [{ value: null, disabled: true }],
+            type: [null, Validators.required]
         });
 
         this.partnerId = this.form.controls['partnerId'];
@@ -153,6 +223,7 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
         this.quantityRange = this.form.controls['quantityRange'];
         this.fromValue = this.form.controls['fromValue'];[]
         this.toValue = this.form.controls['toValue'];
+        this.type = this.form.controls['type'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -193,7 +264,7 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
         const formValue = this.form.getRawValue();
 
         const freightCharge = this.frieghtCharges[0];
-        const priceItemWorkOrder: IPriceWorkOrder = {
+        const priceItemWorkOrder: WorkOrderPriceModel = {
             partnerId: formValue.partnerId,
             partnerName: this.selectedPartnerName,
             unitId: formValue.unitId,
@@ -214,45 +285,37 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
             id: null,
             unitPriceBuying: freightCharge.unitPriceBuying,
             unitPriceSelling: freightCharge.unitPriceSelling,
+            transactionType: null,
+            vatrateBuying: freightCharge.vatBuying,
+            vatrateSelling: freightCharge.vatSelling,
+            workOrderId: null,
+            type: formValue.type,
         }
-        console.log(priceItemWorkOrder);
         this.hide();
         if (this.ACTION === 'CREATE') {
-            // this.onAdd.emit(priceItemWorkOrder);
             priceItemWorkOrder.id = SystemConstants.EMPTY_GUID;
-            this._store.dispatch(AddPriceItemWorkOrderSuccess({ data: priceItemWorkOrder }));
+            priceItemWorkOrder.workOrderId = SystemConstants.EMPTY_GUID;
+
+            this._store.dispatch(AddPriceItemWorkOrder({ data: priceItemWorkOrder }));
             return;
         }
-        this._store.dispatch(UpdatePriceItemWorkOrderSuccess({ data: priceItemWorkOrder }));
-
-
-        // this.onUpdate.emit(priceItemWorkOrder);
+        priceItemWorkOrder.id = this.id;
+        priceItemWorkOrder.workOrderId = this.workOrderId;
+        this._store.dispatch(UpdatePriceItemWorkOrder({ data: priceItemWorkOrder }));
     }
-}
 
-export interface IPriceWorkOrder {
-    id?: string;
-    partnerId: string;
-    unitId: string;
-    unitCode: string;
-    partnerName?: string;
-    quantityFromValue?: number;
-    quantityToValue?: number;
-    quantityFromRange: number;
-    quantityToRange: number;
-    mode: string;
-    chargeIdBuying: string;
-    chargeIdSelling: string;
-    chargeCodeBuying: string;
-    chargeCodeSelling: string;
-    notes: string;
-    currencyIdBuying: string;
-    currencyIdSelling: string;
-    unitPriceBuying: number;
-    unitPriceSelling: number;
-    surcharges: ISurchargeWorkOrder[];
-    // freightCharges: IFreightCharge[];
+    compareNgSelectQuantityRange(item: CommonInterface.ICommonTitleValue, selectedItem: any): boolean {
+        return item.value.from === selectedItem.from && item.value.to === selectedItem.to;
+    }
 
+    hidePriceItemPopup() {
+        this.onHidePriceItemPopup();
+    }
+
+    onHidePriceItemPopup() {
+        this.hide();
+        this._store.dispatch(ResetUpdatePriceItemWorkOrder());
+    }
 }
 
 interface IFreightCharge {

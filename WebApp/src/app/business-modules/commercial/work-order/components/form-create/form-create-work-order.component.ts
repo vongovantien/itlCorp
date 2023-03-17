@@ -1,19 +1,21 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
 import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Incoterm, Partner, PortIndex, User } from '@models';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { GetCataloguePortAction, getCataloguePortLoadingState, getCataloguePortState, IAppState } from '@store';
+import { GetCataloguePortAction, getCataloguePortLoadingState, getCataloguePortState, GetSystemUser, getSystemUsersLoadingState, getSystemUserState, IAppState } from '@store';
 import { FormValidators } from '@validators';
 import { Observable } from 'rxjs';
-import { shareReplay } from 'rxjs/operators';
+import { filter, finalize, shareReplay, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
+import { workOrderDetailIsReadOnlyState } from '../../store';
 
 @Component({
     selector: 'form-create-work-order',
     templateUrl: './form-create-work-order.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommercialFormCreateWorkOrderComponent extends AppForm implements OnInit {
 
@@ -67,19 +69,33 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
     displayFieldsPort = JobConstants.CONFIG.COMBOGRID_PORT;
 
     isLoadingPort: Observable<boolean>;
+    isLoadingPartner: boolean;
+    isLoadingUser: Observable<boolean>;
 
     ngOnInit(): void {
-        this.salesmans = this._systemRepo.getSystemUsers({ active: true });
+        this.isLoadingUser = this._store.select(getSystemUsersLoadingState);
+        this._store.dispatch(GetSystemUser({ active: true }));
+        this.salesmans = this._store.select(getSystemUserState);
 
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this.ports = this._store.select(getCataloguePortState);
         this.isLoadingPort = this._store.select(getCataloguePortLoadingState);
 
-        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL).pipe(shareReplay());
-        this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.transactionType] });
+        this.isLoadingPartner = true;
+        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL)
+            .pipe(
+                shareReplay(),
+                finalize(() => this.isLoadingPartner = false)
+            );
+
         this.initForm();
 
+    }
 
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes.hasOwnProperty("transactionType") && !!changes.transactionType.currentValue) {
+            this.incoterms = this._catalogueRepo.getIncoterm({ service: [changes.transactionType.currentValue] });
+        }
     }
 
     initForm() {
@@ -105,7 +121,9 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
             route: [],
             effectiveDate: [],
             expiredDate: [],
-            schedule: []
+            schedule: [],
+            active: [],
+            notes: []
         }, { validator: FormValidators.comparePort });
 
 
@@ -131,6 +149,22 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
         // this.route = this.form.controls['route'];
         // this.transit = this.form.controls['transit'];
         // this.schedule = this.form.controls['schedule'];
+
+
+        this._store.select(workOrderDetailIsReadOnlyState)
+            .pipe(
+                filter(x => x !== null && x !== undefined),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (active: boolean) => {
+                    this.isReadonly = active;
+                    console.log(active);
+                    if (!!active) {
+                        this.form.disable();
+                    }
+                }
+            )
     }
 
     onSelectDataFormInfo(data: any, key: string) {
@@ -147,9 +181,11 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
                 this.agentDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 break;
             case 'pol':
+                this.pol.setValue(data.id);
                 this.polDescription.setValue((data as PortIndex).nameEn);
                 break;
             case 'pod':
+                this.pod.setValue(data.id);
                 this.podDescription.setValue((data as PortIndex).nameEn);
                 break;
             default:

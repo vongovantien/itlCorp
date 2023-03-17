@@ -30,32 +30,63 @@
                     <tbody>
                         <ng-container *ngIf="!!workOrders.length">
                             <ng-container *ngFor="let item of workOrders; let i = index; trackBy: trackByFn">
-                                <tr class="collapse-toggle-row">
+                                <tr class="collapse-toggle-row" [class.invalid-row]="!item.active"
+                                    [contextMenu]="workOrderContextMenu" (onTouch)="onSelectWorkOrder(item)"
+                                    [class.touch-row]="selectedWorkOrder?.id === item.id">
                                     <td class="table-actions-col">
                                         <div class="table-actions">
-                                            <button type="button" (click)="showDetailWoGroup(item.id)"
+                                            <!-- <button type="button" (click)="showDetailWoGroup(item.id)"
                                                 class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
                                                 data-toggle="collapse" [attr.data-target]="'#work-order-00' + item.id"
                                                 title="Collapse">
                                                 <i class="la la-angle-up"></i>
-                                            </button>
-
-                                            <app-permission-button type="detail" (onClick)="showDetail(item)">
-                                            </app-permission-button>
+                                            </button> -->
                                             <ng-container *ngIf="!item.active">
                                                 <app-permission-button type="delete" [user]="item.userCreated"
                                                     (onClick)="showConfirmDelete(item)"></app-permission-button>
                                             </ng-container>
                                         </div>
                                     </td>
-                                    <td class="font-weight-bold text-underline text-muted pointer">{{item.code}}</td>
+                                    <td class="font-weight-bold text-underline text-muted pointer">
+                                        <!-- <a class="pointer" [routerLink]="'./' + item.id" target="_blank">
+                                            {{ item.code }}
+                                        </a> -->
+                                        <a class="pointer" (click)="gotoDetail(item.id)">
+                                            {{ item.code }}
+                                        </a>
+                                        <!-- <span class="m-badge m-badge--success m--margin-left-10">
+                                            Approved
+                                        </span> -->
+                                        <!-- <span
+                                            class="m-badge m-badge--{{item.active ? 'success': 'danger'}} m--margin-left-10">
+                                            {{item.active ? 'Active' : 'Inactive'}}
+                                        </span> -->
+                                        <!-- <ng-container *ngIf="item.approvedStatus === 'Done'">
+                                            <ng-container [ngSwitch]="item.syncStatus">
+                                                <span *ngSwitchCase="'Approved'"
+                                                    class="badge badge-success m--margin-left-10">
+                                                    {{item.syncStatus}}
+                                                </span>
+                                                <span 
+                                                    class="badge badge-danger m--margin-left-10">
+                                                    {{item.syncStatus}}
+                                                </span>
+                                            </ng-container>
+                                        </ng-container> -->
+                                    </td>
                                     <td class="text-primary">{{item.partnerName}}</td>
                                     <td class="text-info">{{item.salesmanName}}</td>
                                     <td>{{item.service}}</td>
                                     <td>
-                                        <span class="badge badge-info">{{item.polCode}} </span>
+                                        <span class="m-badge m-badge--info">{{item.polCode}} </span>
                                         /
-                                        <span class="badge badge-warning">{{item.podCode}}</span>
+                                        <span class="m-badge m-badge--warning">{{item.podCode}}</span>
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="m-badge m-badge--dark m-badge--wide font-weight-bold dot dot--success text-primary">
+                                            {{item.source}}
+                                        </span>
                                     </td>
                                     <td class="text-success">{{item.userNameCreated}}</td>
                                     <td>{{item.datetimeCreated | date: 'dd/MM/yyyy'}}</td>
@@ -96,3 +127,21 @@
         </a>
     </ng-container>
 </app-dropdown>
+
+
+<app-context-menu #workOrderContextMenu (clickOutside)="selectedWorkOrder = null">
+    <div class="menu-context__item" (click)="activeWorkOrder(selectedWorkOrder)">
+        <span><i class="la la-check text-primary"></i><span> Active / Inactive</span></span>
+    </div>
+    <div class="menu-context__item" (click)="viewDetailWorkOrder(selectedWorkOrder)">
+        <span><i class="la la-edit text-primary"></i><span> Edit</span></span>
+    </div>
+    <ng-container *ngIf="!selectedWorkOrder?.active">
+        <div class="menu-context__item" (click)="deleteWorkOrder(selectedWorkOrder)">
+            <span><i class="la la-edit text-primary"></i><span> Delete</span></span>
+        </div>
+    </ng-container>
+
+</app-context-menu>
+
+<ng-template inject></ng-template>
