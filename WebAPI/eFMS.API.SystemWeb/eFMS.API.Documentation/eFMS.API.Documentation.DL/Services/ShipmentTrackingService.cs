@@ -140,12 +140,12 @@ namespace eFMS.API.Documentation.DL.Services
                                                 && (criteria.ShipmentType == "AIR" && (x.TransactionType == "AE" || x.TransactionType == "AI"))).FirstAsync();
                         }
 
-                        SysPartnerApi partnerApi = partnerApiRepository.First(x => x.Name.Contains(_trackingApi.Value.ApiName));
+                        //SysPartnerApi partnerApi = partnerApiRepository.First(x => x.Name.Contains(_trackingApi.Value.ApiName));
                         var baseUrl = _trackingApi.Value.Url;
                         var payload = new TrackingMoreRequestModel { AwbNumber = shipmentExisted.Mawb };
                         var headers = new List<KeyValuePair<string, string>>
                         {
-                            new KeyValuePair<string, string>("Tracking-Api-Key", partnerApi.ApiKey)
+                            new KeyValuePair<string, string>("Tracking-Api-Key", "xs2pcepz-ek7p-01ol-fhds-6ivds4elzpc")
                         };
 
                         var request = await HttpClientService.PostAPI(baseUrl, payload, null, headers);
@@ -160,7 +160,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                                     if (!DataContext.Any(x => x.JobId == shipmentExisted.Id))
                                     {
-                                        lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataResponse.Data.TrackInfo, partnerApi.Name);
+                                        lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataResponse.Data.TrackInfo, "");
                                     }
                                     else
                                     {
@@ -168,7 +168,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         var dataTrackingSort = dataResponse.Data.TrackInfo.OrderBy(x => x.ActualDate).Skip(dataExisted);
                                         if (dataTrackingSort?.Any() == true)
                                         {
-                                            lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, partnerApi.Name);
+                                            lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, "");
                                         }
                                     }
                                     if (lstTrackInfo.Count() > 0)
@@ -177,7 +177,7 @@ namespace eFMS.API.Documentation.DL.Services
                                     }
                                 }
 
-                                shipmentExisted.TrackingStatus = statusShipment != string.Empty ? statusShipment : null;
+                                shipmentExisted.TrackingStatus = statusShipment != string.Empty ? statusShipment : shipmentExisted.TrackingStatus;
                                 hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
                             }
                         }
@@ -189,7 +189,7 @@ namespace eFMS.API.Documentation.DL.Services
                         trackShipment.Destination = placeRepository.First(x => x.Id == shipmentExisted.Pod)?.NameVn;
                         trackShipment.FlightDate = shipmentExisted.FlightDate;
                         trackShipment.ColoaderName = partnerRepository.First(x => x.Id == shipmentExisted.ColoaderId)?.PartnerNameVn;
-                        trackShipment.Status = statusShipment;
+                        trackShipment.Status = shipmentExisted.TrackingStatus;
                         trackShipment.FlightNo = returnData.Any() == true ? string.Join(", ", returnData.Where(x => !string.IsNullOrEmpty(x.FlightNo) && x.FlightNo != "-").Select(x => x.FlightNo).Distinct()) : shipmentExisted.FlightVesselName;
                         foreach (var item in trackShipment.TrackInfos)
                         {
