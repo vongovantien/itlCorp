@@ -85,9 +85,7 @@ export class SettlementShipmentItemComponent extends AppPage {
     showShipmentAttachFile($event: Event) {
         $event.stopPropagation();
         $event.preventDefault();
-
         this.onViewFiles.emit();
-
         return false;
     }
 }

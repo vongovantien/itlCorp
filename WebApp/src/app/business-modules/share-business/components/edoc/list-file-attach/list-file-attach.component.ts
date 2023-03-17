@@ -45,7 +45,7 @@ export class ShareListFilesAttachComponent extends AppShareEDocBase implements O
             )
         if (this.transactionType !== 'Shipment') {
             if (this.transactionType === "Settlement") {
-                this.requestListEDocSettle();
+                //this.requestListEDocSettle();
                 this.filterJob(null);
             }
             else {
