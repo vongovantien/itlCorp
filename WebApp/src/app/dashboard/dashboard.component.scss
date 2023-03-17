@@ -96,17 +96,23 @@
 
 }
 
-.background-dashboard {
-    /* The image used */
+.dashboard-background--image {
     background-image: url("../../assets/icons/background.jpg");
-
-    /* Full height */
-    height: 500px;
-
-    /* Center and scale the image nicely */
-    background-position: center;
+    width: 100%;
+    height: 100%;
+    background-size: contain;
     background-repeat: no-repeat;
-    background-size: cover;
+    background-position: center center;
+}
+
+@media screen and (min-width: 1400px) {
+    .dashboard-background--image {
+        background-size: cover;
+    }
+}
+
+.dashboard-background {
+    height: 600px;
 }
 
 .text-information {
@@ -159,4 +165,13 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.no-data-image {
+    background-image: url("../../assets/icons/nodatafound.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    width: 500px;
+    height: 400px;
 }

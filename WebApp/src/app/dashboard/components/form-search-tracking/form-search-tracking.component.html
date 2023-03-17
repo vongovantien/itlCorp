@@ -1,52 +1,47 @@
-<div class="m-portlet form-sarch-company-wrapper">
-    <div class="m-portlet__body">
-        <div class="m-form">
-            <form #outTab="ngForm">
-                <div class="input-group m-input-group m-input-group--square">
-                    <div class="input-group-prepend">
-                        <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
-                            {{searchObject.displayName}}
-                        </button>
-                        <div class="dropdown-menu">
-                            <ng-container *ngFor="let item of configSearch.settingFields">
-                                <a class="dropdown-item"
-                                    [ngClass]="{ 'active': item.displayName == searchObject.displayName}"
-                                    href="javascript:void(0)" (click)="searchTypeChange(item); onShowLoading(true)"
-                                    attr.id="{{item.fieldName}}ield">
-                                    {{ item.displayName }}
-                                </a>
-                            </ng-container>
-                        </div>
-                    </div>
-                    <input type="text" class="form-control" placeholder="Text input with dropdown button"
-                        [(ngModel)]="searchObject.searchString" name="searchString"
-                        (change)="searchObject.searchString = searchObject.searchString.trim(); onShowLoading(true) ">
-                </div>
-            </form>
-            <div class="d-flex col-md-auto mt-4">
-                <button type="button"
-                    class="btn {{typeShipment === 'AIR' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase m--margin-right-10 btn-container"
-                    (click)="onSetTypeShipment('AIR');onShowLoading(true)">
-                    <span>
-                        <img src="assets/icons/fly.png" alt="icon" width="25px">
-                    </span>
+<div class="m-form m--margin-bottom-10">
+    <form #outTab="ngForm">
+        <div class="input-group m-input-group m-input-group--square">
+            <div class="input-group-prepend">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    {{searchObject.displayName}}
                 </button>
-                <button disabled type="button"
-                    class="btn {{typeShipment === 'SEA' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase btn-container"
-                    (click)="onSetTypeShipment('SEA'); onShowLoading(true)">
-                    <span>
-                        <img src="assets/icons/ship.png" alt="icon" width="25px">
-                    </span>
-                </button>
-                <div class="ml-auto">
-                    <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase btn-container"
-                        (click)="onSearchValue()">
-                        <img src="assets/icons/routing.png" alt="icon" width="25px">
-                        Track
-                    </button>
+                <div class="dropdown-menu">
+                    <ng-container *ngFor="let item of configSearch.settingFields">
+                        <a class="dropdown-item" [ngClass]="{ 'active': item.displayName == searchObject.displayName}"
+                            href="javascript:void(0)" (click)="searchTypeChange(item); onShowLoading(true)"
+                            attr.id="{{item.fieldName}}ield">
+                            {{ item.displayName }}
+                        </a>
+                    </ng-container>
                 </div>
             </div>
+            <input type="text" class="form-control" placeholder="Text input with dropdown button"
+                [(ngModel)]="searchObject.searchString" name="searchString"
+                (change)="searchObject.searchString = searchObject.searchString.trim(); onShowLoading(true) ">
+        </div>
+    </form>
+    <div class="d-flex col-md-auto mt-4">
+        <button type="button"
+            class="btn {{typeShipment === 'AIR' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase m--margin-right-10 btn-container"
+            (click)="onSetTypeShipment('AIR');onShowLoading(true)">
+            <span>
+                <img src="assets/icons/fly.png" alt="icon" width="25px">
+            </span>
+        </button>
+        <button disabled type="button"
+            class="btn {{typeShipment === 'SEA' ? 'btn-brand' : 'btn-cancel'}} m-btn--icon m-btn--uppercase btn-container"
+            (click)="onSetTypeShipment('SEA'); onShowLoading(true)">
+            <span>
+                <img src="assets/icons/ship.png" alt="icon" width="25px">
+            </span>
+        </button>
+        <div class="ml-auto">
+            <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase btn-container"
+                (click)="onSearchValue()">
+                <img src="assets/icons/routing.png" alt="icon" width="25px">
+                Track
+            </button>
         </div>
     </div>
 </div>

@@ -12,7 +12,7 @@
     </div>
 </div>
 <div class="m-content">
-    <div class="m-portlet">
+    <div class="m-portlet py-0">
         <div class="m-portlet__body">
             <div class="form">
                 <div class="row m-form m-form m-form--state">
@@ -43,27 +43,28 @@
 </div>
 
 
-<div class="m-subheader">
-    <form-search-tracking (onChangeBackGround)="onChangeLoading($event)" (onChangeType)="getType($event)"
-        (onChangeKeyWork)="getValueSearch($event)"></form-search-tracking>
-</div>
-
-<ng-container *ngIf="isSubmitted === true">
-    <div class="m-content">
+<div class="m-content py-0">
+    <div class="m-portlet">
         <div class="m-portlet">
             <div class="m-portlet__body">
-                <div *ngIf="isLoading === true" class="loader-container">
-                    <img src="assets/icons/loader.gif" alt="Loading...">
-                </div>
-                <div class="background-dashboard">
-                </div>
+                <form-search-tracking (onChangeBackGround)="onChangeLoading($event)" (onChangeType)="getType($event)"
+                    (onChangeKeyWork)="getValueSearch($event)"></form-search-tracking>
+                <ng-container *ngIf="isSubmitted === true">
+                    <div *ngIf="isLoading === true" class="loader-container m--margin-top-10">
+                        <img src="assets/icons/loader.gif" alt="Loading...">
+                    </div>
+                    <div class="dashboard-background">
+                        <div class="dashboard-background--image">
+                        </div>
+                    </div>
+                </ng-container>
             </div>
         </div>
     </div>
-</ng-container>
+</div>
 
 <ng-container *ngIf="isSubmitted === false">
-    <div class="m-content">
+    <div class="m-content py-0">
         <div class="m-portlet">
             <div class="m-portlet__head alert-block__heading pointer">
                 <div class="m-portlet__head-caption">
@@ -74,6 +75,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="m-portlet__body">
                 <div class="row">
                     <div class="col-md-4">
@@ -154,6 +156,11 @@
                         <p class="text-info font-weight-bold">{{item.stationName}}</p>
                         <p class="text-info">{{item.eventDescription}}</p>
                     </div>
+                </div>
+            </div>
+            <div *ngIf="!shipmentTracking?.trackInfos?.length" class="d-flex justify-content-center">
+                <div class="no-data-image">
+
                 </div>
             </div>
         </div>
