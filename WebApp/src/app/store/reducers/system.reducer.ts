@@ -3,8 +3,8 @@ import { Action, createReducer, on } from "@ngrx/store";
 import * as Actions from "./../actions";
 
 export interface ISystemAppState {
-    users: User[],
-    offices: Office[],
+    users: User[];
+    offices: Office[];
     isLoadingUser: boolean;
     isLoadingOffice: boolean;
 }
