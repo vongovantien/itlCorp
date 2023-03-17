@@ -521,7 +521,10 @@ namespace eFMS.API.Accounting.Controllers
                 });
                 Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
                 var edocModel = _edocService.MapSettleCharge(model.Settlement.SettlementNo);
-                var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
+                if (edocModel.ListDel.Count > 0 || edocModel.ListAdd.Count > 0)
+                {
+                    var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
+                }
             }
             return Ok(result);
         }

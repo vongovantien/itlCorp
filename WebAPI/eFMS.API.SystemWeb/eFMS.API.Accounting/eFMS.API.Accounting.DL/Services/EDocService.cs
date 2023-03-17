@@ -39,81 +39,71 @@ namespace eFMS.API.Accounting.DL.Services
 
         public EdocAccUpdateModel MapAdvanceRequest(string AdvNo)
         {
-                var lstCurrADV = _advRequest.Get(x => x.AdvanceNo == AdvNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId).ToList();
-                var lstCurrEDoc=DataContext.Get(x=>x.BillingNo== AdvNo).GroupBy(x=>x.JobId).Select(x=>x.FirstOrDefault().JobId).ToList();
-                var lstCurrEDocStr = DataContext.Get(x => x.BillingNo == AdvNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId.ToString()).ToList();
-                var lstAdd = lstCurrADV.Where(x => !lstCurrEDocStr.Contains(x)).Select(x=>x.ToString()).ToList();
-                var lstDel= lstCurrEDoc.Where(x=> !lstCurrADV.Contains(x.ToString())).ToList();
-                var edocModel = new EdocAccUpdateModel()
-                {
-                    BillingNo = AdvNo,
-                    BillingType = "Advance",
-                    ListAdd = ConvertJobdetail(lstAdd),
-                    ListDel = lstDel,
-                };
-                return edocModel;
+            var lstCurrADV = _advRequest.Get(x => x.AdvanceNo == AdvNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId).ToList();
+            var lstCurrEDoc = DataContext.Get(x => x.BillingNo == AdvNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId).ToList();
+            var lstAdvId= ConvertJobdetail(lstCurrADV);
+            var lstAdd = lstAdvId.Where(x => !lstCurrEDoc.Contains(x)).ToList();
+            var lstDel = lstCurrEDoc.Where(x => !lstAdvId.Contains(x)).ToList();
+            var edocModel = new EdocAccUpdateModel()
+            {
+                BillingNo = AdvNo,
+                BillingType = "Advance",
+                ListAdd = lstAdd,
+                ListDel = lstDel,
+            };
+            return edocModel;
         }
 
         public EdocAccUpdateModel MapSettleCharge(string settleNo)
         {
-            var lstCurrSetNo= _surcharge.Get(x => x.SettlementCode == settleNo).GroupBy(x=>x.JobNo).Select(x => x.FirstOrDefault().JobNo).ToList();
-            var lstCurrSet = ConvertJobdetail(lstCurrSetNo).GroupBy(x => x.JobId.ToString()).Select(x=>x.FirstOrDefault().JobId.ToString());
-            var lstCurrEDoc= DataContext.Get(x => x.BillingNo == settleNo).GroupBy(x=>x.JobId).Select(x => x.FirstOrDefault().JobId).ToList();
-            var lstCurrEDocStr = DataContext.Get(x => x.BillingNo == settleNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId.ToString()).ToList();
-            var lstDel = lstCurrEDoc.Where(x => !lstCurrSet.Contains(x.ToString())).ToList();
-            var lstAdd = lstCurrSetNo.Where(x => !lstCurrEDocStr.Contains(x)).ToList();
+            var lstCurrSetNo = _surcharge.Get(x => x.SettlementCode == settleNo).GroupBy(x => x.JobNo).Select(x => x.FirstOrDefault().JobNo).ToList();
+            var lstCurrSet = ConvertJobdetail(lstCurrSetNo);
+            var lstCurrEDoc = DataContext.Get(x => x.BillingNo == settleNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId).ToList();
+            var lstDel = lstCurrEDoc.Where(x => !lstCurrSet.Contains(x)).ToList();
+            var lstAdd = lstCurrSet.Where(x => !lstCurrEDoc.Contains(x)).ToList();
             var edocModel = new EdocAccUpdateModel()
             {
                 BillingNo = settleNo,
                 BillingType = "Settlement",
-                ListAdd = ConvertJobdetail(lstAdd),
+                ListAdd = lstAdd,
                 ListDel = lstDel,
             };
             return edocModel;
         }
 
         public EdocAccUpdateModel MapSOACharge(string soaNo)
-        {
+         {
             var lstCurrSOANo = _surcharge.Get(x => x.Soano == soaNo||x.PaySoano==soaNo).GroupBy(x => x.JobNo).Select(x => x.FirstOrDefault().JobNo).ToList();
-            var lstCurrSOA = ConvertJobdetail(lstCurrSOANo).GroupBy(x => x.JobId.ToString()).Select(x => x.FirstOrDefault().JobId.ToString());
+            var lstCurrSOA = ConvertJobdetail(lstCurrSOANo).ToList();
             var lstCurrEDoc = DataContext.Get(x => x.BillingNo == soaNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId).ToList();
-            var lstCurrEDocStr = DataContext.Get(x => x.BillingNo == soaNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId.ToString()).ToList();
-            var lstDel = lstCurrEDoc.Where(x => !lstCurrSOA.Contains(x.ToString())).ToList();
-            var lstAdd = lstCurrSOANo.Where(x => !lstCurrEDocStr.Contains(x)).ToList();
+            var lstDel = lstCurrEDoc.Where(x => !lstCurrSOA.Contains(x)).ToList();
+            var lstAdd = lstCurrSOA.Where(x => !lstCurrEDoc.Contains(x)).ToList();
             var edocModel = new EdocAccUpdateModel()
             {
                 BillingNo = soaNo,
                 BillingType = "SOA",
-                ListAdd = ConvertJobdetail(lstAdd),
+                ListAdd = lstAdd,
                 ListDel = lstDel,
             };
             return edocModel;
         }
 
-        private List<EdocJobModel> ConvertJobdetail(List<string> jobNos)
+        private List<Guid?> ConvertJobdetail(List<string> jobNos)
         {
-            var result=new List<EdocJobModel>();
+            var result = new List<Guid?>();
             jobNos.ForEach(jobNo =>
             {
                 if (jobNo.Contains("LOG"))
                 {
                     var opsId = _opsTran.Get(x => x.JobNo == jobNo).FirstOrDefault().Id;
-                    result.Add(new EdocJobModel()
-                    {
-                        JobId = opsId,
-                        TransactionType = "CL"
-                    });
+                    result.Add(opsId);
                 }
                 else
                 {
-                    var csJob = _csTran.Get(x => x.JobNo == jobNo).FirstOrDefault();
-                    result.Add(new EdocJobModel()
-                    {
-                        JobId = csJob.Id,
-                        TransactionType = csJob.TransactionType,
-                    });
+                    var csId = _csTran.Get(x => x.JobNo == jobNo).FirstOrDefault().Id;
+                    result.Add(csId);
                 }
-                
+
             });
             return result;
         }
