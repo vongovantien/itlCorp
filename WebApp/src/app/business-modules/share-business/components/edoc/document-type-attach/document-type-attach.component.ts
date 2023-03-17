@@ -8,7 +8,7 @@ import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { getAdvanceDetailRequestState } from 'src/app/business-modules/accounting/advance-payment/store';
-import { LoadListEDocSettle, getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
+import { LoadListEDocSettle, getGrpChargeSettlementPaymentDetailState, getSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getSOADetailState } from 'src/app/business-modules/accounting/statement-of-account/store/reducers';
 import { PopupBase } from 'src/app/popup.base';
 import { getTransactionLocked, getTransactionPermission } from '../../../store';
@@ -110,6 +110,14 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                         }
                     }
                 );
+            this._store.select(getSettlementPaymentDetailState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe((res) => {
+                    if (res) {
+                        this.billingId = res.settlement.id;
+                        this.billingNo = res.settlement.settlementNo
+                    }
+                })
         } else {
             this.configDocType.dataSource = this.documentTypes
         }

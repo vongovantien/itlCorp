@@ -741,14 +741,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
         this.documentAttach.isUpdate = false;
         this.documentAttach.jobOnSettle = true;
-        this._store.select(getSettlementPaymentDetailState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((res) => {
-                if (res) {
-                    this.documentAttach.billingId = res.settlement.id;
-                    this.documentAttach.billingNo = res.settlement.settlementNo
-                }
-            })
         this.documentAttach.jobNo = data.jobId;
         this.documentAttach.jobId = data.shipmentId;
         this.documentAttach.updateListFileItem();
