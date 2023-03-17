@@ -194,7 +194,12 @@ export abstract class AppShareEDocBase extends AppList {
                         },
                     );
             }
-        } else {
+        }
+        else if (this.transactionType === "Settlement") {
+            this.isEdocByAcc = true
+            this.requestListEDocSettle();
+        }
+        else {
             this._systemFileRepo.getEDocByAccountant(this.billingId, transactionType)
                 .pipe(
                     catchError(this.catchError),
@@ -203,16 +208,8 @@ export abstract class AppShareEDocBase extends AppList {
                     (res: any) => {
                         this.edocByAcc = res;
                         this.onChange.emit(res);
-                        if (this.transactionType === "Settlement") {
-                            if (res.eDocs.length > 0) {
-                                this.isEdocByAcc = true
-                            }
-                            this.requestListEDocSettle();
-                        }
-                        else {
-                            this.lstEdocExist = res.eDocs;
-                            this.onChangeListAttach.emit(res);
-                        }
+                        this.lstEdocExist = res.eDocs;
+                        this.onChangeListAttach.emit(res);
                     },
                 );
         }
