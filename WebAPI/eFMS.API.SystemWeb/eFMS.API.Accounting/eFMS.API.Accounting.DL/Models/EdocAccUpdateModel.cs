@@ -8,14 +8,8 @@ namespace eFMS.API.Accounting.DL.Models
     {
         public string BillingNo { get; set; }
         public string BillingType { get; set; }
-        public List<EdocJobModel> ListAdd { get; set; }
+        public List<Guid?> ListAdd { get; set; }
         public List<Guid?> ListDel { get; set; }
-    }
-
-    public class EdocJobModel
-    {
-        public Guid? JobId { get; set; }
-        public string TransactionType { get; set; }
     }
     
 }

@@ -2193,14 +2193,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             var hsDel = new HandleState();
             var result=  new HandleState(true,"Update EDoc Success");
-            if (model.ListDel.Count == 0)
-            {
-                hsDel = new HandleState(true,"Don't have Edoc to Delete");
-            }
-            else
-            {
-                hsDel = await _sysImageDetailRepo.DeleteAsync(x => x.BillingNo == model.BillingNo && model.ListDel.Contains((Guid)x.JobId));
-            }
             if (hsDel.Success)
             {
                 var listEdoc = new List<SysImageDetail>();
@@ -2209,7 +2201,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     model.ListAdd.ForEach(x =>
                     {
-                        //var docType = GetDocType(x.TransactionType, model.BillingType);
                         var edoc = new SysImageDetail()
                         {
                             Id = Guid.NewGuid(),
@@ -2217,7 +2208,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             BillingType = model.BillingType,
                             DatetimeCreated = DateTime.Now,
                             DocumentTypeId = img.DocumentTypeId,
-                            JobId = x.JobId,
+                            JobId = x,
                             Source = model.BillingType,
                             SystemFileName = img.SystemFileName,
                             SysImageId = img.SysImageId,
@@ -2231,6 +2222,17 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 if (!result.Success)
                 {
                     result = new HandleState("Add Edoc Wrrong");
+                }
+                else
+                {
+                    if (model.ListDel.Count == 0)
+                    {
+                        hsDel = new HandleState(true, "Don't have Edoc to Delete");
+                    }
+                    else
+                    {
+                        hsDel = await _sysImageDetailRepo.DeleteAsync(x => x.BillingNo == model.BillingNo && model.ListDel.Contains((Guid)x.JobId));
+                    }
                 }
             }
             return result;
