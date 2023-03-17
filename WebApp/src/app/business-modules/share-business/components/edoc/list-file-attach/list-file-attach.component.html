@@ -1,10 +1,10 @@
 <ng-container *ngIf="typeFrom !== 'Shipment'">
     <div class="m-portlet__body collapse show" id="accountingFile">
         <div class="m-portlet__body">
-            <div class="table-wrapper table-scrollable">
+            <div class="table-wrapper">
                 <table class="table table-hover table-editable dataTable table-summary ">
                     <thead app-table-header [headers]="headersAcc" (onClick)="sortEdoc(doc,i, $event.sortField)">
-                        <th class="m--w-50 first table-actions-col">
+                        <th class="m--w-50 first ">
                             No
                         </th>
                     </thead>
@@ -12,10 +12,10 @@
                         <ng-container *ngFor="let doc of lstEdocExist;let i = index; trackBy: trackByFn">
                             <tr [contextMenu]="edocAccountantContext" (onTouch)="onSelectEDoc(doc)"
                                 [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
-                                <td>{{i + 1}}</td>
+                                <td class="m--w-50 first">{{i + 1}}</td>
                                 <td>
-                                    <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
-                                        download>{{doc.systemFileName}}
+                                    <a class=" text-underline htmlLink" (click)="viewEdocFromName(doc)" download>
+                                        {{doc.systemFileName}}
                                         <icon-file [url]="doc.imageUrl"></icon-file>
                                     </a>
                                 </td>
@@ -60,7 +60,7 @@
     <div class="menu-context__item" (click)="downloadAllEdoc()">
         <span><i class="la la-cloud align-middle text-primary"></i>Download all items</span>
     </div>
-    <div  class="menu-context__item {{(selectedEdoc?.userCreated === currentUser.userName && !readonly) === false ? 'disabled':''}}"
+    <div class="menu-context__item {{(selectedEdoc?.userCreated === currentUser.userName && !readonly) === false ? 'disabled':''}}"
         (click)="confirmDelete()">
         <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
     </div>
