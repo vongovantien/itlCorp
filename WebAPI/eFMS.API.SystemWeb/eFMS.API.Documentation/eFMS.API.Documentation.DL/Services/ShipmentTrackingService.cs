@@ -149,33 +149,36 @@ namespace eFMS.API.Documentation.DL.Services
                         };
 
                         var request = await HttpClientService.PostAPI(baseUrl, payload, null, headers);
-
                         var dataResponse = await request.Content.ReadAsAsync<TrackingMoreResponseModel>();
                         if (request.IsSuccessStatusCode)
                         {
-                            statusShipment = dataResponse.Data.StatusNumber == 2 ? DocumentConstants.IN_TRANSIT : (dataResponse.Data.StatusNumber == 4 ? DocumentConstants.DONE : null);
-                            if (shipmentExisted.TrackingStatus != DocumentConstants.DONE && dataResponse?.Data != null)
+                            if (dataResponse?.Data != null)
                             {
+                                statusShipment = dataResponse.Data.StatusNumber == 2 ? DocumentConstants.IN_TRANSIT : (dataResponse.Data.StatusNumber == 4 ? DocumentConstants.DONE : null);
+                                if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)
+                                {
 
-                                if (!DataContext.Any(x => x.JobId == shipmentExisted.Id))
-                                {
-                                    lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataResponse.Data.TrackInfo, partnerApi.Name);
-                                }
-                                else
-                                {
-                                    var dataExisted = DataContext.Count(x => x.JobId == shipmentExisted.Id);
-                                    var dataTrackingSort = dataResponse.Data.TrackInfo.OrderBy(x => x.ActualDate).Skip(dataExisted);
-                                    if (dataTrackingSort?.Any() == true)
+                                    if (!DataContext.Any(x => x.JobId == shipmentExisted.Id))
                                     {
-                                        lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, partnerApi.Name);
+                                        lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataResponse.Data.TrackInfo, partnerApi.Name);
+                                    }
+                                    else
+                                    {
+                                        var dataExisted = DataContext.Count(x => x.JobId == shipmentExisted.Id);
+                                        var dataTrackingSort = dataResponse.Data.TrackInfo.OrderBy(x => x.ActualDate).Skip(dataExisted);
+                                        if (dataTrackingSort?.Any() == true)
+                                        {
+                                            lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, partnerApi.Name);
+                                        }
+                                    }
+                                    if (lstTrackInfo.Count() > 0)
+                                    {
+                                        hs = await DataContext.AddAsync(lstTrackInfo);
                                     }
                                 }
-                                if (lstTrackInfo.Count() > 0)
-                                {
-                                    shipmentExisted.TrackingStatus = statusShipment;
-                                    hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
-                                    hs = await DataContext.AddAsync(lstTrackInfo);
-                                }
+
+                                shipmentExisted.TrackingStatus = statusShipment != string.Empty ? statusShipment : null;
+                                hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
                             }
                         }
 
