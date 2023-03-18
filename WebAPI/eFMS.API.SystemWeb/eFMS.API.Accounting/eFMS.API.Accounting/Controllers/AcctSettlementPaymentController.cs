@@ -5,7 +5,6 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
-using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -17,10 +16,12 @@ using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -39,9 +40,9 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IMapper mapper;
         private string typeApproval = "Settlement";
         private IAccAccountReceivableService accountReceivableService;
-        private readonly IEDocService _eDocService;
         private readonly IRabbitBus _busControl;
-
+        private readonly IEdocService _edocService;
+        private readonly IOptions<ApiUrl> apiServiceUrl;
 
         /// <summary>
         /// Contructor
@@ -54,8 +55,9 @@ namespace eFMS.API.Accounting.Controllers
             IAcctSettlementPaymentService service,
             ICurrentUser user, IMapper _mapper,
             IAccAccountReceivableService accountReceivable,
-            IEDocService eDocService,
-            IRabbitBus _bus
+            IRabbitBus _bus,
+            IEdocService edocService,
+            IOptions<ApiUrl> _apiServiceUrl
             )
         {
             stringLocalizer = localizer;
@@ -63,8 +65,9 @@ namespace eFMS.API.Accounting.Controllers
             currentUser = user;
             mapper = _mapper;
             accountReceivableService = accountReceivable;
-            _eDocService = eDocService;
             _busControl = _bus;
+            _edocService = edocService;
+            apiServiceUrl = _apiServiceUrl;
         }
 
         /// <summary>
@@ -203,8 +206,6 @@ namespace eFMS.API.Accounting.Controllers
             }
             else
             {
-
-                // acctSettlementPaymentService.UpdateSurchargeSettle(new List<ShipmentChargeSettlement>(), settlementNo, "Delete");
                 Response.OnCompleted(async () =>
                 {
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(settlementNo, "SETTLEMENT");
@@ -212,8 +213,9 @@ namespace eFMS.API.Accounting.Controllers
                     if (modelReceivableList.Count > 0)
                     {
                         await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
-                        await _eDocService.DeleteEdocByBillingNo(settlementNo);
                     }
+                    Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
+                    var deleteEdoc = HttpClientService.DeleteApi(urlEdoc + "File/api/v1/vi/EDoc/DeleteEDocAcc?billingNo="+settlementNo, null);
                 });
             }
             return Ok(result);
@@ -248,9 +250,6 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     chargeNoGrpSettlement = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlement.SettlementNo);
                 }
-                // chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
-                // chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
-                // chargeNoGrpSettlement = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlement.SettlementNo);
             }
             var data = new { settlement, chargeGrpSettlement, chargeNoGrpSettlement };
             return Ok(data);
@@ -502,12 +501,6 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            //var hsGenEdoc = _eDocService.GenerateEdocSettlement(model);
-            //if (hsGenEdoc.Result.Code == 403)
-            //{
-            //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            //}
-
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
@@ -526,6 +519,12 @@ namespace eFMS.API.Accounting.Controllers
                         await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
                 });
+                Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
+                var edocModel = _edocService.MapSettleCharge(model.Settlement.SettlementNo);
+                if (edocModel.ListDel.Count > 0 || edocModel.ListAdd.Count > 0)
+                {
+                    var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
+                }
             }
             return Ok(result);
         }

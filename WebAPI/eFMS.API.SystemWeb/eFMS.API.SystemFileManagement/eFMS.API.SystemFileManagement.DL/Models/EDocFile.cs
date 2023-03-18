@@ -17,5 +17,5 @@ namespace eFMS.API.SystemFileManagement.DL.Models
         public string Note { get; set; }
         public string AccountingType { get; set; }
     }
-    
+
 }
