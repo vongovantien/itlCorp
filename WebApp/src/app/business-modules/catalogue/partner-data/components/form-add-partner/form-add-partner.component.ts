@@ -79,6 +79,10 @@ export class FormAddPartnerComponent extends AppForm {
     workPhoneEx: AbstractControl;
     email: AbstractControl;
 
+    identityNo: AbstractControl;
+    dateId: AbstractControl;
+    placeId: AbstractControl;
+
     bankAccountNo: AbstractControl;
     bankAccountName: AbstractControl;
     bankAccountAddress: AbstractControl;
@@ -354,7 +358,14 @@ export class FormAddPartnerComponent extends AppForm {
             internalCode: [null],
             creditPayment: [null],
             bankName: [],
-            bankCode: [{ value: null, disabled: true }]
+            bankCode: [{ value: null, disabled: true }],
+            identityNo: [null, Validators.compose([
+                Validators.maxLength(15),
+                Validators.minLength(8),
+                Validators.pattern(SystemConstants.CPATTERN.NUMBER),
+            ])],
+            dateId: [null],
+            placeId: [null]
         });
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
         this.internalReferenceNo = this.partnerForm.controls['internalReferenceNo'];
@@ -397,6 +408,9 @@ export class FormAddPartnerComponent extends AppForm {
         this.internalCode = this.partnerForm.controls['internalCode'];
         this.creditPayment = this.partnerForm.controls['creditPayment'];
         this.bankName = this.partnerForm.controls['bankName'];
+        this.identityNo = this.partnerForm.controls["identityNo"];
+        this.dateId = this.partnerForm.controls["dateId"];
+        this.placeId = this.partnerForm.controls["placeId"];
         if (!this.isUpdate) {
             this.partnerMode.setValue('External');
             this.partnerLocation.setValue('Domestic');
@@ -540,7 +554,11 @@ export class FormAddPartnerComponent extends AppForm {
             internalCode: partner.internalCode,
             creditPayment: partner.creditPayment,
             bankName: partner.bankName,
-            bankCode: partner.bankCode
+            bankCode: partner.bankCode,
+            identityNo: partner.identityNo,
+            dateId: !!partner.dateId ? { startDate: new Date(partner.dateId), endDate: new Date(partner.dateId) } : null,
+            placeId: partner.placeId
+
         });
         if (this.partnerAccountRef.value !== partner.parentId) {
             this.isDisabled = false;
@@ -639,4 +657,5 @@ export class FormAddPartnerComponent extends AppForm {
             this.partnerForm.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn)
         }
     }
+    
 }

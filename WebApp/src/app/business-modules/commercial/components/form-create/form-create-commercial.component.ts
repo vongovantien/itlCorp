@@ -42,6 +42,10 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     cities: Observable<ProviceModel[]>;
     acRefCustomers: Observable<Partner[]>;
 
+    identityNo: AbstractControl;
+    dateId: AbstractControl;
+    placeId: AbstractControl;
+
     shippingProvinces: ProviceModel[];
     initShippingProvinces: ProviceModel[];
     billingProvinces: ProviceModel[];
@@ -144,7 +148,14 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             provinceId: [],
             parentId: [],
             partnerLocation: [null, Validators.required],
-            bankAccountName: []
+            bankAccountName: [],
+            identityNo: [null, Validators.compose([
+                Validators.maxLength(15),
+                Validators.minLength(8),
+                Validators.pattern(SystemConstants.CPATTERN.NUMBER),
+            ])],
+            dateId: null,
+            placeId: []
         });
 
         this.partnerNameEn = this.formGroup.controls["partnerNameEn"];
@@ -166,6 +177,9 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         this.addressEn = this.formGroup.controls["addressEn"];
         this.addressVn = this.formGroup.controls["addressVn"];
         this.partnerLocation = this.formGroup.controls["partnerLocation"];
+        this.identityNo = this.formGroup.controls["identityNo"];
+        this.dateId = this.formGroup.controls["dateId"];
+        this.placeId = this.formGroup.controls["placeId"];
         this.isDisabled = this.parentId != null && !this.isUpdate ? true : false;
     }
 
