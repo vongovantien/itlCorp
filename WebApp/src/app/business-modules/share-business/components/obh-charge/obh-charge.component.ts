@@ -84,6 +84,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             .subscribe(
                 (partners: Partner[]) => {
                     this.listPartnerPayee = partners;
+                    this._cd.markForCheck();
                 }
             );
     }

@@ -239,6 +239,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (partners: Partner[]) => {
                     this.listPartner = partners;
+                    this._cd.markForCheck();
+
                 }
             );
 
