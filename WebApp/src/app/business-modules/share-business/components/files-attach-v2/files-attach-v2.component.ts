@@ -12,6 +12,7 @@ import { IAppState, getCurrentUserState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
+import { getGrpChargeSettlementPaymentDetailState } from 'src/app/business-modules/accounting/settlement-payment/components/store';
 import { getOperationTransationState } from 'src/app/business-modules/operation/store';
 import { getTransactionDetailCsTransactionState } from '../../store';
 import { IEDocFile, IEDocUploadFile, ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
@@ -60,6 +61,7 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
         eDocs: [],
     })];
     docTypeId: number = 0;
+    haveAdv: boolean = false;
 
     headersGen: CommonInterface.IHeaderTable[] = [
         { title: 'Alias Name', field: 'systemFileName', sortable: true },
@@ -188,6 +190,17 @@ export class ShareBussinessAttachFileV2Component extends AppList implements OnIn
                     this.currentUser = res;
                 }
             )
+        this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
+            takeUntil(this.ngUnsubscribe)
+        )
+            .subscribe(
+                (data) => {
+                    if (!!data) {
+                        this.haveAdv = data.some(x => x.advanceNo !== null);
+                    }
+                }
+            );
+
         this.getHblList();
     }
 
