@@ -136,7 +136,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 2);
                     }
                 }
-                saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
+                saleman.SaleServiceName = saleman.SaleService.Replace(";", "; ");
                 saleman.Username = item.user.Username;
                 saleman.CreatorCompanyId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.CompanyId == currentUser.CompanyID).Select(t => t.CompanyId).FirstOrDefault();
                 saleman.CreatorOfficeId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.OfficeId == currentUser.OfficeID).Select(t => t.OfficeId).FirstOrDefault();
