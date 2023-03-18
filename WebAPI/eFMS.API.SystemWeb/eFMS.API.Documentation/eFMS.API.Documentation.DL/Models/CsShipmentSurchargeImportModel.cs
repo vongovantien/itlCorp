@@ -32,5 +32,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string SerieNoError { get; set; }
         //public string InvoiceNoError { get; set; }
         public decimal? TotalAmount { get; set; }
+        public string VatPartnerTaxCodeError { get;  set; }
     }
 }
