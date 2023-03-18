@@ -1,7 +1,9 @@
-.m-widget24  {
+.m-widget24 {
     padding-left: 75px;
     position: relative;
+
     .m-widget24__item {
+
         .m-widget24__title,
         .m-widget24__desc,
         .m-widget24__change {
@@ -12,6 +14,7 @@
         }
     }
 }
+
 .fms-widget-icon {
     width: 60px;
     height: 60px;
@@ -24,38 +27,49 @@
     left: 15px;
     z-index: 0;
     margin-top: -25px;
+
     i {
         font-size: 35px;
         line-height: 60px;
     }
 }
+
 .m-widget24__item {
     position: relative;
 }
+
 .bg-gradient-primary {
-    background-image: linear-gradient(to right, #2b62c2 , #5083c5);
+    background-image: linear-gradient(to right, #2b62c2, #5083c5);
+
     .fms-widget-icon {
         background-color: #4073c7;
     }
 }
+
 .bg-gradient-success {
-    background-image: linear-gradient(to right, #3abf9f , #6edab6);
+    background-image: linear-gradient(to right, #3abf9f, #6edab6);
+
     .fms-widget-icon {
         background-color: #61ceb2;
     }
 }
+
 .bg-gradient-warning {
-    background-image: linear-gradient(to right, #fda63f , #fec684);
+    background-image: linear-gradient(to right, #fda63f, #fec684);
+
     .fms-widget-icon {
         background-color: #fdb867;
     }
 }
+
 .bg-gradient-danger {
-    background-image: linear-gradient(to right, #fb4b58 , #ff7966);
+    background-image: linear-gradient(to right, #fb4b58, #ff7966);
+
     .fms-widget-icon {
         background-color: #fc7275;
     }
 }
+
 .fms-btn-group {
     .btn {
         &.active {
@@ -65,10 +79,99 @@
         }
     }
 }
-.fms-chart-detail-block  {
+
+.fms-chart-detail-block {
     height: 400px;
     background-color: #fbfbfb;
 }
+
 .fms-chart-block {
     width: 100%;
+}
+
+.btn-container {
+    padding: 3px 30px;
+    border-radius: 8px;
+    min-width: 80px;
+
+}
+
+.dashboard-background--image {
+    background-image: url("../../assets/icons/background.jpg");
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+@media screen and (min-width: 1400px) {
+    .dashboard-background--image {
+        background-size: cover;
+    }
+}
+
+.dashboard-background {
+    height: 600px;
+}
+
+.text-information {
+    padding-left: 20px;
+    padding-top: 10px;
+    color: #8a8b91;
+    font-weight: 500;
+}
+
+.line-progress-vertical {
+    position: relative;
+    width: 2px;
+    height: 100px;
+    background-color: #34BFA3;
+}
+
+.track-router {
+    box-sizing: border-box;
+    border-radius: 50%;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 6px;
+    top: -4px;
+    z-index: 1;
+}
+
+.track-router-start {
+    background: #FFFFFF;
+    border: 3px solid #3966B6;
+}
+
+.track-progress-router {
+    background: #3966B6;
+}
+
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+    background-color: #3966b6;
+    opacity: 0.4;
+}
+
+.loader-container img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.no-data-image {
+    background-image: url("../../assets/icons/nodatafound.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    width: 500px;
+    height: 400px;
 }

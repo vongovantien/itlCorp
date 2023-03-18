@@ -2,6 +2,8 @@
 {
     public class DocumentationLanguageSub
     {
+
+        public static readonly string MSG_SHIPMENT_NOT_EXIST = "MSG_SHIPMENT_NOT_EXIST";
         public static readonly string MSG_JOBNO_EXISTED = "MSG_JOBNO_EXISTED";
         public static readonly string MSG_REFUND_FEE_EXISTED = "MSG_REFUND_FEE_EXISTED";
         public static readonly string MSG_MAWB_EXISTED = "MSG_MAWB_EXISTED";

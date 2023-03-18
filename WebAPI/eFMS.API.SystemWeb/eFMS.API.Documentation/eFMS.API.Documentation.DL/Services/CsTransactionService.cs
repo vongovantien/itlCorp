@@ -16,6 +16,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
@@ -3785,7 +3786,6 @@ namespace eFMS.API.Documentation.DL.Services
         }
     }
     #endregion
-
 }
 
 

@@ -652,6 +652,7 @@
             <param name="checkPoint"></param>
             <param name="imageService"></param>
             <param name="stageAssignedService"></param>
+            <param name="transactionDetailService"></param>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CountJob(System.DateTime)">
             <summary>
@@ -768,6 +769,13 @@
             preview air document release
             </summary>
             <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.TrackShipmentProgress(eFMS.API.Documentation.DL.Models.Criteria.TrackingShipmentCriteria)">
+            <summary>
+            
+            </summary>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckUpdateServiceDate(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">

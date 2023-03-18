@@ -1,4 +1,5 @@
 ﻿{
+  "MSG_SHIPMENT_NOT_EXIST": "Not found Shipment. Please check the Shipment code",
   "MSG_DATA_NOT_FOUND": "Data not found",
   "MSG_OBJECT_NOT_EXISTS": "Object does not exist",
   "MSG_OBJECT_DUPLICATED": "Object is duplicated",
@@ -109,5 +110,5 @@
   "MSG_CHARGE_CODE_WRONG_OFFICE": "Charge {0} not exist in office {1}",
   "MSG_CUSTOM_NO_NOT_EXIST_JOB": "Custom No does not exist in {0}",
   "MSG_VAT_PARTER_CODE_NOT_EXIST": "VAT Partner code {0} not exist",
-  "MSG_VAT_PARTER_CODE_EMPTY":  "VAT Partner Field is empty"
+  "MSG_VAT_PARTER_CODE_EMPTY": "VAT Partner Field is empty"
 }
