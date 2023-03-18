@@ -19,6 +19,7 @@ import { RoutingConstants } from '@constants';
 import { CommercialEmailListComponent } from '../components/email/commercial-email-list.component';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
+import { formatDate } from '@angular/common';
 
 
 @Component({
@@ -100,6 +101,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         modelAdd.contracts = [...this.contractList.contracts];
         modelAdd.partnerEmails = [...this.partnerEmailList.partnerEmails];
         modelAdd.isRequestApproval = isRequestApproval;
+        modelAdd.dateId = this.formCreate.dateId.value ? (this.formCreate.dateId.value.startDate !== null ? formatDate(this.formCreate.dateId.value.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.saveCustomerCommercial(modelAdd);
     }
 
