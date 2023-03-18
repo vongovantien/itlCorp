@@ -197,7 +197,10 @@ namespace eFMS.API.Documentation.DL.Services
                     chargeBuy.InvoiceNo = null;
                     chargeBuy.InvoiceDate = null;
                     chargeBuy.LinkChargeId = null;
-                    chargeBuy.Notes = null;
+
+                    //[13/03/2022][Link thêm thông tin note khi link fee từ job OPS sang job Service]
+                    //chargeBuy.Notes = null;
+
                     chargeBuy.IsFromShipment = true;
                     chargeBuy.SyncedFrom = null;
                     chargeBuy.PaySyncedFrom = null;
