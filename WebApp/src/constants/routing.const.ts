@@ -17,6 +17,7 @@ export class RoutingConstants {
         CUSTOMER: `${RoutingConstants.ROOT_COMMERCIAL}/customer`,
         INCOTERM: `${RoutingConstants.ROOT_COMMERCIAL}/incoterm`,
         POTENTIAL: `${RoutingConstants.ROOT_COMMERCIAL}/potential-customer`,
+        WO: `${RoutingConstants.ROOT_COMMERCIAL}/work-order`,
     };
 
     public static readonly LOGISTICS = {

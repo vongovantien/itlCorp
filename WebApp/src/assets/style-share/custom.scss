@@ -125,6 +125,9 @@ a {
         background-color: #fbfbfb;
     }
     background-color: #fbfbfb;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .dropdown.open .dropdown-menu {
@@ -621,6 +624,19 @@ table.dataTable {
     background-color: rgba(0, 0, 0, 0.5);
     .modal-content {
         border-radius: 15px;
+        .modal-header-radient {
+            background-image: linear-gradient(to bottom right, #34BF55, #0072AF);
+            .modal-title {
+              color: inherit;
+            }
+            .close {
+              color: inherit;
+              &:not(:disabled):not(.disabled):hover,
+              &:not(:disabled):not(.disabled):focus {
+                color: inherit;
+              }
+            }
+          }
         .modal-header {
             padding: 10px 15px;
             background-color: #3966b6;
@@ -1504,3 +1520,20 @@ button {
         }
     }
 }
+
+.dot {
+    position: relative;
+    padding: 2px 10px 2px 15px !important;
+    &.dot--success {
+        &::before {
+            content: "\2022";
+            position: absolute;
+            left: 5px;
+            top: 3px;
+            font-size: 1.5em;
+            color:#34bfa3;
+        }
+        
+    }
+
+} 
