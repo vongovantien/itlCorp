@@ -1,16 +1,18 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import { ISettlementPaymentData } from '../../../detail/detail-settlement-payment.component';
-import * as Actions from './../actions';
+import * as Actions from '../actions';
 export interface SettlePaymentDetailState {
     settlement: ISettlementPaymentData;
     isLoading: boolean;
     isLoaded: boolean;
+    eDocs: any[];
 }
 
 export const initialState: SettlePaymentDetailState = {
     settlement: null,
     isLoading: false,
-    isLoaded: false
+    isLoaded: false,
+    eDocs: []
 };
 
 const reducer = createReducer(
@@ -26,6 +28,9 @@ const reducer = createReducer(
     })),
     on(Actions.UpdateListNoGroupSurcharge, (state: SettlePaymentDetailState, payload: any) => ({
         ...state, settlement: { ...state.settlement, chargeNoGrpSettlement: payload.data }
+    })),
+    on(Actions.LoadListEDocSettleSuccess, (state: SettlePaymentDetailState, payload: any) => ({
+        ...state, eDocs: payload.eDocs
     })),
 );
 

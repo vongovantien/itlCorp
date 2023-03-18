@@ -383,7 +383,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     HBLNo = _hblNo,
                     Note = x.Note,
                     TransactionType = transactionType,
-                    DocumentCode = template.Code
+                    DocumentCode = template?.Code
                 };
                 lstImageMD.Add(imageModel);
             });
@@ -556,6 +556,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     var image = _sysImageRepo.Get(z => z.Id == x.FirstOrDefault().SysImageId).FirstOrDefault();
                     var jobDetail = GetJobDetail(x.FirstOrDefault().JobId, x.FirstOrDefault().Hblid, x.FirstOrDefault().DocumentTypeId);
+                    var countItem = x.GroupBy(z => z.JobId).Count();
                     var edoc = new SysImageDetailModel()
                     {
                         Id = x.FirstOrDefault().Id,
@@ -573,10 +574,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
                         Note = x.FirstOrDefault().Note,
-                        HBLNo = x.Count() > 1 ? null : jobDetail.HBLNo,
-                        JobNo = x.Count() > 1 ? null : jobDetail.JobNo,
-                        Hblid = x.Count() > 1 ? Guid.Empty : jobDetail.HBLId,
-                        JobId = x.Count() > 1 ? Guid.Empty : jobDetail.JobId,
+                        HBLNo = countItem > 1 ? null : jobDetail.HBLNo,
+                        JobNo = countItem > 1 ? null : jobDetail.JobNo,
+                        Hblid = countItem > 1 ? Guid.Empty : jobDetail.HBLId,
+                        JobId = countItem > 1 ? Guid.Empty : jobDetail.JobId,
                         DocumentTypeName = _attachFileTemplateRepo.Get(y => y.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().NameEn,
                         TransactionType = jobDetail?.TransactionType
                     };
@@ -673,6 +674,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     var image = _sysImageRepo.Get(z => z.Id == x.FirstOrDefault().SysImageId).FirstOrDefault();
                     var jobDetail = GetJobDetail(x.FirstOrDefault().JobId, x.FirstOrDefault().Hblid, x.FirstOrDefault().DocumentTypeId);
+                    var countItem = x.GroupBy(z => z.JobId).Count();
                     var edoc = new SysImageDetailModel()
                     {
                         Id = x.FirstOrDefault().Id,
@@ -691,8 +693,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
                         Note = x.FirstOrDefault().Note,
-                        HBLNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
-                        JobNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
+                        HBLNo = countItem > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
+                        JobNo = countItem > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
                     };
                     lstEdoc.Add(edoc);
                 }
@@ -750,6 +752,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     var image = _sysImageRepo.Get(z => z.Id == x.FirstOrDefault().SysImageId).FirstOrDefault();
                     var jobDetail = GetJobDetail(x.FirstOrDefault().JobId, x.FirstOrDefault().Hblid, x.FirstOrDefault().DocumentTypeId);
+                    var countItem = x.GroupBy(z => z.JobId).Count();
                     var edoc = new SysImageDetailModel()
                     {
                         Id = x.FirstOrDefault().Id,
@@ -768,8 +771,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         UserFileName = x.FirstOrDefault().UserFileName,
                         UserModified = x.FirstOrDefault().UserModified,
                         Note = x.FirstOrDefault().Note,
-                        HBLNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
-                        JobNo = x.Count() > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
+                        HBLNo = countItem > 1 ? null : jobDetail != null ? jobDetail.HBLNo : null,
+                        JobNo = countItem > 1 ? null : jobDetail != null ? jobDetail.JobNo : null,
                     };
                     lstEdoc.Add(edoc);
                 }
@@ -879,6 +882,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
+        
         //Delete with Other case
         //private async Task<bool> DeleteImage(string billingNo, string billingType)
         //{
@@ -912,47 +916,94 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         //}
 
 
-        public async Task<HandleState> DeleteEdoc(Guid edocId)
+        public async Task<HandleState> DeleteEdoc(Guid edocId, Guid jobId)
         {
             HandleState result = new HandleState();
             try
             {
                 var edoc = _sysImageDetailRepo.Get(x => x.Id == edocId).FirstOrDefault();
-                if (edoc == null)
+                if (jobId==Guid.Empty)
                 {
-                    var imageOther = _sysImageRepo.Get(x => x.Id == edocId).FirstOrDefault();
-                    if (imageOther != null)
+                    if (edoc == null)
                     {
-                        var rsDelete = deleteFile(imageOther.KeyS3);
-                        if (rsDelete != null)
+                        var imageOther = _sysImageRepo.Get(x => x.Id == edocId).FirstOrDefault();
+                        if (imageOther != null)
                         {
-                            result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
+                            var rsDelete = deleteFile(imageOther.KeyS3);
+                            if (rsDelete != null)
+                            {
+                                result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
+                            }
                         }
                     }
-                }
-                if (edoc != null)
-                {
-                    if (edoc.Source == "Shipment")
+                    if (edoc != null)
                     {
-                        if (checkHaveGenEdoc(edocId))
+                        if (edoc.Source == "Shipment")
                         {
-                            await _sysImageDetailRepo.DeleteAsync(x => x.Id == edoc.Id);
-                            await _sysImageDetailRepo.DeleteAsync(x => x.GenEdocId == edoc.Id);
-                            var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                            var rsDelete = deleteFile(image.KeyS3);
-                            if (rsDelete != null)
-                                if (edoc.Id != Guid.Empty)
+                            if (checkHaveGenEdoc(edocId))
+                            {
+                                await _sysImageDetailRepo.DeleteAsync(x => x.Id == edoc.Id);
+                                await _sysImageDetailRepo.DeleteAsync(x => x.GenEdocId == edoc.Id);
+                                var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+                                var rsDelete = deleteFile(image.KeyS3);
+                                if (rsDelete != null)
+                                    if (edoc.Id != Guid.Empty)
+                                    {
+                                        result = await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
+                                    }
+                                    else
+                                    {
+                                        result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
+                                    }
+                            }
+                            else
+                            {
+                                var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+                                var rsDelete = deleteFile(image.KeyS3);
+                                if (rsDelete != null)
+                                    if (edoc.Id != Guid.Empty)
+                                    {
+                                        result = await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
+                                    }
+                                    else
+                                    {
+                                        result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
+                                    }
+                                if (result.Success && edoc.Id != Guid.Empty)
                                 {
-                                    result = await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
+                                    await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocId);
                                 }
-                                else
-                                {
-                                    result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
-                                }
+                            }
+
+                        }
+                        else if (edoc.GenEdocId != null)
+                        {
+                            var images = _sysImageDetailRepo.Get(x => x.BillingNo == edoc.BillingNo && x.GenEdocId != null && x.SysImageId==edoc.SysImageId).ToList();
+                            var edocIds = images.Select(x => x.Id).ToList();
+                            //var imageIds = images.Select(x => x.SysImageId).ToList();
+                            var delEdoc = await _sysImageDetailRepo.DeleteAsync(x => edocIds.Contains(x.Id));
+                            //if (delEdoc.Success)
+                            //{
+                            //    var imageRoot = _sysImageRepo.Get(x => imageIds.Contains(x.Id)).ToList();
+                            //    imageRoot.ForEach(async image =>
+                            //    {
+                            //        var rsDelete = deleteFile(image.KeyS3);
+                            //        if (rsDelete != null)
+                            //        {
+                            //            result = await _sysImageRepo.DeleteAsync(x => x.Id == image.Id);
+                            //        }
+                            //        else
+                            //        {
+                            //            result = new HandleState("Can't Delete File Source on S3");
+                            //        }
+                            //    });
+                            //}
                         }
                         else
                         {
                             var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
+                            var edocShipment = _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).ToList();
+                            var edocIds = edocShipment.Select(x => x.Id);
                             var rsDelete = deleteFile(image.KeyS3);
                             if (rsDelete != null)
                                 if (edoc.Id != Guid.Empty)
@@ -965,48 +1016,23 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 }
                             if (result.Success && edoc.Id != Guid.Empty)
                             {
-                                await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocId);
+                                await _sysImageDetailRepo.DeleteAsync(x => edocIds.Contains(x.Id));
                             }
                         }
-
                     }
-                    else if (edoc.GenEdocId != null)
+                }
+                else
+                {
+                    var edocExist = _sysImageDetailRepo.Get(x => x.SysImageId == edoc.SysImageId).ToList();
+                    if(edocExist != null)
                     {
-                        await _sysImageDetailRepo.DeleteAsync(x => x.Id == edoc.Id);
-                        var edocExist = _sysImageDetailRepo.Get(x => x.SysImageId == edoc.SysImageId).FirstOrDefault();
-                        if (edocExist == null)
+                        if (edocExist.Count == 1)
                         {
-                            var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                            if (image != null)
-                            {
-                                var rsDelete = deleteFile(image.KeyS3);
-                                if (rsDelete != null)
-                                {
-                                    result = await _sysImageRepo.DeleteAsync(x => x.Id == image.Id);
-                                }
-                            }
+                            await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
                         }
                     }
-                    else
-                    {
-                        var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
-                        var edocShipment = _sysImageDetailRepo.Get(x => x.SysImageId == image.Id).ToList();
-                        var edocIds = edocShipment.Select(x => x.Id);
-                        var rsDelete = deleteFile(image.KeyS3);
-                        if (rsDelete != null)
-                            if (edoc.Id != Guid.Empty)
-                            {
-                                result = await _sysImageRepo.DeleteAsync(x => x.Id == edoc.SysImageId);
-                            }
-                            else
-                            {
-                                result = await _sysImageRepo.DeleteAsync(x => x.Id == edocId);
-                            }
-                        if (result.Success && edoc.Id != Guid.Empty)
-                        {
-                            await _sysImageDetailRepo.DeleteAsync(x => edocIds.Contains(x.Id));
-                        }
-                    }
+                    var edocDelId = edocExist.Where(x => x.JobId == jobId).FirstOrDefault().Id;
+                    result = await _sysImageDetailRepo.DeleteAsync(x => x.Id == edocDelId);
                 }
                 return result;
             }
@@ -2097,12 +2123,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         public bool CheckAllowSettleEdocSendRequest(Guid settleId)
         {
             var settleNo = _setleRepo.Get(x => settleId == x.Id).FirstOrDefault().SettlementNo;
-            var docTypeId = _sysImageDetailRepo.Get(x => x.BillingNo == settleNo && x.BillingType == "Settlement"&&x.GenEdocId==null).Select(x => x.DocumentTypeId).ToList();
+            var docTypeId = _sysImageDetailRepo.Get(x => x.BillingNo == settleNo && x.BillingType == "Settlement").GroupBy(x => x.DocumentTypeId).Select(x => x.FirstOrDefault().DocumentTypeId).ToList();
             var attAdvSm = _attachFileTemplateRepo.Get(x => x.Type == "Accountant" && (x.AccountingType == "ADV-Settlement")).Select(x => (int?)x.Id).ToList();
-            if (attAdvSm.Intersect(docTypeId).Any())
+            var diff1 = docTypeId.Except(attAdvSm);
+            if (diff1.Count() > 0)
             {
                 var attSm = _attachFileTemplateRepo.Get(x => x.Type == "Accountant" && (x.AccountingType == "Settlement")).Select(x => (int?)x.Id).ToList();
-                if (attSm.Intersect(docTypeId).Any())
+                var diff2 = docTypeId.Except(attSm);
+                if (diff2.Count() > 0)
                 {
                     return false;
                 }
