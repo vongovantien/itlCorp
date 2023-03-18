@@ -14,7 +14,7 @@ export * from './class-status-approval.pipe';
 export * from './extension';
 export * from './class-status-sync.pipe';
 export { SortTableClassPipe, FixedColumnClassPipe, AlignClassPipe } from './sort-table-class.pipe';
-
+export * from './quantity-range.pipe';
 
 
 

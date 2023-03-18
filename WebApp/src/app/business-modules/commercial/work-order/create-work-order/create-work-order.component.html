@@ -1,0 +1,33 @@
+<div class="work-order-wrapper m-animate-fade-in">
+
+    <app-sub-header> </app-sub-header>
+
+    <div class="m-content">
+
+        <form-create-work-order [transactionType]="transactionType"> Work Order Information </form-create-work-order>
+
+        <price-list-work-order></price-list-work-order>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="m--align-center m--margin-top-20">
+                    <div class="c-button-actions">
+                        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
+                            (click)="submitClick('save')">
+                            <span>
+                                <i class="la la-save"></i>
+                                <span>
+                                    Save
+                                </span>
+                            </span>
+                        </button>
+                        <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
+                        </app-default-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template inject></ng-template>

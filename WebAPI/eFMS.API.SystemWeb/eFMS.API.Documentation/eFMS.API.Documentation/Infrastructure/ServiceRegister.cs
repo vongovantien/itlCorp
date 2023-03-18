@@ -58,6 +58,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<ICsStageAssignedService, CsStageAssignedService>();
             services.AddTransient<IStageService, StageService>();
             services.AddTransient<IEDocService, EDocService>();
+            services.AddTransient<IWorkOrderService, WorkOrderService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

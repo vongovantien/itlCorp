@@ -1,14 +1,16 @@
 <div class="dropdown e--combogrid" [class.show]="!showAngledownIcon" dropdown #dropdown="bs-dropdown"
     (clickOutside)="keyword = ''; showAngledownIcon = false" [insideClick]="true" [isDisabled]="disabled">
     <ng-container *ngIf="allowEditing;else readOnlyTpl">
-        <input #clkSearch class="form-control m-input m-input--square dropdown-toggle pos-rel" [disabled]="Disabled"
-            type="text" [tooltip]="isTooltip ? (displayStringValue == '' ? null : displayStringValue) : ''"
+        <input #clkSearch class="form-control m-input m-input--square dropdown-toggle pos-rel {{textColor}}"
+            [disabled]="Disabled" type="text"
+            [tooltip]="isTooltip ? (displayStringValue == '' ? null : displayStringValue) : ''"
             [placeholder]="loading ? '' : placeholder" [attr.aria-expanded]="!showAngledownIcon"
             (focus)="onFocusInputPlaceholder($event)" [(ngModel)]="displayStringValue">
     </ng-container>
     <ng-template #readOnlyTpl>
-        <input #clkSearch (click)="clickSearch()" class="form-control m-input m-input--square dropdown-toggle pos-rel"
-            [disabled]="Disabled" type="text" readonly [value]="displayStringValue == '' ? null : displayStringValue"
+        <input #clkSearch (click)="clickSearch()"
+            class="form-control m-input m-input--square dropdown-toggle pos-rel {{textColor}}" [disabled]="Disabled"
+            type="text" readonly [value]="displayStringValue == '' ? null : displayStringValue"
             [tooltip]="isTooltip ? (displayStringValue == '' ? null : displayStringValue) : ''"
             [placeholder]="loading ? '' : placeholder" [attr.aria-expanded]="!showAngledownIcon"
             (focus)="onFocusInputPlaceholder($event)" dropdownToggle>
