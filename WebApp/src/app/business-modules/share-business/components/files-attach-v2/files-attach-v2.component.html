@@ -76,8 +76,7 @@
                                                 <span>{{doc.systemFileName}} </span>
                                             </td>
                                             <td>
-                                                <a class="text-underline htmlLink"
-                                                    (click)="viewEdocFromName(doc)"
+                                                <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
                                                     download>{{doc.userFileName}}
                                                     <icon-file [url]="doc.imageUrl"></icon-file>
                                                 </a>
@@ -179,13 +178,12 @@
                                                 </span>
                                             </span>
                                         </button>
-                                        <button type="button" class="btn btn-primary m-btn--icon m-btn--uppercase"
-                                            [dpToggle]="dropdownMenu" position="bottomLeft" mode="dropdown"
+                                        <button type="button" class="btn btn-primary m-btn--uppercase dropdown-toggle"
+                                            [dpToggle]="dropdownMenu" position="bottomCenter" mode="dropdown"
                                             *ngIf="typeFrom==='Settlement'">
-                                            <span>
-                                                <i class="la la-download"></i>
-                                                <span> Get Files</span>
-                                            </span>
+                                            <i class="la la-download"></i>
+                                            Get File
+                                            <span class="caret"></span>
                                         </button>
                                         <app-dropdown #dropdownMenu>
                                             <a class="dropdown-item pointer" (click)="genFileToSM('Advance')">
@@ -194,10 +192,12 @@
                                             <a class="dropdown-item pointer" (click)="genFileToSM('SOA')">
                                                 <span>Get Files SOA</span>
                                             </a>
-                                            <a class="dropdown-item pointer" (click)="genFileToSM('MBL')">
+                                            <a class="dropdown-item pointer" *ngIf="!haveAdv"
+                                                (click)="genFileToSM('MBL')">
                                                 <span>Get Files MasterBill</span>
                                             </a>
-                                            <a class="dropdown-item pointer" (click)="genFileToSM('HBL')">
+                                            <a class="dropdown-item pointer" *ngIf="!haveAdv"
+                                                (click)="genFileToSM('HBL')">
                                                 <span>Get Files HouseBill</span>
                                             </a>
                                             <a class="dropdown-item pointer" (click)="genFileToSM('INV')">
@@ -276,9 +276,9 @@
                                                         <icon-file [url]="doc.userFileName"></icon-file>
                                                     </a> -->
                                                     <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
-                                                    download>{{doc.userFileName}}
-                                                    <icon-file [url]="doc.imageUrl"></icon-file>
-                                                </a>
+                                                        download>{{doc.userFileName}}
+                                                        <icon-file [url]="doc.imageUrl"></icon-file>
+                                                    </a>
                                                 </td>
                                                 <td>
                                                     <span>{{doc.hblNo}}</span>
@@ -341,9 +341,9 @@
                                                 <icon-file [url]="doc.userFileName"></icon-file>
                                             </a> -->
                                             <a class="text-underline htmlLink" (click)="viewEdocFromName(doc)"
-                                            download>{{doc.systemFileName}}
-                                            <icon-file [url]="doc.imageUrl"></icon-file>
-                                        </a>
+                                                download>{{doc.systemFileName}}
+                                                <icon-file [url]="doc.imageUrl"></icon-file>
+                                            </a>
                                         </td>
                                         <td
                                             *ngIf=" typeFrom==='Settlement' || typeFrom==='SOA' || typeFrom==='Advance'">

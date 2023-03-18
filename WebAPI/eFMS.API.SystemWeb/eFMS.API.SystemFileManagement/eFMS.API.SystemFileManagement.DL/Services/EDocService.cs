@@ -1677,6 +1677,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 var edocs = new List<SysImageDetail>();
                 var settleId = _setleRepo.Get(x => x.SettlementNo == billingNo).FirstOrDefault().Id.ToString();
                 var haveEdoc = SMhaveADV(settleId);
+                var advSM = _surRepo.Get(x => x.SettlementCode == billingNo && x.Mblno != null && x.AdvanceNo != null).FirstOrDefault();
                 switch (billingType)
                 {
                     case "Advance":
@@ -1743,11 +1744,22 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 if (img != null)
                                 {
                                     var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement");
-                                    var MBLCode = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "BL" || z.Code == "MAWB") && z.Type == "General")).FirstOrDefault();
+                                    var MBLCode = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "BL" || z.Code == "MB") && z.Type == "General")).FirstOrDefault();
                                     if (edocExist.Count() == 0)
                                     {
-                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type== "Accountant")).FirstOrDefault();
-                                        if(MBLCode!= null)
+                                        //int docTypeId = 0;
+                                        //var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type== "Accountant")).FirstOrDefault();
+                                        //var tranType= _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type == "Accountant")).FirstOrDefault();
+                                        //if (advSM != null)
+                                        //{
+                                        //    docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "AD-SM")).FirstOrDefault().Id;
+                                        //}
+                                        //else
+                                        //{
+                                        //    docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "SM"&&z.AccountingType== "Settlement")).FirstOrDefault().Id;
+                                        //}
+                                        int docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.AccountingType == "Settlement")).FirstOrDefault().Id;
+                                        if (MBLCode != null)
                                         {
                                             if (checEdocType(img.Id, MBLCode.Id))
                                             {
@@ -1762,7 +1774,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                     DepartmentId = currentUser.DepartmentId,
                                                     ExpiredDate = null,
                                                     GroupId = currentUser.GroupId,
-                                                    DocumentTypeId = tranType.Id,
+                                                    DocumentTypeId = docTypeId,
                                                     JobId = getJobId(x.jobNo, x.tranType),
                                                     SysImageId = img.Id,
                                                     SystemFileName = edocFrom.SystemFileName,
@@ -1776,15 +1788,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                     GenEdocId=edocFrom.Id
                                                 };
                                                 edocs.Add(edoc);
+                                                }
                                             }
                                         }
-                                    }
                                 }
                             });
                         });
                         break;
                     case "HBL":
                         var chargeSMHBL = _surRepo.Get(x => x.SettlementCode == billingNo && x.Hblno != null);
+                        advSM = _surRepo.Get(x => x.SettlementCode == billingNo && x.Mblno != null && x.AdvanceNo != null).FirstOrDefault();
                         var jobSettleHBL = chargeSMHBL.GroupBy(x=>x.JobNo).Select(x => new { jobNo = x.FirstOrDefault().JobNo, tranType = x.FirstOrDefault().TransactionType });
                         jobSettleHBL.ToList().ForEach(x =>
                         {
@@ -1798,8 +1811,20 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                     var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement");
                                     if (edocExist.Count() == 0)
                                     {
-                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type == "Accountant")).FirstOrDefault();
-                                        var HBLCodes = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "HB") && z.Type == "General")).ToList();
+                                        //var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type == "Accountant")).FirstOrDefault();
+                                        //int docTypeId = 0;
+                                        //var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type== "Accountant")).FirstOrDefault();
+                                        //var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.Type == "Accountant")).FirstOrDefault();
+                                        //if (advSM != null)
+                                        //{
+                                        //    docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "AD-SM")).FirstOrDefault().Id;
+                                        //}
+                                        //else
+                                        //{
+                                        //    docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "SM" && z.AccountingType == "Settlement")).FirstOrDefault().Id;
+                                        //}
+                                        int docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.AccountingType == "Settlement")).FirstOrDefault().Id;
+                                        var HBLCodes = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "HB"||z.Code=="BL") && z.Type == "General")).ToList();
                                         HBLCodes.ToList().ForEach(HBLCode =>
                                         {
                                             if (checEdocType(img.Id, HBLCode.Id))
@@ -1815,7 +1840,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                     DepartmentId = currentUser.DepartmentId,
                                                     ExpiredDate = null,
                                                     GroupId = currentUser.GroupId,
-                                                    DocumentTypeId = tranType.Id,
+                                                    DocumentTypeId = docTypeId,
                                                     JobId = getJobId(x.jobNo, x.tranType),
                                                     SysImageId = img.Id,
                                                     SystemFileName = edocFrom.SystemFileName,
@@ -1851,7 +1876,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                     var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement");
                                     if (edocExist.Count() == 0)
                                     {
-                                        var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "INV" && z.Type == "Accountant" && z.PartnerType== "Supplier" && z.AccountingType== "Settlement").FirstOrDefault();
+                                        //var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "INV" && z.Type == "Accountant" && z.PartnerType== "Supplier" && z.AccountingType== "Settlement").FirstOrDefault();
+                                        int docTypeId = 0;
+                                        if (advSM != null)
+                                        {
+                                            docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "INV"&&z.AccountingType== "ADV-Settlement")).FirstOrDefault().Id;
+                                        }
+                                        else
+                                        {
+                                            docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "INV" && z.AccountingType == "Settlement"&&z.PartnerType== "Supplier")).FirstOrDefault().Id;
+                                        }
                                         var INVCodes=_attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code.Contains("INV") && z.Type == "General").ToList();
                                         INVCodes.ToList().ForEach(INVCode =>
                                         {
@@ -1870,7 +1904,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                         DepartmentId = currentUser.DepartmentId,
                                                         ExpiredDate = null,
                                                         GroupId = currentUser.GroupId,
-                                                        DocumentTypeId = tranType.Id,
+                                                        DocumentTypeId = docTypeId,
                                                         JobId = getJobId(x.jobNo, x.tranType),
                                                         SysImageId = img.Id,
                                                         SystemFileName = edocFrom.SystemFileName,
@@ -1925,7 +1959,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                             var edocExist = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id && z.BillingNo == billingNo && z.Source == "Settlement").FirstOrDefault();
                                             if (edocExist == null)
                                             {
-                                                var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.TransactionType && z.Code == "BK_DN").FirstOrDefault();
+                                                //var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.TransactionType && z.Code == "BK_DN").FirstOrDefault();
+                                                int docTypeId = 0;
+                                                if (advSM != null)
+                                                {
+                                                    docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.TransactionType && (z.Code == "SM_SOA" && z.AccountingType == "ADV-Settlement")).FirstOrDefault().Id;
+                                                }
+                                                else
+                                                {
+                                                    docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.TransactionType && (z.Code == "SM_SOA" && z.AccountingType == "Settlement")).FirstOrDefault().Id;
+                                                }
                                                 var edocFrom = _sysImageDetailRepo.Get(z => z.SysImageId == img.Id).FirstOrDefault();
                                                 var edoc = new SysImageDetail()
                                                 {
@@ -1937,7 +1980,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                     DepartmentId = currentUser.DepartmentId,
                                                     ExpiredDate = null,
                                                     GroupId = currentUser.GroupId,
-                                                    DocumentTypeId = tranType.Id,
+                                                    DocumentTypeId = docTypeId,
                                                     JobId = getJobId(x.JobNo, x.TransactionType),
                                                     SysImageId = img.Id,
                                                     SystemFileName = edocFrom != null ? edocFrom.SystemFileName : img.Name,
@@ -1993,7 +2036,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private bool checEdocType(Guid imageId, int docType)
         {
             var edoc = _sysImageDetailRepo.Get(x => x.SysImageId == imageId).FirstOrDefault();
-            if(edoc!=null)
+            if (edoc != null)
             {
                 if (edoc.DocumentTypeId == docType)
                 {
@@ -2005,7 +2048,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         public bool CheckAllowSettleEdocSendRequest(Guid settleId)
         {
             var settleNo = _setleRepo.Get(x => settleId == x.Id).FirstOrDefault().SettlementNo;
-            var docTypeId = _sysImageDetailRepo.Get(x => x.BillingNo == settleNo && x.BillingType == "Settlement").Select(x => x.DocumentTypeId).ToList();
+            var docTypeId = _sysImageDetailRepo.Get(x => x.BillingNo == settleNo && x.BillingType == "Settlement"&&x.GenEdocId==null).Select(x => x.DocumentTypeId).ToList();
             var attAdvSm = _attachFileTemplateRepo.Get(x => x.Type == "Accountant" && (x.AccountingType == "ADV-Settlement")).Select(x => (int?)x.Id).ToList();
             if (attAdvSm.Intersect(docTypeId).Any())
             {
