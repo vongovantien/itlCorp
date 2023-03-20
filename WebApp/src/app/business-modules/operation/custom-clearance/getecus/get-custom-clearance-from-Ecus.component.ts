@@ -10,7 +10,7 @@ import { PagerSetting } from "src/app/shared/models/layout/pager-setting.model";
 import { PAGINGSETTING } from "src/constants/paging.const";
 import { CustomClearanceFormSearchComponent } from "../components/form-search-custom-clearance/form-search-custom-clearance.component";
 import { ModalDirective } from "ngx-bootstrap/modal";
-import { finalize } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, finalize, takeUntil } from "rxjs/operators";
 import { BehaviorSubject } from "rxjs";
 
 
@@ -19,7 +19,7 @@ import { BehaviorSubject } from "rxjs";
     templateUrl: './get-custom-clearance-from-Ecus.html'
 })
 export class CustomClearanceFromEcus extends PopupBase implements OnInit {
-    @ViewChild('staticModal') public staticModal:ModalDirective;
+    @ViewChild('staticModal') public staticModal: ModalDirective;
     @ViewChild(CustomClearanceFormSearchComponent) CustomClearanceComponent: CustomClearanceFormSearchComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
     @Input() currentJob: OpsTransaction;
@@ -29,7 +29,8 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     form: FormGroup;
     headers: CommonInterface.IHeaderTable[];
     customNo: AbstractControl;
-    strKeySearch: string= "";
+    requestList: any = null;
+    strKeySearch: string = "";
     pager: PagerSetting = PAGINGSETTING;
     isShow: boolean = false;
     sort: string = null;
@@ -44,19 +45,8 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         private _operationRepo: OperationRepo) {
         super();
     }
-    
+
     ngOnInit() {
-        this.initForm();
-        this.pager.totalItems = 15;
-    }
-
-
-    initForm() {
-        this.form = this._fb.group({
-            customNo: ['', Validators.compose([
-                Validators.required
-            ])]
-        });
         this.headers = [
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'Clearance Date', field: 'clearanceDate', sortable: true },
@@ -67,9 +57,32 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
             { title: 'Package Qty', field: 'pkgQty', sortable: true },
             { title: 'Cont Qty', field: 'contQty', sortable: true },
         ];
+
+        this.initForm();
+        this.pager.totalItems = 15;
+        this.requestList = this.getListCleranceNotImported();
+
+        this.term$.pipe(
+            debounceTime(2000),
+            distinctUntilChanged(),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe((text: string) => {
+            this.getListCleranceNotImported();
+        });
+        console.log(this.partnerTaxcode);
     }
 
-    onSearchRequest(){
+ 
+    initForm() {
+        this.form = this._fb.group({
+            customNo: ['', Validators.compose([
+                Validators.required
+            ])]
+        });
+        this.customNo = this.form.controls['customNo'];
+    }
+
+    onSearchRequest() {
         console.log("Hello");
     }
 
@@ -79,12 +92,12 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
             this.getListCleranceNotImported();
         }
     }
-    
-    
+
+
     changeAllNotImported() {
         if (this.checkAllNotImported) {
             this.notImportedCustomClearances.forEach(x => {
-                x.isChecked = true; 
+                x.isChecked = true;
             });
         } else {
             this.notImportedCustomClearances.forEach(x => {
@@ -101,7 +114,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
             this.getClearanceNotImported();
         }
     }
-    
+
     getClearanceNotImported() {
         console.log(this.partnerTaxcode);
         this._operationRepo.getListNotImportToJob(this.strKeySearch, this.partnerTaxcode, false, this.page, this.pageSize)
@@ -119,8 +132,16 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
             );
     }
 
+    refreshData() {
+        this.keyword = '';
+        this.page = 1;
+        this.pageSize = this.numberToShow[1];
+        this.customNo.setValue('');
+        this.strKeySearch = '';
+        this.getListCleranceNotImported();
+    }
+
     close() {
         this.hide();
     }
 }
-
