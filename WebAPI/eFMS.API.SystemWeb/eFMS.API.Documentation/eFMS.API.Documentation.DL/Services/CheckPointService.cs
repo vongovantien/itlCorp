@@ -478,6 +478,26 @@ namespace eFMS.API.Documentation.DL.Services
                         isValid = true;
                         break;
                     }
+                    if(checkPointType == CHECK_POINT_TYPE.SURCHARGE_OBH || checkPointType == 0)
+                    {
+                        if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdueOBH"))
+                        {
+                            if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE) // hđ quá hạn vẫn cho issue DEBIT.
+                            {
+                                isValid = true;
+                            }
+                            if (contract.IsOverDueObh == true)
+                            {
+                                isValid = false;
+                            }
+                            else isValid = true;
+                            if (!isValid)
+                            {
+                                errorCode = 6;
+                                break;
+                            }
+                        }
+                    }
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdue"))
                     {
                         if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE) // hđ quá hạn vẫn cho issue DEBIT.
@@ -495,6 +515,7 @@ namespace eFMS.API.Documentation.DL.Services
                             break;
                         }
                     }
+                   
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "credit"))
                     {
                         if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE) //vẫn cho issue debit nếu vượt hạn mức
@@ -575,6 +596,10 @@ namespace eFMS.API.Documentation.DL.Services
                     case 5:
                         messError = string.Format(@"Contract of {0} is Prepaid. Please issue Prepaid Debit and wait AR confirm",
                             partner?.ShortName);
+                        break;
+                    case 6:
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have Over Due OBH, please you check it again!",
+                  partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
                         break;
                     default:
                         break;
@@ -679,6 +704,10 @@ namespace eFMS.API.Documentation.DL.Services
             if (typeCheckPoint == "overdue")
             {
                 isApply = isApply && setting.OverPaymentTerm == true;
+            }
+            if (typeCheckPoint == "overdueOBH")
+            {
+                isApply = isApply && setting.OverPaymentTermObh == true;
             }
             if (typeCheckPoint == "expired")
             {
