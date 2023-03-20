@@ -11,6 +11,7 @@ import { CustomClearanceFormSearchComponent } from './components/form-search-cus
 import { CustomClearanceAddnewComponent } from './addnew/custom-clearance-addnew.component';
 import { CustomClearanceEditComponent } from './detail/custom-clearance-edit.component';
 import { CustomClearanceImportComponent } from './import/custom-clearance-import.component';
+import { CustomClearanceFromEcus } from './getecus/get-custom-clearance-from-Ecus.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { SharedOperationModule } from '../shared-operation.module';
 
@@ -50,6 +51,7 @@ const LIB = [
         CustomClearanceImportComponent,
         CustomClearanceEditComponent,
         CustomClearanceFormSearchComponent,
+        CustomClearanceFromEcus,
     ],
     providers: [],
 })
