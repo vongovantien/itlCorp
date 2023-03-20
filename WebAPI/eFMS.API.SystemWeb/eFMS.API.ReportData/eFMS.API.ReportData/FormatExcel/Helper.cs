@@ -311,7 +311,7 @@ namespace eFMS.API.ReportData
             // Tạo header
             List<string> headers = new List<string>
             {
-                "No.", "Code", "English Name", "Local Name", "Type", "Inactive"
+                "No.", "Code", "English Name", "Local Name", "Type", "Services", "Apply Offices", "Charge Group", "Buying Mapping Code", "Buying Mapping Name", "Selling Mapping Code", "Selling Mapping Name", "Inactive"
             };
 
             for (int i = 0; i < headers.Count; i++)
@@ -327,7 +327,7 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[3, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
 
-            worksheet.Cells[1, 1, 1, 6].Merge = true;
+            worksheet.Cells[1, 1, 1, 13].Merge = true;
             worksheet.Cells["A1"].Value = "CHARGE INFORMATION";
             worksheet.Cells["A1"].Style.Font.Size = 16;
             worksheet.Cells["A1"].Style.Font.Bold = true;
@@ -344,7 +344,14 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 4, 3].Value = item.ChargeNameEn;
                 worksheet.Cells[i + 4, 4].Value = item.ChargeNameVn;
                 worksheet.Cells[i + 4, 5].Value = item.Type;
-                worksheet.Cells[i + 4, 6].Value = item.Active == true ? "Active" : "Inactive";
+                worksheet.Cells[i + 4, 6].Value = convertServicesName(item.ServiceTypeId);
+                worksheet.Cells[i + 4, 7].Value = item.OfficesName;
+                worksheet.Cells[i + 4, 8].Value = item.ChargeGroupName;
+                worksheet.Cells[i + 4, 9].Value = item.BuyingCode;
+                worksheet.Cells[i + 4, 10].Value = item.BuyingName;
+                worksheet.Cells[i + 4, 11].Value = item.SellingCode;
+                worksheet.Cells[i + 4, 12].Value = item.SellingName;
+                worksheet.Cells[i + 4, 13].Value = item.Active == true ? "Active" : "Inactive";
 
                 worksheet.Cells[i + 4, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet.Cells[i + 4, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
@@ -366,7 +373,67 @@ namespace eFMS.API.ReportData
                 }
             }
         }
+        private string convertServicesName(string ServiceName)
+        {
+            string ContractServicesName = string.Empty;
+            var ContractServiceArr = ServiceName.Split(";").ToArray();
+            List<String> listService = new List<string>();
+            foreach(var item in ContractServiceArr)
+            {
+                if(!String.IsNullOrEmpty(item))
+                {
+                    listService.Add(item);
+                }    
+            }    
+            if (listService.Count() > 0)
+            {
+                foreach (var item in listService)
+                {
+                    switch (item)
+                    {
+                        case "AE":
+                            ContractServicesName += "Air Export; ";
+                            break;
+                        case "AI":
+                            ContractServicesName += "Air Import; ";
+                            break;
+                        case "SCE":
+                            ContractServicesName += "Sea Consol Export; ";
+                            break;
+                        case "SCI":
+                            ContractServicesName += "Sea Consol Import; ";
+                            break;
+                        case "SFE":
+                            ContractServicesName += "Sea FCL Export; ";
+                            break;
+                        case "SLE":
+                            ContractServicesName += "Sea LCL Export; ";
+                            break;
+                        case "SLI":
+                            ContractServicesName += "Sea LCL Import; ";
+                            break;
+                        case "CL":
+                            ContractServicesName += "Custom Logistic; ";
+                            break;
+                        case "IT":
+                            ContractServicesName += "Trucking; ";
+                            break;
+                        case "SFI":
+                            ContractServicesName += "Sea FCL Import; ";
+                            break;
+                        default:
+                            ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
+                            break;
+                    }
+                }
 
+            }
+            if (!string.IsNullOrEmpty(ContractServicesName))
+            {
+                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
+            }
+            return ContractServicesName;
+        }
         #endregion
 
         #region Charge
