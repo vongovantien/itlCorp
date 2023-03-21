@@ -338,26 +338,39 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group" [ngClass]="{'m-form__group has-danger':
+                                (isSubmitted && atd.errors | equalError:'invalidDateFuture' )||
+                               (atd.touched && atd.errors | equalError:'invalidDateFuture')}">
                                     <label>ATD</label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
                                             readonly formControlName="atd" (remove)="resetFormControl(atd)" calendar
-                                            [allowRemove]="!!atd.value && !!atd.value.startDate" [maxDate]="maxDate"/>
+                                            [allowRemove]="!!atd.value && !!atd.value.startDate"
+                                            [maxDate]="maxDateAtd"/>
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && atd.errors | equalError:'invalidDateFuture'">{{errorATD}}
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-md-6">
-                                <div class="form-group">
+                                <div class="form-group" [ngClass]="{'m-form__group has-danger':
+                                (isSubmitted && ata.errors | equalError:'invalidDateFuture' )||
+                               (ata.touched && ata.errors | equalError:'invalidDateFuture')}">
                                     <label>ATA</label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
                                             readonly formControlName="ata" (remove)="resetFormControl(ata)" calendar
-                                            [maxDate]="maxDate" [allowRemove]="!!ata.value && !!ata.value.startDate" />
+                                            [maxDate]="maxDateAta"
+                                            [allowRemove]="!!ata.value && !!ata.value.startDate"/>
+                                    </div>
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && ata.errors | equalError:'invalidDateFuture'">{{errorATA}}
                                     </div>
                                 </div>
                             </div>

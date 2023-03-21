@@ -149,7 +149,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
         this._store.dispatch(new GetCatalogueCommodityAction({ active: true }));
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
-        
+
         this.isLoadingPort = this._store.select(getCataloguePortLoadingState).pipe(
             takeUntil(this.ngUnsubscribe)
         );
@@ -194,6 +194,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             .subscribe(
                 (res: CsTransaction) => {
                     if (!!res) {
+                        this.maxDateAta = this.createMoment(res.ata).isAfter(this.maxDate) ? this.createMoment(res.ata) : this.maxDate;
+                        this.maxDateAtd = this.createMoment(res.atd).isAfter(this.maxDate) ? this.createMoment(res.atd) : this.maxDate;
                         this._store.dispatch(new GetDimensionAction(res.id));
 
                         this.shipmentDetail = new CsTransaction(res);
@@ -304,8 +306,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             isMawb: [false],
             noProfit: [false],
             incotermId: [null, Validators.required],
-            ata: [],
-            atd: [],
+            ata: ["", Validators.compose([FormValidators.validateNotFutureDate])],
+            atd: ["", Validators.compose([FormValidators.validateNotFutureDate])],
             personIncharge: ['', Validators.compose([
                 Validators.required
             ])],
@@ -373,7 +375,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                     }
                 });
         }
-
+        this.maxDateAta = !this.isDetail ? this.maxDate : null;
+        this.maxDateAtd = !this.isDetail ? this.maxDate : null;
         this.handleValidatorChange();
     }
     getUserDefault(id: string, userName: string) {
@@ -613,6 +616,4 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 },
             );
     }
-
-
 }
