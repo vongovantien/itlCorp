@@ -198,6 +198,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                             polDescription: shipment.polDescription,
                             podDescription: shipment.podDescription,
                         });
+
                     }
                 }),
                 mergeMap(
@@ -228,8 +229,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                         this.userCreated = hbl.userNameCreated;
                         this.userModified = hbl.userNameModified;
                         this.updateFormValue(hbl);
-                        this.maxDateAta = this.createMoment(hbl.arrivalDate).isAfter(this.maxDate) ? this.createMoment(hbl.arrivalDate) : this.maxDate;
-                    }
+                   }
                 }
             );
     }
@@ -343,6 +343,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.incotermId = this.formCreate.controls['incotermId'];
         this.polDescription = this.formCreate.controls['polDescription'];
         this.podDescription = this.formCreate.controls['podDescription'];
+
         this.maxDateAta = !this.isUpdate ? this.maxDate : null;
     }
 
@@ -435,6 +436,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
     updateFormValue(data: HouseBill) {
         // console.log('Shipment type:', this.shipmentType);
+        this.maxDateAta = this.createMoment(data.arrivalDate).isAfter(this.maxDate) ? this.createMoment(data.arrivalDate) : this.maxDate;
+
         const formValue = {
             issueHBLDate: !!data.issueHbldate ? { startDate: new Date(data.issueHbldate), endDate: new Date(data.issueHbldate) } : null,
             eta: !!data.eta ? { startDate: new Date(data.eta), endDate: new Date(data.eta) } : null,
