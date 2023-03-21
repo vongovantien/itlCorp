@@ -616,9 +616,4 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 },
             );
     }
-
-    vnvtTest() {
-        console.log(this.formGroup)
-        console.log(this.formGroup.errors)
-    }
 }

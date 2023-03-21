@@ -208,8 +208,9 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (isSubmitted && !atd.value) || (atd.errors | equalError:'invalidDateFuture')}">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger':
+                         (isSubmitted && atd.errors | equalError:'invalidDateFuture' )||
+                        (atd.touched && atd.errors | equalError:'invalidDateFuture')}">
                             <label>ATD</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -224,8 +225,9 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (isSubmitted && !ata.value) || (ata.errors | equalError:'invalidDateFuture')}">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger':
+                        (isSubmitted && ata.errors | equalError:'invalidDateFuture' )||
+                       (ata.touched && ata.errors | equalError:'invalidDateFuture')}">
                             <label>ATA</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd

@@ -338,8 +338,9 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': (isSubmitted && !atd.value) || (atd.errors | equalError:'invalidDateFuture')}">
+                                <div class="form-group" [ngClass]="{'m-form__group has-danger':
+                                (isSubmitted && atd.errors | equalError:'invalidDateFuture' )||
+                               (atd.touched && atd.errors | equalError:'invalidDateFuture')}">
                                     <label>ATD</label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
@@ -347,7 +348,7 @@
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
                                             readonly formControlName="atd" (remove)="resetFormControl(atd)" calendar
                                             [allowRemove]="!!atd.value && !!atd.value.startDate"
-                                            [maxDate]="maxDateAtd" (change)="vnvtTest()" />
+                                            [maxDate]="maxDateAtd"/>
                                     </div>
                                     <div class="form-control-feedback"
                                         *ngIf="isSubmitted && atd.errors | equalError:'invalidDateFuture'">{{errorATD}}
@@ -356,8 +357,9 @@
                             </div>
 
                             <div class="col-md-6">
-                                <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': (isSubmitted && !ata.value) || (ata.errors | equalError:'invalidDateFuture')}">
+                                <div class="form-group" [ngClass]="{'m-form__group has-danger':
+                                (isSubmitted && ata.errors | equalError:'invalidDateFuture' )||
+                               (ata.touched && ata.errors | equalError:'invalidDateFuture')}">
                                     <label>ATA</label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
@@ -365,7 +367,7 @@
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
                                             readonly formControlName="ata" (remove)="resetFormControl(ata)" calendar
                                             [maxDate]="maxDateAta"
-                                            [allowRemove]="!!ata.value && !!ata.value.startDate" />
+                                            [allowRemove]="!!ata.value && !!ata.value.startDate"/>
                                     </div>
                                     <div class="form-control-feedback"
                                         *ngIf="isSubmitted && ata.errors | equalError:'invalidDateFuture'">{{errorATA}}
