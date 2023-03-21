@@ -566,14 +566,17 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     if (!String.IsNullOrEmpty(item.CreditCharge.ToString()))
                     {
+                        var chargeCredit = DataContext.Get(x => x.Id == item.CreditCharge).FirstOrDefault();
 
-                        item.BuyingCode = DataContext.Get(x => x.Id == item.CreditCharge).FirstOrDefault().Code;
-                        item.BuyingName = DataContext.Get(x => x.Id == item.CreditCharge).FirstOrDefault().ChargeNameEn;
+                        item.BuyingCode = chargeCredit.Code;
+                        item.BuyingName = chargeCredit.ChargeNameEn;
                     }
                     if (!String.IsNullOrEmpty(item.DebitCharge.ToString()))
                     {
-                        item.SellingCode = DataContext.Get(x => x.Id == item.DebitCharge).FirstOrDefault().Code;
-                        item.SellingName = DataContext.Get(x => x.Id == item.DebitCharge).FirstOrDefault().ChargeNameEn;
+                        var chargeDebit = DataContext.Get(x => x.Id == item.DebitCharge).FirstOrDefault();
+
+                        item.SellingCode = chargeDebit.Code;
+                        item.SellingName = chargeDebit.ChargeNameEn;
                     }
                     var arrOffice = item.Offices.Split(",").ToArray();
                     string officeStr = string.Empty;
@@ -589,12 +592,73 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                     }
                     item.OfficesName = arrOffice.Length > 1 ? officeStr.TrimEnd(';') : sysOfficeRepository.Where(x => x.Id.ToString().ToLower() == arrOffice[0].ToString().ToLower()).FirstOrDefault().Code.ToUpper();
+                    item.ServiceTypeId = convertServicesName(item.ServiceTypeId);
                 }
             }
             return lst.AsQueryable();
 
         }
+        private string convertServicesName(string ServiceName)
+        {
+            string ContractServicesName = string.Empty;
+            var ContractServiceArr = ServiceName.Split(";").ToArray();
+            List<String> listService = new List<string>();
+            foreach (var item in ContractServiceArr)
+            {
+                if (!String.IsNullOrEmpty(item))
+                {
+                    listService.Add(item);
+                }
+            }
+            if (listService.Count() > 0)
+            {
+                foreach (var item in listService)
+                {
+                    switch (item)
+                    {
+                        case "AE":
+                            ContractServicesName += "Air Export; ";
+                            break;
+                        case "AI":
+                            ContractServicesName += "Air Import; ";
+                            break;
+                        case "SCE":
+                            ContractServicesName += "Sea Consol Export; ";
+                            break;
+                        case "SCI":
+                            ContractServicesName += "Sea Consol Import; ";
+                            break;
+                        case "SFE":
+                            ContractServicesName += "Sea FCL Export; ";
+                            break;
+                        case "SLE":
+                            ContractServicesName += "Sea LCL Export; ";
+                            break;
+                        case "SLI":
+                            ContractServicesName += "Sea LCL Import; ";
+                            break;
+                        case "CL":
+                            ContractServicesName += "Custom Logistic; ";
+                            break;
+                        case "IT":
+                            ContractServicesName += "Trucking; ";
+                            break;
+                        case "SFI":
+                            ContractServicesName += "Sea FCL Import; ";
+                            break;
+                        default:
+                            ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
+                            break;
+                    }
+                }
 
+            }
+            if (!string.IsNullOrEmpty(ContractServicesName))
+            {
+                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
+            }
+            return ContractServicesName;
+        }
         public IQueryable<CatChargeModel> QueryByPermission(CatChargeCriteria criteria, PermissionRange range)
         {
             IQueryable<CatChargeModel> data = null;
