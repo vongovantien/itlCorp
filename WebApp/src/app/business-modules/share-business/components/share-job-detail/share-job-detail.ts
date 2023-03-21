@@ -1,17 +1,18 @@
-import { catchError, concatMap, finalize, mergeMap, takeUntil } from 'rxjs/operators';
+import { HttpResponse } from '@angular/common/http';
+import { Directive, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { ConfirmPopupComponent, ReportPreviewComponent, SubHeaderComponent } from '@common';
+import { JobConstants, RoutingConstants, SystemConstants } from '@constants';
+import { delayTime } from '@decorators';
 import { Crystal, CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
-import { ToastrService } from 'ngx-toastr';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
-import { Directive, ViewChild } from '@angular/core';
-import { JobConstants, RoutingConstants, SystemConstants } from '@constants';
-import { ConfirmPopupComponent, ReportPreviewComponent, SubHeaderComponent } from '@common';
+import moment from 'moment';
+import { ToastrService } from 'ngx-toastr';
+import { of } from 'rxjs';
+import { catchError, concatMap, finalize, mergeMap, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import * as fromShareBussiness from '../../store';
-import { HttpResponse } from '@angular/common/http';
-import { of } from 'rxjs';
-import { delayTime } from '@decorators';
-import { Router } from '@angular/router';
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SETTLE';
 
 @Directive()
@@ -24,7 +25,8 @@ export abstract class ShareJobDetailComponent extends AppForm {
     shipmentDetail: CsTransaction;
     params: any;
     selectedTab: TAB | string = 'SHIPMENT';
-
+    maxDateAta: any = moment();
+    maxDateAtd: any = moment();
     constructor(
         protected _router: Router,
         protected _toastService: ToastrService,
