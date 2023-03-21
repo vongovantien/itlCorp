@@ -226,27 +226,21 @@ namespace eFMS.API.Documentation.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
                 }
             }
-            // validate checkpoint
+             // validate checkpoint
             var partnersNeedValidate = list.Where(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.IsRefundFee != true).ToList();
-            if (partnersNeedValidate.Count() > 0)
+            if(partnersNeedValidate.Count() > 0)
             {
                 string transactionTypeToCheckPoint = partnersNeedValidate[0].JobNo.Contains("LOG") ? "CL" : "DOC";
-
-                var partnerGrp = partnersNeedValidate.GroupBy(x => x.PaymentObjectId).Select(x => x.Key);
-                foreach (var partner in partnerGrp)
+                var checkPoint = new CheckPoint {
+                    PartnerId = partnersNeedValidate[0].PaymentObjectId,
+                    TransactionType = transactionTypeToCheckPoint,
+                    type = list[0].Type == DocumentConstants.CHARGE_OBH_TYPE ? CHECK_POINT_TYPE.SURCHARGE_OBH : CHECK_POINT_TYPE.SURCHARGE,
+                    HblId = partnersNeedValidate[0].Hblid,
+                };
+                var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(checkPoint);
+                if (!hsCheckpoint.Success)
                 {
-                    var checkPoint = new CheckPoint
-                    {
-                        PartnerId = partner,
-                        TransactionType = transactionTypeToCheckPoint,
-                        type = CHECK_POINT_TYPE.SURCHARGE,
-                        HblId = partnersNeedValidate[0].Hblid
-                    };
-                    var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(checkPoint);
-                    if (!hsCheckpoint.Success)
-                    {
-                        return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
-                    }
+                    return Ok(new ResultHandle { Status = hsCheckpoint.Success, Message = hsCheckpoint.Message?.ToString() });
                 }
             }
             currentUser.Action = "AddAndUpdate";

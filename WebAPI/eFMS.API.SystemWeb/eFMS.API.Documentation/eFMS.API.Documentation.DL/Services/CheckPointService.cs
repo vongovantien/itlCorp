@@ -578,19 +578,19 @@ namespace eFMS.API.Documentation.DL.Services
                 switch (errorCode)
                 {
                     case 1:
-                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have shipment that not paid yet, please you check it again!",
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have shipment that not paid yet, please check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
                         break;
                     case 2:
-                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have Over Due, please you check it again!",
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have Over Due, please check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
                         break;
                     case 3:
-                        messError = string.Format(@"{0} - {1} {2} agreement of {3} is Expired, please you check it again!",
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} is Expired, please check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
                         break;
                     case 4:
-                        messError = string.Format(@"{0} - {1} {2} agreement of {3} is Over Credit Limit {4}%, please you check it again!",
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} is Over Credit Limit {4}%, please check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username, contract.CreditRate);
                         break;
                     case 5:
@@ -598,7 +598,7 @@ namespace eFMS.API.Documentation.DL.Services
                             partner?.ShortName);
                         break;
                     case 6:
-                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have Over Due OBH, please you check it again!",
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have Over Due OBH, please check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
                         break;
                     default:
