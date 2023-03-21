@@ -36,7 +36,7 @@
                                     </div>
                                 </form>
                                 <button type="submit" class="btn btn-brand  m-btn--icon m-btn--uppercase"
-                                    (click)="onSearchAutoComplete($event)">
+                                    (click)="onSearchRequest()">
                                     <span>
                                         <i class="la la-search"></i>
                                         <span>
@@ -89,7 +89,7 @@
                                                 <span>{{ item.clearanceNo }}</span>
                                             </td>
                                             <td>
-                                                <span>{{ item.clearanceDate| date:'dd/MM/yyyy' }}</span>
+                                                <span>{{ item.clearanceDate | date:'dd/MM/yyyy' }}</span>
                                             </td>
                                             <td>
                                                 <span>{{ item.hblNo }}</span>
@@ -115,6 +115,30 @@
                                     </tr>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="pagination-nav">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="select-box" style="max-width: 190px">
+                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
+                                            (change)="selectPageSize(pageSize)" name="pagesize">
+                                            <ng-container
+                                                *ngFor="let item of numberToShow; index as i; first as isFirst">
+                                                <option [ngValue]="item" [selected]="isFirst">{{item}} entries / page
+                                                </option>
+                                            </ng-container>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6" *ngIf="totalItems > pageSize">
+                                    <div class="float-right">
+                                        <pagination [boundaryLinks]="true" [totalItems]="totalItems"
+                                            [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
+                                            [(ngModel)]="page" [maxSize]=10>
+                                        </pagination>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

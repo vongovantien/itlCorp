@@ -82,6 +82,57 @@ namespace eFMS.API.Operation.DL.Services
             return Get();
         }
 
+        public List<CustomsDeclarationModel> GetUserCustomClearance(string keySearch, bool Imported, int pageNumber, int pageSize, out int rowsCount)
+        {
+            List<CustomsDeclarationModel> returnList = new List<CustomsDeclarationModel>();
+            string[] clearanceNoArray = null;
+            string autocompleteKey = string.Empty;
+            if (keySearch != null)
+            {
+                keySearch = keySearch.ToLower().Trim();
+                var replaceString = keySearch.Split(',');
+                autocompleteKey = replaceString.Length > 0 ? replaceString[0] : string.Empty;
+                if (replaceString.Length > 1)
+                {
+                    clearanceNoArray = replaceString.Length > 1 ? replaceString[1].Split('\n') : null;
+                }
+                else
+                {
+                    clearanceNoArray = replaceString.Length > 0 ? replaceString[0].Split('\n') : null;
+                }
+            }
+            else
+            {
+                keySearch = String.Empty;
+            }
+            string userId = currentUser.UserID;
+            var connections = ecusCconnectionService.Get(x => x.UserId == userId && x.Active == true);
+            var result = new HandleState();
+            var lists = new List<CustomsDeclaration>();
+            try
+            {
+                foreach (var item in connections)
+                {
+                    var clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
+
+                    if (clearanceEcus == null)
+                    {
+                        rowsCount = 0;
+                        return returnList;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            // Perform pagination
+            rowsCount = returnList.Count();
+            returnList = returnList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            returnList = MapClearancesToClearanceModels((IQueryable<CustomsDeclaration>)returnList);            
+            return returnList;
+        }
+
         public HandleState ImportClearancesFromEcus()
         {
             string userId = currentUser.UserID;

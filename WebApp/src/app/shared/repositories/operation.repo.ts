@@ -224,6 +224,12 @@ export class OperationRepo {
         return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/ReplicateClearance`, null, { id });
 
     }
+
+    getUserCustomClearance(strKeySearch: string, isImported: boolean, page: number, size: number) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetUserCustomClearance`, { keySearch: strKeySearch, imporTed: isImported, page: page, size: size }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

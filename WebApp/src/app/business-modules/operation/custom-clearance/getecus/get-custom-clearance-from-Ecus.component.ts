@@ -23,6 +23,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     @ViewChild(CustomClearanceFormSearchComponent) CustomClearanceComponent: CustomClearanceFormSearchComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
     @Input() currentJob: OpsTransaction;
+    @Input() customer: CustomClearanceFormSearchComponent; 
     @Output() isCloseModal = new EventEmitter();
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
 
@@ -80,6 +81,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
             ])]
         });
         this.customNo = this.form.controls['customNo'];
+        console.log(this.customNo);
     }
 
     onSearchRequest() {
@@ -116,8 +118,8 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     }
 
     getClearanceNotImported() {
-        console.log(this.partnerTaxcode);
-        this._operationRepo.getListNotImportToJob(this.strKeySearch, this.partnerTaxcode, false, this.page, this.pageSize)
+        console.log(this.strKeySearch);
+        this._operationRepo.getUserCustomClearance(this.strKeySearch, false, this.page, this.pageSize)
             .pipe(
                 finalize(() => {
                     this.changeAllNotImported();
