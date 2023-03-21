@@ -452,8 +452,4 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                 this.saleMans = salesmans || [];
             })
     }
-
-    vnvntTest(){
-        console.log(this.formCreate)
-    }
 }

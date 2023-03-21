@@ -118,7 +118,7 @@
                                         formControlName="arrivalDate" [maxDate]="maxDate"
                                         (remove)="resetFormControl(formCreate.controls['arrivalDate'])" calendar
                                         [allowRemove]="!!formCreate.controls['arrivalDate'].value && !!formCreate.controls['arrivalDate'].value.startDate"
-                                        [maxDate]='maxDateAta' (change)="vnvntTest()"/>
+                                        [maxDate]='maxDateAta'/>
                                 </div>
                                 <div class="form-control-feedback"
                                     *ngIf="isSubmitted && arrivaldate.errors | equalError:'invalidDateFuture'">
