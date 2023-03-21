@@ -319,7 +319,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             catch (Exception ex)
             {
-                return new HandleState(ex.ToString());
+                return (new HandleState(false, ex.Message));
+                throw ex;
             }
         }
 
