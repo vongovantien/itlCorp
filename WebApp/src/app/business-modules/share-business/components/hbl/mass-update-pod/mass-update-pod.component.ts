@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HouseBill } from '@models';
 import { Store } from '@ngrx/store';
@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { takeUntil } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
 import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
+import { ShareDocumentTypeAttachComponent } from '../../document-type-attach/document-type-attach.component';
 
 @Component({
     selector: 'app-mass-update-pod',
@@ -20,7 +21,7 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
 
     @Input() jobId: string = '';
     @Output() isUpdated: EventEmitter<boolean> = new EventEmitter<boolean>();
-
+    @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
     formGroup: FormGroup;
     deliveryDate: AbstractControl;
     deliveryPerson: AbstractControl;
@@ -28,7 +29,11 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
     houseBillList: HouseBill[] = [];
     deliveryDateAll: AbstractControl;
     deliveryPersonAll: string = null;
-
+    headersAttachFile: CommonInterface.IHeaderTable[];
+    documentType: any = {
+        code: "abc",
+        id: "3"
+    }
     constructor(
         private _fb: FormBuilder,
         private _toast: ToastrService,
@@ -46,6 +51,14 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
             { title: 'HAWB No', field: 'hawbNo', sortable: true },
             { title: 'Delivery Person', field: 'deliveryPerson', sortable: true },
             { title: 'Delivery Date', field: 'deliveryDate', sortable: true },
+        ]
+        this.headersAttachFile = [
+            { title: 'No', field: 'index', width: 300 },
+            { title: 'Alias Name', field: 'aliasName', width: 300 },
+            { title: 'Real File Name', field: 'realFilename', width: 300 },
+            { title: 'Document Type', field: 'docType', required: true },
+            { title: 'House Bill No', field: 'hbl' },
+            { title: 'Note', field: 'note' },
         ]
         this.getHouseBills();
         this.formGroup = this._fb.group({
@@ -93,7 +106,7 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
     onChangeAllValuePOD() {
         this.houseBillList.map(x => {
             x.deliveryDate = !!this.deliveryDate.value?.startDate ? formatDate(this.deliveryDate.value?.startDate, 'yyyy-MM-dd', 'en') : null,
-            x.deliveryPerson = this.deliveryPerson.value
+                x.deliveryPerson = this.deliveryPerson.value
         })
     }
     // updatePOD() {
@@ -130,4 +143,8 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
         this.deliveryDate.setValue(null);
     }
 
+    onShowDocumentAttach() {
+        this.documentAttach.headers = this.headersAttachFile;
+        this.documentAttach.show();
+    }
 }

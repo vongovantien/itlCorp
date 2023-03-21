@@ -11,7 +11,8 @@
             <div class="modal-body">
                 <div class="clearfix">
                     <div class="float-right">
-                        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase">
+                        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
+                            (click)="onShowDocumentAttach()">
                             <span>
                                 <i class="la la-download"></i>
                                 <span>
@@ -38,9 +39,10 @@
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                             <input type="text" class="form-control m-input m-input--square"
                                                 ngxDaterangepickerMd
-                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange" formControlName="deliveryDateAll"
-                                                placeholder="Please Select" readonly [singleDatePicker]="true"
-                                                [allowRemove]="!!deliveryDateAll.value && !!deliveryDateAll.value?.startDate"
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                                formControlName="deliveryDateAll" placeholder="Please Select" readonly
+                                                [singleDatePicker]="true"
+                                                [allowRemove]="!!deliveryDateAll && !!deliveryDateAll.value?.startDate"
                                                 (remove)="resetDeliveryDate()" [alwaysShowCalendars]="true"
                                                 [autoApply]="true" />
                                             <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -130,3 +132,5 @@
         </div>
     </div>
 </div>
+<document-type-attach [housebills]="houseBillList" [selectedtDocType] ="documentType">
+</document-type-attach>

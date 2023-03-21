@@ -32,6 +32,7 @@
                         <table class="table table-brand table-wrapper table-editable">
                             <thead app-table-header [headers]="headers">
                                 <th class="first">Action</th>
+                                <th class="first">No</th>
                             </thead>
                             <ng-container>
                                 <tbody>
@@ -41,6 +42,9 @@
                                                 <td class="table-actions-col">
                                                     <app-permission-button type="delete" (onClick)="removeFile(i)">
                                                     </app-permission-button>
+                                                </td>
+                                                <td class="table-actions-col">
+                                                    {{i + 1}}
                                                 </td>
                                                 <td class="">
                                                     <div class="form-group"
@@ -74,24 +78,24 @@
                                                             disabled>
                                                     </div>
                                                 </td>
-                                                    <td class="disabled" *ngIf="typeFrom!=='Shipment'">
-                                                        <select class="form-control" [(ngModel)]="file.job"
-                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
-                                                            <option *ngFor="let job of jobs" [ngValue]="job">
-                                                                {{job.jobNo}}
+                                                <td class="disabled" *ngIf="typeFrom!=='Shipment'">
+                                                    <select class="form-control" [(ngModel)]="file.job"
+                                                        (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
+                                                        <option *ngFor="let job of jobs" [ngValue]="job">
+                                                            {{job.jobNo}}
+                                                        </option>
+                                                    </select>
+                                                </td>
+                                                <td class="" *ngIf="typeFrom==='Shipment'">
+                                                    <div class="form-group ">
+                                                        <select class="form-control" [(ngModel)]="file.hwbNo"
+                                                            (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
+                                                            <option *ngFor="let hbl of housebills" [ngValue]="hbl">
+                                                                {{hbl.hwbno}}
                                                             </option>
                                                         </select>
-                                                    </td>
-                                                    <td class="" *ngIf="typeFrom==='Shipment'">
-                                                        <div class="form-group ">
-                                                            <select class="form-control" [(ngModel)]="file.hwbNo"
-                                                                (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
-                                                                <option *ngFor="let hbl of housebills" [ngValue]="hbl">
-                                                                    {{hbl.hwbno}}
-                                                                </option>
-                                                            </select>
-                                                        </div>
-                                                    </td>
+                                                    </div>
+                                                </td>
                                                 <td class="">
                                                     <div class="form-group ">
                                                         <input type="text" class="form-control " placeholder="Note"
