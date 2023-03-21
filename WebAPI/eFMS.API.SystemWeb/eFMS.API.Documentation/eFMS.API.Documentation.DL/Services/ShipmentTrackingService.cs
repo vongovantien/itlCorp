@@ -140,45 +140,48 @@ namespace eFMS.API.Documentation.DL.Services
                                                 && (criteria.ShipmentType == "AIR" && (x.TransactionType == "AE" || x.TransactionType == "AI"))).FirstAsync();
                         }
 
-                        SysPartnerApi partnerApi = partnerApiRepository.First(x => x.Name.Contains(_trackingApi.Value.ApiName));
-                        var baseUrl = _trackingApi.Value.Url;
-                        var payload = new TrackingMoreRequestModel { AwbNumber = shipmentExisted.Mawb };
-                        var headers = new List<KeyValuePair<string, string>>
+                        if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)
                         {
-                             new KeyValuePair<string, string>("Tracking-Api-Key", partnerApi.ApiKey)
-                        };
-
-                        var request = await HttpClientService.PostAPI(baseUrl, payload, null, headers);
-                        var dataResponse = await request.Content.ReadAsAsync<TrackingMoreResponseModel>();
-                        if (request.IsSuccessStatusCode)
-                        {
-                            if (dataResponse?.Data != null)
+                            SysPartnerApi partnerApi = partnerApiRepository.First(x => x.Name.Contains(_trackingApi.Value.ApiName));
+                            var baseUrl = _trackingApi.Value.Url;
+                            var payload = new TrackingMoreRequestModel { AwbNumber = shipmentExisted.Mawb };
+                            var headers = new List<KeyValuePair<string, string>>
                             {
-                                statusShipment = dataResponse.Data.StatusNumber == 2 ? DocumentConstants.IN_TRANSIT : (dataResponse.Data.StatusNumber == 4 ? DocumentConstants.DONE : null);
-                                if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)
-                                {
+                                 new KeyValuePair<string, string>("Tracking-Api-Key", partnerApi.ApiKey)
+                            };
 
-                                    if (!DataContext.Any(x => x.JobId == shipmentExisted.Id))
+                            var request = await HttpClientService.PostAPI(baseUrl, payload, null, headers);
+                            var dataResponse = await request.Content.ReadAsAsync<TrackingMoreResponseModel>();
+                            if (request.IsSuccessStatusCode)
+                            {
+                                if (dataResponse?.Data != null)
+                                {
+                                    statusShipment = dataResponse.Data.StatusNumber == 2 ? DocumentConstants.IN_TRANSIT : (dataResponse.Data.StatusNumber == 4 ? DocumentConstants.DONE : null);
+                                    if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)
                                     {
-                                        lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataResponse.Data.TrackInfo, partnerApi.Name);
-                                    }
-                                    else
-                                    {
-                                        var dataExisted = DataContext.Count(x => x.JobId == shipmentExisted.Id);
-                                        var dataTrackingSort = dataResponse.Data.TrackInfo.OrderBy(x => x.ActualDate).Skip(dataExisted);
-                                        if (dataTrackingSort?.Any() == true)
+
+                                        if (!DataContext.Any(x => x.JobId == shipmentExisted.Id))
                                         {
-                                            lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, partnerApi.Name);
+                                            lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataResponse.Data.TrackInfo, partnerApi.Name);
+                                        }
+                                        else
+                                        {
+                                            var dataExisted = DataContext.Count(x => x.JobId == shipmentExisted.Id);
+                                            var dataTrackingSort = dataResponse.Data.TrackInfo.OrderBy(x => x.ActualDate).Skip(dataExisted);
+                                            if (dataTrackingSort?.Any() == true)
+                                            {
+                                                lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, partnerApi.Name);
+                                            }
+                                        }
+                                        if (lstTrackInfo.Count() > 0)
+                                        {
+                                            hs = await DataContext.AddAsync(lstTrackInfo);
                                         }
                                     }
-                                    if (lstTrackInfo.Count() > 0)
-                                    {
-                                        hs = await DataContext.AddAsync(lstTrackInfo);
-                                    }
-                                }
 
-                                shipmentExisted.TrackingStatus = statusShipment != string.Empty ? statusShipment : shipmentExisted.TrackingStatus;
-                                hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
+                                    shipmentExisted.TrackingStatus = statusShipment != string.Empty ? statusShipment : shipmentExisted.TrackingStatus;
+                                    hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
+                                }
                             }
                         }
 
@@ -195,6 +198,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             item.StationName = placeRepository.First(x => x.Id == item.Station)?.NameVn;
                         };
+
                         break;
                     default:
                         break;
