@@ -5267,7 +5267,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("JobNo", item.JobNo);
                     listKeyData.Add("Type", item.CodeType);
                     listKeyData.Add("IssueDate", item.IssueDate);
-                    excel.Worksheet.Cells[rowStart, 4].Style.Numberformat.Format = "MMM. dd,yyyy";
+                    excel.Worksheet.Cells[rowStart, 4].Style.Numberformat.Format = "dd/MM/yyyy";
                     listKeyData.Add("FlexId", item.FlexID);
                     listKeyData.Add("MAWB", item?.Mawb);
                     listKeyData.Add("Origin", item.Origin);
@@ -5289,7 +5289,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     }
                     excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = numberFormat;                    
                     listKeyData.Add("InvDueDay", item.InvDueDay);
-                    excel.Worksheet.Cells[rowStart, 15].Style.Numberformat.Format = "MMM. dd,yyyy";
+                    excel.Worksheet.Cells[rowStart, 15].Style.Numberformat.Format = "dd/MM/yyyy";
                     listKeyData.Add("Status", item.Status);
                     listKeyData.Add("Comments", "N/A");
                     listKeyData.Add("VATVoucher", item.VatVoucher);
