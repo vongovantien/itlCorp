@@ -1535,6 +1535,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 foreach (var item in receivables)
                                 {
                                     item.Over1To15Day = 0;
+                                    item.OverObh1to15Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
                                 }
 
@@ -1543,6 +1544,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 foreach (var item in receivables)
                                 {
                                     item.Over16To30Day = 0;
+                                    item.OverObh16to30Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
                                 }
                                 break;
@@ -1550,6 +1552,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 foreach (var item in receivables)
                                 {
                                     item.Over30Day = 0;
+                                    item.OverObh30Day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
                                 }
                                 break;
@@ -1615,30 +1618,42 @@ namespace eFMS.API.Accounting.DL.Services
                                 }
 
                                 decimal? totalAmountUnpaid = 0;
+                                decimal? totalAmountUnpaidOBH = 0;
                                 var invoicesData = item.invoices;
                                 foreach (var invoice in invoicesData)
                                 {
                                     if (currentReceivable.ContractCurrency == AccountingConstants.CURRENCY_LOCAL)
                                     {
                                         totalAmountUnpaid += invoice.UnpaidAmountVND;
+                                        if(invoice.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                        {
+                                            totalAmountUnpaidOBH += invoice.UnpaidAmountVND;
+                                        }
                                     }
                                     else if (currentReceivable.ContractCurrency == AccountingConstants.CURRENCY_USD)
                                     {
                                         totalAmountUnpaid += invoice.UnpaidAmountUSD;
+                                        if (invoice.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                        {
+                                            totalAmountUnpaidOBH += invoice.UnpaidAmountUSD;
+                                        }
                                     }
                                 }
                                 switch (type)
                                 {
                                     case 1: // 1 - 15
                                         currentReceivable.Over1To15Day = totalAmountUnpaid;
+                                         currentReceivable.OverObh1to15Day = totalAmountUnpaidOBH;
                                         DataContext.Update(currentReceivable, x => x.Id == currentReceivable.Id, false);
                                         break;
                                     case 2: // 15 - 30
                                         currentReceivable.Over16To30Day = totalAmountUnpaid;
+                                        currentReceivable.OverObh16to30Day = totalAmountUnpaidOBH;
                                         DataContext.Update(currentReceivable, x => x.Id == currentReceivable.Id, false);
                                         break;
                                     case 3: // 30
                                         currentReceivable.Over30Day = totalAmountUnpaid;
+                                        currentReceivable.OverObh30Day = totalAmountUnpaidOBH;
                                         DataContext.Update(currentReceivable, x => x.Id == currentReceivable.Id, false);
                                         break;
                                     default:
@@ -1660,6 +1675,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 if (contract != null)
                                 {
                                     decimal? totalAmountUnpaid = 0;
+                                    decimal? totalAmountUnpaidOBH = 0;
                                     var invoicesData = item.invoices;
 
                                     foreach (var invoice in invoicesData)
@@ -1667,10 +1683,18 @@ namespace eFMS.API.Accounting.DL.Services
                                         if (contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL)
                                         {
                                             totalAmountUnpaid += invoice.UnpaidAmountVND;
+                                            if (invoice.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE)
+                                            {
+                                                totalAmountUnpaidOBH += invoice.UnpaidAmountVND;
+                                            }
                                         }
                                         else if (contract.CreditCurrency == AccountingConstants.CURRENCY_USD)
                                         {
                                             totalAmountUnpaid += invoice.UnpaidAmountUSD;
+                                            if (invoice.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE)
+                                            {
+                                                totalAmountUnpaidOBH += invoice.UnpaidAmountUSD;
+                                            }
                                         }
                                     }
 
@@ -1712,11 +1736,16 @@ namespace eFMS.API.Accounting.DL.Services
                                 else
                                 {
                                     decimal? totalAmountUnpaid = 0;
+                                    decimal? totalAmountUnpaidOBH = 0;
                                     var invoicesData = item.invoices;
 
                                     foreach (var invoice in invoicesData)
                                     {
                                         totalAmountUnpaid += invoice.UnpaidAmountVND;
+                                        if (invoice.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                        {
+                                            totalAmountUnpaidOBH += invoice.UnpaidAmountVND;
+                                        }
                                     }
                                     var newAr = new AccAccountReceivableModel
                                     {
@@ -1733,14 +1762,17 @@ namespace eFMS.API.Accounting.DL.Services
                                     {
                                         case 1:
                                             newAr.Over1To15Day = totalAmountUnpaid;
+                                            newAr.OverObh1to15Day = totalAmountUnpaidOBH;
                                             DataContext.Add(newAr, false);
                                             break;
                                         case 2:
                                             newAr.Over16To30Day = totalAmountUnpaid;
+                                            newAr.OverObh16to30Day = totalAmountUnpaidOBH;
                                             DataContext.Add(newAr, false);
                                             break;
                                         case 3:
                                             newAr.Over30Day = totalAmountUnpaid;
+                                            newAr.OverObh30Day = totalAmountUnpaidOBH;
                                             DataContext.Add(newAr, false);
                                             break;
                                         default:
@@ -1759,13 +1791,13 @@ namespace eFMS.API.Accounting.DL.Services
                     switch (type)
                     {
                         case 1: // 1 - 15
-                            query = query.And(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0));
+                            query = query.And(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0)  || !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0));
                             break;
                         case 2: // 15 - 30
-                            query = query.And(x => !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0));
+                            query = query.And(x => !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0) || !DataTypeEx.IsNullOrValue(x.OverObh16to30Day, 0));
                             break;
                         case 3: // 30
-                            query = query.And(x => !DataTypeEx.IsNullOrValue(x.Over30Day, 0));
+                            query = query.And(x => !DataTypeEx.IsNullOrValue(x.Over30Day, 0) || !DataTypeEx.IsNullOrValue(x.OverObh30Day, 0));
                             break;
                         default:
                             overDueParam = null;
@@ -1782,6 +1814,7 @@ namespace eFMS.API.Accounting.DL.Services
                             foreach (var ar in receivablesNeedReset)
                             {
                                 ar.Over1To15Day = 0;
+                                ar.OverObh1to15Day = 0;
                                 DataContext.Update(ar, x => x.Id == ar.Id, false);
                             }
                             break;
@@ -1789,6 +1822,7 @@ namespace eFMS.API.Accounting.DL.Services
                             foreach (var ar in receivablesNeedReset)
                             {
                                 ar.Over16To30Day = 0;
+                                ar.OverObh16to30Day = 0;
                                 DataContext.Update(ar, x => x.Id == ar.Id, false);
                             }
                             break;
@@ -1796,6 +1830,7 @@ namespace eFMS.API.Accounting.DL.Services
                             foreach (var ar in receivablesNeedReset)
                             {
                                 ar.Over30Day = 0;
+                                ar.OverObh30Day = 0;
                                 DataContext.Update(ar, x => x.Id == ar.Id, false);
                             }
                             break;
@@ -1867,7 +1902,8 @@ namespace eFMS.API.Accounting.DL.Services
                         if (flag == "overdue")
                         {
                             contract.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over30Day, 0));
-                            if(contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
+                            contract.IsOverDueObh = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.OverObh1to15Day, 0));
+                            if (contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
                             {
                                 var relateGuaranteeContracts = contractPartnerRepo.Get(x => x.Active == true
                                     && x.SaleManId == contract.SaleManId
@@ -1880,6 +1916,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         foreach (var contractRalativeOverDue in relateGuaranteeContracts)
                                         {
                                             contractRalativeOverDue.IsOverDue = true;
+                                            contractRalativeOverDue.IsOverDueObh = true;
                                             hs = await contractPartnerRepo.UpdateAsync(contractRalativeOverDue, x => x.Id == contractRalativeOverDue.Id, false);
 
                                         }
@@ -1891,6 +1928,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         foreach (var contractRalativeNotOverDue in relateGuaranteeContracts)
                                         {
                                             contractRalativeNotOverDue.IsOverDue = false;
+                                            contractRalativeNotOverDue.IsOverDueObh = false;
                                             hs = await contractPartnerRepo.UpdateAsync(contractRalativeNotOverDue, x => x.Id == contractRalativeNotOverDue.Id, false);
 
                                         }
