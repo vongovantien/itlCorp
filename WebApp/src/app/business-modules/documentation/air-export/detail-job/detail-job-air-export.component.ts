@@ -330,7 +330,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         const criteria: DocumentationInterface.ICheckPointCriteria = {
                             data: partnerIds,
                             transactionType: 'DOC',
-                            type: 5,
                             settlementCode: null,
                         };
                         return this._documentRepo.validateCheckPointMultiplePartner(criteria)

@@ -403,7 +403,6 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                         const criteria: DocumentationInterface.ICheckPointCriteria = {
                             data: partnerIds,
                             transactionType: 'DOC',
-                            type: 5,
                             settlementCode: null,
                         };
                         return this._documentRepo.validateCheckPointMultiplePartner(criteria)
