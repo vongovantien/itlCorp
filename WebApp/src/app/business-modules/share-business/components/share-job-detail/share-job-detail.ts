@@ -25,8 +25,7 @@ export abstract class ShareJobDetailComponent extends AppForm {
     shipmentDetail: CsTransaction;
     params: any;
     selectedTab: TAB | string = 'SHIPMENT';
-    maxDateAta: any = moment();
-    maxDateAtd: any = moment();
+
     constructor(
         protected _router: Router,
         protected _toastService: ToastrService,
