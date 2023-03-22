@@ -311,7 +311,7 @@ namespace eFMS.API.ReportData
             // Tạo header
             List<string> headers = new List<string>
             {
-                "No.", "Code", "English Name", "Local Name", "Type", "Inactive"
+                "No.", "Code", "English Name", "Local Name", "Type", "Services", "Apply Offices", "Charge Group", "Buying Mapping Code", "Buying Mapping Name", "Selling Mapping Code", "Selling Mapping Name", "Inactive"
             };
 
             for (int i = 0; i < headers.Count; i++)
@@ -327,7 +327,7 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[3, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
 
-            worksheet.Cells[1, 1, 1, 6].Merge = true;
+            worksheet.Cells[1, 1, 1, 13].Merge = true;
             worksheet.Cells["A1"].Value = "CHARGE INFORMATION";
             worksheet.Cells["A1"].Style.Font.Size = 16;
             worksheet.Cells["A1"].Style.Font.Bold = true;
@@ -344,7 +344,14 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 4, 3].Value = item.ChargeNameEn;
                 worksheet.Cells[i + 4, 4].Value = item.ChargeNameVn;
                 worksheet.Cells[i + 4, 5].Value = item.Type;
-                worksheet.Cells[i + 4, 6].Value = item.Active == true ? "Active" : "Inactive";
+                worksheet.Cells[i + 4, 6].Value = item.ServiceTypeId;
+                worksheet.Cells[i + 4, 7].Value = item.OfficesName;
+                worksheet.Cells[i + 4, 8].Value = item.ChargeGroupName;
+                worksheet.Cells[i + 4, 9].Value = item.BuyingCode;
+                worksheet.Cells[i + 4, 10].Value = item.BuyingName;
+                worksheet.Cells[i + 4, 11].Value = item.SellingCode;
+                worksheet.Cells[i + 4, 12].Value = item.SellingName;
+                worksheet.Cells[i + 4, 13].Value = item.Active == true ? "Active" : "Inactive";
 
                 worksheet.Cells[i + 4, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet.Cells[i + 4, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
