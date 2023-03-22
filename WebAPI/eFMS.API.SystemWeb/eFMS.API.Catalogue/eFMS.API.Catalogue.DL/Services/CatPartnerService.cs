@@ -170,7 +170,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                         entity.ContractType = item.ContractType;
                                         entity.SalesmanId = item.SaleManId;
                                         entity.UserCreated = partner.UserCreated;
-                                        entity.ContractService = GetContractServicesName(item.SaleService);
+                                        entity.ContractService = ConvertServicesName.GetServicesName(item.SaleService);
                                         entity.ContractNo = item.ContractNo;
                                         entity.OfficeIdContract = item.OfficeId;
                                         entity.ContractShipmentType = item.ShipmentType;
@@ -971,7 +971,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                  PaymentTerm = c.PaymentTerm,
                                  SaleManName = g1.Username,
                                  UserCreatedName = g2.Username,
-                                 Service = GetContractServicesName(c.SaleService),
+                                 Service = ConvertServicesName.GetServicesName(c.SaleService),
                                  Office = GetContractOfficeName(c.OfficeId),
                                  PartnerType = p.PartnerType
                              };
@@ -1001,7 +1001,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                  PaymentTerm = c.PaymentTerm,
                                  SaleManName = g1.Username,
                                  UserCreatedName = g2.Username,
-                                 Service = GetContractServicesName(c.SaleService),
+                                 Service = ConvertServicesName.GetServicesName(c.SaleService),
                                  Office = GetContractOfficeName(c.OfficeId),
                                  PartnerType = p.PartnerType
                              };
@@ -1038,7 +1038,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             PaymentTerm = c.PaymentTerm,
                             SaleManName = g1.Username,
                             UserCreatedName = g2.Username,
-                            Service = GetContractServicesName(c.SaleService),
+                            Service = ConvertServicesName.GetServicesName(c.SaleService),
                             Office = GetContractOfficeName(c.OfficeId),
                         };
             if (AgreeActive != null)
@@ -2183,59 +2183,59 @@ namespace eFMS.API.Catalogue.DL.Services
 
             return officeName;
         }
-        private string GetContractServicesName(string ContractService)
-        {
-            string ContractServicesName = string.Empty;
-            var ContractServiceArr = ContractService.Split(";").ToArray();
-            if (ContractServiceArr.Any())
-            {
-                foreach (var item in ContractServiceArr)
-                {
-                    switch (item)
-                    {
-                        case "AE":
-                            ContractServicesName += "Air Export; ";
-                            break;
-                        case "AI":
-                            ContractServicesName += "Air Import; ";
-                            break;
-                        case "SCE":
-                            ContractServicesName += "Sea Consol Export; ";
-                            break;
-                        case "SCI":
-                            ContractServicesName += "Sea Consol Import; ";
-                            break;
-                        case "SFE":
-                            ContractServicesName += "Sea FCL Export; ";
-                            break;
-                        case "SLE":
-                            ContractServicesName += "Sea LCL Export; ";
-                            break;
-                        case "SLI":
-                            ContractServicesName += "Sea LCL Import; ";
-                            break;
-                        case "CL":
-                            ContractServicesName += "Custom Logistic; ";
-                            break;
-                        case "IT":
-                            ContractServicesName += "Trucking; ";
-                            break;
-                        case "SFI":
-                            ContractServicesName += "Sea FCL Import; ";
-                            break;
-                        default:
-                            ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
-                            break;
-                    }
-                }
+        //private string GetContractServicesName(string ContractService)
+        //{
+        //    string ContractServicesName = string.Empty;
+        //    var ContractServiceArr = ContractService.Split(";").ToArray();
+        //    if (ContractServiceArr.Any())
+        //    {
+        //        foreach (var item in ContractServiceArr)
+        //        {
+        //            switch (item)
+        //            {
+        //                case "AE":
+        //                    ContractServicesName += "Air Export; ";
+        //                    break;
+        //                case "AI":
+        //                    ContractServicesName += "Air Import; ";
+        //                    break;
+        //                case "SCE":
+        //                    ContractServicesName += "Sea Consol Export; ";
+        //                    break;
+        //                case "SCI":
+        //                    ContractServicesName += "Sea Consol Import; ";
+        //                    break;
+        //                case "SFE":
+        //                    ContractServicesName += "Sea FCL Export; ";
+        //                    break;
+        //                case "SLE":
+        //                    ContractServicesName += "Sea LCL Export; ";
+        //                    break;
+        //                case "SLI":
+        //                    ContractServicesName += "Sea LCL Import; ";
+        //                    break;
+        //                case "CL":
+        //                    ContractServicesName += "Custom Logistic; ";
+        //                    break;
+        //                case "IT":
+        //                    ContractServicesName += "Trucking; ";
+        //                    break;
+        //                case "SFI":
+        //                    ContractServicesName += "Sea FCL Import; ";
+        //                    break;
+        //                default:
+        //                    ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
+        //                    break;
+        //            }
+        //        }
 
-            }
-            if (!string.IsNullOrEmpty(ContractServicesName))
-            {
-                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
-            }
-            return ContractServicesName;
-        }
+        //    }
+        //    if (!string.IsNullOrEmpty(ContractServicesName))
+        //    {
+        //        ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
+        //    }
+        //    return ContractServicesName;
+        //}
 
         public IQueryable<CatPartnerModel> GetBy(CatPartnerGroupEnum partnerGroup)
         {
