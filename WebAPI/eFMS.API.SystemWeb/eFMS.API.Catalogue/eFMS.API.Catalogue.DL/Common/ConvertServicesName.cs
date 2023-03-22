@@ -19,47 +19,45 @@ namespace eFMS.API.Catalogue.DL.Common
                     listService.Add(item);
                 }
             }
-            if (listService.Count() > 0)
+            if (listService.Count > 0)
             {
                 foreach (var item in listService)
                 {
                     switch (item)
                     {
                         case "AE":
-                            ContractServicesName += "Air Export; ";
+                            ContractServicesName += TypeData.AE;
                             break;
                         case "AI":
-                            ContractServicesName += "Air Import; ";
+                            ContractServicesName += TypeData.AI;
                             break;
                         case "SCE":
-                            ContractServicesName += "Sea Consol Export; ";
+                            ContractServicesName += TypeData.SCE;
                             break;
                         case "SCI":
-                            ContractServicesName += "Sea Consol Import; ";
+                            ContractServicesName += TypeData.SCI;
                             break;
                         case "SFE":
-                            ContractServicesName += "Sea FCL Export; ";
+                            ContractServicesName += TypeData.SFE;
                             break;
                         case "SLE":
-                            ContractServicesName += "Sea LCL Export; ";
+                            ContractServicesName += TypeData.SLE;
                             break;
                         case "SLI":
-                            ContractServicesName += "Sea LCL Import; ";
+                            ContractServicesName += TypeData.SLI;
                             break;
                         case "CL":
-                            ContractServicesName += "Custom Logistic; ";
+                            ContractServicesName += TypeData.CL;
                             break;
                         case "IT":
-                            ContractServicesName += "Trucking; ";
+                        case "TK":
+                            ContractServicesName += TypeData.IT;
                             break;
                         case "SFI":
-                            ContractServicesName += "Sea FCL Import; ";
-                            break;
-                        case "TKI":
-                            ContractServicesName += "Inland Trucking; ";
+                            ContractServicesName += TypeData.SFI;
                             break;
                         default:
-                            ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
+                            ContractServicesName = TypeData.AI + TypeData.AE + TypeData.SCE + TypeData.SCI + TypeData.SFE + TypeData.SFI + TypeData.SLE + TypeData.SLI + TypeData.CL + TypeData.IT;
                             break;
                     }
                 }
@@ -71,5 +69,18 @@ namespace eFMS.API.Catalogue.DL.Common
             }
             return ContractServicesName;
         }
+    }
+    public static class TypeData
+    {
+        public static readonly string CL = "Custom Logistic; ";
+        public static readonly string IT = "Trucking; ";
+        public static readonly string AE = "Air Export; ";
+        public static readonly string AI = "Air Import; ";
+        public static readonly string SFE = "Sea FCL Export; ";
+        public static readonly string SCI = "Sea Consol Import; ";
+        public static readonly string SCE = "Sea Consol Export; ";
+        public static readonly string SFI = "Sea FCL Import; ";
+        public static readonly string SLE = "Sea LCL Export; ";
+        public static readonly string SLI = "Sea LCL Import; ";
     }
 }
