@@ -592,7 +592,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                     }
                     item.OfficesName = officeStr.TrimEnd(';');
-                    item.ServiceTypeId = ConvertServicesName.GetServicesName(item.ServiceTypeId);
+                    item.ServiceTypeId = Common.CommonData.GetServicesName(item.ServiceTypeId);
                 }
             }
             return lst.AsQueryable();

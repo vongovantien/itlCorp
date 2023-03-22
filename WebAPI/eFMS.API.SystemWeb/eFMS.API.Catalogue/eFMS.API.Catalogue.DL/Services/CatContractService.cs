@@ -263,7 +263,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
                     model.ContractService = entity.SaleService;
 
-                    model.ContractService = ConvertServicesName.GetServicesName(model.ContractService);
+                    model.ContractService = Common.CommonData.GetServicesName(model.ContractService);
 
                     model.ContractType = entity.ContractType;
                     model.ContractNo = entity.ContractNo;
@@ -527,7 +527,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                     CatPartnerModel modelPartner = mapper.Map<CatPartnerModel>(ObjPartner);
                     modelPartner.ContractService = entity.SaleService;
-                    modelPartner.ContractService = ConvertServicesName.GetServicesName(modelPartner.ContractService);
+                    modelPartner.ContractService = Common.CommonData.GetServicesName(modelPartner.ContractService);
                     modelPartner.ContractType = entity.ContractType;
                     modelPartner.ContractNo = entity.ContractNo;
                     modelPartner.SalesmanId = entity.SaleManId;
@@ -572,7 +572,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     CatPartnerModel modelPartner = mapper.Map<CatPartnerModel>(ObjPartner);
                     modelPartner.ContractService = entity.SaleService;
-                    modelPartner.ContractService = ConvertServicesName.GetServicesName(modelPartner.ContractService);
+                    modelPartner.ContractService = Common.CommonData.GetServicesName(modelPartner.ContractService);
                     modelPartner.ContractType = contract.ContractType;
                     modelPartner.ContractNo = contract.ContractNo;
                     modelPartner.SalesmanId = contract.SaleManId;
@@ -780,7 +780,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     ObjPartner.Active = true;
                     catPartnerRepository.Update(ObjPartner, x => x.Id == partnerId);
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
-                    model.ContractService = ConvertServicesName.GetServicesName(objUpdate.SaleService);
+                    model.ContractService = Common.CommonData.GetServicesName(objUpdate.SaleService);
                     model.ContractType = objUpdate.ContractType;
                     model.SalesmanId = objUpdate.SaleManId;
                     model.UserCreatedContract = objUpdate.UserCreated;
@@ -1589,7 +1589,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeIdUserCreated = sysUserRepository.Get(x => x.Id == contract.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
             var userCreatedObj = sysEmployeeRepository.Get(e => e.Id == employeeIdUserCreated)?.FirstOrDefault();
             string urlToSend = string.Empty;
-            string _saleService = ConvertServicesName.GetServicesName(contract.SaleService);
+            string _saleService = Common.CommonData.GetServicesName(contract.SaleService);
             contract.DatetimeModified = DateTime.Now;
             DataContext.Update(contract, x => x.Id.ToString() == contractId);
 
@@ -1719,7 +1719,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
             string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
-            saleService = ConvertServicesName.GetServicesName(contract.SaleService);
+            saleService = Common.CommonData.GetServicesName(contract.SaleService);
             contract.Arconfirmed = true;
             contract.DatetimeModified = DateTime.Now;
             var hs = DataContext.Update(contract, x => x.Id == new Guid(contractId), false);

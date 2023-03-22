@@ -170,7 +170,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                         entity.ContractType = item.ContractType;
                                         entity.SalesmanId = item.SaleManId;
                                         entity.UserCreated = partner.UserCreated;
-                                        entity.ContractService = ConvertServicesName.GetServicesName(item.SaleService);
+                                        entity.ContractService = Common.CommonData.GetServicesName(item.SaleService);
                                         entity.ContractNo = item.ContractNo;
                                         entity.OfficeIdContract = item.OfficeId;
                                         entity.ContractShipmentType = item.ShipmentType;
@@ -971,7 +971,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                  PaymentTerm = c.PaymentTerm,
                                  SaleManName = g1.Username,
                                  UserCreatedName = g2.Username,
-                                 Service = ConvertServicesName.GetServicesName(c.SaleService),
+                                 Service = Common.CommonData.GetServicesName(c.SaleService),
                                  Office = GetContractOfficeName(c.OfficeId),
                                  PartnerType = p.PartnerType
                              };
@@ -1001,7 +1001,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                  PaymentTerm = c.PaymentTerm,
                                  SaleManName = g1.Username,
                                  UserCreatedName = g2.Username,
-                                 Service = ConvertServicesName.GetServicesName(c.SaleService),
+                                 Service = Common.CommonData.GetServicesName(c.SaleService),
                                  Office = GetContractOfficeName(c.OfficeId),
                                  PartnerType = p.PartnerType
                              };
@@ -1038,7 +1038,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             PaymentTerm = c.PaymentTerm,
                             SaleManName = g1.Username,
                             UserCreatedName = g2.Username,
-                            Service = ConvertServicesName.GetServicesName(c.SaleService),
+                            Service = Common.CommonData.GetServicesName(c.SaleService),
                             Office = GetContractOfficeName(c.OfficeId),
                         };
             if (AgreeActive != null)
