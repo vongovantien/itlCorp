@@ -301,7 +301,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CheckPoint checkPoint = new CheckPoint { PartnerId = partner.PartnerId,
                     HblId = partner.HblId ?? Guid.Empty,
                     TransactionType = criteria.TransactionType,
-                    type = criteria.Type == DocumentConstants.CHARGE_OBH_TYPE ? CHECK_POINT_TYPE.SURCHARGE_OBH : CHECK_POINT_TYPE.SURCHARGE,
+                    type = partner.Type == DocumentConstants.CHARGE_OBH_TYPE ? CHECK_POINT_TYPE.SURCHARGE_OBH : CHECK_POINT_TYPE.SURCHARGE,
                     SettlementCode = criteria.SettlementCode,
                 };
                 var isValid = ValidateCheckPointPartnerSurcharge(checkPoint);
