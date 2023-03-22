@@ -703,12 +703,6 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 isApply = isApply && setting.OverPaymentTermObh == true;
             }
-            else
-            {
-                isApply = setting.ApplyType == DocumentConstants.SETTING_FLOW_APPLY_TYPE_CHECK_POINT
-                && setting.IsApplyContract == true
-                && (setting.ApplyPartner == partnerType || setting.ApplyPartner == DocumentConstants.SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH);
-            }
 
             return isApply;
         }
