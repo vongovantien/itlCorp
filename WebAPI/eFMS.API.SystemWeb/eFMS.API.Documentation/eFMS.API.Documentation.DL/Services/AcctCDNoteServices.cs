@@ -160,8 +160,8 @@ namespace eFMS.API.Documentation.DL.Services
                 case TransactionTypeEnum.CustomLogistic:
                     code += DocumentConstants.LG_SHIPMENT;
                     break;
-                case TransactionTypeEnum.InlandTrucking:
-                    code += DocumentConstants.IT_SHIPMENT;
+                case TransactionTypeEnum.TruckingInland:
+                    code += DocumentConstants.TK_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirExport:
                     code += DocumentConstants.AE_SHIPMENT;
@@ -269,8 +269,8 @@ namespace eFMS.API.Documentation.DL.Services
                 case TransactionTypeEnum.CustomLogistic:
                     _transactionType = TermData.CustomLogistic;
                     break;
-                case TransactionTypeEnum.InlandTrucking:
-                    _transactionType = TermData.InlandTrucking;
+                case TransactionTypeEnum.TruckingInland:
+                    _transactionType = TermData.TruckingInland;
                     break;
                 case TransactionTypeEnum.AirExport:
                     _transactionType = TermData.AirExport;

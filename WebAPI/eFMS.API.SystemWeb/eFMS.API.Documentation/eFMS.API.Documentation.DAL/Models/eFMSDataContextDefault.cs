@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿ using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -4357,6 +4359,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.SuspendTime).HasMaxLength(150);
+
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

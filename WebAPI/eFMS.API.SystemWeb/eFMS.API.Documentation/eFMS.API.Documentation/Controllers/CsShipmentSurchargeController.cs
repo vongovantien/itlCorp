@@ -582,9 +582,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("uploadFile")]
+        [Route("uploadFile/{transactionType}")]
         [Authorize]
-        public IActionResult UploadFile(IFormFile uploadedFile)
+        public IActionResult UploadFile(string transactionType,IFormFile uploadedFile)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);
             if (file != null)
@@ -663,7 +663,7 @@ namespace eFMS.API.Documentation.Controllers
                     };
                     list.Add(surcharge);
                 }
-                var data = csShipmentSurchargeService.CheckValidImport(list);
+                var data = csShipmentSurchargeService.CheckValidImport(list, transactionType);
                 var totalValidRows = data.Count(x => x.IsValid == true);
                 var results = new { data, totalValidRows };
                 return Ok(results);

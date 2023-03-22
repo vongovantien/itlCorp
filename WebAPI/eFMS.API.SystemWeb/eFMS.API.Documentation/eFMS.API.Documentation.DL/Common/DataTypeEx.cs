@@ -63,8 +63,8 @@ namespace eFMS.API.Documentation.DL.Common
             string result = "";
             switch (type)
             {
-                case TransactionTypeEnum.InlandTrucking:
-                    result = TermData.InlandTrucking;
+                case TransactionTypeEnum.TruckingInland:
+                    result = TermData.TruckingInland;
                     break;
                 case TransactionTypeEnum.AirExport:
                     result = TermData.AirExport;
@@ -99,9 +99,9 @@ namespace eFMS.API.Documentation.DL.Common
         public static TransactionTypeEnum GetEnumType(string type)
         {
             TransactionTypeEnum result = 0;
-            if(type == TermData.InlandTrucking)
+            if(type == TermData.TruckingInland)
             {
-                result = TransactionTypeEnum.InlandTrucking;
+                result = TransactionTypeEnum.TruckingInland;
             }
             else if(type == TermData.AirExport)
             {

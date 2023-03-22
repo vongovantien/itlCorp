@@ -1205,7 +1205,7 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var item in dataShipment)
             {
                 GeneralExportShipmentOverviewResult data = new GeneralExportShipmentOverviewResult();
-                if (item.TransactionType == TermData.InlandTrucking)
+                if (item.TransactionType == TermData.TruckingInland)
                 {
                     data.ServiceName = "Inland Trucking ";
                 }
@@ -1549,7 +1549,7 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var item in dataShipment)
             {
                 GeneralExportShipmentOverviewFCLResult data = new GeneralExportShipmentOverviewFCLResult();
-                if (item.TransactionType == TermData.InlandTrucking)
+                if (item.TransactionType == TermData.TruckingInland)
                 {
                     data.ServiceName = "Inland Trucking ";
                 }

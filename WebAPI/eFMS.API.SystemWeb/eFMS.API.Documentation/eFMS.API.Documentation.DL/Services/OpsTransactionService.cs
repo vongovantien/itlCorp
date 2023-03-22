@@ -707,7 +707,79 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private Expression<Func<OpsTransaction, bool>> ExpressionQueryDefault(OpsTransactionCriteria criteria)
         {
-            Expression<Func<OpsTransaction, bool>> query = q => q.CurrentStatus != TermData.Canceled;
+            Expression<Func<OpsTransaction, bool>> query = q => true;
+            if (string.IsNullOrEmpty(criteria.All) && string.IsNullOrEmpty(criteria.JobNo)
+                && string.IsNullOrEmpty(criteria.Mblno) && string.IsNullOrEmpty(criteria.Hwbno)
+                && string.IsNullOrEmpty(criteria.CustomerId) && string.IsNullOrEmpty(criteria.ClearanceNo)
+                && string.IsNullOrEmpty(criteria.ProductService) && string.IsNullOrEmpty(criteria.ServiceMode)
+                && criteria.CreatedDateFrom == null && criteria.CreatedDateTo == null
+                && string.IsNullOrEmpty(criteria.ShipmentMode) && string.IsNullOrEmpty(criteria.FieldOps)
+                && string.IsNullOrEmpty(criteria.CreditDebitInvoice)
+                && criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
+            {
+                var maxDate = (DataContext.Get().Max(x => x.DatetimeModified) ?? DateTime.Now).AddDays(1).Date;
+                var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
+                query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
+            }
+
+            return query;
+        }
+
+        public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
+        {
+            if (criteria.RangeSearch == PermissionRange.None) return null;
+            //IQueryable<OpsTransaction> data = QueryByPermission(criteria.RangeSearch);
+
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
+            var queryDefault = ExpressionQueryDefault(criteria);
+            var data = DataContext.Get(queryDefault);
+            var queryPermission = QueryByPermission(criteria.RangeSearch);
+            queryPermission = QuerySearchLinkJob(queryPermission, criteria);
+            data = data.Where(queryPermission.And(x => x.TransactionType == criteria.TransactionType));
+
+            if (data == null) return null;
+
+            List<OpsTransactionModel> results = new List<OpsTransactionModel>();
+            IQueryable<OpsTransaction> datajoin = data.Where(x => x.CurrentStatus != TermData.Canceled);
+
+            if (!string.IsNullOrEmpty(criteria.ClearanceNo))
+            {
+                IQueryable<CustomsDeclaration> listCustomsDeclaration = customDeclarationRepository.Get(x => x.ClearanceNo.ToLower().Contains(criteria.ClearanceNo.ToLower()));
+                if (listCustomsDeclaration.Count() > 0)
+                {
+                    datajoin = from custom in listCustomsDeclaration
+                               join datas in data on custom.JobNo equals datas.JobNo
+                               select datas;
+                    if (datajoin.Count() > 1)
+                    {
+                        datajoin = datajoin.GroupBy(x => x.JobNo).SelectMany(x => x).AsQueryable();
+                    }
+                }
+                else
+                {
+                    return results.AsQueryable();
+                }
+            }
+            if (!string.IsNullOrEmpty(criteria.CreditDebitInvoice))
+            {
+                IQueryable<AcctCdnote> listDebit = acctCdNoteRepository.Get(x => x.Code.ToLower().Contains(criteria.CreditDebitInvoice.ToLower()));
+                if (listDebit.Count() > 0)
+                {
+                    datajoin = from acctnote in listDebit
+                               join datas in data on acctnote.JobId equals datas.Id
+                               select datas;
+                    if (datajoin.Count() > 1)
+                    {
+                        datajoin = datajoin.GroupBy(x => x.JobNo).SelectMany(x => x).AsQueryable();
+                    }
+                }
+                else
+                {
+                    return results.AsQueryable();
+                }
+
+            }
+
             if (criteria.All == null)
             {
                 query = query.And(x => (x.JobNo ?? "").IndexOf(criteria.JobNo ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -715,6 +787,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 && (x.Mblno ?? "").IndexOf(criteria.Mblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                && (x.TransactionType ?? "").IndexOf(criteria.TransactionType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
                                 && (x.FieldOpsId == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
                                 && (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
@@ -731,6 +804,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    || (x.Mblno ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ProductService ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ServiceMode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.TransactionType ?? "").IndexOf(criteria.TransactionType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.CustomerId == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.FieldOpsId == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.ShipmentMode == criteria.All || string.IsNullOrEmpty(criteria.All))
