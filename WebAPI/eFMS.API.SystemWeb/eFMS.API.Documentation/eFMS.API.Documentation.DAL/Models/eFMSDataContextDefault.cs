@@ -70,11 +70,9 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<SysImageDetail> SysImageDetail { get; set; }
         public virtual DbSet<SysNotifications> SysNotifications { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
-        public virtual DbSet<SysPartnerApi> SysPartnerApi { get; set; }
         public virtual DbSet<SysReportLog> SysReportLog { get; set; }
         public virtual DbSet<SysSentEmailHistory> SysSentEmailHistory { get; set; }
         public virtual DbSet<SysSettingFlow> SysSettingFlow { get; set; }
-        public virtual DbSet<SysTrackInfo> SysTrackInfo { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
         public virtual DbSet<SysUserLevel> SysUserLevel { get; set; }
         public virtual DbSet<SysUserNotification> SysUserNotification { get; set; }
@@ -4334,6 +4332,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.SuspendTime).HasMaxLength(150);
 
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -4948,33 +4950,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
             });
 
-            modelBuilder.Entity<SysPartnerApi>(entity =>
-            {
-                entity.ToTable("sysPartnerAPI");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.Company).HasMaxLength(100);
-
-                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
-
-                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
-
-                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
-
-                entity.Property(e => e.Description).HasMaxLength(100);
-
-                entity.Property(e => e.Environment).HasMaxLength(150);
-
-                entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Name).HasMaxLength(50);
-
-                entity.Property(e => e.UserId).HasColumnName("UserID");
-            });
-
             modelBuilder.Entity<SysReportLog>(entity =>
             {
                 entity.ToTable("sysReportLog");
@@ -5093,45 +5068,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-            });
-
-            modelBuilder.Entity<SysTrackInfo>(entity =>
-            {
-                entity.ToTable("sysTrackInfo");
-
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedNever();
-
-                entity.Property(e => e.ActualDate).HasColumnType("datetime");
-
-                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
-
-                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
-
-                entity.Property(e => e.EventDescription).HasMaxLength(500);
-
-                entity.Property(e => e.FlightNo).HasMaxLength(50);
-
-                entity.Property(e => e.JobId).HasColumnName("JobID");
-
-                entity.Property(e => e.PlanDate).HasColumnType("datetime");
-
-                entity.Property(e => e.Quantity).HasMaxLength(50);
-
-                entity.Property(e => e.Source).HasMaxLength(100);
-
-                entity.Property(e => e.Status).HasMaxLength(50);
-
-                entity.Property(e => e.Type).HasMaxLength(50);
-
-                entity.Property(e => e.Unit).HasMaxLength(50);
-
-                entity.Property(e => e.UserCreated).HasMaxLength(50);
-
-                entity.Property(e => e.UserModified).HasMaxLength(50);
-
-                entity.Property(e => e.Weight).HasMaxLength(50);
             });
 
             modelBuilder.Entity<SysUser>(entity =>
