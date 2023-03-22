@@ -301,7 +301,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CheckPoint checkPoint = new CheckPoint { PartnerId = partner.PartnerId,
                     HblId = partner.HblId ?? Guid.Empty,
                     TransactionType = criteria.TransactionType,
-                    type = criteria.Type,
+                    type = criteria.Type == DocumentConstants.CHARGE_OBH_TYPE ? CHECK_POINT_TYPE.SURCHARGE_OBH : CHECK_POINT_TYPE.SURCHARGE,
                     SettlementCode = criteria.SettlementCode,
                 };
                 var isValid = ValidateCheckPointPartnerSurcharge(checkPoint);
@@ -740,7 +740,12 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (surcharges.Count() > 0)
             {
-                partners = surcharges.GroupBy(x => new { x.PaymentObjectId }).Select(x => new CheckPointPartnerHBLDataGroup { PartnerId = x.Key.PaymentObjectId, HblId = x.FirstOrDefault().Hblid }).ToList();
+                partners = surcharges.GroupBy(x => new { x.PaymentObjectId, x.Type }).Select(x => 
+                new CheckPointPartnerHBLDataGroup { 
+                    PartnerId = x.Key.PaymentObjectId,
+                    HblId = x.FirstOrDefault().Hblid,
+                    Type = x.Key.Type
+                }).ToList();
             }
             else
             {
