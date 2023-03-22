@@ -1476,9 +1476,9 @@ namespace eFMS.API.Documentation.DL.Services
             return users;
         }
 
-        public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list)
+        public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list, string transactionType)
         {
-            var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
+            var listChargeOps = DataContext.Get(x => x.TransactionType == transactionType);
             var listPartner = partnerRepository.Get(x => x.Active == true);
             var chargeData = catChargeRepository.Get(x => x.Active == true).ToLookup(x => x.Code);
             var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
@@ -1607,7 +1607,7 @@ namespace eFMS.API.Documentation.DL.Services
                             item.ObhPartnerError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_OBH_PARTNER_CODE_EMPTY], item.ChargeCode);
                             item.IsValid = false;
                         }
-                        if (!lookupcharges.Any(x => x.ServiceTypeId.Contains("CL")))
+                        if (!lookupcharges.Any(x => x.ServiceTypeId.Contains(transactionType)))
                         {
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_WRONG_SERVICE], item.ChargeCode);
                             item.IsValid = false;
@@ -1760,7 +1760,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         item.Hblid = currentOpsJob.Hblid;
                         item.JobNo = currentOpsJob.JobNo;
-                        item.TransactionType = "CL";
+                        item.TransactionType = transactionType;
                         string jobNo = currentOpsJob.JobNo;
                         if (item.Type.ToLower() == "obh")
                         {

@@ -183,8 +183,8 @@ namespace eFMS.API.Documentation.DL.Services
             int countNumberJob = 0;
             switch (typeEnum)
             {
-                case TransactionTypeEnum.InlandTrucking:
-                    shipment += DocumentConstants.IT_SHIPMENT;
+                case TransactionTypeEnum.TruckingInland:
+                    shipment += DocumentConstants.TK_SHIPMENT;
                     break;
                 case TransactionTypeEnum.AirExport:
                     shipment += DocumentConstants.AE_SHIPMENT;
@@ -1350,7 +1350,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             switch (criteria.TransactionType)
             {
-                case TransactionTypeEnum.InlandTrucking:
+                case TransactionTypeEnum.TruckingInland:
                     results = QueryIT(criteria, listSearch);
                     break;
                 case TransactionTypeEnum.AirExport:
@@ -3139,7 +3139,7 @@ namespace eFMS.API.Documentation.DL.Services
         public string GetShipmentTypeForPreviewPL(string transactionType)
         {
             string shipmentType = string.Empty;
-            if (transactionType == TermData.InlandTrucking)
+            if (transactionType == TermData.TruckingInland)
             {
                 shipmentType = "Inland Trucking ";
             }

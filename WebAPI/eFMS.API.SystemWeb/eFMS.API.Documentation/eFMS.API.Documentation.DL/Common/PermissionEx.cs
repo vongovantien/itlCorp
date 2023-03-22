@@ -364,7 +364,7 @@ namespace eFMS.API.Documentation.DL.Common
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);//Set default
 
-            if (transactionType == TermData.InlandTrucking)
+            if (transactionType == TermData.TruckingInland)
             {
                 _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docInlandTrucking);
             }
