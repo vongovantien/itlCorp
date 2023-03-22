@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, map, takeUntil, withLatestFrom, every } from 'rxjs/operators';
+import { catchError, map, takeUntil, withLatestFrom, every, finalize } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { OperationRepo, DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
@@ -39,6 +39,8 @@ export class CustomClearanceComponent extends AppList {
         imPorted: null,
         personHandle: null
     };
+    strKeySearch: string=null;
+    dataEcus: any;
 
     constructor(
         private _store: Store<IAppState>,
@@ -177,6 +179,7 @@ export class CustomClearanceComponent extends AppList {
             );
     }
     openPopupAdd() {
+        this.getEcusActionPopup.getClearanceNotImported();
         this.getEcusActionPopup.show();
     }
 

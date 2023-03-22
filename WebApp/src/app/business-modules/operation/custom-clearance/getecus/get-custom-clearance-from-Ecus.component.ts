@@ -10,8 +10,9 @@ import { PagerSetting } from "src/app/shared/models/layout/pager-setting.model";
 import { PAGINGSETTING } from "src/constants/paging.const";
 import { CustomClearanceFormSearchComponent } from "../components/form-search-custom-clearance/form-search-custom-clearance.component";
 import { ModalDirective } from "ngx-bootstrap/modal";
-import { debounceTime, distinctUntilChanged, finalize, takeUntil } from "rxjs/operators";
-import { BehaviorSubject } from "rxjs";
+import { debounceTime, distinctUntilChanged, finalize, skip, switchMap, takeUntil, tap } from "rxjs/operators";
+import { BehaviorSubject, Observable } from "rxjs";
+import { ToastrService } from "ngx-toastr";
 
 
 @Component({
@@ -21,7 +22,7 @@ import { BehaviorSubject } from "rxjs";
 export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     @ViewChild('staticModal') public staticModal: ModalDirective;
     @ViewChild(CustomClearanceFormSearchComponent) CustomClearanceComponent: CustomClearanceFormSearchComponent;
-    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    // @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
     @Input() currentJob: OpsTransaction;
     @Input() customer: CustomClearanceFormSearchComponent; 
     @Output() isCloseModal = new EventEmitter();
@@ -35,16 +36,19 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     pager: PagerSetting = PAGINGSETTING;
     isShow: boolean = false;
     sort: string = null;
-    term$ = new BehaviorSubject<string>('');;
+    term$ = new BehaviorSubject<string>('');
+    dataEcus: any;
+;
     checkAllNotImported = false;
-    notImportedCustomClearances: any[] = [];
     partnerTaxcode = '';
     constructor(
         private _fb: FormBuilder,
         private _sortService: SortService,
+        private _toastrService: ToastrService,
         private _documentationRepo: DocumentationRepo,
         private _operationRepo: OperationRepo) {
         super();
+        this.requestList = this.getClearanceNotImported;
     }
 
     ngOnInit() {
@@ -61,16 +65,13 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
 
         this.initForm();
         this.pager.totalItems = 15;
-        this.requestList = this.getListCleranceNotImported();
-
         this.term$.pipe(
             debounceTime(2000),
             distinctUntilChanged(),
             takeUntil(this.ngUnsubscribe)
         ).subscribe((text: string) => {
-            this.getListCleranceNotImported();
+            this.getClearanceNotImported();
         });
-        console.log(this.partnerTaxcode);
     }
 
  
@@ -81,35 +82,61 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
             ])]
         });
         this.customNo = this.form.controls['customNo'];
-        console.log(this.customNo);
     }
 
-    onSearchRequest() {
-        console.log("Hello");
-    }
+    // onSearchRequest(keyword: string) {
+    //     if (!!keyword) {
+    //         if (keyword.indexOf('\\') !== -1) { return this.dataEcus = []; }
+    //         keyword = keyword.toLowerCase();
+    //         // Search group
+    //         let dataGrp = this.dataEcus.filter((item: any) => item.partnerNameEn.toLowerCase().toString().search(keyword) !== -1);
+    //         // Không tìm thấy group thì search tiếp list con của group
+    //         if (dataGrp.length === 0) {
+    //             const arrayCharge = [];
+    //             for (const group of this.cdNoteGroups) {
+    //                 const data = group.dataEcus.filter((item: any) => item.type.toLowerCase().toString().search(keyword) !== -1 || item.code.toLowerCase().toString().search(keyword) !== -1);
+    //                 if (data.length > 0) {
+    //                     arrayCharge.push({ id: group.id, partnerNameEn: group.partnerNameEn, partnerNameVn: group.partnerNameVn, listCDNote: data });
+    //                 }
+    //             }
+    //             dataGrp = arrayCharge;
+    //         }
+    //         return this.cdNoteGroups = dataGrp;
+    //     } else {
+    //         this.cdNoteGroups = this.initGroup;
+    //     }
+    // }
 
+    // onChangeKeyWord(keyword: string) {
+    //     if (!!keyword) {
+    //         this.dataEcus.filter(x => x.clearanceNo.toLowerCase() === keyword.toLowerCase() ||
+    //                              x.hblid.toLowerCase() === keyword.toLowerCase() || 
+    //                              x.customerName.toLowerCase() === keyword.toLowerCase());
+    //     }
+
+    // }
     onSearchAutoComplete(keyword: string) {
+        console.log(this.customNo);
         this.term$.next(keyword.trim());
         if (this.customNo.value === '') {
             this.getListCleranceNotImported();
         }
     }
 
-
     changeAllNotImported() {
         if (this.checkAllNotImported) {
-            this.notImportedCustomClearances.forEach(x => {
+            this.dataEcus.forEach(x => {
                 x.isChecked = true;
             });
         } else {
-            this.notImportedCustomClearances.forEach(x => {
+            this.dataEcus.forEach(x => {
                 x.isChecked = false;
             });
         }
     }
 
     getListCleranceNotImported() {
-        this.notImportedCustomClearances = [];
+        this.dataEcus = [];
         if (this.customNo.value !== '') {
             this.strKeySearch = this.customNo.value;
         } else {
@@ -118,20 +145,29 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     }
 
     getClearanceNotImported() {
-        console.log(this.strKeySearch);
-        this._operationRepo.getUserCustomClearance(this.strKeySearch, false, this.page, this.pageSize)
-            .pipe(
-                finalize(() => {
-                    this.changeAllNotImported();
-                    this.isLoading = false;
-                })
-            )
-            .subscribe(
-                (res: any) => {
-                    this.notImportedCustomClearances = res.data || [];
-                    this.totalItems = res.totalItems;
+        this._operationRepo.getUserCustomClearance(this.strKeySearch, false, this.page, this.pageSize).pipe(
+            finalize(() => { this.isLoading = false; })
+        )
+        .subscribe(
+            (data: CommonInterface.IResponsePaging) => {
+                this.dataEcus = data.data || [];
+                this.totalItems = data.totalItems;
+            }
+        );
+    }
+
+    removeAllChecked() {
+        this.checkAllNotImported = false;
+        const checkedData = this.dataEcus.filter(x => x.isChecked === true);
+        console.log(checkedData.length);
+        if (checkedData.length > 0) {
+            for (let i = 0; i < checkedData.length; i++) {
+                const index = this.dataEcus.indexOf(x => x.id === checkedData[i].id);
+                if (index > -1) {
+                    this.dataEcus[index] = true;
                 }
-            );
+            }
+        }
     }
 
     refreshData() {
@@ -140,10 +176,32 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         this.pageSize = this.numberToShow[1];
         this.customNo.setValue('');
         this.strKeySearch = '';
-        this.getListCleranceNotImported();
+        this._operationRepo.getUserCustomClearance(this.strKeySearch, false, this.page, this.pageSize);
+    }
+
+    updateJobToClearance() {
+        const dataToUpdate = this.dataEcus.filter(x => x.isChecked === true);
+        console.log(dataToUpdate);
+        if (dataToUpdate.length > 0) {
+            this._operationRepo.importCustomClearance(dataToUpdate)
+                .pipe(finalize(() => this.hide()))
+                .subscribe(
+                    (responses: CommonInterface.IResult | any) => {
+                        if (!!responses.message) {
+                            this._toastrService.success(responses.message.value, '');
+                        }
+                    }
+                );
+        }
     }
 
     close() {
+        this.keyword = '';
+        this.page = 1;
+        this.pageSize = this.numberToShow[1];
+        this.customNo.setValue('');
+        this.strKeySearch = '';
+        this._operationRepo.getUserCustomClearance(this.strKeySearch, false, this.page, this.pageSize);
         this.hide();
     }
 }

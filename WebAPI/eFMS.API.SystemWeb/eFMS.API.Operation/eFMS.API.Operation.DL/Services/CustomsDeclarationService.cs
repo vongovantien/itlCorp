@@ -16,15 +16,18 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -44,6 +47,7 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private readonly IContextBase<SysOffice> sysOfficeRepository;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
+        private readonly ICacheServiceBase<DTOKHAIMD> cachedService;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
@@ -59,6 +63,7 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<SysOffice> sysOffice,
+            ICacheServiceBase<DTOKHAIMD> customCacheDeclarationSerice,
         IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
@@ -75,6 +80,7 @@ namespace eFMS.API.Operation.DL.Services
             csShipmentSurchargeRepo = csShipmentSurcharge;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
             sysOfficeRepository = sysOffice;
+            cachedService = customCacheDeclarationSerice;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
@@ -84,6 +90,8 @@ namespace eFMS.API.Operation.DL.Services
 
         public List<CustomsDeclarationModel> GetUserCustomClearance(string keySearch, bool Imported, int pageNumber, int pageSize, out int rowsCount)
         {
+           
+            
             List<CustomsDeclarationModel> returnList = new List<CustomsDeclarationModel>();
             string[] clearanceNoArray = null;
             string autocompleteKey = string.Empty;
@@ -113,12 +121,35 @@ namespace eFMS.API.Operation.DL.Services
             {
                 foreach (var item in connections)
                 {
-                    var clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
-
+                    var clearanceEcus = new List<DTOKHAIMD>();
+                    var dataCached = cachedService.Get();
+                    if(dataCached!=null && dataCached.Count > 0)
+                    {
+                        clearanceEcus = dataCached;
+                    } else
+                    {
+                        clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
+                        cachedService.Set(clearanceEcus, TimeSpan.FromMinutes(3));
+                    }
+                   
                     if (clearanceEcus == null)
                     {
                         rowsCount = 0;
                         return returnList;
+                    } else
+                    {
+                        clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
+                    }
+
+                    var clearencesNotExsitInFMS = clearanceEcus.Where(x => !checkExistEcusInEFMS(x.SOTK.ToString()));
+                    if (clearencesNotExsitInFMS.Count() > 0)
+                    {
+                        foreach (var d in clearencesNotExsitInFMS)
+                        {
+                            var newClearance = MapEcusClearanceToCustom(d, d.SOTK?.ToString().Trim());
+                            newClearance.Source = OperationConstants.FromEcus;
+                            returnList.Add(mapper.Map<CustomsDeclarationModel>(newClearance));
+                        }
                     }
                 }
             }
@@ -127,9 +158,10 @@ namespace eFMS.API.Operation.DL.Services
 
             }
             // Perform pagination
-            rowsCount = returnList.Count();
+            int rowCount = returnList.Count();
+            rowsCount = rowCount;
             returnList = returnList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-            returnList = MapClearancesToClearanceModels((IQueryable<CustomsDeclaration>)returnList);            
+            returnList = MapClearancesToClearanceModels(returnList.AsQueryable());            
             return returnList;
         }
 
@@ -1247,27 +1279,52 @@ namespace eFMS.API.Operation.DL.Services
 
         public HandleState Import(List<CustomsDeclarationModel> data)
         {
+            var result = new HandleState();
             try
             {
-                foreach (var item in data)
+                if (data.Count > 0)
                 {
-                    item.DatetimeCreated = DateTime.Now;
-                    item.DatetimeModified = DateTime.Now;
-                    item.UserCreated = item.UserModified = currentUser.UserID;
-                    item.Source = OperationConstants.FromEFMS;
-                    item.GroupId = currentUser.GroupId;
-                    item.DepartmentId = currentUser.DepartmentId;
-                    item.OfficeId = currentUser.OfficeID;
-                    item.CompanyId = currentUser.CompanyID;
-                }
+                    foreach (var item in data)
+                    {
+                        item.DatetimeCreated = DateTime.Now;
+                        item.DatetimeModified = DateTime.Now;
+                        item.UserCreated = item.UserModified = currentUser.UserID;
+                        item.Source = OperationConstants.FromEFMS;
+                        item.GroupId = currentUser.GroupId;
+                        item.DepartmentId = currentUser.DepartmentId;
+                        item.OfficeId = currentUser.OfficeID;
+                        item.CompanyId = currentUser.CompanyID;
+                    }
 
-                var hs = Add(data);
-                return hs;
+                    HandleState hs = Add(data);
+                    if (hs.Success)
+                    {
+                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, data.Count]);
+
+                        string logErr = String.Format("Import Ecus thành công {0} \n {1} Tờ khai {2}", currentUser.UserName, data.Count, DateTime.Now);
+                        new LogHelper("ECUS", logErr);
+                    }
+                    else
+                    {
+                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, 0]);
+                        string logErr = String.Format("{0} Import thất bại {1} Tờ khai do {2} at {3}", currentUser.UserName, data.Count, hs.Message, DateTime.Now);
+                        new LogHelper("ECUS", logErr);
+                    }
+                }
+                else
+                {
+                    result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA]);
+                    string logErr = String.Format("Import thất bại {0} \n {1} Tờ khai {2}", currentUser.UserName, data.Count, DateTime.Now);
+                    new LogHelper("ECUS", logErr);
+                }
             }
             catch (Exception ex)
             {
-                return new HandleState(ex.Message);
+                string logErr = String.Format("Lỗi import Ecus {0} \n {1} {2}", currentUser.UserID, ex.ToString(), DateTime.Now);
+                new LogHelper("ECUS", logErr);
+                result = new HandleState(ex.Message);
             }
+            return result;
         }
 
         public List<CustomsDeclarationModel> GetCustomsShipmentNotLocked()
