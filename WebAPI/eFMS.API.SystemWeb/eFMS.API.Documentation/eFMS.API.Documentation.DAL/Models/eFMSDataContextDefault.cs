@@ -142,6 +142,18 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Over30Day).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.OverObh16to30Day)
+                    .HasColumnName("OverOBH16To30Day")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.OverObh1to15Day)
+                    .HasColumnName("OverOBH1To15Day")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.OverObh30day)
+                    .HasColumnName("OverOBH30Day")
+                    .HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.PaidAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.PartnerId)
@@ -1358,6 +1370,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.FirstShipmentDate).HasColumnType("datetime");
 
+                entity.Property(e => e.IsOverDueObh).HasColumnName("IsOverDueOBH");
+
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
                     .IsUnicode(false);
@@ -1695,6 +1709,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(3)
                     .IsUnicode(false);
 
+                entity.Property(e => e.DateId)
+                    .HasColumnName("DateID")
+                    .HasColumnType("datetime");
+
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -1714,6 +1732,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
+                entity.Property(e => e.IdentityNo)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
@@ -1759,6 +1781,10 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.PaymentBeneficiary).HasMaxLength(4000);
 
                 entity.Property(e => e.PercentCredit).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.PlaceId)
+                    .HasColumnName("PlaceID")
+                    .HasMaxLength(200);
 
                 entity.Property(e => e.ProvinceId).HasColumnName("ProvinceID");
 
@@ -5054,6 +5080,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.OverPaymentTermObh).HasColumnName("OverPaymentTermOBH");
 
                 entity.Property(e => e.ReplicatePrefix)
                     .HasMaxLength(50)
