@@ -460,14 +460,27 @@ namespace eFMS.API.Documentation.DL.Services
                         } else if (contract.IsOverDue == true)
                         {
                             isValid = false;
-                        } else
+                        } else if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdueOBH"))
                         {
-                            isValid = true;
+                            if(checkPointType == CHECK_POINT_TYPE.SURCHARGE_OBH || checkPointType == 0)
+                            {
+                                if (contract.IsOverDueObh == true)
+                                {
+                                    isValid = false;
+                                }
+                                else
+                                {
+                                    isValid = true;
+                                }
+                            } else
+                            {
+                                isValid = true;
+                            }
                         }
-                        // isValid = ValidateCheckPointCashContractPartner(criteria.PartnerId, criteria.HblId, criteria.TransactionType, criteria.SettlementCode, CHECK_POINT_TYPE.SURCHARGE);
+                        if (!isValid) errorCode = 2;
+                        break;
                     }
                     else isValid = true;
-                    if (!isValid) errorCode = 2;
 
                     break;
                 case "Trial":
@@ -515,7 +528,6 @@ namespace eFMS.API.Documentation.DL.Services
                             break;
                         }
                     }
-                   
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "credit"))
                     {
                         if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE) //vẫn cho issue debit nếu vượt hạn mức
@@ -667,7 +679,7 @@ namespace eFMS.API.Documentation.DL.Services
             switch (ContractType)
             {
                 case "Cash":
-                    IsApplySetting = IsApplySettingFlowContractCash(settingFlow.ApplyType, settingFlow.ApplyPartner, settingFlow.IsApplyContract, partnerType);
+                    IsApplySetting = IsApplySettingFlowContractCash(settingFlow, partnerType, typeCheckPoint);
                     break;
                 case "Trial":
                 case "Official":
@@ -681,12 +693,16 @@ namespace eFMS.API.Documentation.DL.Services
             return IsApplySetting;
         }
 
-        private bool IsApplySettingFlowContractCash(string applyType, string applyPartnerType, bool? isApplyContract, string partnerType)
+        private bool IsApplySettingFlowContractCash(SysSettingFlow setting, string partnerType, string typeCheckPoint)
         {
-            bool isApply = false;
-            isApply = applyType == DocumentConstants.SETTING_FLOW_APPLY_TYPE_CHECK_POINT
-                && isApplyContract == true
-                && (applyPartnerType == partnerType || applyPartnerType == DocumentConstants.SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH);
+            bool isApply;
+            isApply = setting.ApplyType == DocumentConstants.SETTING_FLOW_APPLY_TYPE_CHECK_POINT
+                && setting.IsApplyContract == true
+                && (setting.ApplyPartner == partnerType || setting.ApplyPartner == DocumentConstants.SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH);
+            if (typeCheckPoint == "overdueOBH")
+            {
+                isApply = isApply && setting.OverPaymentTermObh == true;
+            }
 
             return isApply;
         }
