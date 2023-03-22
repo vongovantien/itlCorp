@@ -34,9 +34,9 @@ namespace eFMS.API.Documentation.DL.Models
     public class TrackInfo
     {
         [JsonProperty("plan_date")]
-        public DateTime? PlanDate { get; set; }
+        public string PlanDate { get; set; }
         [JsonProperty("actual_date")]
-        public DateTime? ActualDate { get; set; }
+        public string ActualDate { get; set; }
         public string Event { get; set; }
         public string Station { get; set; }
         [JsonProperty("flight_number")]

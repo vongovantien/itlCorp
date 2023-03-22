@@ -50,16 +50,17 @@ namespace eFMS.API.Documentation.DL.Services
         private List<SysTrackInfo> GetTrackInfoList(Guid? hblId, IEnumerable<TrackInfo> trackInfos, string source)
         {
             var trackInfoList = new List<SysTrackInfo>();
+
             foreach (var item in trackInfos)
             {
                 var data = new SysTrackInfo();
                 data.Id = Guid.NewGuid();
-                data.PlanDate = item.PlanDate;
+                data.PlanDate = string.IsNullOrEmpty(item.PlanDate) ? null : DateTime.TryParse(item.PlanDate, out var date) ? date : (DateTime?)null;
                 data.Quantity = item.Piece;
                 data.EventDescription = item.Event;
                 data.Station = placeRepository.First(x => x.Code == item.Station)?.Id;
                 data.Weight = item.Weight;
-                data.ActualDate = item.ActualDate;
+                data.ActualDate = string.IsNullOrEmpty(item.ActualDate) ? null : DateTime.TryParse(item.ActualDate, out var dateTime) ? dateTime : (DateTime?)null;
                 data.FlightNo = item.FlightNumber;
                 data.DatetimeCreated = data.DatetimeModified = DateTime.Now;
                 data.UserCreated = data.UserModified = _currentUser.UserID;
@@ -152,51 +153,47 @@ namespace eFMS.API.Documentation.DL.Services
 
                             var request = await HttpClientService.PostAPI(baseUrl, payload, null, headers);
                             var dataResponse = await request.Content.ReadAsAsync<TrackingMoreResponseModel>();
-                            if (request.IsSuccessStatusCode)
+                            if (request.IsSuccessStatusCode && dataResponse?.Data != null)
                             {
-                                if (dataResponse?.Data != null)
+                                statusShipment = dataResponse.Data.StatusNumber == 2 ? DocumentConstants.IN_TRANSIT : (dataResponse.Data.StatusNumber == 4 ? DocumentConstants.DONE : null);
+
+                                if (!DataContext.Any(x => x.JobId == shipmentExisted.Id))
                                 {
-                                    statusShipment = dataResponse.Data.StatusNumber == 2 ? DocumentConstants.IN_TRANSIT : (dataResponse.Data.StatusNumber == 4 ? DocumentConstants.DONE : null);
-                                    if (shipmentExisted.TrackingStatus != DocumentConstants.DONE)
-                                    {
-
-                                        if (!DataContext.Any(x => x.JobId == shipmentExisted.Id))
-                                        {
-                                            lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataResponse.Data.TrackInfo, partnerApi.Name);
-                                        }
-                                        else
-                                        {
-                                            var dataExisted = DataContext.Count(x => x.JobId == shipmentExisted.Id);
-                                            var dataTrackingSort = dataResponse.Data.TrackInfo.OrderBy(x => x.ActualDate).Skip(dataExisted);
-                                            if (dataTrackingSort?.Any() == true)
-                                            {
-                                                lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, partnerApi.Name);
-                                            }
-                                        }
-                                        if (lstTrackInfo.Count() > 0)
-                                        {
-                                            hs = await DataContext.AddAsync(lstTrackInfo);
-                                        }
-                                    }
-
-                                    shipmentExisted.TrackingStatus = statusShipment != string.Empty ? statusShipment : shipmentExisted.TrackingStatus;
-                                    hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
+                                    lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataResponse.Data.TrackInfo, partnerApi.Name);
                                 }
+                                else
+                                {
+                                    var dataExisted = DataContext.Count(x => x.JobId == shipmentExisted.Id);
+                                    var dataTrackingSort = dataResponse.Data.TrackInfo.OrderBy(x => x.ActualDate).Skip(dataExisted);
+                                    if (dataTrackingSort?.Any() == true)
+                                    {
+                                        lstTrackInfo = GetTrackInfoList(shipmentExisted.Id, dataTrackingSort, partnerApi.Name);
+                                    }
+                                }
+                                if (lstTrackInfo.Count() > 0)
+                                {
+                                    hs = await DataContext.AddAsync(lstTrackInfo);
+                                }
+
+                                shipmentExisted.TrackingStatus = statusShipment != string.Empty ? statusShipment : shipmentExisted.TrackingStatus;
+                                hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
                             }
                         }
 
-                        var returnData = DataContext.Get(x => x.JobId == shipmentExisted.Id).OrderBy(x => x.ActualDate);
+                        var returnData = DataContext.Get(x => x.JobId == shipmentExisted.Id)
+                                                    .OrderByDescending(x => x.ActualDate == null)
+                                                    .ThenByDescending(x => x.ActualDate);
 
                         trackShipment.TrackInfos = _mapper.Map<List<SysTrackInfoModel>>(returnData);
-                        trackShipment.Departure = placeRepository.First(x => x.Id == shipmentExisted.Pol)?.NameVn;
-                        trackShipment.Destination = placeRepository.First(x => x.Id == shipmentExisted.Pod)?.NameVn;
+                        trackShipment.Departure = placeRepository.First(x => x.Id == shipmentExisted.Pol)?.NameEn;
+                        trackShipment.Destination = placeRepository.First(x => x.Id == shipmentExisted.Pod)?.NameEn;
                         trackShipment.FlightDate = shipmentExisted.FlightDate;
-                        trackShipment.ColoaderName = partnerRepository.First(x => x.Id == shipmentExisted.ColoaderId)?.PartnerNameVn;
+                        trackShipment.ColoaderName = partnerRepository.First(x => x.Id == shipmentExisted.ColoaderId)?.PartnerNameEn;
                         trackShipment.Status = shipmentExisted.TrackingStatus;
                         trackShipment.FlightNo = returnData.Any() == true ? string.Join(", ", returnData.Where(x => !string.IsNullOrEmpty(x.FlightNo) && x.FlightNo != "-").Select(x => x.FlightNo).Distinct()) : shipmentExisted.FlightVesselName;
                         foreach (var item in trackShipment.TrackInfos)
                         {
-                            item.StationName = placeRepository.First(x => x.Id == item.Station)?.NameVn;
+                            item.StationName = placeRepository.First(x => x.Id == item.Station)?.NameEn;
                         };
 
                         break;

@@ -130,20 +130,22 @@
                     </div>
                     <div class="col-md-1">
                         <div *ngIf="first">
-                            <p class="track-router track-router-start"></p>
-                        </div>
-                        <div *ngIf="last">
-                            <div *ngIf="shipmentTracking?.status !== 'DONE'; else finishIcon" class="track-router">
-                                <ng-container *ngIf="shipmentType === 'AIR'; else iconTrack">
-                                    <img src="assets/icons/fly.png" alt="icon" width="30px">
-                                </ng-container>
-                                <ng-template #iconTrack>
-                                    <img src="assets/icons/ship.png" alt="icon" width="30px">
+                            <div class="track-router">
+                                <div *ngIf="shipmentTracking?.status !== 'DONE'; else finishIcon">
+                                    <ng-container *ngIf="shipmentType === 'AIR'; else iconTrack">
+                                        <img src="assets/icons/fly.png" alt="icon" width="30px">
+                                    </ng-container>
+                                    <ng-template #iconTrack>
+                                        <img src="assets/icons/ship.png" alt="icon" width="30px">
+                                    </ng-template>
+                                </div>
+                                <ng-template #finishIcon>
+                                    <img src="assets/icons/flag.png" alt="icon" width="30px">
                                 </ng-template>
                             </div>
-                            <ng-template #finishIcon>
-                                <img src="assets/icons/flag.png" alt="icon" width="30px">
-                            </ng-template>
+                        </div>
+                        <div *ngIf="last">
+                            <p class="track-router track-router-start"></p>
                         </div>
                         <ng-container *ngIf="!first && !last">
                             <p class="track-router track-progress-router"></p>
