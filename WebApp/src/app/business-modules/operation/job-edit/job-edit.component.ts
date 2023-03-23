@@ -119,6 +119,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (action: fromShareBussiness.ContainerAction) => {
+
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.lstMasterContainers = action.payload;
                         this.updateData(this.lstMasterContainers);
@@ -170,7 +171,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         // this.editForm.formEdit.controls['sumPackages'].setValue(sumPackages === 0 ? null : sumPackages);
         // this.editForm.formEdit.controls['sumNetWeight'].setValue(sumNetWeight === 0 ? null : sumNetWeight);
         // this.editForm.formEdit.controls['sumGrossWeight'].setValue(sumGrossWeight === 0 ? null : sumGrossWeight);
-
+        
         this.editForm.formEdit.controls['containerDescription'].setValue(containerDescription);
         this.editForm.formEdit.controls['sumContainers'].setValue(dataSum.sumContainers === 0 ? null : dataSum.sumContainers);
     }
@@ -316,6 +317,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.sumNetWeight = form.sumNetWeight === 0 ? null : form.sumNetWeight;
         this.opsTransaction.sumPackages = form.sumPackages === 0 ? null : form.sumPackages;
         this.opsTransaction.sumContainers = form.sumContainers === 0 ? null : form.sumContainers;
+        this.opsTransaction.sumChargeWeight = (this.lstMasterContainers || []).reduce((acc, curr) => acc += curr.chargeAbleWeight, 0);
         this.opsTransaction.sumCbm = form.sumCbm === 0 ? null : form.sumCbm;
         this.opsTransaction.containerDescription = form.containerDescription;
         this.opsTransaction.note = form.note;
@@ -500,7 +502,9 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             eta: this.opsTransaction.eta,
                             deliveryDate: this.opsTransaction.deliveryDate,
                             suspendTime: this.opsTransaction.suspendTime,
-                            clearanceDate: this.opsTransaction.clearanceDate
+                            clearanceDate: this.opsTransaction.clearanceDate,
+                            serviceMode: this.opsTransaction.serviceMode,
+                            productService: this.opsTransaction.productService
                         }));
 
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(csTransation));

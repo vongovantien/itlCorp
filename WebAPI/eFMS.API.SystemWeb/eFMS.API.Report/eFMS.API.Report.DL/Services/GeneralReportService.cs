@@ -18,6 +18,7 @@ namespace eFMS.API.Report.DL.Services
     {
         private readonly IContextBase<OpsTransaction> opsRepository;
         private readonly IContextBase<CsTransactionDetail> detailRepository;
+        private readonly IContextBase<CsTransaction> tranRepository;
         private readonly IContextBase<CsShipmentSurcharge> surCharge;
         private readonly IContextBase<CatPartner> catPartnerRepo;
         private readonly ICurrentUser currentUser;
@@ -33,10 +34,12 @@ namespace eFMS.API.Report.DL.Services
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepo; 
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<CatIncoterm> catIncotermRepository;
+        private readonly IContextBase<SysImageDetail> imageDetailRepository;
+        private readonly IContextBase<SysAttachFileTemplate> sysattachRepository; 
 
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)opsRepository.DC;
 
-        public GeneralReportService(ICurrentUser currentUser,
+        public GeneralReportService(
             IContextBase<OpsTransaction> ops,
             IContextBase<CsTransactionDetail> detail,
             IContextBase<CsShipmentSurcharge> surcharge,
@@ -58,25 +61,31 @@ namespace eFMS.API.Report.DL.Services
             IContextBase<SysOffice> Office,
             IContextBase<CustomsDeclaration> customsDeclaration,
             IContextBase<CatIncoterm> catIncoterm,
-            IContextBase<SysUserLevel> UserLevel)
+            IContextBase<SysImageDetail> imageDetailRepo,
+            IContextBase<CsTransaction> tranRepo,
+            IContextBase<SysAttachFileTemplate> sysattachRepo,
+        IContextBase<SysUserLevel> UserLevel)
         {
-            opsRepository = ops;
-            detailRepository = detail;
-            surCharge = surcharge;
-            catPartnerRepo = catPartner;
-            currentUser = user;
-            sysEmployeeRepo = sysEmployee;
-            sysUserRepo = sysUser;
-            catCurrencyExchangeRepo = catCurrencyExchange;
-            catPlaceRepo = catPlace;
-            catChargeRepo = catCharge;
-            catChargeGroupRepo = ChargeGroup;
-            sysOfficeRepo = Office;
-            sysUserLevelRepo = UserLevel;
-            customsDeclarationRepo = customsDeclaration;
-            currencyExchangeService = currencyExchange;
-            catUnitRepo = catUnit;
-            catIncotermRepository = catIncoterm;
+                opsRepository = ops;
+                detailRepository = detail;
+                surCharge = surcharge;
+                catPartnerRepo = catPartner;
+                currentUser = user;
+                sysEmployeeRepo = sysEmployee;
+                sysUserRepo = sysUser;
+                catCurrencyExchangeRepo = catCurrencyExchange;
+                catPlaceRepo = catPlace;
+                catChargeRepo = catCharge;
+                catChargeGroupRepo = ChargeGroup;
+                sysOfficeRepo = Office;
+                sysUserLevelRepo = UserLevel;
+                customsDeclarationRepo = customsDeclaration;
+                currencyExchangeService = currencyExchange;
+                catUnitRepo = catUnit;
+                catIncotermRepository = catIncoterm;
+                imageDetailRepository = imageDetailRepo;
+                tranRepository = tranRepo;
+                sysattachRepository = sysattachRepo;
         }
 
         public List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria, int page, int size, out int rowsCount)
@@ -108,13 +117,27 @@ namespace eFMS.API.Report.DL.Services
             //var dataShipment = QueryDataDocumentation(criteria);
             var dataShipment = GetDataGeneralReport(criteria);
             List<GeneralReportResult> dataList = new List<GeneralReportResult>();
-            var LstSurcharge = surCharge.Get();
-            var LookupSurchage = LstSurcharge.ToLookup(x => x.Hblid);
-            var PartnerList = catPartnerRepo.Get();
-            var LookupPartner = PartnerList.ToLookup(x => x.Id);
-            var PlaceLookup = catPlaceRepo.Get().ToLookup(q => q.Id);
+            var hblIds = dataShipment.Select(x => x.HblId).Distinct().ToList();
+            var LstSurcharge = surCharge.Get(x => hblIds.Contains(x.Hblid)).ToList();
+
+            var customerIds = dataShipment.Where(x => x.CustomerId != null).Select(x => x.CustomerId).ToList();
+            var carrierIds = dataShipment.Where(x => x.ColoaderId != null).Select(x => x.ColoaderId).ToList();
+            var agentIds = dataShipment.Where(x => x.AgentId != null).Select(x => x.AgentId).ToList();
+
+            var partnerIds = customerIds.Union(carrierIds).Union(agentIds).Distinct().ToList();
+            var partnerList = catPartnerRepo.Get(x => partnerIds.Contains(x.Id));
+            Dictionary<string, CatPartner> partnerMap = partnerList.ToDictionary(x => x.Id);
+
+            var polIds = dataShipment.Where(x => x.Pol != null).Select(x => x.Pol).ToList();
+            var podIds = dataShipment.Where(x => x.Pol != null).Select(x => x.Pod).ToList();
+            var portIds = polIds.Union(podIds);
+            
+            Dictionary<Guid, CatPlace> placeMap = catPlaceRepo.Get(x => portIds.Contains(x.Id)).ToDictionary(x => x.Id);
+
             var lookupUser = sysUserRepo.Get().ToLookup(q => q.Id);
             var lookupEmployee = sysEmployeeRepo.Get().ToLookup(q => q.Id);
+
+
             int _no = 1;
             foreach (var item in dataShipment)
             {
@@ -122,24 +145,45 @@ namespace eFMS.API.Report.DL.Services
                 data.JobId = item.JobNo;
                 data.Mawb = item.Mawb;
                 data.Hawb = item.HwbNo;
-                data.CustomerName = LookupPartner[item.CustomerId].FirstOrDefault()?.PartnerNameEn;
-                data.CarrierName = LookupPartner[item.ColoaderId].FirstOrDefault()?.PartnerNameEn;
-                data.AgentName = LookupPartner[item.AgentId].FirstOrDefault()?.PartnerNameEn;
+       
+                if (item.CustomerId != null && partnerMap.TryGetValue(item.CustomerId, out var customer))
+                {
+                    data.CustomerName = customer.PartnerNameEn;
+                }
+
+                if (item.ColoaderId != null && partnerMap.TryGetValue(item.ColoaderId, out var carrier))
+                {
+                    data.CarrierName = carrier.PartnerNameEn;
+                }
+                if (item.AgentId != null && partnerMap.TryGetValue(item.AgentId, out var agent))
+                {
+                    data.AgentName = agent.PartnerNameEn;
+                }
                 data.ServiceDate = item.ServiceDate;
                 data.VesselFlight = item.FlightNo;
 
-                var _polCode = item.Pol != null ? PlaceLookup[(Guid)item.Pol].FirstOrDefault()?.Code : string.Empty;
-                var _podCode = item.Pod != null ? PlaceLookup[(Guid)item.Pod].FirstOrDefault()?.Code : string.Empty;
+                var _polCode = string.Empty;
+                var _podCode = string.Empty;
+
+                if (item.Pol != null && placeMap.TryGetValue((Guid)item.Pol, out var pol))
+                {
+                    _polCode = pol.Code;
+                }
+                if (item.Pod != null && placeMap.TryGetValue((Guid)item.Pod, out var pod))
+                {
+                    _podCode = pod.Code;
+                }
                 data.Route = _polCode + (!string.IsNullOrEmpty(_polCode) || !string.IsNullOrEmpty(_podCode) ? "/" : "") + _podCode;
 
                 //Qty lấy theo Housebill
                 data.Qty = item.PackageQty ?? 0;
                 data.ChargeWeight = item.ChargeWeight ?? 0;
+                var _charge = LstSurcharge.Where(x => x.Hblid == item.HblId);
 
                 #region -- Phí Selling trước thuế --
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeSell = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE);
+                    var _chargeSell = _charge.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE);
                     data.Revenue = criteria.Currency == ReportConstants.CURRENCY_LOCAL ? _chargeSell.Sum(x => x.AmountVnd ?? 0) : _chargeSell.Sum(x => x.AmountUsd ?? 0);
                 }
 
@@ -148,7 +192,7 @@ namespace eFMS.API.Report.DL.Services
                 #region -- Phí Buying trước thuế --
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeBuy = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE);
+                    var _chargeBuy = _charge.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE);
                     data.Cost = criteria.Currency == ReportConstants.CURRENCY_LOCAL ? _chargeBuy.Sum(x => x.AmountVnd ?? 0) : _chargeBuy.Sum(x => x.AmountUsd ?? 0);
                 }
 
@@ -159,7 +203,7 @@ namespace eFMS.API.Report.DL.Services
                 #region -- Phí OBH sau thuế --
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeObh = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_OBH_TYPE);
+                    var _chargeObh = _charge.Where(x => x.Type == ReportConstants.CHARGE_OBH_TYPE);
                     data.Obh = criteria.Currency == ReportConstants.CURRENCY_LOCAL ? _chargeObh.Sum(x => x.AmountVnd + x.VatAmountVnd ?? 0) : _chargeObh.Sum(x => x.AmountUsd + x.VatAmountUsd ?? 0);
                 }
 
@@ -233,8 +277,11 @@ namespace eFMS.API.Report.DL.Services
             List<GeneralExportShipmentOverviewResult> lstShipment = new List<GeneralExportShipmentOverviewResult>();
             var dataShipment = GetDataGeneralReport(criteria);
             if (!dataShipment.Any()) return lstShipment.AsQueryable();
-            var lstSurchage = surCharge.Get();
-            var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
+            //var lstSurchage = surCharge.Get();
+            //var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
+            var hblIds = dataShipment.Select(x => x.HblId).Distinct().ToList();
+            var LstSurcharge = surCharge.Get(x => hblIds.Contains(x.Hblid)).ToList();
+
             var PlaceList = catPlaceRepo.Get();
             var PartnerList = catPartnerRepo.Get();
             var LookupPartner = PartnerList.ToLookup(x => x.Id);
@@ -330,9 +377,10 @@ namespace eFMS.API.Report.DL.Services
                 decimal? _totalSellAmountHandling = 0;
                 decimal? _totalSellAmountOther = 0;
                 decimal? _totalSellCustom = 0;
+                var chargeList = LstSurcharge.Where(x => x.Hblid == item.HblId);
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeSell = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE);
+                    var _chargeSell = chargeList.Where(x => x.Type == ReportConstants.CHARGE_SELL_TYPE);
                     foreach (var charge in _chargeSell)
                     {
                         var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
@@ -425,7 +473,7 @@ namespace eFMS.API.Report.DL.Services
                 decimal? _totalBuyCustom = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeBuy = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE);
+                    var _chargeBuy = chargeList.Where(x => x.Type == ReportConstants.CHARGE_BUY_TYPE);
                     foreach (var charge in _chargeBuy)
                     {
                         var chargeObj = LookupCharge[charge.ChargeId].Select(t => t).FirstOrDefault();
@@ -529,7 +577,7 @@ namespace eFMS.API.Report.DL.Services
                 decimal? _obh = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var _chargeObh = detailLookupSur[(Guid)item.HblId].Where(x => x.Type == ReportConstants.CHARGE_OBH_TYPE);
+                    var _chargeObh = chargeList.Where(x => x.Type == ReportConstants.CHARGE_OBH_TYPE);
                     foreach (var charge in _chargeObh)
                     {
                         _obh += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, criteria.Currency);

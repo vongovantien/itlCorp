@@ -9,6 +9,7 @@ namespace eFMS.API.Documentation.DL.Models
     {
         public string HBLNoError { get; set; }
         public string MBLNoError { get; set; }
+        public string ClearanceNoError { get; set; }
         public string PartnerCode { get; set; }
         public string PartnerCodeError { get; set; }
         public string ObhPartner { get; set; }
@@ -31,5 +32,6 @@ namespace eFMS.API.Documentation.DL.Models
         public string SerieNoError { get; set; }
         //public string InvoiceNoError { get; set; }
         public decimal? TotalAmount { get; set; }
+        public string VatPartnerTaxCodeError { get;  set; }
     }
 }

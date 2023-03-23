@@ -56,6 +56,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
+    <PackageReference Include="RabbitMQ.Client" Version="6.4.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.2.88" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="4.0.1" />
@@ -73,6 +74,9 @@
     </Reference>
     <Reference Include="eFMS.API.Infrastructure">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.API.Provider">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
     </Reference>
     <Reference Include="eFMS.IdentityServer.DL">
       <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>

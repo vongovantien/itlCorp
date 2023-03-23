@@ -212,7 +212,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     initForm() {
         this.formEdit = this._fb.group({
-            jobNo: [null],
+            jobNo: [{value: null, disabled: true}],
             hwbno: [null, Validators.compose([
                 FormValidators.validateSpecialChar,
             ])],
@@ -250,7 +250,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             sumContainers: [null, Validators.max(5000000)],
             sumPackages: [null, Validators.max(5000000)],
             sumCbm: [null],
-            containerDescription: [null],
+            containerDescription: [{value: null, disabled: true}],
             packageTypeId: [null],
             note: [null],
             noProfit: [false],
@@ -458,7 +458,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     }
 
     syncGoodInforToReplicateJob() {
-        this._documentRepo.syncGoodInforToReplicateJob({ jobNo: this.opsTransaction.jobNo }).pipe(
+        this._documentRepo.syncGoodInforToReplicateJob(this.opsTransaction.id).pipe(
             takeUntil(this.ngUnsubscribe),
             catchError(this.catchError),
         ).subscribe((res: any) => {

@@ -1,0 +1,75 @@
+<div class="work-order-wrapper m-animate-fade-in">
+
+    <app-sub-header> </app-sub-header>
+
+    <div class="m-content">
+        <form-create-work-order class="pos-rel" [transactionType]="workOrderDetail?.transactionType">
+            <ng-container *ngIf="!!(code$ | async)">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h4>
+                        {{transactionTypeName$ | async}}
+                        <span class="badge badge-pill badge-warning text-white font-weight-bold">
+                            {{code$ | async}}
+                        </span>
+                    </h4>
+                </div>
+                <span [class.bg-success]="isActive" [class.bg-danger]="!isActive"
+                    class="font-weight-bold font-15 text-uppercase text-white" style="padding: 5px 10px;
+                border-radius: 25px;
+                box-shadow: 2px 2px 5px rgb(0 0 0 / 30%);
+                transform: rotate(-10deg);
+                position: absolute;
+                right: 2px;
+                top: 1px;
+                z-index: 2;">{{ isActive ? 'Active' : 'InActive'}}
+                </span>
+            </ng-container>
+
+            <div class="infoCreateModified row m--margin-top-20" *ngIf="!!workOrderDetail">
+                <div class="col-md-8">
+                    <span>Created: {{workOrderDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
+                    <span class="text-success">{{workOrderDetail.userNameCreated}}</span>
+                </div>
+                <div class="col-md-4">
+                    <span>Modified: {{workOrderDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}} by
+                    </span> <span class="text-success">{{workOrderDetail.userNameModified}}</span>
+                </div>
+            </div>
+        </form-create-work-order>
+
+        <price-list-work-order></price-list-work-order>
+
+        <ng-container *ngIf="!!workOrderDetail && !workOrderDetail?.active">
+            <div class="row">
+                <div class="col-12">
+                    <div class="m--align-center m--margin-top-20">
+                        <div class="c-button-actions">
+                            <ng-container *ngIf="!!workOrderDetail && workOrderDetail?.permission?.allowUpdate">
+                                <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
+                                    (click)="submitClick('update')">
+                                    <span>
+                                        <i class="la la-save"></i>
+                                        <span>
+                                            Save
+                                        </span>
+                                    </span>
+                                </button>
+                                <!-- <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
+                                    (click)="sendRequest()">
+                                    <span>
+                                        <i class="la la-download"></i>
+                                        <span>
+                                            Send Request
+                                        </span>
+                                    </span>
+                                </button> -->
+                            </ng-container>
+                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
+                            </app-default-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+    </div>
+</div>

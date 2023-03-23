@@ -23,5 +23,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public string Source { get; set; }
         public Guid? SysImageId { get; set; }
         public string Note { get; set; }
+        public Guid? GenEdocId { get; set; }
     }
 }

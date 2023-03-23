@@ -43,6 +43,7 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
     get allowEditing(): boolean {
         return this._allowEditing;
     }
+    @Input() textColor: string = '';
 
     @Output() itemSelected = new EventEmitter<any>();
     @Output() remove = new EventEmitter<any>();

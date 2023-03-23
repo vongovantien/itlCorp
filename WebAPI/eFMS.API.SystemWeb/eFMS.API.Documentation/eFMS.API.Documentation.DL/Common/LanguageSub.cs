@@ -2,6 +2,8 @@
 {
     public class DocumentationLanguageSub
     {
+
+        public static readonly string MSG_SHIPMENT_NOT_EXIST = "MSG_SHIPMENT_NOT_EXIST";
         public static readonly string MSG_JOBNO_EXISTED = "MSG_JOBNO_EXISTED";
         public static readonly string MSG_REFUND_FEE_EXISTED = "MSG_REFUND_FEE_EXISTED";
         public static readonly string MSG_MAWB_EXISTED = "MSG_MAWB_EXISTED";
@@ -87,6 +89,8 @@
         public static readonly string MSG_HBLNO_NOT_EXIST = "MSG_HBLNO_NOT_EXIST";
         public static readonly string MSG_MBLNO_NOT_EXIST = "MSG_MBLNO_NOT_EXIST";
         public static readonly string MSG_PARTER_CODE_NOT_EXIST = "MSG_PARTER_CODE_NOT_EXIST";
+        public static readonly string MSG_VAT_PARTER_CODE_NOT_EXIST = "MSG_VAT_PARTER_CODE_NOT_EXIST";
+        public static readonly string MSG_VAT_PARTER_CODE_EMPTY = "MSG_VAT_PARTER_CODE_EMPTY";
         public static readonly string MSG_CHARGE_CODE_NOT_EXIST = "MSG_CHARGE_CODE_NOT_EXIST";
         public static readonly string MSG_UNIT_NOT_EXIST = "MSG_UNIT_NOT_EXIST";
         public static readonly string MSG_TYPE_NOT_VALID = "MSG_TYPE_NOT_VALID";
@@ -94,6 +98,8 @@
         public static readonly string MSG_SERIES_NO_REQUIRED = "MSG_SERIES_NO_REQUIRED";
         public static readonly string MSG_INVOICE_NO_REQUIRED = "MSG_INVOICE_NO_REQUIRED";
         public static readonly string MSG_SHIPMENT_INVALID_NO_PROFIT = "MSG_SHIPMENT_INVALID_NO_PROFIT";
+        public static readonly string MSG_HBLNO_NOT_EXIST_OFFICE = "MSG_HBLNO_NOT_EXIST_OFFICE";
+        public static readonly string MSG_MBLNO_NOT_EXIST_OFFICE = "MSG_MBLNO_NOT_EXIST_OFFICE";
 
         public static readonly string MSG_OBH_PARTNER_CODE_WRONG = "MSG_OBH_PARTNER_CODE_WRONG";
         public static readonly string MSG_OBH_PARTNER_CODE_EMPTY = "MSG_OBH_PARTNER_CODE_EMPTY";
@@ -108,6 +114,6 @@
         public static readonly string MSG_CLEARANCE_IS_OVERDUE = "MSG_CLEARANCE_IS_OVERDUE";
         public static readonly string MSG_CLEARANCE_IS_OVERLIMIT = "MSG_CLEARANCE_IS_OVERLIMIT";
         public static readonly string MSG_CHARGE_CODE_WRONG_OFFICE = "MSG_CHARGE_CODE_WRONG_OFFICE";
-
+        public static readonly string MSG_CUSTOM_NO_NOT_EXIST_JOB = "MSG_CUSTOM_NO_NOT_EXIST_JOB";
     }
 }

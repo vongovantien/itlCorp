@@ -1015,157 +1015,44 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return results;
         }
-        public IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria)
+        public List<sp_GetSurchargeRecently> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria)
         {
-            Expression<Func<OpsTransaction, bool>> queryShipmentNearest = x => (x.OfficeId == currentUser.OfficeID
-                                                   && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
-                                                   && (x.SupplierId == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId)));
-            if (queryShipmentNearest == null) return null;
-            List<Guid> houseIds = new List<Guid>();
-            queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId); // kHác với lô hiện tại
-
-            OpsTransaction shipment = opsTransRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
-
-            if (shipment == null) return null;
-
-            if (criteria.ChargeType == DocumentConstants.CHARGE_BUY_TYPE)
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@Type", Value = criteria.ChargeType },
+                new SqlParameter(){ ParameterName = "@SupplierID", Value = criteria.ColoaderId },
+                new SqlParameter(){ ParameterName = "@CustomerID", Value = criteria.CustomerId },
+                new SqlParameter(){ ParameterName = "@OfficeID", Value = currentUser.OfficeID },
+                new SqlParameter(){ ParameterName = "@ID", Value = criteria.JobId },
+                new SqlParameter(){ ParameterName = "@SalemanID", Value = criteria.SalesmanId },
+            };
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeRecently>(parameters);
+            if(data.Count == 0)
             {
-                if (criteria.ColoaderId == null) return null;
-                houseIds = opsTransRepository.Get(x => x.Id == shipment.Id && x.SupplierId == criteria.ColoaderId).Select(x => x.Hblid).ToList();
+                return null;
             }
-            else
-            {
-                if (criteria.CustomerId == null) return null;
-                houseIds = opsTransRepository.Get(x => x.Id == shipment.Id && x.CustomerId == criteria.CustomerId).Select(x => x.Hblid).ToList();
-            }
-
-            if (houseIds.Count == 0) return null;
-            IQueryable<CsShipmentSurcharge> csShipmentSurcharge = DataContext.Get(x => houseIds.Contains(x.Hblid) && x.Type == criteria.ChargeType && x.IsFromShipment == true);
-            if (csShipmentSurcharge == null) return null;
-            IQueryable<CsShipmentSurchargeDetailsModel> result = (
-               from surcharge in csShipmentSurcharge
-               join charge in catChargeRepository.Get() on surcharge.ChargeId equals charge.Id
-               join p in partnerRepository.Get() on surcharge.PaymentObjectId equals p.Id into gp
-               from p1 in gp.DefaultIfEmpty()
-               join payer in partnerRepository.Get() on surcharge.PayerId equals payer.Id into gp2
-               from p2 in gp2.DefaultIfEmpty()
-               select new CsShipmentSurchargeDetailsModel
-               {
-                   Type = surcharge.Type,
-                   ChargeId = surcharge.ChargeId,
-                   Quantity = surcharge.Quantity,
-                   QuantityType = surcharge.QuantityType,
-                   UnitId = surcharge.UnitId,
-                   UnitPrice = surcharge.UnitPrice,
-                   CurrencyId = surcharge.CurrencyId,
-                   IncludedVat = surcharge.IncludedVat,
-                   Vatrate = surcharge.Vatrate,
-                   Total = surcharge.Total,
-                   PayerId = surcharge.PayerId,
-                   ObjectBePaid = surcharge.ObjectBePaid,
-                   PaymentObjectId = surcharge.PaymentObjectId,
-                   ExchangeDate = surcharge.ExchangeDate,
-                   Notes = surcharge.Notes,
-                   IsFromShipment = true,
-                   TypeOfFee = surcharge.TypeOfFee,
-                   KickBack = surcharge.KickBack,
-                   PartnerShortName = p1.ShortName,
-                   PartnerName = p1.PartnerNameEn,
-                   ReceiverShortName = p1.ShortName,
-                   ReceiverName = p1.PartnerNameEn,
-                   PayerShortName = p2.ShortName,
-                   PayerName = p2.PartnerNameEn,
-                   ChargeNameEn = charge.ChargeNameEn,
-                   ChargeCode = charge.Code,
-                   ChargeGroup = surcharge.ChargeGroup
-               });
-            return result;
+            return data;
         }
 
-        public IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria)
+        public List<sp_GetSurchargeRecently> GetRecentlyCharges(RecentlyChargeCriteria criteria)
         {
-            // get charge info of newest shipment by charge type of an PIC and not existed in current shipment and by criteria: POL, POD, Customer, Shipping Line, Consignee
             string transactionType = DataTypeEx.GetType(criteria.TransactionType);
-
-            Expression<Func<CsTransaction, bool>> queryShipmentNearest = x => (x.OfficeId == currentUser.OfficeID
-                                                        && (x.AgentId == criteria.AgentId || string.IsNullOrEmpty(criteria.AgentId))
-                                                        && (x.ColoaderId == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId))
-                                                        && x.TransactionType == transactionType);
-
-
-            if (queryShipmentNearest == null) return null;
-            List<Guid> houseIds = new List<Guid>();
-
-            if (criteria.ChargeType == DocumentConstants.CHARGE_BUY_TYPE)
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@Type", Value = criteria.ChargeType },
+                new SqlParameter(){ ParameterName = "@SupplierID", Value = criteria.ColoaderId },
+                new SqlParameter(){ ParameterName = "@CustomerID", Value = criteria.CustomerId },
+                new SqlParameter(){ ParameterName = "@OfficeID", Value = currentUser.OfficeID },
+                new SqlParameter(){ ParameterName = "@ID", Value = criteria.JobId },
+                new SqlParameter(){ ParameterName = "@SalemanID", Value = criteria.SalesmanId },
+                new SqlParameter(){ ParameterName = "@HBLID", Value = criteria.HblId },
+                new SqlParameter(){ ParameterName = "@TransactionType", Value = transactionType },
+                new SqlParameter(){ ParameterName = "@AgentID", Value = criteria.AgentId },
+            };
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeRecently>(parameters);
+            if (data.Count == 0)
             {
-                if (criteria.ColoaderId == null) return null;
-                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId); // kHác với lô hiện tại
-
-                CsTransaction shipment = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
-                if (shipment == null) return null;
-
-                houseIds = tranDetailRepository.Get(x => x.JobId == shipment.Id && x.Id != criteria.HblId).Select(x => x.Id).ToList();
+                return null;
             }
-            else
-            {
-                if (criteria.CustomerId == null) return null;
-                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId);
-                IQueryable<CsTransaction> shipmentQuery = csTransactionRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).Take(1);
-                if (shipmentQuery == null) return null;
-
-                // Chỉ lấy house
-                foreach (var shipment in shipmentQuery)
-                {
-                    var houseId = tranDetailRepository.Get(x => x.JobId == shipment.Id && x.CustomerId == criteria.CustomerId && x.Id != criteria.HblId).Select(x => x.Id).ToList();
-                    houseIds.AddRange(houseId);
-                }
-            }
-
-            if (houseIds.Count == 0) return null;
-            IQueryable<CsShipmentSurcharge> csShipmentSurcharge = DataContext.Get(x => houseIds.Contains(x.Hblid) && x.Type == criteria.ChargeType && x.IsFromShipment == true);
-            if (csShipmentSurcharge == null) return null;
-
-            IQueryable<CsShipmentSurchargeDetailsModel> result = (
-                from surcharge in csShipmentSurcharge
-                join charge in catChargeRepository.Get() on surcharge.ChargeId equals charge.Id
-                join p in partnerRepository.Get() on surcharge.PaymentObjectId equals p.Id into gp
-                from p1 in gp.DefaultIfEmpty()
-                join payer in partnerRepository.Get() on surcharge.PayerId equals payer.Id into gp2
-                from p2 in gp2.DefaultIfEmpty()
-                select new CsShipmentSurchargeDetailsModel
-                {
-                    Type = surcharge.Type,
-                    ChargeId = surcharge.ChargeId,
-                    Quantity = surcharge.Quantity,
-                    QuantityType = surcharge.QuantityType,
-                    UnitId = surcharge.UnitId,
-                    UnitPrice = surcharge.UnitPrice,
-                    CurrencyId = surcharge.CurrencyId,
-                    IncludedVat = surcharge.IncludedVat,
-                    Vatrate = surcharge.Vatrate,
-                    Total = surcharge.Total,
-                    PayerId = surcharge.PayerId,
-                    ObjectBePaid = surcharge.ObjectBePaid,
-                    PaymentObjectId = surcharge.PaymentObjectId,
-                    ExchangeDate = surcharge.ExchangeDate,
-                    Notes = surcharge.Notes,
-                    IsFromShipment = true,
-                    TypeOfFee = surcharge.TypeOfFee,
-                    KickBack = surcharge.KickBack,
-
-                    PartnerShortName = p1.ShortName,
-                    PartnerName = p1.PartnerNameEn,
-                    ReceiverShortName = p1.ShortName,
-                    ReceiverName = p1.PartnerNameEn,
-                    PayerShortName = p2.ShortName,
-                    PayerName = p2.PartnerNameEn,
-
-                    ChargeNameEn = charge.ChargeNameEn,
-                    ChargeCode = charge.Code,
-                    ChargeGroup = surcharge.ChargeGroup
-
-                });
-            return result;
+            return data;
         }
 
         public HandleState NotificationCreditTerm(List<CsShipmentSurchargeModel> list)
@@ -1595,6 +1482,7 @@ namespace eFMS.API.Documentation.DL.Services
             var listPartner = partnerRepository.Get(x => x.Active == true);
             var chargeData = catChargeRepository.Get(x => x.Active == true).ToLookup(x => x.Code);
             var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var customsDeclaration = customsDeclarationRepository.Get().ToLookup(x => x.ClearanceNo); ;
             string TypeCompare = string.Empty;
             list.ForEach(item =>
             {
@@ -1605,12 +1493,17 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno) && x.Hwbno == item.Hblno))
-                    {
-                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
-                        item.IsValid = false;
+                    //if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno) && x.Hwbno == item.Hblno))
+                    //{
+                    //    item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
+                    //    item.IsValid = false;
 
-                    }
+                    //}
+                    if(!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno.Trim()) && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
+                    {
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST_OFFICE], item.Hblno, currentUser.OfficeCode);
+                        item.IsValid = false;
+                    }    
                 }
                 if (string.IsNullOrEmpty(item.Mblno))
                 {
@@ -1619,9 +1512,14 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno)))
+                    //if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno)))
+                    //{
+                    //    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                    //    item.IsValid = false;
+                    //}
+                    if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno.Trim()) && x.OfficeId == currentUser.OfficeID))
                     {
-                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST_OFFICE], item.Mblno, currentUser.OfficeCode);
                         item.IsValid = false;
                     }
                     else if (!string.IsNullOrEmpty(item.Hblno) && !string.IsNullOrEmpty(item.Mblno))
@@ -1634,7 +1532,19 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     }
                 }
-
+                if (!string.IsNullOrEmpty(item.ClearanceNo))
+                {
+                    if (item.HBLNoError == null && item.MBLNoError == null)
+                    {
+                        var jobNoCurrent = opsTransaction.Where(job => job.Hwbno == item.Hblno.Trim() && job.Mblno == item.Mblno.Trim() && job.OfficeId == currentUser.OfficeID).FirstOrDefault().JobNo;
+                        var customNo = customsDeclaration[item.ClearanceNo.Trim()].Any(x => x.JobNo != null && x.JobNo == jobNoCurrent);
+                        if (!customNo)
+                        {
+                            item.ClearanceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CUSTOM_NO_NOT_EXIST_JOB], jobNoCurrent);
+                            item.IsValid = false;
+                        }
+                    }
+                }    
                 if (string.IsNullOrEmpty(item.PartnerCode))
                 {
                     item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTNER_CODE_EMPTY]);
@@ -1702,7 +1612,7 @@ namespace eFMS.API.Documentation.DL.Services
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_WRONG_SERVICE], item.ChargeCode);
                             item.IsValid = false;
                         }
-                        if(lookupcharges.FirstOrDefault().Offices != null && !(lookupcharges.FirstOrDefault().Offices.Contains(currentUser.OfficeID.ToString())))
+                        if (lookupcharges.FirstOrDefault().Offices != null && !(lookupcharges.FirstOrDefault().Offices.ToLower().Contains(currentUser.OfficeID.ToString().ToLower())))
                         {
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_WRONG_OFFICE], item.ChargeCode, currentUser.OfficeCode);
                             item.IsValid = false;
@@ -1749,6 +1659,11 @@ namespace eFMS.API.Documentation.DL.Services
                 if (!item.Vatrate.HasValue)
                 {
                     item.VatError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_VAT_EMPTY]);
+                    item.IsValid = false;
+                }
+                if (!string.IsNullOrEmpty(item.VatPartnerId) && !partnerRepository.Any(x => x.TaxCode == item.VatPartnerId))
+                {
+                    item.VatPartnerTaxCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_VAT_PARTER_CODE_NOT_EXIST], item.VatPartnerId);
                     item.IsValid = false;
                 }
                 //if (!item.TotalAmount.HasValue)
@@ -2058,7 +1973,10 @@ namespace eFMS.API.Documentation.DL.Services
                     item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
                     var chargeGroupId = catChargeRepository.Get(x => x.Id == item.ChargeId).Select(x => x.ChargeGroup).FirstOrDefault();
                     item.KickBack = chargeGroup.Where(x => x.Id == chargeGroupId && x.Name == "Com").Any();
-
+                    item.VatPartnerId = partnerRepository
+                                        .Where(x => x.TaxCode == item.VatPartnerId)
+                                        .Select(x => x.Id)
+                                        .FirstOrDefault();
                     decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                     #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --

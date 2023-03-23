@@ -128,6 +128,11 @@
                                 (click)="sort('currencyId')">
                                 <span>Currency*</span>
                             </th>
+                            <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'vatPartner'), 'sorting_desc': (!isDesc && sortKey == 'vatPartner') }"
+                                (click)="sort('vatPartner')">
+                                <span>Vat Partner</span>
+                            </th>
                             <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'vatrate'), 'sorting_desc': (!isDesc && sortKey == 'vatrate') }"
                                 (click)="sort('vatrate')">
                                 <span>Vat*</span>
@@ -186,7 +191,8 @@
                                         }}</span>
                                 </td>
                                 <td>
-                                    <span> {{item.clearanceNo}} </span>
+                                    <span *ngIf="item.clearanceNoError === null"> {{item.clearanceNo}} </span>
+                                    <span class="m--font-danger" *ngIf="item.clearanceNoError !== null">{{ item.clearanceNoError }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.partnerCodeError === null">{{ item.partnerCode }}</span>
@@ -228,6 +234,12 @@
                                     <span class="m--font-danger"
                                         *ngIf="item.currencyError !== null">{{item.currencyError
                                         }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.vatPartnerTaxCodeError == null">{{ item.vatPartnerId }}</span>
+                                    <span class="m--font-danger" *ngIf="item.vatPartnerTaxCodeError!== null">
+                                        {{ item.vatPartnerTaxCodeError }}
+                                    </span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.vatError === null">{{ item.vatrate }}</span>

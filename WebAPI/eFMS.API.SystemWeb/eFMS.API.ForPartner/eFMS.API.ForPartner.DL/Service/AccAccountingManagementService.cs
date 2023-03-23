@@ -663,7 +663,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return new HandleState();
         }
 
-        public HandleState DeleteInvoice(InvoiceInfo model, string apiKey, out Guid Id)
+        public HandleState DeleteInvoice(InvoiceInfo model, string apiKey, out AccAccountingManagement invoice)
         {
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
@@ -674,13 +674,15 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.Action = "DeleteInvoice";
 
             var hsDeleteInvoice = DeleteInvoice(model, currentUser, out AccAccountingManagement data);
-            Id = data.Id;
+            invoice = data;
             return hsDeleteInvoice;
         }
 
         private HandleState DeleteInvoice(InvoiceInfo model, ICurrentUser _currentUser, out AccAccountingManagement data)
         {
             string invoiceType = ForPartnerConstants.ACCOUNTING_INVOICE_TYPE;
+            bool isDeleteMoreOBH = false;
+
             List<Guid> IdsInvoiceTemps = new List<Guid>();
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -738,10 +740,41 @@ namespace eFMS.API.ForPartner.DL.Service
                         {
                             return new HandleState((object)"Không tìm thấy hóa đơn");
                         }
-
-                        if(accPaymentService.CheckInvoicePayment(new List<Guid> { invoiceToDelete.Id }))
+                       
+                        if (accPaymentService.CheckInvoicePayment(new List<Guid> { invoiceToDelete.Id }))
                         {
                             return new HandleState((object)string.Format("Hóa đơn {0} đã tồn tại phiếu thu, vui lòng check lại với bộ Phận Thu Công Nợ (AR) ", invoiceToDelete.InvoiceNoReal));
+                        }
+
+
+                        CsShipmentSurcharge charge = surchargeRepo.First(x => x.ReferenceNo == model.ReferenceNo);
+                        // Find and Delete Inoice Temp with same debit/soa
+                        IQueryable<CsShipmentSurcharge> surchargeHadSynced = null;
+                        if (charge.SyncedFrom == ForPartnerConstants.SYNCED_FROM_CDNOTE)
+                        {
+                            surchargeHadSynced = surchargeRepo.Get(x => x.DebitNo == charge.DebitNo
+                            && x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_CDNOTE
+                            && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        }
+                        else if (charge.SyncedFrom == ForPartnerConstants.SYNCED_FROM_SOA)
+                        {
+                            surchargeHadSynced = surchargeRepo.Get(x => x.Soano == charge.Soano
+                           && x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_SOA
+                           && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        }
+
+                        if (surchargeHadSynced != null && surchargeHadSynced.Count() > 0)
+                        {
+                            isDeleteMoreOBH = true; // Xoá thêm phí OBH.
+                            IdsInvoiceTemps = surchargeHadSynced.Select(x => x.AcctManagementId ?? Guid.Empty).Distinct().ToList();
+                            if (accPaymentService.CheckInvoicePayment(IdsInvoiceTemps))
+                            {
+                                return new HandleState((object)string.Format("Hóa đơn {0} đã tồn tại phiếu thu, vui lòng check lại với bộ Phận Thu Công Nợ (AR)", model.ReferenceNo));
+                            }
+                            foreach (var Id in IdsInvoiceTemps)
+                            {
+                                DataContext.Delete(x => x.Id == Id, false);
+                            }
                         }
 
                         data = invoiceToDelete;
@@ -753,7 +786,13 @@ namespace eFMS.API.ForPartner.DL.Service
                         IQueryable<CsShipmentSurcharge> charges = null;
                         if (invoiceType == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE)
                         {
-                            charges = surchargeRepo.Get(x => x.ReferenceNo == model.ReferenceNo);
+                            Expression<Func<CsShipmentSurcharge, bool>> queryC = q => q.ReferenceNo == model.ReferenceNo;
+                            if (isDeleteMoreOBH)
+                            {
+                                queryC = queryC.Or(x => IdsInvoiceTemps.Contains(x.AcctManagementId ?? Guid.Empty) && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                            }
+                            charges = surchargeRepo.Get(queryC);
+
                         }
                         else
                         {
@@ -805,12 +844,6 @@ namespace eFMS.API.ForPartner.DL.Service
                         var smDebitNote = acctCdNoteRepo.SubmitChanges();
                         var smSur = surchargeRepo.SubmitChanges();
                         var sm = DataContext.SubmitChanges();
-
-                        // Tính lại công nợ của hđ vừa hủy từ bravo.
-                        //if(sm.Success)
-                        //{
-                        //    CalculatorInvoiceReceivable(data);
-                        //}
 
                         trans.Commit();
                     }
@@ -1967,9 +2000,9 @@ namespace eFMS.API.ForPartner.DL.Service
                     var _id = Guid.Empty;
                     Guid.TryParse(id, out _id);
                     var receiptSync = receiptSyncRepository.Get(x => x.Id == _id).FirstOrDefault();
-                    if (receiptSync == null) return new HandleState((object)"Không tìm thấy phiếu thu");
+                    if (receiptSync == null) return new HandleState();
                     var receipt = receiptRepository.Get(x => x.Id == receiptSync.ReceiptId).FirstOrDefault();
-                    if (receipt == null) return new HandleState((object)"Không tìm thấy phiếu thu");
+                    if (receipt == null) return new HandleState();
 
                     receiptSync.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     receiptSync.UserModified = currentUser.UserID;
@@ -2343,12 +2376,11 @@ namespace eFMS.API.ForPartner.DL.Service
                 return new ResultHandle() { Status = false, Message = "Đối tượng " + model.OfficeCode + " không tồn tại" };
             }
             // gom các detail cùng voucherNo, voucherDate, 
-            // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV), bỏ qua dòng BALANCE do dính các phiếu hoàn ứng.
+            // Chỉ lấy type OBH và CREDIT k lấy dòng CLEAR_ADVANCE (do pass model contain ADV)
             var grpVoucherDetail = model.Details
                 .Where(x => x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV
                     && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE
-                    && x.TransactionType != ForPartnerConstants.TYPE_DEBIT
-                    && x.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE)
+                    )
                 .GroupBy(x => new { x.AcctID })
                 .Select(s => new
                 {
@@ -2380,7 +2412,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
                     var surchargesIds = item.surcharges.Select(x => x.ChargeId).ToList();
                     var surcharges = surchargeRepo.Get(x => surchargesIds.Contains(x.Id)).ToList();
-                    if(surcharges.Count == 0)
+                    if(item.voucherData.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE && surcharges.Count == 0)
                     {
                         return new ResultHandle() { Status = false, Message = string.Format("Không tìm thấy ds charge {0}", string.Join(",", surchargesIds)) };
                     }
@@ -2413,7 +2445,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         Id = Guid.NewGuid(),
                         Type = ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE,
                         VoucherId = itemGroup.VoucherNo,
-                        VoucherType = itemGroup.VoucherType,
+                        VoucherType = string.IsNullOrEmpty(itemGroup.VoucherType) ? ForPartnerConstants.ACCOUNTING_PAYMENT_TYPE_NET_OFF : itemGroup.VoucherType,
                         AccountNo = itemGroup.AccountNo,
                         Currency = itemGroup.Currency,
                         Date = itemGroup.VoucherDate,
@@ -2501,7 +2533,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                                 surcharge.UserModified = currentUser.UserID;
                                                 // [CR:20062022 => refNo dành để lưu khi issue HĐ]
                                                 //surcharge.ReferenceNo = surChargeBravo.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
-                                                                                               
+
                                                 if (surcharge.Type != ForPartnerConstants.TYPE_CHARGE_OBH)
                                                 {
 
@@ -2511,7 +2543,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                                     surcharge.AmountUsd = surChargeBravo.Currency == ForPartnerConstants.CURRENCY_USD ? surChargeBravo.AmountUsd : surcharge.AmountUsd;
 
                                                     // CR: 17688
-                                                    surcharge.VatAmountVnd =  surChargeBravo.VatAmountVnd;
+                                                    surcharge.VatAmountVnd = surChargeBravo.VatAmountVnd;
                                                     surcharge.AmountVnd = surChargeBravo.AmountVnd;
                                                     // surcharge.VatAmountUsd =  surChargeBravo.VatAmountUsd;
                                                     // surcharge.AmountUsd = surChargeBravo.AmountUsd;
@@ -2628,8 +2660,11 @@ namespace eFMS.API.ForPartner.DL.Service
                         return new ResultHandle() { Status = false, Message = updateSurchargeVoucher.Message };
                     }
                 }
+            } else
+            {
+                rs.Message = "Dữ liệu động bộ không có thông tin để tạo voucher.";
             }
-
+            
             return rs;
         }
 

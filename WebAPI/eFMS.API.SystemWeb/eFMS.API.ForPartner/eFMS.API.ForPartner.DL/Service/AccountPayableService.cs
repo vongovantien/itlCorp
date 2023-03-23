@@ -248,7 +248,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             {
                                 invChargeIds = catChargeRepository.Get(x => x.Mode == ForPartnerConstants.CHARGE_MODE_NINV).Select(x => x.Id).ToList();
                             }
-                            var grpVoucherDetail = voucherDetail.Where(z => !invChargeIds.Any(chg => chg == z.ChargeId)).GroupBy(z => customer.PartnerMode == ForPartnerConstants.PARTNER_MODE_INTERNAL ? new { z.VoucherNo, z.VoucherDate, z.BravoRefNo } : new { VoucherNo = string.Empty, VoucherDate = (DateTime?)null, z.BravoRefNo }).Select(z => z).ToList();
+                            var grpVoucherDetail = voucherDetail.Where(z => !invChargeIds.Any(chg => chg == z.ChargeId)).GroupBy(z => new { z.VoucherNo, z.VoucherDate, z.BravoRefNo }).Select(z => z).ToList();
                             grpVoucherDetail.ForEach(c =>
                             {
                                 var acctId = accountingDatas == null ? null : accountingDatas.Where(x => x.VoucherId == c.FirstOrDefault().VoucherNo && x.ReferenceNo == c.FirstOrDefault().AcctID).FirstOrDefault()?.Id.ToString();
@@ -335,7 +335,11 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 try
                 {
-                    var detailBravoRefNos = model.Details.Where(x => !string.IsNullOrEmpty(x.BravoRefNo)).ToList();
+                    var detailBravoRefNos = model.Details.Where(x => x.TransactionType != "NONE"
+                                            && x.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CLEAR_ADV
+                                            && x.TransactionType != ForPartnerConstants.TRANSACTION_TYPE_BALANCE
+                                            && x.TransactionType != ForPartnerConstants.TYPE_DEBIT
+                                            && x.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE).ToList();//.Where(x => !string.IsNullOrEmpty(x.BravoRefNo)).ToList();
                     if (detailBravoRefNos.Count == 0)
                     {
                         return hsUpdate;
@@ -343,9 +347,9 @@ namespace eFMS.API.ForPartner.DL.Service
                     var partner = partnerRepository.Get(x => x.AccountNo == model.CustomerCode).FirstOrDefault();
                     SysOffice office = officeRepository.Get(x => x.Code == model.OfficeCode).FirstOrDefault();
 
-                    var shipments = detailBravoRefNos.GroupBy(x => new { x.JobNo, x.MblNo, x.Hblno, x.BravoRefNo });
-                    var _code = string.Empty;
-                    var _type = string.Empty;
+                    var shipments = detailBravoRefNos.GroupBy(x => new { x.VoucherNo, x.VoucherDate, x.TransactionType, x.JobNo, x.MblNo, x.Hblno, x.BravoRefNo });
+                    var _code = model.DocCode;
+                    var _type = model.DocType;
                     decimal? exchangeRateUsd = 0;
                     if (model.DocType == "SOA" || model.DocType == "CDNOTE")
                     {
@@ -358,20 +362,20 @@ namespace eFMS.API.ForPartner.DL.Service
                         // Get detail to update Credit AR
                         var acctCredit = new AcctCreditManagementAr();
                         var chargeIds = item.Select(x => x.ChargeId).ToList();
-                        var surcharges = surchargeRepository.Where(x => x.JobNo == item.Key.JobNo && x.Mblno == item.Key.MblNo && x.Hblno == item.Key.Hblno && chargeIds.Contains(x.Id));
+                        var surcharges = surchargeRepository.Where(x => x.JobNo == item.Key.JobNo && chargeIds.Contains(x.Id));
                         var detailBilling = surcharges.FirstOrDefault();
                         var syncFrom = string.Empty;
                         if (string.IsNullOrEmpty(_code))
                         {
                             if (detailBilling.Type == "OBH")
                             {
-                                _type = detailBilling.PaySyncedFrom.Contains("SOA") ? "CREDITSOA" : (detailBilling.PaySyncedFrom.Contains("CDNOTE") ? "CREDITNOTE" : null);
+                                _type = detailBilling.PaySyncedFrom.Contains("SOA") ? "CREDITSOA" : (detailBilling.PaySyncedFrom.Contains("CDNOTE") ? "CREDITNOTE" : _type);
                             }
                             else
                             {
-                                _type = detailBilling.SyncedFrom.Contains("SOA") ? "CREDITSOA" : (detailBilling.SyncedFrom.Contains("CDNOTE") ? "CREDITNOTE" : null);
+                                _type = detailBilling.SyncedFrom.Contains("SOA") ? "CREDITSOA" : (detailBilling.SyncedFrom.Contains("CDNOTE") ? "CREDITNOTE" : _type);
                             }
-                            _code = _type == "CREDITSOA" ? detailBilling.PaySoano : (_type == "CREDITNOTE" ? detailBilling.CreditNo : null);
+                            _code = _type == "CREDITSOA" ? detailBilling.PaySoano : (_type == "CREDITNOTE" ? detailBilling.CreditNo : _code);
                         }
                         decimal totalVnd = 0, totalUsd = 0;
                         totalVnd = surcharges.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
@@ -382,13 +386,13 @@ namespace eFMS.API.ForPartner.DL.Service
                         acctCredit.Type = _type;
                         acctCredit.PartnerId = partner.Id;
                         acctCredit.JobNo = item.Key.JobNo;
-                        acctCredit.Mblno = item.Key.MblNo;
-                        acctCredit.Hblno = item.Key.Hblno;
+                        acctCredit.Mblno = detailBilling.Mblno;
+                        acctCredit.Hblno = detailBilling.Hblno;
                         acctCredit.Hblid = detailBilling.Hblid;
                         acctCredit.SurchargeId = string.Join(';', chargeIds);
                         acctCredit.Currency = item.FirstOrDefault().Currency;
                         acctCredit.ExchangeRate = item.FirstOrDefault().ExchangeRate;
-                        if(exchangeRateUsd == 0 && acctCredit.Currency == ForPartnerConstants.CURRENCY_USD)
+                        if(exchangeRateUsd == 0)
                         {
                             exchangeRateUsd = currencyExchangeService.CurrencyExchangeRateConvert(null, detailBilling.ExchangeDate, ForPartnerConstants.CURRENCY_USD, ForPartnerConstants.CURRENCY_LOCAL);
                         }
@@ -412,15 +416,30 @@ namespace eFMS.API.ForPartner.DL.Service
                         acctCredit.NetOff = false;
                         acctCredit.ReferenceNo = item.Key.BravoRefNo;
                         acctCredit.Source = "Bravo";
-                        hsUpdate = await creditManagementArRepository.AddAsync(acctCredit);
+                        acctCredit.VoucherNo = item.FirstOrDefault().VoucherNo;
+                        acctCredit.VoucherDate = item.FirstOrDefault().VoucherDate;
+                        acctCredit.TransactionType = item.FirstOrDefault().TransactionType.ToLower().Contains("credit") ? "CREDIT" : item.FirstOrDefault().TransactionType;
+                        acctCredit.AccountNo = item.FirstOrDefault().AccountNo;
+                        acctCredit.SerieNo = item.FirstOrDefault().SerieNo;
+
+                        var existedCreditAR = creditManagementArRepository.Get(x => x.VoucherNo == acctCredit.VoucherNo && x.Code == _code && x.Type == _type && x.PartnerId == acctCredit.PartnerId && x.Hblid == acctCredit.Hblid && x.ReferenceNo == acctCredit.ReferenceNo).FirstOrDefault();
+                        if (existedCreditAR != null)
+                        {
+                            acctCredit.Id = existedCreditAR.Id;
+                            hsUpdate = await creditManagementArRepository.UpdateAsync(acctCredit, x => x.Id == acctCredit.Id);
+                        }
+                        else
+                        {
+                            hsUpdate = await creditManagementArRepository.AddAsync(acctCredit);
+                        }
                         if (!hsUpdate.Success)
                         {
                             new LogHelper("AddCreditMangagement_Fail", hsUpdate.Message?.ToString() + JsonConvert.SerializeObject(acctCredit));
                         }
-                        else
-                        {
-                            trans.Commit();
-                        }
+                    }
+                    if (hsUpdate.Success)
+                    {
+                        trans.Commit();
                     }
                     return hsUpdate;
                 }
@@ -441,11 +460,12 @@ namespace eFMS.API.ForPartner.DL.Service
         {
 
             bool IshasPayment = false;
-            var office = officeRepository.Get(x => x.Code == model.OfficeCode).FirstOrDefault();
-            List<AccAccountPayable> payable = DataContext.Get(x => x.VoucherNo == model.VoucherNo
-            && x.BillingNo == model.DocCode
-            && x.BillingType == model.DocType
-            && x.OfficeId == office.Id && !string.IsNullOrEmpty(x.ReferenceNo)).ToList();
+            var office = officeRepository.Get(x => x.Code == model.OfficeCode).FirstOrDefault()?.Id;
+            var payable = DataContext.Get(x => x.VoucherNo == model.VoucherNo
+                && x.VoucherDate.Value.Date == model.VoucherDate.Date
+                && x.BillingNo == model.DocCode
+                && x.BillingType == model.DocType
+                && x.OfficeId == office && !string.IsNullOrEmpty(x.ReferenceNo)).Select(x => new { x.ReferenceNo, x.TransactionType }).ToList();
             if (payable.Count > 0)
             {
                 IshasPayment = paymentRepository.Any(x => payable.Any(pa => pa.ReferenceNo == x.ReferenceNo && (pa.TransactionType != ForPartnerConstants.PAYABLE_PAYMENT_TYPE_ADV ? pa.TransactionType == x.PaymentType : (x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT || x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF))));
@@ -998,7 +1018,7 @@ namespace eFMS.API.ForPartner.DL.Service
             foreach (var payable in payables)
             {
                 var office = officeRepository.Get(x => x.Id == payable.OfficeId).FirstOrDefault()?.Id.ToString();
-                var creditMng = creditManagementArRepository.Get(x => x.PartnerId == payable.PartnerId && x.ReferenceNo == payable.ReferenceNo && (x.RemainVnd > 0 || x.RemainUsd > 0) && x.OfficeId == office).OrderBy(x => x.RemainVnd);
+                var creditMng = creditManagementArRepository.Get(x => x.PartnerId == payable.PartnerId && !string.IsNullOrEmpty(x.ReferenceNo) && x.ReferenceNo == payable.ReferenceNo && (x.RemainVnd > 0 || x.RemainUsd > 0) && x.OfficeId == office).OrderBy(x => x.RemainVnd);
                 foreach (var creditDetail in creditMng)
                 {
                     if ((creditDetail.RemainVnd == 0 && creditDetail.RemainUsd == 0) || (payable.PaymentAmountVnd == 0 && payable.PaymentAmountUsd == 0))
@@ -1226,13 +1246,14 @@ namespace eFMS.API.ForPartner.DL.Service
             using (var trans = creditManagementArRepository.DC.Database.BeginTransaction())
             {
                 try
-                {
-                    
-                    var refNos = payables.Select(x => x.ReferenceNo).ToList();
+                {                  
                     var partnerId = payables.FirstOrDefault().PartnerId;
                     var officeId = payables.FirstOrDefault().OfficeId;
                     var office = officeRepository.Get(x => x.Id == officeId).FirstOrDefault()?.Id.ToString();
-                    var creditMngIds = creditManagementArRepository.Get(x => x.PartnerId == partnerId && refNos.Contains(x.ReferenceNo) && x.OfficeId == office).Select(x => x.Id).ToList();
+                    var mappingData = payables.Select(x => new { x.VoucherNo, x.VoucherDate, x.ReferenceNo});
+                    var creditMngIds = creditManagementArRepository.Get(x => x.PartnerId == partnerId 
+                                        && mappingData.Any(z => x.VoucherNo == z.VoucherNo && x.VoucherDate.Value.Date == z.VoucherDate.Value.Date && x.ReferenceNo == z.ReferenceNo)
+                                        && x.OfficeId == office && x.Source == "Bravo").Select(x => x.Id).ToList();
                     hsDeleteCredit = await creditManagementArRepository.DeleteAsync(x => creditMngIds.Contains(x.Id));
                     if (!hsDeleteCredit.Success)
                     {

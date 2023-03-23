@@ -186,8 +186,8 @@ export class ExportRepo {
         );
     }
 
-    exportAdvancePaymentDetail(advanceId: string, language: string) {
-        return this._api.get(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}`).pipe(
+    exportAdvancePaymentDetail(advanceId: string, language: string, action: string = "Preview") {
+        return this._api.get(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}&action=${action}`).pipe(
             map((data: any) => data)
         );
     }
@@ -504,6 +504,13 @@ export class ExportRepo {
 
     exportOutsourcingRegcognising(criteria: any) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportOutsourcingRegcognising`, criteria, null, null, 'response').pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    exportAgencyTemplate(body: any){
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingManagementAgencyTemplate`, body, null, null, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

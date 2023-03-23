@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Report.DL.Common;
 using eFMS.API.Report.DL.IService;
 using eFMS.API.Report.DL.Models;
@@ -11,6 +12,7 @@ using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
@@ -88,29 +90,114 @@ namespace eFMS.API.Report.DL.Services
 
         private List<sp_GetDataExportAccountant> GetDataExportAccountant(GeneralReportCriteria criteria)
         {
-            var parameters = new[]{
-                new SqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.ServiceDateFrom },
-                new SqlParameter(){ ParameterName = "@serviceDateTo", Value = criteria.ServiceDateTo },
-                new SqlParameter(){ ParameterName = "@createdDateFrom", Value = criteria.CreatedDateFrom },
-                new SqlParameter(){ ParameterName = "@createdDateTo", Value = criteria.CreatedDateTo },
-                new SqlParameter(){ ParameterName = "@customerId", Value = criteria.CustomerId },
-                new SqlParameter(){ ParameterName = "@service", Value = criteria.Service },
-                new SqlParameter(){ ParameterName = "@currency", Value = criteria.Currency },
-                new SqlParameter(){ ParameterName = "@jobId", Value = criteria.JobId },
-                new SqlParameter(){ ParameterName = "@mawb", Value = criteria.Mawb },
-                new SqlParameter(){ ParameterName = "@hawb", Value = criteria.Hawb },
-                new SqlParameter(){ ParameterName = "@officeId", Value = criteria.OfficeId },
-                new SqlParameter(){ ParameterName = "@departmentId", Value = criteria.DepartmentId },
-                new SqlParameter(){ ParameterName = "@groupId", Value = criteria.GroupId },
-                new SqlParameter(){ ParameterName = "@personalInCharge", Value = criteria.PersonInCharge },
-                new SqlParameter(){ ParameterName = "@salesMan", Value = criteria.SalesMan },
-                new SqlParameter(){ ParameterName = "@creator", Value = criteria.Creator },
-                new SqlParameter(){ ParameterName = "@carrierId", Value = criteria.CarrierId },
-                new SqlParameter(){ ParameterName = "@agentId", Value = criteria.AgentId },
-                new SqlParameter(){ ParameterName = "@pol", Value = criteria.Pol },
-                new SqlParameter(){ ParameterName = "@pod", Value = criteria.Pod }
-            };
-            var list = ((eFMSDataContext)DC).ExecuteProcedure<sp_GetDataExportAccountant>(parameters);
+            //var parameters = new[]{
+            //    new SqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.ServiceDateFrom },
+            //    new SqlParameter(){ ParameterName = "@serviceDateTo", Value = criteria.ServiceDateTo },
+            //    new SqlParameter(){ ParameterName = "@createdDateFrom", Value = criteria.CreatedDateFrom },
+            //    new SqlParameter(){ ParameterName = "@createdDateTo", Value = criteria.CreatedDateTo },
+            //    new SqlParameter(){ ParameterName = "@customerId", Value = criteria.CustomerId },
+            //    new SqlParameter(){ ParameterName = "@service", Value = criteria.Service },
+            //    new SqlParameter(){ ParameterName = "@currency", Value = criteria.Currency },
+            //    new SqlParameter(){ ParameterName = "@jobId", Value = criteria.JobId },
+            //    new SqlParameter(){ ParameterName = "@mawb", Value = criteria.Mawb },
+            //    new SqlParameter(){ ParameterName = "@hawb", Value = criteria.Hawb },
+            //    new SqlParameter(){ ParameterName = "@officeId", Value = criteria.OfficeId },
+            //    new SqlParameter(){ ParameterName = "@departmentId", Value = criteria.DepartmentId },
+            //    new SqlParameter(){ ParameterName = "@groupId", Value = criteria.GroupId },
+            //    new SqlParameter(){ ParameterName = "@personalInCharge", Value = criteria.PersonInCharge },
+            //    new SqlParameter(){ ParameterName = "@salesMan", Value = criteria.SalesMan },
+            //    new SqlParameter(){ ParameterName = "@creator", Value = criteria.Creator },
+            //    new SqlParameter(){ ParameterName = "@carrierId", Value = criteria.CarrierId },
+            //    new SqlParameter(){ ParameterName = "@agentId", Value = criteria.AgentId },
+            //    new SqlParameter(){ ParameterName = "@pol", Value = criteria.Pol },
+            //    new SqlParameter(){ ParameterName = "@pod", Value = criteria.Pod }
+            //};
+            // var list = ((eFMSDataContext)DC).ExecuteProcedure<sp_GetDataExportAccountant>(parameters);
+            // var list = DataContextEx.ExecuteProcedure<sp_GetDataExportAccountant>(((eFMSDataContext)DC), parameters);
+            var list = new List<sp_GetDataExportAccountant>();
+            using (SqlConnection connection = new SqlConnection(DbHelper.DBHelper.ConnectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    Console.WriteLine("Connection Opened");
+                    using (SqlCommand command = new SqlCommand("sp_GetDataExportAccountant", connection))
+                    {
+                        command.CommandTimeout = 300;
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        command.Parameters.Add("@serviceDateFrom", SqlDbType.Date).Value = criteria.ServiceDateFrom.Value.ToString("yyyy-MM-dd"); ;
+                        command.Parameters.Add("@serviceDateTo", SqlDbType.Date).Value = criteria.ServiceDateTo.Value.ToString("yyyy-MM-dd"); ;
+                        command.Parameters.Add("@createdDateFrom", SqlDbType.DateTime).Value = criteria.CreatedDateFrom.HasValue ? (object)criteria.CreatedDateFrom : DBNull.Value;
+                        command.Parameters.Add("@createdDateTo", SqlDbType.DateTime).Value = criteria.CreatedDateTo.HasValue ? (object)criteria.CreatedDateTo.Value : DBNull.Value;
+                        command.Parameters.Add("@customerId", SqlDbType.VarChar).Value = criteria.CustomerId != null ? (object)criteria.CustomerId : DBNull.Value;
+                        command.Parameters.Add("@service", SqlDbType.VarChar).Value = criteria.Service;
+                        command.Parameters.Add("@currency", SqlDbType.VarChar).Value = criteria.Currency;
+                        command.Parameters.Add("@jobId", SqlDbType.VarChar).Value = criteria.JobId != null ? (object)criteria.JobId : DBNull.Value;
+                        command.Parameters.Add("@mawb", SqlDbType.VarChar).Value = criteria.Mawb != null ? (object)criteria.Mawb : DBNull.Value;
+                        command.Parameters.Add("@hawb", SqlDbType.VarChar).Value = criteria.Hawb != null ? (object)criteria.Hawb : DBNull.Value;
+                        command.Parameters.Add("@officeId", SqlDbType.VarChar).Value = criteria.OfficeId;
+                        command.Parameters.Add("@departmentId", SqlDbType.VarChar).Value = criteria.DepartmentId;
+                        command.Parameters.Add("@groupId", SqlDbType.VarChar).Value = criteria.GroupId;
+                        command.Parameters.Add("@personalInCharge", SqlDbType.VarChar).Value = criteria.PersonInCharge;
+                        command.Parameters.Add("@salesMan", SqlDbType.VarChar).Value = criteria.SalesMan != null ? (object)criteria.SalesMan : DBNull.Value;
+                        command.Parameters.Add("@creator", SqlDbType.VarChar).Value = criteria.Creator != null ? (object)criteria.Creator : DBNull.Value;
+                        command.Parameters.Add("@carrierId", SqlDbType.VarChar).Value = criteria.CarrierId != null ? (object)criteria.CarrierId : DBNull.Value;
+                        command.Parameters.Add("@agentId", SqlDbType.VarChar).Value = criteria.AgentId != null ? (object)criteria.AgentId : DBNull.Value;
+                        command.Parameters.Add("@pol", SqlDbType.UniqueIdentifier).Value = criteria.Pol != null ? (object)criteria.Pol : DBNull.Value;
+                        command.Parameters.Add("@pod", SqlDbType.UniqueIdentifier).Value = criteria.Pod != null ? (object)criteria.Pod : DBNull.Value;
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                Console.WriteLine();
+                                var item = new sp_GetDataExportAccountant
+                                {
+                                    JobNo = reader["JobNo"] == DBNull.Value ? string.Empty : reader["JobNo"].ToString(),
+                                    SurChargeId = reader["SurChargeId"] == DBNull.Value ? Guid.Empty : Guid.Parse(reader["SurChargeId"].ToString()),
+                                    HWBNo = reader["HWBNo"] == DBNull.Value ? string.Empty : reader["HWBNo"].ToString(),
+                                    Service = reader["Service"] == DBNull.Value ? string.Empty : reader["Service"].ToString(),
+                                    KickBack = reader["KickBack"] == DBNull.Value ? false : (bool?)reader["KickBack"],
+                                    InvoiceNo = reader["InvoiceNo"] == DBNull.Value ? string.Empty : reader["InvoiceNo"].ToString(),
+                                    DebitNo = reader["DebitNo"] == DBNull.Value ? string.Empty : reader["DebitNo"].ToString(),
+                                    VatAmountVnd = reader["VatAmountVnd"] == DBNull.Value ? 0 : (decimal?)reader["VatAmountVnd"],
+                                    VatAmountUsd = reader["VatAmountUsd"] == DBNull.Value ? 0 : (decimal?)reader["VatAmountUsd"],
+                                    AmountUsd = reader["AmountUsd"] == DBNull.Value ? 0 : (decimal?)reader["AmountUsd"],
+                                    AmountVnd = reader["AmountVnd"] == DBNull.Value ? 0 : (decimal?)reader["AmountVnd"],
+                                    VoucherId = reader["VoucherId"] == DBNull.Value ? string.Empty : reader["VoucherId"].ToString(),
+                                    Type = reader["Type"] == DBNull.Value ? string.Empty : reader["Type"].ToString(),
+                                    CurrencyId = reader["CurrencyId"] == DBNull.Value ? string.Empty : reader["CurrencyId"].ToString(),
+                                    ExchangeDate = reader["ExchangeDate"] == DBNull.Value ? null : (DateTime?)reader["ExchangeDate"],
+                                    MAWB = reader["MAWB"] == DBNull.Value ? string.Empty : reader["MAWB"].ToString(),
+                                    ChargeId = reader["ChargeId"] == DBNull.Value ? Guid.Empty : Guid.Parse(reader["ChargeId"].ToString()),
+                                    CreditNo = reader["CreditNo"] == DBNull.Value ? string.Empty : reader["CreditNo"].ToString(),
+                                    VatPartnerID = reader["VatPartnerID"] == DBNull.Value ? string.Empty : reader["VatPartnerID"].ToString(),
+                                    PartnerId = reader["PartnerId"] == DBNull.Value ? string.Empty : reader["PartnerId"].ToString(),
+                                    FinalExchangeRate = reader["FinalExchangeRate"] == DBNull.Value ? 1 : (decimal)reader["FinalExchangeRate"],
+                                    ServiceDate = reader["ServiceDate"] == DBNull.Value ? null : (DateTime?)reader["ServiceDate"],
+                                    Quantity = reader["Quantity"] == DBNull.Value ? 0 : (decimal)reader["Quantity"],
+                                    UnitPrice = reader["UnitPrice"] == DBNull.Value ? 0 : (decimal)reader["UnitPrice"],
+                                    ClearanceNo = reader["ClearanceNo"] == DBNull.Value ? string.Empty : reader["ClearanceNo"].ToString(),
+                                    UserCreated = reader["UserCreated"] == DBNull.Value ? string.Empty : reader["UserCreated"].ToString(),
+                                    SyncedFrom = reader["SyncedFrom"] == DBNull.Value ? string.Empty : reader["SyncedFrom"].ToString(),
+                                    PaySyncedFrom = reader["PaySyncedFrom"] == DBNull.Value ? string.Empty : reader["PaySyncedFrom"].ToString(),
+                                    BillNoSynced = reader["BillNoSynced"] == DBNull.Value ? string.Empty : reader["BillNoSynced"].ToString(),
+                                    PayBillNoSynced = reader["PayBillNoSynced"] == DBNull.Value ? string.Empty : reader["PayBillNoSynced"].ToString(),
+                                };
+                                list.Add(item);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    new LogHelper("GetDataExportAccountantError", ex.Message?.ToString());
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
             return list;
         }
 
@@ -244,6 +331,8 @@ namespace eFMS.API.Report.DL.Services
                 data.BillNoSynced = charge.BillNoSynced;
                 data.PaySyncedFrom = charge.PaySyncedFrom;
                 data.PayBillNoSynced = charge.PayBillNoSynced;
+                data.Quantity = charge.Quantity;
+                data.UnitPrice = charge.UnitPrice;
                 dataList.Add(data);
             }
             return dataList.AsQueryable();

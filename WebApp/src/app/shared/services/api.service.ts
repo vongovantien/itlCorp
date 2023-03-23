@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SystemConstants } from 'src/constants/system.const';
-import { IEDocFile, IEDocUploadFile } from './../../business-modules/share-business/components/document-type-attach/document-type-attach.component';
+import { IEDocFile, IEDocUploadFile } from '../../business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -161,7 +161,8 @@ export class ApiService {
                 FileName: edoc.EDocFiles[i].FileName,
                 Note: edoc.EDocFiles[i].Note,
                 BillingId: edoc.EDocFiles[i].BillingId,
-                Id: edoc.EDocFiles[i].Id
+                Id: edoc.EDocFiles[i].Id,
+                AccountingType: edoc.EDocFiles[i].AccountingType
             });
             edocFile.push(edocFileItem);
         }
@@ -178,6 +179,7 @@ export class ApiService {
             formData.append(`edocUploadModel.EDocFiles[${i}][FileName]`, edocFile[i].FileName);
             formData.append(`edocUploadModel.EDocFiles[${i}][Note]`, edocFile[i].Note);
             formData.append(`edocUploadModel.EDocFiles[${i}][BillingId]`, edocFile[i].BillingId);
+            formData.append(`edocUploadModel.EDocFiles[${i}][AccountingType]`, edocFile[i].AccountingType);
         }
         for (const file of files) {
             formData.append('files', file);

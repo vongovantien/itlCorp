@@ -13,6 +13,7 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,6 +57,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmailSetting> emailSettingRepository;
         private readonly IUserBaseService userBaseService;
         private readonly IContextBase<SysImage> sysFileRepository;
+        private readonly IContextBase<SysImageDetail> sysFileDetailRepository;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
@@ -111,6 +113,7 @@ namespace eFMS.API.Accounting.DL.Services
             ICurrentUser cUser,
             IAcctSettlementPaymentService settlementService,
             IContextBase<SysImage> sysFileRepo,
+            IContextBase<SysImageDetail> sysFileDetail,
             IDatabaseUpdateService _databaseUpdateService,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<CsTransaction> csTransactionRepo,
@@ -152,6 +155,7 @@ namespace eFMS.API.Accounting.DL.Services
             emailSettingRepository = emailSettingRepo;
 
             sysFileRepository = sysFileRepo;
+            sysFileDetailRepository = sysFileDetail;
             settlementPaymentService = settlementService;
             databaseUpdateService = _databaseUpdateService;
             sysEmailTemplateRepository = sysEmailTemplateRepo;
@@ -352,7 +356,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var user = users.Where(x => x.Id == settle.Requester).FirstOrDefault();
                             var employee = user == null ? null : employees.Where(x => x.Id == user.EmployeeId).FirstOrDefault();
                             var partner = partners.Where(x => x.Id == settle.Payee).FirstOrDefault();
-                            item.CustomerName = partner != null ? partner.ShortName : employee.EmployeeNameVn;
+                            item.CustomerName = partner != null ? partner.PartnerNameVn : employee.EmployeeNameVn;
                             // CustomerCode = partner != null ? partner.AccountNo : (!string.IsNullOrEmpty(employee.PersonalId) ? employee.PersonalId : employee.StaffCode),
                             item.CustomerCode = partner != null ? partner.AccountNo : employee.StaffCode; //[06/01/2021]
                             item.PaymentMethod = settle.PaymentMethod == "Bank" ? "Bank Transfer" : settle.PaymentMethod;
@@ -1621,10 +1625,12 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     var sm = cdNoteRepository.SubmitChanges();
+                    new LogHelper("SyncListCdNoteToAccountant", JsonConvert.SerializeObject(sm));
                     return sm;
                 }
                 catch (Exception ex)
                 {
+                    new LogHelper("SyncListCdNoteToAccountantERROR", ex.ToString() + " ");
                     return new HandleState((object)ex.Message);
                 }
             }
@@ -1677,10 +1683,12 @@ namespace eFMS.API.Accounting.DL.Services
                         var hsUpdateSOA = soaRepository.Update(soa, x => x.Id == soa.Id, false);
                     }
                     var sm = soaRepository.SubmitChanges();
+                    new LogHelper("SyncListSoaToAccountant", JsonConvert.SerializeObject(sm));
                     return sm;
                 }
                 catch (Exception ex)
                 {
+                    new LogHelper("SyncListSoaToAccountantERROR", ex.ToString() + " ");
                     return new HandleState((object)ex.Message);
                 }
                 finally
@@ -3406,6 +3414,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var hsReceiptSync = AddOrUpdateReceiptSync(receiptSyncs);
 
                     trans.Commit();
+
+                    new LogHelper("SyncListReceiptToAccountant", "ReceitState: " + JsonConvert.SerializeObject(sm) + "\n " + "ReceiptSyncState: " + JsonConvert.SerializeObject(hsReceiptSync));
                     return sm;
                 }
                 catch (Exception ex)
@@ -3516,19 +3526,24 @@ namespace eFMS.API.Accounting.DL.Services
         {
             List<BravoAttachDoc> results = new List<BravoAttachDoc>();
 
-            var files = sysFileRepository.Get(x => x.Folder == folder && x.ObjectId == objectId).ToList();
-            if(files.Count > 0)
-            {
-                files.ForEach(c =>
-                {
-                    results.Add(new BravoAttachDoc {
-                        AttachDocRowId = c.Id.ToString(),
-                        AttachDocName = c.Name,
-                        AttachDocPath = c.Url,
-                        AttachDocDate = c.DateTimeCreated
-                    });
-                });
-            }
+            //var fileOrigins = sysFileRepository.Get(x => x.Folder == folder && x.ObjectId == objectId);
+            //var files = from f in fileOrigins
+            //            join e in sysFileDetailRepository.Get() on f.Id equals e.SysImageId into fGrps
+            //            select new { fileOrigin = f, edoc = fGrps.DefaultIfEmpty() };
+            //if (files.Count() > 0)
+            //{
+            //    foreach (var file in files)
+            //    {
+            //        results.Add(new BravoAttachDoc
+            //        {
+            //            AttachDocRowId = file.fileOrigin.Id.ToString(),
+            //            AttachDocName = file.edoc.FirstOrDefault().SystemFileName,
+            //            AttachDocPath = file.fileOrigin.Url,
+            //            AttachDocDate = file.fileOrigin.DateTimeCreated
+            //        });
+            //    }
+            //}
+            
             string queryParamUrlAttachFile = string.Format(@"/en/#/home/tool/file-management/user-attach-file?module={0}&folder={1}&objectId={2}&billingNo={3}", "Accounting", folder, objectId, billingNo);
             results.Add(new BravoAttachDoc
             {

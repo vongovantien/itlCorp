@@ -658,7 +658,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (detail == null) return null;
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(detail.TransactionType, currentUser);
 
-            if(detail.ShipmentType == null)
+            if (detail.ShipmentType == null)
             {
                 var detailJob = DataContext.Where(x => x.JobId == detail.JobId).FirstOrDefault();
                 detail.ShipmentType = detailJob.ShipmentType;
@@ -1579,7 +1579,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = jobNo!=null? "AirImpProofofDelivery_" + data.Hwbno + "_" + jobNo.JobNo + ".pdf":"AirImpProofofDelivery_" + data.Hwbno+"_"+".pdf";
+            var reportName = jobNo != null ? "AirImpProofofDelivery_" + data.Hwbno + "_" + jobNo.JobNo + ".pdf" : "AirImpProofofDelivery_" + data.Hwbno + "_" + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -1643,7 +1643,7 @@ namespace eFMS.API.Documentation.DL.Services
             var jobNo = csTransactionRepo.Get(x => x.Id == data.JobId)?.FirstOrDefault();
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = jobNo!=null ? "AirImptDocumentRelease_" + data.Hwbno + "_" + jobNo.JobNo + ".pdf": "AirImptDocumentRelease_" + data.Hwbno + ".pdf";
+            var reportName = jobNo != null ? "AirImptDocumentRelease_" + data.Hwbno + "_" + jobNo.JobNo + ".pdf" : "AirImptDocumentRelease_" + data.Hwbno + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -1885,7 +1885,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "HouseBillOfLadingITL_" + data.Hwbno+ ".pdf";
+            var reportName = "HouseBillOfLadingITL_" + data.Hwbno + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -2083,7 +2083,7 @@ namespace eFMS.API.Documentation.DL.Services
             };
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "AirAttachedList_"+data.Hwbno + ".pdf";
+            var reportName = "AirAttachedList_" + data.Hwbno + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
             result.AddDataSource(housebills);
@@ -2091,7 +2091,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public Crystal PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign)
+        public Crystal PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign, string language)
         {
             Crystal result = null;
             var data = GetById(housbillId);
@@ -2105,7 +2105,7 @@ namespace eFMS.API.Documentation.DL.Services
                     Consignee = data.ConsigneeDescription?.ToUpper(),
                     FlightNo = data.FlightNo?.ToUpper(),
                     FlightDate = data.FlightDate,
-                    DepartureAirport = data.Route,//data.PODName?.ToUpper(), (change: tuyến sẽ lấy Route)
+                    DatePackage = data.Eta,
                     NoPieces = data.PackageQty?.ToString() + " " + catUnitRepo.Get(x => x.Id == data.PackageType).FirstOrDefault()?.UnitNameEn?.ToUpper(),
                     Description = data.DesOfGoods?.ToUpper() ?? data.GoodsDeliveryDescription?.ToUpper(),
                     WChargeable = data.GrossWeight,//data.ChargeWeight, (change: trọng lượng sẽ lấy Gross Weight)
@@ -2113,7 +2113,9 @@ namespace eFMS.API.Documentation.DL.Services
                     FirstDestination = data.DosentTo1?.ToUpper(),//data.FirstCarrierTo?.ToUpper(),
                     SecondDestination = data.SubAbbr?.ToUpper(),//data.TransitPlaceTo1?.ToUpper(),
                     Notify = data.NotifyPartyDescription?.ToUpper(),
-                    SignPath = printSign ? "Department" : string.Empty
+                    SignPath = printSign ? "Department" : string.Empty,
+                    LastDestination = data.PodDescription?.ToUpper(),
+                    DepartureAirport = data.PolDescription?.ToUpper(),
                 };
                 authorizeLetters.Add(authorizeLetter);
             }
@@ -2126,11 +2128,13 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var companyUser = sysCompanyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
             var officeUser = sysOfficeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();
+
+
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = companyUser?.BunameVn, // Company Name Vn of user
-                CompanyAddress1 = officeUser?.AddressVn, // Office Address Vn of user
+                CompanyName = language == "EN" ? companyUser?.BunameEn : companyUser?.BunameVn, // Company Name Vn of user
+                CompanyAddress1 = language == "EN" ? officeUser?.AddressEn : officeUser?.AddressVn, // Office Address Vn of user
                 CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty), //Tel & Fax of Office user
                 Website = officeUser?.Taxcode, //(Sửa lại thành MST)
                 DecimalNo = 2,
@@ -2144,9 +2148,10 @@ namespace eFMS.API.Documentation.DL.Services
                 parameter.PrintMonth = data.DeliveryOrderPrintedDate.Value.Month.ToString();
                 parameter.PrintYear = data.DeliveryOrderPrintedDate.Value.Year.ToString();
             }
+
             result = new Crystal
             {
-                ReportName = "AirImptAuthorisedLetter.rpt",
+                ReportName = language == "EN" ? "AirImptAuthorisedLetterEN.rpt" : "AirImptAuthorisedLetter.rpt",
                 AllowPrint = true,
                 AllowExport = true
             };
@@ -2168,7 +2173,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = doNo!=null?doNo+".pdf": "AirImptAuthorisedLetter_" + data.Hwbno + ".pdf";
+            var reportName = doNo != null ? doNo + ".pdf" : "AirImptAuthorisedLetter_" + data.Hwbno + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -2254,7 +2259,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = doNo!=null?doNo+".pdf":"AirImptAuthorisedLetter_Consign_" + data.Hwbno + ".pdf";
+            var reportName = doNo != null ? doNo + ".pdf" : "AirImptAuthorisedLetter_Consign_" + data.Hwbno + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 
@@ -2311,7 +2316,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get path link to report
             CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
-            var reportName = "BookingNoteAir"+"_"+bookingNotes.FirstOrDefault().HawbNo + ".pdf";
+            var reportName = "BookingNoteAir" + "_" + bookingNotes.FirstOrDefault().HawbNo + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName.Replace("/", "_");
             result.PathReportGenerate = _pathReportGenerate;
 

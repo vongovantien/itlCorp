@@ -14,6 +14,8 @@ using System;
 using eFMS.API.Accounting.Service.Contexts;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Services;
+using Microsoft.Extensions.Configuration;
+using eFMS.API.Infrastructure.RabbitMQ;
 
 namespace eFMS.API.Accounting.Infrastructure
 {
@@ -43,11 +45,12 @@ namespace eFMS.API.Accounting.Infrastructure
             services.AddTransient<IAcctDebitManagementARService, AcctDebitManagementArService>();
             services.AddTransient<IAcctCombineBillingService, AcctCombineBillingService>();
             services.AddTransient<IAcctPayableService, AcctPayableService>();
+            services.AddTransient<IEdocService, EDocService>();
             services.AddTransient<IDatabaseUpdateService, DatabaseUpdateService>();
-            services.AddHostedService<eFMSQueueBackgroundService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddTransient<IAccountingPrePaidPaymentService, AccountingPrePaidPaymentService>();
-            services.AddTransient<IEDocService, EDocService>();
+            services.AddScoped<IAccAccountReceivableHostedService, AccAccountReceivableHostedService>();
+            services.AddHostedService<ReceivableCalculatingBackgroundService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

@@ -11,7 +11,6 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -81,6 +80,36 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
+
+        public async Task<HandleState> DeleteFileS3(string moduleName, string folder, Guid id, Guid objId)
+        {
+            HandleState result = new HandleState();
+            try
+            {
+                var lst = await _sysImageRepo.GetAsync(x => x.Id == id);
+                var it = lst.Where(x => x.Id == id).FirstOrDefault();
+                if (it == null) { return new HandleState("Not found data"); }
+                var key = moduleName + "/" + folder + "/" + objId + "/" + it.Name;
+
+                DeleteObjectRequest request = new DeleteObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = key,
+                };
+
+                DeleteObjectResponse rsDelete = await _client.DeleteObjectAsync(request);
+                if (rsDelete == null)
+                {
+                    return new HandleState(true, "Delete File S3 Wrong");
+                }
+                return new HandleState(true, "Delete File S3 Success");
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+
         public async Task<List<SysImage>> GetFileSysImage(string moduleName, string folder, Guid id, string child = null)
         {
             var res = await _sysImageRepo.GetAsync(x => x.Folder == folder
@@ -342,6 +371,25 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             return filecCoppyModel;
         }
+        //private bool MoveEdoc(Guid oldImgId, Guid newImgId)
+        //{
+        //    //List<SysImageDetail> imgDetails = new List<SysImageDetail>();
+        //    var edoc = _sysImageDetailRepo.Get(x => x.SysImageId == oldImgId);
+        //    edoc.ToList().ForEach(x =>
+        //    {
+        //        var edocNew = x;
+        //        edocNew.SysImageId = newImgId;
+        //        //imgDetails.Add(edocNew);
+        //        var updateEdoc = _sysImageDetailRepo.Update(edocNew, z => z.Id == x.Id);
+        //    });
+        //    var hs = _sysImageDetailRepo.SubmitChanges();
+        //    if (hs.Success)
+        //    {
+        //        return true;
+        //    }
+        //    return false;
+        //}
+
         public async Task<HandleState> MoveObjectAsync(FileCoppyModel filecCoppyModel)
         {
             try
@@ -363,15 +411,23 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     var images = _sysImageRepo.Get(x => x.KeyS3 == item).ToList();
                     foreach (var image in images)
                     {
-                        image.Id = Guid.NewGuid();
+                        //var oldId = image.Id;
+                        //var newId = Guid.NewGuid();
+                        //image.Id = newId;
+                        //image.Id = Guid.NewGuid();
                         image.KeyS3 = filecCoppyConvert.destKey + image.Name;
                         image.ObjectId = filecCoppyModel.destKey.ToLower();
-                        image.Url = _apiUrl + "/file/api/v1/en-Us/AWSS3/OpenFile/" + filecCoppyConvert.destKey + image.Name;
-                        var updateImg = _sysImageRepo.Add(image);
-                        if (updateImg == null)
+                        image.Url = _apiUrl.Value.Url.ToString() + "/file/api/v1/en-Us/AWSS3/OpenFile/" + filecCoppyConvert.destKey + image.Name;
+                        var updateImg = await _sysImageRepo.UpdateAsync(image, x => x.Id == image.Id);
+                        if (!updateImg.Success)
                         {
                             return new HandleState(false, "Update Image Error");
                         }
+                        //var moveEdoc = MoveEdoc(oldId, newId);
+                        //if (!moveEdoc)
+                        //{
+                        //    return new HandleState(false, "Move Edoc Error");
+                        //}
                     }
                 }
                 return new HandleState(true, listFile);

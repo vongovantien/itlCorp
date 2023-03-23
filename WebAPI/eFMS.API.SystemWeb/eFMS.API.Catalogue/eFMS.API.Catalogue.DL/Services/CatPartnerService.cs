@@ -349,10 +349,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
 
                 var DataHeadOfficeAR = officeRepository.Get(x => x.OfficeType == "Head").FirstOrDefault();
+                var DataCamOfficeAR = officeRepository.Get(x => x.OfficeType == "Repo").FirstOrDefault();
                 if (DataHeadOfficeAR == null)
                 {
                     lstCCAR = null;
                 }
+                else if(DataCamOfficeAR.Id.ToString().ToUpper().Equals(OfficeId.ToUpper()))
+                {
+                    lstCCAR = null;
+                }    
                 else
                 {
                     var departmentHeadAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOfficeAR.Id).FirstOrDefault();
@@ -2494,11 +2499,12 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             List<SysUserViewModel> salemans = new List<SysUserViewModel>();
             Expression<Func<CatContract, bool>> contractExp = x => x.PartnerId == partnerId
-            && x.Active == true
+             && x.Active == true
             && x.SaleService.Contains(transactionType)
-            && x.SaleService.Contains(transactionType)
+            && x.OfficeId.Contains(currentUser.OfficeID.ToString())
             && ((shipmentType == "Freehand") ? (x.ShipmentType != "Nominated") : true);
-            if(!string.IsNullOrEmpty(officeId))
+
+            if (!string.IsNullOrEmpty(officeId))
             {
                 var office = officeRepository.Get(x => x.Id.ToString() == officeId)?.FirstOrDefault();
                 if(office != null && office.OfficeType == "OutSource")
@@ -2519,10 +2525,26 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
             } else
             {
-                var contracts = contractRepository.Get(contractExp);
-                if (contracts.Count() > 0)
+                var office = officeRepository.Get(x => x.Id.ToString() == currentUser.OfficeID.ToString())?.FirstOrDefault();
+                if (office != null && office.OfficeType == "OutSource")
                 {
-                    salemans = GetSysUserViewModelByContract(contracts);
+                    salemans.Add(new SysUserViewModel
+                    {
+                        Active = true,
+                        EmployeeNameVn = salemanBOD.Username,
+                        EmployeeNameEn = salemanBOD.Username,
+                        Id = salemanBOD.Id,
+                        Username = salemanBOD.Username,
+                    });
+
+                    return salemans;
+                } else
+                {
+                    var contracts = contractRepository.Get(contractExp);
+                    if (contracts.Count() > 0)
+                    {
+                        salemans = GetSysUserViewModelByContract(contracts);
+                    }
                 }
             }
             return salemans;

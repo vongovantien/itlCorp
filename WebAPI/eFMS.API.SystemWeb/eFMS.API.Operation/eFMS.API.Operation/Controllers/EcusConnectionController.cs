@@ -10,6 +10,7 @@ using eFMS.API.Operation.DL.Models;
 using eFMS.API.Operation.DL.Models.Criteria;
 using eFMS.API.Operation.Infrastructure.Middlewares;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -270,6 +271,19 @@ namespace eFMS.API.Operation.Controllers
         {
             var results = ecusConnectionService.GetDataEcusByUser(userId, serverName, dbusername, dbpassword, database);
             return Ok(results);
+        }
+
+        [HttpGet]
+        [Route("CheckConnectionServer")]
+        public IActionResult CheckConnectionServer(string serverName, string dbName, string userName, string pw)
+        {
+            HandleState hs = ecusConnectionService.CheckConnectionServer(serverName, dbName, userName, pw);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "The connection to ECUS has failed!" };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

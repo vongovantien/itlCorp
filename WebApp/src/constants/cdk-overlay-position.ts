@@ -56,5 +56,17 @@ export const OVERLAY_POSITION_MAP: { [key: string]: ConnectionPositionPair } = {
     leftBottom: new ConnectionPositionPair(
         { originX: 'start', originY: 'bottom' },
         { overlayX: 'end', overlayY: 'bottom' }
-    )
+    ),
+    leftalignedTop: new ConnectionPositionPair(
+        { originX: 'end', originY: 'top'},
+        { overlayX: 'start', overlayY: 'top'}
+    ),
+    rightAlignedTop: new ConnectionPositionPair(
+        { originX: 'start', originY: 'top'},
+        { overlayX: 'end', overlayY: 'top'}
+    ),
+    leftAlignedBottom: new ConnectionPositionPair(
+        { originX: 'end', originY: 'bottom'},
+        { overlayX: 'start', overlayY: 'bottom'}
+    ),
 };

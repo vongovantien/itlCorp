@@ -19,6 +19,7 @@ namespace eFMS.API.Report.DL.Common
 
         // Template Name
         public const string AP_Account_Template = "AP_Account_Template.xlsx";
+        public const string Edoc_Report_Template = "Template-Report-eDOC.xlsx";
         public const string AP_Standart_Report = "AP_Standart_Report.xlsx";
         public const string AR_DebitDetail_Template = "AR_DebitDetail_Template.xlsx";
         public const string AR_SUMMARY_TEMPLATE = "AR_SUMMARY_TEMPLATE.xlsx";
@@ -39,6 +40,7 @@ namespace eFMS.API.Report.DL.Common
         public const string CombineBillingByShipmentVND = "CombingBillingByJobVND.xlsx";
         public const string CombineBillingByShipmentUSD = "CombingBillingByJobUSD.xlsx";
         public const string OutsourcingRecognisingTemplate = "Outsourcing Recognising Template.xlsx";
+        public const string Accounting_PL_Sheet = "AccountingPLSheet.xlsx";
 
         public static readonly string LG_SHIPMENT = "CL";// Custom Logistic
         public static readonly string SEF_SHIPMENT = "SEF"; //Sea FCL Export

@@ -1,4 +1,5 @@
 ﻿{
+  "MSG_SHIPMENT_NOT_EXIST": "Not found Shipment. Please check the Shipment code",
   "MSG_DATA_NOT_FOUND": "Data not found",
   "MSG_OBJECT_NOT_EXISTS": "Object does nont exist",
   "MSG_OBJECT_DUPLICATED": "Object is douplicated",
@@ -74,5 +75,8 @@
   "MSG_CLEARANCE_IS_EXPIRED": "{0} - {1} {2} Thỏa thuận của {3} hết hạn, vui lòng kiểm tra lại!",
   "MSG_CLEARANCE_IS_OVERDUE": "{0} - {1} {2} Thỏa thuận của {3} có công nợ quá hạn, vui lòng kiểm tra lại!",
   "MSG_CLEARANCE_IS_OVERLIMIT": "{0} - {1} {2} Thỏa thuận của {3} vượt hạn mức tín dụng {4}% , vui lòng kiểm tra lại!",
-  "MSG_CHARGE_CODE_WRONG_OFFICE": "Charge {0} không tồn tại ở office {1}"
+  "MSG_CHARGE_CODE_WRONG_OFFICE": "Charge {0} không tồn tại ở office {1}",
+  "MSG_HBLNO_NOT_EXIST_OFFICE": "hbl no '{0}' không tồn tại ở office {1}",
+  "MSG_MBLNO_NOT_EXIST_OFFICE": "mbl no '{0}' không tồn tại ở office {1}",
+  "MSG_CUSTOM_NO_NOT_EXIST_JOB": "Custom No không tồn tại trong {0}"
 }

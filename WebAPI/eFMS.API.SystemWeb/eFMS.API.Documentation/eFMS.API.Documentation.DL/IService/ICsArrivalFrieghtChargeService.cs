@@ -21,7 +21,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState SetArrivalChargeDefault(CsArrivalFrieghtChargeDefaultEditModel model);
         HandleState SetArrivalHeaderFooterDefault(CsArrivalDefaultModel model);
         HandleState SetDeliveryOrderHeaderFooterDefault(CsDeliveryOrderDefaultModel model);
-        Crystal PreviewDeliveryOrder(Guid hblid);
+        Crystal PreviewDeliveryOrder(Guid hblid, string language);
         Crystal PreviewArrivalNoticeSIF(PreviewArrivalNoticeCriteria criteria);
         Crystal PreviewArrivalNoticeAir(PreviewArrivalNoticeCriteria criteria);
         ProofOfDeliveryViewModel GetProofOfDelivery(Guid hblid);

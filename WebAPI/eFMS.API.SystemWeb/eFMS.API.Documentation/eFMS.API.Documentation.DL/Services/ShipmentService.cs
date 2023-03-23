@@ -359,7 +359,7 @@ namespace eFMS.API.Documentation.DL.Services
                 HBL = x.HBL,
                 HBLID = x.HBLID,
                 CustomNo = x.CustomNo,
-                Service = Common.CustomData.Services.FirstOrDefault(s => s.Value == x.Service)?.DisplayName
+                Service = x.Service
             }).ToList();
             return dataList;
         }

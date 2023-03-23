@@ -29,6 +29,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
@@ -347,45 +348,57 @@ namespace eFMS.API.Accounting.DL.Services
             List<string> refNo = new List<string>();
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
-                refNo = (from set in settlementPayments
-                         join sur in surcharge on set.SettlementNo equals sur.SettlementCode into grpSur
-                         from sur in grpSur.DefaultIfEmpty()
-                         join ops in opst on sur.Hblid equals ops.Hblid into grpOps
-                         from ops in grpOps.DefaultIfEmpty()
-                         join cus in custom on ops.JobNo equals cus.JobNo into grpCus
-                         from cus in grpCus.DefaultIfEmpty()
-                         where
-                         (
-                              criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
-                              (
+                Regex regex = new Regex("SM");
+                if (criteria.ReferenceNos.Any(x => regex.IsMatch(x)))
+                {
+                    refNo = criteria.ReferenceNos.Where(x => regex.IsMatch(x)).ToList();
+
+                    settlementPayments = settlementPayments.Where(x => refNo.Contains(x.SettlementNo));
+                }
+                else
+                {
+                    refNo = (from set in settlementPayments
+                             join sur in surcharge on set.SettlementNo equals sur.SettlementCode into grpSur
+                             from sur in grpSur.DefaultIfEmpty()
+                             join ops in opst.AsParallel() on sur.Hblid equals ops.Hblid into grpOps
+                             from ops in grpOps.DefaultIfEmpty()
+                             join cus in custom.AsParallel() on ops.JobNo equals cus.JobNo into grpCus
+                             from cus in grpCus.DefaultIfEmpty()
+                             where
+                             (
+                                  criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0 ?
                                   (
-                                         (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Hblno, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Mblno, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.JobNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true)
-                                      || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.AdvanceNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      (
+                                             (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(set.SettlementNo, StringComparer.OrdinalIgnoreCase) : true)
+                                          || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Hblno, StringComparer.OrdinalIgnoreCase) : true)
+                                          || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.Mblno, StringComparer.OrdinalIgnoreCase) : true)
+                                          || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.JobNo, StringComparer.OrdinalIgnoreCase) : true)
+                                          || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(cus.ClearanceNo, StringComparer.OrdinalIgnoreCase) : true)
+                                          || (criteria.ReferenceNos != null ? criteria.ReferenceNos.Contains(sur.AdvanceNo, StringComparer.OrdinalIgnoreCase) : true)
+                                      )
                                   )
-                              )
-                              :
-                              (
-                                  true
-                              )
-                         )
-                         select set.SettlementNo).ToList();
+                                  :
+                                  (
+                                      true
+                                  )
+                             )
+                             select set.SettlementNo).ToList();
+
+                    if (refNo.Count() > 0)
+                    {
+                        settlementPayments = settlementPayments.Where(x => refNo.Contains(x.SettlementNo));
+                    }
+                    else
+                    {
+                        if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+                        {
+                            settlementPayments = null;
+                        }
+                    }
+                }
+
             }
 
-            if (refNo.Count() > 0)
-            {
-                settlementPayments = settlementPayments.Where(x => refNo.Contains(x.SettlementNo));
-            }
-            else
-            {
-                if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
-                {
-                    settlementPayments = null;
-                }
-            }
             return settlementPayments;
         }
 
@@ -626,7 +639,7 @@ namespace eFMS.API.Accounting.DL.Services
             settlementMap.IsApproved = CheckUserIsApproved(currentUser, settlement, settlementApprove);
             settlementMap.IsShowBtnDeny = CheckIsShowBtnDeny(currentUser, settlement, settlementApprove);
 
-            if(!string.IsNullOrEmpty(settlement.Payee))
+            if (!string.IsNullOrEmpty(settlement.Payee))
             {
                 settlementMap.PayeeName = catPartnerRepo.Get(x => x.Id == settlement.Payee)?.FirstOrDefault().ShortName;
             }
@@ -2806,7 +2819,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (!string.IsNullOrEmpty(approve.Requester))
                             {
                                 settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_LEADERAPPROVED;
-                                approve.LeaderApr = userCurrent;
+                                approve.LeaderApr = approve.Leader = userCurrent;
                                 approve.LeaderAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_LEADER;
                                 userApproveNext = managerLevel.UserId;
@@ -2881,7 +2894,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if ((!string.IsNullOrEmpty(approve.Leader) && !string.IsNullOrEmpty(approve.LeaderApr)) || string.IsNullOrEmpty(approve.Leader) || leaderLevel.Role == AccountingConstants.ROLE_NONE || leaderLevel.Role == AccountingConstants.ROLE_AUTO)
                             {
                                 settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DEPARTMENTAPPROVED;
-                                approve.ManagerApr = userCurrent;
+                                approve.ManagerApr = approve.Manager = userCurrent;
                                 approve.ManagerAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_MANAGER;
                                 userApproveNext = accountantLevel.UserId;
@@ -2947,7 +2960,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if ((!string.IsNullOrEmpty(approve.Manager) && !string.IsNullOrEmpty(approve.ManagerApr)) || string.IsNullOrEmpty(approve.Manager) || managerLevel.Role == AccountingConstants.ROLE_NONE || managerLevel.Role == AccountingConstants.ROLE_AUTO)
                             {
                                 settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_ACCOUNTANTAPPRVOVED;
-                                approve.AccountantApr = userCurrent;
+                                approve.AccountantApr = approve.Accountant = userCurrent;
                                 approve.AccountantAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
                                 userApproveNext = buHeadLevel.UserId;
@@ -3008,17 +3021,17 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             if (!string.IsNullOrEmpty(approve.Leader) && string.IsNullOrEmpty(approve.LeaderApr))
                             {
-                                approve.LeaderApr = userCurrent;
+                                approve.LeaderApr = approve.Leader = userCurrent;
                                 approve.LeaderAprDate = DateTime.Now;
                             }
                             if (!string.IsNullOrEmpty(approve.Manager) && string.IsNullOrEmpty(approve.ManagerApr))
                             {
-                                approve.ManagerApr = userCurrent;
+                                approve.ManagerApr = approve.Manager = userCurrent;
                                 approve.ManagerAprDate = DateTime.Now;
                             }
                             if (!string.IsNullOrEmpty(approve.Accountant) && string.IsNullOrEmpty(approve.AccountantApr))
                             {
-                                approve.AccountantApr = userCurrent;
+                                approve.AccountantApr = approve.Accountant = userCurrent;
                                 approve.AccountantAprDate = DateTime.Now;
                             }
                         }
@@ -3027,7 +3040,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if ((!string.IsNullOrEmpty(approve.Accountant) && !string.IsNullOrEmpty(approve.AccountantApr)) || string.IsNullOrEmpty(approve.Accountant) || accountantLevel.Role == AccountingConstants.ROLE_NONE || accountantLevel.Role == AccountingConstants.ROLE_AUTO || buHeadLevel.Role == AccountingConstants.ROLE_SPECIAL)
                             {
                                 settlementPayment.StatusApproval = AccountingConstants.STATUS_APPROVAL_DONE;
-                                approve.BuheadApr = userCurrent;
+                                approve.BuheadApr = approve.Buhead = userCurrent;
                                 approve.BuheadAprDate = DateTime.Now;
                                 approve.LevelApprove = AccountingConstants.LEVEL_BOD;
                             }
@@ -3919,7 +3932,7 @@ namespace eFMS.API.Accounting.DL.Services
                     chargeCopy.IsFromShipment = charge.IsFromShipment;
                     chargeCopy.TypeOfFee = charge.TypeOfFee;
                     chargeCopy.AdvanceNo = advance;
-
+                    chargeCopy.TypeService = charge.TypeService;
                     chargesCopy.Add(chargeCopy);
                 }
             }
@@ -4752,13 +4765,13 @@ namespace eFMS.API.Accounting.DL.Services
                 //Quy đổi theo currency của Settlement
                 if (settlementCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
-                    infoShipmentCharge.ChargeNetAmount = sur.NetAmount;
+                    infoShipmentCharge.ChargeNetAmount = sur.AmountVnd;
                     infoShipmentCharge.ChargeVatAmount = (sur.VatAmountVnd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0);
                 }
                 else
                 {
-                    infoShipmentCharge.ChargeNetAmount = sur.NetAmount;
+                    infoShipmentCharge.ChargeNetAmount = sur.AmountUsd;
                     infoShipmentCharge.ChargeVatAmount = (sur.VatAmountUsd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0);
                 }
@@ -5643,12 +5656,12 @@ namespace eFMS.API.Accounting.DL.Services
                     jobDetail.MBL = item.Key.MBL;
                     jobDetail.HBL = item.Key.HBL;
                     jobDetail.CustomNo = customNo;
-                    jobDetail.AdvanceNo = item.FirstOrDefault().AdvanceNo;
+                    jobDetail.AdvanceNo = string.Join(";", item.GroupBy(x => x.AdvanceNo).Select(x => x.Key));
                     jobDetail.NetAmount = item.Sum(x => x.NetAmount ?? 0);
                     jobDetail.VatAmount = item.Sum(x => x.VatAmount ?? 0);
                     jobDetail.TotalAmount = item.Sum(x => x.TotalAmount ?? 0);
                     jobDetail.TotalAmountVnd = item.Sum(x => x.TotalAmountVnd ?? 0);
-                    jobDetail.AdvanceAmount = item.FirstOrDefault().AdvanceAmount ?? 0;
+                    jobDetail.AdvanceAmount = item.GroupBy(x => x.AdvanceNo).Sum(x => x.FirstOrDefault().AdvanceAmount ?? 0);
                     jobDetail.Balance = jobDetail.AdvanceAmount - totalShipment;
 
                     settle.TotalNetAmount += jobDetail.NetAmount;

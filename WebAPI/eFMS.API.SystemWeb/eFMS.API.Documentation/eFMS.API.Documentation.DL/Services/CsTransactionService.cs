@@ -16,6 +16,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
@@ -3107,9 +3108,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             var parameter = new FormPLsheetReportParameter();
             parameter.Contact = _currentUser;//Get user name login
-            parameter.CompanyName = DocumentConstants.COMPANY_NAME;
+            parameter.CompanyName = sysOfficeRepository.Get(x => x.Id == shipment.OfficeId).FirstOrDefault().BranchNameEn;
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1;
+            parameter.CompanyAddress1 = sysOfficeRepository.Get(x => x.Id == shipment.OfficeId).FirstOrDefault().AddressEn;
             parameter.CompanyAddress2 = DocumentConstants.COMPANY_CONTACT;
             parameter.Website = DocumentConstants.COMPANY_WEBSITE;
             parameter.CurrDecimalNo = 2;
@@ -3785,7 +3786,6 @@ namespace eFMS.API.Documentation.DL.Services
         }
     }
     #endregion
-
 }
 
 

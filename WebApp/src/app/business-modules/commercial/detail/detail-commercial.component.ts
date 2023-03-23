@@ -19,6 +19,7 @@ import { catchError, concatMap, finalize, map } from 'rxjs/operators';
 import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialBankListComponent } from '../components/bank/commercial-bank-list.component';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-detail-commercial',
@@ -170,7 +171,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             provinceShippingId: partner.provinceShippingId,
             partnerLocation: partner.partnerLocation,
             parentId: this.isAddSubPartner ? partner.id : partner.parentId,
-            bankAccountName: partner.bankAccountName
+            bankAccountName: partner.bankAccountName,
+            identityNo: partner.identityNo,
+            dateId: !!partner.dateId ? { startDate: new Date(partner.dateId), endDate: new Date(partner.dateId) } : null,
+            placeId: partner.placeId
         });
         if (this.formCommercialComponent.partnerId !== partner.parentId) {
             this.formCommercialComponent.isDisabled = false;
@@ -288,6 +292,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         modelAdd.partnerType = this.partner.partnerType;
         modelAdd.partnerGroup = this.partner.partnerGroup;
         modelAdd.datetimeCreated = this.partner.datetimeCreated;
+        modelAdd.dateId = (modelAdd.dateId === null || modelAdd.dateId?.startDate === null) ? null : (!!modelAdd.dateId ? (!!modelAdd.dateId.startDate ? formatDate(modelAdd.dateId.startDate, 'yyyy-MM-dd', 'en'):  formatDate(new Date(modelAdd.dateId), 'yyyy-MM-dd', 'en')) : null);
 
         // * Update catalogue partner data.
         modelAdd.roundUpMethod = this.partner.roundUpMethod;

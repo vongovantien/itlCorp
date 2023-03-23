@@ -2,13 +2,11 @@
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Services;
-using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Infrastructure;
 using eFMS.API.Shipment.Infrastructure;
 using eFMS.API.Shipment.Infrastructure.Middlewares;
-using eFMS.API.Shipment.Service.Contexts;
-using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
@@ -34,7 +32,7 @@ namespace eFMS.API.Shipment
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
-            
+
 
             Configuration = builder.Build();
         }
@@ -54,10 +52,17 @@ namespace eFMS.API.Shipment
             services.AddCustomSwagger();
             services.AddHostedService<ScopedAlertHostedService>();
             services.AddScoped<IScopedProcessingAlertService, ScopedProcessingAlertService>();
-            services.Configure<ApiServiceUrl>(option => {
+            services.Configure<ApiServiceUrl>(option =>
+            {
                 option.ApiUrlAccounting = Configuration.GetSection("ApiUrlAccounting").Value;
                 option.ApiUrlExport = Configuration.GetSection("ApiUrlExport").Value;
             });
+            services.Configure<TrackingApi>(option =>
+            {
+                option.ApiName = Configuration.GetSection("TrackingApi:TrackingMore:ApiName").Value;
+                option.Url = Configuration.GetSection("TrackingApi:TrackingMore:Url").Value;
+            });
+            services.SetUpRabbitMq(Configuration);
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

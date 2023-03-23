@@ -558,8 +558,8 @@ export class DocumentationRepo {
         );
     }
 
-    previewDeliveryOrder(hblId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/PreviewDeliveryOrder`, { hblid: hblId }).pipe(
+    previewDeliveryOrder(hblId: string, language: string = '') {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/PreviewDeliveryOrder`, { hblid: hblId, language: language }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -600,8 +600,8 @@ export class DocumentationRepo {
         );
     }
 
-    previewAirImportAuthorizeLetter1(id: string, withSign: boolean) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirImptAuthorisedLetter`, { housbillId: id, printSign: withSign }).pipe(
+    previewAirImportAuthorizeLetter1(id: string, withSign: boolean, language: string = '') {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirImptAuthorisedLetter`, { housbillId: id, printSign: withSign, language: language }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -1282,8 +1282,8 @@ export class DocumentationRepo {
             );
     }
 
-    syncGoodInforToReplicateJob(body: any) {
-        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/SyncGoodInforToReplicateJob`, body).pipe(
+    syncGoodInforToReplicateJob(jobId: string, body: any = {}) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/SyncGoodInforToReplicateJob`, body, { jobId: jobId }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -1292,6 +1292,53 @@ export class DocumentationRepo {
     addMultipleStageToJob(jobId: string, body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsStageAssigned/AddMultipleStage`, body, { jobId: jobId }).pipe(
             catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getListWorkOrder(page?: number, size?: number, body: any = {}) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsWorkOrder/Paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }, { "hideSpinner": "true" })
+        }
+    }
+
+    getDetailWorkOrder(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/${id}`, null, { "hideSpinner": "true" });
+    }
+
+    addWorkOrder(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsWorkOrder`, body);
+    }
+
+    deleteWorkOrder(id: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/${id}`);
+    }
+
+    updateWorkOrder(body: any) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsWorkOrder`, body);
+    }
+
+    setActiveInActiveWorkOrder(body: { id: string, active: boolean }) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/SetActiveInactive`, body);
+    }
+
+    deletePriceItem(id: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/Price/${id}`);
+    }
+
+    checkAllowDeleteWorkOrder(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/CheckAllowDelete/${id}`);
+    }
+
+    checkAllowDetailWorkOrder(id: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/CheckAllowDetail/${id}`);
+    }
+
+    trackShipmentProgress(params: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/ShipmentTracking/TrackShipmentProgress`, params, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
     }
