@@ -213,7 +213,7 @@ export class UtilityHelper {
             [ChargeConstants.CL_CODE, [CommonEnum.TransactionTypeEnum.CustomLogistic]],
             [ChargeConstants.SCE_CODE, [CommonEnum.TransactionTypeEnum.SeaConsolExport]],
             [ChargeConstants.SCI_CODE, [CommonEnum.TransactionTypeEnum.SeaConsolImport]],
-            [ChargeConstants.IT_CODE, [CommonEnum.TransactionTypeEnum.InlandTrucking]],
+            [ChargeConstants.TK_CODE, [CommonEnum.TransactionTypeEnum.InlandTrucking]],
         ]).get(type)[0];
     }
 
@@ -228,7 +228,7 @@ export class UtilityHelper {
             [CommonEnum.TransactionTypeEnum.CustomLogistic, [ChargeConstants.CL_CODE]],
             [CommonEnum.TransactionTypeEnum.SeaConsolExport, [ChargeConstants.SCE_CODE]],
             [CommonEnum.TransactionTypeEnum.SeaConsolImport, [ChargeConstants.SCI_CODE]],
-            [CommonEnum.TransactionTypeEnum.InlandTrucking, [ChargeConstants.IT_CODE]],
+            [CommonEnum.TransactionTypeEnum.InlandTrucking, [ChargeConstants.TK_CODE]],
 
         ]).get(type)[0];
     }
@@ -242,7 +242,7 @@ export class UtilityHelper {
             [ChargeConstants.SLE_CODE, [ChargeConstants.SLE_DES]],
             [ChargeConstants.SLI_CODE, [ChargeConstants.SLI_DES]],
             [ChargeConstants.CL_CODE, [ChargeConstants.CL_DES]],
-            [ChargeConstants.IT_CODE, [ChargeConstants.IT_DES]],
+            [ChargeConstants.TK_CODE, [ChargeConstants.TK_DES]],
             [ChargeConstants.SCE_CODE, [ChargeConstants.SCE_DES]],
             [ChargeConstants.SCI_CODE, [ChargeConstants.SCI_DES]],
         ]).get(type)[0];
@@ -257,7 +257,7 @@ export class UtilityHelper {
             [ChargeConstants.SLE_DES, [ChargeConstants.SLE_CODE]],
             [ChargeConstants.SLI_DES, [ChargeConstants.SLI_CODE]],
             [ChargeConstants.CL_DES, [ChargeConstants.CL_CODE]],
-            [ChargeConstants.IT_DES, [ChargeConstants.IT_CODE]],
+            [ChargeConstants.TK_DES, [ChargeConstants.TK_CODE]],
             [ChargeConstants.SCE_DES, [ChargeConstants.SCE_CODE]],
             [ChargeConstants.SCI_DES, [ChargeConstants.SCI_CODE]],
         ]).get(type)[0];

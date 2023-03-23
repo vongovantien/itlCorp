@@ -42,7 +42,7 @@ export class ChargeConstants {
         { id: ChargeConstants.SLE_CODE, text: ChargeConstants.SLE_DES },
         { id: ChargeConstants.SLI_CODE, text: ChargeConstants.SLI_DES },
         { id: ChargeConstants.CL_CODE, text: ChargeConstants.CL_DES },
-        { id: ChargeConstants.IT_CODE, text: ChargeConstants.IT_DES },
+        { id: ChargeConstants.TK_CODE, text: ChargeConstants.TK_DES },
         { id: ChargeConstants.SCE_CODE, text: ChargeConstants.SCE_DES },
         { id: ChargeConstants.SCI_CODE, text: ChargeConstants.SCI_DES }
     ];
