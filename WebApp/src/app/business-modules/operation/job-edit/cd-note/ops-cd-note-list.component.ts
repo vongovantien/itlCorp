@@ -23,6 +23,7 @@ import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/
 import { OpsCdNoteDetailPopupComponent } from '../components/popup/ops-cd-note-detail/ops-cd-note-detail.popup';
 import { getCurrentUserState, IAppState } from '@store';
 import { HttpResponse } from '@angular/common/http';
+import { getOperationTransationDetail } from '../../store';
 
 @Component({
     selector: 'ops-cd-note-list',
@@ -41,7 +42,7 @@ export class OpsCDNoteComponent extends AppList {
     initGroup: any[] = [];
     deleteMessage: string = '';
     selectedCdNoteId: string = '';
-    transactionType: TransactionTypeEnum = 0;
+    transactionType: TransactionTypeEnum;
     cdNotePrint: AcctCDNote[] = [];
     selectedCdNote: AcctCDNote = null;
 
@@ -54,7 +55,8 @@ export class OpsCDNoteComponent extends AppList {
         private _sortService: SortService,
         private _activedRouter: ActivatedRoute,
         private _toastService: ToastrService,
-        private _fileMngtRepo: SystemFileManageRepo
+        private _fileMngtRepo: SystemFileManageRepo,
+        private _store: Store<IAppState>,
     ) {
         super();
     }
@@ -92,7 +94,7 @@ export class OpsCDNoteComponent extends AppList {
             { title: 'Sync Status', field: 'syncStatus', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
         ];
-
+        this.getTransactionType();
     }
 
     getListCdNote(id: string) {
@@ -115,6 +117,23 @@ export class OpsCDNoteComponent extends AppList {
                 },
             );
     }
+
+    getTransactionType() {
+        this._store.select(getOperationTransationDetail)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        if (res.transactionType === 'TKI') {
+                            this.transactionType = TransactionTypeEnum.TruckingInland;
+                        } else {
+                            this.transactionType = TransactionTypeEnum.CustomLogistic;
+                        }
+                    }
+                }
+            );
+    }
+
 
     getListCdNoteWithPreview(id: string, cdNo: string, currency: string) {
         this.isLoading = true;
@@ -329,7 +348,7 @@ export class OpsCDNoteComponent extends AppList {
                 () => {
                     sub.unsubscribe();
                 }
-            );        
+            );
     }
 
     preview(isOrigin: boolean) {

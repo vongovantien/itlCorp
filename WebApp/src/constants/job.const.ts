@@ -34,6 +34,7 @@ export class JobConstants {
         WT: <string[]>['PP', 'CLL'],
 
         SHIPMENTMODES: <string[]>['Internal', 'External'],
+        SHIPMENTMODESTKI: <string[]>['Domestic', 'Internal', 'External'],
 
         SERVICEMODES: <string[]>['Export', 'Import'],
 

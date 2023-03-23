@@ -68,6 +68,7 @@ export class OpsTransaction extends BaseModel {
     note: string = '';
     isLinkFee: boolean = false;
     isLinkJob: boolean = false;
+    transactionType: string = '';
 
     permission: PermissionShipment = new PermissionShipment();
 

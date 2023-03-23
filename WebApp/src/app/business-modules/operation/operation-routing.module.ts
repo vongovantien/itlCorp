@@ -11,7 +11,15 @@ const routes: Routes = [
     {
         path: "job-management",
         loadChildren: () => import('./job-mangement/job-management.module').then(m => m.JobManagementModule),
-        data: { name: 'Job Management', title: 'eFMS Ops Job' },
+        data: { name: 'Job Management', title: 'eFMS Ops Job', transactionType: null },
+        resolve: {
+            checkMenu: MenuResolveGuard
+        },
+    },
+    {
+        path: "trucking-inland",
+        loadChildren: () => import('./job-mangement/job-management.module').then(m => m.JobManagementModule),
+        data: { name: 'Trucking Inland', title: 'eFMS Trucking Inland', transactionType: 'TKI' },
         resolve: {
             checkMenu: MenuResolveGuard
         },

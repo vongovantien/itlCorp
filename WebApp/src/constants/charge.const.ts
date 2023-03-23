@@ -1,5 +1,5 @@
 export class ChargeConstants {
-    public static readonly IT_CODE: string = "IT";
+    public static readonly TK_CODE: string = "TK";
     public static readonly AI_CODE: string = "AI";
     public static readonly AE_CODE: string = "AE";
     public static readonly SFE_CODE: string = "SFE";
@@ -10,7 +10,7 @@ export class ChargeConstants {
     public static readonly SCI_CODE: string = "SCI";
     public static readonly CL_CODE: string = "CL";
 
-    public static readonly IT_DES: string = "Inland Trucking";
+    public static readonly TK_DES: string = "Trucking Inland";
     public static readonly AI_DES: string = "Air Import";
     public static readonly AE_DES: string = "Air Export";
     public static readonly SFE_DES: string = "Sea FCL Export";
@@ -42,7 +42,7 @@ export class ChargeConstants {
         { id: ChargeConstants.SLE_CODE, text: ChargeConstants.SLE_DES },
         { id: ChargeConstants.SLI_CODE, text: ChargeConstants.SLI_DES },
         { id: ChargeConstants.CL_CODE, text: ChargeConstants.CL_DES },
-        { id: ChargeConstants.IT_CODE, text: ChargeConstants.IT_DES },
+        { id: ChargeConstants.TK_CODE, text: ChargeConstants.TK_DES },
         { id: ChargeConstants.SCE_CODE, text: ChargeConstants.SCE_DES },
         { id: ChargeConstants.SCI_CODE, text: ChargeConstants.SCI_DES }
     ];

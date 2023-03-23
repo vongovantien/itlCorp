@@ -61,6 +61,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     selectedTabSurcharge: string = 'BUY';
     allowLinkFeeSell: boolean = true;
     isReplicate: boolean = false;
+    transactionType: string = '';
 
     constructor(
         private route: ActivatedRoute,
@@ -79,11 +80,23 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this.subscriptionJobOpsType();
         this.subscriptionParamURLChange();
         this.subscriptionSaveContainerChange();
 
         this.currentUser$ = this._store.select(getCurrentUserState);
     }
+
+    subscriptionJobOpsType() {
+        this.subscription =
+            this.route.data
+                .pipe(
+                    takeUntil(this.ngUnsubscribe)
+                ).subscribe((res: any) => {
+                    this.transactionType = res.transactionType;
+                });
+    }
+
 
     subscriptionParamURLChange() {
         this.subscription = combineLatest([
