@@ -460,6 +460,7 @@ namespace eFMS.API.Documentation.DL.Services
                         } else if (contract.IsOverDue == true)
                         {
                             isValid = false;
+                            errorCode = 2;
                         } else if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdueOBH"))
                         {
                             if(checkPointType == CHECK_POINT_TYPE.SURCHARGE_OBH || checkPointType == 0)
@@ -467,6 +468,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 if (contract.IsOverDueObh == true)
                                 {
                                     isValid = false;
+                                    errorCode = 6;
                                 }
                                 else
                                 {
@@ -477,8 +479,6 @@ namespace eFMS.API.Documentation.DL.Services
                                 isValid = true;
                             }
                         }
-                        if (!isValid) errorCode = 2;
-                        break;
                     }
                     else isValid = true;
 
