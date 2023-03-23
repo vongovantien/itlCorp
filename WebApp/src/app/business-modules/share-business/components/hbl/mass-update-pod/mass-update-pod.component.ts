@@ -1,16 +1,15 @@
 import { formatDate } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HouseBill } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { DocumentationRepo } from '@repositories';
-import { IShareBussinessState, getHBLSState } from '@share-bussiness';
+import { IShareBussinessState } from '@share-bussiness';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
 import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
-import { ShareDocumentTypeAttachComponent } from '../../document-type-attach/document-type-attach.component';
+import { ShareDocumentTypeAttachComponent } from '../../edoc/document-type-attach/document-type-attach.component';
 
 @Component({
     selector: 'app-mass-update-pod',
@@ -34,14 +33,13 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
         nameEn: "abc",
         id: "3"
     }]
-    houseBillListTemp: any[] = [];
     constructor(
         private _fb: FormBuilder,
         private _toast: ToastrService,
         private _progressService: NgProgress,
         private _documentRepo: DocumentationRepo,
-        private _cd: ChangeDetectorRef,
         protected _store: Store<IShareBussinessState>,
+        private _cd: ChangeDetectorRef
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -61,13 +59,9 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
             { title: 'House Bill No', field: 'hbl', width: 250 },
             { title: 'Note', field: 'note' },
         ]
-        //this.getHouseBills();
         this.initForm()
+        this.getHouseBills();
     }
-
-    // ngAfterViewInit(): void {
-    //     this.getHouseBills();
-    // }
 
     initForm() {
         this.formGroup = this._fb.group({
@@ -86,22 +80,8 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
         this.deliveryDateAll = this.formGroup.controls['deliveryDateAll'];
     }
 
-    selectedHAWBNo($event: any) {
-        console.log($event);
-
-        if ($event.length > 0) {
-            if ($event[$event.length - 1].id === 'All') {
-                this.HAWBNo.setValue([{ id: 'All', hwbno: 'All' }]);
-            }
-            else {
-                const arrNotIncludeAll = $event.filter(x => x.id !== 'All'); //
-                this.HAWBNo.setValue(arrNotIncludeAll);
-            }
-        }
-    }
-
     onChangeAllValuePOD() {
-        this.houseBillListTemp.map(x => {
+        this.houseBillList.map(x => {
             x.deliveryDate = !!this.deliveryDateAll?.value?.startDate ? this.deliveryDateAll.value : null,
                 x.deliveryPerson = this.deliveryPersonAll
         })
@@ -117,15 +97,13 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
     }
 
     getHouseBills() {
-        this._store.select(getHBLSState)
+        this._documentRepo.getHBLOfJob({ jobId: this.jobId })
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (res: any[]) => {
                     if (res?.length >= 1) {
                         this.houseBillList = res;
-                        this.houseBillListTemp = res;
                         console.log(res)
-                        console.log(this.houseBillListTemp)
                     }
                 }
             );
@@ -146,21 +124,21 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
                         this._toast.success(res.message);
                         this.getHouseBills();
                         this.isUpdated.emit(true);
-                        this.onClosePopUp();
                     } else {
                         this._toast.error(res.message);
                     }
+                    this.onClosePopUp();
                 }
             )
     }
 
     onClosePopUp() {
-        this._cd.detectChanges();
         this.isSubmitted = false;
         this.formGroup.reset();
         this.deliveryDateAll.setValue(null);
         this.deliveryPersonAll = null;
-        this.houseBillListTemp = this.houseBillList;
+        console.log(this.houseBillList)
+        this._cd.detectChanges();
         this.hide();
     }
 }

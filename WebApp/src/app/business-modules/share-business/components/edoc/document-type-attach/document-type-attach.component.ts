@@ -36,6 +36,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() docTypeId: number = 0;
     @Input() documentTypes: any[] = [];
     @Input() readonly: boolean = false;
+    @Input() isPOD: boolean = false;
 
     lstEdocExist: any[] = [];
     headers: CommonInterface.IHeaderTable[] = [];

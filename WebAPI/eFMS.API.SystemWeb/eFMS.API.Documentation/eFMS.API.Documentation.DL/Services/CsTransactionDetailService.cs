@@ -1020,6 +1020,8 @@ namespace eFMS.API.Documentation.DL.Services
                           SaleManId = detail.SaleManId,
                           CustomerId = detail.CustomerId,
                           CustomerName = cus.ShortName,
+                          DeliveryPerson = detail.DeliveryPerson,
+                          DeliveryDate = detail.DeliveryDate,
                       };
             return res;
         }

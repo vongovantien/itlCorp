@@ -439,7 +439,6 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
     showMassUpdatePOD() {
         if (!!this.houseBills) {
             this.massUpdatePODComponent.show();
-            this.massUpdatePODComponent.houseBillList = this.houseBills;
         }
     }
 

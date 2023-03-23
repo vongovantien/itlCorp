@@ -76,7 +76,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let hbl of houseBillListTemp">
+                            <tr *ngFor="let hbl of houseBillList">
                                 <td>
                                     {{hbl.hwbno}}
                                 </td>
@@ -124,5 +124,5 @@
         </div>
     </div>
 </div>
-<document-type-attach [housebills]="houseBillList" [selectedtDocType]="documentType" [isPOD]="true">
+<document-type-attach [housebills]="houseBillList" [documentTypes]="documentType" [isPOD]="true">
 </document-type-attach>
