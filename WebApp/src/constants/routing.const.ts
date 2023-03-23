@@ -27,6 +27,9 @@ export class RoutingConstants {
         ASSIGNMENT: `${RoutingConstants.ROOT_LOGISTICS}/assigment`,
         TRUCKING_ASSIGNMENT: `${RoutingConstants.ROOT_LOGISTICS}/trucking-assigment`,
         CUSTOM_CLEARANCE: `${RoutingConstants.ROOT_LOGISTICS}/custom-clearance`,
+        TRUCKING_INLAND: `${RoutingConstants.ROOT_LOGISTICS}/trucking-inland`,
+        TRUCKING_INLAND_DETAIL: `${RoutingConstants.ROOT_LOGISTICS}/trucking-inland/trucking-inland-edit`,
+
     };
 
     public static readonly DOCUMENTATION = {

@@ -9,7 +9,8 @@
                     <label class="form-control-label" for="">
                         Job ID
                     </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Job ID" name="jobNo" formControlName="jobNo">
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Job ID" name="jobNo"
+                        formControlName="jobNo">
                 </div>
             </div>
             <div class="col-lg-4">
@@ -109,9 +110,17 @@
                     <label class="form-control-label" required>
                         Product Service
                     </label>
-                    <ng-select class="custom" [items]="productServices" placeholder="Please select"
+                    <!-- <ng-select class="custom" [items]="productServices" placeholder="Please select"
                         formControlName="productService" [clearable]="false">
+                    </ng-select> -->
+                    <ng-select *ngIf="transactionType!=='TKI',else truckingService" class="custom" disabled
+                        [items]="productServices" placeholder="Please select" [clearable]="false"
+                        formControlName="productService">
                     </ng-select>
+                    <ng-template #truckingService>
+                        <input disabled type="text" class="form-control m-input m-input--square" value="Trucking">
+                    </ng-template>
+
                     <div class="form-control-feedback"
                         *ngIf="(productService.dirty && !productService.valid) || (isSubmitted && !productService.valid)">
                         Product Service is required!
@@ -422,7 +431,8 @@
                         </div>
                     </div>
                     <div class="col-lg-4 app-switch-custom">
-                        <div class="form-group" *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
+                        <div class="form-group"
+                            *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                             <label class="form-control-label">
                                 No Profit
                             </label>

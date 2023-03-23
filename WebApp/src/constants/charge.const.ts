@@ -1,5 +1,5 @@
 export class ChargeConstants {
-    public static readonly IT_CODE: string = "IT";
+    public static readonly TK_CODE: string = "TK";
     public static readonly AI_CODE: string = "AI";
     public static readonly AE_CODE: string = "AE";
     public static readonly SFE_CODE: string = "SFE";
@@ -10,7 +10,7 @@ export class ChargeConstants {
     public static readonly SCI_CODE: string = "SCI";
     public static readonly CL_CODE: string = "CL";
 
-    public static readonly IT_DES: string = "Inland Trucking";
+    public static readonly TK_DES: string = "Trucking Inland";
     public static readonly AI_DES: string = "Air Import";
     public static readonly AE_DES: string = "Air Export";
     public static readonly SFE_DES: string = "Sea FCL Export";

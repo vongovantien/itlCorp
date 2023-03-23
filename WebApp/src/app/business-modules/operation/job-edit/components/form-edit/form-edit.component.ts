@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OperationRepo } from '@repositories';
 import { takeUntil } from 'rxjs/operators';
@@ -28,7 +28,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
     @ViewChild(InjectViewContainerRefDirective) confirmContainerRef: InjectViewContainerRefDirective;
-
+    @Input() transactionType: string = '';
     opsTransaction: OpsTransaction = null;
 
     formEdit: FormGroup;
@@ -212,7 +212,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     initForm() {
         this.formEdit = this._fb.group({
-            jobNo: [{value: null, disabled: true}],
+            jobNo: [{ value: null, disabled: true }],
             hwbno: [null, Validators.compose([
                 FormValidators.validateSpecialChar,
             ])],
@@ -250,7 +250,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             sumContainers: [null, Validators.max(5000000)],
             sumPackages: [null, Validators.max(5000000)],
             sumCbm: [null],
-            containerDescription: [{value: null, disabled: true}],
+            containerDescription: [{ value: null, disabled: true }],
             packageTypeId: [null],
             note: [null],
             noProfit: [false],
@@ -300,7 +300,16 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.deliveryDate = this.formEdit.controls['deliveryDate'];
         this.suspendTime = this.formEdit.controls['suspendTime'];
         this.clearanceDate = this.formEdit.controls['clearanceDate'];
+        if (this.transactionType === 'TKI') {
+            this.initTruckingData();
+        }
     }
+
+    initTruckingData() {
+        this.productService.setValue('Trucking');
+        this.shipmentModes = JobConstants.COMMON_DATA.SHIPMENTMODESTKI;
+    }
+
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {

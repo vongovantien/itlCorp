@@ -23,7 +23,7 @@ import { Container } from './../../../../../shared/models/document/container.mod
 export class JobManagementFormCreateComponent extends AppForm implements OnInit {
     @ViewChild('comboGridCustomerCpn') comboGridCustomerCpn: ComboGridVirtualScrollComponent;
     @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
-
+    @Input() transactionType: string = '';
     formCreate: FormGroup;
 
     hwbno: AbstractControl;
@@ -265,7 +265,16 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.packageTypeId = this.formCreate.controls['packageTypeId'];
         this.sumCbm = this.formCreate.controls['sumCbm']
         this.containerDescription = this.formCreate.controls['containerDescription'];
+        if (this.transactionType === 'TKI') {
+            this.initTruckingData();
+        }
     }
+
+    initTruckingData() {
+        this.productService.setValue('Trucking');
+        this.shipmentModes = JobConstants.COMMON_DATA.SHIPMENTMODESTKI;
+    }
+
 
     getASInfoToLink() {
         if (!this.hwbno.value || !this.mblno.value) {
