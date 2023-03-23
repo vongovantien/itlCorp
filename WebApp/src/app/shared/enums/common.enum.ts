@@ -29,7 +29,7 @@ export namespace CommonEnum {
     }
 
     export enum TransactionTypeEnum {
-        InlandTrucking = 1,
+        TruckingInland = 1,
         AirExport = 2,
         AirImport = 3,
         SeaConsolExport = 4,

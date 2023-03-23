@@ -86,9 +86,9 @@
                                 <span>SOA</span>
                             </th>
                             <th class="sorting"
-                            [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'status'), 'sorting_desc': (!isDesc && sortKey == 'status') }"
-                            (click)="sortCdNotes('status')">
-                            <span>Status</span>
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'status'), 'sorting_desc': (!isDesc && sortKey == 'status') }"
+                                (click)="sortCdNotes('status')">
+                                <span>Status</span>
                             </th>
                             <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'syncStatus'), 'sorting_desc': (!isDesc && sortKey == 'syncStatus') }"
@@ -122,9 +122,9 @@
                                             <table
                                                 class="table   table-striped table-brand table-collapse-group dataTable">
                                                 <tbody>
-                                                    <tr
-                                                        *ngFor="let cdNote of cdNoteGroup.listCDNote; let j = index; trackBy: trackByFn"
-                                                        [contextMenu]="CdContextMenu" (onTouch)="onSelectCdNote(cdNote)">
+                                                    <tr *ngFor="let cdNote of cdNoteGroup.listCDNote; let j = index; trackBy: trackByFn"
+                                                        [contextMenu]="CdContextMenu"
+                                                        (onTouch)="onSelectCdNote(cdNote)">
                                                         <td class="table-actions-col">
                                                             <div class="table-actions">
                                                                 <label class="m-checkbox" style="display: inline;">
@@ -237,7 +237,7 @@
                 <i class="la la-caret-right font-13"></i>
             </div>
         </div>
-        
+
     </div>
     <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
         <div class="d-flex justify-content-between ">
@@ -278,6 +278,7 @@
 </app-dropdown>
 <ops-cd-note-detail (onDeleted)="onDeletedCdNote()"></ops-cd-note-detail>
 
-<ops-cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"></ops-cd-note-add-popup>
+<ops-cd-note-add-popup (onRequest)="onRequestCdNoteChange($event)"
+    [transactionType]="transactionType"></ops-cd-note-add-popup>
 
 <ng-template inject></ng-template>

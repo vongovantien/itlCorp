@@ -1,21 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { MenuResolveGuard } from '@core';
-import { InlandTruckingComponent } from './inland-trucking/inland-trucking.component';
 
 const routes: Routes = [
     {
         path: '',
         redirectTo: 'air-export',
         pathMatch: 'full'
-    },
-    {
-        path: 'inland-trucking',
-        component: InlandTruckingComponent,
-        data: {
-            name: "Inland Trucking",
-            level: 2
-        },
     },
     {
         path: 'sea-consol-import', loadChildren: () => import('./sea-consol-import/sea-consol-import.module').then(m => m.SeaConsolImportModule),

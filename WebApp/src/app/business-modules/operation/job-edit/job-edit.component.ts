@@ -59,6 +59,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     selectedTabSurcharge: string = 'BUY';
     allowLinkFeeSell: boolean = true;
     isReplicate: boolean = false;
+    transactionType: string = '';
 
     constructor(
         private route: ActivatedRoute,
@@ -77,11 +78,23 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this.subscriptionJobOpsType();
         this.subscriptionParamURLChange();
         this.subscriptionSaveContainerChange();
 
         this.currentUser$ = this._store.select(getCurrentUserState);
     }
+
+    subscriptionJobOpsType() {
+        this.subscription =
+            this.route.data
+                .pipe(
+                    takeUntil(this.ngUnsubscribe)
+                ).subscribe((res: any) => {
+                    this.transactionType = res.transactionType;
+                });
+    }
+
 
     subscriptionParamURLChange() {
         this.subscription = combineLatest([
@@ -171,7 +184,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         // this.editForm.formEdit.controls['sumPackages'].setValue(sumPackages === 0 ? null : sumPackages);
         // this.editForm.formEdit.controls['sumNetWeight'].setValue(sumNetWeight === 0 ? null : sumNetWeight);
         // this.editForm.formEdit.controls['sumGrossWeight'].setValue(sumGrossWeight === 0 ? null : sumGrossWeight);
-        
+
         this.editForm.formEdit.controls['containerDescription'].setValue(containerDescription);
         this.editForm.formEdit.controls['sumContainers'].setValue(dataSum.sumContainers === 0 ? null : dataSum.sumContainers);
     }

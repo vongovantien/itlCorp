@@ -8,8 +8,9 @@ import { InfoPopupComponent } from 'src/app/shared/common/popup';
 import { AppPage } from 'src/app/app.base';
 import { DocumentationRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
-import { catchError } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-job-charge-import',
@@ -26,25 +27,37 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
     pager: PagerSetting = PAGINGSETTING;
     isDesc = true;
     sortKey: string = 'code';
+    transactionType: string = '';
 
     constructor(
         private _documentRepo: DocumentationRepo,
         private pagingService: PagingService,
         private sortService: SortService,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private route: ActivatedRoute
     ) {
         super();
     }
 
     ngOnInit() {
         this.pager.totalItems = 0;
+        this.subscriptionJobOpsType();
+    }
+
+    subscriptionJobOpsType() {
+        this.subscription =
+            this.route.data
+                .pipe(
+                    takeUntil(this.ngUnsubscribe)
+                ).subscribe((res: any) => { this.transactionType = res.transactionType; }
+                );
     }
 
 
     chooseFile(file: Event) {
         this.pager.totalItems = 0;
         if (file.target['files'] == null) { return; }
-        this._documentRepo.upLoadChargeFile(file.target['files'])
+        this._documentRepo.upLoadChargeFile(file.target['files'], this.transactionType)
             .subscribe((response: any) => {
                 this.data = response.data;
                 this.pager.currentPage = 1;

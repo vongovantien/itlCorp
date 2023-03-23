@@ -20,9 +20,15 @@
                     type="import">
                 </app-permission-button>
                 <div class="dropdown-menu" aria-labelledby="">
-                    <a routerLink="/home/operation/job-management/import-charge" class="dropdown-item"
+                    <a *ngIf="transactionType!=='TKI',else importTruckingInland"
+                        routerLink="/home/operation/job-management/import-charge" class="dropdown-item"
                         href="javascript:void(0)">Import
                         Charge</a>
+                    <ng-template #importTruckingInland>
+                        <a routerLink="/home/operation/job-management/import-charge-trucking-inland"
+                            class="dropdown-item" href="javascript:void(0)">Import</a>
+                    </ng-template>
+
                 </div>
             </div>
         </div>
@@ -269,4 +275,3 @@
 </app-dropdown>
 
 <link-charge-from-job-rep></link-charge-from-job-rep>
-

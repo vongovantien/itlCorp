@@ -149,7 +149,7 @@ export class FormSearchRuleComponent extends AppForm {
             { displayName: 'Sea FCL Import', value: 'SFI' },
             { displayName: 'Sea LCL Export', value: 'SLE' },
             { displayName: 'Sea LCL Import', value: 'SLI' },
-            { displayName: 'Inland Trucking', value: 'IT' },
+            { displayName: 'Trucking Inland', value: 'Tk' },
         ];
     }
 
