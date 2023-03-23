@@ -9,7 +9,8 @@
                         </th>
                     </thead>
                     <tbody>
-                        <ng-container *ngFor="let doc of lstEdocExist;let i = index; trackBy: trackByFn">
+                        <ng-container
+                            *ngFor="let doc of lstEdocExist| filter:keyword: ['systemFileName','jobNo','userCreated'];let i = index; trackBy: trackByFn">
                             <tr [contextMenu]="edocAccountantContext" (onTouch)="onSelectEDoc(doc)"
                                 [class.touch-row]="selectedEdoc?.id === doc.id && selectedEdoc?.systemFileName === doc.systemFileName">
                                 <td class="m--w-50 first">{{i + 1}}</td>
