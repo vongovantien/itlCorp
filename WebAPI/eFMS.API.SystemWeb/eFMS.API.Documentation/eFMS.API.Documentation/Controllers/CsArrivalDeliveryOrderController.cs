@@ -147,7 +147,7 @@ namespace eFMS.API.Documentation.Controllers
 
         [HttpPut("UpdateMultipleProofOfDelivery")]
         [Authorize]
-        public async Task<IActionResult> UpdateMultipleProofOfDelivery(List<ProofOfDeliveryModel> listModel)
+        public async Task<IActionResult> UpdateMultipleProofOfDelivery([FromBody] List<ProofOfDeliveryModel> listModel)
         {
             var handleStatus = await arrivalFreightChargeServices.UpdateMultipleProofOfDelivery(listModel);
             var message = HandleError.GetMessage(handleStatus, Crud.Update);

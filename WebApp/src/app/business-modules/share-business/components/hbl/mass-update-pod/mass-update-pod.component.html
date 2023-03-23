@@ -3,8 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Mass Update POD</h5>
-                <button type="button" class="close" aria-label="Close"
-                    (click)="formGroup.reset(); hide(); isSubmitted = false">
+                <button type="button" class="close" aria-label="Close" (click)="onClosePopUp()">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -41,15 +40,18 @@
                                                 ngxDaterangepickerMd
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                                 formControlName="deliveryDateAll" placeholder="Please Select" readonly
-                                                [singleDatePicker]="true"
-                                                [allowRemove]="!!deliveryDateAll && !!deliveryDateAll.value?.startDate"
-                                                (remove)="resetDeliveryDate()" [alwaysShowCalendars]="true"
-                                                [autoApply]="true" />
+                                                [singleDatePicker]="true" (remove)="resetDeliveryDate()"
+                                                [alwaysShowCalendars]="true" [autoApply]="true" />
                                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                                 <span>
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
+                                            <ng-container
+                                                *ngIf="!!deliveryDateAll.value && !!deliveryDateAll.value.startDate">
+                                                <span class=" m-input-icon_clear" (click)="resetDeliveryDate()"><i
+                                                        class=" la la-times"></i></span>
+                                            </ng-container>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
@@ -74,45 +76,36 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let hbl of houseBillList">
+                            <tr *ngFor="let hbl of houseBillListTemp">
                                 <td>
                                     {{hbl.hwbno}}
                                 </td>
                                 <td>
                                     <div class="form-group">
-                                        <input type="text" class="form-control" placeholder="Delivery Person">
+                                        <input type="text" [(ngModel)]="hbl.deliveryPerson" class="form-control"
+                                            placeholder="Delivery Person">
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="form-group"
-                                        [ngClass]="{ 'm-form__group has-danger': isSubmitted && deliveryDate.value?.startDate===null}">
+                                    <div class="form-group">
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                             <input type="text" class="form-control m-input m-input--square"
                                                 ngxDaterangepickerMd
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                                 placeholder="Please Select" readonly [singleDatePicker]="true"
-                                                [allowRemove]="!!deliveryDate.value && !!deliveryDate.value?.startDate"
-                                                [alwaysShowCalendars]="true" [autoApply]="true" />
+                                                [alwaysShowCalendars]="true" [autoApply]="true"
+                                                [(ngModel)]="hbl.deliveryDate" />
                                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                                 <span>
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
+                                            <ng-container *ngIf="!!hbl.deliveryDate && !!hbl.deliveryDate?.startDate">
+                                                <span class=" m-input-icon_clear" (click)="resetDeliveryDate()"><i
+                                                        class=" la la-times"></i></span>
+                                            </ng-container>
                                         </div>
                                     </div>
-
-                                    <!-- <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            name="daterange" placeholder="Please Select" readonly
-                                            [singleDatePicker]="true"
-                                            [allowRemove]="!!deliveryDate.value && !!deliveryDate.value?.startDate"
-                                            (remove)="resetDeliveryDate()" [alwaysShowCalendars]="true"
-                                            [autoApply]="true" />
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span> -->
                                 </td>
                             </tr>
                         </tbody>
@@ -121,16 +114,15 @@
             </div>
             <div class="modal-footer m--align-center c-button-actions">
                 <ng-container>
-                    <app-default-button [buttonSetting]="saveButtonSetting">
+                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="updatePOD()">
                     </app-default-button>
                 </ng-container>
 
-                <app-default-button [buttonSetting]="cancelButtonSetting"
-                    (onClick)="isSubmitted = false; formGroup.reset(); hide()">
+                <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="onClosePopUp()">
                 </app-default-button>
             </div>
         </div>
     </div>
 </div>
-<document-type-attach [housebills]="houseBillList" [selectedtDocType] ="documentType">
+<document-type-attach [housebills]="houseBillList" [selectedtDocType]="documentType" [isPOD]="true">
 </document-type-attach>

@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HouseBill } from '@models';
 import { Store } from '@ngrx/store';
@@ -7,7 +7,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { DocumentationRepo } from '@repositories';
 import { IShareBussinessState, getHBLSState } from '@share-bussiness';
 import { ToastrService } from 'ngx-toastr';
-import { takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
 import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
 import { ShareDocumentTypeAttachComponent } from '../../document-type-attach/document-type-attach.component';
@@ -26,19 +26,21 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
     deliveryDate: AbstractControl;
     deliveryPerson: AbstractControl;
     HAWBNo: AbstractControl;
-    houseBillList: HouseBill[] = [];
+    houseBillList: any[] = [];
     deliveryDateAll: AbstractControl;
     deliveryPersonAll: string = null;
     headersAttachFile: CommonInterface.IHeaderTable[];
-    documentType: any = {
-        code: "abc",
+    documentType: any = [{
+        nameEn: "abc",
         id: "3"
-    }
+    }]
+    houseBillListTemp: any[] = [];
     constructor(
         private _fb: FormBuilder,
         private _toast: ToastrService,
         private _progressService: NgProgress,
         private _documentRepo: DocumentationRepo,
+        private _cd: ChangeDetectorRef,
         protected _store: Store<IShareBussinessState>,
     ) {
         super();
@@ -53,14 +55,21 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
             { title: 'Delivery Date', field: 'deliveryDate', sortable: true },
         ]
         this.headersAttachFile = [
-            { title: 'No', field: 'index', width: 300 },
-            { title: 'Alias Name', field: 'aliasName', width: 300 },
-            { title: 'Real File Name', field: 'realFilename', width: 300 },
+            { title: 'Alias Name', field: 'aliasName', width: 200 },
+            { title: 'Real File Name', field: 'realFilename', width: 250 },
             { title: 'Document Type', field: 'docType', required: true },
-            { title: 'House Bill No', field: 'hbl' },
+            { title: 'House Bill No', field: 'hbl', width: 250 },
             { title: 'Note', field: 'note' },
         ]
-        this.getHouseBills();
+        //this.getHouseBills();
+        this.initForm()
+    }
+
+    // ngAfterViewInit(): void {
+    //     this.getHouseBills();
+    // }
+
+    initForm() {
         this.formGroup = this._fb.group({
             deliveryPerson: [null, Validators.compose([
                 Validators.required
@@ -69,24 +78,12 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
                 Validators.required
             ])],
             HAWBNo: [null, Validators.required],
-        }
-        );
+            deliveryDateAll: [],
+        });
         this.deliveryPerson = this.formGroup.controls['deliveryPerson'];
         this.deliveryDate = this.formGroup.controls['deliveryDate'];
         this.HAWBNo = this.formGroup.controls['HAWBNo'];
         this.deliveryDateAll = this.formGroup.controls['deliveryDateAll'];
-    }
-
-    getHouseBills() {
-        this._store.select(getHBLSState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (hbls: any[]) => {
-                    if (hbls?.length >= 1) {
-                        this.houseBillList = hbls;
-                    }
-                }
-            );
     }
 
     selectedHAWBNo($event: any) {
@@ -104,47 +101,66 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
     }
 
     onChangeAllValuePOD() {
-        this.houseBillList.map(x => {
-            x.deliveryDate = !!this.deliveryDate.value?.startDate ? formatDate(this.deliveryDate.value?.startDate, 'yyyy-MM-dd', 'en') : null,
-                x.deliveryPerson = this.deliveryPerson.value
+        this.houseBillListTemp.map(x => {
+            x.deliveryDate = !!this.deliveryDateAll?.value?.startDate ? this.deliveryDateAll.value : null,
+                x.deliveryPerson = this.deliveryPersonAll
         })
     }
-    // updatePOD() {
-    //     this.isSubmitted = true;
-    //     const deliveryDateInput = !!this.deliveryDate.value?.startDate ? formatDate(this.deliveryDate.value?.startDate, 'yyyy-MM-dd', 'en') : null;
-    //     if (this.formGroup.invalid || deliveryDateInput === null) {
-    //         return;
-    //     }
-    //     const listHbl = !!this.HAWBNo.value && this.HAWBNo.value[0].id === 'All' ?
-    //         this.houseBillList.filter(x => x.id !== 'All').map((x: any) => x.id) :
-    //         this.HAWBNo.value.map((x: any) => x.id)
-    //     const body = {
-    //         deliveryDate: deliveryDateInput,
-    //         deliveryPerson: this.deliveryPerson.value,
-    //         houseBills: listHbl,
-    //     }
-    //     this._documentRepo.updateMultipleProofOfDelivery(body).pipe(catchError(this.catchError)).subscribe(
-    //         (res: CommonInterface.IResult) => {
-    //             if (res.status) {
-    //                 this._toast.success(res.message);
-    //                 this.isUpdated.emit(true);
-    //                 this.isSubmitted = false;
-    //                 this.formGroup.reset();
-    //                 this.hide();
-    //             } else {
-    //                 this._toast.error(res.message);
-    //             }
-    //         }
-
-    //     )
-    // }
 
     resetDeliveryDate() {
-        this.deliveryDate.setValue(null);
+        this.deliveryDateAll?.setValue(null);
     }
 
     onShowDocumentAttach() {
         this.documentAttach.headers = this.headersAttachFile;
         this.documentAttach.show();
+    }
+
+    getHouseBills() {
+        this._store.select(getHBLSState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any[]) => {
+                    if (res?.length >= 1) {
+                        this.houseBillList = res;
+                        this.houseBillListTemp = res;
+                        console.log(res)
+                        console.log(this.houseBillListTemp)
+                    }
+                }
+            );
+    }
+
+    updatePOD() {
+        this.isSubmitted = true;
+        const body = this.houseBillList.map(x =>
+        ({
+            deliveryDate: !!x.deliveryDate?.startDate ? formatDate(x.deliveryDate?.startDate, 'yyyy-MM-dd', 'en') : null,
+            deliveryPerson: x.deliveryPerson,
+            hblId: x.id
+        }))
+        this._documentRepo.updateMultipleProofOfDelivery(body)
+            .pipe(catchError(this.catchError)).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res?.status) {
+                        this._toast.success(res.message);
+                        this.getHouseBills();
+                        this.isUpdated.emit(true);
+                        this.onClosePopUp();
+                    } else {
+                        this._toast.error(res.message);
+                    }
+                }
+            )
+    }
+
+    onClosePopUp() {
+        this._cd.detectChanges();
+        this.isSubmitted = false;
+        this.formGroup.reset();
+        this.deliveryDateAll.setValue(null);
+        this.deliveryPersonAll = null;
+        this.houseBillListTemp = this.houseBillList;
+        this.hide();
     }
 }

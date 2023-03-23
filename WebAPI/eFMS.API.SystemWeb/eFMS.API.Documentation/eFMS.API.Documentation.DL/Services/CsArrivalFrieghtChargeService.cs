@@ -851,12 +851,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             foreach (var hbl in listModel)
             {
-                var detailTransaction = detailTransactionRepository.First(x => x.Id == hbl.hblId);
-                detailTransaction.ReferenceNoProof = hbl.ReferenceNo;
+                var detailTransaction = detailTransactionRepository.First(x => x.Id == hbl.HblId);
                 detailTransaction.DeliveryDate = hbl.DeliveryDate;
                 detailTransaction.DeliveryPerson = hbl.DeliveryPerson;
-                detailTransaction.DeliveryPerson = hbl.DeliveryPerson;
-                detailTransaction.Note = hbl.Note;
                 listHBL.Add(detailTransaction);
             }
 

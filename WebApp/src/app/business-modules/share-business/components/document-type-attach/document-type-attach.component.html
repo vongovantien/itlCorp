@@ -32,24 +32,24 @@
                         <table class="table table-brand table-wrapper table-editable">
                             <thead app-table-header [headers]="headers">
                                 <th class="first">Action</th>
-                                <th class="first">No</th>
+                                <th *ngIf="typeFrom === 'HouseBill'" class="first">No</th>
                             </thead>
                             <ng-container>
                                 <tbody>
-                                    <ng-container *ngIf="listFile.length>0">
+                                    <ng-container *ngIf="listFile?.length>0">
                                         <ng-container *ngFor="let file of listFile; let i = index">
                                             <tr>
                                                 <td class="table-actions-col">
                                                     <app-permission-button type="delete" (onClick)="removeFile(i)">
                                                     </app-permission-button>
                                                 </td>
-                                                <td class="table-actions-col">
+                                                <td *ngIf="typeFrom === 'HouseBill'" class="table-actions-col">
                                                     {{i + 1}}
                                                 </td>
                                                 <td class="">
                                                     <div class="form-group"
                                                         [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.aliasName) }">
-                                                        <input class="form-control" placeholder="Aias name" type="text"
+                                                        <input class="form-control" placeholder="Alias name" type="text"
                                                             (ngModelChange)="onSelectDataFormInfo($event,i,'aliasName')"
                                                             [ngModel]="file.aliasName">
                                                     </div>
@@ -63,13 +63,18 @@
                                                 <td class="">
                                                     <div class="form-group"
                                                         [ngClass]="{'m-form__group has-danger': (isSubmitted && !file.docType) }">
-                                                        <select class="form-control" [(ngModel)]="file.docType"
+                                                        <select *ngIf="!isPOD, else POD" class="form-control"
+                                                            [(ngModel)]="file.docType"
                                                             (ngModelChange)="onSelectDataFormInfo($event,i,'docType')">
                                                             <option *ngFor="let docType of documentTypes"
                                                                 [ngValue]="docType">
                                                                 {{docType.nameEn}}
                                                             </option>
                                                         </select>
+                                                        <ng-template #POD>
+                                                            <input type="text" class="form-control "
+                                                                value="POD" disabled>
+                                                        </ng-template>
                                                     </div>
                                                 </td>
                                                 <td class="disabled" *ngIf="typeFrom==='Shipment'">
@@ -78,7 +83,8 @@
                                                             disabled>
                                                     </div>
                                                 </td>
-                                                <td class="disabled" *ngIf="typeFrom!=='Shipment'">
+                                                <td class="disabled"
+                                                    *ngIf="typeFrom!=='Shipment' && typeFrom !=='HouseBill'">
                                                     <select class="form-control" [(ngModel)]="file.job"
                                                         (ngModelChange)="onSelectDataFormInfo($event,i,'job')">
                                                         <option *ngFor="let job of jobs" [ngValue]="job">
@@ -86,7 +92,7 @@
                                                         </option>
                                                     </select>
                                                 </td>
-                                                <td class="" *ngIf="typeFrom==='Shipment'">
+                                                <td class="" *ngIf="typeFrom==='Shipment' || typeFrom ==='HouseBill'">
                                                     <div class="form-group ">
                                                         <select class="form-control" [(ngModel)]="file.hwbNo"
                                                             (ngModelChange)="onSelectDataFormInfo($event,i,'houseBill')">
