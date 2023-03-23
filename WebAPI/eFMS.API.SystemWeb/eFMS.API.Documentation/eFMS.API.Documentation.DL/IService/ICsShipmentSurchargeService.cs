@@ -27,7 +27,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState NotificationCreditTerm(List<CsShipmentSurchargeModel> list);
         HandleState NotificationExpiredAgreement(List<CsShipmentSurchargeModel> list);
         HandleState NotificationPaymenTerm(List<CsShipmentSurchargeModel> list);
-        List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list);
+        List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list, string transactionType);
         List<sp_GetSurchargeRecently> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria);
         HandleState Import(List<CsShipmentSurchargeImportModel> data, out List<Guid> Ids);
         HandleState UpdateFieldNetAmount_AmountUSD_VatAmountUSD(List<Guid> Ids);

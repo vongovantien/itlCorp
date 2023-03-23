@@ -49,7 +49,7 @@
         public static readonly string SIC_SHIPMENT = "SIC"; //Sea Consol Import
         public static readonly string AE_SHIPMENT = "AE"; //Sea Air Export
         public static readonly string AI_SHIPMENT = "AI"; //Sea Air Import
-        public static readonly string IT_SHIPMENT = "IT"; //Inland Trucking
+        public static readonly string TK_SHIPMENT = "TK"; //Inland Trucking
 
 
         public static readonly string SEF_HBL = "HBL";

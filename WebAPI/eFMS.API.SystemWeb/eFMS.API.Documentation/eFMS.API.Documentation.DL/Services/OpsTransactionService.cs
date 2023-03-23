@@ -715,7 +715,7 @@ namespace eFMS.API.Documentation.DL.Services
             var data = DataContext.Get(queryDefault);
             var queryPermission = QueryByPermission(criteria.RangeSearch);
             queryPermission = QuerySearchLinkJob(queryPermission, criteria);
-            data = data.Where(queryPermission);
+            data = data.Where(queryPermission.And(x => x.TransactionType == criteria.TransactionType));
 
             if (data == null) return null;
 
@@ -767,6 +767,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 && (x.Mblno ?? "").IndexOf(criteria.Mblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   && (x.TransactionType ?? "").IndexOf(criteria.TransactionType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
                                 && (x.FieldOpsId == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
                                 && (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
@@ -783,6 +784,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    || (x.Mblno ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ProductService ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ServiceMode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   || (x.TransactionType ?? "").IndexOf(criteria.TransactionType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.CustomerId == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.FieldOpsId == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.ShipmentMode == criteria.All || string.IsNullOrEmpty(criteria.All))

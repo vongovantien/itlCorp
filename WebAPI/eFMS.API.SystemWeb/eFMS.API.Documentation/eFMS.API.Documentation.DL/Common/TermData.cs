@@ -6,7 +6,7 @@ namespace eFMS.API.Documentation.DL.Common
 {
     public enum TransactionTypeEnum
     {
-        InlandTrucking = 1,
+        TruckingInland = 1,
         AirExport = 2,
         AirImport = 3,
         SeaConsolExport = 4,
@@ -72,7 +72,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string Warning = "Warning";
 
         public static readonly string CustomLogistic = "CL";
-        public static readonly string InlandTrucking = "IT";//"InlandTrucking";
+        public static readonly string TruckingInland = "TK";//"TruckingInland";
         public static readonly string AirExport = "AE";//"AirExport";
         public static readonly string AirImport = "AI";//"AirImport";
         public static readonly string SeaConsolExport = "SCE";//"SeaConsolExport";

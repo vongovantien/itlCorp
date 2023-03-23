@@ -1834,7 +1834,7 @@ namespace eFMS.API.Documentation.DL.Services
         public string GetShipmentTypeForPreviewPL(string transactionType)
         {
             string shipmentType = string.Empty;
-            if (transactionType == TermData.InlandTrucking)
+            if (transactionType == TermData.TruckingInland)
             {
                 shipmentType = "Inland Trucking ";
             }
