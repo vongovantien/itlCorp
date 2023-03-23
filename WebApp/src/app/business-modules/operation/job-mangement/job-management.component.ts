@@ -121,6 +121,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                     } else {
                         this.dataSearch = this.defaultDataSearch;
                     }
+                    this.dataSearch.transactionType = this.transactionType;
                     this.page = criteria.page;
                     this.pageSize = criteria.pageSize;
                     this.requestSearchShipment();
