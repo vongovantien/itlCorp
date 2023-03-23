@@ -326,14 +326,25 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[3, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet.Cells[3, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
-
+            worksheet.Column(1).Width = 5;
+            worksheet.Column(2).Width = 25;
+            worksheet.Column(3).Width = 50;
+            worksheet.Column(4).Width = 50;
+            worksheet.Column(5).Width = 10;
+            worksheet.Column(6).Width = 90;
+            worksheet.Column(7).Width = 35;
+            worksheet.Column(8).Width = 10;
+            worksheet.Column(9).Width = 22;
+            worksheet.Column(10).Width = 43;
+            worksheet.Column(11).Width = 22;
+            worksheet.Column(12).Width = 43;
             worksheet.Cells[1, 1, 1, 13].Merge = true;
             worksheet.Cells["A1"].Value = "CHARGE INFORMATION";
             worksheet.Cells["A1"].Style.Font.Size = 16;
             worksheet.Cells["A1"].Style.Font.Bold = true;
             worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             worksheet.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            //worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
             worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             for (int i = 0; i < listItems.Count; i++)
@@ -355,6 +366,12 @@ namespace eFMS.API.ReportData
 
                 worksheet.Cells[i + 4, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet.Cells[i + 4, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                worksheet.Cells[i + 4, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[i + 4, 5].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                worksheet.Cells[i + 4, 8].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[i + 4, 8].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 //Add border left right for cells
                 for (int j = 0; j < headers.Count; j++)
