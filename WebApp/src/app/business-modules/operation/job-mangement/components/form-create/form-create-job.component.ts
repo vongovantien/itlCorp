@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from '@app';
 import { ComboGridVirtualScrollComponent, InfoPopupComponent } from '@common';
 import { ChargeConstants, JobConstants } from '@constants';
