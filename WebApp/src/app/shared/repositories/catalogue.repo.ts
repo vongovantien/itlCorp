@@ -1065,8 +1065,8 @@ export class CatalogueRepo {
         );
     }
 
-    upLoadChargeFile(files: any, transactionType: string) {
-        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/UploadFile/${transactionType}`, files, "uploadedFile");
+    upLoadChargeFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCharge/UploadFile`, files, "uploadedFile");
     }
 
     importCharge(body: any) {
