@@ -760,7 +760,7 @@ namespace eFMS.API.Documentation.DL.Services
                 query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
             }
 
-            return query;
+            return query.And(x => x.TransactionType == criteria.TransactionType);
         }
 
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
@@ -773,7 +773,7 @@ namespace eFMS.API.Documentation.DL.Services
             var data = DataContext.Get(queryDefault);
             var queryPermission = QueryByPermission(criteria.RangeSearch);
             queryPermission = QuerySearchLinkJob(queryPermission, criteria);
-            data = data.Where(queryPermission.And(x => x.TransactionType == criteria.TransactionType));
+            data = data.Where(queryPermission);
 
             if (data == null) return null;
 
