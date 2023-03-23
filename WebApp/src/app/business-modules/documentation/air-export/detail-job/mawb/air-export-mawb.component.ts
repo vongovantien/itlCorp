@@ -472,14 +472,17 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit, ICrys
                 }
                 if (key === 'freightPayment') {
                     if (!!value) {
+                        console.log(this.wtorValpayment.value);
                         if (value === "Prepaid") {
-                            this.wtorValpayment.setValue([this.wts[0]]);
+                            this.wtorValpayment.setValue(this.wts[0]);
                         } else if (value === "Collect") {
-                            this.wtorValpayment.setValue([this.wts[1]]);
+                            this.wtorValpayment.setValue(this.wts[1]);
                         } else {
-                            this.wtorValpayment.setValue([this.wts[0]]);
+                            this.wtorValpayment.setValue(this.wts[0]);
                         }
                     }
+                    
+                    console.log(this.wtorValpayment.value);
                 }
             });
     }
