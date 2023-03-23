@@ -1476,7 +1476,7 @@ namespace eFMS.API.Documentation.DL.Services
             return users;
         }
 
-        public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list, string transactionType)
+        public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list,string transactionType)
         {
             var listChargeOps = DataContext.Get(x => x.TransactionType == transactionType);
             var listPartner = partnerRepository.Get(x => x.Active == true);

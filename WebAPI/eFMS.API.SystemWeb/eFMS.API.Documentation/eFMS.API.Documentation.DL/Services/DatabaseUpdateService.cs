@@ -69,7 +69,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var parameters = new[]{
                 new SqlParameter(){ ParameterName = "@table", Value = obj.GetType().Name.Replace("Model", "") },
                 new SqlParameter(){ ParameterName = "@values", Value = sql },
-                 new SqlParameter(){ ParameterName = "@type", Value = transactionType}
+                new SqlParameter(){ ParameterName = "@type", Value = transactionType}
             };
                 var result = context.DC.ExecuteProcedure<sp_InsertRowToDataBase>(parameters);
                 return result.FirstOrDefault();

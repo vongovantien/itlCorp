@@ -771,7 +771,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 && (x.Mblno ?? "").IndexOf(criteria.Mblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
-                                && (x.TransactionType ?? "").IndexOf(criteria.TransactionType ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   && (x.TransactionType ?? "").IndexOf(criteria.TransactionType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
                                 && (x.FieldOpsId == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
                                 && (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
