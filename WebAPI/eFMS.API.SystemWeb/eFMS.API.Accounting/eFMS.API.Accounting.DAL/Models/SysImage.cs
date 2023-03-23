@@ -18,5 +18,6 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? IsTemp { get; set; }
         public string KeyS3 { get; set; }
+        public string SyncStatus { get; set; }
     }
 }
