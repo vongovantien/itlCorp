@@ -1886,7 +1886,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             contract.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over30Day, 0));
                             contract.IsOverDueObh = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.OverObh1to15Day, 0) 
-                            || !DataTypeEx.IsNullOrValue(x.OverObh16To30Day, 0)
+                            || !DataTypeEx.IsNullOrValue(x.OverObh16to30Day, 0)
                             || !DataTypeEx.IsNullOrValue(x.OverObh30Day, 0));
                             if (contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
                             {
