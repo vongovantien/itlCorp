@@ -373,6 +373,11 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 4, 8].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet.Cells[i + 4, 8].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
+                worksheet.Cells[i + 4, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
+                worksheet.Cells[i + 4, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
+                worksheet.Cells[i + 4, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
+                worksheet.Cells[i + 4, 12].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
+
                 //Add border left right for cells
                 for (int j = 0; j < headers.Count; j++)
                 {
