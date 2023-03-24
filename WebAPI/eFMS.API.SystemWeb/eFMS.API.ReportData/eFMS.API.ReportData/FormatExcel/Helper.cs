@@ -333,7 +333,7 @@ namespace eFMS.API.ReportData
             worksheet.Column(5).Width = 10;
             worksheet.Column(6).Width = 90;
             worksheet.Column(7).Width = 35;
-            worksheet.Column(8).Width = 10;
+            worksheet.Column(8).Width = 15;
             worksheet.Column(9).Width = 22;
             worksheet.Column(10).Width = 43;
             worksheet.Column(11).Width = 22;
