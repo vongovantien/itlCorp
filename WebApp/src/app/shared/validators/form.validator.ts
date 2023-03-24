@@ -1,5 +1,5 @@
-import { FormGroup, AbstractControl, FormControl, Validators, ValidationErrors, } from '@angular/forms';
 import { Injectable } from "@angular/core";
+import { AbstractControl, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 
 @Injectable()
 export class FormValidators extends Validators {
@@ -64,6 +64,7 @@ export class FormValidators extends Validators {
         }
         return null;
     }
+
     public static validateSpecialChar(controls: AbstractControl | FormControl | FormGroup): ValidationErrors {
         if (controls.valid && controls.value) {
             const billNo: string = controls.value;
@@ -75,5 +76,17 @@ export class FormValidators extends Validators {
         }
         return null;
     }
+
+    public static validateNotFutureDate(controls: AbstractControl | FormControl): ValidationErrors {
+        if (controls.value != null) {
+            const inputDate: any = new Date(controls.value?.startDate);
+            const currentDate: any = new Date();
+            if (inputDate > currentDate) {
+                return { invalidDateFuture: true };
+            }
+        }
+        return null;
+    }
+
     // TODO Custom validator Fn here !
 }

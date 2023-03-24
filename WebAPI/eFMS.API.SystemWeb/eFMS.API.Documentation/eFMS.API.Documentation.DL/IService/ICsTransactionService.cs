@@ -30,7 +30,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState SoftDeleteJob(Guid jobId, out List<ObjectReceivableModel> modelReceivable);
         List<object> GetListTotalHB(Guid JobId);
         Crystal PreviewSIFFormPLsheet(Guid jobId, Guid hblId, string currency);
-        Task<ResultHandle> SyncHouseBills(Guid JobId,CsTransactionSyncHBLCriteria model);
+        Task<ResultHandle> SyncHouseBills(Guid JobId, CsTransactionSyncHBLCriteria model);
         HandleState SyncShipmentByAirWayBill(Guid JobId, csTransactionSyncAirWayBill model);
         int CheckDeletePermission(Guid id);
         HandleState LockCsTransaction(Guid jobId);
@@ -38,8 +38,9 @@ namespace eFMS.API.Documentation.DL.IService
         LinkAirSeaInfoModel GetLinkASInfomation(string jobNo, string mblNo, string hblNo, string serviceName, string serviceMode);
         int CheckUpdateMBL(CsTransactionEditModel model, out string mblNo, out List<string> advs);
         Task<HandleState> CreateFileZip(FileDowloadZipModel m);
-        string CheckHasHBLUpdateNominatedtoFreehand(CsTransactionEditModel model,bool isUpdate);
+        string CheckHasHBLUpdateNominatedtoFreehand(CsTransactionEditModel model, bool isUpdate);
         HandleState UpdateJobStatus(ChargeShipmentStatusModel model);
+
     }
     public class FileDowloadZipModel
     {

@@ -354,7 +354,8 @@ namespace eFMS.API.Accounting.DL.Services
                     refNo = criteria.ReferenceNos.Where(x => regex.IsMatch(x)).ToList();
 
                     settlementPayments = settlementPayments.Where(x => refNo.Contains(x.SettlementNo));
-                } else
+                }
+                else
                 {
                     refNo = (from set in settlementPayments
                              join sur in surcharge on set.SettlementNo equals sur.SettlementCode into grpSur
@@ -395,7 +396,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                 }
-                
+
             }
 
             return settlementPayments;
@@ -638,7 +639,7 @@ namespace eFMS.API.Accounting.DL.Services
             settlementMap.IsApproved = CheckUserIsApproved(currentUser, settlement, settlementApprove);
             settlementMap.IsShowBtnDeny = CheckIsShowBtnDeny(currentUser, settlement, settlementApprove);
 
-            if(!string.IsNullOrEmpty(settlement.Payee))
+            if (!string.IsNullOrEmpty(settlement.Payee))
             {
                 settlementMap.PayeeName = catPartnerRepo.Get(x => x.Id == settlement.Payee)?.FirstOrDefault().ShortName;
             }

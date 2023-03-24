@@ -2,16 +2,19 @@ import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/s
 import { catalogueReducer, ICatalogueState } from './catalogue.reducer';
 import { IMenuState, menuReducer } from './menu.reducer';
 import { IAuthState, authReducer } from './auth.reducer';
+import { ISystemAppState, systemReducer } from './system.reducer';
 export interface IAppState {
     catalogueReducer: ICatalogueState;
     menuReducer: IMenuState;
-    authReducer: IAuthState
+    authReducer: IAuthState;
+    systemReducer: ISystemAppState;
 }
 
 export const reducers: ActionReducerMap<IAppState> = {
     catalogueReducer: catalogueReducer,
     menuReducer: menuReducer,
-    authReducer: authReducer
+    authReducer: authReducer,
+    systemReducer: systemReducer
 };
 
 
@@ -20,6 +23,7 @@ export const reducers: ActionReducerMap<IAppState> = {
 export const catalogueState = createFeatureSelector<any>('catalogueReducer');
 export const menuState = createFeatureSelector<any>('menuReducer');
 export const authState = createFeatureSelector<any>('authReducer');
+export const systemState = createFeatureSelector<any>('systemReducer');
 
 
 // * CATALOGUE 
@@ -74,3 +78,10 @@ export const getMenuUserSpecialPermissionState = createSelector(menuState, (stat
 // * Auth
 export const getAuthState = createSelector(authState, (state: IAuthState) => state);
 export const getCurrentUserState = createSelector(authState, (state: IAuthState) => state?.currentUser);
+
+// * System
+export const getSystemState = createSelector(systemState, (state: ISystemAppState) => state);
+export const getSystemUserState = createSelector(systemState, (state: ISystemAppState) => state.users);
+export const getSystemOfficesState = createSelector(systemState, (state: ISystemAppState) => state.offices);
+export const getSystemOfficesLoadingState = createSelector(systemState, (state: ISystemAppState) => state.isLoadingOffice);
+export const getSystemUsersLoadingState = createSelector(systemState, (state: ISystemAppState) => state.isLoadingUser);

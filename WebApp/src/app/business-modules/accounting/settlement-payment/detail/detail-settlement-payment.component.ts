@@ -3,8 +3,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { ISettlementPaymentState, getListEdocState } from '../components/store/reducers/index';
 import { SettlementPayment } from './../../../../shared/models/accouting/settlement-payment';
-import { ISettlementPaymentState } from './../components/store/reducers/index';
 
 import { AppPage } from '@app';
 import { InfoPopupComponent, ReportPreviewComponent } from '@common';
@@ -23,7 +23,7 @@ import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, concatMap, finalize, pluck, takeUntil } from 'rxjs/operators';
-import { ShareBussinessAttachFileV2Component } from 'src/app/business-modules/share-business/components/files-attach-v2/files-attach-v2.component';
+import { ShareBussinessAttachFileV2Component } from 'src/app/business-modules/share-business/components/edoc/files-attach-v2/files-attach-v2.component';
 import isUUID from 'validator/lib/isUUID';
 import { LoadDetailSettlePayment, LoadDetailSettlePaymentFail, LoadDetailSettlePaymentSuccess } from '../components/store';
 @Component({
@@ -42,6 +42,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     settlementId: string = '';
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
+    totalEDoc: number = 0;
 
     attachFiles: any[] = [];
     folderModuleName: string = 'Settlement';
@@ -73,6 +74,13 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                 }
             });
         this.userLogged$ = this._store.select(getCurrentUserState);
+        this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    this.totalEDoc = res.length;
+                }
+            );
+
     }
 
     onChangeCurrency(currency: string) {
@@ -80,6 +88,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             this.requestSurchargeListComponent.changeCurrency(currency);
         }
     }
+
 
     getBodySettlement() {
         const settlement = {
@@ -116,12 +125,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     updateSettlement() {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
-
-
         if (!this.checkValidSettle()) {
             return;
         }
@@ -148,9 +151,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        // this.attachRef.getHblList();
                         this._toastService.success(res.message);
                         this.getDetailSettlement(this.settlementId, 'LIST');
+                        this.attachRef.getDocumentType('Settlement');
+                        this.attachRef.getListEdoc('Settlement');
                     } else {
                         this._toastService.warning(res.message, '', { enableHtml: true });
                     }
@@ -163,6 +167,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     }
                 }
             );
+
     }
 
     getDetailSettlement(settlementId: string, typeCharge: string) {
@@ -214,8 +219,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         bankCode: this.settlementPayment.settlement.bankCode,
                         dueDate: !!this.settlementPayment.settlement.dueDate ? { startDate: new Date(this.settlementPayment.settlement.dueDate), endDate: new Date(this.settlementPayment.settlement.dueDate) } : null
                     });
-                    // this.formCreateSurcharge.getBeneficiaryInfo();
-
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
 
@@ -234,9 +237,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     if (this.settlementPayment.settlement.settlementType === 'EXISTING') {
                         this.requestSurchargeListComponent.isExistingSettlement = true;
                     }
-                    // if (this.requestSurchargeListComponent.groupShipments.length) {
-                    //     this.requestSurchargeListComponent.openAllCharge.next(true);
-                    // }
                 },
                 () => {
                     this._store.dispatch(LoadDetailSettlePaymentFail());
@@ -262,10 +262,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     saveAndSendRequest() {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
         if (!this.checkValidSettle()) {
             return;
         }
@@ -339,6 +335,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     else {
                         this._toastService.success(`${settlementResult.settlementNo}`, ' Send request successfully');
                         this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}/${settlementResult.id}/approve`]);
+                        this.attachRef.getListEdoc('Settlement');
                     }
                 },
                 (error) => {
@@ -352,11 +349,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     previewSettlementPayment() {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
-
         this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.settlementNo)
             .pipe(catchError(this.catchError))
             .subscribe(
@@ -381,10 +373,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     exportSettlementPayment(language: string, typeExp: string) {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
 
         this._exportRepo.exportSettlementPaymentDetail(this.settlementPayment.settlement.id, language)
             .pipe(
@@ -402,10 +390,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     exportSettlementPaymentTemplate(language: string, typeExp: string) {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-        //     return;
-        // }
 
         this._exportRepo.exportSettlementPaymentDetailTemplate(this.settlementPayment.settlement.id, language)
             .pipe(
@@ -424,10 +408,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
 
 
     exportGeneralPreview(typeExp: string) {
-        // if (!this.requestSurchargeListComponent.surcharges.length) {
-        //     this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
-        //     return;
-        // }
 
         this._exportRepo.exportGeneralSettlementPayment(this.settlementPayment.settlement.id)
             .pipe(
@@ -449,12 +429,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         this.componentRef.instance.frm.nativeElement.submit();
         this.componentRef.instance.ShowWithDelay(); // Gọi method có delay này để ViewChild Popup nó get đc
     }
-
-    // regetEdoc(event: boolean) {
-    //     if (event) {
-    //         this.attachList.getEDoc("Settlement");
-    //     }
-    // }
 }
 
 export interface ISettlementPaymentData {

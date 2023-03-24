@@ -32,7 +32,8 @@
                             <span class="badge badge-success"
                                 *ngIf="attachFiles.eDocs?.length > 0">{{attachFiles.eDocs?.length}}</span>
                         </ng-template>
-                        <files-attach-v2 [typeFrom]="'Advance'" [billingId]="advId" [billingNo]="advNo" (onChange)="attachFiles = $event">
+                        <files-attach-v2 [typeFrom]="'Advance'" [billingId]="advId" [billingNo]="advNo"
+                            (onChange)="attachFiles = $event">
                         </files-attach-v2>
                     </tab>
                 </tabset>

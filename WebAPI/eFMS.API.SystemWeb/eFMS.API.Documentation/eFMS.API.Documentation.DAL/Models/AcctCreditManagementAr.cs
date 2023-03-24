@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -30,5 +31,11 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? NetOff { get; set; }
         public string ReferenceNo { get; set; }
         public string Source { get; set; }
+        public string VoucherNo { get; set; }
+        public DateTime? VoucherDate { get; set; }
+        public string TransactionType { get; set; }
+        public string AccountNo { get; set; }
+        public string SerieNo { get; set; }
+        public string PaymentStatus { get; set; }
     }
 }

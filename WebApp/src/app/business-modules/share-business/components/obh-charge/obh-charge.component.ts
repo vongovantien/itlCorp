@@ -84,6 +84,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             .subscribe(
                 (partners: Partner[]) => {
                     this.listPartnerPayee = partners;
+                    this._cd.markForCheck();
                 }
             );
     }
@@ -152,7 +153,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                         this._documentRepo.validateCheckPointContractPartner({
                             partnerId: this.hbl.customerId,
                             transactionType: transactionType,
-                            hblId: this.hbl.id
+                            hblId: this.hbl.id,
+                            type: 9
                         }).subscribe(
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {
@@ -227,7 +229,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                     this._documentRepo.validateCheckPointContractPartner({
                         partnerId: partnerData.id,
                         transactionType: transactionType,
-                        hblId: this.hbl.id
+                        hblId: this.hbl.id,
+                        type: 9
                     }).subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {

@@ -10,7 +10,7 @@
     {
         public static string EFMS_Accounting { get; } = "eFMS_AccountingExchange";
         public static string EFMS_Documentation { get; } = "eFMS_DocumentationExchange";
-        public static string EFMS_Operation{ get; } = "eFMS_OperationExchange";
+        public static string EFMS_Operation { get; } = "eFMS_OperationExchange";
         public static string EFMS_System { get; } = "eFMS_SystemExchange";
         public static string EFMS_Setting { get; } = "eFMS_SettingExchange";
         public static string EFMS_Catalogue { get; } = "eFMS_CatalogueExchange";

@@ -99,15 +99,16 @@
             </ng-template>
         </div>
     </div>
-    <!-- <div class="col-lg-2">
+    <div class="col-lg-2">
         <a class="font-20" title="Attach files" (click)="showShipmentAttachFile($event)" ClickStopPropagation>
             <i class="flaticon-folder-1"></i>
-            <ng-container *ngIf="data?.files?.length > 0">
-                <span
-                    class="m-badge m-badge--warning m-badge--rounded text-white font-weight-bold">{{data?.files?.length}}</span>
+            <ng-container *ngIf="(countFile$ | async)>0">
+                <span class="m-badge m-badge--warning m-badge--rounded text-white font-weight-bold">{{(countFile$ |
+                    async)}}</span>
             </ng-container>
         </a>
-    </div> -->
+    </div>
+
     <ng-container *ngIf="data.isLocked">
         <div class="stamp" style="
     position: absolute;

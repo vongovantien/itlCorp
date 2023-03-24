@@ -2,16 +2,19 @@
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
-using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,8 +33,9 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IAcctSOAService acctSOAService;
         private readonly ICurrentUser currentUser;
         private readonly IAccAccountReceivableService accountReceivableService;
-        private readonly IEDocService _edocService;
         private readonly IRabbitBus _busControl;
+        private readonly IEdocService _edocService;
+        private readonly IOptions<ApiUrl> apiServiceUrl;
 
         /// <summary>
         /// constructor
@@ -39,14 +43,23 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="user"></param>
-        public AcctSOAController(IStringLocalizer<LanguageSub> localizer, IAcctSOAService service, ICurrentUser user, IAccAccountReceivableService accountReceivable, IEDocService edocService, IRabbitBus _bus)
+        public AcctSOAController(
+            IStringLocalizer<LanguageSub> localizer,
+            IAcctSOAService service,
+            ICurrentUser user,
+            IAccAccountReceivableService accountReceivable,
+            IRabbitBus _bus,
+            IEdocService edocService,
+            IOptions<ApiUrl> _apiServiceUrl
+            )
         {
             stringLocalizer = localizer;
             acctSOAService = service;
             currentUser = user;
             accountReceivableService = accountReceivable;
-            _edocService = edocService;
             _busControl = _bus;
+            _edocService = edocService;
+            apiServiceUrl = _apiServiceUrl;
         }
 
         /// <summary>
@@ -84,12 +97,6 @@ namespace eFMS.API.Accounting.Controllers
                 result = new ResultHandle { Status = hs.Status, Message = hs.Message, Data = model };
                 Response.OnCompleted(async () =>
                 {
-                    //if (hs.Data != null)
-                    //{
-                    //    // Update table acctCreditManagementAR
-                    //    await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Add");
-                    //}
-
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
@@ -138,17 +145,18 @@ namespace eFMS.API.Accounting.Controllers
                 result = new ResultHandle { Status = hs.Status, Message = hs.Message, Data = model };
                 Response.OnCompleted(async () =>
                 {
-                    //if (hs.Data != null)
-                    //{
-                    //    await acctSOAService.UpdateAcctCreditManagement((List<CsShipmentSurcharge>)hs.Data, model.Soano, "Update");
-                    //}
                     List<ObjectReceivableModel> modelReceivableList = accountReceivableService.CalculatorReceivableByBillingCode(model.Soano, "SOA");
                     if (modelReceivableList.Count > 0)
                     {
                         await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
-                    // await _edocService.GenerateEdocSOA(model);
                 });
+                Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
+                var edocModel = _edocService.MapSOACharge(model.Soano);
+                if (edocModel.ListDel.Count > 0 || edocModel.ListAdd.Count > 0)
+                {
+                    var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
+                }
             }
             return Ok(result);
         }
@@ -216,7 +224,8 @@ namespace eFMS.API.Accounting.Controllers
                     {
                         await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
-                    await _edocService.DeleteEdocByBillingNo(soaNo);
+                    Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
+                    var deleteEdoc = HttpClientService.DeleteApi(urlEdoc + "File/api/v1/vi/EDoc/DeleteEDocAcc?billingNo=" + soaId , null);
                 });
             }
             return Ok(result);
