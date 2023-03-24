@@ -129,7 +129,7 @@ namespace eFMS.API.Operation.DL.Services
                     } else
                     {
                         clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
-                        cachedService.Set(clearanceEcus, TimeSpan.FromMinutes(3));
+                        cachedService.Set(clearanceEcus, TimeSpan.FromSeconds(30));
                     }
                    
                     if (clearanceEcus == null)
