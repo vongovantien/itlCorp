@@ -111,7 +111,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     }
 
     getClearanceNotImported() {
-        this._operationRepo.getUserCustomClearance(this.strKeySearch, false, this.page, this.pageSize).pipe(
+        this._operationRepo.getUserCustomClearance(this.page, this.pageSize).pipe(
             finalize(() => { this.isLoading = false; })
         )
             .subscribe(
@@ -142,7 +142,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         this.pageSize = this.numberToShow[2];
         this.customNo.setValue('');
         this.strKeySearch = '';
-        this._operationRepo.getUserCustomClearance(this.strKeySearch, false, this.page, this.pageSize);
+        this._operationRepo.getUserCustomClearance(this.page, this.pageSize);
     }
 
     updateJobToClearance() {
@@ -167,7 +167,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         this.pageSize = this.numberToShow[2];
         this.customNo.setValue('');
         this.strKeySearch = '';
-        this._operationRepo.getUserCustomClearance(this.strKeySearch, false, this.page, this.pageSize);
+        this._operationRepo.getUserCustomClearance(this.page, this.pageSize);
         this.hide();
     }
 }

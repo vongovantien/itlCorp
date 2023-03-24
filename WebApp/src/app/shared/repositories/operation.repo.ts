@@ -225,8 +225,8 @@ export class OperationRepo {
 
     }
 
-    getUserCustomClearance(strKeySearch: string, isImported: boolean, page: number, size: number) {
-        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetUserCustomClearance`, { keySearch: strKeySearch, imporTed: isImported, page: page, size: size }).pipe(
+    getUserCustomClearance(page: number, size: number) {
+        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetUserCustomClearance`, { page: page, size: size }).pipe(
             map((data: any) => data)
         );
     }

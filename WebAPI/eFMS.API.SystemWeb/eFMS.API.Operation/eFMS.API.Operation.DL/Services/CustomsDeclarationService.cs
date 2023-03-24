@@ -88,31 +88,14 @@ namespace eFMS.API.Operation.DL.Services
             return Get();
         }
 
-        public List<CustomsDeclarationModel> GetUserCustomClearance(string keySearch, bool Imported, int pageNumber, int pageSize, out int rowsCount)
+        public List<CustomsDeclarationModel> GetUserCustomClearance(int pageNumber, int pageSize, out int rowsCount)
         {
            
             
             List<CustomsDeclarationModel> returnList = new List<CustomsDeclarationModel>();
             string[] clearanceNoArray = null;
             string autocompleteKey = string.Empty;
-            if (keySearch != null)
-            {
-                keySearch = keySearch.ToLower().Trim();
-                var replaceString = keySearch.Split(',');
-                autocompleteKey = replaceString.Length > 0 ? replaceString[0] : string.Empty;
-                if (replaceString.Length > 1)
-                {
-                    clearanceNoArray = replaceString.Length > 1 ? replaceString[1].Split('\n') : null;
-                }
-                else
-                {
-                    clearanceNoArray = replaceString.Length > 0 ? replaceString[0].Split('\n') : null;
-                }
-            }
-            else
-            {
-                keySearch = String.Empty;
-            }
+            
             string userId = currentUser.UserID;
             var connections = ecusCconnectionService.Get(x => x.UserId == userId && x.Active == true);
             var result = new HandleState();
@@ -131,14 +114,11 @@ namespace eFMS.API.Operation.DL.Services
                         clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
                         cachedService.Set(clearanceEcus, TimeSpan.FromSeconds(30));
                     }
-                   
+
                     if (clearanceEcus == null)
                     {
                         rowsCount = 0;
                         return returnList;
-                    } else
-                    {
-                        clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
                     }
 
                     var clearencesNotExsitInFMS = clearanceEcus.Where(x => !checkExistEcusInEFMS(x.SOTK.ToString()));
