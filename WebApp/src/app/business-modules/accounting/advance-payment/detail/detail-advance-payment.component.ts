@@ -321,7 +321,7 @@ export class AdvancePaymentDetailComponent
                             `${res.data.advanceNo + " is update successfully"}`,
                             "Update Success !"
                         );
-                        this.attachRef.getListEdoc("Advance");
+                        this.attachRef.getEDoc("Advance");
                         this.getDetail(this.advId);
                     } else {
                         this.handleError((data: any) => {
@@ -447,7 +447,7 @@ export class AdvancePaymentDetailComponent
                             queryParams: Object.assign({}, { action: "carrier" })
                         });
                     }
-                    this.attachRef.getListEdoc("Advance");
+                    this.attachRef.getEDoc("Advance");
                 } else {
                     this.handleError((data: any) => {
                         this._toastService.error(data.message, data.title);
