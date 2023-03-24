@@ -166,16 +166,18 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
                     this.currentUser = res;
                 }
             )
-        this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
-            takeUntil(this.ngUnsubscribe)
-        )
-            .subscribe(
-                (data) => {
-                    if (!!data) {
-                        this.haveAdv = data.some(x => x.advanceNo !== null);
+        if (this.typeFrom === 'Settlement') {
+            this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        if (!!data) {
+                            this.haveAdv = data.some(x => x.advanceNo !== null);
+                        }
                     }
-                }
-            );
+                );
+        }
 
         this.getHblList();
     }
