@@ -586,8 +586,11 @@ namespace eFMS.API.Catalogue.DL.Services
                         {
                             if (!String.IsNullOrEmpty(o))
                             {
-                                var office = sysOfficeRepository.Where(x => x.Id.ToString().ToLower() == o.ToLower()).FirstOrDefault().Code.ToUpper();
-                                officeStr += office + ";";
+                                var office = sysOfficeRepository.Where(x => x.Id.ToString().ToLower() == o.ToLower()).FirstOrDefault();
+                                if (office != null)
+                                {
+                                    officeStr += office.Code.ToUpper() + ";";
+                                }
                             }
                         }
                     }
