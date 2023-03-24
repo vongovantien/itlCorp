@@ -5,15 +5,13 @@ import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.mo
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { template } from "lodash";
 import { DocumentationRepo, OperationRepo } from "@repositories";
-import { InjectViewContainerRefDirective } from "@directives";
 import { PagerSetting } from "src/app/shared/models/layout/pager-setting.model";
 import { PAGINGSETTING } from "src/constants/paging.const";
 import { CustomClearanceFormSearchComponent } from "../components/form-search-custom-clearance/form-search-custom-clearance.component";
 import { ModalDirective } from "ngx-bootstrap/modal";
-import { debounceTime, distinctUntilChanged, finalize, skip, switchMap, takeUntil, tap } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, finalize, takeUntil} from "rxjs/operators";
 import { BehaviorSubject, Observable } from "rxjs";
 import { ToastrService } from "ngx-toastr";
-
 
 @Component({
     selector: 'get-custom-clearance-from-Ecus',
@@ -24,7 +22,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     @ViewChild(CustomClearanceFormSearchComponent) CustomClearanceComponent: CustomClearanceFormSearchComponent;
     // @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
     @Input() currentJob: OpsTransaction;
-    @Input() customer: CustomClearanceFormSearchComponent; 
+    @Input() customer: CustomClearanceFormSearchComponent;
     @Output() isCloseModal = new EventEmitter();
     @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
 
@@ -38,7 +36,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     sort: string = null;
     term$ = new BehaviorSubject<string>('');
     dataEcus: any;
-;
+    ;
     checkAllNotImported = false;
     partnerTaxcode = '';
     constructor(
@@ -64,7 +62,6 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         ];
 
         this.initForm();
-        this.pager.totalItems = 15;
         this.term$.pipe(
             debounceTime(2000),
             distinctUntilChanged(),
@@ -74,8 +71,9 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         });
     }
 
- 
+
     initForm() {
+        this.pageSize=30;
         this.form = this._fb.group({
             customNo: ['', Validators.compose([
                 Validators.required
@@ -83,38 +81,6 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         });
         this.customNo = this.form.controls['customNo'];
     }
-
-    // onSearchRequest(keyword: string) {
-    //     if (!!keyword) {
-    //         if (keyword.indexOf('\\') !== -1) { return this.dataEcus = []; }
-    //         keyword = keyword.toLowerCase();
-    //         // Search group
-    //         let dataGrp = this.dataEcus.filter((item: any) => item.partnerNameEn.toLowerCase().toString().search(keyword) !== -1);
-    //         // Không tìm thấy group thì search tiếp list con của group
-    //         if (dataGrp.length === 0) {
-    //             const arrayCharge = [];
-    //             for (const group of this.cdNoteGroups) {
-    //                 const data = group.dataEcus.filter((item: any) => item.type.toLowerCase().toString().search(keyword) !== -1 || item.code.toLowerCase().toString().search(keyword) !== -1);
-    //                 if (data.length > 0) {
-    //                     arrayCharge.push({ id: group.id, partnerNameEn: group.partnerNameEn, partnerNameVn: group.partnerNameVn, listCDNote: data });
-    //                 }
-    //             }
-    //             dataGrp = arrayCharge;
-    //         }
-    //         return this.cdNoteGroups = dataGrp;
-    //     } else {
-    //         this.cdNoteGroups = this.initGroup;
-    //     }
-    // }
-
-    // onChangeKeyWord(keyword: string) {
-    //     if (!!keyword) {
-    //         this.dataEcus.filter(x => x.clearanceNo.toLowerCase() === keyword.toLowerCase() ||
-    //                              x.hblid.toLowerCase() === keyword.toLowerCase() || 
-    //                              x.customerName.toLowerCase() === keyword.toLowerCase());
-    //     }
-
-    // }
     onSearchAutoComplete(keyword: string) {
         console.log(this.customNo);
         this.term$.next(keyword.trim());
@@ -148,12 +114,12 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         this._operationRepo.getUserCustomClearance(this.strKeySearch, false, this.page, this.pageSize).pipe(
             finalize(() => { this.isLoading = false; })
         )
-        .subscribe(
-            (data: CommonInterface.IResponsePaging) => {
-                this.dataEcus = data.data || [];
-                this.totalItems = data.totalItems;
-            }
-        );
+            .subscribe(
+                (data: CommonInterface.IResponsePaging) => {
+                    this.dataEcus = data.data || [];
+                    this.totalItems = data.totalItems;
+                }
+            );
     }
 
     removeAllChecked() {
@@ -173,7 +139,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     refreshData() {
         this.keyword = '';
         this.page = 1;
-        this.pageSize = this.numberToShow[1];
+        this.pageSize = this.numberToShow[2];
         this.customNo.setValue('');
         this.strKeySearch = '';
         this._operationRepo.getUserCustomClearance(this.strKeySearch, false, this.page, this.pageSize);
@@ -198,7 +164,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     close() {
         this.keyword = '';
         this.page = 1;
-        this.pageSize = this.numberToShow[1];
+        this.pageSize = this.numberToShow[2];
         this.customNo.setValue('');
         this.strKeySearch = '';
         this._operationRepo.getUserCustomClearance(this.strKeySearch, false, this.page, this.pageSize);
