@@ -25,7 +25,7 @@ export class FormSearchTrackingComponent extends AppForm {
     };
     defaultSetting: any = { displayName: 'MAWB', fieldName: 'mawb', searchString: "" };
     settingFields: any[] = [this.defaultSetting];
-    constructor(private _routerService: Router) {
+    constructor() {
         super();
     }
 

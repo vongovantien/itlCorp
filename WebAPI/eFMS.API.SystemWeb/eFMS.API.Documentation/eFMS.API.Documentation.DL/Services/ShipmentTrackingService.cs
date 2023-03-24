@@ -184,14 +184,13 @@ namespace eFMS.API.Documentation.DL.Services
 
                             }
                             #region ghiLogTracking
-                            var message = HandleError.GetMessage(hs, Crud.Insert);
                             var logTrackingModel = new LogTrackingResponseModel();
                             logTrackingModel.Status = dataResponse.Meta.Code;
                             logTrackingModel.Message = dataResponse.Meta.Message;
                             logTrackingModel.User = _currentUser;
                             logTrackingModel.User.Action = "Added";
                             logTrackingModel.ObjectRequest = payload;
-                            logTrackingModel.ObjectResponse = dataResponse;
+                            logTrackingModel.ObjectsResponse = dataResponse;
 
                             MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
                             MongoDbHelper.Insert("SysTrackInfo", logTrackingModel);
@@ -224,7 +223,6 @@ namespace eFMS.API.Documentation.DL.Services
             }
             catch (Exception ex)
             {
-                new LogHelper("eFMS_TRACKSHIPMENT", ex.ToString());
                 throw;
             }
         }
