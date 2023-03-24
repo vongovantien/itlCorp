@@ -31,6 +31,9 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
     @ViewChild(ShareModulesReasonRejectPopupComponent) reasonRejectPopupComponent: ShareModulesReasonRejectPopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
     @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
+    @ViewChild('scroller') scroller: CdkVirtualScrollViewport;
+
+    page: number = 1;
     soaNO: string = '';
 
     soa: SOA = new SOA();
@@ -113,6 +116,25 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
                     this.userLogged = u;
                 }
             })
+    }
+
+    ngAfterViewInit(): void {
+        this.scroller.elementScrolled().pipe(
+            map(() => this.scroller.measureScrollOffset('bottom')),
+            pairwise(),
+            filter(([y1, y2]) => (y2 < y1 && y2 < 50)),
+            throttleTime(200)
+        ).subscribe(() => {
+            this.ngZone.run(() => {
+                const totalPage = Math.ceil(this.soa.totalCharge / 20);
+                if (this.page < totalPage) {
+                    this.getNextSurcharge();
+                } else {
+                    return;
+                }
+            });
+        }
+        );
     }
 
     getDetailSOA(soaNO: string, currency: string) {
@@ -467,46 +489,18 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
     onSaveAdjustDebit() {
         this.getDetailSOA(this.soaNO, 'VND');
     }
-    @ViewChild('scroller') scroller: CdkVirtualScrollViewport;
 
-    page: number = 1;
-    ngAfterViewInit(): void {
-        this.scroller.elementScrolled().pipe(
-            map(() => this.scroller.measureScrollOffset('bottom')),
-            pairwise(),
-            filter(([y1, y2]) => (y2 < y1 && y2 < 50)),
-            throttleTime(200)
-        ).subscribe(() => {
-            this.ngZone.run(() => {
-                const totalPage = Math.ceil(this.soa.totalCharge / 20);
-                console.log(this.page);
-                if (this.page < totalPage) {
-                    this.getNextSurcharge();
-                } else {
-                    return;
-                }
-            });
-        }
-        );
-    }
 
     getNextSurcharge() {
         this.isLoading = true;
         this.page++;
         this._accoutingRepo.getPagingSurchargeSOA(this.soa.soano, this.page, 20)
-            .pipe(
-                finalize(() => {
-                    this.isLoading = false;
-                })
-            )
+            .pipe(finalize(() => { this.isLoading = false; }))
             .subscribe((res: CommonInterface.IResponsePaging) => {
-                console.log(res);
                 if (!!res.data.length) {
                     this.soa.chargeShipments = [...this.soa.chargeShipments, ...res.data || []];
                 }
             });
-
-
     }
 }
 
