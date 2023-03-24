@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using eFMS.IdentityServer.DL.UserManager;
+using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
@@ -9,6 +11,23 @@ namespace eFMS.API.Documentation.DL.Models
         public Meta Meta { get; set; }
         public Data Data { get; set; }
     }
+    public class LogTrackingResponseModel
+    {
+        public string Message { get; set; }
+        public int Status { get; set; }
+        public ICurrentUser User { get; set;}
+        public string Action { get; set; }
+        public TrackingMoreRequestModel ObjectRequest { get; set; }
+        public TrackingMoreResponseModel ObjectsResponse { get; set; }
+    }
+
+    public class LogTrackingMoreResponseModel
+    {
+        public string Message { get; set; }
+        public string Status { get; set; }
+    }
+
+
     public class Meta
     {
         public int Code { get; set; }

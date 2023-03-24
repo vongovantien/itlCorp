@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.Infrastructure.NoSql;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -177,7 +181,21 @@ namespace eFMS.API.Documentation.DL.Services
 
                                 shipmentExisted.TrackingStatus = statusShipment != string.Empty ? statusShipment : shipmentExisted.TrackingStatus;
                                 hs = await transactionRepository.UpdateAsync(shipmentExisted, x => x.Id == shipmentExisted.Id);
+
                             }
+                            #region ghiLogTracking
+                            var message = HandleError.GetMessage(hs, Crud.Insert);
+                            var logTrackingModel = new LogTrackingResponseModel();
+                            logTrackingModel.Status = dataResponse.Meta.Code;
+                            logTrackingModel.Message = dataResponse.Meta.Message;
+                            logTrackingModel.User = _currentUser;
+                            logTrackingModel.User.Action = "Added";
+                            logTrackingModel.ObjectRequest = payload;
+                            logTrackingModel.ObjectResponse = dataResponse;
+
+                            MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
+                            MongoDbHelper.Insert("SysTrackInfo", logTrackingModel);
+                            #endregion
                         }
 
                         var returnData = DataContext.Get(x => x.JobId == shipmentExisted.Id)
@@ -202,9 +220,11 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 return trackShipment;
+
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                new LogHelper("eFMS_TRACKSHIPMENT", ex.ToString());
                 throw;
             }
         }

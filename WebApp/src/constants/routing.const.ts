@@ -2,6 +2,10 @@
 
 export class RoutingConstants {
 
+
+    public static readonly MAWB_TRACKING_URL: string = `https://www.unitedcargo.com/en/us/track/awb`;
+    public static readonly HAWB_TRACKING_URL: string = 'https://www.track-trace.com/aircargo';
+
     public static readonly ROOT_COMMERCIAL: string = '/home/commercial';
     public static readonly ROOT_LOGISTICS: string = '/home/operation';
     public static readonly ROOT_DOC: string = '/home/documentation';
