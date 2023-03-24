@@ -1,5 +1,6 @@
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { HttpResponse } from '@angular/common/http';
-import { Component, ViewChild } from '@angular/core';
+import { Component, NgZone, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent, ReportPreviewComponent } from '@common';
 import { AccountingConstants, RoutingConstants, SystemConstants } from '@constants';
@@ -11,7 +12,8 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { IAppState, getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
 import groupBy from 'lodash/groupBy';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { timer } from 'rxjs';
+import { catchError, filter, finalize, map, pairwise, takeUntil, throttleTime } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup';
@@ -55,7 +57,8 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
         private _router: Router,
         private _progressService: NgProgress,
         private _exportRepo: ExportRepo,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
+        private ngZone: NgZone
     ) {
         super();
         this.requestSort = this.sortChargeList;
@@ -329,6 +332,17 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
             this.TYPE = 'LIST';
         } else {
             this.TYPE = 'GROUP';
+            if (!!this.soa.groupShipments.length) {
+                return;
+            }
+            this.isLoading = true;
+            this._accoutingRepo.getSurchargeGroupSOA(this.soa.soano)
+                .pipe(finalize(() => this.isLoading = false))
+                .subscribe(
+                    (res: any) => {
+                        this.soa.groupShipments = res;
+                    }
+                )
         }
     }
 
@@ -454,6 +468,47 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
 
     onSaveAdjustDebit() {
         this.getDetailSOA(this.soaNO, 'VND');
+    }
+    @ViewChild('scroller') scroller: CdkVirtualScrollViewport;
+
+    page: number = 1;
+    ngAfterViewInit(): void {
+        this.scroller.elementScrolled().pipe(
+            map(() => this.scroller.measureScrollOffset('bottom')),
+            pairwise(),
+            filter(([y1, y2]) => (y2 < y1 && y2 < 50)),
+            throttleTime(200)
+        ).subscribe(() => {
+            this.ngZone.run(() => {
+                const totalPage = Math.ceil(this.soa.totalCharge / 20);
+                console.log(this.page);
+                if (this.page < totalPage) {
+                    this.getNextSurcharge();
+                } else {
+                    return;
+                }
+            });
+        }
+        );
+    }
+
+    getNextSurcharge() {
+        this.isLoading = true;
+        this.page++;
+        this._accoutingRepo.getPagingSurchargeSOA(this.soa.soano, this.page, 20)
+            .pipe(
+                finalize(() => {
+                    this.isLoading = false;
+                })
+            )
+            .subscribe((res: CommonInterface.IResponsePaging) => {
+                console.log(res);
+                if (!!res.data.length) {
+                    this.soa.chargeShipments = [...this.soa.chargeShipments, ...res.data || []];
+                }
+            });
+
+
     }
 }
 

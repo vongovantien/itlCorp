@@ -2162,135 +2162,6 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var data = new List<ChargeShipmentModel>();
             var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
-            if (soa != null)
-            {
-
-                //var surcharges = csShipmentSurchargeRepo.Get(x => soa.Type == "Debit" ? x.Soano == soaNo : x.PaySoano == soaNo);
-                //foreach (var surcharge in surcharges)
-                //{
-                //    var chg = new ChargeShipmentModel();
-                //    chg.SOANo = soa.Type == "Debit" ? surcharge.Soano : surcharge.PaySoano;
-                //    chg.ID = surcharge.Id;
-                //    var charge = catChargeRepo.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
-                //    chg.ChargeCode = charge?.Code;
-                //    chg.ChargeName = charge?.ChargeNameEn;
-                //    chg.JobId = surcharge.JobNo;
-                //    chg.HBL = surcharge.Hblno;
-                //    chg.MBL = surcharge.Mblno;
-                //    chg.Type = surcharge.Type;
-                //    chg.Currency = surcharge.CurrencyId;
-                //    chg.InvoiceNo = surcharge.InvoiceNo;
-                //    chg.Note = surcharge.Notes;
-                //    chg.CurrencyToLocal = AccountingConstants.CURRENCY_LOCAL;
-                //    chg.CurrencyToUSD = AccountingConstants.CURRENCY_USD;
-                //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || (surcharge.PaymentObjectId == soa.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                //    {
-                //        chg.Debit = surcharge.Total;
-                //        chg.AmountDebitLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
-                //        chg.AmountDebitUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
-                //    }
-                //    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY || (surcharge.PayerId == soa.Customer && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH))
-                //    {
-                //        chg.Credit = surcharge.Total;
-                //        chg.AmountCreditLocal = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
-                //        chg.AmountCreditUSD = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
-                //    }
-                //    chg.DatetimeModifiedSurcharge = surcharge.DatetimeModified;
-
-                //    string _pic = string.Empty;
-                //    DateTime? _serviceDate = null;
-                //    string _customNo = string.Empty;
-                //    if (surcharge.TransactionType == "CL")
-                //    {
-                //        var ops = opsTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
-                //        if (ops != null)
-                //        {
-                //            _serviceDate = ops.ServiceDate;
-                //            var user = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault();
-                //            _pic = user?.Username;
-                //            _customNo = surcharge.ClearanceNo;
-                //        }
-                //    }
-                //    else
-                //    {
-                //        var tran = csTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
-                //        if (tran != null)
-                //        {
-                //            //_serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
-                //            _serviceDate = tran.ServiceDate;
-                //            var user = sysUserRepo.Get(x => x.Id == tran.PersonIncharge).FirstOrDefault();
-                //            _pic = user?.Username;
-                //        }
-                //    }
-                //    chg.CustomNo = _customNo;
-                //    chg.ServiceDate = _serviceDate;
-                //    chg.PIC = _pic;
-
-                //    bool _isSynced = false;
-                //    string _syncedFromBy = null;
-                //    string _cdNote = string.Empty;
-                //    if (soa != null)
-                //    {
-                //        if (soa.Customer == surcharge.PayerId && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                //        {
-                //            _cdNote = surcharge.CreditNo;
-
-                //            _isSynced = !string.IsNullOrEmpty(surcharge.PaySyncedFrom) && (surcharge.PaySyncedFrom.Equals("SOA") || surcharge.PaySyncedFrom.Equals("CDNOTE") || surcharge.PaySyncedFrom.Equals("VOUCHER") || surcharge.PaySyncedFrom.Equals("SETTLEMENT"));
-                //            if (surcharge.PaySyncedFrom == "SOA")
-                //            {
-                //                _syncedFromBy = chg.SOANo;
-                //            }
-                //            if (surcharge.PaySyncedFrom == "CDNOTE")
-                //            {
-                //                _syncedFromBy = _cdNote;
-                //            }
-                //            if (surcharge.PaySyncedFrom == "VOUCHER")
-                //            {
-                //                _syncedFromBy = surcharge.VoucherId;
-                //            }
-                //            if (surcharge.PaySyncedFrom == "SETTLEMENT")
-                //            {
-                //                _syncedFromBy = surcharge.SettlementCode;
-                //            }
-                //        }
-                //        else
-                //        {
-                //            if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
-                //            {
-                //                _cdNote = surcharge.CreditNo;
-                //            }
-                //            if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL || surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                //            {
-                //                _cdNote = surcharge.DebitNo;
-                //            }
-
-                //            _isSynced = !string.IsNullOrEmpty(surcharge.SyncedFrom) && (surcharge.SyncedFrom.Equals("SOA") || surcharge.SyncedFrom.Equals("CDNOTE") || surcharge.SyncedFrom.Equals("VOUCHER") || surcharge.SyncedFrom.Equals("SETTLEMENT"));
-                //            if (surcharge.SyncedFrom == "SOA")
-                //            {
-                //                _syncedFromBy = chg.SOANo;
-                //            }
-                //            if (surcharge.SyncedFrom == "CDNOTE")
-                //            {
-                //                _syncedFromBy = _cdNote;
-                //            }
-                //            if (surcharge.SyncedFrom == "VOUCHER")
-                //            {
-                //                _syncedFromBy = surcharge.VoucherId;
-                //            }
-                //            if (surcharge.SyncedFrom == "SETTLEMENT")
-                //            {
-                //                _syncedFromBy = surcharge.SettlementCode;
-                //            }
-                //        }
-                //    }
-                //    chg.CDNote = _cdNote;
-                //    chg.IsSynced = _isSynced;
-                //    chg.SyncedFromBy = _syncedFromBy;
-                //    chg.ExchangeRate = surcharge.FinalExchangeRate;
-
-                //    data.Add(chg);
-                //}
-            }
 
             var parameters = new[]{
                 new SqlParameter(){ ParameterName = "@SoaNo", Value = soa.Soano },
@@ -2301,7 +2172,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             data = mapper.Map<List<ChargeShipmentModel>>(listSurcharges);
             return data;
-        }
+        }      
 
         public AcctSOADetailResult GetDetailBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
         {
@@ -2311,24 +2182,32 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return data;
             }
-            var chargeShipments = GetChargesForDetailSoa(soaNo);
+            var chargeShipments = new List<ChargeShipmentModel>();
+            if (soaDetail.Status == AccountingConstants.STATUS_SOA_NEW && string.IsNullOrEmpty(soaDetail.SyncStatus))
+            {
+                chargeShipments = GetChargesForDetailSoa(soaNo);
+            } else
+            {
+                chargeShipments = GetPagingChargesForDetailSoa(soaNo, 1, 20);
+            }
 
             var _groupShipments = new List<GroupShipmentModel>();
-            _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL, g.PIC, g.ShipmentId })
-            .Select(s => new GroupShipmentModel
-            {
-                PIC = s.Key.PIC,
-                JobId = s.Key.JobId,
-                HBL = s.Key.HBL,
-                MBL = s.Key.MBL,
-                TotalCredit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Credit)) + " " + se.Key.Currency).ToList()),
-                TotalDebit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Debit)) + " " + se.Key.Currency).ToList()),
-                ChargeShipments = s.ToList(),
-                ShipmentId=s.Key.ShipmentId,
-            }).ToList();
+            //_groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL, g.PIC, g.ShipmentId })
+            //.Select(s => new GroupShipmentModel
+            //{
+            //    PIC = s.Key.PIC,
+            //    JobId = s.Key.JobId,
+            //    HBL = s.Key.HBL,
+            //    MBL = s.Key.MBL,
+            //    TotalCredit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Credit)) + " " + se.Key.Currency).ToList()),
+            //    TotalDebit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Debit)) + " " + se.Key.Currency).ToList()),
+            //    ChargeShipments = s.ToList(),
+            //    ShipmentId=s.Key.ShipmentId,
+            //}).ToList();
             data = soaDetail;
-            data.TotalCharge = chargeShipments.Count;
-            data.GroupShipments = _groupShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
+            data.TotalCharge = csShipmentSurchargeRepo.Count(x => (soaDetail.Type == "Debit" ? x.Soano : x.PaySoano) == soaNo);
+            //data.GroupShipments = _groupShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
+            data.GroupShipments = _groupShipments;
             data.ChargeShipments = chargeShipments.ToArray().OrderByDescending(o => o.JobId).ToList(); //Sắp xếp giảm dần theo số Job
             data.AmountDebitLocal = NumberHelper.RoundNumber(chargeShipments.Sum(x => x.AmountDebitLocal), 3);
             data.AmountCreditLocal = NumberHelper.RoundNumber(chargeShipments.Sum(x => x.AmountCreditLocal), 3);
@@ -3929,6 +3808,63 @@ namespace eFMS.API.Accounting.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public async Task<ResponsePagingModel<ChargeShipmentModel>> GetPagingSurchargeSOA(string soaNo, int page, int size)
+        {
+            var data = GetPagingChargesForDetailSoa(soaNo, page, size);
+            var rowsCount = data.Count();
+
+            if (page == 0)
+            {
+                page = 1;
+                size = rowsCount;
+            }
+            var result = mapper.ProjectTo<ChargeShipmentModel>(data.AsQueryable());
+
+            return new ResponsePagingModel<ChargeShipmentModel>
+            {
+                Data = result,
+                Page = page,
+                Size = size,
+                TotalItems = rowsCount
+            };
+        }
+
+        private List<ChargeShipmentModel> GetPagingChargesForDetailSoa(string soaNo, int page, int size)
+        {
+            var data = new List<ChargeShipmentModel>();
+            var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
+
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@SoaNo", Value = soaNo },
+                new SqlParameter(){ ParameterName = "@Type", Value = soa.Type },
+                new SqlParameter(){ ParameterName = "@Customer", Value = soa.Customer },
+                new SqlParameter(){ ParameterName = "@Page", Value = page },
+                new SqlParameter(){ ParameterName = "@Size", Value = size }
+            };
+            List<sp_GetSurchargeDetailSOAPaging> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSOAPaging>(parameters);
+
+            data = mapper.Map<List<ChargeShipmentModel>>(listSurcharges);
+            return data;
+        }
+
+        public List<GroupShipmentModel> GetSOAGroupShipmentModels(string soaNo)
+        {
+            var chargeShipments = GetChargesForDetailSoa(soaNo);
+            var _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL, g.PIC, g.ShipmentId })
+            .Select(s => new GroupShipmentModel
+            {
+                PIC = s.Key.PIC,
+                JobId = s.Key.JobId,
+                HBL = s.Key.HBL,
+                MBL = s.Key.MBL,
+                TotalCredit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Credit)) + " " + se.Key.Currency).ToList()),
+                TotalDebit = string.Join(" | ", s.ToList().GroupBy(gr => new { gr.Currency }).Select(se => string.Format("{0:#,##0.###}", se.Sum(su => su.Debit)) + " " + se.Key.Currency).ToList()),
+                ChargeShipments = s.ToList(),
+                ShipmentId = s.Key.ShipmentId,
+            }).ToList();
+            return _groupShipments;
         }
     }
 }
