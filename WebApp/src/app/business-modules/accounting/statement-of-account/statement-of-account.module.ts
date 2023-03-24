@@ -34,6 +34,7 @@ import { ConfirmBillingComponent } from './confirm-billing/confirm-billing.compo
 import { ConfirmBillingDetailComponent } from './confirm-billing/detail/detail-confirm-billing.component';
 import { soaEffect } from './store/effects';
 import { reducers } from './store/reducers';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 const routing: Routes = [
     {
@@ -119,7 +120,8 @@ const COMPONENTS = [
         ShareBussinessModule,
         StoreModule.forFeature('soa', reducers),
         EffectsModule.forFeature(soaEffect),
-        ShareBussinessAccountingModule
+        ShareBussinessAccountingModule,
+        ScrollingModule
     ],
     exports: [],
     providers: [

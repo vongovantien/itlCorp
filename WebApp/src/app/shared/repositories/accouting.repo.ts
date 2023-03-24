@@ -92,6 +92,14 @@ export class AccountingRepo {
             );
     }
 
+    getPagingSurchargeSOA(soaNo: string, page: number, size: number) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetPagingSurchargeSOA`, { soaNo, page, size }, { "hideSpinner": "true" });
+    }
+
+    getSurchargeGroupSOA(soaNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetSurchargeGroupSOA`, { soaNo });
+    }
+
 
     getListShipmentDocumentOperation() {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/GetShipments`)
