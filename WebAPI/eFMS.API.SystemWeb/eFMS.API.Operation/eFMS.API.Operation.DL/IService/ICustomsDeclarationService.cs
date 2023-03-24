@@ -33,5 +33,6 @@ namespace eFMS.API.Operation.DL.IService
         HandleState ImportClearancesOlaFromEcus();
         Task<HandleState> ReplicateCustomClearance(int Id);
         Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model);
+        List<CustomsDeclarationModel> GetUserCustomClearance(int page, int size, out int rowsCount);
     }
 }

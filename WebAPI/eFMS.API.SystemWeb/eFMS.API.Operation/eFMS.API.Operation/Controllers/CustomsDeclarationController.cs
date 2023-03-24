@@ -104,6 +104,21 @@ namespace eFMS.API.Operation.Controllers
             return Ok(result);
         }
 
+        /// </summary>
+        /// <param name="keySearch"></param>
+        /// <param name="customerNo"></param>
+        /// <param name="imporTed"></param>
+        /// <param name="page"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        [HttpGet("GetUserCustomClearance")]
+        public IActionResult GetUserCustomClearance(int page, int size)
+        {
+            var data = customsDeclarationService.GetUserCustomClearance(page, size, out int rowsCount);
+            var result = new { data, totalItems = rowsCount, page, size };
+            return Ok(result);
+        }
+
         /// <summary>
         /// get and paging the list of custom declarations by conditions
         /// </summary>

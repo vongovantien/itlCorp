@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, map, takeUntil, withLatestFrom, every } from 'rxjs/operators';
+import { catchError, map, takeUntil, withLatestFrom, every, finalize } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { OperationRepo, DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
@@ -18,6 +18,7 @@ import { CustomsDeclarationLoadListAction } from '../store/actions/custom-cleara
 import { HttpResponse } from '@angular/common/http';
 import { InjectViewContainerRefDirective } from '@directives';
 import { forkJoin } from 'rxjs';
+import { CustomClearanceFromEcus } from './getecus/get-custom-clearance-from-Ecus.component';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -26,7 +27,7 @@ import { forkJoin } from 'rxjs';
 export class CustomClearanceComponent extends AppList {
     @ViewChild(Permission403PopupComponent) canNotAllowActionPopup: Permission403PopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
-
+    @ViewChild(CustomClearanceFromEcus) getEcusActionPopup: CustomClearanceFromEcus;
     listCustomDeclaration: CustomDeclaration[] = [];
     menuPermission: SystemInterface.IUserPermission;
     messageConvertError: string = '';
@@ -38,6 +39,8 @@ export class CustomClearanceComponent extends AppList {
         imPorted: null,
         personHandle: null
     };
+    strKeySearch: string=null;
+    dataEcus: any;
 
     constructor(
         private _store: Store<IAppState>,
@@ -175,6 +178,11 @@ export class CustomClearanceComponent extends AppList {
                 },
             );
     }
+    openPopupAdd() {
+        this.getEcusActionPopup.getClearanceNotImported();
+        this.getEcusActionPopup.show();
+    }
+
 
     getDataOlaFromEcus() {
         this._operationRepo.importCustomClearanceOlaFromEcus()
