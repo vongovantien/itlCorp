@@ -16,6 +16,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string Message { get; set; }
         public int Status { get; set; }
         public ICurrentUser User { get; set;}
+        public DateTime DateTimeTracking { get; set; }
         public string Action { get; set; }
         public TrackingMoreRequestModel ObjectRequest { get; set; }
         public TrackingMoreResponseModel ObjectsResponse { get; set; }

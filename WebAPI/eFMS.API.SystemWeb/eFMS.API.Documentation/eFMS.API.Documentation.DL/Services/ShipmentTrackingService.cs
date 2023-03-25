@@ -188,6 +188,7 @@ namespace eFMS.API.Documentation.DL.Services
                             logTrackingModel.Status = dataResponse.Meta.Code;
                             logTrackingModel.Message = dataResponse.Meta.Message;
                             logTrackingModel.User = _currentUser;
+                            logTrackingModel.DateTimeTracking = DateTime.Now;
                             logTrackingModel.User.Action = "Added";
                             logTrackingModel.ObjectRequest = payload;
                             logTrackingModel.ObjectsResponse = dataResponse;
