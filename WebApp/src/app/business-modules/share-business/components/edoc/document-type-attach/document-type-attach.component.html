@@ -30,7 +30,7 @@
                 <list-file-attach *ngIf="jobOnSettle" [typeFrom]="typeFrom" [jobNo]="jobNo" [jobOnSettle]="jobOnSettle"
                     [transactionType]="transactionType" [billingId]="billingId" [readonly]="readonly"
                     [isEdocByAcc]="isEdocByAcc" [jobId]="jobId" [lstEdocExist]="lstEdocExist"></list-file-attach>
-                <div class="row">
+                <div class="row" *ngIf="!readonly">
                     <div class="col-md-12">
                         <table class="table table-brand table-editable table-fixed-err">
                             <thead app-table-header [headers]="headers">
@@ -177,7 +177,8 @@
                                             </td>
                                         </tr>
                                     </ng-container>
-                                    <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!listFile.length">
+                                    <tr app-table-none-record [colspan]="headers.length  + 1"
+                                        *ngIf="!listFile.length && !readonly">
                                     </tr>
                                 </tbody>
                             </ng-container>
@@ -185,7 +186,7 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer m--align-center c-button-actions">
+            <div *ngIf="!readonly" class="modal-footer m--align-center c-button-actions">
                 <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="uploadEDoc()">
                 </app-default-button>
                 <app-default-button [buttonSetting]="cancelButtonSetting"
