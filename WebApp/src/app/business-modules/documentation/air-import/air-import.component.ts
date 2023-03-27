@@ -117,8 +117,8 @@ export class AirImportComponent extends AppList {
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
                     if (res.data?.length > 0) {
-                        let opsFirst = res.data[0];
-                        if (opsFirst && opsFirst.transactionType === "AI") {
+                        let jobFirst = res.data[0];
+                        if (jobFirst && jobFirst.transactionType === "AI") {
                             this.shipments = res.data || [];
                             this.totalItems = res.totalItems;
                         } else {
