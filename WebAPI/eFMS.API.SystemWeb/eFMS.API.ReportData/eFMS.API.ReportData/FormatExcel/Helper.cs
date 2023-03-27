@@ -375,6 +375,8 @@ namespace eFMS.API.ReportData
 
                 worksheet.Cells[i + 4, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
                 worksheet.Cells[i + 4, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
+                worksheet.Cells[i + 4, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
+                worksheet.Cells[i + 4, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
                 worksheet.Cells[i + 4, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
                 worksheet.Cells[i + 4, 12].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
 
