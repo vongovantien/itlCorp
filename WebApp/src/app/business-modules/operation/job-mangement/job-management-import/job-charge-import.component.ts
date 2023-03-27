@@ -49,8 +49,10 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
             this.route.data
                 .pipe(
                     takeUntil(this.ngUnsubscribe)
-                ).subscribe((res: any) => { this.transactionType = res.transactionType; }
-                );
+                ).subscribe((res: any) => {
+                    this.transactionType = res.transactionType;
+                    console.log(this.transactionType);
+                });
     }
 
 
