@@ -105,7 +105,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.initForm();
-        
+
         this._store.dispatch(new GetCatalogueAgentAction());
         this._store.dispatch(new GetCatalogueCarrierAction(CommonEnum.PartnerGroupEnum.CARRIER));
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.SEA }));
@@ -131,6 +131,8 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
             .subscribe(
                 (res: CsTransaction) => {
                     if (!!res) {
+                        this.maxDateAta = this.createMoment(res.ata).isAfter(this.maxDate) ? this.createMoment(res.ata) : this.maxDate;
+                        this.maxDateAtd = this.createMoment(res.atd).isAfter(this.maxDate) ? this.createMoment(res.atd) : this.maxDate;
                         try {
                             this._route.queryParams.subscribe((param: Params) => {
                                 if (param.action === 'copy') {
@@ -180,7 +182,6 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                                 noProfit: res.noProfit
 
                             });
-
                             this.currentFormValue = this.formGroup.getRawValue(); // For CanDeactivate.
                         } catch (error) {
                             console.log(error);
@@ -196,8 +197,8 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
 
             etd: [null, Validators.required], // * Date
             eta: [], // * Date
-            ata: [],
-            atd: [],
+            ata: [null, FormValidators.validateNotFutureDate],
+            atd: [null, FormValidators.validateNotFutureDate],
 
             serviceDate: [null, Validators.required],
 
@@ -270,6 +271,8 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                 }
             });
 
+        this.maxDateAta = !this.isDetail ? this.maxDate : null;
+        this.maxDateAtd = !this.isDetail ? this.maxDate : null;
     }
     getUserDefault(id: string, userName: string) {
         this.defaultUserName = userName;
@@ -360,6 +363,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                 );
         }
     }
+
     getPIC(groupId: number) {
         this._systemRepo.getPersonInchargeByCurrentUser(groupId, this.isDetail)
             .pipe(catchError(this.catchError))

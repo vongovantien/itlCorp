@@ -21,6 +21,7 @@ export class ShareListFilesAttachComponent extends AppShareEDocBase implements O
 
     @Input() transactionType: string = '';
     @Input() readonly: boolean = false;
+    @Input() keyword: string;
 
 
     constructor(
