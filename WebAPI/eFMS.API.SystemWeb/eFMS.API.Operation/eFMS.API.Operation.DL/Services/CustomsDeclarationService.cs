@@ -111,7 +111,7 @@ namespace eFMS.API.Operation.DL.Services
                     {
                         var clearanceEcus = new List<DTOKHAIMD>();
                         clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
-                        
+
                         if (clearanceEcus == null)
                         {
                             rowsCount = 0;
@@ -127,15 +127,15 @@ namespace eFMS.API.Operation.DL.Services
                                 newClearance.Source = OperationConstants.FromEcus;
                                 returnList.Add(mapper.Map<CustomsDeclarationModel>(newClearance));
                             }
-                            cachedService.Set(returnList, TimeSpan.FromSeconds(15));
                         }
                     }
+                    cachedService.Set(returnList, TimeSpan.FromSeconds(15));
                 }
             }
             catch (Exception ex)
             {
                 result = new HandleState(ex.Message);
-                rowsCount = 0;
+                rowsCount = 0;  
             }
             // Perform pagination
             int rowCount = returnList.Count();
