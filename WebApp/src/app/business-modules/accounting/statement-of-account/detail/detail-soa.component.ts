@@ -127,7 +127,9 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
                     this.totalItems = this.soa.chargeShipments.length;
                     this.initGroup = this.soa.groupShipments;
                     this.soa.shipment = Object.keys(groupBy(this.initGroup, 'jobId')).length || 0;
-                    this._store.dispatch(LoadSOADetailSuccess({ detail: res }));
+                    if (res) {
+                        this._store.dispatch(LoadSOADetailSuccess({ detail: res }));
+                    }
                 },
             );
     }
