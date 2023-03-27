@@ -118,14 +118,36 @@ export class SeaFCLExportComponent extends AppList {
 
 
     getShipments() {
+        // this._store.select(fromShare.getTransactionListShipment)
+        //     .pipe(
+        //         takeUntil(this.ngUnsubscribe),
+        //     )
+        //     .subscribe(
+        //         (res: CommonInterface.IResponsePaging | any) => {
+        //             this.shipments = res.data || [];
+        //             this.totalItems = res.totalItems;
+        //         }
+        //     );
         this._store.select(fromShare.getTransactionListShipment)
             .pipe(
                 takeUntil(this.ngUnsubscribe),
             )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
-                    this.shipments = res.data || [];
-                    this.totalItems = res.totalItems;
+                    if (res.data?.length > 0) {
+                        let opsFirst = res.data[0];
+                        if (opsFirst && opsFirst.transactionType === "SFE") {
+                            this.shipments = res.data || [];
+                            this.totalItems = res.totalItems;
+                        } else {
+                            this.shipments = [];
+                            this.totalItems = 0;
+                        }
+                    } else {
+                        this.shipments = [];
+                        this.totalItems = 0;
+                    }
+
                 }
             );
     }
