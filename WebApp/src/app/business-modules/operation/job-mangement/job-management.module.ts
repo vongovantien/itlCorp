@@ -38,10 +38,10 @@ const routing: Routes = [
                 data: { name: "New", transationType: 'TKI' }
             },
             {
-                path: 'import-charge', component: JobManagementChargeImportComponent, data: { name: "Import Logistics Charge", transactionType: 'CL' }
+                path: 'import-charge', component: JobManagementChargeImportComponent, data: { name: "Import Logistics Charge", transactionType: null }
             },
             {
-                path: 'import-charge-trucking-inland', component: JobManagementChargeImportComponent, data: { name: "Import Trucking Inland Charge", transactionType: 'TK' }
+                path: 'import-charge-trucking-inland', component: JobManagementChargeImportComponent, data: { name: "Import Trucking Inland Charge", transactionType: 'TKI' }
             },
             {
                 path: "job-edit",

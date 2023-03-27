@@ -1760,7 +1760,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         item.Hblid = currentOpsJob.Hblid;
                         item.JobNo = currentOpsJob.JobNo;
-                        item.TransactionType = transactionType;
+                        item.TransactionType = transactionType=="TK"?"TKI":"CL";
                         string jobNo = currentOpsJob.JobNo;
                         if (item.Type.ToLower() == "obh")
                         {
