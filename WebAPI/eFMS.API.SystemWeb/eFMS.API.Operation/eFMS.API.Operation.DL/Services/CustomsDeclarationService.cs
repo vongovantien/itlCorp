@@ -47,7 +47,7 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private readonly IContextBase<SysOffice> sysOfficeRepository;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
-        private readonly ICacheServiceBase<DTOKHAIMD> cachedService;
+        private readonly ICacheServiceBase<CustomsDeclarationModel> cachedService;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
@@ -63,7 +63,7 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<SysOffice> sysOffice,
-            ICacheServiceBase<DTOKHAIMD> customCacheDeclarationSerice,
+            ICacheServiceBase<CustomsDeclarationModel> customCacheDeclarationSerice,
         IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
@@ -90,58 +90,58 @@ namespace eFMS.API.Operation.DL.Services
 
         public List<CustomsDeclarationModel> GetUserCustomClearance(int pageNumber, int pageSize, out int rowsCount)
         {
-           
-            
-            List<CustomsDeclarationModel> returnList = new List<CustomsDeclarationModel>();
-            string[] clearanceNoArray = null;
-            string autocompleteKey = string.Empty;
-            
+            List<CustomsDeclarationModel> returnList = new List<CustomsDeclarationModel>();            
             string userId = currentUser.UserID;
             var connections = ecusCconnectionService.Get(x => x.UserId == userId && x.Active == true);
             var result = new HandleState();
             var lists = new List<CustomsDeclaration>();
             try
             {
-                foreach (var item in connections)
+                var dataCached = cachedService.Get();
+                if (dataCached != null && dataCached.Count > 0)
                 {
-                    var clearanceEcus = new List<DTOKHAIMD>();
-                    var dataCached = cachedService.Get();
-                    if(dataCached!=null && dataCached.Count > 0)
+                    returnList = dataCached;
+                }
+                else
+                {
+                    // clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
+                    // Loc xong set cache, case > 1 connect
+                    // cachedService.Set(clearanceEcus, TimeSpan.FromSeconds(30));
+                    foreach (var item in connections)
                     {
-                        clearanceEcus = dataCached;
-                    } else
-                    {
+                        var clearanceEcus = new List<DTOKHAIMD>();
                         clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
-                        cachedService.Set(clearanceEcus, TimeSpan.FromSeconds(30));
-                    }
-
-                    if (clearanceEcus == null)
-                    {
-                        rowsCount = 0;
-                        return returnList;
-                    }
-
-                    var clearencesNotExsitInFMS = clearanceEcus.Where(x => !checkExistEcusInEFMS(x.SOTK.ToString()));
-                    if (clearencesNotExsitInFMS.Count() > 0)
-                    {
-                        foreach (var d in clearencesNotExsitInFMS)
+                        
+                        if (clearanceEcus == null)
                         {
-                            var newClearance = MapEcusClearanceToCustom(d, d.SOTK?.ToString().Trim());
-                            newClearance.Source = OperationConstants.FromEcus;
-                            returnList.Add(mapper.Map<CustomsDeclarationModel>(newClearance));
+                            rowsCount = 0;
+                            return returnList;
+                        }
+
+                        var clearencesNotExsitInFMS = clearanceEcus.Where(x => !checkExistEcusInEFMS(x.SOTK.ToString()));
+                        if (clearencesNotExsitInFMS.Count() > 0)
+                        {
+                            foreach (var d in clearencesNotExsitInFMS)
+                            {
+                                var newClearance = MapEcusClearanceToCustom(d, d.SOTK?.ToString().Trim());
+                                newClearance.Source = OperationConstants.FromEcus;
+                                returnList.Add(mapper.Map<CustomsDeclarationModel>(newClearance));
+                            }
+                            cachedService.Set(returnList, TimeSpan.FromSeconds(15));
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-
+                result = new HandleState(ex.Message);
+                rowsCount = 0;
             }
             // Perform pagination
             int rowCount = returnList.Count();
             rowsCount = rowCount;
             returnList = returnList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-            returnList = MapClearancesToClearanceModels(returnList.AsQueryable());            
+            returnList = MapClearancesToClearanceModels(returnList.AsQueryable());
             return returnList;
         }
 
@@ -1275,19 +1275,28 @@ namespace eFMS.API.Operation.DL.Services
                         item.OfficeId = currentUser.OfficeID;
                         item.CompanyId = currentUser.CompanyID;
                     }
-
-                    HandleState hs = Add(data);
-                    if (hs.Success)
+                    var data_not_in_efms = data.Where(x => !checkExistEcusInEFMS(x.ClearanceNo.ToString())).ToList();
+                    if (data.Count() > 0 && data_not_in_efms.Count() > 0)
                     {
-                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, data.Count]);
+                        HandleState hs = Add(data_not_in_efms);
+                        if (hs.Success)
+                        {
+                            result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, data.Count]);
 
-                        string logErr = String.Format("Import Ecus thành công {0} \n {1} Tờ khai {2}", currentUser.UserName, data.Count, DateTime.Now);
-                        new LogHelper("ECUS", logErr);
+                            string logErr = String.Format("Import Ecus thành công {0} \n {1} Tờ khai {2}", currentUser.UserName, data.Count, DateTime.Now);
+                            new LogHelper("ECUS", logErr);
+                        }
+                        else
+                        {
+                            result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, 0]);
+                            string logErr = String.Format("{0} Import thất bại {1} Tờ khai do {2} at {3}", currentUser.UserName, data.Count, hs.Message, DateTime.Now);
+                            new LogHelper("ECUS", logErr);
+                        }
                     }
                     else
                     {
-                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, 0]);
-                        string logErr = String.Format("{0} Import thất bại {1} Tờ khai do {2} at {3}", currentUser.UserName, data.Count, hs.Message, DateTime.Now);
+                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_DATA_EXISTED]);
+                        string logErr = String.Format("Import thất bại {0} \n Tờ khai đang chọn đã tồn tại {1}.", currentUser.UserName, DateTime.Now);
                         new LogHelper("ECUS", logErr);
                     }
                 }

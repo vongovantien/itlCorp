@@ -2,12 +2,12 @@ import { Component, EventEmitter, OnInit, Output, ViewChild } from "@angular/cor
 import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { template } from "lodash";
+import { size, template } from "lodash";
 import { DocumentationRepo, OperationRepo } from "@repositories";
 import { PagerSetting } from "src/app/shared/models/layout/pager-setting.model";
 import { PAGINGSETTING } from "src/constants/paging.const";
 import { CustomClearanceFormSearchComponent } from "../components/form-search-custom-clearance/form-search-custom-clearance.component";
-import { finalize} from "rxjs/operators";
+import { catchError, finalize} from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 
 @Component({
@@ -26,16 +26,15 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     dataEcus: any;
     checkAllNotImported = false;
     constructor(
-        private _fb: FormBuilder,
-        private _sortService: SortService,
         private _toastrService: ToastrService,
-        private _documentationRepo: DocumentationRepo,
+        private _sortService: SortService,
         private _operationRepo: OperationRepo) {
         super();
         this.requestList = this.getClearanceNotImported;
     }
 
     ngOnInit() {
+        this.pageSize=this.numberToShow[2];
         this.headers = [
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'Clearance Date', field: 'clearanceDate', sortable: true },
@@ -51,7 +50,9 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
 
 
     initForm() {
-        this.pageSize=30;
+        console.log(this.pageSize);
+        this.pageSize=this.numberToShow[2];
+        console.log(this.pageSize);
     }
 
     changeAllNotImported() {
@@ -72,9 +73,11 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     }
 
     getClearanceNotImported() {
-        this._operationRepo.getUserCustomClearance(this.page, this.pageSize).pipe(
-            finalize(() => { this.isLoading = false; })
-        )
+        console.log(this.pageSize);
+        this._operationRepo.getUserCustomClearance(this.page, this.pageSize)
+            .pipe(
+                finalize(() => { this.isLoading = false; })
+            )
             .subscribe(
                 (data: CommonInterface.IResponsePaging) => {
                     this.dataEcus = data.data || [];
@@ -109,14 +112,24 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         const dataToUpdate = this.dataEcus.filter(x => x.isChecked === true);
         if (dataToUpdate.length > 0) {
             this._operationRepo.importCustomClearance(dataToUpdate)
-                .pipe()
+                .pipe(catchError(this.catchError), finalize(() => this.refreshData()))
                 .subscribe(
                     (responses: CommonInterface.IResult | any) => {
                         if (!!responses.message) {
                             this._toastrService.success(responses.message.value, '');
+                            this.dataEcus.filter(x => x.isChecked === true);
                         }
                     }
                 );
+        }
+        else{
+            this._toastrService.warning("Chưa chọn clearance để save!", '');
+        }
+    }
+    
+    sortChargeCdNote(sort: string): void {
+        if (this.dataEcus) {
+            this.dataEcus = this._sortService.sort(this.dataEcus, sort, this.order);
         }
     }
 
