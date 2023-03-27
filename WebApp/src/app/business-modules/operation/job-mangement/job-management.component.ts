@@ -265,8 +265,8 @@ export class JobManagementComponent extends AppList implements OnInit {
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
                     if (!!res.data) {
-                        let opsFirst = res.data.opsTransactions[0];
-                        if (opsFirst && opsFirst.transactionType === this.transactionType) {
+                        let jobFirst = res.data.opsTransactions[0];
+                        if (jobFirst && jobFirst.transactionType === this.transactionType) {
                             this.shipments = res.data.opsTransactions || [];
                             this.totalItems = res.totalItems;
                         } else {
