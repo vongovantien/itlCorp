@@ -109,8 +109,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group" [ngClass]="{'m-form__group has-danger':
-                            (isSubmitted && arrivaldate.errors | equalError:'invalidDateFuture' )||
-                           (arrivaldate.touched && arrivaldate.errors | equalError:'invalidDateFuture')}">
+                            (isSubmitted && arrivalDate.errors | equalError:'invalidDateFuture' )||
+                           (arrivalDate.touched && arrivalDate.errors | equalError:'invalidDateFuture')}">
                                 <label>ATA</label>
                                 <div class=" m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -122,7 +122,7 @@
                                         [maxDate]='maxDateAta' />
                                 </div>
                                 <div class="form-control-feedback"
-                                    *ngIf="isSubmitted && arrivaldate.errors | equalError:'invalidDateFuture'">
+                                    *ngIf="isSubmitted && arrivalDate.errors | equalError:'invalidDateFuture'">
                                     {{errorATA}}
                                 </div>
                             </div>
