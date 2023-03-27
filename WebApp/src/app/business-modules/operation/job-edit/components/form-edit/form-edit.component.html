@@ -474,7 +474,7 @@
                         <span> Get From Declaration </span>
                     </span>
                 </button>
-                <ng-container *ngIf="opsTransaction?.linkSource !== 'Replicate'">
+                <ng-container *ngIf="opsTransaction?.linkSource !== 'Replicate' && transactionType!=='TKI'">
                     <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase m--margin-right-10"
                         (click)="syncGoodInforToReplicateJob()">
                         <span>

@@ -602,7 +602,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     gotoList() {
-        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
+        if (this.transactionType === 'TKI') {
+            this._router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND}`]);
+        } else {
+            this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
+        }
     }
 
     handleCancelForm() {
@@ -620,7 +624,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     confirmCancel() {
         this.isCancelFormPopupSuccess = true;
-
         if (this.nextState) {
             this._router.navigate([this.nextState.url.toString()]);
         } else {
