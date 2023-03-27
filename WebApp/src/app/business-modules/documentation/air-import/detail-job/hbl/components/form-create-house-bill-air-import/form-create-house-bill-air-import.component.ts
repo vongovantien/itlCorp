@@ -45,7 +45,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     warehouseId: AbstractControl;
     forwardingAgentId: AbstractControl;
     hbltype: AbstractControl;
-    arrivaldate: AbstractControl;
+    arrivalDate: AbstractControl;
     eta: AbstractControl;
     pol: AbstractControl;
     pod: AbstractControl;
@@ -155,14 +155,14 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             this.getShipmentAndSetDefault();
         } else {
             this._store.select(getDetailHBlState)
-            .pipe(catchError(this.catchError),
-                distinctUntilChanged(),
-                switchMap((shipment: any) => this._store.select(getTransactionDetailCsTransactionState))
-            ).subscribe((res: any) => {
-                this.shipmentType = res.shipmentType;
-                // console.log("useswitch map:", this.shipmentType);
-            }
-            );
+                .pipe(catchError(this.catchError),
+                    distinctUntilChanged(),
+                    switchMap((shipment: any) => this._store.select(getTransactionDetailCsTransactionState))
+                ).subscribe((res: any) => {
+                    this.shipmentType = res.shipmentType;
+                    // console.log("useswitch map:", this.shipmentType);
+                }
+                );
             this.getDetailHBLState();
         }
     }
@@ -182,7 +182,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                             mawb: shipment.mawb,
                             pod: shipment.pod,
                             pol: shipment.pol,
-                            arrivaldate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
+                            //arrivaldate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
                             eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
                             flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
                             flightNo: shipment.flightVesselName,
@@ -216,6 +216,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             );
     }
 
+
     getDetailHBLState() {
         this._store.select(getDetailHBlState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -229,7 +230,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                         this.userCreated = hbl.userNameCreated;
                         this.userModified = hbl.userNameModified;
                         this.updateFormValue(hbl);
-                   }
+                    }
                 }
             );
     }
@@ -298,7 +299,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             packageType: [],
 
             // * Date
-            arrivaldate: [null, FormValidators.validateNotFutureDate],
+            //arrivaldate: [null],
             arrivalDate: [null, FormValidators.validateNotFutureDate],
             flightDate: [],
             issueHBLDate: [{ startDate: new Date(), endDate: new Date() }],
@@ -329,7 +330,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.freightPayment = this.formCreate.controls["freightPayment"];
         this.packageType = this.formCreate.controls["packageType"];
 
-        this.arrivaldate = this.formCreate.controls["arrivalDate"];
+        this.arrivalDate = this.formCreate.controls["arrivalDate"];
         this.eta = this.formCreate.controls["eta"];
 
         this.flightDate = this.formCreate.controls["flightDate"];
