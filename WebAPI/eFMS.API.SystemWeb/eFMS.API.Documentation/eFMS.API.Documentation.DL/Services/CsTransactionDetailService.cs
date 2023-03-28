@@ -1409,15 +1409,23 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         if (
                             !string.IsNullOrEmpty(item.Soano)
+                            || !string.IsNullOrEmpty(item.PaySoano)
                             || !string.IsNullOrEmpty(item.CreditNo)
                             || !string.IsNullOrEmpty(item.DebitNo)
                             || !string.IsNullOrEmpty(item.SettlementCode)
                             || !string.IsNullOrEmpty(item.VoucherId)
+                            || !string.IsNullOrEmpty(item.AdvanceNo)
+                            || !string.IsNullOrEmpty(item.SyncedFrom)
+                            || !string.IsNullOrEmpty(item.PaySyncedFrom)
                             || item.LinkFee == true)
                         {
                             isSpecialCase = true;
                             break;
                         }
+                    }
+                    if (!isSpecialCase)
+                    {
+                        isSpecialCase = acctAdvanceRequestRepository.Any(x => x.Hblid == hbId);
                     }
                     if (isSpecialCase == true)
                     {
