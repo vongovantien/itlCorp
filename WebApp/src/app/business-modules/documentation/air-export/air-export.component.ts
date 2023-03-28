@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { SortService } from '@services';
-import { CommonEnum } from '@enums';
+import { CommonEnum, TransactionTypeEnum } from '@enums';
 import { DocumentationRepo } from '@repositories';
 import { CsTransactionDetail, CsTransaction } from '@models';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
@@ -119,15 +119,9 @@ export class AirExportComponent extends AppList {
             )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
-                    if (res.data?.length > 0) {
-                        let jobFirst = res.data[0];
-                        if (jobFirst && jobFirst.transactionType === "AE") {
-                            this.shipments = res.data || [];
-                            this.totalItems = res.totalItems;
-                        } else {
-                            this.shipments = [];
-                            this.totalItems = 0;
-                        }
+                    if (res.data?.length > 0 && this.dataSearch.transactionType === TransactionTypeEnum.AirExport) {
+                        this.shipments = res.data || [];
+                        this.totalItems = res.totalItems;
                     } else {
                         this.shipments = [];
                         this.totalItems = 0;
@@ -229,7 +223,6 @@ export class AirExportComponent extends AppList {
     }
 
     gotoCreateJob() {
-
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/new`]);
     }
 
