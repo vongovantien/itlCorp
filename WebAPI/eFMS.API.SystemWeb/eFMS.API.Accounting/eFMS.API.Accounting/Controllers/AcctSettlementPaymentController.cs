@@ -5,11 +5,13 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
+using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -22,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -248,12 +251,26 @@ namespace eFMS.API.Accounting.Controllers
                 }
                 else
                 {
-                    chargeNoGrpSettlement = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlement.SettlementNo);
+                    if(settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_NEW || settlement.StatusApproval == AccountingConstants.STATUS_APPROVAL_DENIED)
+                    {
+                        chargeNoGrpSettlement = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlement.SettlementNo);
+                    } else
+                    {
+                        chargeNoGrpSettlement = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlement.SettlementNo,  null, null, null, 1, 20);
+                    }
                 }
             }
             var data = new { settlement, chargeGrpSettlement, chargeNoGrpSettlement };
             return Ok(data);
         }
+        [HttpGet]
+        [Route("GetSurchargePagingSettlementPayment")]
+        public IActionResult GetSurchargePagingSettlementPayment(string settlementNo, int page, int size)
+        {
+            ResponsePagingModel<ShipmentChargeSettlement> data = acctSettlementPaymentService.GetSurchargePagingSettlementPayment(settlementNo, page, size);
+            return Ok(data);
+        }
+
 
         /// <summary>
         /// Get Payment Management By Shipment

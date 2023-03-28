@@ -92,10 +92,6 @@ export class AccountingRepo {
             );
     }
 
-    getPagingSurchargeSOA(soaNo: string, page: number, size: number) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetPagingSurchargeSOA`, { soaNo, page, size }, { "hideSpinner": "true" });
-    }
-
     getSurchargeGroupSOA(soaNo: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetSurchargeGroupSOA`, { soaNo });
     }
@@ -1080,6 +1076,16 @@ export class AccountingRepo {
     confirmCdNotePrepaid(body: any) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPrePaidPayment`, body);
     }
+
+
+    getPagingSurchargeSOA(soaNo: string, page: number, size: number) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetPagingSurchargeSOA`, { soaNo, page, size }, { "hideSpinner": "true" });
+    }
+
+    getPagingSurchargeSettlement(settlementNo: string, page: number, size: number) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetSurchargePagingSettlementPayment`, { settlementNo, page, size }, { "hideSpinner": "true" });
+    }
+
 }
 
 

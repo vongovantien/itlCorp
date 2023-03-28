@@ -2158,7 +2158,7 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
-        private List<ChargeShipmentModel> GetChargesForDetailSoa(string soaNo)
+        private List<ChargeShipmentModel> GetChargesForDetailSoa(string soaNo, int page = -1, int size = 0)
         {
             var data = new List<ChargeShipmentModel>();
             var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
@@ -2168,6 +2168,10 @@ namespace eFMS.API.Accounting.DL.Services
                 new SqlParameter(){ ParameterName = "@Type", Value = soa.Type },
                 new SqlParameter(){ ParameterName = "@Customer", Value = soa.Customer }
             };
+            if (page > 0)
+            {
+                parameters = parameters.Concat(new[] { new SqlParameter("@Page", page), new SqlParameter("@Size", size) }).ToArray();
+            }
             List<sp_GetSurchargeDetailSOA> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSOA>(parameters);
 
             data = mapper.Map<List<ChargeShipmentModel>>(listSurcharges);
@@ -2188,7 +2192,7 @@ namespace eFMS.API.Accounting.DL.Services
                 chargeShipments = GetChargesForDetailSoa(soaNo);
             } else
             {
-                chargeShipments = GetPagingChargesForDetailSoa(soaNo, 1, 20);
+                chargeShipments = GetChargesForDetailSoa(soaNo, 1, 20);
             }
 
             var _groupShipments = new List<GroupShipmentModel>();
@@ -3812,7 +3816,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public async Task<ResponsePagingModel<ChargeShipmentModel>> GetPagingSurchargeSOA(string soaNo, int page, int size)
         {
-            var data = GetPagingChargesForDetailSoa(soaNo, page, size);
+            var data = GetChargesForDetailSoa(soaNo, page, size);
             var rowsCount = data.Count();
 
             if (page == 0)
@@ -3829,24 +3833,6 @@ namespace eFMS.API.Accounting.DL.Services
                 Size = size,
                 TotalItems = rowsCount
             };
-        }
-
-        private List<ChargeShipmentModel> GetPagingChargesForDetailSoa(string soaNo, int page, int size)
-        {
-            var data = new List<ChargeShipmentModel>();
-            var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
-
-            var parameters = new[]{
-                new SqlParameter(){ ParameterName = "@SoaNo", Value = soaNo },
-                new SqlParameter(){ ParameterName = "@Type", Value = soa.Type },
-                new SqlParameter(){ ParameterName = "@Customer", Value = soa.Customer },
-                new SqlParameter(){ ParameterName = "@Page", Value = page },
-                new SqlParameter(){ ParameterName = "@Size", Value = size }
-            };
-            List<sp_GetSurchargeDetailSOAPaging> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSOAPaging>(parameters);
-
-            data = mapper.Map<List<ChargeShipmentModel>>(listSurcharges);
-            return data;
         }
 
         public List<GroupShipmentModel> GetSOAGroupShipmentModels(string soaNo)

@@ -12,8 +12,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { IAppState, getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
 import groupBy from 'lodash/groupBy';
 import { ToastrService } from 'ngx-toastr';
-import { timer } from 'rxjs';
-import { catchError, filter, finalize, map, pairwise, takeUntil, throttleTime } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { ShareBussinessAdjustDebitValuePopupComponent } from 'src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup';
@@ -61,7 +60,7 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
         private _progressService: NgProgress,
         private _exportRepo: ExportRepo,
         private _store: Store<IAppState>,
-        private ngZone: NgZone
+        private _ngZone: NgZone
     ) {
         super();
         this.requestSort = this.sortChargeList;
@@ -119,13 +118,8 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
     }
 
     ngAfterViewInit(): void {
-        this.scroller.elementScrolled().pipe(
-            map(() => this.scroller.measureScrollOffset('bottom')),
-            pairwise(),
-            filter(([y1, y2]) => (y2 < y1 && y2 < 50)),
-            throttleTime(200)
-        ).subscribe(() => {
-            this.ngZone.run(() => {
+        this.listenScrollingEvent(() => {
+            this._ngZone.run(() => {
                 const totalPage = Math.ceil(this.soa.totalCharge / 20);
                 if (this.page < totalPage) {
                     this.getNextSurcharge();
@@ -133,8 +127,7 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
                     return;
                 }
             });
-        }
-        );
+        })
     }
 
     getDetailSOA(soaNO: string, currency: string) {
@@ -494,7 +487,7 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
     getNextSurcharge() {
         this.isLoading = true;
         this.page++;
-        this._accoutingRepo.getPagingSurchargeSOA(this.soa.soano, this.page, 20)
+        this._accoutingRepo.getPagingSurchargeSOA(this.soa.soano, this.page, 30)
             .pipe(finalize(() => { this.isLoading = false; }))
             .subscribe((res: CommonInterface.IResponsePaging) => {
                 if (!!res.data.length) {
