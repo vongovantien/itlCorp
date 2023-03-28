@@ -28,7 +28,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatChargeDefaultAccount> chargeDefaultRepository;
         private readonly ICatCurrencyService currencyService;
         private readonly ICatUnitService catUnitService;
-
+        private readonly ICatChargeGroupService catChargeGroupService;
 
         public CatChargeService(IContextBase<CatCharge> repository,
             ICacheServiceBase<CatCharge> cacheService,
@@ -37,6 +37,7 @@ namespace eFMS.API.Catalogue.DL.Services
             ICurrentUser user,
             IContextBase<CatChargeDefaultAccount> chargeDefaultRepo,
             ICatCurrencyService currService,
+            ICatChargeGroupService catChargeGroup,
             ICatUnitService unitService) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -44,6 +45,7 @@ namespace eFMS.API.Catalogue.DL.Services
             currencyService = currService;
             currentUser = user;
             catUnitService = unitService;
+            catChargeGroupService = catChargeGroup;
             SetChildren<CsShipmentSurcharge>("Id", "ChargeId");
             SetChildren<CatPartnerCharge>("Id", "ChargeId");
         }
@@ -515,33 +517,40 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = query.And(x => !string.IsNullOrEmpty(x.Offices) && x.Offices.ToLower().Contains(criteria.OfficeId.ToLower()));
             } 
             var list = DataContext.Get(query);
-            var catChargeLst = (from charge in list select new CatChargeModel
-                                {
-                                    Id = charge.Id,
-                                    Code = charge.Code,
-                                    ChargeNameVn = charge.ChargeNameVn,
-                                    ChargeNameEn = charge.ChargeNameEn,
-                                    ServiceTypeId = charge.ServiceTypeId,
-                                    Type = charge.Type,
-                                    CurrencyId = charge.CurrencyId,
-                                    UnitPrice = charge.UnitPrice,
-                                    UnitId = charge.UnitId,
-                                    Vatrate = charge.Vatrate,
-                                    IncludedVat = charge.IncludedVat,
-                                    UserCreated = charge.UserCreated,
-                                    DatetimeCreated = charge.DatetimeCreated,
-                                    UserModified = charge.UserModified,
-                                    DatetimeModified = charge.DatetimeModified,
-                                    Active = charge.Active,
-                                    InactiveOn = charge.InactiveOn,
-                                    GroupId = charge.GroupId,
-                                    DepartmentId = charge.DepartmentId,
-                                    OfficeId = charge.OfficeId,
-                                    CompanyId = charge.CompanyId,
-                                    ChargeGroup = charge.ChargeGroup,
-            })?.OrderBy(x => x.DatetimeModified).AsQueryable();
-            return catChargeLst;
+            var chargeGroups = catChargeGroupService.Get();
 
+
+            // help me writing linq left join charge and charge group
+            var data = from charge in list
+                       join chargeGroup in chargeGroups on charge.ChargeGroup equals chargeGroup.Id into chargeGroupTemp
+                       from chargeGroup in chargeGroupTemp.DefaultIfEmpty()
+                       select new CatChargeModel
+                       {
+                           Id = charge.Id,
+                           Code = charge.Code,
+                           ChargeNameVn = charge.ChargeNameVn,
+                           ChargeNameEn = charge.ChargeNameEn,
+                           ServiceTypeId = charge.ServiceTypeId,
+                           Type = charge.Type,
+                           CurrencyId = charge.CurrencyId,
+                           UnitPrice = charge.UnitPrice,
+                           UnitId = charge.UnitId,
+                           Vatrate = charge.Vatrate,
+                           IncludedVat = charge.IncludedVat,
+                           UserCreated = charge.UserCreated,
+                           DatetimeCreated = charge.DatetimeCreated,
+                           UserModified = charge.UserModified,
+                           DatetimeModified = charge.DatetimeModified,
+                           Active = charge.Active,
+                           InactiveOn = charge.InactiveOn,
+                           GroupId = charge.GroupId,
+                           DepartmentId = charge.DepartmentId,
+                           OfficeId = charge.OfficeId,
+                           CompanyId = charge.CompanyId,
+                           ChargeGroup = charge.ChargeGroup,
+                           ChargeGroupName = chargeGroup.Name
+                       };
+            return data;
         }
 
         public IQueryable<CatChargeModel> QueryByPermission(CatChargeCriteria criteria, PermissionRange range)
