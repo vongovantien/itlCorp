@@ -85,8 +85,9 @@ export class FormValidators extends Validators {
     // }
 
     public static validateNotFutureDate(controls: AbstractControl | FormControl): ValidationErrors {
-        if (controls.value?.startDate !== null && controls.value !== null) {
-            const inputDate: any = new Date(controls.value.startDate.getFullYear(), controls.value.startDate.getMonth(), controls.value.startDate.getDate());
+        if (controls.value?.startDate !== null && controls.value !== null && controls.value?.startDate !== undefined) {
+            let inputDatePart = new Date(controls.value.startDate);
+            const inputDate: any = new Date(inputDatePart?.getFullYear(), inputDatePart?.getMonth(), inputDatePart?.getDate());
             const currentDate: any = new Date().setHours(0, 0, 0, 0);
             if (inputDate > currentDate) {
                 return { invalidDateFuture: true };
