@@ -450,7 +450,6 @@
 <adjust-debit-value-popup (onSave)="onSaveAdjustDebit()"></adjust-debit-value-popup>
 
 <ng-template #scrollingList>
-    scrolling list
     <ng-container *ngIf="TYPE === 'LIST'">
         <div class="table-horizontal">
             <cdk-virtual-scroll-viewport [itemSize]="30" style="max-height: 525px" [ngStyle]="{'height.px': (!soa.chargeShipments.length && !isLoading) 

@@ -605,9 +605,9 @@ table.dataTable {
         border: none;
         outline: none;
     }
-    &:nth-child(1) {
-        max-height: 50em;
-    }
+    // &:nth-child(1) {
+    //     max-height: 50em;
+    // }
 }
 
 .tatable__pager-size {
