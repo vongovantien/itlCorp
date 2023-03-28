@@ -16,6 +16,7 @@ import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/opera
 
 import * as fromShare from './../../share-business/store';
 import { JobConstants, RoutingConstants } from '@constants';
+import { TransactionTypeEnum } from '@enums';
 
 @Component({
     selector: 'app-sea-fcl-import-management',
@@ -125,8 +126,14 @@ export class SeaFCLImportManagementComponent extends AppList {
             )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
-                    this.masterbills = res.data || [];
-                    this.totalItems = res.totalItems;
+                    if (res.data?.length > 0 && this.dataSearch.transactionType === TransactionTypeEnum.SeaFCLImport) {
+                        this.masterbills = res.data || [];
+                        this.totalItems = res.totalItems;
+                    } else {
+                        this.masterbills = [];
+                        this.totalItems = 0;
+                    }
+
                 }
             );
     }

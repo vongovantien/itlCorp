@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { Store } from '@ngrx/store';
 import { CsTransactionDetail, CsTransaction } from '@models';
-import { CommonEnum } from '@enums';
+import { CommonEnum, TransactionTypeEnum } from '@enums';
 import { SortService } from '@services';
 import { DocumentationRepo } from '@repositories';
 import { InfoPopupComponent, ConfirmPopupComponent, Permission403PopupComponent } from '@common';
@@ -121,8 +121,14 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
             )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
-                    this.shipments = res.data || [];
-                    this.totalItems = res.totalItems;
+                    if (res.data?.length > 0 && this.dataSearch.transactionType === TransactionTypeEnum.SeaConsolExport) {
+                        this.shipments = res.data || [];
+                        this.totalItems = res.totalItems;
+                    } else {
+                        this.shipments = [];
+                        this.totalItems = 0;
+                    }
+
                 }
             );
     }

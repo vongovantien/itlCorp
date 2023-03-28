@@ -16,6 +16,7 @@ import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/opera
 import * as fromShare from './../../share-business/store';
 import { formatDate } from '@angular/common';
 import { JobConstants, RoutingConstants } from '@constants';
+import { TransactionTypeEnum } from '@enums';
 
 
 @Component({
@@ -124,10 +125,17 @@ export class SeaFCLExportComponent extends AppList {
             )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
-                    this.shipments = res.data || [];
-                    this.totalItems = res.totalItems;
+                    if (res.data?.length > 0 && this.dataSearch.transactionType === TransactionTypeEnum.SeaFCLExport) {
+                        this.shipments = res.data || [];
+                        this.totalItems = res.totalItems;
+                    } else {
+                        this.shipments = [];
+                        this.totalItems = 0;
+                    }
+
                 }
             );
+
     }
 
     sortShipment(sortField: string) {

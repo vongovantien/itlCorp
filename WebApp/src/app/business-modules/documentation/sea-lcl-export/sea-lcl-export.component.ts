@@ -12,6 +12,7 @@ import { AppList } from 'src/app/app.list';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { takeUntil, finalize, catchError, withLatestFrom, map } from 'rxjs/operators';
 import { JobConstants, RoutingConstants } from '@constants';
+import { TransactionTypeEnum } from '@enums';
 @Component({
     selector: 'app-sea-lcl-export',
     templateUrl: './sea-lcl-export.component.html',
@@ -115,8 +116,14 @@ export class SeaLCLExportComponent extends AppList {
             )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
-                    this.shipments = res.data || [];
-                    this.totalItems = res.totalItems;
+                    if (res.data?.length > 0 && this.dataSearch.transactionType === TransactionTypeEnum.SeaLCLExport) {
+                        this.shipments = res.data || [];
+                        this.totalItems = res.totalItems;
+                    } else {
+                        this.shipments = [];
+                        this.totalItems = 0;
+                    }
+
                 }
             );
     }

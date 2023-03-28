@@ -108,8 +108,13 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Note', field: 'note', sortable: true },
         ];
 
-        this.getShipments();
+        // this.getShipments();
+        this.selectListJob();
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this.currentUser$ = this._store.select(getCurrentUserState);
+    }
 
+    selectListJob() {
         this._store.select(fromOperationStore.getOperationTransationDataSearch)
             .pipe(
                 withLatestFrom(this._store.select(fromOperationStore.getOperationTransationPagingState)),
@@ -129,9 +134,6 @@ export class JobManagementComponent extends AppList implements OnInit {
                     this.requestSearchShipment();
                 }
             );
-
-        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
-        this.currentUser$ = this._store.select(getCurrentUserState);
     }
 
     subscriptionJobOpsType() {
@@ -142,7 +144,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                 ).subscribe((res: any) => {
                     this.transactionType = res.transactionType;
                     console.log(this.transactionType);
-
+                    this.getShipments();
                 });
     }
 
@@ -265,8 +267,15 @@ export class JobManagementComponent extends AppList implements OnInit {
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
                     if (!!res.data) {
-                        this.shipments = res.data.opsTransactions || [];
-                        this.totalItems = res.totalItems;
+                        let jobFirst = res.data.opsTransactions[0];
+                        if (jobFirst && jobFirst.transactionType === this.transactionType) {
+                            this.shipments = res.data.opsTransactions || [];
+                            this.totalItems = res.totalItems;
+                        } else {
+                            this.shipments = [];
+                            this.totalItems = 0;
+                        }
+
                     } else {
                         this.shipments = [];
                         this.totalItems = 0;
