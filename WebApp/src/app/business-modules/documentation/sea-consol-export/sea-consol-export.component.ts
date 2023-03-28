@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { Store } from '@ngrx/store';
 import { CsTransactionDetail, CsTransaction } from '@models';
-import { CommonEnum } from '@enums';
+import { CommonEnum, TransactionTypeEnum } from '@enums';
 import { SortService } from '@services';
 import { DocumentationRepo } from '@repositories';
 import { InfoPopupComponent, ConfirmPopupComponent, Permission403PopupComponent } from '@common';
@@ -115,32 +115,15 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
     }
 
     getShipments() {
-        // this._store.select(fromShare.getTransactionListShipment)
-        //     .pipe(
-        //         takeUntil(this.ngUnsubscribe),
-        //     )
-        //     .subscribe(
-        //         (res: CommonInterface.IResponsePaging | any) => {
-        //             this.shipments = res.data || [];
-        //             this.totalItems = res.totalItems;
-        //         }
-        //     );
-
         this._store.select(fromShare.getTransactionListShipment)
             .pipe(
                 takeUntil(this.ngUnsubscribe),
             )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
-                    if (res.data?.length > 0) {
-                        let jobFirst = res.data[0];
-                        if (jobFirst && jobFirst.transactionType === "SCE") {
-                            this.shipments = res.data || [];
-                            this.totalItems = res.totalItems;
-                        } else {
-                            this.shipments = [];
-                            this.totalItems = 0;
-                        }
+                    if (res.data?.length > 0 && this.dataSearch.transactionType === TransactionTypeEnum.SeaConsolExport) {
+                        this.shipments = res.data || [];
+                        this.totalItems = res.totalItems;
                     } else {
                         this.shipments = [];
                         this.totalItems = 0;

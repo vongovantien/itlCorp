@@ -16,6 +16,7 @@ import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/opera
 import * as fromShare from './../../share-business/store';
 import { formatDate } from '@angular/common';
 import { JobConstants, RoutingConstants } from '@constants';
+import { TransactionTypeEnum } from '@enums';
 
 
 @Component({
@@ -118,31 +119,15 @@ export class SeaFCLExportComponent extends AppList {
 
 
     getShipments() {
-        // this._store.select(fromShare.getTransactionListShipment)
-        //     .pipe(
-        //         takeUntil(this.ngUnsubscribe),
-        //     )
-        //     .subscribe(
-        //         (res: CommonInterface.IResponsePaging | any) => {
-        //             this.shipments = res.data || [];
-        //             this.totalItems = res.totalItems;
-        //         }
-        //     );
         this._store.select(fromShare.getTransactionListShipment)
             .pipe(
                 takeUntil(this.ngUnsubscribe),
             )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
-                    if (res.data?.length > 0) {
-                        let jobFirst = res.data[0];
-                        if (jobFirst && jobFirst.transactionType === "SFE") {
-                            this.shipments = res.data || [];
-                            this.totalItems = res.totalItems;
-                        } else {
-                            this.shipments = [];
-                            this.totalItems = 0;
-                        }
+                    if (res.data?.length > 0 && this.dataSearch.transactionType === TransactionTypeEnum.SeaFCLExport) {
+                        this.shipments = res.data || [];
+                        this.totalItems = res.totalItems;
                     } else {
                         this.shipments = [];
                         this.totalItems = 0;
@@ -150,6 +135,7 @@ export class SeaFCLExportComponent extends AppList {
 
                 }
             );
+
     }
 
     sortShipment(sortField: string) {

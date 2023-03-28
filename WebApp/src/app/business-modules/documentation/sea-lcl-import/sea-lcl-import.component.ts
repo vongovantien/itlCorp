@@ -15,6 +15,7 @@ import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/opera
 
 import * as fromShare from './../../share-business/store';
 import { JobConstants, RoutingConstants } from '@constants';
+import { TransactionTypeEnum } from '@enums';
 
 @Component({
     selector: 'app-sea-lcl-import',
@@ -119,33 +120,17 @@ export class SeaLCLImportComponent extends AppList implements OnInit {
     }
 
     getShipments() {
-        // this._store.select(fromShare.getTransactionListShipment)
-        //     .pipe(
-        //         takeUntil(this.ngUnsubscribe),
-        //     )
-        //     .subscribe(
-        //         (res: CommonInterface.IResponsePaging | any) => {
-        //             this.masterbills = res.data || [];
-        //             this.totalItems = res.totalItems;
-        //         }
-        //     );
         this._store.select(fromShare.getTransactionListShipment)
             .pipe(
                 takeUntil(this.ngUnsubscribe),
             )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
-                    if (res.data?.length > 0) {
-                        let jobFirst = res.data[0];
-                        if (jobFirst && jobFirst.transactionType === "AE") {
-                            this.shipments = res.data || [];
-                            this.totalItems = res.totalItems;
-                        } else {
-                            this.shipments = [];
-                            this.totalItems = 0;
-                        }
+                    if (res.data?.length > 0 && this.dataSearch.transactionType === TransactionTypeEnum.SeaLCLImport) {
+                        this.masterbills = res.data || [];
+                        this.totalItems = res.totalItems;
                     } else {
-                        this.shipments = [];
+                        this.masterbills = [];
                         this.totalItems = 0;
                     }
 

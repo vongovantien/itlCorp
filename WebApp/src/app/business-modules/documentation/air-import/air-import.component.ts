@@ -7,7 +7,7 @@ import { DocumentationRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Store } from '@ngrx/store';
 import * as fromShare from './../../share-business/store';
-import { CommonEnum } from '@enums';
+import { CommonEnum, TransactionTypeEnum } from '@enums';
 import { CsTransactionDetail, CsTransaction } from '@models';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { takeUntil, catchError, finalize, withLatestFrom, map } from 'rxjs/operators';
@@ -101,10 +101,10 @@ export class AirImportComponent extends AppList {
                         this.dataSearch = criteria.dataSearch;
                     } else {
                         this.dataSearch = this.defaultDataSearch;
+                        this.page = criteria.page;
+                        this.pageSize = criteria.pageSize;
+                        this.requestSearchShipment();
                     }
-                    this.page = criteria.page;
-                    this.pageSize = criteria.pageSize;
-                    this.requestSearchShipment();
                 }
             );
     }
@@ -116,15 +116,9 @@ export class AirImportComponent extends AppList {
             )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
-                    if (res.data?.length > 0) {
-                        let jobFirst = res.data[0];
-                        if (jobFirst && jobFirst.transactionType === "AI") {
-                            this.shipments = res.data || [];
-                            this.totalItems = res.totalItems;
-                        } else {
-                            this.shipments = [];
-                            this.totalItems = 0;
-                        }
+                    if (res.data?.length > 0 && this.dataSearch.transactionType === TransactionTypeEnum.AirImport) {
+                        this.shipments = res.data || [];
+                        this.totalItems = res.totalItems;
                     } else {
                         this.shipments = [];
                         this.totalItems = 0;
