@@ -13,7 +13,6 @@ namespace eFMS.API.Catalogue.DL.Models
         public string BuyingName { get; set; }
         public string SellingCode { get; set; }
         public string SellingName { get; set; }
-        public string ChargeGroupName { get; set; }
 
         public PermissionAllowBase Permission { get; set; }
     }
