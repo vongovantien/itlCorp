@@ -524,7 +524,7 @@
                                 <span>{{charge.exchangeRate | number: '.0-3'}}</span>
                             </td>
                         </tr>
-                        <tr app-table-row-loading></tr>
+                        <tr app-table-row-loading *ngIf="isLoading"> </tr>
                         <tr app-table-none-record *ngIf="!isLoading && !!soa && !soa.chargeShipments.length"></tr>
 
                     </tbody>

@@ -134,7 +134,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
         this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState);
         this.detailSettlement = this._store.select(getSettlementPaymentDetailState);
-        console.log("onInit", this.scroller);
 
     }
 
