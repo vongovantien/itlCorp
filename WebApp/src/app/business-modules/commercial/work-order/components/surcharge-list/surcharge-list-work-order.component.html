@@ -85,7 +85,7 @@
                                                 <div class="list-master-unit">
                                                     <app-combo-grid-virtual-scroll #comboGridCharge
                                                         [currentActiveItemId]="{field:'id', value: surcharge.chargeId}"
-                                                        (itemSelected)="onSelectDataTableInfo($event.id, surcharge, 'chargeId')"
+                                                        (itemSelected)="onSelectDataTableInfo($event, surcharge, 'chargeId')"
                                                         [selectedDisplayFields]="['chargeNameEn']"
                                                         [dataSources]="charges | async"
                                                         [displayFields]="configComboGridCharge" [height]="150"
