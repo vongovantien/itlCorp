@@ -35,11 +35,11 @@
                         <label class="form-control-label" required>
                             Salesman
                         </label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'salesmanId')"
+                        <app-combo-grid-virtual-scroll #combogridSalesman
+                            (itemSelected)="onSelectDataFormInfo($event, 'salesmanId')"
                             (remove)="resetFormControl(salesmanId)"
-                            [currentActiveItemId]="{field:'id', value: salesmanId.value, hardValue: partnerName}"
-                            [selectedDisplayFields]="['username']" [dataSources]="salesmans | async"
-                            [loading]="(isLoadingUser | async)"
+                            [currentActiveItemId]="{field:'id', value: salesmanId.value, hardValue: salesmanName}"
+                            [selectedDisplayFields]="['username']" [dataSources]="salesmans"
                             [displayFields]="[{ field: 'username', label: 'User Name' }, { field: 'employeeNameVn', label: 'Full Name' }]"
                             placeholder="Select salesman" [clearable]="false" [disabled]="isReadonly"
                             textColor="text-success">

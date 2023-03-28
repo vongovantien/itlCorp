@@ -143,6 +143,7 @@ export class WorkOrderViewUpdateModel extends WorkOrderModel {
 
 export class WorkOrderViewModel {
     id: string;
+    userCreated: string;
     userNameCreated: string;
     userNameModified: string;
     partnerName: string;

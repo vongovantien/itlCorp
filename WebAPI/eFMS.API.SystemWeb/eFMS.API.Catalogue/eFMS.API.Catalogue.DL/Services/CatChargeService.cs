@@ -29,10 +29,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICatCurrencyService currencyService;
         private readonly ICatUnitService catUnitService;
         private readonly IContextBase<SysOffice> sysOfficeRepository;
-        private readonly IContextBase<CatChargeGroup> catChargeGroupRepository;
-
-
-
+        private readonly ICatChargeGroupService catChargeGroupService;
 
         public CatChargeService(IContextBase<CatCharge> repository,
             ICacheServiceBase<CatCharge> cacheService,
@@ -42,7 +39,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CatChargeDefaultAccount> chargeDefaultRepo,
             ICatCurrencyService currService,
             IContextBase<SysOffice> sysOfficeRepo,
-            IContextBase<CatChargeGroup> catChargeGroupRepo,
+            ICatChargeGroupService catChargeGroup,
             ICatUnitService unitService) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -51,8 +48,7 @@ namespace eFMS.API.Catalogue.DL.Services
             currentUser = user;
             catUnitService = unitService;
             sysOfficeRepository = sysOfficeRepo;
-            catChargeGroupRepository = catChargeGroupRepo;
-
+            catChargeGroupService = catChargeGroup;
             SetChildren<CsShipmentSurcharge>("Id", "ChargeId");
             SetChildren<CatPartnerCharge>("Id", "ChargeId");
         }
@@ -524,7 +520,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = query.And(x => !string.IsNullOrEmpty(x.Offices) && x.Offices.ToLower().Contains(criteria.OfficeId.ToLower()));
             } 
             var list = DataContext.Get(query);
-            var chargeGroup = catChargeGroupRepository.Get();
+            var chargeGroup = catChargeGroupService.Get();
             var catChargeLst = (from charge in list
                                 join chgroup in chargeGroup on charge.ChargeGroup equals chgroup.Id into chargeGrp
                                 from chgroup in chargeGrp.DefaultIfEmpty()
@@ -599,7 +595,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
             }
             return lst.AsQueryable();
-
         }
         public IQueryable<CatChargeModel> QueryByPermission(CatChargeCriteria criteria, PermissionRange range)
         {

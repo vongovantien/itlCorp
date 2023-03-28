@@ -114,7 +114,7 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
             unitPrice: null,
             currencyId: this.transactionType.includes('A') ? 'USD' : 'VND',
             vatrate: null,
-            partnerType: 'Customer',
+            partnerType: this.type === 'SELL' ? 'Customer' : 'Carrier',
             type: this.type,
             kickBack: null,
             id: SystemConstants.EMPTY_GUID,
@@ -142,7 +142,14 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
     onSelectDataTableInfo(data: any, surcharge: WorkOrderSurchargeModel, type: string) {
         switch (type) {
             case 'chargeId':
-                surcharge.chargeId = data;
+                surcharge.chargeId = data.id;
+                surcharge.unitPrice = data.unitPrice || null;
+                surcharge.vatRate = data.vatrate || null;
+                if (data.chargeGroupName === 'Com') {
+                    surcharge.kickBack = true;
+                } else {
+                    surcharge.kickBack = false;
+                }
                 break;
             case 'partnerId':
                 surcharge.partnerId = data;

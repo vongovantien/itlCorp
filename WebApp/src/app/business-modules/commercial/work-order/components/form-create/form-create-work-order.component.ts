@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, SimpleChange, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { ComboGridVirtualScrollComponent } from '@common';
 import { JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Incoterm, Partner, PortIndex, User } from '@models';
@@ -7,6 +8,7 @@ import { Store } from '@ngrx/store';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { GetCataloguePortAction, getCataloguePortLoadingState, getCataloguePortState, GetSystemUser, getSystemUsersLoadingState, getSystemUserState, IAppState } from '@store';
 import { FormValidators } from '@validators';
+import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { filter, finalize, shareReplay, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
@@ -18,6 +20,7 @@ import { workOrderDetailIsReadOnlyState } from '../../store';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommercialFormCreateWorkOrderComponent extends AppForm implements OnInit {
+    @ViewChild('combogridSalesman') combogrid: ComboGridVirtualScrollComponent;
 
     @Input() transactionType: string;
 
@@ -25,7 +28,9 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
         private readonly _fb: FormBuilder,
         private readonly _catalogueRepo: CatalogueRepo,
         private readonly _systemRepo: SystemRepo,
-        private readonly _store: Store<IAppState>
+        private readonly _store: Store<IAppState>,
+        private readonly _toast: ToastrService,
+        private readonly _cd: ChangeDetectorRef
     ) {
         super();
     }
@@ -57,13 +62,14 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
 
     partners: Observable<Partner[]>;
     ports: Observable<PortIndex[]>;
-    salesmans: Observable<User[]>
+    salesmans: User[] = [];
     incoterms: Observable<Incoterm[]>
 
     paymentMethods = JobConstants.COMMON_DATA.FREIGHTTERMS;
     shipmentTypes: string[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
 
     partnerName: string;
+    salesmanName: string;
 
     displayFieldsPartner = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldsPort = JobConstants.CONFIG.COMBOGRID_PORT;
@@ -75,7 +81,7 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
     ngOnInit(): void {
         this.isLoadingUser = this._store.select(getSystemUsersLoadingState);
         this._store.dispatch(GetSystemUser({ active: true }));
-        this.salesmans = this._store.select(getSystemUserState);
+        // this.salesmans = this._store.select(getSystemUserState);
 
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this.ports = this._store.select(getCataloguePortState);
@@ -171,7 +177,6 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
         this.form.controls[key].setValue(data.id);
         switch (key) {
             case 'shipperId':
-                // this.customerName = data.shortName;
                 this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 break;
             case 'consigneeId':
@@ -187,6 +192,23 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
             case 'pod':
                 this.pod.setValue(data.id);
                 this.podDescription.setValue((data as PortIndex).nameEn);
+                break;
+            case 'partnerId':
+                this._catalogueRepo.getListSalemanByPartner(data.id, this.transactionType)
+                    .subscribe(
+                        (salesmans: any[]) => {
+                            if (!!salesmans.length) {
+                                this.salesmans = salesmans;
+                                this.salesmanId.setValue(salesmans[0].id);
+                            } else {
+                                this.salesmans = [];
+                                this.combogrid.displaySelectedStr = '';
+                                this.salesmanId.setValue(null);
+                                this._toast.warning(`Partner ${data.shortName} does not have any agreement`);
+                            }
+                            this._cd.detectChanges();
+                        }
+                    );
                 break;
             default:
                 break;

@@ -51,7 +51,8 @@
                                         <!-- <a class="pointer" [routerLink]="'./' + item.id" target="_blank">
                                             {{ item.code }}
                                         </a> -->
-                                        <a class="pointer" (click)="gotoDetail(item.id)">
+
+                                        <a class="pointer" (click)="viewDetailWorkOrder(item)">
                                             {{ item.code }}
                                         </a>
                                         <!-- <span class="m-badge m-badge--success m--margin-left-10">
@@ -137,11 +138,13 @@
         <span><i class="la la-edit text-primary"></i><span> Edit</span></span>
     </div>
     <ng-container *ngIf="!selectedWorkOrder?.active">
-        <div class="menu-context__item" (click)="deleteWorkOrder(selectedWorkOrder)">
-            <span><i class="la la-edit text-primary"></i><span> Delete</span></span>
+        <div class="menu-context__item">
+            <app-permission-button type="delete" (onClick)="deleteWorkOrder(selectedWorkOrder)"
+                [user]="selectedWorkOrder?.userCreated" class="icon" icon="la la-trash text-danger" mode="context-menu"
+                title="Delete">
+            </app-permission-button>
         </div>
     </ng-container>
-
 </app-context-menu>
 
 <ng-template inject></ng-template>
