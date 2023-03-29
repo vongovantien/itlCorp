@@ -151,6 +151,14 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.initForm();
         this.getMasterData();
         this.incoterms = this._catalogueRepo.getIncoterm({ service: ['AI'] });
+        // if (!this.isUpdate) {
+        //     this.maxDateAta = this.maxDate;
+        //     this.arrivalDate.setValue({ startDate: new Date(), endDate: new Date() })
+        //     console.log(this.arrivalDate.value);
+
+        // } else {
+        //     this.maxDateAta = null;
+        // }
         if (!this.isUpdate) {
             this.getShipmentAndSetDefault();
         } else {
@@ -163,6 +171,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                     // console.log("useswitch map:", this.shipmentType);
                 }
                 );
+            this.maxDateAta = null;
             this.getDetailHBLState();
         }
     }
@@ -173,7 +182,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1),
                 tap((shipment: CsTransaction) => {
                     this.shipmentDetail = new CsTransaction(shipment);
-
+                    this.maxDateAta = !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null;
                     // * set default value for controls from shipment detail.
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                         this.jobId = shipment.id;
@@ -344,8 +353,6 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this.incotermId = this.formCreate.controls['incotermId'];
         this.polDescription = this.formCreate.controls['polDescription'];
         this.podDescription = this.formCreate.controls['podDescription'];
-
-        this.maxDateAta = !this.isUpdate ? this.maxDate : null;
     }
 
     onSelectDataFormInfo(data: any, type: string) {
