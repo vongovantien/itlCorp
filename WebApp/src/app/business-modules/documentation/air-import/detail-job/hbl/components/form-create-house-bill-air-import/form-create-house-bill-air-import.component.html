@@ -116,7 +116,7 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="Select ATA" readonly
-                                        formControlName="arrivalDate" [maxDate]="maxDate"
+                                        formControlName="arrivalDate"
                                         (remove)="resetFormControl(formCreate.controls['arrivalDate'])" calendar
                                         [allowRemove]="!!formCreate.controls['arrivalDate'].value && !!formCreate.controls['arrivalDate'].value.startDate"
                                         [maxDate]='maxDateAta' />
