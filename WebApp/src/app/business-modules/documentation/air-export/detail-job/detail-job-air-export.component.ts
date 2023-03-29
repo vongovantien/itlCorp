@@ -177,7 +177,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                     } else {
                         //this._toastService.error(res.message);
 
-                        if (res.data.errorCode = 453) {
+                        if (res.data?.errorCode = 453) {
                             this.showHBLsInvalid(res.message);
                         } else {
                             this._toastService.error(res.message);
