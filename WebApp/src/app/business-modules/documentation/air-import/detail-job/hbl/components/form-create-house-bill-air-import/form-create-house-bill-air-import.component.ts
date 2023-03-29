@@ -182,7 +182,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1),
                 tap((shipment: CsTransaction) => {
                     this.shipmentDetail = new CsTransaction(shipment);
-                    this.maxDateAta = !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null;
+                    this.maxDateAta = !!shipment.eta ? (this.createMoment(shipment.eta).isAfter(this.maxDate) ? this.createMoment(shipment.eta) : this.maxDate) : null;
                     // * set default value for controls from shipment detail.
                     if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                         this.jobId = shipment.id;
