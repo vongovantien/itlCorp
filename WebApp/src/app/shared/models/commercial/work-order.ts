@@ -126,8 +126,8 @@ export class WorkOrderSurcharge {
 }
 
 export class WorkOrderSurchargeModel extends WorkOrderSurcharge {
-    partnerName: string;
-    chargeName: string;
+    partnerName: string = null;
+    chargeName: string = null;
 }
 
 export class WorkOrderViewUpdateModel extends WorkOrderModel {

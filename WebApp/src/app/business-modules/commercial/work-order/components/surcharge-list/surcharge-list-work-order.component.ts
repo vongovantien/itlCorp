@@ -121,6 +121,7 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
             partnerId: null,
             workOrderId: SystemConstants.EMPTY_GUID,
             workOrderPriceId: SystemConstants.EMPTY_GUID,
+            partnerName: null
         });
 
         if (!!this.cachedSurcharge.length) {

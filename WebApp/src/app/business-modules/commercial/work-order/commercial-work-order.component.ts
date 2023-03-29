@@ -156,7 +156,7 @@ export class CommercialWorkOrderComponent extends AppList implements OnInit {
     }
 
     viewDetailWorkOrder(wo: WorkOrderViewModel) {
-        this._documentationRepo.checkAllowDeleteWorkOrder(wo.id)
+        this._documentationRepo.checkAllowDetailWorkOrder(wo.id)
             .subscribe((value: boolean) => {
                 if (value) {
                     this._router.navigate([`${RoutingConstants.COMMERCIAL.WO}/`, wo.id]);
