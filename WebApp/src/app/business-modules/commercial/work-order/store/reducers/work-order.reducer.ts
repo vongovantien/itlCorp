@@ -27,7 +27,7 @@ export const reducer = createReducer(
         ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size }
     })),
     on(WorkOrderActions.LoadListWorkOrderSuccess, (state: IWorkOrderListState, payload: CommonInterface.IResponsePaging) => ({
-        ...state, data: payload.data, isLoading: false, isLoaded: true
+        ...state, data: payload.data, isLoading: false, isLoaded: true, totalItems: payload.totalItems
     })),
     on(WorkOrderActions.LoadListWorkOrderFail, (state: IWorkOrderListState) => ({
         ...state, isLoading: false, isLoaded: true
