@@ -43,7 +43,7 @@
                                             </button> -->
                                             <ng-container *ngIf="!item.active">
                                                 <app-permission-button type="delete" [user]="item.userCreated"
-                                                    (onClick)="showConfirmDelete(item)"></app-permission-button>
+                                                    (onClick)="deleteWorkOrder(item)"></app-permission-button>
                                             </ng-container>
                                         </div>
                                     </td>
