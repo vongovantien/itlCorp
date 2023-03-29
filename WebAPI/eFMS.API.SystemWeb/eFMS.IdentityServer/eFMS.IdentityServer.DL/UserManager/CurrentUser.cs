@@ -22,14 +22,14 @@ namespace eFMS.IdentityServer.DL.UserManager
             userPermissionService = userPermission;
         }
 
-        private string userId = "";
+        private string userId;
         public string UserID
         {
             get
             {
                 if(currentUser == null)
                 {
-                    return userId;
+                    return "";
                 }
                 userId = !string.IsNullOrEmpty(currentUser.FirstOrDefault(x => x.Type == "id")?.Value) ? currentUser.FirstOrDefault(x => x.Type == "id")?.Value : userId;
                 return userId;
@@ -37,14 +37,14 @@ namespace eFMS.IdentityServer.DL.UserManager
             set { userId = value; }
         }
 
-        private string userName = "";
+        private string userName;
         public string UserName
         {
             get
             {
                 if (currentUser == null)
                 {
-                    return userName;
+                    return "";
                 }
                 userName = !string.IsNullOrEmpty(currentUser.FirstOrDefault(x => x.Type == "userName")?.Value) ? currentUser.FirstOrDefault(x => x.Type == "userName")?.Value : userName;
                 return userName;
@@ -52,14 +52,14 @@ namespace eFMS.IdentityServer.DL.UserManager
             set { userName = value; }
         }
 
-        private Guid companyId = Guid.Empty;
+        private Guid companyId;
         public Guid CompanyID
         {
             get
             {
                 if (currentUser == null)
                 {
-                    return companyId;
+                    return Guid.Empty;
                 }
                 companyId = currentUser.FirstOrDefault(x => x.Type == "companyId")?.Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "companyId").Value) : companyId;
                 return companyId;
@@ -67,14 +67,14 @@ namespace eFMS.IdentityServer.DL.UserManager
             set { companyId = value; }
         }
 
-        private Guid officeId = Guid.Empty;
+        private Guid officeId;
         public Guid OfficeID
         {
             get
             {
                 if (currentUser == null)
                 {
-                    return officeId;
+                    return Guid.Empty;
                 }
                 officeId = currentUser.FirstOrDefault(x => x.Type == "officeId")?.Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "officeId").Value) : officeId;
                 return officeId;
@@ -82,14 +82,14 @@ namespace eFMS.IdentityServer.DL.UserManager
             set { officeId = value; }
         }
 
-        private short? groupId = 0;
+        private short? groupId;
         public short? GroupId
         {
             get
             {
                 if (currentUser == null)
                 {
-                    return groupId;
+                    return 0;
                 }
                 if (groupId == null && currentUser.FirstOrDefault(x => x.Type == "groupId") != null)
                 {
@@ -103,14 +103,14 @@ namespace eFMS.IdentityServer.DL.UserManager
             }
         }
 
-        private int? departmentId = 0;
+        private int? departmentId;
         public int? DepartmentId
         {
             get
             {
                 if (currentUser == null)
                 {
-                    return departmentId;
+                    return 0;
                 }
                 if (departmentId == null && currentUser.FirstOrDefault(x => x.Type == "departmentId") != null)
                 {
