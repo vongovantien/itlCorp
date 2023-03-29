@@ -22,55 +22,75 @@ namespace eFMS.IdentityServer.DL.UserManager
             userPermissionService = userPermission;
         }
 
-        private string userId;
+        private string userId = "";
         public string UserID
         {
             get
             {
+                if(currentUser == null)
+                {
+                    return userId;
+                }
                 userId = !string.IsNullOrEmpty(currentUser.FirstOrDefault(x => x.Type == "id")?.Value) ? currentUser.FirstOrDefault(x => x.Type == "id")?.Value : userId;
                 return userId;
             }
             set { userId = value; }
         }
 
-        private string userName;
+        private string userName = "";
         public string UserName
         {
             get
             {
+                if (currentUser == null)
+                {
+                    return userName;
+                }
                 userName = !string.IsNullOrEmpty(currentUser.FirstOrDefault(x => x.Type == "userName")?.Value) ? currentUser.FirstOrDefault(x => x.Type == "userName")?.Value : userName;
                 return userName;
             }
             set { userName = value; }
         }
 
-        private Guid companyId;
+        private Guid companyId = Guid.Empty;
         public Guid CompanyID
         {
             get
             {
+                if (currentUser == null)
+                {
+                    return companyId;
+                }
                 companyId = currentUser.FirstOrDefault(x => x.Type == "companyId")?.Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "companyId").Value) : companyId;
                 return companyId;
             }
             set { companyId = value; }
         }
 
-        private Guid officeId;
+        private Guid officeId = Guid.Empty;
         public Guid OfficeID
         {
             get
             {
+                if (currentUser == null)
+                {
+                    return officeId;
+                }
                 officeId = currentUser.FirstOrDefault(x => x.Type == "officeId")?.Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "officeId").Value) : officeId;
                 return officeId;
             }
             set { officeId = value; }
         }
 
-        private short? groupId;
+        private short? groupId = 0;
         public short? GroupId
         {
             get
             {
+                if (currentUser == null)
+                {
+                    return groupId;
+                }
                 if (groupId == null && currentUser.FirstOrDefault(x => x.Type == "groupId") != null)
                 {
                     groupId = (short)Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "groupId")?.Value);
@@ -83,11 +103,15 @@ namespace eFMS.IdentityServer.DL.UserManager
             }
         }
 
-        private int? departmentId;
+        private int? departmentId = 0;
         public int? DepartmentId
         {
             get
             {
+                if (currentUser == null)
+                {
+                    return departmentId;
+                }
                 if (departmentId == null && currentUser.FirstOrDefault(x => x.Type == "departmentId") != null)
                 {
                     var _departmentId = currentUser.FirstOrDefault(x => x.Type == "departmentId").Value;
