@@ -1,6 +1,12 @@
-import { Component, Input, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { ReportPreviewComponent } from '@common';
 import { SysImage } from '@models';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
+import { AppPage } from 'src/app/app.base';
+import { ISettlementPaymentState, getListEdocState } from '../store';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
 @Component({
@@ -9,7 +15,7 @@ import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class SettlementShipmentItemComponent {
+export class SettlementShipmentItemComponent extends AppPage {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentAttachFilePopup: SettlementShipmentAttachFilePopupComponent;
 
@@ -23,13 +29,34 @@ export class SettlementShipmentItemComponent {
 
     initCheckbox: boolean = false;
     isCheckAll: boolean = false;
+    countFile$: Observable<number>;
+
+    @Input() set readOnly(val: any) {
+        this._readonly = coerceBooleanProperty(val);
+    }
+
+    private _readonly: boolean = false;
+
+    get readonly(): boolean {
+        return this._readonly;
+    }
 
     constructor(
+        private _store: Store<ISettlementPaymentState>,
     ) {
-
+        super();
     }
 
     ngOnInit() {
+        this.countFile$ = this._store.select(getListEdocState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                map(
+                    (d) => {
+                        return d.filter(x => x.jobNo === this.data.jobId || x.jobNo === null).length
+                    }
+                ),
+            )
     }
 
     showPaymentManagement($event: Event): any {
@@ -55,6 +82,8 @@ export class SettlementShipmentItemComponent {
     }
 
     showShipmentAttachFile($event: Event) {
+        $event.stopPropagation();
+        $event.preventDefault();
         this.onViewFiles.emit();
         return false;
     }

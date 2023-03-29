@@ -19,6 +19,11 @@
         public static readonly string SEND_AL_CODE = "S_AL";
         public static readonly string SEND_HB_CODE = "S_HB";
 
+
+        //tracking constants
+        public const string IN_TRANSIT = "IN TRANSIT";
+        public const string DONE = "DONE";
+
         //stage constants
         public const string UPDATE_ATA = "UPDATE_ATA";
         public const string UPDATE_ATD = "UPDATE_ATD";

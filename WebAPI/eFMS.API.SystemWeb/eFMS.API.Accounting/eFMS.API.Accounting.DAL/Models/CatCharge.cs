@@ -31,5 +31,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string ProductDept { get; set; }
         public string Mode { get; set; }
         public Guid? CreditCharge { get; set; }
+        public string Offices { get; set; }
     }
 }

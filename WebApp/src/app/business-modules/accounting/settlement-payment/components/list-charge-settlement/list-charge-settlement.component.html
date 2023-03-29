@@ -78,11 +78,11 @@
                     <accordion [isAnimated]="true">
                         <accordion-group *ngFor="let item of groupShipments; let i = index; trackBy: trackByFn"
                             [isOpen]="openAllCharge" class="m--margin-bottom-20">
-                            <shipment-item #headingShipmentGroup accordion-heading [data]="item"
+                            <shipment-item #headingShipmentGroup accordion-heading [data]="item" readOnly
                                 (onClick)="onClickHeadingShipment(item)"
                                 (onCheck)="onCheckBoxShipmentItemInGroupShipment($event, i)"
                                 (onPrintPlUSD)="previewPLsheet(item,'USD')" (onPrintPlVND)="previewPLsheet(item, 'VND')"
-                                (onViewFiles)="viewShipmentAttachFile(i)"></shipment-item>
+                                (onViewFiles)="viewShipmentAttachFile(item)"></shipment-item>
                             <table-surcharge-settlement [data]="item" #tableSurcharge
                                 (onChangeCheckBox)="onChangeCheckBoxSurChargeListInGroupShipment($event, i)"
                                 (onClickSurcharge)="openSurchargeDetail($event,null,'update')"
@@ -276,6 +276,7 @@
 </div>
 
 <payment-management-popup></payment-management-popup>
+<document-type-attach [typeFrom]="'Settlement'" [readonly]="readonly"></document-type-attach>
 
 <shipment-attach-file (onChange)="onChangeShipmentGroupAttachFile($event)" [readOnly]="readonly"></shipment-attach-file>
 

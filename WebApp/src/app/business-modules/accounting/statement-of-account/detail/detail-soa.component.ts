@@ -8,7 +8,8 @@ import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
-import { getCurrentUserState, getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { IAppState, getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
+import groupBy from 'lodash/groupBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
@@ -19,7 +20,6 @@ import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { StatementOfAccountPaymentMethodComponent } from '../components/poup/payment-method/soa-payment-method.popup';
 import { LoadSOADetailSuccess } from '../store/actions';
-import groupBy from 'lodash/groupBy'
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
@@ -127,7 +127,9 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
                     this.totalItems = this.soa.chargeShipments.length;
                     this.initGroup = this.soa.groupShipments;
                     this.soa.shipment = Object.keys(groupBy(this.initGroup, 'jobId')).length || 0;
-                    this._store.dispatch(LoadSOADetailSuccess({ detail: res }));
+                    if (res) {
+                        this._store.dispatch(LoadSOADetailSuccess({ detail: res }));
+                    }
                 },
             );
     }
@@ -449,6 +451,7 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
         this.adjustDebitValuePopup.action = "SOA";
         this.adjustDebitValuePopup.active();
     }
+
     onSaveAdjustDebit() {
         this.getDetailSOA(this.soaNO, 'VND');
     }

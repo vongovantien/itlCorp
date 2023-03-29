@@ -509,6 +509,13 @@ export class ExportRepo {
         );
     }
 
+    exportAgencyTemplate(body: any){
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingManagementAgencyTemplate`, body, null, null, 'response').pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     downloadExportUrl(url: string) {
         return this._api.get(url);
     }

@@ -1,12 +1,11 @@
-import { settlementPayment } from './../reducers/index';
-import { LoadListSettlePaymentSuccess } from './../actions/settlement-payment.action';
 import { Injectable } from "@angular/core";
-import { createEffect, ofType, Actions } from "@ngrx/effects";
-import { switchMap, map, catchError } from "rxjs/operators";
-import { Observable, EMPTY } from "rxjs";
-import { AccountingRepo } from "@repositories";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { Action } from '@ngrx/store';
-import { SettlementPaymentActionTypes, LoadDetailSettlePaymentSuccess } from "../actions";
+import { AccountingRepo, SystemFileManageRepo } from "@repositories";
+import { EMPTY, Observable } from "rxjs";
+import { catchError, map, switchMap } from "rxjs/operators";
+import { SettlementPaymentActionTypes } from "../actions";
+import { IEDocSettleSearch, LoadListEDocSettleSuccess, LoadListSettlePaymentSuccess } from './../actions/settlement-payment.action';
 
 @Injectable()
 export class SettlePaymentEffect {
@@ -14,6 +13,7 @@ export class SettlePaymentEffect {
     constructor(
         private actions$: Actions,
         private _accountingRepo: AccountingRepo,
+        private _systemFileRepo: SystemFileManageRepo
     ) { }
 
     getListSettlePaymentEffect$: Observable<Action> = createEffect(() => this.actions$
@@ -24,6 +24,18 @@ export class SettlePaymentEffect {
                     .pipe(
                         catchError(() => EMPTY),
                         map((data: CommonInterface.IResponsePaging) => LoadListSettlePaymentSuccess(data)),
+                    )
+            )
+        ));
+
+    getListSettleEdocEffect$: Observable<Action> = createEffect(() => this.actions$
+        .pipe(
+            ofType(SettlementPaymentActionTypes.LOAD_LIST_EDOC),
+            switchMap(
+                (param: IEDocSettleSearch) => this._systemFileRepo.getEDocByAccountant(param.billingId, param.transactionType)
+                    .pipe(
+                        catchError(() => EMPTY),
+                        map((data: any) => LoadListEDocSettleSuccess(data)),
                     )
             )
         ));

@@ -509,7 +509,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.setError(this.currencyId);
         this.isSubmitted = true;
         this.selectedContract.index = this.indexDetailContract;
-
         if (!this.checkSubmitData()) {
             return;
         }

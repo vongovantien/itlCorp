@@ -296,7 +296,6 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                         const criteria: DocumentationInterface.ICheckPointCriteria = {
                             data: partnerIds,
                             transactionType: 'DOC',
-                            type: 5,
                             settlementCode: null,
                         };
                         return this._documenRepo.validateCheckPointMultiplePartner(criteria)

@@ -77,5 +77,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public string BankCode { get; set; }
         public string Currency { get; set; }
         public int? PaymentTerm { get; set; }
+        public string IdentityNo { get; set; }
+        public DateTime? DateId { get; set; }
+        public string PlaceId { get; set; }
     }
 }

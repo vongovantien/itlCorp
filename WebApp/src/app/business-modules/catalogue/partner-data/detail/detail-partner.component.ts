@@ -27,6 +27,7 @@ import { SystemConstants } from 'src/constants/system.const';
 import { FormAddPartnerComponent } from '../components/form-add-partner/form-add-partner.component';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { UserCreatePopupComponent } from '../components/user-create-popup/user-create-popup.component';
+import { formatDate } from '@angular/common';
 
 
 @Component({
@@ -168,7 +169,7 @@ export class PartnerDetailComponent extends AppList {
                         this.allowUpdate = this.partner.permission.allowUpdate;
                         this.formPartnerComponent.isAddBranchSub = this.isAddSubPartner;
                         this.formPartnerComponent.groups = this.partner.partnerGroup;
-                        console.log("res: ", res);
+                        // console.log("res: ", res);
                         this.formPartnerComponent.setFormData(this.partner);
                         if (this.isAddSubPartner) {
                             this.formPartnerComponent.getACRefName(this.partner.id);
@@ -444,6 +445,7 @@ export class PartnerDetailComponent extends AppList {
         console.log("formBody: ", formBody);
         console.log("clone: ", cloneObject);
         const mergeObj = Object.assign(_merge(formBody, cloneObject));
+        mergeObj.dateId = !!mergeObj.dateId ? (mergeObj.dateId.startDate !== null ? formatDate(mergeObj.dateId.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         // merge clone & this.partner.
         const mergeObjPartner = Object.assign(_merge(this.partner, mergeObj));
 
@@ -496,7 +498,7 @@ export class PartnerDetailComponent extends AppList {
                         this.formPartnerComponent.isExistedTaxcode = true;
 
                         if (!!res.internalReferenceNo) {
-                            this.deleteMessage = `This Partner is existed, please you check again!`;
+                            this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in <b>${res.shortName}</b>, If you want to Create Internal account, Please change <b>Internal Reference Info</b>.`;;
                             this.confirmDuplicatePartner.show();
                         } else {
                             this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;

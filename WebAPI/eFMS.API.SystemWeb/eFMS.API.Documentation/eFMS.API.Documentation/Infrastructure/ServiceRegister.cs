@@ -1,21 +1,19 @@
-﻿using ITL.NetCore.Connection.EF;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Localization;
+﻿using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Services;
+using eFMS.API.Shipment.Infrastructure.Filters;
+using eFMS.API.Shipment.Service.Contexts;
+using ITL.NetCore.Connection.EF;
 using LocalizationCultureCore.StringLocalizer;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using eFMS.API.Shipment.Service.Contexts;
-using eFMS.API.Documentation.DL.IService;
-using eFMS.API.Documentation.DL.Services;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Swashbuckle.AspNetCore.Swagger;
-using System.Collections.Generic;
-using eFMS.API.Shipment.Infrastructure.Filters;
-using System.Reflection;
-using System.IO;
 using System;
-using eFMS.API.Infrastructure.RabbitMQ;
-using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
@@ -29,7 +27,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            
+
             services.AddTransient<ITerminologyService, TerminologyService>();
             services.AddTransient<ICsTransactionService, CsTransactionService>();
             services.AddTransient<ICsTransactionDetailService, CsTransactionDetailService>();
@@ -59,6 +57,7 @@ namespace eFMS.API.Shipment.Infrastructure
             services.AddTransient<IStageService, StageService>();
             services.AddTransient<IEDocService, EDocService>();
             services.AddTransient<IWorkOrderService, WorkOrderService>();
+            services.AddTransient<IShipmentTrackingService, ShipmentTrackingService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

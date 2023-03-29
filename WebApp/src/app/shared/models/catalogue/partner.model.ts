@@ -73,7 +73,9 @@ export class Partner {
     contracts: Contract[] = [];
     partnerEmails: PartnerEmail[] = [];
 
-
+    identityNo: string = '';
+    dateId: any = null;
+    placeId: string = '';
 
     partnerType: string = '';
     partnerMode: string = '';

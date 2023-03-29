@@ -1336,4 +1336,10 @@ export class DocumentationRepo {
     checkAllowDetailWorkOrder(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/CheckAllowDetail/${id}`);
     }
+
+    trackShipmentProgress(params: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/ShipmentTracking/TrackShipmentProgress`, params, { "hideSpinner": "true" }).pipe(
+            map((data: any) => data)
+        );
+    }
 }

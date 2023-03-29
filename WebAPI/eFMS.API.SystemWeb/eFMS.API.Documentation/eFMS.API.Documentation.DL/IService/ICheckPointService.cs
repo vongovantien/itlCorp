@@ -40,5 +40,7 @@ namespace eFMS.API.Documentation.DL.IService
         PREVIEW_HBL = 7,
         [Description("UPDATE_HBL")]
         UPDATE_HBL = 8,
+        [Description("SurchargeOBH")]
+        SURCHARGE_OBH = 9,
     }
 }

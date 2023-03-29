@@ -32,9 +32,11 @@ namespace eFMS.API.Report.Service.Models
         public virtual DbSet<CsTransactionDetail> CsTransactionDetail { get; set; }
         public virtual DbSet<CustomsDeclaration> CustomsDeclaration { get; set; }
         public virtual DbSet<OpsTransaction> OpsTransaction { get; set; }
+        public virtual DbSet<SysAttachFileTemplate> SysAttachFileTemplate { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
         public virtual DbSet<SysGroup> SysGroup { get; set; }
+        public virtual DbSet<SysImageDetail> SysImageDetail { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
         public virtual DbSet<SysReportLog> SysReportLog { get; set; }
         public virtual DbSet<SysUser> SysUser { get; set; }
@@ -45,13 +47,13 @@ namespace eFMS.API.Report.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=efms-report-db.itlvn.com; Database=eFMS; User ID=eFMS-Report; Password=eFMSrep@rt21#");
+                optionsBuilder.UseSqlServer("Server=192.168.0.120; Database=eFMS_20220617; User ID=eFMS-Admin; Password=eFMS@dm!n20");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AcctCdnote>(entity =>
             {
@@ -2062,6 +2064,63 @@ namespace eFMS.API.Report.Service.Models
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
 
+            modelBuilder.Entity<SysAttachFileTemplate>(entity =>
+            {
+                entity.ToTable("sysAttachFileTemplate");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.AccountingType).HasMaxLength(50);
+
+                entity.Property(e => e.Code).HasMaxLength(150);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.NameEn)
+                    .HasColumnName("NameEN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.NameVn)
+                    .HasColumnName("NameVN")
+                    .HasMaxLength(250);
+
+                entity.Property(e => e.PartnerType).HasMaxLength(50);
+
+                entity.Property(e => e.PreFix).HasMaxLength(150);
+
+                entity.Property(e => e.Service)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ServiceType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StorageFollowing)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StorageRule)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.StorageType)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SubFix).HasMaxLength(150);
+
+                entity.Property(e => e.Tag).HasMaxLength(150);
+
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Type).HasMaxLength(10);
+            });
+
             modelBuilder.Entity<SysCompany>(entity =>
             {
                 entity.ToTable("sysCompany");
@@ -2320,6 +2379,51 @@ namespace eFMS.API.Report.Service.Models
                 entity.Property(e => e.ParentId).HasColumnName("ParentID");
 
                 entity.Property(e => e.ShortName).HasMaxLength(100);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysImageDetail>(entity =>
+            {
+                entity.ToTable("sysImageDetail");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.BillingNo).HasMaxLength(50);
+
+                entity.Property(e => e.BillingType).HasMaxLength(50);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
+
+                entity.Property(e => e.GroupId)
+                    .HasColumnName("GroupID")
+                    .HasColumnType("decimal(18, 0)");
+
+                entity.Property(e => e.Hblid).HasColumnName("HBLID");
+
+                entity.Property(e => e.JobId).HasColumnName("JobID");
+
+                entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.Source)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.SystemFileName).HasColumnName("SystemFIleName");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

@@ -79,7 +79,7 @@
             public const string NeutralHawbExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/NeutralHawbExport";
             public const string AirwayBillExportUrl = "/Documentation/api/v1/en-US/CsAirWayBill/AirwayBillExport?jobId=";
 
-          
+
             public const string GetDataHousebillDailyExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/GetHousebillsDailyExport?issuedDate=";
 
             public const string GetDataCDNoteExportUrl = "/Documentation/api/v1/en-US/AcctCDNote/ExportOpsCdNote?jobId=";
@@ -91,6 +91,8 @@
             public const string GetOutsourcingRegcognisingUrl = "/Documentation/api/v1/en-US/OpsTransaction/GetOutsourcingRegcognising";
 
             public const string GetDataExporDebCretInvUrl = "/Documentation/api/v1/en-US/AcctCDNote/GetDataAcctMngtDebCretInvExport";
+
+            public const string GetDataExportAgencyInvUrl = "/Documentation/api/v1/en-US/AcctCDNote/GetDataAcctMngtAgencyExport";
 
             public const string GetDataOustandingDebitUrl = "/Documentation/api/v1/en-US/DocSendMail/GetDataOustandingDebit?salemanId=";
             public const string GetOPSTransactionUrl = "/Documentation/api/v1/en-US/OpsTransaction/Query";

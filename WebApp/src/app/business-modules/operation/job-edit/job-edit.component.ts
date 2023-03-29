@@ -119,6 +119,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (action: fromShareBussiness.ContainerAction) => {
+
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
                         this.lstMasterContainers = action.payload;
                         this.updateData(this.lstMasterContainers);
@@ -656,7 +657,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                         const criteria: DocumentationInterface.ICheckPointCriteria = {
                             data: partnerIds,
                             transactionType: 'CL',
-                            type: 5,
                             settlementCode: null,
                         };
                         return this._documentRepo.validateCheckPointMultiplePartner(criteria)
