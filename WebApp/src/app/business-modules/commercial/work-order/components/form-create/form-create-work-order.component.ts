@@ -76,12 +76,9 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
 
     isLoadingPort: Observable<boolean>;
     isLoadingPartner: boolean;
-    isLoadingUser: Observable<boolean>;
+    isLoadingUser: boolean = false;
 
     ngOnInit(): void {
-        this.isLoadingUser = this._store.select(getSystemUsersLoadingState);
-        this._store.dispatch(GetSystemUser({ active: true }));
-        // this.salesmans = this._store.select(getSystemUserState);
 
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this.ports = this._store.select(getCataloguePortState);
@@ -165,7 +162,7 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
             .subscribe(
                 (active: boolean) => {
                     this.isReadonly = active;
-                    console.log(active);
+                    console.log("isReadonly", this.isReadonly);
                     if (!!active) {
                         this.form.disable();
                     }
@@ -194,8 +191,11 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
                 this.podDescription.setValue((data as PortIndex).nameEn);
                 break;
             case 'partnerId':
+                this.isLoadingUser = true;
                 this._catalogueRepo.getListSalemanByPartner(data.id, this.transactionType)
-                    .subscribe(
+                    .pipe(
+                        finalize(() => this.isLoadingUser = false)
+                    ).subscribe(
                         (salesmans: any[]) => {
                             if (!!salesmans.length) {
                                 this.salesmans = salesmans;
@@ -231,4 +231,23 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
         }
         return strDescription;
     }
+
+    getListSalesman(partnerId: string, transactionType: string) {
+        console.log(this.isReadonly);
+        if (this.isReadonly) {
+            return;
+        }
+        this.isLoadingUser = true;
+        this._catalogueRepo.getListSalemanByPartner(partnerId, transactionType)
+            .pipe(
+                finalize(() => this.isLoadingUser = false)
+            ).subscribe(
+                (salesmans: any[]) => {
+                    this.salesmans = salesmans || [];
+                    this._cd.detectChanges();
+                }
+
+            )
+    }
+
 }

@@ -212,10 +212,11 @@ namespace eFMS.API.Documentation.DL.Services
             string partnerId = workOrder.PartnerId.ToString();
             workOrderViewUpdateModel.PartnerName = catPartnerRepo.Get(x => x.Id == partnerId)?.FirstOrDefault()?.ShortName;
 
-            var userIds = new List<string> { workOrder.UserCreated, workOrder.UserModified };
+            var userIds = new List<string> { workOrder.UserCreated, workOrder.UserModified, workOrder.SalesmanId?.ToString() };
             var users = sysUserRepo.Get(x => userIds.Contains(x.Id)).ToList();
             workOrderViewUpdateModel.UserNameCreated = users.Where(x => x.Id == workOrder.UserCreated)?.FirstOrDefault()?.Username;
             workOrderViewUpdateModel.UserNameModified = users.Where(x => x.Id == workOrder.UserModified)?.FirstOrDefault()?.Username;
+            workOrderViewUpdateModel.SalesmanName = users.Where(x => x.Id == workOrder.SalesmanId.ToString())?.FirstOrDefault()?.Username;
 
             workOrderViewUpdateModel.TransactionTypeName = GetTypeFromData.GetTranctionTypeName(workOrder.TransactionType);
 

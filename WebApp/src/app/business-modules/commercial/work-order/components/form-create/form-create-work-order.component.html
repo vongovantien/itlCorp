@@ -33,11 +33,11 @@
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger':(isSubmitted || salesmanId.dirty) && !salesmanId.valid }">
                         <label class="form-control-label" required>
-                            Salesman
+                            Salesman {{isLoadingUser | json}}
                         </label>
                         <app-combo-grid-virtual-scroll #combogridSalesman
                             (itemSelected)="onSelectDataFormInfo($event, 'salesmanId')"
-                            (remove)="resetFormControl(salesmanId)"
+                            (remove)="resetFormControl(salesmanId)" [loading]="isLoadingUser"
                             [currentActiveItemId]="{field:'id', value: salesmanId.value, hardValue: salesmanName}"
                             [selectedDisplayFields]="['username']" [dataSources]="salesmans"
                             [displayFields]="[{ field: 'username', label: 'User Name' }, { field: 'employeeNameVn', label: 'Full Name' }]"
