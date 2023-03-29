@@ -109,20 +109,20 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group" [ngClass]="{'m-form__group has-danger':
-                            (isSubmitted && arrivaldate.errors | equalError:'invalidDateFuture' )||
-                           (arrivaldate.touched && arrivaldate.errors | equalError:'invalidDateFuture')}">
+                            (isSubmitted && arrivalDate.errors | equalError:'invalidDateFuture' )||
+                           (arrivalDate.touched && arrivalDate.errors | equalError:'invalidDateFuture')}">
                                 <label>ATA</label>
                                 <div class=" m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" placeholder="Select ATA" readonly
-                                        formControlName="arrivalDate" [maxDate]="maxDate"
+                                        formControlName="arrivalDate"
                                         (remove)="resetFormControl(formCreate.controls['arrivalDate'])" calendar
                                         [allowRemove]="!!formCreate.controls['arrivalDate'].value && !!formCreate.controls['arrivalDate'].value.startDate"
                                         [maxDate]='maxDateAta' />
                                 </div>
                                 <div class="form-control-feedback"
-                                    *ngIf="isSubmitted && arrivaldate.errors | equalError:'invalidDateFuture'">
+                                    *ngIf="isSubmitted && arrivalDate.errors | equalError:'invalidDateFuture'">
                                     {{errorATA}}
                                 </div>
                             </div>
