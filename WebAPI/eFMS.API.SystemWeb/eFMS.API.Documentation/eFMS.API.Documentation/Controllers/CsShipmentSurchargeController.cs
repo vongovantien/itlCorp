@@ -234,8 +234,8 @@ namespace eFMS.API.Documentation.Controllers
                 var checkPoint = new CheckPoint {
                     PartnerId = partnersNeedValidate[0].PaymentObjectId,
                     TransactionType = transactionTypeToCheckPoint,
-                    type = CHECK_POINT_TYPE.SURCHARGE,
-                    HblId = partnersNeedValidate[0].Hblid
+                    type = list[0].Type == DocumentConstants.CHARGE_OBH_TYPE ? CHECK_POINT_TYPE.SURCHARGE_OBH : CHECK_POINT_TYPE.SURCHARGE,
+                    HblId = partnersNeedValidate[0].Hblid,
                 };
                 var hsCheckpoint = checkPointService.ValidateCheckPointPartnerSurcharge(checkPoint);
                 if (!hsCheckpoint.Success)

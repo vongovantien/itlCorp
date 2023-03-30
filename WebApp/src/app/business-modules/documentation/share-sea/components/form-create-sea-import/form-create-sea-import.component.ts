@@ -101,7 +101,6 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
         this.agents = this._store.select(getCatalogueAgentState);
         this.ports = this._store.select(getCataloguePortState).pipe(shareReplay());
         this.listUsers = this._systemRepo.getListSystemUser();
-        console.log(this.service);
         this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.service == 'lcl' ? 'SLI' : this.service] });
 
         this.initForm();
@@ -116,6 +115,8 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             .subscribe(
                 (res: CsTransaction) => {
                     if (!!res) {
+                        this.maxDateAta = this.createMoment(res.ata).isAfter(this.maxDate) ? this.createMoment(res.ata) : this.maxDate;
+                        this.maxDateAtd = this.createMoment(res.atd).isAfter(this.maxDate) ? this.createMoment(res.atd) : this.maxDate;
                         this.fclImportDetail = res;
                         this._route.queryParams.subscribe((param: Params) => {
                             if (param.action === 'copy') {
@@ -165,7 +166,6 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
                                 polDescription: !!this.fclImportDetail.polDescription ? this.fclImportDetail.polDescription : res.polName,
                                 noProfit: this.fclImportDetail.noProfit,
                             });
-
                             this.currentFormValue = this.formCreate.getRawValue(); // * For Candeactivate
                         } catch (error) {
                             console.log(error);
@@ -182,8 +182,8 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             // * Date
             etd: [],
             eta: [null, Validators.required],
-            ata: [],
-            atd: [],
+            ata: [null, FormValidators.validateNotFutureDate],
+            atd: [null, FormValidators.validateNotFutureDate],
             serviceDate: [null, Validators.required],
 
             subColoader: [],
@@ -266,12 +266,16 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
                     this.formCreate.controls["serviceDate"].setValue(null);
                 }
             });
+        this.maxDateAta = !this.isDetail ? this.maxDate : null;
+        this.maxDateAtd = !this.isDetail ? this.maxDate : null;
     }
+
     getUserDefault(id: string, userName: string) {
         this.defaultUserName = userName;
         this.personIncharge.setValue(id);
         //this.personIncharge.disable();
     }
+
     getUserLogged() {
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
 
@@ -308,6 +312,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
                 break;
         }
     }
+
     getPIC(groupId: number) {
         this._systemRepo.getPersonInchargeByCurrentUser(groupId, this.isDetail)
             .pipe(catchError(this.catchError))

@@ -301,7 +301,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CheckPoint checkPoint = new CheckPoint { PartnerId = partner.PartnerId,
                     HblId = partner.HblId ?? Guid.Empty,
                     TransactionType = criteria.TransactionType,
-                    type = criteria.Type,
+                    type = partner.Type == DocumentConstants.CHARGE_OBH_TYPE ? CHECK_POINT_TYPE.SURCHARGE_OBH : CHECK_POINT_TYPE.SURCHARGE,
                     SettlementCode = criteria.SettlementCode,
                 };
                 var isValid = ValidateCheckPointPartnerSurcharge(checkPoint);
@@ -460,14 +460,27 @@ namespace eFMS.API.Documentation.DL.Services
                         } else if (contract.IsOverDue == true)
                         {
                             isValid = false;
-                        } else
+                            errorCode = 2;
+                        } else if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdueOBH"))
                         {
-                            isValid = true;
+                            if(checkPointType == CHECK_POINT_TYPE.SURCHARGE_OBH || checkPointType == 0)
+                            {
+                                if (contract.IsOverDueObh == true)
+                                {
+                                    isValid = false;
+                                    errorCode = 6;
+                                }
+                                else
+                                {
+                                    isValid = true;
+                                }
+                            } else
+                            {
+                                isValid = true;
+                            }
                         }
-                        // isValid = ValidateCheckPointCashContractPartner(criteria.PartnerId, criteria.HblId, criteria.TransactionType, criteria.SettlementCode, CHECK_POINT_TYPE.SURCHARGE);
                     }
                     else isValid = true;
-                    if (!isValid) errorCode = 2;
 
                     break;
                 case "Trial":
@@ -477,6 +490,26 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         isValid = true;
                         break;
+                    }
+                    if(checkPointType == CHECK_POINT_TYPE.SURCHARGE_OBH || checkPointType == 0)
+                    {
+                        if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdueOBH"))
+                        {
+                            if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE) // hđ quá hạn vẫn cho issue DEBIT.
+                            {
+                                isValid = true;
+                            }
+                            if (contract.IsOverDueObh == true)
+                            {
+                                isValid = false;
+                            }
+                            else isValid = true;
+                            if (!isValid)
+                            {
+                                errorCode = 6;
+                                break;
+                            }
+                        }
                     }
                     if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdue"))
                     {
@@ -557,24 +590,28 @@ namespace eFMS.API.Documentation.DL.Services
                 switch (errorCode)
                 {
                     case 1:
-                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have shipment that not paid yet, please you check it again!",
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have shipment that not paid yet, please check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
                         break;
                     case 2:
-                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have Over Due, please you check it again!",
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have Over Due, please check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
                         break;
                     case 3:
-                        messError = string.Format(@"{0} - {1} {2} agreement of {3} is Expired, please you check it again!",
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} is Expired, please check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
                         break;
                     case 4:
-                        messError = string.Format(@"{0} - {1} {2} agreement of {3} is Over Credit Limit {4}%, please you check it again!",
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} is Over Credit Limit {4}%, please check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username, contract.CreditRate);
                         break;
                     case 5:
                         messError = string.Format(@"Contract of {0} is Prepaid. Please issue Prepaid Debit and wait AR confirm",
                             partner?.ShortName);
+                        break;
+                    case 6:
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have Over Due OBH, please check it again!",
+                  partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
                         break;
                     default:
                         break;
@@ -642,7 +679,7 @@ namespace eFMS.API.Documentation.DL.Services
             switch (ContractType)
             {
                 case "Cash":
-                    IsApplySetting = IsApplySettingFlowContractCash(settingFlow.ApplyType, settingFlow.ApplyPartner, settingFlow.IsApplyContract, partnerType);
+                    IsApplySetting = IsApplySettingFlowContractCash(settingFlow, partnerType, typeCheckPoint);
                     break;
                 case "Trial":
                 case "Official":
@@ -656,12 +693,16 @@ namespace eFMS.API.Documentation.DL.Services
             return IsApplySetting;
         }
 
-        private bool IsApplySettingFlowContractCash(string applyType, string applyPartnerType, bool? isApplyContract, string partnerType)
+        private bool IsApplySettingFlowContractCash(SysSettingFlow setting, string partnerType, string typeCheckPoint)
         {
-            bool isApply = false;
-            isApply = applyType == DocumentConstants.SETTING_FLOW_APPLY_TYPE_CHECK_POINT
-                && isApplyContract == true
-                && (applyPartnerType == partnerType || applyPartnerType == DocumentConstants.SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH);
+            bool isApply;
+            isApply = setting.ApplyType == DocumentConstants.SETTING_FLOW_APPLY_TYPE_CHECK_POINT
+                && setting.IsApplyContract == true
+                && (setting.ApplyPartner == partnerType || setting.ApplyPartner == DocumentConstants.SETTING_FLOW_APPLY_PARTNER_TYPE_BOTH);
+            if (typeCheckPoint == "overdueOBH")
+            {
+                isApply = isApply && setting.OverPaymentTermObh == true;
+            }
 
             return isApply;
         }
@@ -679,6 +720,10 @@ namespace eFMS.API.Documentation.DL.Services
             if (typeCheckPoint == "overdue")
             {
                 isApply = isApply && setting.OverPaymentTerm == true;
+            }
+            if (typeCheckPoint == "overdueOBH")
+            {
+                isApply = isApply && setting.OverPaymentTermObh == true;
             }
             if (typeCheckPoint == "expired")
             {
@@ -711,7 +756,12 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (surcharges.Count() > 0)
             {
-                partners = surcharges.GroupBy(x => new { x.PaymentObjectId }).Select(x => new CheckPointPartnerHBLDataGroup { PartnerId = x.Key.PaymentObjectId, HblId = x.FirstOrDefault().Hblid }).ToList();
+                partners = surcharges.GroupBy(x => new { x.PaymentObjectId, x.Type }).Select(x => 
+                new CheckPointPartnerHBLDataGroup { 
+                    PartnerId = x.Key.PaymentObjectId,
+                    HblId = x.FirstOrDefault().Hblid,
+                    Type = x.Key.Type
+                }).ToList();
             }
             else
             {

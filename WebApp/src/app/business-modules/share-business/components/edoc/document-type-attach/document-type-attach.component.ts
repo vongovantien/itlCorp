@@ -125,7 +125,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     updateListFileItem() {
-        this.listFileAttach.filterJob(this.jobNo);
+        this.listFileAttach?.filterJob(this.jobNo);
     }
 
     getDocType(isADV: boolean) {

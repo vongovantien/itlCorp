@@ -30,6 +30,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
+using System.Security.Cryptography.X509Certificates;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -792,7 +793,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (!string.IsNullOrEmpty(id))
             {
                 var partner = DataContext.Get(x => x.Id == id).FirstOrDefault();
-                var existClearance = customsDeclarationRepository.Any(x => (x.AccountNo ?? "").Contains(partner.AccountNo) || x.PartnerTaxCode.Contains(partner.TaxCode));
+                var existClearance = customsDeclarationRepository.Any(x => (x.AccountNo ?? "").Contains(partner.AccountNo));
                 if (transactionDetailRepository.Any(x => x.CustomerId == id) || existClearance)
                 {
                     return new HandleState("This partner is already in use so you can not delete it");

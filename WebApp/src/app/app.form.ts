@@ -50,12 +50,14 @@ export abstract class AppForm extends AppPage {
     confirmDeleteJob: string = 'You you sure you want to delete this Job?';
     invalidFormText: string = 'Opps, It looks like you missed something, Please recheck the highlighted field below.';
     errorETA: string = 'ETA must be greater than or equal ETD';
+    errorATA: string = 'The ATA dates cannot exceed the current date'
+    errorATD: string = 'The ATD dates cannot exceed the current date'
     confirmSyncHBLText: string = `Do you want to sync <span class='font-italic'>ETD, Port, Issue By, Agent, Flight No, Flight Date, Warehouse, Route, MBL to HAWB ?<span>`;
     currentFormValue: any;
-
+    maxDateAta: any;
+    maxDateAtd: any;
     form: FormGroup;
     private $submitClick = new Subject<null>();
-
     @HostListener('document:keydown.escape', ['$event']) onKeydownHandler(event: KeyboardEvent) {
         this.reset();
     }
