@@ -158,7 +158,7 @@ export class UserDetailsComponent extends AppPage {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this.userDetail = res.data;
-                        this.formAdd.SelectedUser = new User(res.data);
+                        this.formAdd.selectedUser = new User(res.data);
                         this.formAdd.isDetail = true;
                         this.formData.isLdap = res.data.isLdap;
                         this.formData.username = res.data.username;
@@ -201,6 +201,7 @@ export class UserDetailsComponent extends AppPage {
                 (res: any) => {
                     if (!!res) {
                         this.userLevels = res;
+                        this.formAdd.userLevels = res;
                     }
                 },
             );

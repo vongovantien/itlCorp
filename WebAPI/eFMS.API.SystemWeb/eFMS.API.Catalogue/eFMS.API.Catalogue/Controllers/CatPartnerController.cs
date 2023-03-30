@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
@@ -19,6 +15,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -648,6 +648,27 @@ namespace eFMS.API.Catalogue.Controllers
         {
             var results = await catPartnerService.GetPartnerByTaxCode(taxCode);
             return Ok(results);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("AddPartnerFromUserData")]
+        [Authorize]
+        public async Task<IActionResult> AddPartnerFromUserData( Guid userId, Guid officeId)
+        {
+            var hs = await catPartnerService.AddPartnerFromUserData(userId, officeId);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+
         }
     }
 }

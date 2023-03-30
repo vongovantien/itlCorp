@@ -17,6 +17,7 @@ import { Store } from '@ngrx/store';
 
 import { CookieService } from 'ngx-cookie-service';
 import crypto_js from 'crypto-js';
+import { CatalogueRepo } from '@repositories';
 @Component({
     selector: 'app-form-add-user',
     templateUrl: './form-add-user.component.html'
@@ -25,7 +26,7 @@ export class FormAddUserComponent extends AppList {
     formGroup: FormGroup;
     isSubmited: boolean = false;
     isDetail: boolean = false;
-    SelectedUser: any = {};
+    selectedUser: any = {};
     staffcode: AbstractControl;
     username: AbstractControl;
     employeeNameVn: AbstractControl;
@@ -101,6 +102,7 @@ export class FormAddUserComponent extends AppList {
         private _spinner: NgxSpinnerService,
         private _store: Store<IAppState>,
         private cookieService: CookieService,
+        private catalogueRepo: CatalogueRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -242,5 +244,14 @@ export class FormAddUserComponent extends AppList {
         });
     }
 
-
+    addPartnerFromUserData() {
+        const userOffice = this.userLevels.find(user => user.isDefault) || this.userLevels[0];
+        this.catalogueRepo.addPartnerFromUserData(this.selectedUser.id, userOffice.officeId)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res: any) => {
+                if (res.status) {
+                    this._toastService.success(res.message);
+                }
+            })
+    }
 }
