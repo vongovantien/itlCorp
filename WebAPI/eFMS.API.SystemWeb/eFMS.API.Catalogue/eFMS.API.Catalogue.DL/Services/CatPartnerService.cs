@@ -2699,13 +2699,17 @@ namespace eFMS.API.Catalogue.DL.Services
         public async Task<HandleState> AddPartnerFromUserData(Guid userId, Guid officeId)
         {
             var hs = new HandleState();
-            var userExisted = sysUserRepository.Where(x => x.Id == userId.ToString());
-            if (userExisted == null)
+            var userExisted = await sysUserRepository.WhereAsync(x => x.Id == userId.ToString());
+            var emplExisted = await sysEmployeeRepository.FirstAsync(x => x.Id == userExisted.First().EmployeeId);
+
+            string accountNo = !string.IsNullOrEmpty(emplExisted.PersonalId) ? emplExisted.PersonalId : emplExisted.StaffCode;
+            if (userExisted == null || DataContext.Any(x => x.AccountNo == accountNo))
             {
-                return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND].Value);
+                string errorMsg = userExisted == null ? LanguageSub.MSG_DATA_NOT_FOUND : LanguageSub.MSG_OBJECT_DUPLICATED;
+                return new HandleState(stringLocalizer[errorMsg].Value);
             }
             var userOffice = await officeRepository.Where(x => x.Id == officeId).FirstOrDefaultAsync();
-            var listEmp = from user in userExisted
+            var newModel = from user in userExisted
                            join empl in sysEmployeeRepository.Get() on user.EmployeeId equals empl.Id
                            select new CatPartner
                            {
@@ -2717,11 +2721,11 @@ namespace eFMS.API.Catalogue.DL.Services
                                PartnerMode = "Internal",
                                TaxCode = !string.IsNullOrEmpty(empl.PersonalId) ? empl.PersonalId : empl.StaffCode,
                                AccountNo = !string.IsNullOrEmpty(empl.PersonalId) ? empl.PersonalId : empl.StaffCode,
-                               CountryId = 368,
-                               AddressEn = userOffice.AddressEn,
-                               AddressShippingEn = userOffice.AddressEn,
-                               AddressVn = userOffice.AddressVn,
-                               AddressShippingVn = userOffice.AddressEn,
+                               CountryId = userOffice?.CountryId,
+                               AddressEn = userOffice?.AddressEn,
+                               AddressShippingEn = userOffice?.AddressEn,
+                               AddressVn = userOffice?.AddressVn,
+                               AddressShippingVn = userOffice?.AddressEn,
                                PartnerGroup = "STAFF;PERSONAL",
                                Active = true,
                                UserCreated = currentUser.UserID,
@@ -2729,39 +2733,9 @@ namespace eFMS.API.Catalogue.DL.Services
                                DatetimeCreated = DateTime.Now,
                                DatetimeModified = DateTime.Now,
                            };
-            var empExisted = listEmp.FirstOrDefault();
-            if (DataContext.Any(x => x.AccountNo == empExisted.AccountNo))
-            {
-                return new HandleState(stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value);
-            }
 
-            using (var trans = DataContext.DC.Database.BeginTransaction())
-            {
-                try
-                {
-                    hs = DataContext.Add(empExisted);
-                    if (hs.Success)
-                    {
-                        trans.Commit();
-                    }
-                    else
-                    {
-                        trans.Rollback();
-                    }
-                    return new HandleState();
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                    return new HandleState(ex.Message);
-                }
-                finally
-                {
-                    ClearCache();
-                    Get();
-                    trans.Dispose();
-                }
-            }
+            hs = await DataContext.AddAsync(newModel);
+            return hs;
         }
     }
 }
