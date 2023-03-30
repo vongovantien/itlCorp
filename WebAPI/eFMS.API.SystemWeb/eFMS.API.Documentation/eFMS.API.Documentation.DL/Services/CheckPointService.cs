@@ -551,7 +551,38 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             if (contract.IsExpired == true)
                             {
-                                isValid = false;
+                                // check shipment service date between contract effective date and expired date
+                                if (criteria.TransactionType == "CL")
+                                {
+                                    var shipment = opsTransactionRepository.First(x => x.Hblid == criteria.HblId);
+                                    if (shipment != null)
+                                    {
+                                        if (shipment.ServiceDate >= contract.EffectiveDate && shipment.ServiceDate <= contract.ExpiredDate)
+                                        {
+                                            isValid = true;
+                                        }
+                                        else
+                                        {
+                                            isValid = false;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    var hbl = csTransactionDetail.First(x => x.Id == criteria.HblId);
+                                    var shipment = csTransactionRepository.Get(x => x.Id == hbl.JobId)?.FirstOrDefault();
+                                    if (shipment != null)
+                                    {
+                                        if (shipment.ServiceDate >= contract.EffectiveDate && shipment.ServiceDate <= contract.ExpiredDate)
+                                        {
+                                            isValid = true;
+                                        }
+                                        else
+                                        {
+                                            isValid = false;
+                                        }
+                                    }
+                                }
                             }
                             else isValid = true;
                         }
