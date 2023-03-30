@@ -2700,7 +2700,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var hs = new HandleState();
             var userExisted = await sysUserRepository.WhereAsync(x => x.Id == userId.ToString());
-            var emplExisted = await sysEmployeeRepository.FirstAsync(x => x.Id == userExisted.First().EmployeeId);
+            var emplExisted = await sysEmployeeRepository.Where(x => x.Id == userExisted.FirstOrDefault().EmployeeId).FirstOrDefaultAsync();
 
             string accountNo = !string.IsNullOrEmpty(emplExisted.PersonalId) ? emplExisted.PersonalId : emplExisted.StaffCode;
             if (userExisted == null || DataContext.Any(x => x.AccountNo == accountNo))
