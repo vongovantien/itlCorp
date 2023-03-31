@@ -208,7 +208,7 @@
                                     <div class="form-group m--align-right"
                                         *ngIf="(currentUser?.userType === 'Super Admin') && (currentUser?.id !== selectedUser.id)">
                                         <button class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
-                                            (click)="switchUser(SelectedUser)">
+                                            (click)="switchUser(selectedUser)">
                                             <span>
                                                 <i class="la la-user-plus"></i>
                                                 <span>Log In</span>
