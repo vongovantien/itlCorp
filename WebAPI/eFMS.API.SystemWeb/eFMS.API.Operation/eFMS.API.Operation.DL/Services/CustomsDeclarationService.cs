@@ -88,12 +88,31 @@ namespace eFMS.API.Operation.DL.Services
             return Get();
         }
 
-        public List<CustomsDeclarationModel> GetUserCustomClearance(int pageNumber, int pageSize, out int rowsCount)
+        public List<CustomsDeclarationModel> GetUserCustomClearance(string searchType, string keySearch, int pageNumber, int pageSize, out int rowsCount)
         {
             List<CustomsDeclarationModel> returnList = new List<CustomsDeclarationModel>();            
             string userId = currentUser.UserID;
+            string[] searchingKeys = null;
             var connections = ecusCconnectionService.Get(x => x.UserId == userId && x.Active == true);
             var result = new HandleState();
+            var autocompleteKey = string.Empty;
+            if (!string.IsNullOrEmpty(keySearch) || !string.IsNullOrWhiteSpace(keySearch))
+            {
+                if (searchType == "clearanceNo" || searchType == "hblNo")
+                {
+                    keySearch = keySearch.ToLower().Trim();
+                    var replacedString = keySearch.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    autocompleteKey = replacedString.Length > 0 ? replacedString[0] : string.Empty;
+                    if (replacedString.Length >= 1)
+                    {
+                        searchingKeys = replacedString.Length >= 1 ? replacedString : null;
+                    }
+                }
+            }
+            else
+            {
+                keySearch = String.Empty;
+            }
             var lists = new List<CustomsDeclaration>();
             try
             {
@@ -114,7 +133,7 @@ namespace eFMS.API.Operation.DL.Services
 
                         if (clearanceEcus == null)
                         {
-                            rowsCount = 0;
+                            rowsCount = 0;                            
                             return returnList;
                         }
 
@@ -129,7 +148,17 @@ namespace eFMS.API.Operation.DL.Services
                             }
                         }
                     }
-                    cachedService.Set(returnList, TimeSpan.FromSeconds(15));
+                    if (keySearch != null && (!string.IsNullOrEmpty(keySearch) || !string.IsNullOrWhiteSpace(keySearch)))
+                    {
+                        if(searchType=="clearanceNo")
+                        {
+                            returnList = returnList.Where(x => searchingKeys.Any(val => x.ClearanceNo.Contains(val, StringComparison.OrdinalIgnoreCase))).ToList();
+                        }
+                        else if (searchType == "hblNo") {
+                            returnList = returnList.Where(x => searchingKeys.Any(val => x.Hblid.Contains(val, StringComparison.OrdinalIgnoreCase))).ToList();
+                        }
+                    }
+                    cachedService.Set(returnList, TimeSpan.FromSeconds(10));
                 }
             }
             catch (Exception ex)
@@ -137,11 +166,21 @@ namespace eFMS.API.Operation.DL.Services
                 result = new HandleState(ex.Message);
                 rowsCount = 0;  
             }
+            
+            if(searchType == "partnerName" && (keySearch != null && (!string.IsNullOrEmpty(keySearch) || !string.IsNullOrWhiteSpace(keySearch))))
+            {
+                returnList = MapClearancesToClearanceModels(returnList.AsQueryable());
+                //searchingKeys = keySearch.Split(',').Select(s => s.Trim()).ToArray();
+                returnList = returnList.Where(x => keySearch == x.CustomerName).ToList();
+            }
+            else
+            {
+                returnList = MapClearancesToClearanceModels(returnList.AsQueryable());
+            }
             // Perform pagination
             int rowCount = returnList.Count();
             rowsCount = rowCount;
             returnList = returnList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-            returnList = MapClearancesToClearanceModels(returnList.AsQueryable());
             return returnList;
         }
 

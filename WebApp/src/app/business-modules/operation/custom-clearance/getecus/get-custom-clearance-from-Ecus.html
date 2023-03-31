@@ -21,17 +21,42 @@
             <div class="modal-body">
                 <div class="m-form m-form--state">
                     <div class="m-form m-form--state">
-                        <div class="row">
-                            <div class="m-input-icon m-input-icon--left down mx-3">
-                                <span class="m-input-icon__icon m-input-icon__icon--left">
-                                    <span>
-                                        <i class="la la-search"></i>
-                                    </span>
-                                </span>
-                                <input type="text" class="form-control m-input m-input--square" placeholder="Search" [(ngModel)]="keyword"
-                                    name="keyword">
+                        <form [formGroup]="formSearch">
+                            <div class="row">
+                                <div class="col-lg-4" style="max-width: 180px">
+                                    <select class="form-control" formControlName="filterType">
+                                        <option *ngFor="let type of filterTypes" [ngValue]="type">{{type.title}}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="m-input-icon m-input-icon--left down"
+                                        *ngIf="filterType.value.value!='partnerName'">
+                                        <input type="text" class="form-control" formControlName="clearanceNo">
+                                    </div>
+                                    <div class="form-group col-md-8" *ngIf="filterType.value.value=='partnerName'" style="padding-top: 0 ; flex: 0 0 33.33333333%; max-width: 100%">
+                                        <app-combo-grid-virtual-scroll
+                                            [currentActiveItemId]="{ field: 'accountNo', value: customer.value}"
+                                            (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                                            [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
+                                            [displayFields]= "displayFieldsCustomer"
+                                            (remove)="resetFormControl(partnerId)"
+                                            placeholder="Please select partner" formControlName="partnerId">
+                                        </app-combo-grid-virtual-scroll>
+                                    </div>
+                                </div>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase"
+                                        (click)="getClearanceNotImported()">
+                                        <span>
+                                            <i class="la la-search"></i>
+                                            <span> Search </span>
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
+                        </form>
+
                         <br>
                         <div class="table-horizontal" style="max-height: 700px">
                             <table class="table table-striped table-brand dataTable" style="max-height:700px">
@@ -64,7 +89,7 @@
                                             *ngFor="let item of dataEcus | filter: keyword: ['clearanceNo','hblid' , 'customerName'] let i=index; trackBy: trackByFn">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
-                                                    <label class="m-checkbox">
+                                                    <label class="m-checkbox" *ngIf="!item.imprtStts">
                                                         <input type="checkbox" [attr.name]="item.clearanceNo"
                                                             [checked]="item.isChecked"
                                                             (change)="item.isChecked=!item.isChecked; removeAllChecked();">
@@ -95,6 +120,14 @@
                                             </td>
                                             <td>
                                                 <span>{{ item.qtyCont }}</span>
+                                            </td>
+                                            <td [ngSwitch]="item.imprtStts">
+                                                <span *ngSwitchCase="true" class="text-success">
+                                                    {{"Imported"}}
+                                                </span>
+                                                <span *ngSwitchDefault="false" class="text-danger">
+                                                    {{"Not Imported"}}
+                                                </span>
                                             </td>
                                         </tr>
                                     </ng-container>
@@ -131,7 +164,7 @@
                 </div>
                 <div class="modal-footer m--align-center">
                     <button type=" button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
-                            (click)="updateJobToClearance(); changeAllNotImported();">
+                        (click)="updateJobToClearance()">
                         <span>
                             <i class="la la-save"></i>
                             <span> Add </span>

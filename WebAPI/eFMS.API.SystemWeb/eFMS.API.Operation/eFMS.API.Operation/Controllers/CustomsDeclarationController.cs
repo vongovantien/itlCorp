@@ -112,9 +112,9 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="size"></param>
         /// <returns></returns>
         [HttpGet("GetUserCustomClearance")]
-        public IActionResult GetUserCustomClearance(int page, int size)
+        public IActionResult GetUserCustomClearance(string searchType, string keySearch, int page, int size)
         {
-            var data = customsDeclarationService.GetUserCustomClearance(page, size, out int rowsCount);
+            var data = customsDeclarationService.GetUserCustomClearance(searchType, keySearch, page, size, out int rowsCount);
             var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }
