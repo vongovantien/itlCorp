@@ -121,7 +121,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         { id: "SLE", text: "Sea LCL Export" },
         { id: "SFI", text: "Sea FCL Import" },
         { id: "SLI", text: "Sea LCL Import" },
-        { id: "CL", text: "Custom Logistic" }
+        { id: "CL", text: "Custom Logistic" },
+        { id: "TKI", text: "Trucking Inland" }
     ];
 
 
@@ -224,7 +225,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             contractNo: [null, Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
             expiredDate: [null, Validators.compose([
-                Validators.required, 
+                Validators.required,
                 this.checkExpiredDate
             ])],
             contractType: [null, Validators.required],
@@ -570,7 +571,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                             }
                         }
                     );
-            } else if (this.isUpdate && !this.isCreateNewCommercial) {                            
+            } else if (this.isUpdate && !this.isCreateNewCommercial) {
                 const body = new Contract(this.selectedContract);
                 if (this.contractTypeDetail !== this.contractType.value && this.selectedContract.active === true && this.isAllowActiveContract === false) { //&& this.isChangeAgrmentType === false && this.isAllowActiveContract === false) {
                     this.status = this.statusContract;
