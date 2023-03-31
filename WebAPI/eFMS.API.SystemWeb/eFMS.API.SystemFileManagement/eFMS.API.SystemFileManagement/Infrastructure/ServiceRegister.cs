@@ -44,6 +44,7 @@ namespace eFMS.API.SystemFileManagement.Infrastructure
             services.AddTransient<IAWSS3Service, AWSS3Service>();
             services.AddTransient<IEDocService, EDocService>();
             services.AddTransient<IAttachFileTemplateService, AttachFilteTemplateService>();
+            services.AddHostedService<EDocBackgroundService>();
 
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
