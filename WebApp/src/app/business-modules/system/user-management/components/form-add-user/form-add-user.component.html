@@ -188,23 +188,16 @@
                     </div>
                     <div class="col-lg-4">
                         <div class="row">
-                            <div class="col-lg-4">
+                            <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-control-label">LDAP</label>
                                     <div class="m-checkbox-inline">
                                         <app-switch formControlName="ldap">
                                         </app-switch>
-
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4" *ngIf="isDetail">
-                                <div class="m--margin-top-25">
-                                    <button class="btn btn-brand m-btn--icon m-btn--uppercase" (click)="addPartnerFromUserData()">Create Partner
-                                        Data</button>
-                                </div>
-                            </div>
-                            <div class="col-lg-4" *ngIf="isDetail">
+                            <div class="col-lg-6" *ngIf="isDetail">
                                 <div class="form-group m--align-right">
                                     <label></label>
                                     <div class="c-btn-form-group">
@@ -215,7 +208,7 @@
                                     <div class="form-group m--align-right"
                                         *ngIf="(currentUser?.userType === 'Super Admin') && (currentUser?.id !== selectedUser.id)">
                                         <button class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
-                                            (click)="switchUser(selectedUser)">
+                                            (click)="switchUser(SelectedUser)">
                                             <span>
                                                 <i class="la la-user-plus"></i>
                                                 <span>Log In</span>

@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormAddUserComponent } from '../components/form-add-user/form-add-user.component';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { SystemRepo } from '@repositories';
+import { SystemRepo, CatalogueRepo } from '@repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { User, UserLevel } from '@models';
 import { ConfirmPopupComponent } from '@common';
@@ -9,7 +9,7 @@ import { AppPage } from 'src/app/app.base';
 import { ToastrService } from 'ngx-toastr';
 
 import { IAddUser } from '../addnew/user.addnew.component';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
 import { DataService } from '@services';
 
@@ -84,6 +84,7 @@ export class UserDetailsComponent extends AppPage {
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _dataService: DataService,
+        private _catalogueRepo: CatalogueRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -201,7 +202,6 @@ export class UserDetailsComponent extends AppPage {
                 (res: any) => {
                     if (!!res) {
                         this.userLevels = res;
-                        this.formAdd.userLevels = res;
                     }
                 },
             );
@@ -251,5 +251,18 @@ export class UserDetailsComponent extends AppPage {
                     }
                 )
         }
+    }
+
+    addPartnerFromUserData() {
+        this._catalogueRepo.addPartnerFromUserData(this.userDetail.id)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res: any) => {
+                if (!!res && res.status) {
+                    this._toastService.success(res.message);
+                }
+                else {
+                    this._toastService.warning("This Staff Code has already been used to create an Partner in the system!");
+                }
+            })
     }
 }

@@ -40,7 +40,7 @@ namespace eFMS.API.Catalogue.DL.IService
         List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType, string office);
         IQueryable<CatPartnerForKeyinCharge> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria);
         Task<CatPartnerModel> GetPartnerByTaxCode (string taxCode);
-        Task<HandleState> AddPartnerFromUserData(Guid userId, Guid officeId);
+        Task<HandleState> AddPartnerFromUserData(Guid userId);
 
     }
 }

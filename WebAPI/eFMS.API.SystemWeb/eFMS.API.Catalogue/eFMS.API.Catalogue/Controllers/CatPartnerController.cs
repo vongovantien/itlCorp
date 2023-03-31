@@ -9,6 +9,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +19,7 @@ using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.Controllers
@@ -658,17 +660,16 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPost]
         [Route("AddPartnerFromUserData")]
         [Authorize]
-        public async Task<IActionResult> AddPartnerFromUserData( Guid userId, Guid officeId)
+        public async Task<IActionResult> AddPartnerFromUserData( Guid userId)
         {
-            var hs = await catPartnerService.AddPartnerFromUserData(userId, officeId);
-            var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
+            var hs = await catPartnerService.AddPartnerFromUserData(userId);
+            if (hs.Success)
             {
-                return BadRequest(result);
+                var message = HandleError.GetMessage(hs, Crud.Insert);
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
             }
-            return Ok(result);
-
+            return Ok(hs);
         }
     }
 }
