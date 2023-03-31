@@ -1419,8 +1419,8 @@ export class CatalogueRepo {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStandardCharge/GetBy`, criteria);
     }
 
-    addPartnerFromUserData(userId: string, officeId: string) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/AddPartnerFromUserData`, null, { userId: userId, officeId: officeId }).pipe(
+    addPartnerFromUserData(userId: string) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/AddPartnerFromUserData`, null, { userId: userId }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;

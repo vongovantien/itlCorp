@@ -40,7 +40,6 @@ export class FormAddUserComponent extends AppList {
     description: AbstractControl;
     ldap: AbstractControl;
     personalId: AbstractControl;
-    userLevels: UserLevel[] = [];
     headersuslv: CommonInterface.IHeaderTable[];
     //
     creditLimit: AbstractControl;
@@ -138,7 +137,7 @@ export class FormAddUserComponent extends AppList {
             description: [],
             ldap: [true],
             //
-            creditLimit: [],
+            creditLimit: [20000000],
             creditRate: [],
             personalId: [],
             userRole: [this.userRoles[0],
@@ -244,14 +243,5 @@ export class FormAddUserComponent extends AppList {
         });
     }
 
-    addPartnerFromUserData() {
-        const userOffice = this.userLevels.find(user => user.isDefault) || this.userLevels[0];
-        this.catalogueRepo.addPartnerFromUserData(this.selectedUser.id, userOffice.officeId)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((res: any) => {
-                if (res.status) {
-                    this._toastService.success(res.message);
-                }
-            })
-    }
+
 }

@@ -2696,36 +2696,40 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        public async Task<HandleState> AddPartnerFromUserData(Guid userId, Guid officeId)
+        public async Task<HandleState> AddPartnerFromUserData(Guid userId)
         {
             var hs = new HandleState();
             var userExisted = await sysUserRepository.WhereAsync(x => x.Id == userId.ToString());
             var emplExisted = await sysEmployeeRepository.Where(x => x.Id == userExisted.FirstOrDefault().EmployeeId).FirstOrDefaultAsync();
 
-            string accountNo = !string.IsNullOrEmpty(emplExisted.PersonalId) ? emplExisted.PersonalId : emplExisted.StaffCode;
-            if (userExisted == null || DataContext.Any(x => x.AccountNo == accountNo))
-            {
-                string errorMsg = userExisted == null ? LanguageSub.MSG_DATA_NOT_FOUND : LanguageSub.MSG_OBJECT_DUPLICATED;
-                return new HandleState(stringLocalizer[errorMsg].Value);
-            }
-            var userOffice = await officeRepository.Where(x => x.Id == officeId).FirstOrDefaultAsync();
+            if (DataContext.Any(x => x.AccountNo == emplExisted.StaffCode)) return new HandleState(false, null);
+
+            var useLevel = await userlevelRepository.WhereAsync(u => u.UserId == userId.ToString());
+            var defaultUserLevel = useLevel.FirstOrDefault(x => x.IsDefault == true) ?? useLevel.FirstOrDefault();
+            var officeUser = await officeRepository.Where(x => x.Id == defaultUserLevel.OfficeId).FirstOrDefaultAsync();
+            var countryUser = await catCountryRepository.Where(x => x.Code == "VN").FirstOrDefaultAsync();
             var newModel = from user in userExisted
                            join empl in sysEmployeeRepository.Get() on user.EmployeeId equals empl.Id
                            select new CatPartner
                            {
                                Id = Guid.NewGuid().ToString(),
                                PartnerNameEn = empl.EmployeeNameEn,
-                               ShortName = empl.EmployeeNameEn,
+                               ShortName = user.Username.Replace(".", " "),
                                PartnerNameVn = empl.EmployeeNameVn,
                                PartnerLocation = "Domestic",
                                PartnerMode = "Internal",
-                               TaxCode = !string.IsNullOrEmpty(empl.PersonalId) ? empl.PersonalId : empl.StaffCode,
-                               AccountNo = !string.IsNullOrEmpty(empl.PersonalId) ? empl.PersonalId : empl.StaffCode,
-                               CountryId = userOffice?.CountryId,
-                               AddressEn = userOffice?.AddressEn,
-                               AddressShippingEn = userOffice?.AddressEn,
-                               AddressVn = userOffice?.AddressVn,
-                               AddressShippingVn = userOffice?.AddressEn,
+                               TaxCode = empl.StaffCode,
+                               AccountNo = empl.StaffCode,
+                               CountryId = countryUser.Id,
+                               CountryShippingId = countryUser.Id,
+                               AddressEn = officeUser?.AddressEn,
+                               AddressShippingEn = officeUser?.AddressEn,
+                               AddressVn = officeUser?.AddressVn,
+                               AddressShippingVn = officeUser?.AddressEn,
+                               OfficeId = defaultUserLevel?.OfficeId,
+                               DepartmentId = defaultUserLevel?.DepartmentId,
+                               GroupId = defaultUserLevel?.GroupId,
+                               CompanyId = defaultUserLevel?.CompanyId,
                                PartnerGroup = "STAFF;PERSONAL",
                                Active = true,
                                UserCreated = currentUser.UserID,
