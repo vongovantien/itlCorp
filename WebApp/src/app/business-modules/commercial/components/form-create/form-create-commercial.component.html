@@ -51,7 +51,7 @@
                                 <label required>Tax Code</label>
                                 <input type="text" class="form-control" formControlName="taxCode"
                                     [attr.disabled]="active || isBranchSubCurrent || this.isBranchSub ? 'disabled' : null"
-                                    (change)="getInforCompanyByTaxCode(this.taxCode.value)">
+                                    (blur)="getInforCompanyByTaxCode(this.taxCode.value)">
                                 <div class="form-control-feedback"
                                     *ngIf="(isSubmitted &&
                                 ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength')))||((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">

@@ -93,7 +93,7 @@
                             class="form-control m-input m-input--square" title="Tax code must be number"
                             placeholder="Please enter Tax Code" autocomplete="nope" formControlName="taxCode"
                             [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }" required
-                            (change)="getInforCompanyByTaxCode(this.taxCode.value)">
+                            (blur)="getInforCompanyByTaxCode(this.taxCode.value)">
                         <div class="form-control-feedback"
                             *ngIf="(isSubmitted &&
                             ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength')))||((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
