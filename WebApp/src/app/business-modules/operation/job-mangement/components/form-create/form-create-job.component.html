@@ -337,7 +337,7 @@
                                 <div class="col-md-4">
                                     <div class="row">
                                         <ng-container
-                                            *ngIf="userLogged?.officeType === 'Head' || userLogged?.officeType === 'Branch'">
+                                            *ngIf="(userLogged?.officeType === 'Head' || userLogged?.officeType === 'Branch')&&transactionType!=='TKI'">
                                             <div class="col-lg-3">
                                                 <div class="form-group">
                                                     <label class="form-control-label">

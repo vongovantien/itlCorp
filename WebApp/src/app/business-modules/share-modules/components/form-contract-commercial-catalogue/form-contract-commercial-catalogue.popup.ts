@@ -121,7 +121,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         { id: "SLE", text: "Sea LCL Export" },
         { id: "SFI", text: "Sea FCL Import" },
         { id: "SLI", text: "Sea LCL Import" },
-        { id: "CL", text: "Custom Logistic" }
+        { id: "CL", text: "Custom Logistic" },
+        { id: "TKI", text: "Trucking Inland" }
     ];
 
 
@@ -222,7 +223,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             contractNo: [null, Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
             expiredDate: [null, Validators.compose([
-                Validators.required, 
+                Validators.required,
                 this.checkExpiredDate
             ])],
             contractType: [null, Validators.required],
