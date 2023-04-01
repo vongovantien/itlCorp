@@ -1,5 +1,5 @@
 import { coerceBooleanProperty } from "@angular/cdk/coercion";
-import { Component, EventEmitter, Input, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, NgZone, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { AppList } from '@app';
 import { ReportPreviewComponent } from '@common';
 import { delayTime } from '@decorators';
@@ -25,9 +25,10 @@ import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import cloneDeep from 'lodash/cloneDeep';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, pipe } from 'rxjs';
 import { ShareDocumentTypeAttachComponent } from "src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component";
-import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
+import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState, getSettlementPaymentDetailTotalChargeState, LoadListNoGroupSurcharge } from '../store';
+import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -55,6 +56,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentFilePopup: SettlementShipmentAttachFilePopupComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
     @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
+    @ViewChild('scroller') scroller: CdkVirtualScrollViewport;
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
     @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>
@@ -86,13 +88,16 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     isLoadingGroupShipment: boolean = false;
 
     listEdoc: any[] = [];
+    pageSize: number = this.numberToShow[1];
+
     constructor(
         private readonly _sortService: SortService,
         private readonly _toastService: ToastrService,
         private readonly _documenRepo: DocumentationRepo,
         private readonly _dataService: DataService,
         private readonly _store: Store<ISettlementPaymentState>,
-        private readonly _accountingRepo: AccountingRepo
+        private readonly _accountingRepo: AccountingRepo,
+        private readonly _ngZone: NgZone
     ) {
         super();
     }
@@ -130,7 +135,41 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState);
         this.detailSettlement = this._store.select(getSettlementPaymentDetailState);
 
+    }
 
+    ngAfterViewInit(): void {
+        this.listenScrollingEvent(() => {
+            this._ngZone.run(() => {
+                this._store.select(getSettlementPaymentDetailTotalChargeState)
+                    .pipe(takeUntil(this.ngUnsubscribe))
+                    .subscribe(
+                        (total: any) => {
+                            if (!!this.settlementCode) {
+                                const totalPage = Math.ceil(total / 20);
+                                if (this.page < totalPage) {
+                                    this.getNextSurcharge();
+                                } else {
+                                    return;
+                                }
+                            }
+
+                        }
+                    )
+
+            });
+        })
+    }
+
+    getNextSurcharge() {
+        this._store.dispatch(LoadListNoGroupSurcharge());
+        this.page++;
+        this._accountingRepo.getPagingSurchargeSettlement(this.settlementCode, this.page, 20)
+            .pipe(finalize(() => { this.isLoading = false; }))
+            .subscribe((res: CommonInterface.IResponsePaging) => {
+                if (!!res.data.length) {
+                    this.surcharges = [...this.surcharges, ...res.data || []];
+                }
+            });
     }
 
 
