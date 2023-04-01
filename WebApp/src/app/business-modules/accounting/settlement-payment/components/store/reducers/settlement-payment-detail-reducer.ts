@@ -29,6 +29,9 @@ const reducer = createReducer(
     on(Actions.UpdateListNoGroupSurcharge, (state: SettlePaymentDetailState, payload: any) => ({
         ...state, settlement: { ...state.settlement, chargeNoGrpSettlement: payload.data }
     })),
+    on(Actions.LoadListNoGroupSurcharge, (state: SettlePaymentDetailState) => ({
+        ...state, isLoading: true
+    })),
     on(Actions.LoadListEDocSettleSuccess, (state: SettlePaymentDetailState, payload: any) => ({
         ...state, eDocs: payload.eDocs
     })),

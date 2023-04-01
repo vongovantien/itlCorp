@@ -43,4 +43,9 @@ namespace eFMS.API.Accounting.Service.ViewModels
         public decimal VatAmountUSD { get; set; }
         public Guid ShipmentId { get; set; }
     }
+
+    public class sp_GetSurchargeDetailSOAPaging : sp_GetSurchargeDetailSOA
+    {
+
+    }
 }

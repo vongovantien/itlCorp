@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -42,5 +43,7 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState UpdateAdjustDebitValue(AdjustModel model);
         HandleState UpdateSoaCharge(string soaNo, List<CsShipmentSurcharge> surchargesSoa, string action);
         Task<HandleState> UpdateAcctCreditManagement(List<CsShipmentSurcharge> surchargesSoa, string soaNo, string action);
+        Task<ResponsePagingModel<ChargeShipmentModel>> GetPagingSurchargeSOA(string soaNo, int page, int size);
+        List<GroupShipmentModel> GetSOAGroupShipmentModels(string soaNo);
     }
 }
