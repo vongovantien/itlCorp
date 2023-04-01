@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using eFMS.API.Common.Helpers;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using eFMS.API.Infrastructure.RabbitMQ;
 
 namespace eFMS.API.Accounting.Controllers
@@ -275,13 +276,13 @@ namespace eFMS.API.Accounting.Controllers
                     result = new ResultHandle { Status = false, Message = "Save Receipt fail" };
                     break;
             }
-            
+
             if (!hs.Success)
             {
                 return BadRequest(result);
             }
-            else if(saveAction == SaveAction.SAVECANCEL || saveAction == SaveAction.SAVEDONE)
-            {                
+            else if (saveAction == SaveAction.SAVECANCEL || saveAction == SaveAction.SAVEDONE)
+            {
                 Response.OnCompleted(async () =>
                 {
                     var modelReceivableList = acctReceiptService.GetListReceivableReceipt(receiptModel.Id);
@@ -296,6 +297,18 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     await CalculateOverDueAsync(new List<string>() { receiptModel.CustomerId });
                 });
+            }
+            if (saveAction == SaveAction.SAVEDRAFT_ADD || saveAction == SaveAction.SAVEDRAFT_UPDATE || saveAction == SaveAction.SAVEDONE)
+            {
+                // Cập nhật cấn trừ debit
+                if (receiptModel.Type == "Agent")
+                {
+                    var hsDebit = acctReceiptService.UpdateAccountingDebitAR(receiptModel.Payments, saveAction);
+                    if (!hsDebit.Success)
+                    {
+                        new LogHelper("eFMS_SaveReceipt_UpdateDebitAR_LOG", hsDebit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
+                    }
+                }
             }
             return Ok(result);
         }
@@ -475,8 +488,9 @@ namespace eFMS.API.Accounting.Controllers
                                 && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd))
                                 )
                 {
-                    List<ReceiptInvoiceModel> invalidPayments = payments.Where(x => x.Type == "DEBIT" && x.TotalPaidVnd > 0
-                    && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd)).ToList();
+                    List<ReceiptInvoiceModel> invalidPayments = model.Type.ToLower() == "customer" ?
+                        payments.Where(x => x.Type == "DEBIT" && x.TotalPaidVnd > 0 && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd)).ToList() :
+                        payments.Where(x => x.Type == "DEBIT" && x.TotalPaidUsd > 0 && x.TotalPaidUsd > x.UnpaidAmountUsd).ToList();
                     List<string> messages = new List<string>();
                     if (invalidPayments.Count > 0)
                     {
