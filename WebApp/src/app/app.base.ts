@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from "@angular/common/http";
-import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ComponentFactory, ComponentFactoryResolver, ComponentRef, DoCheck, Injector, OnChanges, OnDestroy, OnInit, QueryList, ViewContainerRef } from "@angular/core";
+import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, ComponentFactory, ComponentFactoryResolver, ComponentRef, Directive, DoCheck, Injector, OnChanges, OnDestroy, OnInit, QueryList, ViewContainerRef } from "@angular/core";
 import { BehaviorSubject, Observable, Subject, Subscription, throwError } from "rxjs";
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 
@@ -15,7 +15,7 @@ import { PermissionShipment } from "./shared/models/document/permissionShipment"
 import { ButtonModalSetting } from "./shared/models/layout/button-modal-setting.model";
 import { ContextMenuDirective } from "@directives";
 
-
+@Directive()
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
 
     ranges: any = {

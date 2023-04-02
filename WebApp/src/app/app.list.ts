@@ -1,8 +1,9 @@
 import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
-import { ViewChild } from "@angular/core";
+import { Directive, ViewChild } from "@angular/core";
 import { filter, map, pairwise, takeUntil, throttleTime } from "rxjs/operators";
 import { AppPage } from "./app.base";
 
+@Directive()
 export abstract class AppList extends AppPage {
     @ViewChild('scroller') scroller: CdkVirtualScrollViewport;
 

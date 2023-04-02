@@ -152,7 +152,7 @@
         "no-any": [
             true,
             {
-                "ignore-rest-args": true,
+                "ignore-rest-args": true
             }
         ],
         "no-invalid-template-strings": true,
