@@ -1377,45 +1377,47 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             var urlImage = "";
             List<SysImage> list = new List<SysImage>();
-            foreach (var file in model.Files)
-            {
-                string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
-                var key = "";
-
-                string extension = Path.GetExtension(file.FileName);
-                key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
-
-                var putRequest = new PutObjectRequest()
+            if(model.Files != null){
+                foreach (var file in model.Files)
                 {
-                    BucketName = _bucketName,
-                    Key = key,
-                    InputStream = file.OpenReadStream(),
-                };
+                    string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
+                    var key = "";
 
-                PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
-                if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
-                {
-                    urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
-                    if (extension == ".doc")
+                    string extension = Path.GetExtension(file.FileName);
+                    key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+
+                    var putRequest = new PutObjectRequest()
                     {
-                        urlImage = _domainTest + "/DownloadFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
-                    }
-                    var sysImage = new SysImage
-                    {
-                        Id = Guid.NewGuid(),
-                        Url = urlImage,
-                        Name = fileName + extension,
-                        Folder = model.FolderName,
-                        ObjectId = model.Id.ToString(),
-                        UserCreated = currentUser.UserName,
-                        UserModified = currentUser.UserName,
-                        DateTimeCreated = DateTime.Now,
-                        DatetimeModified = DateTime.Now,
-                        ChildId = model.Child,
-                        KeyS3 = key,
-                        SyncStatus = isSync == true ? "Synced" : ""
+                        BucketName = _bucketName,
+                        Key = key,
+                        InputStream = file.OpenReadStream(),
                     };
-                    list.Add(sysImage);
+
+                    PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
+                    if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                        if (extension == ".doc")
+                        {
+                            urlImage = _domainTest + "/DownloadFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                        }
+                        var sysImage = new SysImage
+                        {
+                            Id = Guid.NewGuid(),
+                            Url = urlImage,
+                            Name = fileName + extension,
+                            Folder = model.FolderName,
+                            ObjectId = model.Id.ToString(),
+                            //UserCreated = currentUser.UserName,
+                            //UserModified = currentUser.UserName,
+                            DateTimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            ChildId = model.Child,
+                            KeyS3 = key,
+                            SyncStatus = isSync == true ? "Synced" : ""
+                        };
+                        list.Add(sysImage);
+                    }
                 }
             }
 
@@ -1446,8 +1448,19 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return null;
             }
         }
-        public async Task<string> PostAttachFileTemplateToEDoc(FileUploadModel model)
+        public async Task<string> PostAttachFileTemplateToEDoc(FileUploadAttachTemplateModel req)
         {
+            var stream = new MemoryStream(req.File.FileContent);
+            var fFile = new FormFile(stream, 0, stream.Length, null, req.File.FileName);
+            var fFiles = new List<IFormFile>() { fFile };
+            var model = new FileUploadModel
+            {
+                Child = null,
+                Files = fFiles,
+                FolderName = req.FolderName,
+                ModuleName = req.ModuleName,
+                Id = req.Id,
+            };
             var urlImage = "";
             List<SysImage> imageList = await UpLoadS3(model, true);
             urlImage = imageList.FirstOrDefault()?.Url;

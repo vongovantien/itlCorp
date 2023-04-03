@@ -46,6 +46,7 @@ namespace eFMS.API.SystemFileManagement
             services.AddInfrastructure<LanguageSub>(Configuration);
             ServiceRegister.Register(services, Configuration);
             services.AddCustomSwagger();
+            services.SetUpRabbitMq(Configuration);
             DbHelper.DbHelper.AWSS3BucketName = Configuration.GetSection("AWSS3:BucketName")?.Value;
             DbHelper.DbHelper.AWSS3AccessKeyId = Configuration.GetSection("AWSS3:AccessKeyId")?.Value;
             DbHelper.DbHelper.AWSS3SecretAccessKey = Configuration.GetSection("AWSS3:SecretAccessKey")?.Value;

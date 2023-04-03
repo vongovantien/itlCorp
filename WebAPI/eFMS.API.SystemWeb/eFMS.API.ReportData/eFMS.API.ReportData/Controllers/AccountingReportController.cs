@@ -1,4 +1,11 @@
-﻿using eFMS.API.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
+using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.API.ReportData.Consts;
 using eFMS.API.ReportData.FormatExcel;
 using eFMS.API.ReportData.Helpers;
@@ -10,6 +17,7 @@ using eFMS.API.ReportData.Models.Criteria;
 using FMS.API.ReportData.Models.Accounting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -29,13 +37,17 @@ namespace eFMS.API.ReportData.Controllers
     public class AccountingReportController : ControllerBase
     {
         private readonly APIs aPis;
+        private readonly IRabbitBus _busControl;
+        //private readonly IStringLocalizer stringLocalizer;
         /// <summary>
         /// Contructor controller Accounting Report
         /// </summary>
         /// <param name="appSettings"></param>
-        public AccountingReportController(IOptions<APIs> appSettings)
+        public AccountingReportController(IOptions<APIs> appSettings,IRabbitBus busControl)
         {
             this.aPis = appSettings.Value;
+            _busControl = busControl;
+            //stringLocalizer = localizer;
         }
 
         /// <summary>
@@ -326,18 +338,34 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportDetailSettlementPayment(Guid settlementId, string lang, string action)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
+            var result = new ResultHandle();
+            if (action == "Preview")
+            {
+                var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
 
-            var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
+                var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
 
-            var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "");
-            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+                var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "");
+                if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
-            var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
-            string previewURL = action == "Preview" ? Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile : Urls.Accounting.UploadFileEdoc + "Settlement";
-            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + previewURL + "/" + settlementId, accessToken);
-            var result = response.Content.ReadAsAsync<ResultHandle>().Result;
-            HeaderResponse(file.FileName);
+                var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
+                string previewURL = Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile;
+                var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + previewURL + "/" + settlementId, accessToken);
+                result = response.Content.ReadAsAsync<ResultHandle>().Result;
+                HeaderResponse(file.FileName);
+            }
+            else
+            {
+                var model = new ExportDetailSettleModel
+                {
+                    AccessToken = accessToken,
+                    Action = action,
+                    Lang = lang,
+                    SettlementId = settlementId
+                };
+                await _busControl.SendAsync(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileQueue, model);
+                result = new ResultHandle { Status = true, Message = "Sync File Success" };
+            }
             return Ok(result);
         }
 

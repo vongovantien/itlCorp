@@ -18,4 +18,13 @@ namespace eFMS.API.SystemFileManagement.DL.Models
         public byte[] FileContent { get; set; }
         public string FileName { get; set; }
     }
+
+    public class FileUploadAttachTemplateModel
+    {
+        public FileReportUpload File { get; set; }
+        public string FolderName { get; set; }
+        public Guid Id { get; set; }
+        public string Child { get; set; }
+        public string ModuleName { get; set; }
+    }
 }
