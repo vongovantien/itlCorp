@@ -819,7 +819,15 @@ namespace eFMS.API.Documentation.DL.Services
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
         {
             int code = 0;
-            if (permissionRange == PermissionRange.None)
+            var checkActiveGrps = userlevelRepository.Get(x => x.UserId == currentUser.UserID && x.Active==true).Select(t => t.GroupId).ToList();
+
+            if (checkActiveGrps.Any(x => x.Equals(model.GroupId)) == false)
+            {
+                code = 403;
+                return code;
+            }
+
+            if (permissionRange == PermissionRange.None) 
             {
                 code = 403;
                 return code;
