@@ -2,224 +2,409 @@
     <div class="m-portlet__head alert-block__heading pointer bg-secondary">
         <div class="m-portlet__head-caption">
             <div class="m-portlet__head-title w-100">
-                <h3 class="m-portlet__head-text collapse-toggle" data-toggle="collapse" data-target="#credit-summary">
-                    {{type | titlecase}} Combine
-                    <ng-container *ngIf="!!cdCombineList?.length">
-                        <span class="badge badge-success">{{cdCombineList?.length}}</span>
-                    </ng-container>
-                </h3>
-            </div>
-        </div>
-    </div>
-    <div class="m-portlet__body">
-        <div class="m-portlet__head alert-block__heading pointer">
-            <div class="m-portlet__head-caption">
-                <div class="m-portlet__head-title w-100">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="div">
-                            Office: <span class="font-weight-bold text-success">ITL HCM</span>
-                        </div>
-                        <div class="form-group">
-                            <select class="form-control" placeholder="payment method">
-                                <option [ngValue]="null" disabled>Please select</option>
-                                <option *ngFor="let method of paymentMethods" [ngValue]="method.value">
-                                    {{method.title}}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="div">
-                            <input type="text" class="form-control" placeholder="Receipt No">
-                        </div>
-                        <div class="div">
-                            <input type="text" class="form-control" placeholder="Notes">
-                        </div>
+                <div class="row align-items-center">
+                    <div class="col-lg-4 order-2 order-lg-1">
+                        <h3 class="m-portlet__head-text collapse-toggle" data-toggle="collapse"
+                            [attr.data-target]="'#' +listType+'-summary'">
+                            <i class="la la-angle-up m--margin-right-5"></i>{{listType | titlecase}} Combine
+                        </h3>
                     </div>
+                    <ng-container *ngIf="!isUpdate">
+                        <div class="col-lg-8 order-1 order-lg-2 c-button-actions m--align-right">
+                            <app-permission-button title="Get {{listType | titlecase}} " class="outline-info"
+                                [icon]="'la la-search'" (onClick)="getDebit()">
+                            </app-permission-button>
+                        </div>
+                    </ng-container>
                 </div>
             </div>
         </div>
-        <div class="table-wrapper table-editable m--margin-top-20 m-animate-fade-in m--margin-bottom-20">
-            <table class="table table-bordered dataTable-edit">
-                <thead app-table-header [headers]="headers"
-                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                    <th class="m--w-90 first table-actions-col fixed-side">
-
-                    </th>
-                </thead>
-                <tbody class="tbody-group">
-                    <ng-container *ngIf="!!cdCombineList.length">
-                        <tr *ngFor="let item of cdCombineList; let i = index; trackBy: trackByFn">
-                            <td class="table-actions-col fixed-side">
-                                <div class="table-actions">
-                                    <ng-container>
-                                        <button type="button" (click)="deleteCdCombineItem(i)"
-                                            class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove">
-                                            <i class="la la-trash"></i>
-                                        </button>
-                                    </ng-container>
+    </div>
+    <ng-container *ngIf="listType ==='credit'">
+        <div class="m-portlet__body">
+            <div class="collapse show" id="credit-summary">
+                <div class="combine-credit-list-wrapper m-animate-fade-in">
+                    <ng-container *ngFor="let grp of receiptCreditGroups ; let i = index; trackBy: trackByFn">
+                        <div class="m-portlet__head alert-block__heading pointer">
+                            <div class="m-portlet__head-caption">
+                                <div class="m-portlet__head-title w-100">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <ng-container *ngIf="!!isUpdate && grp.status !== 'Done'">
+                                                        <button type="button"
+                                                            class="btn m-btn--icon m-btn--uppercase  m--margin-bottom-10 text-primary">
+                                                            <span>
+                                                                <i class="la la-save"
+                                                                    (click)="onSaveReceiptGroup('credit', 'update')"></i>
+                                                            </span>
+                                                        </button>
+                                                        <button type="button"
+                                                            class="btn m-btn--icon m-btn--uppercase  m--margin-bottom-10 text-success">
+                                                            <span>
+                                                                <i class="la la-edit"
+                                                                    (click)="getDebitDetail(grp, 'credit')"></i>
+                                                            </span>
+                                                        </button>
+                                                    </ng-container>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <span class="font-weight-bold">Office: </span>
+                                                    <span class="font-weight-bold text-success">{{grp.officeName}}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <span class="font-weight-bold">Payment method:</span>
+                                                <ng-select [(ngModel)]="grp.paymentMethod" class="custom"
+                                                    [items]="paymentMethodsCredit" bindLabel="title" bindValue="value"
+                                                    [clearable]="false">
+                                                </ng-select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-5">
+                                                        <span class="font-weight-bold">Receipt No:</span>
+                                                    </div>
+                                                    <div class="col-7">
+                                                        <div *ngIf="grp.status != 'Cancel'; else CancelNo">
+                                                            <ng-container [ngSwitch]="grp.status" *ngIf="!grp.syncStatus">
+                                                                <span *ngSwitchCase="'Done'"
+                                                                    class="badge badge-success m--margin-left-10">
+                                                                    {{grp.status}}</span>
+                                                                <span *ngSwitchCase="'Draft'"
+                                                                    class="badge badge-danger m--margin-left-10">
+                                                                    {{grp.status}}</span>
+                                                            </ng-container>
+                                                            <ng-container [ngSwitch]="grp.syncStatus"
+                                                                *ngIf="grp.syncStatus">
+                                                                <span *ngSwitchCase="'Synced'"
+                                                                    class="badge badge-success m--margin-left-10">
+                                                                    {{grp.syncStatus}}</span>
+                                                                <span *ngSwitchCase="'Rejected'"
+                                                                    class="badge badge-danger m--margin-left-10">
+                                                                    {{grp.syncStatus}}</span>
+                                                            </ng-container>
+                                                        </div>
+                                                        <ng-template #CancelNo>
+                                                            <span class="badge badge-dark m--margin-left-10">
+                                                                Cancel</span>
+                                                        </ng-template>
+                                                    </div>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="Receipt No"
+                                                    [(ngModel)]="grp.receiptNo"
+                                                    [attr.disabled]="!grp?.status !== null ? null : 'disabled'">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <span class="font-weight-bold">Description:</span>
+                                                <input type="text" class="form-control" placeholder="Notes"
+                                                    [(ngModel)]="grp.description"
+                                                    [attr.disabled]="grp?.status === 'Draft' || !grp?.status !== null ? null : 'disabled'">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </td>
-                            <td>{{item.partnerName}}</td>
-                            <td>{{item.billingNo}}</td>
-                            <td>{{item.unpaidAmount}}</td>
-                            <td>
-                                <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (item.amountVnd < 0 || item.amountVnd === null)}">
-                                    <ng-container *ngIf="!item.readonly else AmoutVndTpl ">
-                                        <input type="number" class="form-control" [(ngModel)]="item.amountVnd"
-                                            placeholder="Amount VND" min="0" autoFormatCurrency>
+                            </div>
+                        </div>
+                        <div class="table-horizontal table-wrapper table-editable" style="max-height:700px">
+                            <table class="table table-brand dataTable-edit">
+                                <thead app-table-header [headers]="headers"
+                                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                    <th class="m--w-90 first table-actions-col">
+    
+                                    </th>
+                                </thead>
+                                <tbody class="tbody-group">
+                                    <ng-container *ngIf="!!grp.cdCombineList.length">
+                                        <tr *ngFor="let item of grp.cdCombineList; let y = index; trackBy: trackByFn">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions">
+                                                    <ng-container>
+                                                        <ng-container *ngIf="grp.status !== 'Done'">
+                                                            <button type="button"
+                                                                (click)="confirmDeleteInvoiceItem(item, y, 'credit')"
+                                                                class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
+                                                                title="Remove">
+                                                                <i class="la la-trash"></i>
+                                                            </button>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                </div>
+                                            </td>
+                                            <td>{{item.partnerName}}</td>
+                                            <td>{{item.refNo}}{{isSubmitted}}{{isSubmitted && (item.paidAmountUsd < 0 ||
+                                                    item.paidAmountUsd===null || item.paidAmountUsd> item.unpaidAmountUsd)}}
+                                            </td>
+                                            <td>{{item.unpaidAmountUsd}}</td>
+                                            <td>
+                                                <div class="form-group "
+                                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (item.paidAmountUsd < 0 || item.paidAmountUsd === null || item.paidAmountUsd > item.unpaidAmountUsd)}">
+                                                    <ng-container *ngIf="!item.readonly else AmoutVndTpl ">
+                                                        <input type="number" class="form-control"
+                                                            [(ngModel)]="item.paidAmountUsd" placeholder="Amount" min="0"
+                                                            autoFormatCurrency
+                                                            (ngModelChange)="calculateTotalPaidAmount(item, grp)">
+                                                    </ng-container>
+                                                    <ng-template #AmoutVndTpl>
+                                                        <span style="cursor: not-allowed;">
+                                                            {{item.paidAmountUsd}}
+                                                        </span>
+                                                    </ng-template>
+                                                </div>
+                                            </td>
+                                            <td>{{item.remainAmountUsd | number: '.0-2'}}</td>
+                                            <td>{{item.hbl}} - {{item.mbl}}</td>
+                                            <td>
+                                                <div class="form-group ">
+                                                    <ng-container *ngIf="!item.readonly; else notesTpl">
+                                                        <input type="text" class="form-control" [(ngModel)]="item.notes"
+                                                            placeholder="Notes">
+                                                    </ng-container>
+                                                    <ng-template #notesTpl>
+                                                        {{item.notes}}
+                                                    </ng-template>
+                                                </div>
+                                            </td>
+                                            <td>{{item.unpaidAmountVnd | number: '1.0-2'}}</td>
+                                            <td>{{item.paidAmountVnd | number: '1.0-2'}}</td>
+                                            <td>{{item.remainAmountVnd | number: '1.0-2'}}</td>
+                                            <td>{{item.invoiceNo}}</td>
+                                            <td>{{item.referenceNo}}</td>
+                                        </tr>
+    
                                     </ng-container>
-                                    <ng-template #AmoutVndTpl>
-                                        <span style="cursor: not-allowed;">
-                                            {{item.amountVnd}}
-                                        </span>
-                                    </ng-template>
-                                </div>
-                            </td>
-                            <td>{{item.remain | number: '.0-2'}}</td>
-                            <td>{{item.hbl}} - {{item.mbl}}</td>
-                            <td>
-                                <div class="form-group ">
-                                    <ng-container *ngIf="!item.readonly; else notesTpl">
-                                        <input type="text" class="form-control" [(ngModel)]="item.notes"
-                                            placeholder="Notes">
-                                    </ng-container>
-                                    <ng-template #notesTpl>
-                                        {{item.notes}}
-                                    </ng-template>
-                                </div>
-                            </td>
-                            <td>{{item.unpaidAmountVnd | number: '.0-2'}}</td>
-                            <td>{{item.unpaidAmountVnd | number: '.0-2'}}</td>
-                            <td>{{item.remainAmountVnd | number: '.0-2'}}</td>
-                            <td>{{item.invoiceNo}}</td>
-                            <td>{{item.refNo}}</td>
-                        </tr>
-
+                                    <!-- <tr app-table-none-record *ngIf="!(isLoading | async) && !grp.cdCombineList.length">
+                                            </tr> -->
+                                    <!-- <tr app-table-row-loading *ngIf="(isLoading | async)">
+                                            </tr> -->
+                                </tbody>
+                                <tfoot *ngIf="!!receiptCreditGroups.length">
+                                    <tr class="font-15 font-weight-bold">
+                                        <td colspan="3" align="center">Total</td>
+                                        <td>{{grp.sumTotal.totalUnpaidAmountUsd | number: '.0-2'}}</td>
+                                        <td>{{grp.sumTotal.totalPaidAmountUsd | number: '.0-2'}}</td>
+                                        <td>{{grp.sumTotal.totalRemainUsd | number: '.0-2'}}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>{{grp.sumTotal.totalUnpaidAmountVnd | number: '1.0-2'}}</td>
+                                        <td>{{grp.sumTotal.totalPaidAmountVnd | number: '1.0-2'}}</td>
+                                        <td>{{grp.sumTotal.totalRemainVnd | number: '1.0-2'}}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </ng-container>
-                    <tr app-table-none-record *ngIf="!(isLoading | async) && !cdCombineList.length">
-                    </tr>
-                    <tr app-table-row-loading *ngIf="(isLoading | async)">
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="font-15 font-weight-bold">
-                        <td colspan="3" align="center">Total</td>
-                        <td>{{100}}</td>
-                        <td>{{100}}</td>
-                        <td>{{0}}</td>
-                        <td></td>
-                        <td></td>
-                        <td>{{100}}</td>
-                        <td>{{100}}</td>
-                        <td>{{0}}</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-
-        <div class="m-portlet__head alert-block__heading pointer">
-            <div class="m-portlet__head-caption">
-                <div class="m-portlet__head-title w-100">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="div">
-                            Office: <span class="font-weight-bold text-success">ITL HCM</span>
-                        </div>
-                        <div class="form-group">
-                            <select class="form-control" placeholder="payment method">
-                                <option [ngValue]="null" disabled>Please select</option>
-                                <option *ngFor="let method of paymentMethods" [ngValue]="method.value">
-                                    {{method.title}}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="div">
-                            <input type="text" class="form-control" placeholder="Receipt No">
-                        </div>
-                        <div class="div">
-                            <input type="text" class="form-control" placeholder="Notes">
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
-        <div class="table-wrapper table-editable m--margin-top-20 m-animate-fade-in">
-            <table class="table table-bordered dataTable-edit">
-                <thead app-table-header [headers]="headers"
-                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                    <th class="m--w-90 first table-actions-col fixed-side">
-
-                    </th>
-                </thead>
-                <tbody class="tbody-group">
-                    <ng-container *ngIf="!!cdCombineList.length">
-                        <tr *ngFor="let item of cdCombineList; let i = index; trackBy: trackByFn">
-                            <td class="table-actions-col fixed-side">
-                                <div class="table-actions">
-                                    <ng-container>
-                                        <button type="button" (click)="deleteCdCombineItem(i)"
-                                            class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove">
-                                            <i class="la la-trash"></i>
-                                        </button>
-                                    </ng-container>
-                                </div>
-                            </td>
-                            <td>{{item.partnerName}}</td>
-                            <td>{{item.billingNo}}</td>
-                            <td>{{item.unpaidAmount}}</td>
-                            <td>
-                                <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (item.amountVnd < 0 || item.amountVnd === null)}">
-                                    <ng-container *ngIf="!item.readonly else AmoutVndTpl ">
-                                        <input type="number" class="form-control" [(ngModel)]="item.amountVnd"
-                                            placeholder="Amount VND" min="0" autoFormatCurrency>
-                                    </ng-container>
-                                    <ng-template #AmoutVndTpl>
-                                        <span style="cursor: not-allowed;">
-                                            {{item.amountVnd}}
-                                        </span>
-                                    </ng-template>
-                                </div>
-                            </td>
-                            <td>{{item.remain | number: '.0-2'}}</td>
-                            <td>{{item.hbl}} - {{item.mbl}}</td>
-                            <td>
-                                <div class="form-group ">
-                                    <ng-container *ngIf="!item.readonly; else notesTpl">
-                                        <input type="text" class="form-control" [(ngModel)]="item.notes"
-                                            placeholder="Notes">
-                                    </ng-container>
-                                    <ng-template #notesTpl>
-                                        {{item.notes}}
-                                    </ng-template>
-                                </div>
-                            </td>
-                            <td>{{item.unpaidAmountVnd | number: '.0-2'}}</td>
-                            <td>{{item.unpaidAmountVnd | number: '.0-2'}}</td>
-                            <td>{{item.remainAmountVnd | number: '.0-2'}}</td>
-                            <td>{{item.invoiceNo}}</td>
-                            <td>{{item.refNo}}</td>
-                        </tr>
-
-                    </ng-container>
-                    <tr app-table-none-record *ngIf="!(isLoading | async) && !cdCombineList.length">
-                    </tr>
-                    <tr app-table-row-loading *ngIf="(isLoading | async)">
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="font-15 font-weight-bold">
-                        <td colspan="3" align="center">Total</td>
-                        <td>{{100}}</td>
-                        <td>{{100}}</td>
-                        <td>{{0}}</td>
-                        <td></td>
-                        <td></td>
-                        <td>{{100}}</td>
-                        <td>{{100}}</td>
-                        <td>{{0}}</td>
-                    </tr>
-                </tfoot>
-            </table>
+        <div class="c-button-actions text-center">
+            <ng-container *ngIf="isContainDraftCredit">
+                <app-permission-button type="save" title="Done" class="outline-success"
+                    (onClick)="onSaveReceiptGroup('credit', 'done')">
+                </app-permission-button>
+            </ng-container>
         </div>
-    </div>
+    </ng-container>
+
+    <ng-container *ngIf="listType ==='debit'">
+        <div class="m-portlet__body">
+            <div class="collapse show" id="debit-summary">
+                <div class="combine-debit-list-wrapper m-animate-fade-in">
+                    <ng-container *ngFor="let grp of receiptDebitGroups ; let i = index; trackBy: trackByFn">
+                        <div class="m-portlet__head alert-block__heading pointer">
+                            <div class="m-portlet__head-caption">
+                                <div class="m-portlet__head-title w-100">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <ng-container *ngIf="!!isUpdate && grp.status !== 'Done'">
+                                                            <button type="button"
+                                                                class="btn m-btn--icon m-btn--uppercase  m--margin-bottom-10 text-primary">
+                                                                <span>
+                                                                    <i class="la la-save"
+                                                                        (click)="onSaveReceiptGroup('debit', 'update')"></i>
+                                                                </span>
+                                                            </button>
+                                                            <button type="button"
+                                                                class="btn m-btn--icon m-btn--uppercase  m--margin-bottom-10 text-success">
+                                                                <span>
+                                                                    <i class="la la-edit"
+                                                                        (click)="getDebitDetail(grp, 'debit')"></i>
+                                                                </span>
+                                                            </button>
+                                                        </ng-container>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <span class="font-weight-bold">Office: </span>
+                                                        <span
+                                                            class="font-weight-bold text-success">{{grp.officeName}}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <span class="font-weight-bold">Payment method:</span>
+                                                <ng-select [(ngModel)]="grp.paymentMethod" class="custom"
+                                                    [items]="paymentMethodsDebit" bindLabel="title" bindValue="value"
+                                                    [clearable]="false">
+                                                </ng-select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-5">
+                                                        <span class="font-weight-bold">Receipt No:</span>
+                                                    </div>
+                                                    <div class="col-7">
+                                                        <div *ngIf="grp.status != 'Cancel'; else CancelNo">
+                                                            <ng-container [ngSwitch]="grp.status" *ngIf="!grp.syncStatus">
+                                                                <span *ngSwitchCase="'Done'"
+                                                                    class="badge badge-success m--margin-left-10">
+                                                                    {{grp.status}}</span>
+                                                                <span *ngSwitchCase="'Draft'"
+                                                                    class="badge badge-danger m--margin-left-10">
+                                                                    {{grp.status}}</span>
+                                                            </ng-container>
+                                                            <ng-container [ngSwitch]="grp.syncStatus"
+                                                                *ngIf="grp.syncStatus">
+                                                                <span *ngSwitchCase="'Synced'"
+                                                                    class="badge badge-success m--margin-left-10">
+                                                                    {{grp.syncStatus}}</span>
+                                                                <span *ngSwitchCase="'Rejected'"
+                                                                    class="badge badge-danger m--margin-left-10">
+                                                                    {{grp.syncStatus}}</span>
+                                                            </ng-container>
+                                                        </div>
+                                                        <ng-template #CancelNo>
+                                                            <span class="badge badge-dark m--margin-left-10">
+                                                                Cancel</span>
+                                                        </ng-template>
+                                                    </div>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="Receipt No"
+                                                    [(ngModel)]="grp.receiptNo"
+                                                    [attr.disabled]="!grp?.status !== null ? null : 'disabled'">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <span class="font-weight-bold">Description:</span>
+                                                <input type="text" class="form-control" placeholder="Notes"
+                                                    [(ngModel)]="grp.description"
+                                                    [attr.disabled]="grp?.status === 'Draft' || !grp?.status !== null ? null : 'disabled'">
+                                            </div>
+                                        </div>
+    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-horizontal table-wrapper table-editable" style="max-height:700px">
+                            <table class="table table-brand dataTable-edit">
+                                <thead app-table-header [headers]="headers"
+                                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                    <th class="m--w-90 first table-actions-col">
+    
+                                    </th>
+                                </thead>
+                                <tbody class="tbody-group">
+                                    <ng-container *ngIf="!!grp.cdCombineList.length">
+                                        <tr *ngFor="let item of grp.cdCombineList; let y = index; trackBy: trackByFn">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions">
+                                                    <ng-container *ngIf="grp.status !== 'Done'">
+                                                        <button type="button"
+                                                            (click)="confirmDeleteInvoiceItem(item, y, 'debit')"
+                                                            class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
+                                                            title="Remove">
+                                                            <i class="la la-trash"></i>
+                                                        </button>
+                                                    </ng-container>
+                                                </div>
+                                            </td>
+                                            <td>{{item.partnerName}}</td>
+                                            <td>{{item.refNo}}{{isSubmitted}}{{isSubmitted && (item.paidAmountUsd < 0 || item.paidAmountUsd === null || item.paidAmountUsd > item.unpaidAmountUsd)}}</td>
+                                            <td>{{item.unpaidAmountUsd}}</td>
+                                            <td>
+                                                <div class="form-group"
+                                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (item.paidAmountUsd < 0 || item.paidAmountUsd === null || item.paidAmountUsd > item.unpaidAmountUsd)}">
+                                                    <ng-container *ngIf="!item.readonly else AmoutVndTpl ">
+                                                        <input type="number" class="form-control"
+                                                            [(ngModel)]="item.paidAmountUsd" placeholder="Amount" min="0"
+                                                            autoFormatCurrency
+                                                            (ngModelChange)="calculateTotalPaidAmount(item, grp)">
+                                                    </ng-container>
+                                                    <ng-template #AmoutVndTpl>
+                                                        <span style="cursor: not-allowed;">
+                                                            {{item.paidAmountUsd}}
+                                                        </span>
+                                                    </ng-template>
+                                                </div>
+                                            </td>
+                                            <td>{{item.remainAmountUsd | number: '.0-2'}}</td>
+                                            <td>{{item.hbl}} - {{item.mbl}}</td>
+                                            <td>
+                                                <div class="form-group ">
+                                                    <ng-container *ngIf="!item.readonly; else notesTpl">
+                                                        <input type="text" class="form-control" [(ngModel)]="item.notes"
+                                                            placeholder="Notes">
+                                                    </ng-container>
+                                                    <ng-template #notesTpl>
+                                                        {{item.notes}}
+                                                    </ng-template>
+                                                </div>
+                                            </td>
+                                            <td>{{item.unpaidAmountVnd | number: '1.0-2'}}</td>
+                                            <td>{{item.paidAmountVnd | number: '1.0-2'}}</td>
+                                            <td>{{item.remainAmountVnd | number: '1.0-2'}}</td>
+                                            <td>{{item.invoiceNo}}</td>
+                                            <td>{{item.referenceNo}}</td>
+                                        </tr>
+    
+                                    </ng-container>
+                                    <!-- <tr app-table-none-record *ngIf="!(isLoading | async) && !grp.cdCombineList.length">
+                                    </tr> -->
+                                    <!-- <tr app-table-row-loading *ngIf="(isLoading | async)">
+                                    </tr> -->
+                                </tbody>
+                                <tfoot>
+                                    <tr class="font-15 font-weight-bold">
+                                        <td colspan="3" align="center">Total</td>
+                                        <td>{{grp.sumTotal.totalUnpaidAmountUsd | number: '.0-2'}}</td>
+                                        <td>{{grp.sumTotal.totalPaidAmountUsd | number: '.0-2'}}</td>
+                                        <td>{{grp.sumTotal.totalRemainUsd | number: '.0-2'}}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>{{grp.sumTotal.totalUnpaidAmountVnd | number: '1.0-2'}}</td>
+                                        <td>{{grp.sumTotal.totalPaidAmountVnd | number: '1.0-2'}}</td>
+                                        <td>{{grp.sumTotal.totalRemainVnd | number: '1.0-2'}}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+        <ng-container *ngIf="isContainDraftDebit">
+            <div class="c-button-actions text-center">
+                <app-permission-button type="save" title="Done" class="outline-success"
+                    (onClick)="onSaveReceiptGroup('debit', 'done')">
+                </app-permission-button>
+            </div>
+        </ng-container>
+    </ng-container>
 </div>
+
+<customer-agent-debit-popup></customer-agent-debit-popup>

@@ -66,5 +66,28 @@ namespace eFMS.API.Accounting.DL.Common
             new CommonData { Value = AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OTHER, DisplayName = AccountingConstants.PAYMENT_TYPE_NAME_COLLECT_OTHER },
             new CommonData { Value = AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE, DisplayName = AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE }
         };
+
+        public static readonly List<CommonData> PaymentMethodGeneral = new List<CommonData>
+        {
+            new CommonData { Value = AccountingConstants.COLLECT_OBH_AGENCY, DisplayName = AccountingConstants.COLLECT_OBH_AGENCY },
+            new CommonData { Value = AccountingConstants.PAY_OBH_AGENCY, DisplayName = AccountingConstants.PAY_OBH_AGENCY },
+            new CommonData { Value = AccountingConstants.COLLECTED_AMOUNT, DisplayName = AccountingConstants.COLLECTED_AMOUNT },
+            new CommonData { Value = AccountingConstants.ADVANCE_AGENCY, DisplayName = AccountingConstants.ADVANCE_AGENCY },
+            new CommonData { Value = AccountingConstants.BANK_FEE_AGENCY, DisplayName = AccountingConstants.BANK_FEE_AGENCY },
+            new CommonData { Value = AccountingConstants.RECEIVE_FROM_PAY_OBH, DisplayName = AccountingConstants.RECEIVE_FROM_PAY_OBH },
+            new CommonData { Value = AccountingConstants.RECEIVE_FROM_COLLECT_OBH, DisplayName = AccountingConstants.RECEIVE_FROM_COLLECT_OBH }
+        };
+
+        public static readonly List<CommonData> PaymentMethodCreditCombine = new List<CommonData>
+        {
+            new CommonData { Value = AccountingConstants.CLEAR_CREDIT_FROM_OBH, DisplayName = AccountingConstants.CLEAR_CREDIT_FROM_OBH },
+            new CommonData { Value = AccountingConstants.CLEAR_CREDIT_FROM_PAID_AMT, DisplayName = AccountingConstants.CLEAR_CREDIT_FROM_PAID_AMT },
+        };
+
+        public static readonly List<CommonData> PaymentMethodDebitCombine = new List<CommonData>
+        {
+            new CommonData { Value = AccountingConstants.CLEAR_DEBIT_FROM_OBH, DisplayName = AccountingConstants.CLEAR_DEBIT_FROM_OBH },
+            new CommonData { Value = AccountingConstants.CLEAR_DEBIT_FROM_PAID_AMT, DisplayName = AccountingConstants.CLEAR_DEBIT_FROM_PAID_AMT },
+        };
     }
 }

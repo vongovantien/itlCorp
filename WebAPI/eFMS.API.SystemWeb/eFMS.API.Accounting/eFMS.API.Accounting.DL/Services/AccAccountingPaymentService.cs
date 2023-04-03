@@ -38,7 +38,6 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly ICurrentUser currentUser;
         private readonly ICurrencyExchangeService currencyExchangeService;
-        private readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
         private readonly IContextBase<SysOffice> sysOfficeRepository;
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         private readonly IContextBase<CsTransactionDetail> csTransactionDetailRepository;
@@ -60,7 +59,6 @@ namespace eFMS.API.Accounting.DL.Services
              IContextBase<SysEmployee> sysEmployeeRepo,
              IContextBase<CsTransaction> csTransRepo,
              ICurrencyExchangeService exchangeService,
-             IContextBase<AcctCreditManagementAr> creditArRepo,
              IContextBase<SysOffice> sysOfficeRepo,
              IContextBase<OpsTransaction> opsTransactionRepo,
              IContextBase<CsTransactionDetail> csTransactionDetailRepo,
@@ -82,7 +80,6 @@ namespace eFMS.API.Accounting.DL.Services
             sysEmployeeRepository = sysEmployeeRepo;
             csTransactionRepository = csTransRepo;
             currencyExchangeService = exchangeService;
-            acctCreditManagementArRepository = creditArRepo;
             sysOfficeRepository = sysOfficeRepo;
             opsTransactionRepository = opsTransactionRepo;
             csTransactionDetailRepository = csTransactionDetailRepo;

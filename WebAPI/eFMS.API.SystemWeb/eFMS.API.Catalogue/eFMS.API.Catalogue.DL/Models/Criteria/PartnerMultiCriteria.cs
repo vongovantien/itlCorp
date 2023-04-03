@@ -13,5 +13,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string SalemanId { get; set; }
         public string ContractType { get; set; }
         public string PartnerType { get; set; }
+        public bool? IsShowSaleman { get; set; }
     }
 }

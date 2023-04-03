@@ -73,6 +73,21 @@
         public static readonly string PAYMENT_METHOD_MANAGEMENT_FEE = "Management Fee";
         public static readonly string PAYMENT_METHOD_OTHER_FEE = "Other Fee";
 
+        #region -- PAYMENT METHOD COMBINE--
+        public static readonly string COLLECT_OBH_AGENCY = "Collect OBH Agency";
+        public static readonly string PAY_OBH_AGENCY = "Pay OBH Agency";
+        public static readonly string COLLECTED_AMOUNT = "Collected Amount";
+        public static readonly string ADVANCE_AGENCY = "Advance Agency";
+        public static readonly string BANK_FEE_AGENCY = "Bank Fee Agency";
+        public static readonly string RECEIVE_FROM_PAY_OBH = "Receive From Pay OBH";
+        public static readonly string RECEIVE_FROM_COLLECT_OBH = "Receive From Collect OBH";
+
+        public static readonly string CLEAR_CREDIT_FROM_OBH = "Clear Credit From OBH";
+        public static readonly string CLEAR_CREDIT_FROM_PAID_AMT = "Clear Credit From Paid AMT";
+
+        public static readonly string CLEAR_DEBIT_FROM_OBH = "Clear Debit From OBH";
+        public static readonly string CLEAR_DEBIT_FROM_PAID_AMT = "Clear Debit From Paid AMT";
+        #endregion
         #endregion -- PAYMENT METHOD --
 
         #region -- STATUS SOA --

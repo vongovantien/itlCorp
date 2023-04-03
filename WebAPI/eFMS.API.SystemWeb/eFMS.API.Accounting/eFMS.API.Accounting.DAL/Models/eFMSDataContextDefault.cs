@@ -1207,6 +1207,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PaymentStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ReferenceNo).HasMaxLength(100);
 
                 entity.Property(e => e.RemainUsd).HasColumnType("decimal(18, 4)");
@@ -1336,6 +1340,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.AgreementAdvanceAmountVnd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.AgreementId).HasColumnName("AgreementID");
+
+                entity.Property(e => e.Arcbno)
+                    .HasColumnName("ARCBNo")
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.Balance).HasColumnType("decimal(18, 4)");
 
@@ -3907,6 +3915,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.SuspendTime).HasMaxLength(150);
+
+                entity.Property(e => e.TransactionType).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

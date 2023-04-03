@@ -720,6 +720,13 @@
             <param name="id">id of receipt</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetByReceiptCombine(System.String)">
+            <summary>
+            Get detail receipt combine
+            </summary>
+            <param name="arcbNo"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.CancelReceipt(System.Guid)">
             <summary>
             Update Cancel Receipt
@@ -741,6 +748,33 @@
             </param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.CheckValidReciptSaveDone(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.AcctReceiptModel})">
+            <summary>
+            check receipt is valid when save done receipt
+            </summary>
+            <param name="receiptModels"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.SaveCombineReceipt(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.AcctReceiptModel},eFMS.API.Accounting.DL.Models.SaveAction)">
+            <summary>
+            Save Combine Receipt
+            </summary>
+            <param name="receiptModels"></param>
+            <param name="saveAction">
+            0 - Save Draft - Add
+            1 - Save Draft - Update
+            2 - Save Done
+            3 - Save Cancel
+            </param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.CheckValidReceiptNo(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.AcctReceiptModel})">
+            <summary>
+            
+            </summary>
+            <param name="receiptNos"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetDataIssueCustomerPayment(eFMS.API.Accounting.DL.Models.Receipt.CustomerDebitCreditCriteria)">
             <summary>
             Get Data Issue Customer Payment
@@ -751,6 +785,13 @@
         <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetDataIssueAgencyPayment(eFMS.API.Accounting.DL.Models.Receipt.CustomerDebitCreditCriteria)">
             <summary>
             Get Data Issue Customer Payment
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetDataIssueCreditAgency(eFMS.API.Accounting.DL.Models.Receipt.CustomerDebitCreditCriteria)">
+            <summary>
+            Get Data Issued Agency Payment
             </summary>
             <param name="criteria"></param>
             <returns></returns>

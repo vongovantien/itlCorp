@@ -95,6 +95,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     isSubmitted: boolean = false;
     isReadonly: boolean = null;  // * DONE | CANCEL
     exchangeRateValue: number = 1;
+    isCombineReceipt: boolean = false;
 
     headerReceiptReadonly: CommonInterface.IHeaderTable[] = [
         { title: 'Billing Ref No', field: 'invoiceNo' },

@@ -1,20 +1,28 @@
+import { ReceiptInvoiceModel } from "@models";
 import { Action, createReducer, on } from "@ngrx/store";
-import { IAgreementReceipt } from "../../components/form-create-receipt/form-create-receipt.component";
+import { AgencyReceiptModel } from "src/app/shared/models/accouting/agency-receipt.model";
 import * as ReceiptCombineActions from "../actions";
 export interface IReceiptCombineState {
+    creditInvoiceList: AgencyReceiptModel;
+    debitInvoiceList: AgencyReceiptModel;
     generalCombineList: any[],
-    debitCombineList: any[],
-    creditCombineList: any[],
+    debitCombineList: any[],//ReceiptInvoiceModel
+    creditCombineList: ReceiptInvoiceModel[],
     isLoading: boolean;
     isLoaded: boolean;
     partnerId: string;
     paymentDate: any; // * Ngày tím kiếm -> Điều kiện search
-    agreementId: Partial<IAgreementReceipt>;
     currency: string;
     exchangeRate: number;
+    salemanId: string;
+    contractId: string;
+    isCombineReceipt: boolean;
+    refPartnerId: string;
 }
 
 export const initialState: IReceiptCombineState = {
+    creditInvoiceList: null,
+    debitInvoiceList: null,
     generalCombineList: [],
     debitCombineList: [],
     creditCombineList: [],
@@ -22,20 +30,49 @@ export const initialState: IReceiptCombineState = {
     isLoaded: false,
     partnerId: null,
     paymentDate: null,
-    agreementId: null,
+    contractId: null,
     currency: 'USD',
-    exchangeRate: null
+    exchangeRate: null,
+    salemanId: null,
+    isCombineReceipt: false,
+    refPartnerId: null,
+    // listType: ''
 };
 
 export const receiptCombineManagementReducer = createReducer(
     initialState,
     on(ReceiptCombineActions.SelectPartnerReceiptCombine, (state: IReceiptCombineState, payload: {
         id: string,
-        shortName: string,
-        accountNo: string,
-        partnerNameEn: string
-    }) => ({ ...state, partnerId: payload.id })),
+        contractId: string,
+    }) => ({ ...state, partnerId: payload.id, contractId: payload.contractId })),
+    on(ReceiptCombineActions.RegistGetDebitType, (state: IReceiptCombineState, payload: {
+        partnerId: string;
+        officeId: string,
+        listType: string
+    }) => ({ ...state, refPartnerId: payload.partnerId, officeId: payload.officeId, listType: payload.listType })),
     on(ReceiptCombineActions.UpdateExchangeRateReceiptCombine, (state: IReceiptCombineState, payload: { exchangeRate: number }) => ({ ...state, exchangeRate: payload.exchangeRate })),
+    on(ReceiptCombineActions.SelectedSalemanReceiptCombine, (state: IReceiptCombineState, payload: { salemanId: string }) => ({ ...state, salemanId: payload.salemanId })),
+    on(ReceiptCombineActions.SelectedAgreementReceiptCombine, (state: IReceiptCombineState, payload: { contractId: string }) => ({ ...state, contractId: payload.contractId })),
+    on(ReceiptCombineActions.IsCombineReceipt, (state: IReceiptCombineState, payload: { isCombineReceipt: boolean }) => ({ ...state, isCombineReceipt: payload.isCombineReceipt })),
+    on(ReceiptCombineActions.RegistDebitListTypeReceipt, (state: IReceiptCombineState, payload: { listType: string }) => ({ ...state, listType: payload.listType })),
+    on(ReceiptCombineActions.AddGeneralCombineToReceipt, (state: IReceiptCombineState, payload: any) => ({ ...state, generalCombineList: [...payload.generalCombineList, ...state.generalCombineList] })),
+    on(ReceiptCombineActions.AddCreditCombineToReceipt, (state: IReceiptCombineState, payload: any) => ({ ...state, creditCombineList: [...payload.creditCombineList, ...state.creditCombineList] })),
+    on(ReceiptCombineActions.AddDebitCombineToReceipt, (state: IReceiptCombineState, payload: any) => ({ ...state, debitCombineList: [...payload.debitCombineList, ...state.debitCombineList] })),
+    on(ReceiptCombineActions.RegistCreditInvoiceListSuccess, (state: IReceiptCombineState, payload: any) => ({ ...state, creditInvoiceList: payload.creditInvoiceList })),
+    on(ReceiptCombineActions.RegistDebitInvoiceListSuccess, (state: IReceiptCombineState, payload: any) => ({ ...state, debitInvoiceList: payload.debitInvoiceList })),
+    on(ReceiptCombineActions.RemoveDebitCombine, (state: IReceiptCombineState, payload: any) => {
+        if (payload._typeList === 'debit') {
+            return { ...state, debitCombineList: [...state.debitCombineList.slice(0, payload.index), ...state.debitCombineList.slice(payload.index + 1)] }
+        } else if(payload._typeList === 'credit') {
+            return { ...state, creditCombineList: [...state.creditCombineList.slice(0, payload.index), ...state.creditCombineList.slice(payload.index + 1)] }
+        } else if(payload._typeList === 'general') {
+            return { ...state, generalCombineList: [...state.generalCombineList.slice(0, payload.index), ...state.generalCombineList.slice(payload.index + 1)] }
+        }
+    }),
+    on(ReceiptCombineActions.ResetCombineInvoiceList, (state: IReceiptCombineState) => ({
+        ...state, isLoading: false, isCombineReceipt: false, partnerId: null, agreementId: null
+        , creditInvoiceList: null, debitInvoiceList: null, generalCombineList: [], creditCombineList: [], debitCombineList: []
+    })),
 )
 
 export function receiptCombineReducer(state: IReceiptCombineState | undefined, action: Action) {

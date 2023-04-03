@@ -29,6 +29,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     creditList$: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptCreditListState);
 
     agencyHeaders: CommonInterface.IHeaderTable[] = [
+        { title: 'Partner', field: '', sortable: true, width: 50 },
         { title: 'RefNo', field: '', sortable: true },
         { title: 'Type', field: '', width: 150 },
         { title: 'Invoice No', field: '' },
