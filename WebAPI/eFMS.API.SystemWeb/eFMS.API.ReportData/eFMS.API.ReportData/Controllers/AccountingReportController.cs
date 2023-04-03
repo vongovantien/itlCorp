@@ -351,7 +351,7 @@ namespace eFMS.API.ReportData.Controllers
                 Lang = lang,
                 SettlementId = settlementId
             };
-            await _busControl.SendAsync(RabbitExchange.EFMS_Report, RabbitConstants.GenFileQueue, model);
+            await _busControl.SendAsync(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileQueue, model);
             ResultHandle result = new ResultHandle { Status = true, Message = "Sync File Success" };
             //HeaderResponse(file.FileName);
             return Ok(result);

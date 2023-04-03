@@ -19,7 +19,7 @@
         public static string EFMS_Report { get; } = "eFMS_ReportExchange";
         public static string EFMS_Mail { get; } = "eFMS_MailExchange";
         public static string EFMS_Notify { get; } = "eFMS_NotifyExchange";
-        public static string EFMS_FileManagement { get; } = "eFMS_FileManagement";
-        public static string EFMS_ReportData { get; } = "eFMS_ReportData";
+        public static string EFMS_FileManagement { get; } = "eFMS_FileManagementExchange";
+        public static string EFMS_ReportData { get; } = "eFMS_ReportDataExchange";
     }
 }

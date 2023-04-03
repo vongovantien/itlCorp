@@ -54,8 +54,24 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
                     //if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
 
                     var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
-                    string previewURL = models.Action == "Preview" ? Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile : Urls.Accounting.UploadFileEdoc + "Settlement";
-                    var response = await HttpServiceExtension.PutDataToApi(file, "https://localhost:44329" + previewURL + "/" + models.SettlementId, models.AccessToken);
+                    if (models.Action == "Preview")
+                    {
+                        //string previewURL = Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile;
+                        var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + models.SettlementId, models.AccessToken);
+                    }
+                    else
+                    {
+                        var model = new FileUploadAttachTemplateModel
+                        {
+                            Child=null,
+                            File=file,
+                            FolderName= "Settlement",
+                            ModuleName="Accounting",
+                            Id=models.SettlementId,
+                        };
+                        await _busControl.SendAsync(RabbitExchange.EFMS_FileManagement, RabbitConstants.PostAttachFileTemplateToEDocQueue, model);
+                    }
+
                     Console.WriteLine("==================== GenFileSyncSMBackgroundService ============================");
 
                 }, batchSize: 3, maxMessagesInFlight: 10);
