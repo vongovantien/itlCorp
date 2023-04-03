@@ -567,16 +567,20 @@ namespace eFMS.API.Catalogue.DL.Services
                     if (!String.IsNullOrEmpty(item.CreditCharge.ToString()))
                     {
                         var chargeCredit = DataContext.Get(x => x.Id == item.CreditCharge).FirstOrDefault();
-
-                        item.BuyingCode = chargeCredit.Code;
-                        item.BuyingName = chargeCredit.ChargeNameEn;
+                        if (chargeCredit != null)
+                        {
+                            item.BuyingCode = chargeCredit.Code;
+                            item.BuyingName = chargeCredit.ChargeNameEn;
+                        }
                     }
                     if (!String.IsNullOrEmpty(item.DebitCharge.ToString()))
                     {
                         var chargeDebit = DataContext.Get(x => x.Id == item.DebitCharge).FirstOrDefault();
-
-                        item.SellingCode = chargeDebit.Code;
-                        item.SellingName = chargeDebit.ChargeNameEn;
+                        if (chargeDebit != null)
+                        {
+                            item.SellingCode = chargeDebit.Code;
+                            item.SellingName = chargeDebit.ChargeNameEn;
+                        }
                     }
                     var arrOffice = item.Offices.Split(",").ToArray();
                     string officeStr = string.Empty;
