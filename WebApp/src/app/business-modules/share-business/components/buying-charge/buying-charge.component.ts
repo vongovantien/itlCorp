@@ -239,6 +239,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (partners: Partner[]) => {
                     this.listPartner = partners;
+                    this._cd.markForCheck();
+
                 }
             );
 
@@ -735,7 +737,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 this._documentRepo.validateCheckPointContractPartner({
                     partnerId: partnerData.id,
                     transactionType: transactionType,
-                    hblId: this.hbl.id
+                    hblId: this.hbl.id,
+                    type: 5
                 })
                     .subscribe(
                         (res: CommonInterface.IResult) => {
@@ -822,7 +825,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     this._documentRepo.validateCheckPointContractPartner({
                         partnerId: this.hbl.customerId,
                         transactionType: transactionType,
-                        hblId: this.hbl.id
+                        hblId: this.hbl.id,
+                        type: 5
                     }).subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {

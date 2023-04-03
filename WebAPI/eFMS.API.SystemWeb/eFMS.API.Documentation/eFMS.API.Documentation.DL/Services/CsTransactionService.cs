@@ -16,6 +16,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
@@ -530,6 +531,7 @@ namespace eFMS.API.Documentation.DL.Services
                             || !string.IsNullOrEmpty(surcharge.AdvanceNo)
                             || !string.IsNullOrEmpty(surcharge.VoucherId)
                             || !string.IsNullOrEmpty(surcharge.SyncedFrom)
+                            || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
                             || surcharge.AcctManagementId != null
                          select detail);
             var data = DataContext.Get(x => x.Id == jobId).FirstOrDefault();
@@ -3785,7 +3787,6 @@ namespace eFMS.API.Documentation.DL.Services
         }
     }
     #endregion
-
 }
 
 

@@ -50,6 +50,10 @@ export enum CatalogueActionTypes {
     GET_BANK = '[Catalogue] Get Bank',
     GET_BANK_SUCCESS = '[Catalogue] Get Bank Success',
     GET_BANK_FAIL = '[Catalogue] Get Bank Fail',
+
+    GET_USER = '[Catalogue] Get User',
+    GET_USER_SUCCESS = '[Catalogue] Get User Success',
+    GET_USER_FAIL = '[Catalogue] Get User Fail',
 }
 
 export class GetCataloguePartnerAction implements Action {
@@ -57,6 +61,7 @@ export class GetCataloguePartnerAction implements Action {
     constructor(public payload: number) {
     }
 }
+
 //#region Port
 export class GetCataloguePortAction implements Action {
     readonly type = CatalogueActionTypes.GET_PORT;
@@ -86,7 +91,6 @@ export class GetCatalogueWarehouseFailAction implements Action {
     constructor(public payload: any) { }
 }
 //#endregion
-
 
 //#region carrier
 export class GetCatalogueCarrierAction implements Action {
@@ -135,7 +139,6 @@ export class GetCatalogueUnitFailAction implements Action {
     constructor(public payload: any) { }
 }
 //#endregion
-
 
 //#region Package
 export class GetCataloguePackageAction implements Action {
@@ -213,6 +216,7 @@ export class GetCatalogueCurrencyFailAction implements Action {
 //#endregion
 
 //#region Bank
+
 export class GetCatalogueBankAction implements Action {
     readonly type = CatalogueActionTypes.GET_BANK;
     constructor(public payload: any = { active: true }) { }
@@ -225,8 +229,8 @@ export class GetCatalogueBankFailAction implements Action {
     readonly type = CatalogueActionTypes.GET_BANK_FAIL;
     constructor(public payload: any) { }
 }
-//#endregion
 
+//#endregion
 export type CatalogueActions = GetCataloguePartnerAction
     | GetCataloguePortAction
     | GetCataloguePortSuccessAction
@@ -260,5 +264,8 @@ export type CatalogueActions = GetCataloguePartnerAction
     | GetCataloguePackageFailAction
     | GetCatalogueBankAction
     | GetCatalogueBankSuccessAction
+    | GetCatalogueBankFailAction
+    | GetCatalogueBankFailAction
+    | GetCatalogueBankFailAction
     | GetCatalogueBankFailAction
     ;

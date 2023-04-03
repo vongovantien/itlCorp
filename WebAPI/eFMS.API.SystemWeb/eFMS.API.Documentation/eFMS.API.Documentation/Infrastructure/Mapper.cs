@@ -1,15 +1,13 @@
 ﻿using AutoMapper;
-using eFMS.API.Documentation.DL;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
 using eFMS.API.Documentation.Service.ViewModels;
-using System.Collections.Generic;
 
 namespace eFMS.API.Shipment.Infrastructure
 {
     public class MappingProfile : Profile
     {
-        public  MappingProfile()
+        public MappingProfile()
         {
             CreateMap<CsTransaction, CsTransactionEditModel>();
             CreateMap<CsTransactionDetail, CsTransactionDetailModel>();
@@ -45,7 +43,7 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<CsBookingNote, CsBookingNoteModel>();
             CreateMap<CsShippingInstruction, CsShippingInstructionReportConstModel>();
             CreateMap<spc_GetListChargeShipmentMaster, ChargeShipmentModel>();
-            CreateMap<CsShipmentSurcharge, CsShipmentSurchargeModel>(); 
+            CreateMap<CsShipmentSurcharge, CsShipmentSurchargeModel>();
             CreateMap<CsMawbcontainerImportModel, CsMawbcontainer>();
             CreateMap<CsDimensionDetailModel, CsDimensionDetail>();
             CreateMap<AcctCdnoteModel, AcctCdnote>();
@@ -57,9 +55,16 @@ namespace eFMS.API.Shipment.Infrastructure
             CreateMap<sp_GetDataExportAccountant, CsShipmentSurcharge>();
             CreateMap<SysReportLogModel, SysReportLog>();
             CreateMap<CatStageModel, CatStage>();
-
+            CreateMap<SysTrackInfo, SysTrackInfoModel>();
             CreateMap<CsShipmentSurchargeImportModel, CsShipmentSurcharge>();
             CreateMap<sp_GetShipmentAssignPIC, Shipments>();
+
+            CreateMap<CsWorkOrder, CsWorkOrderModel>().ReverseMap();
+            CreateMap<CsWorkOrder, WorkOrderRequest>().ReverseMap();
+            CreateMap<CsWorkOrder, CsWorkOrderViewModel>().ReverseMap();
+            CreateMap<CsWorkOrder, CsWorkOrderViewUpdateModel>().ReverseMap();
+            CreateMap<CsWorkOrderPrice, CsWorkOrderPriceModel>().ReverseMap();
+            CreateMap<CsWorkOrderSurcharge, CsWorkOrderSurchargeModel>().ReverseMap();
         }
     }
 }

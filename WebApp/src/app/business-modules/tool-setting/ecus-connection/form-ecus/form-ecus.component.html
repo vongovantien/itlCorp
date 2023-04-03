@@ -97,10 +97,16 @@
             </div>
             <div class="modal-footer m--align-center c-button-actions">
                 <ng-container *ngIf="!!isAllowUpdate">
+                    <button (click)="onCheckConnect()" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">
+                        <span>
+                            <i class="la la-check"></i>
+                            <span> Test Connection </span>
+                        </span>
+                    </button>
                     <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveEcus()">
                     </app-default-button>
                 </ng-container>
-
+            
                 <app-default-button [buttonSetting]="cancelButtonSetting"
                     (onClick)="isSubmitted = false; formGroup.reset(); hide()">
                 </app-default-button>

@@ -15,7 +15,7 @@ namespace DocumentationInterface {
     export interface ICheckPointCriteria {
         data: string[];
         settlementCode: string;
-        type: number;
+        type?: number;
         /*
          1 - SHIPMENT
          2 - SOA

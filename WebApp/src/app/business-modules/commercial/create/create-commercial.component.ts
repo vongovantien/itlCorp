@@ -19,6 +19,7 @@ import { RoutingConstants } from '@constants';
 import { CommercialEmailListComponent } from '../components/email/commercial-email-list.component';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
+import { formatDate } from '@angular/common';
 
 
 @Component({
@@ -100,6 +101,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         modelAdd.contracts = [...this.contractList.contracts];
         modelAdd.partnerEmails = [...this.partnerEmailList.partnerEmails];
         modelAdd.isRequestApproval = isRequestApproval;
+        modelAdd.dateId = this.formCreate.dateId.value ? (this.formCreate.dateId.value.startDate !== null ? formatDate(this.formCreate.dateId.value.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.saveCustomerCommercial(modelAdd);
     }
 
@@ -113,7 +115,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
             map((value: Partner) => {
                 if (!!value) {
                     if (!!body.internalReferenceNo) {
-                        this.invalidTaxCode = `This Parnter is existed, please you check again!`;
+                        this.invalidTaxCode = `This <b>Taxcode</b> already <b>Existed</b> in <b>${value.shortName}</b>, If you want to Create Internal account, Please change <b>Internal Reference Info</b>.`;
                         this.infoPopupTaxCode.show();
                     } else {
                         this.invalidTaxCode = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${value.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;

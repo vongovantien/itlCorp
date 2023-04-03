@@ -87,10 +87,9 @@
                 <div class="col-lg-4">
                     <div class="form-group"
                         [ngClass]="{ 'm-form__group has-danger': (isSubmitted || taxCode.dirty) && (taxCode.invalid|| (taxCode.errors | equalError:'maxlength' || taxCode.errors | equalError:'minlength')) }">
-                        <label class="form-control-label" for="">
-                            Tax Code <span class="m--font-danger">(*)</span>
+                        <label class="form-control-label" for="">Tax Code<span class="m--font-danger">(*)</span>
                         </label>
-                        <input [attr.disabled]="this.active.value === true ? 'disabled' : null" type="text" min="0"
+                        <input [attr.disabled]="active.value || isBranchSub || this.isAddBranchSub ?  'disabled' : null" type="text" min="0"
                             class="form-control m-input m-input--square" title="Tax code must be number"
                             placeholder="Please enter Tax Code" autocomplete="nope" formControlName="taxCode"
                             [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }" required
@@ -112,9 +111,8 @@
                         <label class="form-control-label" for="">
                             Internal Reference
                         </label>
-                        <input #focusInput type="text" name="internalReferenceNo"
-                            [attr.disabled]="isDisabled === true ? 'disabeld' : null" class="form-control" minlength="3"
-                            formControlName="internalReferenceNo" />
+                        <input #focusInput type="text" class="form-control" formControlName="internalReferenceNo">
+
                         <div class="form-control-feedback" *ngIf="isSubmitted &&
                                 ((internalReferenceNo.errors | equalError: 'maxlength' )|| (internalReferenceNo.errors | equalError: 'minlength'))
                                 ">
@@ -163,8 +161,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="form-group"
-                        [ngClass]="{ 'm-form__group has-danger': isSubmitted && partnerGroup.invalid }">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': isSubmitted && partnerGroup.invalid }">
                         <label class="form-control-label" for="">
                             Category <span class="m--font-danger">(*)</span>
                         </label>
@@ -177,6 +174,18 @@
                             Category is required
                         </div>
                     </div>
+                    <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': isSubmitted && identityNo.invalid }">
+                        <label>Identity No</label>
+                        <input type="text" class="form-control" formControlName="identityNo"
+                        [attr.disabled]="this.active.value === true ? 'disabled' : null">
+                        <div [ngClass]="'text-danger'"
+                            *ngIf="(isSubmitted && ((identityNo.errors | equalError:'maxlength') || (identityNo.errors | equalError:'minlength')))">
+                            Identity No include 8 - 15 characters!
+                        </div>
+                        <div [ngClass]="'text-danger'" *ngIf="isSubmitted && identityNo.errors  | equalError:'pattern'">
+                            Identity No invalid
+                        </div>
+                    </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group">
@@ -186,11 +195,27 @@
                         <input type="text" name="coLoaderCode" class="form-control" formControlName="coLoaderCode"
                             [attr.disabled]="this.active.value === true ? 'disabled' : null" />
                     </div>
-                    <div classs="form-group" *ngIf="isUpdate">
-                        <div class="text-left text-underline m--margin-top-10">
-                            <a (click)="showOtherCharge()" class="pointer font-weight-bold">Other
-                                Charge</a>
-                        </div>
+                    <div class="form-group">
+                        <label>ID Date</label>
+                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true" name="daterange"
+                                [autoApply]="true" formControlName="dateId" readonly 
+                                [attr.disabled]="this.active.value === true ? 'disabled' : null">
+                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                <span>
+                                    <i class="la la-calendar"></i>
+                                </span>
+                            </span>
+                            <ng-container *ngIf="!!dateId.value && !!dateId.value.startDate && this.active.value === false">
+                                <span class=" m-input-icon_clear"  (click)="resetFormControl(dateId)"><i class="la la-times"></i></span>
+                            </ng-container>
+                        </div> 
+                    </div>
+                    <div class="form-group">
+                        <label>ID Place</label>
+                        <input type="text" class="form-control" formControlName="placeId"
+                        [attr.disabled]="this.active.value === true ? 'disabled' : null">
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -203,6 +228,12 @@
                                     [disabled]="(menuSpecialPermission | async | specialPermission: 'ActivePartner') === true  ? null : 'disabled'"
                                     placeholder="Select credit payment">
                                 </ng-select>
+                            </div>
+                            <div classs="form-group" *ngIf="isUpdate">
+                                <div class="text-left text-underline m--margin-top-10">
+                                    <a (click)="showOtherCharge()" class="pointer font-weight-bold">Other
+                                        Charge</a>
+                                </div>
                             </div>
                         </div>
                         <div class="col-lg-4" *ngIf="isUpdate">

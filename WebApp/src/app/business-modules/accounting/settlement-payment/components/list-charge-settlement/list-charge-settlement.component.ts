@@ -1,5 +1,5 @@
 import { coerceBooleanProperty } from "@angular/cdk/coercion";
-import { Component, EventEmitter, Input, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, NgZone, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { AppList } from '@app';
 import { ReportPreviewComponent } from '@common';
 import { delayTime } from '@decorators';
@@ -25,8 +25,10 @@ import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import cloneDeep from 'lodash/cloneDeep';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
+import { BehaviorSubject, Observable, pipe } from 'rxjs';
+import { ShareDocumentTypeAttachComponent } from "src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component";
+import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState, getSettlementPaymentDetailTotalChargeState, LoadListNoGroupSurcharge } from '../store';
+import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -53,9 +55,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentFilePopup: SettlementShipmentAttachFilePopupComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
+    @ViewChild('scroller') scroller: CdkVirtualScrollViewport;
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
-    @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>;
+    @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>
 
     groupShipments: ISettlementShipmentGroup[] = [];
     headers: CommonInterface.IHeaderTable[];
@@ -82,13 +86,18 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
     isLoadingSurchargeList: boolean = false;
     isLoadingGroupShipment: boolean = false;
+
+    listEdoc: any[] = [];
+    pageSize: number = this.numberToShow[1];
+
     constructor(
         private readonly _sortService: SortService,
         private readonly _toastService: ToastrService,
         private readonly _documenRepo: DocumentationRepo,
         private readonly _dataService: DataService,
         private readonly _store: Store<ISettlementPaymentState>,
-        private readonly _accountingRepo: AccountingRepo
+        private readonly _accountingRepo: AccountingRepo,
+        private readonly _ngZone: NgZone
     ) {
         super();
     }
@@ -125,7 +134,44 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
         this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState);
         this.detailSettlement = this._store.select(getSettlementPaymentDetailState);
+
     }
+
+    ngAfterViewInit(): void {
+        this.listenScrollingEvent(() => {
+            this._ngZone.run(() => {
+                this._store.select(getSettlementPaymentDetailTotalChargeState)
+                    .pipe(takeUntil(this.ngUnsubscribe))
+                    .subscribe(
+                        (total: any) => {
+                            if (!!this.settlementCode) {
+                                const totalPage = Math.ceil(total / 20);
+                                if (this.page < totalPage) {
+                                    this.getNextSurcharge();
+                                } else {
+                                    return;
+                                }
+                            }
+
+                        }
+                    )
+
+            });
+        })
+    }
+
+    getNextSurcharge() {
+        this._store.dispatch(LoadListNoGroupSurcharge());
+        this.page++;
+        this._accountingRepo.getPagingSurchargeSettlement(this.settlementCode, this.page, 20)
+            .pipe(finalize(() => { this.isLoading = false; }))
+            .subscribe((res: CommonInterface.IResponsePaging) => {
+                if (!!res.data.length) {
+                    this.surcharges = [...this.surcharges, ...res.data || []];
+                }
+            });
+    }
+
 
     updateListSurcharge() {
         this._store.dispatch(UpdateListNoGroupSurcharge({ data: this.surcharges }));
@@ -720,13 +766,24 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             )
     }
 
-    viewShipmentAttachFile(index: number) {
-        this.selectedGroupShipmentIndex = index;
-        this.shipmentFilePopup.shipmentGroups = this.groupShipments[index];
-        this.shipmentFilePopup.files = this.shipmentFilePopup.shipmentGroups.files;
+    viewShipmentAttachFile(data: any) {
+        this.documentAttach.headers = [
+            { title: 'Alias Name', field: 'aliasName', width: 200 },
+            { title: 'Real File Name', field: 'realFilename' },
+            { title: 'Document Type', field: 'docType', required: true },
+            { title: 'Payee', field: 'payee' },
+            { title: 'Invoice No', field: 'invoiceNo' },
+            { title: 'Series No', field: 'seriesNo' },
+            { title: 'Job Ref', field: 'jobRef' },
+            { title: 'Note', field: 'note' },
+        ]
 
-        this.shipmentFilePopup.show();
-
+        this.documentAttach.isUpdate = false;
+        this.documentAttach.jobOnSettle = true;
+        this.documentAttach.jobNo = data.jobId;
+        this.documentAttach.jobId = data.shipmentId;
+        this.documentAttach.updateListFileItem();
+        this.documentAttach.show();
     }
 
     onChangeShipmentGroupAttachFile(files: SysImage[]) {

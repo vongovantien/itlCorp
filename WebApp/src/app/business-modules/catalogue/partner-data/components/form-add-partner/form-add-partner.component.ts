@@ -79,6 +79,10 @@ export class FormAddPartnerComponent extends AppForm {
     workPhoneEx: AbstractControl;
     email: AbstractControl;
 
+    identityNo: AbstractControl;
+    dateId: AbstractControl;
+    placeId: AbstractControl;
+
     bankAccountNo: AbstractControl;
     bankAccountName: AbstractControl;
     bankAccountAddress: AbstractControl;
@@ -98,6 +102,7 @@ export class FormAddPartnerComponent extends AppForm {
     partnerLocation: AbstractControl;
     internalCode: AbstractControl;
     isAddBranchSub: boolean;
+    isBranchSub: boolean;
     creditPayment: AbstractControl;
     bankName: AbstractControl;
     roundMethods: CommonInterface.INg2Select[] = [
@@ -354,7 +359,14 @@ export class FormAddPartnerComponent extends AppForm {
             internalCode: [null],
             creditPayment: [null],
             bankName: [],
-            bankCode: [{ value: null, disabled: true }]
+            bankCode: [{ value: null, disabled: true }],
+            identityNo: [null, Validators.compose([
+                Validators.maxLength(15),
+                Validators.minLength(8),
+                Validators.pattern(SystemConstants.CPATTERN.NUMBER),
+            ])],
+            dateId: [null],
+            placeId: [null]
         });
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
         this.internalReferenceNo = this.partnerForm.controls['internalReferenceNo'];
@@ -397,6 +409,9 @@ export class FormAddPartnerComponent extends AppForm {
         this.internalCode = this.partnerForm.controls['internalCode'];
         this.creditPayment = this.partnerForm.controls['creditPayment'];
         this.bankName = this.partnerForm.controls['bankName'];
+        this.identityNo = this.partnerForm.controls["identityNo"];
+        this.dateId = this.partnerForm.controls["dateId"];
+        this.placeId = this.partnerForm.controls["placeId"];
         if (!this.isUpdate) {
             this.partnerMode.setValue('External');
             this.partnerLocation.setValue('Domestic');
@@ -451,8 +466,6 @@ export class FormAddPartnerComponent extends AppForm {
     }
 
     setFormData(partner: Partner) {
-
-
         this.countryShippingIdName = partner.countryShippingName;
         this.countryIdName = partner.countryName;
         this.shippingProvinceName = partner.provinceShippingName;
@@ -497,12 +510,12 @@ export class FormAddPartnerComponent extends AppForm {
         this.partnerForm.setValue({
             partnerAccountNo: this.isAddBranchSub ? null : partner.accountNo,
             internalReferenceNo: partner.internalReferenceNo,
-            partnerNameEn: partner.partnerNameEn,
-            partnerNameVn: partner.partnerNameVn,
-            shortName: partner.shortName,
+            partnerNameEn: this.isAddBranchSub ? null : partner.partnerNameEn,
+            partnerNameVn: this.isAddBranchSub ? null : partner.partnerNameVn,
+            shortName: this.isAddBranchSub ? null : partner.shortName,
+            taxCode: partner.taxCode,
             //
             partnerAccountRef: this.isAddBranchSub ? partner.id : partner.parentId,
-            taxCode: this.isAddBranchSub ? null : partner.taxCode,
             partnerGroup: partnerGroupActives,
             countryShippingId: partner.countryShippingId,
             provinceShippingId: partner.provinceShippingId,
@@ -540,7 +553,11 @@ export class FormAddPartnerComponent extends AppForm {
             internalCode: partner.internalCode,
             creditPayment: partner.creditPayment,
             bankName: partner.bankName,
-            bankCode: partner.bankCode
+            bankCode: partner.bankCode,
+            identityNo: partner.identityNo,
+            dateId: !!partner.dateId ? { startDate: new Date(partner.dateId), endDate: new Date(partner.dateId) } : null,
+            placeId: partner.placeId
+
         });
         if (this.partnerAccountRef.value !== partner.parentId) {
             this.isDisabled = false;
@@ -548,6 +565,9 @@ export class FormAddPartnerComponent extends AppForm {
         else {
             this.isDisabled = true;
         }
+
+        this.isBranchSub = !!partner.parentId && this.partnerAccountRef?.value != partner.id;
+        console.log('Branch sub:', this.isAddBranchSub);
     }
 
     getPartnerGroupActives(arg0: string[]): any {
@@ -639,4 +659,5 @@ export class FormAddPartnerComponent extends AppForm {
             this.partnerForm.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn)
         }
     }
+    
 }

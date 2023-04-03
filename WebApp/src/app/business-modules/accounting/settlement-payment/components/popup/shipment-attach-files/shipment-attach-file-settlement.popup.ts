@@ -1,16 +1,16 @@
-import { getSettlementPaymentDetailState } from './../../store/reducers/index';
-import { SystemFileManageRepo } from '@repositories';
-import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
-import { PopupBase } from '@app';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { SysImage } from '@models';
-import { ToastrService } from 'ngx-toastr';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { PopupBase } from '@app';
+import { ConfirmPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
+import { SysImage } from '@models';
+import { Store } from '@ngrx/store';
+import { SystemFileManageRepo } from '@repositories';
+import { ToastrService } from 'ngx-toastr';
+import { finalize, takeUntil } from 'rxjs/operators';
 import { ISettlementShipmentGroup } from '../../shipment-item/shipment-item.component';
 import { ISettlementPaymentState } from '../../store';
-import { Store } from '@ngrx/store';
-import { takeUntil, finalize } from 'rxjs/operators';
-import { ConfirmPopupComponent } from '@common';
+import { getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../../store/reducers/index';
 
 @Component({
     selector: 'shipment-attach-file',
@@ -46,12 +46,18 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
     }
 
     ngOnInit() {
-        this._store.select(getSettlementPaymentDetailState)
-            .pipe(takeUntil(this.ngUnsubscribe))
+        this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState).pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((res) => {
-                if (res) {
-                    this.settlementId = res.settlement.id;
-                    this.settlementNo = res.settlement.settlementNo;
+                if (!res) {
+                    console.log(res);
+                    this._store.select(getSettlementPaymentDetailState)
+                        .pipe(takeUntil(this.ngUnsubscribe))
+                        .subscribe((res) => {
+                            if (res) {
+                                this.settlementId = res?.settlement.id;
+                                this.settlementNo = res?.settlement.settlementNo;
+                            }
+                        })
                 }
             })
     }

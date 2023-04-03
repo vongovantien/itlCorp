@@ -143,9 +143,9 @@ namespace eFMS.API.SystemFileManagement.Controllers
         }
 
         [HttpDelete("DeleteFileS3/{moduleName}/{folder}/{id}/{objId}")]
-        public async Task<IActionResult> DeleteFileS3(string moduleName, string folder, Guid id,Guid objId)
+        public async Task<IActionResult> DeleteFileS3(string moduleName, string folder, Guid id, Guid objId)
         {
-            HandleState hs = await _aWSS3Service.DeleteFileS3(moduleName, folder, id,objId);
+            HandleState hs = await _aWSS3Service.DeleteFileS3(moduleName, folder, id, objId);
             if (hs.Success)
                 return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
             return BadRequest(hs);

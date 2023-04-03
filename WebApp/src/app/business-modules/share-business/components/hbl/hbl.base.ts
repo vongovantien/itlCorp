@@ -372,7 +372,6 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                         const criteria: DocumentationInterface.ICheckPointCriteria = {
                             data: partnerIds,
                             transactionType: 'DOC',
-                            type: 5,
                             settlementCode: null,
                         };
                         return this._documentRepo.validateCheckPointMultiplePartner(criteria)

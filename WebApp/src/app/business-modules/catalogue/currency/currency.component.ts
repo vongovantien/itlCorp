@@ -143,7 +143,7 @@ export class CurrencyComponent extends AppList implements OnInit {
             .pipe((finalize(() => this._progressRef.complete())))
             .subscribe(
                 (res: HttpResponse<any>) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
                 },
             );
     }

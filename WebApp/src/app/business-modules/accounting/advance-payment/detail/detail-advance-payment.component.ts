@@ -12,7 +12,7 @@ import { InfoPopupComponent, ReportPreviewComponent } from "@common";
 import { RoutingConstants } from "@constants";
 import { delayTime } from "@decorators";
 import { ICrystalReport } from "@interfaces";
-import { AdvancePayment, AdvancePaymentRequest, SysImage } from "@models";
+import { AdvancePayment, AdvancePaymentRequest } from "@models";
 import { AccountingRepo, ExportRepo } from "@repositories";
 
 import { AdvancePaymentFormCreateComponent } from "../components/form-create-advance-payment/form-create-advance-payment.component";
@@ -23,6 +23,7 @@ import { Store } from "@ngrx/store";
 import { IAppState } from "@store";
 import { combineLatest, EMPTY } from "rxjs";
 import { catchError, concatMap, map } from "rxjs/operators";
+import { ShareBussinessAttachFileV2Component } from "src/app/business-modules/share-business/components/edoc/files-attach-v2/files-attach-v2.component";
 import isUUID from "validator/lib/isUUID";
 import { ListAdvancePaymentCarrierComponent } from "../components/list-advance-payment-carrier/list-advance-payment-carrier.component";
 
@@ -37,6 +38,7 @@ export class AdvancePaymentDetailComponent
     @ViewChild(AdvancePaymentFormCreateComponent, { static: true }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
     @ViewChild(ListAdvancePaymentCarrierComponent) listAdvancePaymentCarrierComponent: ListAdvancePaymentCarrierComponent;
+    @ViewChild(ShareBussinessAttachFileV2Component) attachRef: ShareBussinessAttachFileV2Component;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(InjectViewContainerRefDirective)
 
@@ -48,7 +50,7 @@ export class AdvancePaymentDetailComponent
     actionList: string = "update";
     approveInfo: any = null;
 
-    attachFiles: SysImage[] = [];
+    attachFiles: any[] = [];
     folderModuleName: string = "Advance";
     statusApproval: string = "";
     isAdvCarrier: boolean = false;
@@ -319,6 +321,7 @@ export class AdvancePaymentDetailComponent
                             `${res.data.advanceNo + " is update successfully"}`,
                             "Update Success !"
                         );
+                        this.attachRef.getEDoc("Advance");
                         this.getDetail(this.advId);
                     } else {
                         this.handleError((data: any) => {
@@ -444,6 +447,7 @@ export class AdvancePaymentDetailComponent
                             queryParams: Object.assign({}, { action: "carrier" })
                         });
                     }
+                    this.attachRef.getEDoc("Advance");
                 } else {
                     this.handleError((data: any) => {
                         this._toastService.error(data.message, data.title);
@@ -496,4 +500,5 @@ export class AdvancePaymentDetailComponent
             this.listAdvancePaymentCarrierComponent.configDisplayShipment(data);
         }
     }
+
 }

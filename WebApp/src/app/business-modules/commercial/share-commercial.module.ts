@@ -16,6 +16,7 @@ import { ContractImportComponent } from './components/contract/import/contract-i
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CommonModule } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
 
 @NgModule({
     declarations: [
@@ -38,6 +39,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
         PaginationModule.forRoot(),
         NgSelectModule,
         TabsModule.forRoot(),
+        NgxDaterangepickerMd,
     ],
     exports: [
         CommercialCreateComponent,

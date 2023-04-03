@@ -23,10 +23,10 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group" [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) 
-                            || (isSubmitted && !eta.value) 
-                            || (isSubmitted && !eta.valid) 
-                            || (isSubmitted && !eta.value.startDate) 
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value)
+                            || (isSubmitted && !eta.value)
+                            || (isSubmitted && !eta.valid)
+                            || (isSubmitted && !eta.value.startDate)
                             || (isSubmitted && formCreate.errors | equalError:'validateEta_Etd')}">
                             <label required>ETA</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
@@ -214,26 +214,37 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger':
+                         (isSubmitted && atd.errors | equalError:'invalidDateFuture' )||
+                        (atd.touched && atd.errors | equalError:'invalidDateFuture')}">
                             <label>ATD</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                     [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
                                     formControlName="atd" calendar [allowRemove]="!!atd.value && !!atd.value.startDate"
-                                    (remove)="resetFormControl(atd)" />
+                                    (remove)="resetFormControl(atd)" [maxDate]="maxDateAtd" />
+                            </div>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && atd.errors | equalError:'invalidDateFuture'">{{errorATD}}
                             </div>
                         </div>
                     </div>
+
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger':
+                        (isSubmitted && ata.errors | equalError:'invalidDateFuture' )||
+                       (ata.touched && ata.errors | equalError:'invalidDateFuture')}">
                             <label>ATA</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                     [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
                                     formControlName="ata" calendar [allowRemove]="!!ata.value && !!ata.value.startDate"
-                                    (remove)="resetFormControl(ata)" />
+                                    [maxDate]="maxDateAta" (remove)="resetFormControl(ata)" />
+                            </div>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmitted && ata.errors | equalError:'invalidDateFuture'">{{errorATA}}
                             </div>
                         </div>
                     </div>
@@ -250,7 +261,8 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group" *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
+                                <div class="form-group"
+                                    *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                                     <label>
                                         No Profit
                                     </label>

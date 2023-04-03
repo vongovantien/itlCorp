@@ -171,6 +171,13 @@ namespace eFMS.API.Accounting.DL.Services
             ChangeTrackerHelper.InsertToMongoDb(addedList);
         }
 
+        public void LogUpdateEntity(IEnumerable<object> oldEntity, IEnumerable<object> newEntity)
+        {
+            var mongoDb = MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
+            var editList = ChangeTrackerHelper.GetChangeModifield(oldEntity, newEntity);
+            ChangeTrackerHelper.InsertToMongoDb(editList);
+        }
+
         /// <summary>
         /// Update surcharge when synce settle/soa/voucher/cdnote
         /// </summary>
