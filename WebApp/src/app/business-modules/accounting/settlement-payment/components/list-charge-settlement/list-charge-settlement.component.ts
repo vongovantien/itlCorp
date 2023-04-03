@@ -139,19 +139,27 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     ngAfterViewInit(): void {
         this.listenScrollingEvent(() => {
             this._ngZone.run(() => {
-                this._store.select(getSettlementPaymentDetailTotalChargeState)
-                    .pipe(takeUntil(this.ngUnsubscribe))
+                this._store.select(getSettlementPaymentDetailState)
+                    .pipe(
+                        takeUntil(this.ngUnsubscribe),
+                    )
                     .subscribe(
-                        (total: any) => {
-                            if (!!this.settlementCode) {
-                                const totalPage = Math.ceil(total / 20);
+                        (detail: any) => {
+                            if (!this.settlementCode) {
+                                return;
+                            }
+                            if (!!this.settlementCode && (detail?.settlement?.statusApproval === 'New' || detail?.settlement?.statusApproval === 'Denied')) {
+                                return;
+
+                            } else {
+                                const totalCharge = detail?.settlement?.totalCharge || 1;
+                                const totalPage = Math.ceil(totalCharge / 20);
                                 if (this.page < totalPage) {
                                     this.getNextSurcharge();
                                 } else {
                                     return;
                                 }
                             }
-
                         }
                     )
 
