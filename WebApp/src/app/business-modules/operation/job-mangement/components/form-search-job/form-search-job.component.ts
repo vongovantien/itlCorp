@@ -70,14 +70,24 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.users = this._sysRepo.getListSystemUser();
 
         this.initFormSearch();
-
-        this.filterTypes = [
-            { title: 'Custom No', value: 'clearanceNo' },
-            { title: 'Job Id', value: 'jobNo' },
-            { title: 'HBL', value: 'hwbno' },
-            { title: 'MBL', value: 'mblno' },
-            { title: 'Credit\/Debit\/Invoice\ No', value: 'creditDebitInvoice' },
-        ];
+        console.log(this.transactionType);
+        if (this.transactionType === 'TKI') {
+            this.filterTypes = [
+                { title: 'Job Id', value: 'jobNo' },
+                { title: 'Custom No', value: 'clearanceNo' },
+                { title: 'HBL', value: 'hwbno' },
+                { title: 'MBL', value: 'mblno' },
+                { title: 'Credit\/Debit\/Invoice\ No', value: 'creditDebitInvoice' },
+            ];
+        } else {
+            this.filterTypes = [
+                { title: 'Custom No', value: 'clearanceNo' },
+                { title: 'Job Id', value: 'jobNo' },
+                { title: 'HBL', value: 'hwbno' },
+                { title: 'MBL', value: 'mblno' },
+                { title: 'Credit\/Debit\/Invoice\ No', value: 'creditDebitInvoice' },
+            ];
+        }
         this.filterType.setValue(this.filterTypes[0]);
 
         this._store.select(fromOpsStore.getOperationTransationDataSearch)
