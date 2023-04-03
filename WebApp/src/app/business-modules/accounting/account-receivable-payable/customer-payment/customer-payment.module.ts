@@ -25,6 +25,7 @@ import { ARCustomerPaymentCreateReciptCombineComponent } from './create-receipt-
 import { ARCustomerPaymentFormCreateReceiptCombineComponent } from './components/form-combine-receipt/form-combine-receipt.component';
 import { ARCustomerPaymentReceiptGeneralCombineComponent } from './components/general-combine/receipt-general-combine.component';
 import { ARCustomerPaymentReceiptCDCombineComponent } from './components/cd-combine/receipt-cd-combine.component';
+import { DetailReceiptCombineComponent } from './detail-receipt-combine/detail-receipt-combine.component';
 
 const routing: Routes = [
     {
@@ -33,6 +34,8 @@ const routing: Routes = [
             { path: 'receipt/:type/new', component: ARCustomerPaymentCreateReciptComponent, data: { name: 'New' } },
             { path: 'receipt/:id', component: ARCustomerPaymentDetailReceiptComponent },
             { path: 'receipt/combine/new-combine', component: ARCustomerPaymentCreateReciptCombineComponent, data: { type: 'new' } },
+            { path: 'receipt/combine/existing', component: ARCustomerPaymentCreateReciptCombineComponent, data: { type: 'existing', name: 'Receipt Combine' } },
+            { path: 'receipt/combine/:arcbno', component: DetailReceiptCombineComponent },
         ]
     },
 
@@ -55,7 +58,8 @@ const routing: Routes = [
         ARCustomerPaymentCreateReciptCombineComponent,
         ARCustomerPaymentFormCreateReceiptCombineComponent,
         ARCustomerPaymentReceiptGeneralCombineComponent,
-        ARCustomerPaymentReceiptCDCombineComponent
+        ARCustomerPaymentReceiptCDCombineComponent,
+        DetailReceiptCombineComponent
     ],
     imports: [
         SharedModule,

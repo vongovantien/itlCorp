@@ -48,5 +48,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string ReferenceNo { get; set; }
         public decimal? AgreementAdvanceAmountVnd { get; set; }
         public decimal? AgreementAdvanceAmountUsd { get; set; }
+        public string Arcbno { get; set; }
     }
 }

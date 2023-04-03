@@ -649,5 +649,17 @@ namespace eFMS.API.Catalogue.Controllers
             var results = await catPartnerService.GetPartnerByTaxCode(taxCode);
             return Ok(results);
         }
+        
+        /// Get AC ref partner with same saleman
+        /// </summary>
+        /// <param name="salemanId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetParentPartnerSameSaleman")]
+        public IActionResult GetParentPartnerSameSaleman(string salemanId)
+        {
+            var data = catPartnerService.GetParentPartnerSameSaleman(salemanId);
+            return Ok(data);
+        }
     }
 }

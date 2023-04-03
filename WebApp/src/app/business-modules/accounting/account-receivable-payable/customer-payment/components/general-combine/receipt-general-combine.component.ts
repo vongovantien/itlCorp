@@ -1,16 +1,18 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Component, Input, OnInit } from '@angular/core';
-import { JobConstants } from '@constants';
-import { Office, Partner } from '@models';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
+import { AccountingConstants, JobConstants, SystemConstants } from '@constants';
+import { InjectViewContainerRefDirective } from '@directives';
+import { ContractPartner, GeneralCombineReceiptModel, Office, Partner } from '@models';
 import { ActionsSubject, Store } from '@ngrx/store';
 import { AccountingRepo, CatalogueRepo, SystemRepo } from '@repositories';
 import { getCurrentUserState } from '@store';
-import { cloneDeep, forEach, take } from 'lodash';
-import { forkJoin, Observable, of } from 'rxjs';
-import { filter, map, mergeMap, skipWhile, startWith, switchMap, switchMapTo, takeUntil, tap } from 'rxjs/operators';
+import { cloneDeep } from 'lodash';
+import { forkJoin } from 'rxjs';
+import { filter, map, skipWhile, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { ReceiptCombineActionTypes } from '../../store/actions';
-import { ICustomerPaymentState, ReceiptCombineExchangeState, ReceiptCombineLoadingState, ReceiptCombinePartnerState } from '../../store/reducers';
+import { AddGeneralCombineToReceipt, ReceiptCombineActionTypes, RemoveDebitCombine } from '../../store/actions';
+import { ICustomerPaymentState, ReceiptCombineExchangeState, ReceiptCombinePartnerState, ReceiptCombineSalemanState } from '../../store/reducers';
 
 @Component({
     selector: 'receipt-general-combine',
@@ -18,7 +20,8 @@ import { ICustomerPaymentState, ReceiptCombineExchangeState, ReceiptCombineLoadi
     styleUrls: ['./receipt-general-combine.component.scss']
 })
 export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList implements OnInit {
-
+    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
+    
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
@@ -26,25 +29,21 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
         return this._readonly;
     }
     private _readonly: boolean = false;
-
-    generalReceipts: IGeneralReceipt[] = [];
-    partners: Partner[] = [];
+    @Input() isUpdate: boolean = false;
+    @Output() onSaveReceipt: EventEmitter<Partial<any>> = new EventEmitter<Partial<any>>();
+    
+    generalReceipts: GeneralCombineReceiptModel[] = [];
+    partners: ContractPartner[] = [];
     obhPartners: Partner[] = [];
     offices: Office[] = []
-    paymentMethods: CommonInterface.ICommonTitleValue[] = [
-        { title: 'Collect OBH Agency', value: 'Collect OBH Agency' },
-        { title: 'Pay OBH Agency', value: 'Pay OBH Agency' },
-        { title: 'Collected Amount', value: 'Collected Amount' },
-        { title: 'Advance Agency', value: 'Advance Agency' },
-        { title: 'Bank Fee Agency', value: 'Bank Fee Agency' },
-        { title: 'Receive form Pay OBH', value: 'Receive form Pay OBH' },
-        { title: 'Receive from Collect OBH', value: 'Receive from Collect OBH' },
-    ]
+    paymentMethods = AccountingConstants.GENERAL_RECEIPT_PAYMENT_METHOD;
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     isSubmitted: boolean = false;
 
     exchangeRate: number;
+    partnerId: any;
+    isContainDraft: boolean = false;
 
     constructor(
         private readonly _store: Store<ICustomerPaymentState>,
@@ -57,17 +56,21 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
     }
 
     ngOnInit(): void {
-        this.isLoading = this._store.select(ReceiptCombineLoadingState);
-
         this.headers = [
             { title: 'Agency Name', field: '', width: 200, required: true },
-            { title: 'Payment Method', field: '', required: true, width: 200 },
+            { title: 'Payment Method', field: '', required: true, width: 150 },
             { title: 'Amount', field: '', required: true },
             { title: 'Amount VND', field: '', required: true },
             { title: 'OBH Branch', field: '' },
             { title: 'Handle Office', field: '', required: true },
             { title: 'Note', field: '' },
         ];
+
+        if (this.isUpdate) {
+            this.headers.push({ title: 'Receipt No', field: '', required: true },
+                { title: 'Creator', field: '', required: true },
+                { title: 'Modified Time', field: '', required: true });
+        }
 
         this._store.select(ReceiptCombineExchangeState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -106,9 +109,10 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
                     shortName: string,
                     accountNo: string,
                     partnerNameEn: string,
-                    type: string
+                    type: string,
+                    salemanId: string,
                 }) => {
-                    return this._catalogueRepo.getSubListPartner(data.id).pipe(map(values => [data, ...values])) // * Khởi tạo giá trị là partner đang chọn.
+                    return this._catalogueRepo.getACRefPartnerWithSaleman(data.salemanId);//.pipe(map(values => [data, ...values])) // * Khởi tạo giá trị là partner đang chọn.
                 }),
                 skipWhile((v) => v.length === 0),
                 filter(value => !!value.length),
@@ -117,16 +121,17 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
             .subscribe(
                 (data: any) => {
                     this.partners = data;
-                    if (!!this.generalReceipts.length) {
-                        this.generalReceipts.forEach(x => { x.partnerId = this.partners[0].id });
-                    }
                 }
             )
     }
 
     duplicateGeneralItem(index: number) {
         const newItem = cloneDeep(this.generalReceipts[index]);
-        this.generalReceipts.push(newItem);
+        newItem.duplicate = false;
+        newItem.receiptNo = null;
+        newItem.userCreated = null;
+        newItem.datetimeModified = null;
+        this._store.dispatch(AddGeneralCombineToReceipt({ generalCombineList: [newItem] }));
     }
 
     deleteGeneralItem(index: number) {
@@ -136,19 +141,48 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
     }
 
     addGeneralItem() {
-        const newItem: IGeneralReceipt = {
+        this._store.select(ReceiptCombinePartnerState)
+            .subscribe((partner: any) => {
+                this.partnerId = partner;
+            })
+            let salemanId=null;
+            this._store.select(ReceiptCombineSalemanState)
+            .subscribe((data: any) => {
+                salemanId = data;
+            })
+        if (!this.partnerId) {
+            this._store.dispatch(AddGeneralCombineToReceipt({ generalCombineList: [] }));
+            return;
+        }
+
+        const partner = this.partners.find(x => x.id === this.partnerId);
+        let newItem: GeneralCombineReceiptModel[] = [{
+            id: SystemConstants.EMPTY_GUID,
+            partnerId: partner.id,
             paymentMethod: null,
             officeId: null,
-            partnerId: null,
-        };
-        this.generalReceipts.push(newItem);
+            amountUsd: null,
+            amountVnd: null,
+            obhPartnerId: null,
+            duplicate: false,
+            isModified: true,
+            agreementId: partner.contractId,
+            receiptNo: null,
+            userCreated: null,
+            datetimeModified: null
+        }];
+        this._store.dispatch(AddGeneralCombineToReceipt({ generalCombineList: newItem }));
     }
 
-    onSelectDataTableInfo(data: any, generalReceiptItem: IGeneralReceipt, key: string) {
+    onSelectDataTableInfo(data: any, generalReceiptItem: GeneralCombineReceiptModel, key: string) {
         switch (key) {
             case 'amountUsd':
-                const amountVnd = +(+data.target.value * this.exchangeRate).toFixed(0) || 0;
+                const amountVnd = +(+data * this.exchangeRate).toFixed(0) || 0;
                 generalReceiptItem.amountVnd = amountVnd;
+                break;
+            case 'partnerId':
+                generalReceiptItem.partnerId = data.id;
+                // generalReceiptItem.agreementId = data.contractId;
                 break;
             default:
                 generalReceiptItem[key] = data;
@@ -156,14 +190,35 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
         }
     }
 
-}
+    onSaveReceiptGroup(type: string, action: string, data: any = null) {
+        if (action === 'draft') {
+            this.onSaveReceipt.emit({ type: type, action: !!this.generalReceipts.length ? 'draft' : 'update', receipt: data });
+        } else {
+            this.onSaveReceipt.emit({ type: type, action: action, receipt: data });
+        }
+    }
 
-interface IGeneralReceipt {
-    partnerId?: string;
-    paymentMethod?: string;
-    amountVnd?: number;
-    amountUsd?: number;
-    obhPartnerId?: string;
-    officeId?: string;
-    notes?: string;
+    checkAllowDelete(data: any, index: number) {
+        if (!this.isUpdate) {
+            this._store.dispatch(RemoveDebitCombine({ index: index, _typeList: 'general'}));
+        } else {
+            this._accountingRepo
+                .checkAllowDeleteCusPayment(data.id)
+                .subscribe((value: boolean) => {
+                    if (value) {
+                        const messageDelete = `Do you want to delete Receipt ${data.receiptNo} ? `;
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+                            title: 'Delete Receipt',
+                            body: messageDelete,
+                            labelConfirm: 'Yes',
+                            classConfirmButton: 'btn-danger',
+                            iconConfirm: 'la la-trash',
+                            center: true
+                        }, () => this.onSaveReceiptGroup('general', 'delete', data));
+                    } else {
+                        this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainer.viewContainerRef, { center: true });
+                    }
+                });
+        }
+    }
 }

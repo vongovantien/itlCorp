@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Get {{type === 'CUSTOMER' ? "Customer's" : "Agency's"}} Debit</h5>
-                <button type="button" class="close" aria-label="Close" (click)=hide()>
+                <button type="button" class="close" aria-label="Close" (click)=close();this.hide()>
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -70,17 +70,17 @@
                                                 </span>
                                             </td>
                                             <td ALIGN="right">
-                                                <ng-container *ngIf="debit.paymentType === 'CREDIT';else notCredit1">
+                                                <!-- <ng-container *ngIf="debit.paymentType === 'CREDIT';else notCredit1">
                                                     {{(-debit.unpaidAmountVnd) | number}}
-                                                </ng-container>
+                                                </ng-container> -->
                                                 <ng-template #notCredit1>
                                                     {{debit.unpaidAmountVnd | number}}
                                                 </ng-template>
                                             </td>
                                             <td ALIGN="right">
-                                                <ng-container *ngIf="debit.paymentType === 'CREDIT';else notCredit2">
+                                                <!-- <ng-container *ngIf="debit.paymentType === 'CREDIT';else notCredit2">
                                                     {{(-debit.unpaidAmountUsd) | number: '1.2-2'}}
-                                                </ng-container>
+                                                </ng-container> -->
                                                 <ng-template #notCredit2>
                                                     {{debit.unpaidAmountUsd | number: '1.2-2'}}
                                                 </ng-template>
@@ -277,7 +277,7 @@
                                             </tr>
                                         </ng-container>
                                         <tr app-table-none-record
-                                            *ngIf="agencyDebitModel.groupShipmentsAgency.length === 0"></tr>
+                                            *ngIf="agencyDebitModel?.groupShipmentsAgency?.length === 0"></tr>
                                     </ng-container>
 
                                     <ng-container *ngIf="TYPELIST === 'LIST'">
@@ -340,22 +340,22 @@
                                                     <span>{{invoice.mbl}}</span>
                                                 </td>
                                                 <td ALIGN="right">
-                                                    <ng-container
+                                                    <!-- <ng-container
                                                         *ngIf="invoice.paymentType === 'CREDIT';else notCreditVndTpl">
                                                         {{(-invoice.unpaidAmountVnd) | number}}
-                                                    </ng-container>
-                                                    <ng-template #notCreditVndTpl>
+                                                    </ng-container> -->
+                                                    <!-- <ng-template> -->
                                                         {{invoice.unpaidAmountVnd | number}}
-                                                    </ng-template>
+                                                    <!-- </ng-template> -->
                                                 </td>
                                                 <td ALIGN="right">
-                                                    <ng-container
+                                                    <!-- <ng-container
                                                         *ngIf="invoice.paymentType === 'CREDIT';else notCreditUsdTpl">
                                                         {{(-invoice.unpaidAmountUsd) | number: '1.2-2'}}
-                                                    </ng-container>
-                                                    <ng-template #notCreditUsdTpl>
+                                                    </ng-container> -->
+                                                    <!-- <ng-template> -->
                                                         {{invoice.unpaidAmountUsd | number: '1.2-2'}}
-                                                    </ng-template>
+                                                    <!-- </ng-template> -->
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.taxCode}}</span>
@@ -495,7 +495,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="this.hide()">
+                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="close();this.hide()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

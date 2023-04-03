@@ -10,7 +10,7 @@ import { AppForm } from '@app';
 import { Store } from '@ngrx/store';
 import { SearchListCustomerPayment } from '../../store/actions';
 import { customerPaymentReceipSearchState, ICustomerPaymentState } from '../../store/reducers';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { isNull } from '@angular/compiler/src/output/output_ast';
 import { DataService } from '@services';
 
@@ -68,7 +68,14 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.EXTRA,
-        AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.COLLECT_OBH_AGENCY,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.PAY_OBH_AGENCY,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.COLLECTED_AMOUNT,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.ADVANCE_AGENCY,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.BANK_FEE_AGENCY,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_PAY_OBH,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_COLLECT_OBH
     ];
     
     constructor(
@@ -131,7 +138,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     }
 
     search() {
-        const body: IAcctReceiptCriteria = {
+        let body: any = {
             refNo: this.refNo.value,
             paymentType: this.paymentType.value,
             customerID: this.customerID.value,
@@ -141,12 +148,18 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             currency: this.currency.value,
             syncStatus: this.syncStatus.value,
             status: this.status.value,
-            typeReceipt: this.typeReceipt.value,
             class: this.class.value,
             paymentMethod: this.paymentMethod.value
         };
         //this._listReceipt.onSearchCPs(body);
-        this._store.dispatch(SearchListCustomerPayment(body))
+        this._store.select(customerPaymentReceipSearchState)
+        .pipe(take(1))
+        .subscribe(
+            (data: any) => {
+                body.typeReceipt = data.typeReceipt;
+                this._store.dispatch(SearchListCustomerPayment(body));
+            }
+        );
     }
 
     reset() {
@@ -162,8 +175,13 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.status.reset();
         this.class.reset();
         this.paymentMethod.reset();
-
-        this._store.dispatch(SearchListCustomerPayment({}))
+        this._store.select(customerPaymentReceipSearchState)
+            .pipe(take(1))
+            .subscribe(
+                (data: any) => {
+                    this._store.dispatch(SearchListCustomerPayment({ typeReceipt: data.typeReceipt }));
+                }
+            );
     }
 
     subscriptionSearchParamState() {

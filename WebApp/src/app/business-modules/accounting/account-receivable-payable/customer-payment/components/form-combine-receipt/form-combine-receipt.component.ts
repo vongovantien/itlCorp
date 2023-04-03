@@ -1,20 +1,20 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { formatDate } from '@angular/common';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
-import { ActivatedRoute, Params } from '@angular/router';
-import { ComboGridVirtualScrollComponent } from '@common';
-import { JobConstants } from '@constants';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ComboGridVirtualScrollComponent, ConfirmPopupComponent } from '@common';
+import { RoutingConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Partner } from '@models';
-import { Store } from '@ngrx/store';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
-import { SelectPartnerReceiptCombine, UpdateExchangeRateReceiptCombine } from '../../store/actions';
-import { ICustomerPaymentState } from '../../store/reducers';
+import { ResetCombineInvoiceList, ResetInvoiceList, SelectPartnerReceiptCombine, UpdateExchangeRateReceiptCombine } from '../../store/actions';
+import { ICustomerPaymentState, ReceiptCombineCreditListState, ReceiptCombineGeneralListState } from '../../store/reducers';
 
 type COMBINE_TYPE = 'NEW' | 'EXISTING';
 @Component({
@@ -23,14 +23,9 @@ type COMBINE_TYPE = 'NEW' | 'EXISTING';
 })
 export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm implements OnInit {
     @ViewChild('comboGridPartner') combogridPartner: ComboGridVirtualScrollComponent;
-
-    @Input() set readOnly(val: any) {
-        this._readonly = coerceBooleanProperty(val);
-    }
-    get readonly(): boolean {
-        return this._readonly;
-    }
-    private _readonly: boolean = false;
+    
+    @Output() onSynceCombine: EventEmitter<any> = new EventEmitter<any>();
+    @Input() isUpdate: boolean = false;
 
     partnerId: AbstractControl;
     paymentDate: AbstractControl;
@@ -38,9 +33,20 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
     currency: AbstractControl;
     combineNo: AbstractControl;
 
-    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = <CommonInterface.IComboGridDisplayField[]>[
+        { field: 'accountNo', label: 'Partner Code' },
+        { field: 'shortName', label: 'Name ABBR' },
+        { field: 'salemanName', label: 'Saleman Name' },
+        { field: 'contractType', label: 'Contract Type' },
+    ];
+    selectedDisplayFieldAgent: ['shortName', 'salemanName']
+    selectedAgentData : any = {};
+
     partners: Observable<Partner[]>;
     partnerName: string;
+    isSubmitted: boolean = false;
+    selectedPartner: any = {};
+    isContainDraft: boolean = false;
 
     typeCombine: COMBINE_TYPE = 'NEW';
 
@@ -50,42 +56,30 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
         private readonly _fb: FormBuilder,
         private readonly _catalogueRepo: CatalogueRepo,
         private readonly _activedRouter: ActivatedRoute,
-        private readonly _toastService: ToastrService
+        private readonly _toastService: ToastrService,
+        private readonly _actionStoreSubject: ActionsSubject,
+        protected readonly _router: Router,
     ) {
         super();
     }
 
     ngOnInit(): void {
+        this.partners = this._catalogueRepo.getPartnerGroupsWithCriteria({ partnerGroups: [CommonEnum.PartnerGroupEnum.AGENT], partnerType : 'Agent', isShowSaleman: true});
         this._activedRouter.data
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (paramData: Params) => {
-                    console.log({ paramData });
                     this.typeCombine = paramData.type;
                 }
             )
         this.initForm();
-
-        this.partners = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.AGENT]);
-        this._catalogueRepo.convertExchangeRate(formatDate(new Date(), 'yyyy-MM-dd', 'en'), 'USD')
-            .subscribe(
-                (value: {
-                    id: number;
-                    currencyFromID: string;
-                    rate: number;
-                    currencyToID: string;
-                }) => {
-                    this.exchangeRate.setValue(value.rate);
-                    this._store.dispatch(UpdateExchangeRateReceiptCombine({ exchangeRate: value.rate }));
-                }
-            )
-
+        this.getExchangeRate(this.paymentDate.value?.startDate);
     }
 
     initForm() {
         this.form = this._fb.group({
             partnerId: [null, Validators.required],
-            paymentDate: [new Date()],
+            paymentDate: [{ startDate: new Date(), endDate: new Date() }],
             exchangeRate: [null],
             currency: [{ value: 'USD', disabled: true }],
             combineNo: [null, this.typeCombine === 'EXISTING' ? Validators.required : null]
@@ -97,40 +91,97 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
         this.exchangeRate = this.form.controls['exchangeRate'];
     }
 
+    getExchangeRate(date: any = null) {
+        if (!!date && !this.isUpdate) {
+            this._catalogueRepo.convertExchangeRate(formatDate(new Date(date), 'yyyy-MM-dd', 'en-US'), 'USD')
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (value: {
+                        id: number;
+                        currencyFromID: string;
+                        rate: number;
+                        currencyToID: string;
+                    }) => {
+                        this.exchangeRate.setValue(value.rate);
+                        this._store.dispatch(UpdateExchangeRateReceiptCombine({ exchangeRate: value.rate }));
+                    }
+                );
+        }
+    }
+
+    onChangePaymentDate(date: any) {
+        this.getExchangeRate();
+    }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
-                const partner = (data as Partner);
-                this._catalogueRepo.getAgreement(
-                    <any>{
-                        partnerId: partner.id,
-                        status: true
-                    }).subscribe(
-                        (agreements: any[]) => {
-                            console.log({ agreements });
-                            if (!agreements.length) {
-                                this.combogridPartner.displaySelectedStr = '';
-                                this.partnerId.setValue(null);
-                                this.partnerName = '';
-                                this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
-                                return;
-                            }
-                            this.partnerId.setValue(partner.id);
-                            this.partnerName = partner.shortName;
-                            // TODO Dispatch select partner combine.
-                            this._store.dispatch(SelectPartnerReceiptCombine({
-                                id:
-                                    this.partnerId.value,
-                                shortName: partner.shortName,
-                                accountNo: partner.accountNo,
-                                partnerNameEn: partner.partnerNameEn
-                            }))
-                        }
-                    );
+                this.selectedPartner = data;
+                this.partnerId.setValue(data.contractId);
+                this._store.dispatch(ResetCombineInvoiceList());
+                this._store.dispatch(ResetInvoiceList());
+                // TODO Dispatch select partner combine.
+                this._store.dispatch(SelectPartnerReceiptCombine({
+                    id: data.id,
+                    shortName: data.shortName,
+                    accountNo: data.accountNo,
+                    partnerNameEn: data.partnerNameEn,
+                    salemanId: data.salemanId,
+                    salemanName: data.salemanName,
+                    contractId: data.contractId
+                }))
                 break;
+                case 'exchangeRate':
+                    if (!data.target.value.length) {
+                        this.exchangeRate.setValue(0);
+                    } 
+                    this._store.dispatch(UpdateExchangeRateReceiptCombine({ exchangeRate: this.exchangeRate.value }));
+                    break;
             default:
                 break;
         }
     }
 
+    gotoList() {
+        this._store.dispatch(ResetCombineInvoiceList());
+        this._store.dispatch(ResetInvoiceList());
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
+
+    }
+
+    confirmCancel() {
+        let dataList = [];
+        combineLatest([
+            this._store.select(ReceiptCombineCreditListState),
+            this._store.select(ReceiptCombineCreditListState),
+            this._store.select(ReceiptCombineGeneralListState)])
+            .subscribe(x => {
+                x.forEach((element: any) => {
+                    if (!!element && element?.length > 0) {
+                        element.map(item => dataList.push(item))
+                    }
+                });
+            });
+
+        if (dataList.length > 0) {
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'Do you want to exit without saving?',
+            }, () => {
+                this.gotoList();
+            })
+        } else {
+            this.gotoList();
+        }
+    }
+
+    confirmSync() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Sync To Accountant System',
+            body: 'Are you sure to send these data to accountant system',
+            iconConfirm: 'la la-cloud-upload',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.onSynceCombine.emit(true);
+        });
+    }
 }

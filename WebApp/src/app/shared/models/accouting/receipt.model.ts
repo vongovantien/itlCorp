@@ -43,6 +43,9 @@ export class ReceiptCreditDebitModel {
     netOff: boolean = null;
     netOffVnd: number;
     netOffUsd: number;
+    referenceNo: string = null;
+    paymentRefNo: string = null;
+    description: string = null;
 }
 
 export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
@@ -121,6 +124,8 @@ export class Receipt {
     referenceNo: string = null;
     bankAccountNo: string = null;
     exchangeRate: number = 0;
+    officeId: string = null;
+    arcbno: string = null;
 
     constructor(object?: any) {
         const self = this;
@@ -141,7 +146,8 @@ export class ReceiptModel extends Receipt {
     isReceiptBankFee: boolean = false;
     receiptInternalOfficeCode: string = null;
     obhPartnerName: string = null;
-
+    salemanId: string = null;
+    
     constructor(object?: any) {
         super();
         const self = this;
