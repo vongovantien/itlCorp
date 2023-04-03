@@ -6,6 +6,7 @@ using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Accounting.Service.ViewModels;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
@@ -104,7 +105,7 @@ namespace eFMS.API.Accounting.DL.IService
         AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _hbl, string _settleCurrency, string _advanceNo, string clearanceNo = null);
 
         HandleState CalculateBalanceSettle(List<string> settlementNo);
-        List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null);
+        List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null, int page = -1, int size = 0);
 
         ResultHandle CheckAllowUpdateDirectCharges(List<ShipmentChargeSettlement> shipmentCharges);
         ResultHandle CheckAllowDenySettle(List<Guid> ids);
@@ -112,5 +113,6 @@ namespace eFMS.API.Accounting.DL.IService
         Task<ResultHandle> AutoRateReplicateFromSettle(Guid settleId);
         string CheckValidFeesOnShipment(CreateUpdateSettlementModel model);
         bool CheckSettleHasAutoRateCharges(string settlementNo);
+        ResponsePagingModel<ShipmentChargeSettlement> GetSurchargePagingSettlementPayment(string settlementNo, int page, int size);
     }
 }

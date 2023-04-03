@@ -18,5 +18,6 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public PaymentType PaymentType { get; set; }
         public List<string> Office { get; set; }
         public bool? IsPaging { get; set; }
+        public int? Size { get; set; }
     }
 }

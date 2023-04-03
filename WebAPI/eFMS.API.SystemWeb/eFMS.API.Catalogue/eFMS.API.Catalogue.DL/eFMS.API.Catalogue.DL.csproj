@@ -22,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Common\CommonData.cs" />
     <Compile Remove="Common\WebUrl.cs" />
     <Compile Remove="Infrastructure\ExpressionExtension.cs" />
     <Compile Remove="Infrastructure\StringExtensions.cs" />

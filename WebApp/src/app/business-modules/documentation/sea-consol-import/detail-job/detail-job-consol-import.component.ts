@@ -182,7 +182,7 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                         this.isDuplicate = true;
                     } else {
                         //this._toastService.error(res.message);
-                        if (res.data.errorCode = 453) {
+                        if (res.data?.errorCode === 453) {
                             this.showHBLsInvalid(res.message);
                         } else {
                             this._toastService.error(res.message);

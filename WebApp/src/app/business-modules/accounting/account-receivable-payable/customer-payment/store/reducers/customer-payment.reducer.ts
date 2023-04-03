@@ -21,6 +21,7 @@ export interface IReceiptState {
     currency: string;
     class: string; // ? REceipt Type
     exchangeRate: number;
+    paymentMethod: string;
 }
 
 
@@ -39,7 +40,8 @@ export const initialState: IReceiptState = {
     isAutoConvertPaid: true,
     currency: 'VND',
     class: AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT,
-    exchangeRate: 1
+    exchangeRate: 1,
+    paymentMethod: null
 };
 
 export const receiptManagementReducer = createReducer(
@@ -155,6 +157,9 @@ export const receiptManagementReducer = createReducer(
     })),
     on(ReceiptActions.SelectReceiptClass, (state: IReceiptState, payload: { class: string }) => ({
         ...state, class: payload.class
+    })),
+    on(ReceiptActions.SelectReceiptPaymentMethod, (state: IReceiptState, payload: { paymentMethod: string }) => ({
+        ...state, paymentMethod: payload.paymentMethod
     })),
     on(ReceiptActions.ChangeADVType, (state: IReceiptState, payload: { index: number, newType: string }) => {
         const newArrayDebit = [...state.debitList];
