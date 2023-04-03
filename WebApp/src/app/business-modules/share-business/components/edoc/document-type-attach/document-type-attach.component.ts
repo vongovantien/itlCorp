@@ -114,8 +114,10 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe((res) => {
                     if (res) {
-                        this.billingId = res.settlement.id;
-                        this.billingNo = res.settlement.settlementNo
+                        if (res?.settlement !== null && res?.settlement !== undefined) {
+                            this.billingId = res.settlement.id;
+                            this.billingNo = res.settlement.settlementNo
+                        }
                     }
                 })
         } else {

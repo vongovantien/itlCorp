@@ -278,7 +278,7 @@
 <payment-management-popup></payment-management-popup>
 <document-type-attach [typeFrom]="'Settlement'" [readonly]="readonly"></document-type-attach>
 
-<shipment-attach-file (onChange)="onChangeShipmentGroupAttachFile($event)" [readOnly]="readonly"></shipment-attach-file>
+<!-- <shipment-attach-file (onChange)="onChangeShipmentGroupAttachFile($event)" [readOnly]="readonly"></shipment-attach-file> -->
 
 <ng-container *ngIf="!readonly">
     <existing-charge-popup (onRequest)="onRequestSurcharge($event)" *ngIf="!isDirectSettlement"></existing-charge-popup>
