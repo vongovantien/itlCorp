@@ -5201,7 +5201,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var generalCombines = receiptModels.Where(x => Common.CustomData.PaymentMethodGeneral.Any(c => c.Value == x.PaymentMethod)).ToList();
                 if (generalCombines.Count > 0)
                 {
-                    var existedGeneralCombine = DataContext.Get(x => x.Arcbno == generalCombines[0].Arcbno && x.ArcbpartnerId == generalCombines[0].ArcbpartnerId).ToList();
+                    var existedGeneralCombine = DataContext.Get(x => x.Arcbno == generalCombines[0].Arcbno && x.CustomerId == generalCombines[0].CustomerId).ToList();
                     if (existedGeneralCombine != null && existedGeneralCombine.Count > 0)
                     {
                         foreach (var model in generalCombines)
@@ -5385,7 +5385,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                         AcctReceipt receipt = mapper.Map<AcctReceipt>(model);
                         //receipt.CustomerId = model.Payments[0].PartnerId;
-                        receipt.ArcbpartnerId = model.CustomerId;
 
                         HandleState hs = DataContext.Add(receipt);
                         if (hs.Success)
@@ -5468,7 +5467,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                         AcctReceipt receipt = mapper.Map<AcctReceipt>(model);
                         //receipt.CustomerId = model.Payments[0].PartnerId;
-                        receipt.ArcbpartnerId = model.CustomerId;
                         HandleState hs = DataContext.Add(receipt, false);
 
                         if (hs.Success)
