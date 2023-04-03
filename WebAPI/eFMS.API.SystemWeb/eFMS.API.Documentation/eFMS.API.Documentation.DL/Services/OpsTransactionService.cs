@@ -465,7 +465,8 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detail = GetBy(id);
             if (detail == null) return null;
-            List<string> authorizeUserIds = permissionService.GetAuthorizedIds("CL", currentUser);
+            var tranType = detail.TransactionType == "TKI" ? "TKI" : "CL";
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds(tranType, currentUser);
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             var permissionRangeDelete = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
             detail.Permission = new PermissionAllowBase
