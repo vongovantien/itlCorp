@@ -1,5 +1,5 @@
 import { CatalogueActionTypes, CatalogueActions } from "../actions/catalogue.action";
-import { PortIndex, Customer, Unit, Commodity, CountryModel, Currency, Warehouse, CommodityGroup, Bank } from "@models";
+import { PortIndex, Customer, Unit, Commodity, CountryModel, Currency, Warehouse, CommodityGroup, Bank, AddressPartner } from "@models";
 
 
 export interface ICatalogueState {
@@ -15,6 +15,7 @@ export interface ICatalogueState {
     commodityGroups: CommodityGroup[];
     currencies: Currency[];
     banks: Bank[],
+    addresses: AddressPartner[];
     isLoading: boolean;
 
 }
@@ -32,6 +33,7 @@ const initialState: ICatalogueState = {
     countries: [],
     currencies: [],
     banks: [],
+    addresses: [],
     isLoading: false
 };
 
@@ -149,6 +151,15 @@ export function catalogueReducer(state = initialState, action: CatalogueActions)
             return { ...state, isLoading: false, banks: action.payload };
         }
         case CatalogueActionTypes.GET_BANK_FAIL: {
+            return { ...state, isLoading: false, };
+        }
+        case CatalogueActionTypes.GET_ADDRESS: {
+            return { ...state, isLoading: true };
+        }
+        case CatalogueActionTypes.GET_ADDRESS_SUCCESS: {
+            return { ...state, isLoading: false, banks: action.payload };
+        }
+        case CatalogueActionTypes.GET_ADDRESS_FAIL: {
             return { ...state, isLoading: false, };
         }
         default: {

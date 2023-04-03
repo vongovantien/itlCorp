@@ -101,6 +101,21 @@ namespace eFMS.API.Catalogue.Infrastructure
             new CacheServiceBase<CatStandardCharge>(x.GetRequiredService<IConnectionMultiplexer>()
             , Enum.GetName(typeof(CacheEntity), CacheEntity.CatStandardCharge)));
 
+            services.AddSingleton<ICacheServiceBase<CatCity>>(x =>
+            new CacheServiceBase<CatCity>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatCity)));
+
+            services.AddSingleton<ICacheServiceBase<CatDistrict>>(x =>
+            new CacheServiceBase<CatDistrict>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatDistrict)));
+
+            services.AddSingleton<ICacheServiceBase<CatWard>>(x =>
+            new CacheServiceBase<CatWard>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatWard)));
+
+            services.AddSingleton<ICacheServiceBase<CatAddressPartner>>(x =>
+            new CacheServiceBase<CatAddressPartner>(x.GetRequiredService<IConnectionMultiplexer>()
+            , Enum.GetName(typeof(CacheEntity), CacheEntity.CatAddressPartner)));
             services.AddTransient<ICurrentUser, CurrentUser>();
             //services.AddTransient<ICatBranchService, CatBranchService>();
             services.AddTransient<ICatPlaceService, CatPlaceService>();
@@ -125,6 +140,11 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatPartnerEmailService, CatPartnerEmailService>();
             services.AddTransient<ICatBankService, CatBankService>();
             services.AddTransient<ICatStandardChargeService, CatStandardChargeService>();
+            services.AddTransient<ICatCityService, CatCityService>();
+            services.AddTransient<ICatAddressPartnerService, CatAddressPartnerService>();
+
+
+
 
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)

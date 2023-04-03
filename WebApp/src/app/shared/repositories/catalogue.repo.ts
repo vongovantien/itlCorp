@@ -1362,6 +1362,30 @@ export class CatalogueRepo {
         );
     }
 
+    addAddress(data:any)
+    {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatAddressPartner/Add`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+    updateAddress(data: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatAddressPartner/Update`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    deleteAddress(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatAddressPartner/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
     downloadBankExcel() {
         return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/downloadExcel`, null).pipe(
             catchError((error) => throwError(error)),

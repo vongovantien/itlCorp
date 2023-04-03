@@ -51,6 +51,10 @@ export enum CatalogueActionTypes {
     GET_BANK_SUCCESS = '[Catalogue] Get Bank Success',
     GET_BANK_FAIL = '[Catalogue] Get Bank Fail',
 
+    GET_ADDRESS = '[Catalogue] Get Address',
+    GET_ADDRESS_SUCCESS = '[Catalogue] Get Address Success',
+    GET_ADDRESS_FAIL = '[Catalogue] Get Address Fail',
+
     GET_USER = '[Catalogue] Get User',
     GET_USER_SUCCESS = '[Catalogue] Get User Success',
     GET_USER_FAIL = '[Catalogue] Get User Fail',
@@ -230,6 +234,19 @@ export class GetCatalogueBankFailAction implements Action {
     constructor(public payload: any) { }
 }
 
+export class GetCatalogueAddressAction implements Action {
+    readonly type = CatalogueActionTypes.GET_ADDRESS;
+    constructor(public payload: any = { active: true }) { }
+}
+export class GetCatalogueAddressSuccessAction implements Action {
+    readonly type = CatalogueActionTypes.GET_ADDRESS_SUCCESS;
+    constructor(public payload: any) { }
+}
+export class GetCatalogueAddressFailAction implements Action {
+    readonly type = CatalogueActionTypes.GET_ADDRESS_FAIL;
+    constructor(public payload: any) { }
+}
+
 //#endregion
 export type CatalogueActions = GetCataloguePartnerAction
     | GetCataloguePortAction
@@ -265,7 +282,7 @@ export type CatalogueActions = GetCataloguePartnerAction
     | GetCatalogueBankAction
     | GetCatalogueBankSuccessAction
     | GetCatalogueBankFailAction
-    | GetCatalogueBankFailAction
-    | GetCatalogueBankFailAction
-    | GetCatalogueBankFailAction
+    | GetCatalogueAddressAction
+    | GetCatalogueAddressSuccessAction
+    | GetCatalogueAddressFailAction
     ;
