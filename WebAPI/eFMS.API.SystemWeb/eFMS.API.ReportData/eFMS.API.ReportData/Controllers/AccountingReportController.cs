@@ -333,27 +333,34 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportDetailSettlementPayment(Guid settlementId, string lang, string action)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            //var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
-
-            //var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
-
-            //var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "");
-            //if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
-
-            //var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
-            //string previewURL = action == "Preview" ? Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile : Urls.Accounting.UploadFileEdoc + "Settlement";
-            //var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + previewURL + "/" + settlementId, accessToken);
-            //var result = response.Content.ReadAsAsync<ResultHandle>().Result;
-            var model = new ExportDetailSettleModel
+            var result = new ResultHandle();
+            if (action == "Preview")
             {
-                AccessToken = accessToken,
-                Action = action,
-                Lang = lang,
-                SettlementId = settlementId
-            };
-            await _busControl.SendAsync(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileQueue, model);
-            ResultHandle result = new ResultHandle { Status = true, Message = "Sync File Success" };
-            //HeaderResponse(file.FileName);
+                var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
+
+                var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
+
+                var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "");
+                if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+
+                var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
+                string previewURL = Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile;
+                var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + previewURL + "/" + settlementId, accessToken);
+                result = response.Content.ReadAsAsync<ResultHandle>().Result;
+                HeaderResponse(file.FileName);
+            }
+            else
+            {
+                var model = new ExportDetailSettleModel
+                {
+                    AccessToken = accessToken,
+                    Action = action,
+                    Lang = lang,
+                    SettlementId = settlementId
+                };
+                await _busControl.SendAsync(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileQueue, model);
+                result = new ResultHandle { Status = true, Message = "Sync File Success" };
+            }
             return Ok(result);
         }
 

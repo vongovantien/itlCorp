@@ -28,23 +28,18 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             try
             {
                 TimeSpan interval = TimeSpan.FromSeconds(45);
-                new LogHelper("EDocBackgroundService", "RUNNING at " + DateTime.Now);
                 await _busControl.ReceiveAsync<FileUploadAttachTemplateModel>(RabbitExchange.EFMS_FileManagement, RabbitConstants.PostAttachFileTemplateToEDocQueue, async (models) =>
                 {
-                    Console.WriteLine("==================== EDocBackgroundService ============================");
-                    new LogHelper("EDocBackgroundService", "EXCUTE at " + DateTime.Now + " " + JsonConvert.SerializeObject(models));
                     using (var scope = _services.CreateScope())
                     {
                         var scopedService = scope.ServiceProvider.GetRequiredService<IEDocService>();
                         var d = await scopedService.PostAttachFileTemplateToEDoc(models);
                     }
-                    Console.WriteLine("==================== EDocBackgroundService ============================");
 
                 }, batchSize: 3, maxMessagesInFlight: 10);
             }
             catch (Exception ex)
             {
-                new LogHelper("EDocBackgroundService", " ERROR at " + DateTime.Now + " " + ex.ToString() + " ");
                 throw;
             }
         }
