@@ -2708,11 +2708,12 @@ namespace eFMS.API.Catalogue.DL.Services
             var defaultUserLevel = useLevel.FirstOrDefault(x => x.IsDefault == true) ?? useLevel.FirstOrDefault();
             var officeUser = await officeRepository.Where(x => x.Id == defaultUserLevel.OfficeId).FirstOrDefaultAsync();
             var countryUser = await catCountryRepository.Where(x => x.Code == "VN").FirstOrDefaultAsync();
+            string newGuidId = Guid.NewGuid().ToString();
             var newModel = from user in userExisted
                            join empl in sysEmployeeRepository.Get() on user.EmployeeId equals empl.Id
                            select new CatPartner
                            {
-                               Id = Guid.NewGuid().ToString(),
+                               Id = newGuidId,
                                PartnerNameEn = empl.EmployeeNameEn,
                                ShortName = user.Username.Replace(".", " "),
                                PartnerNameVn = empl.EmployeeNameVn,
@@ -2725,12 +2726,13 @@ namespace eFMS.API.Catalogue.DL.Services
                                AddressEn = officeUser?.AddressEn,
                                AddressShippingEn = officeUser?.AddressEn,
                                AddressVn = officeUser?.AddressVn,
-                               AddressShippingVn = officeUser?.AddressEn,
+                               AddressShippingVn = officeUser?.AddressVn,
                                OfficeId = defaultUserLevel?.OfficeId,
                                DepartmentId = defaultUserLevel?.DepartmentId,
                                GroupId = defaultUserLevel?.GroupId,
                                CompanyId = defaultUserLevel?.CompanyId,
                                PartnerGroup = "STAFF;PERSONAL",
+                               ParentId = newGuidId,
                                Active = true,
                                UserCreated = currentUser.UserID,
                                UserModified = currentUser.UserID,
