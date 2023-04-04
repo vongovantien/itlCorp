@@ -9,7 +9,7 @@ using System;
 
 namespace eFMS.API.Accounting.Service.Contexts
 {
-    public class eFMSDataContext: eFMSDataContextDefault
+    public class eFMSDataContext : eFMSDataContextDefault
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -26,6 +26,7 @@ namespace eFMS.API.Accounting.Service.Contexts
         }
         public override int SaveChanges()
         {
+            int result = -1;
             try
             {
                 var entities = ChangeTracker.Entries();
@@ -33,25 +34,18 @@ namespace eFMS.API.Accounting.Service.Contexts
                 var modifiedList = ChangeTrackerHelper.GetChangModifield(entities);
                 var addedList = ChangeTrackerHelper.GetAdded(entities);
                 var deletedList = ChangeTrackerHelper.GetDeleted(entities);
-                var result = base.SaveChanges();
-
-    
-                if (result > 0)
+                if (addedList != null)
                 {
-                    if (addedList != null)
-                    {
-                        ChangeTrackerHelper.InsertToMongoDb(addedList);
-                    }
-                    if (modifiedList != null)
-                    {
-                        ChangeTrackerHelper.InsertToMongoDb(modifiedList);
-                    }
-                    if (deletedList != null)
-                    {
-                        ChangeTrackerHelper.InsertToMongoDb(deletedList);
-                    }
+                    ChangeTrackerHelper.InsertToMongoDb(addedList);
                 }
-                return result;
+                if (modifiedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(modifiedList);
+                }
+                if (deletedList != null)
+                {
+                    ChangeTrackerHelper.InsertToMongoDb(deletedList);
+                }
             }
             catch (Exception ex)
             {
@@ -69,7 +63,11 @@ namespace eFMS.API.Accounting.Service.Contexts
                 new LogHelper("SaveChangesError", JsonConvert.SerializeObject(log));
                 throw;
             }
-            
+            finally
+            {
+                result = base.SaveChanges();
+            }
+            return result;
         }
     }
 }

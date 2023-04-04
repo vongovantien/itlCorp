@@ -14,7 +14,7 @@
                 </div>
             </div>
             <div class="col-lg-7">
-                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted  && !partnerId.valid }">
+                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted  && !contractList.length && isRequireAgreement}">
                     <label required>Partner Name</label>
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
                         [currentActiveItemId]="{ field: 'id', value: partnerId.value}"

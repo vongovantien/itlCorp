@@ -12,5 +12,12 @@ namespace eFMS.API.ReportData.Models
         public string ChargeNameVn { get; set; }
         public string Type { get; set; }
         public bool? Active { get; set; }
+        public string ServiceTypeId { get; set; }
+        public string OfficesName { get; set; }
+        public string ChargeGroupName { get; set; }
+        public string BuyingCode { get; set; }
+        public string BuyingName { get; set; }
+        public string SellingCode { get; set; }
+        public string SellingName { get; set; }
     }
 }

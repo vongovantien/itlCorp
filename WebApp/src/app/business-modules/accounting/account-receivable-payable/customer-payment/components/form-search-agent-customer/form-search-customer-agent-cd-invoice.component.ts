@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { ChargeConstants, JobConstants } from '@constants';
+import { AccountingConstants, ChargeConstants, JobConstants } from '@constants';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { AppForm } from '@app';
@@ -8,16 +8,17 @@ import { Partner, Office } from '@models';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 
-import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState } from '../../store/reducers';
+import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState, ReceiptClassState, ReceiptPaymentMethodState, ReceiptAgreementState } from '../../store/reducers';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { IReceiptState } from '../../store/reducers/customer-payment.reducer';
 
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { takeUntil, switchMap, tap, filter, startWith, map } from 'rxjs/operators';
 import { SelectPartnerReceipt } from '../../store/actions';
 import { getCurrentUserState } from '@store';
 import { CommonEnum } from '@enums';
 import { environment } from 'src/environments/environment';
+import { FormValidators } from '@validators';
 
 @Component({
     selector: 'form-search-customer-agent-cd-invoice',
@@ -57,6 +58,8 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     customerFromReceipt: string;
     partnerTypeState: string;
     offices: Office[];
+    isRequireAgreement: boolean = true;
+    contractList: any[] = [];
 
     selectedDefaultOffice = { id: 'All', shortName: "All" };
     currentUser;
@@ -72,15 +75,15 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     ) { super(); }
 
     ngOnInit(): void {
-        if (environment.production) {
-            this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER]);
-        } else {
-            this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
-        }
+        // if (environment.production) {
+        //     this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER]);
+        // } else {
+        //     this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
+        // }
+        // this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
 
         this.initSubmitClickSubscription(() => this.searchData());
         this.initForm();
-
         this._store.select(getCurrentUserState)
             .pipe(
                 filter(c => !!c.userName),
@@ -96,8 +99,12 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
             )
             .subscribe((offices: Office[]) => {
                 this.offices = offices;
-            })
+            });
 
+        this.customers = this._catalogueRepo.getPartnerGroupsWithCriteria({
+            partnerGroups: [CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]
+            , partnerType: this.partnerTypeState.toUpperCase() === 'CUSTOMER' ? 'Customer' : 'Agent'
+        });
     }
 
     initForm() {
@@ -128,6 +135,16 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                     if (!!partnerId) {
                         this.partnerId.setValue(partnerId);
                         this.customerFromReceipt = partnerId;
+                    }
+                }
+            )
+        this._store.select(ReceiptAgreementState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (contract) => {
+                    this.contractList = [];
+                    if (!!contract) {
+                        this.contractList.push(contract);
                     }
                 }
             )
@@ -163,10 +180,12 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     }
 
     onSelectDataFormInfo(data: any) {
+        this.isRequireAgreementAgent();
         this._catalogueRepo.getAgreement(
             { partnerId: data.id, status: true })
             .subscribe(
                 (d: any[]) => {
+                    this.contractList = d;
                     if (!!d && !!d.length) {
                         this.partnerId.setValue(data.id);
 
@@ -183,12 +202,44 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                         this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerType.toUpperCase() }));
 
                     } else {
-                        this.partnerId.setValue(null);
-                        this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
+                        this.partnerId.setValue(data.id);
+                        if (this.isRequireAgreement) {
+                            this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
+                        } else {
+                            this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerType.toUpperCase() }));
+                        }
                         return false;
                     }
                 }
             );
+    }
+
+    isRequireAgreementAgent() {
+        if(this.partnerTypeState.toUpperCase() === 'CUSTOMER'){
+            this.isRequireAgreement = true;
+            return;
+        }
+        let result: boolean = false;
+        combineLatest([
+            this._store.select(ReceiptClassState),
+            this._store.select(ReceiptPaymentMethodState)
+        ])
+        .pipe(
+            map(([type, method]) => ({ type, method })),
+        ).subscribe(
+            (res: any) => {
+               console.log('class-method', res)
+               if (res.type && (res.type === AccountingConstants.RECEIPT_CLASS.ADVANCE || res.type === AccountingConstants.RECEIPT_CLASS.COLLECT_OBH)){
+                    result = true;
+               }
+                if (res.type === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT) {
+                    if (res.method.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE) || res.method.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL)) {
+                        result = true;
+                    }
+                }
+            }
+        );
+        this.isRequireAgreement = result;
     }
 
     onSelectMultipleValue(event: any, type: string) {
@@ -218,7 +269,8 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
 
     searchData() {
         this.isSubmitted = true;
-        if (this.formSearch.valid) {
+        this.isRequireAgreementAgent();
+        if (this.formSearch.valid && (this.contractList.length || !this.isRequireAgreement)) {
             const body: IAcctCustomerDebitCredit = {
                 partnerId: this.partnerId.value,
                 searchType: this.typeSearch.value,

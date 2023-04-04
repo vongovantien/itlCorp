@@ -90,9 +90,10 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
             this.invaliDataAlert.show();
         } else {
             const data = this.data.filter(x => x.isValid);
-            const sellObhs = data.filter(x => ['selling', 'sell', 'debit', 'obh'].includes((x.type || '').toLowerCase()));
+            const sells = data.filter(x => ['selling', 'sell', 'debit'].includes((x.type || '').toLowerCase()));
+            const obhs = data.filter(x => ['obh'].includes((x.type || '').toLowerCase()));
 
-            const result = sellObhs.reduce((acc, curr) => {
+            const sellGrp = sells.reduce((acc, curr) => {
                 const key = `${curr.paymentObjectId}_${curr.hblid}`; // * guid_guiid
                 if (!acc[key]) {
                     acc[key] = [];
@@ -101,19 +102,39 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
                 return acc;
             }, {} as { [key: string]: { hblid: string, paymentObjectId: string }[] });
 
-            const finalResult = Object.entries(result).map(([key]) => {
+            const obhGrp = obhs.reduce((acc, curr) => {
+                const key = `${curr.paymentObjectId}_${curr.hblid}`; // * guid_guiid
+                if (!acc[key]) {
+                    acc[key] = [];
+                }
+                acc[key].push(curr);
+                return acc;
+            }, {} as { [key: string]: { hblid: string, paymentObjectId: string }[] });
+
+            const sellResult = Object.entries(sellGrp).map(([key]) => {
                 const [paymentObjectId, hblid] = key.split("_");
                 return {
                     paymentObjectId,
                     hblid,
+                    type: 5
                 };
             });
 
+            const obhResult = Object.entries(obhGrp).map(([key]) => {
+                const [paymentObjectId, hblid] = key.split("_");
+                return {
+                    paymentObjectId,
+                    hblid,
+                    type: 9
+                };
+            });
+            const finalResult = [...sellResult, ...obhResult];
             if (!!finalResult.length) {
                 const criteriaCheckpointsObs = finalResult.map(x => ({
                     partnerId: x.paymentObjectId,
                     hblId: x.hblid,
                     transactionType: 'CL',
+                    type: x.type || 5
                 })).map(y => this._documentRepo.validateCheckPointContractPartner(y));
 
                 forkJoin(criteriaCheckpointsObs)

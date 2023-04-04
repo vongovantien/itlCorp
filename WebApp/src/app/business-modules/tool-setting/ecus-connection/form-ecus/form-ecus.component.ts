@@ -42,7 +42,6 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
     title: string = 'Add new Ecus';
 
     isAllowUpdate: boolean = true;
-
     constructor(
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
@@ -143,5 +142,17 @@ export class EcusConnectionFormPopupComponent extends PopupBase implements OnIni
         }
 
     }
-
+    onCheckConnect() {
+        const valueForm = this.formGroup.getRawValue();
+        const ecus: EcusConnection = new EcusConnection(valueForm);
+        this._operationRepo.checkConnectServer(ecus.serverName, ecus.dbname, ecus.dbusername, ecus.dbpassword).subscribe(
+            (res: CommonInterface.IResult) => {
+                if (res.status) {
+                    this._toast.success("Connect Successful!");
+                }
+                else{
+                    this._toast.error(res.message);
+                }
+            });
+    }
 }

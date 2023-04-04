@@ -1,6 +1,6 @@
 import { Action, createReducer, on } from '@ngrx/store';
-import * as Types from '../actions/';
 import { ISearchSettlePayment } from '../../form-search-settlement/form-search-settlement.component';
+import * as Types from '../actions';
 
 
 export interface SettlePaymentListState {

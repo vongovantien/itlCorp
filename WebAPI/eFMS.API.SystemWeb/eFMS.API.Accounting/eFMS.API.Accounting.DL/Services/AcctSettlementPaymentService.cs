@@ -354,7 +354,8 @@ namespace eFMS.API.Accounting.DL.Services
                     refNo = criteria.ReferenceNos.Where(x => regex.IsMatch(x)).ToList();
 
                     settlementPayments = settlementPayments.Where(x => refNo.Contains(x.SettlementNo));
-                } else
+                }
+                else
                 {
                     refNo = (from set in settlementPayments
                              join sur in surcharge on set.SettlementNo equals sur.SettlementCode into grpSur
@@ -395,7 +396,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                 }
-                
+
             }
 
             return settlementPayments;
@@ -638,11 +639,13 @@ namespace eFMS.API.Accounting.DL.Services
             settlementMap.IsApproved = CheckUserIsApproved(currentUser, settlement, settlementApprove);
             settlementMap.IsShowBtnDeny = CheckIsShowBtnDeny(currentUser, settlement, settlementApprove);
 
-            if(!string.IsNullOrEmpty(settlement.Payee))
+            if (!string.IsNullOrEmpty(settlement.Payee))
             {
                 settlementMap.PayeeName = catPartnerRepo.Get(x => x.Id == settlement.Payee)?.FirstOrDefault().ShortName;
             }
 
+            var totalChargeSM = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo).Count();
+            settlementMap.TotalCharge = totalChargeSM;
             return settlementMap;
         }
 
@@ -5745,7 +5748,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         }
 
-        public List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null)
+        public List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null, int page = -1, int size = 30)
         {
             var parameters = new[]{
                 new SqlParameter(){ ParameterName = "@SettlementNo", Value = settlementNo },
@@ -5761,6 +5764,10 @@ namespace eFMS.API.Accounting.DL.Services
             if (clearanceNo != null)
             {
                 parameters = parameters.Concat(new[] { new SqlParameter("@ClearanceNo", clearanceNo) }).ToArray();
+            }
+            if(page > 0)
+            {
+                parameters = parameters.Concat(new[] { new SqlParameter("@Page", page), new SqlParameter("@Size", size ) }).ToArray();
             }
             List<sp_GetSurchargeDetailSettlement> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSettlement>(parameters);
             var data = mapper.Map<List<ShipmentChargeSettlement>>(listSurcharges);
@@ -6353,6 +6360,25 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return invalidShipment;
+        }
+
+        public ResponsePagingModel<ShipmentChargeSettlement> GetSurchargePagingSettlementPayment(string settlementNo, int page, int size)
+        {
+            var data = GetSurchargeDetailSettlement(settlementNo, null, null, null, page, size);
+
+            if (page == 0)
+            {
+                page = 1;
+                size = size;
+            }
+            var result = mapper.ProjectTo<ShipmentChargeSettlement>(data.AsQueryable());
+
+            return new ResponsePagingModel<ShipmentChargeSettlement>
+            {
+                Data = result,
+                Page = page,
+                Size = size,
+            };
         }
     }
 }

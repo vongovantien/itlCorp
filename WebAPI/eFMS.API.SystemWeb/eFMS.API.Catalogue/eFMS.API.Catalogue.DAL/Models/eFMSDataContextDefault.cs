@@ -232,7 +232,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
-                entity.Property(e => e.Offices).HasMaxLength(250);
+                entity.Property(e => e.Offices).HasMaxLength(500);
 
                 entity.Property(e => e.ProductDept)
                     .HasMaxLength(50)
@@ -916,6 +916,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(3)
                     .IsUnicode(false);
 
+                entity.Property(e => e.DateId)
+                    .HasColumnName("DateID")
+                    .HasColumnType("datetime");
+
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
@@ -935,6 +939,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
+
+                entity.Property(e => e.IdentityNo)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
@@ -980,6 +988,10 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.PaymentBeneficiary).HasMaxLength(4000);
 
                 entity.Property(e => e.PercentCredit).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.PlaceId)
+                    .HasColumnName("PlaceID")
+                    .HasMaxLength(200);
 
                 entity.Property(e => e.ProvinceId).HasColumnName("ProvinceID");
 

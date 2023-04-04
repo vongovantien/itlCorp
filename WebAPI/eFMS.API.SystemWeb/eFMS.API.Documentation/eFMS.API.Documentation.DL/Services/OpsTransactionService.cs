@@ -235,8 +235,13 @@ namespace eFMS.API.Documentation.DL.Services
                             var opsInfo = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                             // Insert Replicate Data
                             entityReplicate.JobNo += opsInfo.JobNo;
-                            databaseUpdateService.InsertDataToDB(entityReplicate);
+                            addResult = databaseUpdateService.InsertDataToDB(entityReplicate);
                             result = new HandleState(addResult.Status, (object)addResult.Message);
+                            if (model.CsMawbcontainers?.Count > 0 && result.Success)
+                            {
+                                var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, entityReplicate.Id);
+                                model.CsMawbcontainers.ForEach(x => x.Id = Guid.Empty);
+                            }
                         }
                     }
                     else
@@ -251,6 +256,10 @@ namespace eFMS.API.Documentation.DL.Services
                         OpsTransaction entity = mapper.Map<OpsTransaction>(opsInfo);
                         result = new HandleState(addResult.Status, (object)addResult.Message);
                     }
+                    if (model.CsMawbcontainers?.Count > 0 && result.Success)
+                    {
+                        var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -258,12 +267,6 @@ namespace eFMS.API.Documentation.DL.Services
                     result = new HandleState(ex.Message);
                 }
             }
-            if (model.CsMawbcontainers?.Count > 0 && result.Success)
-            {
-                var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
-            }
-
-
             return result;
         }
 
@@ -616,12 +619,16 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return false;
             }
-            var query = surchargeRepository.Get(x => x.Hblid == detail.Hblid && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null
+            var query = surchargeRepository.Get(x => x.Hblid == detail.Hblid && (!string.IsNullOrEmpty(x.CreditNo)
+                        || !string.IsNullOrEmpty(x.DebitNo)
+                        || !string.IsNullOrEmpty(x.Soano)
+                        || !string.IsNullOrEmpty(x.PaymentRefNo)
                         || !string.IsNullOrEmpty(x.AdvanceNo)
                         || !string.IsNullOrEmpty(x.VoucherId)
                         || !string.IsNullOrEmpty(x.PaySoano)
                         || !string.IsNullOrEmpty(x.SettlementCode)
                         || !string.IsNullOrEmpty(x.SyncedFrom)
+                        || !string.IsNullOrEmpty(x.PaySyncedFrom)
                         || !string.IsNullOrEmpty(x.LinkChargeId))
                         );
             if (query.Any() || accAdvanceRequestRepository.Any(x => x.JobId == detail.JobNo))
@@ -1454,16 +1461,29 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         surchargeRepository.Delete(x => x.Id == item.Id, false);
                     }
-                    //Xóa job OPS xóa luôn tờ khai rep
-                    var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo && x.Source == "Replicate");
-                    if (clearances != null)
+                    //Xóa job OPS rep xóa luôn tờ khai rep
+                    if(job.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE)
                     {
-                        foreach (var item in clearances)
+                        var clearancesRep = customDeclarationRepository.Get(x => x.JobNo == job.JobNo && x.Source == "Replicate");
+                        if (clearancesRep != null)
                         {
-                            //item.JobNo = null;
-                            //item.ConvertTime = null;
-                            //customDeclarationRepository.Update(item, x => x.Id == item.Id, false);
-                            customDeclarationRepository.Delete(x => x.Id == item.Id, false);
+                            foreach (var item in clearancesRep)
+                            {
+                                customDeclarationRepository.Delete(x => x.Id == item.Id, false);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var clearances = customDeclarationRepository.Get(x => x.JobNo == job.JobNo);
+                        if (clearances != null)
+                        {
+                            foreach (var item in clearances)
+                            {
+                                item.JobNo = null;
+                                item.ConvertTime = null;
+                                customDeclarationRepository.Update(item, x => x.Id == item.Id, false);
+                            }
                         }
                     }
                 }
@@ -2748,7 +2768,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (chargeBuy.CurrencyId == "VND")
             {
-                var per = (chargeBuy.ServiceDate.Value < datetimeCR ? (double)chargeBuy.Total  : (double)chargeBuy.UnitPrice) / (double)0.76;
+                var per = (chargeBuy.ServiceDate.Value < datetimeCR ? (double)chargeBuy.Total : (double)chargeBuy.UnitPrice) / (double)0.76;
                 surcharge.UnitPrice = NumberHelper.RoundNumber((decimal)per / 10000, 0) * 10000;
                 surcharge.NetAmount = surcharge.UnitPrice * surcharge.Quantity;
                 surcharge.Total = surcharge.NetAmount + ((surcharge.NetAmount * surcharge.Vatrate) / 100) ?? 0;

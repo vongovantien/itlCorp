@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Report.DL.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;

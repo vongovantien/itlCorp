@@ -71,10 +71,10 @@ namespace eFMS.API.SystemFileManagement.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("DeleteEDoc/{edocId}")]
-        public async Task<IActionResult> DeleteEDoc(Guid edocId)
+        [HttpDelete("DeleteEDoc/{edocId}/{jobId}")]
+        public async Task<IActionResult> DeleteEDoc(Guid edocId, Guid jobId)
         {
-            HandleState hs = await _edocService.DeleteEdoc(edocId);
+            HandleState hs = await _edocService.DeleteEdoc(edocId,jobId);
             if (hs.Success)
                 return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
             return BadRequest(hs);
@@ -152,15 +152,6 @@ namespace eFMS.API.SystemFileManagement.Controllers
             return BadRequest(new ResultHandle { Message = string.IsNullOrEmpty(hs.Message.ToString()) ? "Upload File fail" : hs.Message.ToString(), Status = false, Data = models });
         }
 
-        //[HttpGet("OpenEDocFile/{moduleName}/{folder}/{objId}/{aliasName}")]
-        //public async Task<IActionResult> OpenEdocFile(string moduleName, string folder, Guid objId, string aliasName)
-        //{
-        //    HandleState hs = await _edocService.OpenEdocFile(moduleName, folder, objId, aliasName);
-        //    if (hs.Success)
-        //        return Ok(hs.Message);
-        //    return BadRequest(hs);
-        //}
-
         [HttpGet("OpenFile/{Id}")]
         public async Task<IActionResult> OpenFileAliasName(Guid Id)
         {
@@ -198,15 +189,23 @@ namespace eFMS.API.SystemFileManagement.Controllers
             return Ok(result);
         }
 
-        [HttpPut("UploadEdoc")]
-        //[Authorize]
-        public async Task<IActionResult> UploadEdocBankInfo([FromForm] EDocUploadModel edocUploadModel, List<IFormFile> files, string type)
+        [HttpPut("UpdateEdocByAcc")]
+        public async Task<IActionResult> UpdateEdocByAcc(EdocAccUpdateModel model)
         {
-            HandleState hs = await _edocService.PostEDocAsync(edocUploadModel, files, type);
-            if (hs.Success)
+            var hs = await _edocService.UpdateEdocByAcc(model);
+            if (!hs.Success)
             {
-                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
+                return BadRequest(hs);
             }
+            return Ok(hs);
+        }
+
+        [HttpDelete("DeleteEDocAcc")]
+        public async Task<IActionResult> DeleteEDocAcc(string billingNo)
+        {
+            HandleState hs = await _edocService.DeleteEdocAcc(billingNo);
+            if (hs.Success)
+                return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
             return BadRequest(hs);
         }
     }

@@ -21,7 +21,7 @@ import { getCurrentUserState } from '@store';
 import { Observable } from 'rxjs';
 import { catchError, finalize, pluck, switchMap, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { ISettlementPaymentState, LoadDetailSettlePayment, LoadDetailSettlePaymentSuccess } from '../../settlement-payment/components/store';
+import { ISettlementPaymentState, LoadDetailSettlePayment, LoadDetailSettlePaymentSuccess, getListEdocState } from '../../settlement-payment/components/store';
 
 @Component({
     selector: 'app-approve-settlement',
@@ -50,6 +50,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     attachFiles: SysImage[] = [];
     folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
+    totalEDoc: number = 0;
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -76,6 +77,13 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 }
             });
         this.userLogged$ = this._store.select(getCurrentUserState);
+        this._store.select(getListEdocState).pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    this.totalEDoc = res.length;
+                }
+            );
+
     }
 
     onChangeCurrency(currency: string) {

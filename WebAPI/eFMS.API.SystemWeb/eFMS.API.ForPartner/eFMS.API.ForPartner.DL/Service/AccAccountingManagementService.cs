@@ -2000,9 +2000,9 @@ namespace eFMS.API.ForPartner.DL.Service
                     var _id = Guid.Empty;
                     Guid.TryParse(id, out _id);
                     var receiptSync = receiptSyncRepository.Get(x => x.Id == _id).FirstOrDefault();
-                    if (receiptSync == null) return new HandleState((object)"Không tìm thấy phiếu thu");
+                    if (receiptSync == null) return new HandleState();
                     var receipt = receiptRepository.Get(x => x.Id == receiptSync.ReceiptId).FirstOrDefault();
-                    if (receipt == null) return new HandleState((object)"Không tìm thấy phiếu thu");
+                    if (receipt == null) return new HandleState();
 
                     receiptSync.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                     receiptSync.UserModified = currentUser.UserID;

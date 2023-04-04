@@ -177,7 +177,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                     } else {
                         //this._toastService.error(res.message);
 
-                        if (res.data.errorCode = 453) {
+                        if (res.data?.errorCode === 453) {
                             this.showHBLsInvalid(res.message);
                         } else {
                             this._toastService.error(res.message);
@@ -203,7 +203,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.getDetailShipment(this.jobId);
                         // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     } else {
-                        if (res.data.errorCode = 452) {
+                        if (res.data?.errorCode === 452) {
                             this.showHBLsInvalid(res.message);
                         } else {
                             this._toastService.error(res.message);
@@ -330,7 +330,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         const criteria: DocumentationInterface.ICheckPointCriteria = {
                             data: partnerIds,
                             transactionType: 'DOC',
-                            type: 5,
                             settlementCode: null,
                         };
                         return this._documentRepo.validateCheckPointMultiplePartner(criteria)

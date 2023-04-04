@@ -136,7 +136,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         saleman.OfficeNameAbbr = saleman.OfficeNameAbbr.Remove(saleman.OfficeNameAbbr.Length - 2);
                     }
                 }
-                saleman.SaleServiceName = GetContractServicesName(saleman.SaleService);
+                saleman.SaleServiceName = saleman.SaleService.Replace(";", "; ");
                 saleman.Username = item.user.Username;
                 saleman.CreatorCompanyId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.CompanyId == currentUser.CompanyID).Select(t => t.CompanyId).FirstOrDefault();
                 saleman.CreatorOfficeId = userlevelRepository.Get(x => x.UserId == saleman.UserCreated && x.OfficeId == currentUser.OfficeID).Select(t => t.OfficeId).FirstOrDefault();
@@ -263,7 +263,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
                     model.ContractService = entity.SaleService;
 
-                    model.ContractService = GetContractServicesName(model.ContractService);
+                    model.ContractService = Common.CommonData.GetServicesName(model.ContractService);
 
                     model.ContractType = entity.ContractType;
                     model.ContractNo = entity.ContractNo;
@@ -272,7 +272,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     model.UserCreated = entity.UserCreated;
                     model.OfficeIdContract = entity.OfficeId;
                     model.ContractShipmentType = contract.ShipmentType;
-                    SendMailActiveSuccess(model, string.Empty);
+                    SendMailActiveSuccess(model, string.Empty, false);
                     ClearCache();
                     Get();
                 }
@@ -372,59 +372,59 @@ namespace eFMS.API.Catalogue.DL.Services
         }
 
 
-        private string GetContractServicesName(string ContractService)
-        {
-            string ContractServicesName = string.Empty;
-            var ContractServiceArr = ContractService.Split(";").ToArray();
-            if (ContractServiceArr.Any())
-            {
-                foreach (var item in ContractServiceArr)
-                {
-                    switch (item)
-                    {
-                        case "AE":
-                            ContractServicesName += "Air Export; ";
-                            break;
-                        case "AI":
-                            ContractServicesName += "Air Import; ";
-                            break;
-                        case "SCE":
-                            ContractServicesName += "Sea Consol Export; ";
-                            break;
-                        case "SCI":
-                            ContractServicesName += "Sea Consol Import; ";
-                            break;
-                        case "SFE":
-                            ContractServicesName += "Sea FCL Export; ";
-                            break;
-                        case "SLE":
-                            ContractServicesName += "Sea LCL Export; ";
-                            break;
-                        case "SLI":
-                            ContractServicesName += "Sea LCL Import; ";
-                            break;
-                        case "CL":
-                            ContractServicesName += "Custom Logistic; ";
-                            break;
-                        case "IT":
-                            ContractServicesName += "Trucking; ";
-                            break;
-                        case "SFI":
-                            ContractServicesName += "Sea FCL Import; ";
-                            break;
-                        default:
-                            ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
-                            break;
-                    }
-                }
+        //private string GetContractServicesName(string ContractService)
+        //{
+        //    string ContractServicesName = string.Empty;
+        //    var ContractServiceArr = ContractService.Split(";").ToArray();
+        //    if (ContractServiceArr.Any())
+        //    {
+        //        foreach (var item in ContractServiceArr)
+        //        {
+        //            switch (item)
+        //            {
+        //                case "AE":
+        //                    ContractServicesName += "Air Export; ";
+        //                    break;
+        //                case "AI":
+        //                    ContractServicesName += "Air Import; ";
+        //                    break;
+        //                case "SCE":
+        //                    ContractServicesName += "Sea Consol Export; ";
+        //                    break;
+        //                case "SCI":
+        //                    ContractServicesName += "Sea Consol Import; ";
+        //                    break;
+        //                case "SFE":
+        //                    ContractServicesName += "Sea FCL Export; ";
+        //                    break;
+        //                case "SLE":
+        //                    ContractServicesName += "Sea LCL Export; ";
+        //                    break;
+        //                case "SLI":
+        //                    ContractServicesName += "Sea LCL Import; ";
+        //                    break;
+        //                case "CL":
+        //                    ContractServicesName += "Custom Logistic; ";
+        //                    break;
+        //                case "IT":
+        //                    ContractServicesName += "Trucking; ";
+        //                    break;
+        //                case "SFI":
+        //                    ContractServicesName += "Sea FCL Import; ";
+        //                    break;
+        //                default:
+        //                    ContractServicesName = "Air Export; Air Import; Sea Consol Export; Sea Consol Import; Sea FCL Export; Sea LCL Export; Sea LCL Import; Custom Logistic; Trucking  ";
+        //                    break;
+        //            }
+        //        }
 
-            }
-            if (!string.IsNullOrEmpty(ContractServicesName))
-            {
-                ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
-            }
-            return ContractServicesName;
-        }
+        //    }
+        //    if (!string.IsNullOrEmpty(ContractServicesName))
+        //    {
+        //        ContractServicesName = ContractServicesName.Remove(ContractServicesName.Length - 2);
+        //    }
+        //    return ContractServicesName;
+        //}
 
         public IQueryable<CatContract> CheckDuplicatedContract(CatContractModel modelUpdate, bool isCurrentContract)
         {
@@ -476,6 +476,18 @@ namespace eFMS.API.Catalogue.DL.Services
 
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
+            if(entity.Arconfirmed == true && entity.Active == false)
+            {
+                if((entity.TrialCreditLimited != currentContract.TrialCreditLimited) || (entity.TrialCreditDays != currentContract.TrialCreditDays) ||
+                    (entity.PaymentTerm != currentContract.PaymentTerm) || (entity.PaymentTermObh != currentContract.PaymentTermObh) || 
+                    (entity.CreditLimit != currentContract.CreditLimit) || (entity.TrialEffectDate != currentContract.TrialEffectDate) ||
+                    (entity.TrialExpiredDate != currentContract.TrialExpiredDate) || (entity.CreditLimitRate != currentContract.CreditLimitRate) ||
+                    (entity.BaseOn != currentContract.BaseOn))
+                {
+                    entity.Arconfirmed = false;
+                }    
+
+            }
             if (entity.ExpiredDate != null)
             {
                 if (entity.Active == true)
@@ -515,7 +527,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     var ObjPartner = catPartnerRepository.Get(x => x.Id == entity.PartnerId).FirstOrDefault();
                     CatPartnerModel modelPartner = mapper.Map<CatPartnerModel>(ObjPartner);
                     modelPartner.ContractService = entity.SaleService;
-                    modelPartner.ContractService = GetContractServicesName(modelPartner.ContractService);
+                    modelPartner.ContractService = Common.CommonData.GetServicesName(modelPartner.ContractService);
                     modelPartner.ContractType = entity.ContractType;
                     modelPartner.ContractNo = entity.ContractNo;
                     modelPartner.SalesmanId = entity.SaleManId;
@@ -524,7 +536,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.ContractShipmentType = entity.ShipmentType;
                     ClearCache();
                     Get();
-                    SendMailActiveSuccess(modelPartner, string.Empty);
+                    SendMailActiveSuccess(modelPartner, string.Empty, entity.Arconfirmed);
                 }
             }
             return hs;
@@ -560,7 +572,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     CatPartnerModel modelPartner = mapper.Map<CatPartnerModel>(ObjPartner);
                     modelPartner.ContractService = entity.SaleService;
-                    modelPartner.ContractService = GetContractServicesName(modelPartner.ContractService);
+                    modelPartner.ContractService = Common.CommonData.GetServicesName(modelPartner.ContractService);
                     modelPartner.ContractType = contract.ContractType;
                     modelPartner.ContractNo = contract.ContractNo;
                     modelPartner.SalesmanId = contract.SaleManId;
@@ -570,7 +582,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.ContractShipmentType = contract.ShipmentType;
                     ClearCache();
                     Get();
-                    SendMailActiveSuccess(modelPartner, string.Empty);
+                    SendMailActiveSuccess(modelPartner, string.Empty, false);
                 }
 
             }
@@ -768,13 +780,13 @@ namespace eFMS.API.Catalogue.DL.Services
                     ObjPartner.Active = true;
                     catPartnerRepository.Update(ObjPartner, x => x.Id == partnerId);
                     CatPartnerModel model = mapper.Map<CatPartnerModel>(ObjPartner);
-                    model.ContractService = GetContractServicesName(objUpdate.SaleService);
+                    model.ContractService = Common.CommonData.GetServicesName(objUpdate.SaleService);
                     model.ContractType = objUpdate.ContractType;
                     model.SalesmanId = objUpdate.SaleManId;
                     model.UserCreatedContract = objUpdate.UserCreated;
                     model.OfficeIdContract = objUpdate.OfficeId;
                     model.ContractShipmentType = objUpdate.ShipmentType;
-                    SendMailActiveSuccess(model, "active");
+                    SendMailActiveSuccess(model, "active", false);
                 }
             }
             return isUpdateDone;
@@ -1360,7 +1372,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return EmailModel;
         }
 
-        private void SendMailActiveSuccess(CatPartnerModel partner, string type)
+        private void SendMailActiveSuccess(CatPartnerModel partner, string type, bool? contractActive)
         {
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreatedContract).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoCreator = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
@@ -1511,7 +1523,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 // Body
                 body = new StringBuilder(emailTemplate.Body);
                 urlToSend = UrlClone.Replace("Catalogue", "");
-                body.Replace("{{dear}}", (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID) ? "Accountant Team" : "AR Team");
+                body.Replace("{{dear}}", (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID ||
+                    ((partner.ContractType == DataEnums.CONTRACT_TRIAL || partner.ContractType == DataEnums.CONTRACT_OFFICIAL) && contractActive == true)) ? "Accountant Team" : "AR Team");
                 body.Replace("{{title}}", "Customer");
                 body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
                 body.Replace("{{accountNo}}", partner.AccountNo);
@@ -1524,7 +1537,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 body.Replace("{{address}}", address);
                 body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
-                if (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID)
+                if (partner.ContractType == DataEnums.CONTRACT_CASH || partner.ContractType == DataEnums.CONTRACT_GUARANTEE || partner.ContractType == DataEnums.CONTRACT_PREPAID ||
+                    ((partner.ContractType == DataEnums.CONTRACT_TRIAL || partner.ContractType == DataEnums.CONTRACT_OFFICIAL) && contractActive == true))
                 {
                     lstTo = listEmailViewModel.ListAccountant;
                     if (listEmailViewModel.ListCCAccountant != null)
@@ -1575,7 +1589,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeIdUserCreated = sysUserRepository.Get(x => x.Id == contract.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
             var userCreatedObj = sysEmployeeRepository.Get(e => e.Id == employeeIdUserCreated)?.FirstOrDefault();
             string urlToSend = string.Empty;
-            string _saleService = GetContractServicesName(contract.SaleService);
+            string _saleService = Common.CommonData.GetServicesName(contract.SaleService);
             contract.DatetimeModified = DateTime.Now;
             DataContext.Update(contract, x => x.Id.ToString() == contractId);
 
@@ -1705,7 +1719,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             string FullNameCreatetor = objInfoCreator?.EmployeeNameVn;
             string EnNameCreatetor = objInfoCreator?.EmployeeNameEn;
-            saleService = GetContractServicesName(contract.SaleService);
+            saleService = Common.CommonData.GetServicesName(contract.SaleService);
             contract.Arconfirmed = true;
             contract.DatetimeModified = DateTime.Now;
             var hs = DataContext.Update(contract, x => x.Id == new Guid(contractId), false);

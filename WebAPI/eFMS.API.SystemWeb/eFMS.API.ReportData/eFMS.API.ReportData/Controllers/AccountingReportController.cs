@@ -581,6 +581,11 @@ namespace eFMS.API.ReportData.Controllers
             return fileContent;
         }
 
+        /// <summary>
+        /// Export Statement Of Receivable - Agent
+        /// </summary>
+        /// <param name="paymentCriteria"></param>
+        /// <returns></returns>
         [Route("ExportAccountingAgencyPayment")]
         [HttpPost]
         [Authorize]
@@ -590,10 +595,10 @@ namespace eFMS.API.ReportData.Controllers
             var responseFromApi = await HttpServiceExtension.PostAPI(paymentCriteria, aPis.AccountingAPI + Urls.Accounting.AgencyPaymentUrl, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingAgencyPaymentExport>>();
-            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
+            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok(null);
 
             var stream = new AccountingHelper().GenerateExportAgencyHistoryPayment(dataObjects.Result, paymentCriteria);
-            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "");
+            if (stream == null) return new FileHelper().ExportExcel(null, new MemoryStream(), "Statement of Receivable Agency - eFMS");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(null, stream, "Statement of Receivable Agency - eFMS");
             HeaderResponse(fileContent.FileDownloadName);

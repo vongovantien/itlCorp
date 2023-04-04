@@ -36,6 +36,14 @@ const routes: Routes = [
         resolve: {
             checkMenu: MenuResolveGuard
         },
+    },
+    {
+        path: 'work-order',
+        loadChildren: () => import('./work-order/commercial-work-order.module').then(m => m.CommercialWorkOrderModule),
+        data: { name: 'Work Order', title: 'eFMS Work Order' },
+        resolve: {
+            checkMenu: MenuResolveGuard
+        },
     }
 ];
 
