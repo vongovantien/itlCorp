@@ -180,7 +180,8 @@
         commercialAgent,
         commercialIncoterm,
         commercialPotential,
-        commercialWorkOrder
+        commercialWorkOrder,
+        opsTruckingInland
     }
     public enum UnlockTypeEnum
     {
