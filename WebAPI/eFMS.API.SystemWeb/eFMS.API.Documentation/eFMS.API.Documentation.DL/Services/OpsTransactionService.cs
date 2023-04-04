@@ -462,9 +462,11 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public OpsTransactionModel GetDetails(Guid id)
         {
+            //PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
             var detail = GetBy(id);
             if (detail == null) return null;
             var tranType = detail.TransactionType == "TKI" ? "TKI" : "CL";
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, detail.TransactionType == "TKI" ?Menu.opsTruckingInland:Menu.opsJobManagement);
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(tranType, currentUser);
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             var permissionRangeDelete = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
@@ -473,7 +475,8 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail),
                 AllowDelete = GetPermissionDetail(permissionRangeDelete, authorizeUserIds, detail)
             };
-            var specialActions = currentUser.UserMenuPermission.SpecialActions;
+            //var specialActions = currentUser.UserMenuPermission.SpecialActions;
+            var specialActions = _user.UserMenuPermission.SpecialActions;
             detail.Permission = PermissionEx.GetSpecialActions(detail.Permission, specialActions);
             return detail;
         }

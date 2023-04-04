@@ -122,7 +122,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         { id: "SFI", text: "Sea FCL Import" },
         { id: "SLI", text: "Sea LCL Import" },
         { id: "CL", text: "Custom Logistic" },
-        { id: "TKI", text: "Trucking Inland" }
+        { id: "TK", text: "Trucking Inland" }
     ];
 
 
