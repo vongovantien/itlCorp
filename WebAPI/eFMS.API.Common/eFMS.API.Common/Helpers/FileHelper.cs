@@ -118,7 +118,9 @@ namespace eFMS.API.Common.Helpers
         }
         public static string RenameFileS3(string fileName)
         {
-            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#+:'*?<>|&%@$]+", "") + "_" + StringHelper.RandomString(5);
+            var newName = Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#+:'*?<>|&%@$]+", "") + "_" + StringHelper.RandomString(5);
+            return ClearBidirectionalCharater(newName);
+           
         }
         public static async Task<byte[]> DownloadFile(string url)
         {
@@ -134,7 +136,10 @@ namespace eFMS.API.Common.Helpers
             }
             return null;
         }
-
+        public static string ClearBidirectionalCharater(string fileName)
+        {
+            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\u0590-\u05FF\uFB50-\uFDFF\uFE70-\uFEFF-\u200B-\u200D-\u200e]+", "");
+        }
 
         public static byte[] GetZipArchive(List<InMemoryFile> files)
         {

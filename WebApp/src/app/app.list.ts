@@ -1,6 +1,10 @@
+import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
+import { ViewChild } from "@angular/core";
+import { filter, map, pairwise, takeUntil, throttleTime } from "rxjs/operators";
 import { AppPage } from "./app.base";
 
 export abstract class AppList extends AppPage {
+    @ViewChild('scroller') scroller: CdkVirtualScrollViewport;
 
     page: number = 1;
     totalItems: number = 0;
@@ -81,6 +85,19 @@ export abstract class AppList extends AppPage {
         this.page = e.page;
         this.pageSize = e.pageSize;
         this.requestList(e.data);
+    }
+
+    protected listenScrollingEvent(cb: (d?: any) => void) {
+        if (!this.scroller) {
+            return;
+        }
+        this.scroller.elementScrolled().pipe(
+            map(() => this.scroller.measureScrollOffset('bottom')),
+            pairwise(),
+            filter(([y1, y2]) => (y2 < y1 && y2 < 125)),
+            throttleTime(200),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(cb);
     }
 }
 

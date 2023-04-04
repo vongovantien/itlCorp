@@ -531,6 +531,7 @@ namespace eFMS.API.Documentation.DL.Services
                             || !string.IsNullOrEmpty(surcharge.AdvanceNo)
                             || !string.IsNullOrEmpty(surcharge.VoucherId)
                             || !string.IsNullOrEmpty(surcharge.SyncedFrom)
+                            || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
                             || surcharge.AcctManagementId != null
                          select detail);
             var data = DataContext.Get(x => x.Id == jobId).FirstOrDefault();

@@ -652,7 +652,6 @@
             <param name="checkPoint"></param>
             <param name="imageService"></param>
             <param name="stageAssignedService"></param>
-            <param name="transactionDetailService"></param>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CountJob(System.DateTime)">
             <summary>
@@ -769,13 +768,6 @@
             preview air document release
             </summary>
             <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.TrackShipmentProgress(eFMS.API.Documentation.DL.Models.Criteria.TrackingShipmentCriteria)">
-            <summary>
-            
-            </summary>
-            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckUpdateServiceDate(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">
@@ -1291,6 +1283,25 @@
             <param name="criteria"></param>
             <param name="userId"></param>
             <returns></returns>
+        </member>
+        <member name="T:eFMS.API.Documentation.Controllers.ShipmentTrackingController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentTrackingController.#ctor(eFMS.API.Documentation.DL.IService.IShipmentTrackingService,Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="service"></param>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentTrackingController.TrackShipmentProgress(eFMS.API.Documentation.DL.Models.Criteria.TrackingShipmentCriteria)">
+            <summary>
+            
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+            
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.TerminologyController.GetA">
             <summary>

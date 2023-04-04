@@ -1,5 +1,6 @@
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { HttpResponse } from '@angular/common/http';
-import { Component, ViewChild } from '@angular/core';
+import { Component, NgZone, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent, ReportPreviewComponent } from '@common';
 import { AccountingConstants, RoutingConstants, SystemConstants } from '@constants';
@@ -29,6 +30,9 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
     @ViewChild(ShareModulesReasonRejectPopupComponent) reasonRejectPopupComponent: ShareModulesReasonRejectPopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
     @ViewChild(ShareBussinessAdjustDebitValuePopupComponent) adjustDebitValuePopup: ShareBussinessAdjustDebitValuePopupComponent;
+    @ViewChild('scroller') scroller: CdkVirtualScrollViewport;
+
+    page: number = 1;
     soaNO: string = '';
 
     soa: SOA = new SOA();
@@ -55,7 +59,8 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
         private _router: Router,
         private _progressService: NgProgress,
         private _exportRepo: ExportRepo,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
+        private _ngZone: NgZone
     ) {
         super();
         this.requestSort = this.sortChargeList;
@@ -112,6 +117,19 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
             })
     }
 
+    ngAfterViewInit(): void {
+        this.listenScrollingEvent(() => {
+            this._ngZone.run(() => {
+                const totalPage = Math.ceil(this.soa.totalCharge / 20);
+                if (this.page < totalPage) {
+                    this.getNextSurcharge();
+                } else {
+                    return;
+                }
+            });
+        })
+    }
+
     getDetailSOA(soaNO: string, currency: string) {
         this._progressRef.start();
         this.isLoading = true;
@@ -127,7 +145,9 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
                     this.totalItems = this.soa.chargeShipments.length;
                     this.initGroup = this.soa.groupShipments;
                     this.soa.shipment = Object.keys(groupBy(this.initGroup, 'jobId')).length || 0;
-                    this._store.dispatch(LoadSOADetailSuccess({ detail: res }));
+                    if (res) {
+                        this._store.dispatch(LoadSOADetailSuccess({ detail: res }));
+                    }
                 },
             );
     }
@@ -327,6 +347,17 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
             this.TYPE = 'LIST';
         } else {
             this.TYPE = 'GROUP';
+            if (!!this.soa.groupShipments.length) {
+                return;
+            }
+            this.isLoading = true;
+            this._accoutingRepo.getSurchargeGroupSOA(this.soa.soano)
+                .pipe(finalize(() => this.isLoading = false))
+                .subscribe(
+                    (res: any) => {
+                        this.soa.groupShipments = res;
+                    }
+                )
         }
     }
 
@@ -452,6 +483,19 @@ export class StatementOfAccountDetailComponent extends AppList implements ICryst
 
     onSaveAdjustDebit() {
         this.getDetailSOA(this.soaNO, 'VND');
+    }
+
+
+    getNextSurcharge() {
+        this.isLoading = true;
+        this.page++;
+        this._accoutingRepo.getPagingSurchargeSOA(this.soa.soano, this.page, 30)
+            .pipe(finalize(() => { this.isLoading = false; }))
+            .subscribe((res: CommonInterface.IResponsePaging) => {
+                if (!!res.data.length) {
+                    this.soa.chargeShipments = [...this.soa.chargeShipments, ...res.data || []];
+                }
+            });
     }
 }
 

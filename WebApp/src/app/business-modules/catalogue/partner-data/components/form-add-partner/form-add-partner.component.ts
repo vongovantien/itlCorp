@@ -102,6 +102,7 @@ export class FormAddPartnerComponent extends AppForm {
     partnerLocation: AbstractControl;
     internalCode: AbstractControl;
     isAddBranchSub: boolean;
+    isBranchSub: boolean;
     creditPayment: AbstractControl;
     bankName: AbstractControl;
     roundMethods: CommonInterface.INg2Select[] = [
@@ -465,8 +466,6 @@ export class FormAddPartnerComponent extends AppForm {
     }
 
     setFormData(partner: Partner) {
-
-
         this.countryShippingIdName = partner.countryShippingName;
         this.countryIdName = partner.countryName;
         this.shippingProvinceName = partner.provinceShippingName;
@@ -511,12 +510,12 @@ export class FormAddPartnerComponent extends AppForm {
         this.partnerForm.setValue({
             partnerAccountNo: this.isAddBranchSub ? null : partner.accountNo,
             internalReferenceNo: partner.internalReferenceNo,
-            partnerNameEn: partner.partnerNameEn,
-            partnerNameVn: partner.partnerNameVn,
-            shortName: partner.shortName,
+            partnerNameEn: this.isAddBranchSub ? null : partner.partnerNameEn,
+            partnerNameVn: this.isAddBranchSub ? null : partner.partnerNameVn,
+            shortName: this.isAddBranchSub ? null : partner.shortName,
+            taxCode: partner.taxCode,
             //
             partnerAccountRef: this.isAddBranchSub ? partner.id : partner.parentId,
-            taxCode: this.isAddBranchSub ? null : partner.taxCode,
             partnerGroup: partnerGroupActives,
             countryShippingId: partner.countryShippingId,
             provinceShippingId: partner.provinceShippingId,
@@ -566,6 +565,9 @@ export class FormAddPartnerComponent extends AppForm {
         else {
             this.isDisabled = true;
         }
+
+        this.isBranchSub = !!partner.parentId && this.partnerAccountRef?.value != partner.id;
+        console.log('Branch sub:', this.isAddBranchSub);
     }
 
     getPartnerGroupActives(arg0: string[]): any {
