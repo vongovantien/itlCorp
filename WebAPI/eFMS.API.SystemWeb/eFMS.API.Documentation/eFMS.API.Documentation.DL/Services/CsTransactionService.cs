@@ -797,8 +797,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return 0;
             }
-            var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
-            var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
+            var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId && x.Active==true).Select(t => t.UserId).ToList();
+            var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId && x.Active == true).Select(t => t.UserId).ToList();
 
             var SalemansIds = csTransactionDetailRepo.Get(x => x.JobId == id).Select(t => t.SaleManId).ToArray();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
@@ -819,13 +819,6 @@ namespace eFMS.API.Documentation.DL.Services
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
         {
             int code = 0;
-            var checkActiveGrps = userlevelRepository.Get(x => x.UserId == currentUser.UserID && x.Active==true).Select(t => t.GroupId).ToList();
-
-            if (checkActiveGrps.Any(x => x.Equals(model.GroupId)) == false)
-            {
-                code = 403;
-                return code;
-            }
 
             if (permissionRange == PermissionRange.None) 
             {
