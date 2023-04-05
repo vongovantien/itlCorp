@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output, ViewChild } from "@angular/core";
 import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
-import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, AbstractControl, FormControl } from '@angular/forms';
 import { OperationRepo } from "@repositories";
 import { PagerSetting } from "src/app/shared/models/layout/pager-setting.model";
 import { PAGINGSETTING } from "src/constants/paging.const";
@@ -19,7 +19,6 @@ import { JobConstants } from "@constants";
     templateUrl: './get-custom-clearance-from-Ecus.html'
 })
 export class CustomClearanceFromEcus extends PopupBase implements OnInit {
-    [x: string]: any;
     @ViewChild(CustomClearanceFormSearchComponent) CustomClearanceComponent: CustomClearanceFormSearchComponent;
     @Output() isCloseModal = new EventEmitter();
 
@@ -32,9 +31,10 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     filterTypes: CommonInterface.ICommonTitleValue[];
     clearanceNo: AbstractControl;
     filterType: AbstractControl;
-    partnerId: AbstractControl;
     checkAllNotImported = false;
+    customer: AbstractControl;
 
+    dataSearch: ISearchCustomClearance;
     customers: Observable<Customer[]>;
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
@@ -49,6 +49,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     }
 
     ngOnInit() {
+        this.initSearchDefaultValue();
         this.pageSize = this.numberToShow[2];
 
         this.headers = [
@@ -62,13 +63,8 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
             { title: 'Cont Qty', field: 'contQty', sortable: true },
             { title: 'Status', field: 'imprtStts' },
         ];
-        this.filterTypes = [
-            { title: 'Custom No', value: 'clearanceNo' },
-            { title: 'HBL No', value: 'hblNo' },
-            { title: 'Partner Name', value: 'partnerName' },
-        ];
+
         this.initForm();
-        this.filterType.setValue(this.filterTypes[0]);
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER, null);
     }
 
@@ -77,23 +73,45 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         this.formSearch = this._fb.group({
             clearanceNo: "",
             'customer': [],
-            partnerId: [null],
-            filterType: [this.filterTypes[0]]
+            'filterType': [this.filterTypes[0].value]
         });
-        this.partnerId = this.formSearch.controls['partnerId'];
         this.clearanceNo = this.formSearch.controls['clearanceNo'];
         this.filterType = this.formSearch.controls['filterType'];
-
         this.customer = this.formSearch.controls['customer'];
     }
 
-    onInputAutoSearch(keyword: string) {
-        this.term$.next(keyword.trim());
-        if (this.customNo.value === '') {
-            this.getListCleranceNotImported();
-        } else {
-            this.popupSearchMultiple.customNoSearch = '';
+    initSearchDefaultValue() {
+        this.filterTypes = [
+            { title: 'All', value: 'All' },
+            { title: 'Custom No', value: 'clearanceNo' },
+            { title: 'HBL No', value: 'hblNo' },
+        ];
+    }
+
+    resetFormControl(control: FormControl | AbstractControl) {
+        if (!!control && control instanceof FormControl) {
+            control.setValue(null);
+            control.markAsUntouched({ onlySelf: true });
+            control.markAsPristine({ onlySelf: true });
         }
+    }
+
+    onSearchClearance(){
+        const body: ISearchCustomClearance = {
+            clearanceNo: !!this.clearanceNo.value ? this.clearanceNo.value.split('\n').map(item => item.trim()).join(';') : null,
+            cusType: (!this.filterType.value || this.filterType.value === this.filterTypes[0].value) ? null : this.filterType.value,
+            customerNo: this.customer.value,
+        };
+        this._operationRepo.getUserCustomClearance(body, this.page, this.pageSize)
+            .pipe(
+                finalize(() => { this.isLoading = false; })
+            )
+            .subscribe(
+                (data: CommonInterface.IResponsePaging) => {
+                    this.dataEcus = data.data || [];
+                    this.totalItems = data.totalItems;
+                }
+            );
     }
 
     changeAllNotImported() {
@@ -114,7 +132,13 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     }
 
     getClearanceNotImported() {
-        this._operationRepo.getUserCustomClearance(this.filterType.value.value, this.clearanceNo.value, this.page, this.pageSize)
+        const body: ISearchCustomClearance = {
+            clearanceNo: !!this.clearanceNo.value ? this.clearanceNo.value.split('\n').map(item => item.trim()).join(';') : null,
+            cusType: (!this.filterType.value || this.filterType.value === this.filterTypes[0].value) ? null : this.filterType.value,
+            customerNo: this.customer.value,
+        };
+
+        this._operationRepo.getUserCustomClearance(body, this.page, this.pageSize)
             .pipe(
                 finalize(() => { this.isLoading = false; })
             )
@@ -142,6 +166,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     refreshData() {
         this.page = 1;
         this.pageSize = this.numberToShow[2];
+        this.resetFormControl(this.customer);
         this.formSearch.reset();
         this.getListCleranceNotImported();
     }
@@ -171,7 +196,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     onSelectDataFormInfo(data, type: string) {
         switch (type) {
             case 'partner':
-                this.clearanceNo.setValue((data as Customer).shortName);
+                this.clearanceNo.setValue((data as Customer).accountNo);
                 break;
             default:
                 break;
@@ -188,6 +213,14 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         this.keyword = '';
         this.page = 1;
         this.pageSize = this.numberToShow[2];
+        this.resetFormControl(this.customer);
+        this.formSearch.reset();
         this.hide();
     }
+}
+
+export interface ISearchCustomClearance {
+    clearanceNo: string;
+    cusType: string;
+    customerNo: string;
 }

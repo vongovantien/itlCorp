@@ -88,31 +88,26 @@ namespace eFMS.API.Operation.DL.Services
             return Get();
         }
 
-        public List<CustomsDeclarationModel> GetUserCustomClearance(string searchType, string keySearch, int pageNumber, int pageSize, out int rowsCount)
+        public List<CustomsDeclarationModel> GetUserCustomClearance(CustomEcusCriteria ecusCustomCriteria, int pageNumber, int pageSize, out int rowsCount)
         {
-            List<CustomsDeclarationModel> returnList = new List<CustomsDeclarationModel>();            
+            List<CustomsDeclarationModel> returnList = new List<CustomsDeclarationModel>();          
             string userId = currentUser.UserID;
             string[] searchingKeys = null;
             var connections = ecusCconnectionService.Get(x => x.UserId == userId && x.Active == true);
             var result = new HandleState();
-            var autocompleteKey = string.Empty;
-            if (!string.IsNullOrEmpty(keySearch) || !string.IsNullOrWhiteSpace(keySearch))
+
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None)
             {
-                if (searchType == "clearanceNo" || searchType == "hblNo")
-                {
-                    keySearch = keySearch.ToLower().Trim();
-                    var replacedString = keySearch.Split(new char[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    autocompleteKey = replacedString.Length > 0 ? replacedString[0] : string.Empty;
-                    if (replacedString.Length >= 1)
-                    {
-                        searchingKeys = replacedString.Length >= 1 ? replacedString : null;
-                    }
-                }
+                rowsCount = 0;
+                return null;
             }
-            else
-            {
-                keySearch = String.Empty;
-            }
+            Expression<Func<CustomsDeclaration, bool>> query = x => x.Source != OperationConstants.FROM_REPLICATE && (ecusCustomCriteria.ClearanceNo.Contains(x.ClearanceNo) || string.IsNullOrEmpty(ecusCustomCriteria.ClearanceNo))
+                                                                                    && (x.Type == ecusCustomCriteria.CusType || string.IsNullOrEmpty(ecusCustomCriteria.CusType))
+                                                                                    && ((x.AccountNo ?? x.PartnerTaxCode) == ecusCustomCriteria.CustomerNo || string.IsNullOrEmpty(ecusCustomCriteria.CustomerNo));
+
+
             var lists = new List<CustomsDeclaration>();
             try
             {
@@ -148,16 +143,6 @@ namespace eFMS.API.Operation.DL.Services
                             }
                         }
                     }
-                    if (keySearch != null && (!string.IsNullOrEmpty(keySearch) || !string.IsNullOrWhiteSpace(keySearch)))
-                    {
-                        if(searchType=="clearanceNo")
-                        {
-                            returnList = returnList.Where(x => searchingKeys.Any(val => x.ClearanceNo.Contains(val, StringComparison.OrdinalIgnoreCase))).ToList();
-                        }
-                        else if (searchType == "hblNo") {
-                            returnList = returnList.Where(x => searchingKeys.Any(val => x.Hblid.Contains(val, StringComparison.OrdinalIgnoreCase))).ToList();
-                        }
-                    }
                     cachedService.Set(returnList, TimeSpan.FromSeconds(10));
                 }
             }
@@ -166,17 +151,16 @@ namespace eFMS.API.Operation.DL.Services
                 result = new HandleState(ex.Message);
                 rowsCount = 0;  
             }
-            
-            if(searchType == "partnerName" && (keySearch != null && (!string.IsNullOrEmpty(keySearch) || !string.IsNullOrWhiteSpace(keySearch))))
+
+
+            returnList = MapClearancesToClearanceModels(returnList.AsQueryable());
+            if (ecusCustomCriteria.ClearanceNo != null || (ecusCustomCriteria.CusType != null && ecusCustomCriteria.CusType!="All") || ecusCustomCriteria.CustomerNo != null)
             {
-                returnList = MapClearancesToClearanceModels(returnList.AsQueryable());
-                //searchingKeys = keySearch.Split(',').Select(s => s.Trim()).ToArray();
-                returnList = returnList.Where(x => keySearch == x.CustomerName).ToList();
+                returnList = returnList.Where(x => (ecusCustomCriteria.CusType == "hblNo" ? ecusCustomCriteria.ClearanceNo.Contains(x.Hblid) : ecusCustomCriteria.ClearanceNo.Contains(x.ClearanceNo) || string.IsNullOrEmpty(ecusCustomCriteria.ClearanceNo))
+                                                                                    && ((x.AccountNo ?? x.PartnerTaxCode) == ecusCustomCriteria.CustomerNo || string.IsNullOrEmpty(ecusCustomCriteria.CustomerNo))).ToList();
+
             }
-            else
-            {
-                returnList = MapClearancesToClearanceModels(returnList.AsQueryable());
-            }
+
             // Perform pagination
             int rowCount = returnList.Count();
             rowsCount = rowCount;

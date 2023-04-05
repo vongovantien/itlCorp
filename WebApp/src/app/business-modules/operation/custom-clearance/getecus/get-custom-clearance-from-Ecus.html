@@ -7,56 +7,73 @@
                 <button type="button" class="close" aria-label="Close" (click)=close()>
                     <span aria-hidden="true">&times;</span>
                 </button>
-                <div class="modal-actions c-button-actions">
-                    <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="refreshData()">
-                        <span>
-                            <i class="la la-refresh"></i>
-                            <span>
-                                Reset
-                            </span>
-                        </span>
-                    </button>
-                </div>
             </div>
             <div class="modal-body">
                 <div class="m-form m-form--state">
                     <div class="m-form m-form--state">
                         <form [formGroup]="formSearch">
                             <div class="row">
-                                <div class="col-lg-4" style="max-width: 180px">
-                                    <select class="form-control" formControlName="filterType">
-                                        <option *ngFor="let type of filterTypes" [ngValue]="type">{{type.title}}
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-md-8">
-                                    <div class="m-input-icon m-input-icon--left down"
-                                        *ngIf="filterType.value.value!='partnerName'">
-                                        <input type="text" class="form-control" formControlName="clearanceNo">
-                                    </div>
-                                    <div class="form-group col-md-8" *ngIf="filterType.value.value=='partnerName'" style="padding-top: 0 ; flex: 0 0 33.33333333%; max-width: 100%">
-                                        <app-combo-grid-virtual-scroll
-                                            [currentActiveItemId]="{ field: 'accountNo', value: customer.value}"
-                                            (itemSelected)="onSelectDataFormInfo($event, 'partner')"
-                                            [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
-                                            [displayFields]= "displayFieldsCustomer"
-                                            (remove)="resetFormControl(partnerId)"
-                                            placeholder="Please select partner" formControlName="partnerId">
-                                        </app-combo-grid-virtual-scroll>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Clearance No</label>
+                                        <textarea rows="3" class="form-control" formControlName="clearanceNo"
+                                            placeholder="Clearance No">
+                                        </textarea>
                                     </div>
                                 </div>
-                                <div class="input-group-append">
-                                    <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase"
-                                        (click)="getClearanceNotImported()">
-                                        <span>
-                                            <i class="la la-search"></i>
-                                            <span> Search </span>
-                                        </span>
-                                    </button>
+                                <div class="col-lg-6">
+                                    <div class="row">
+                                        <div class="col-lg-6" style="max-width: 320px">
+                                            <div class="form-group">
+                                                <label class="form-control-label">Search Type</label>
+                                                <ng-select class="custom" formControlName="filterType"
+                                                    [items]="filterTypes" bindLabel="title" bindValue="value">
+                                                </ng-select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6" style="max-width: 320px">
+                                            <div class="form-group">
+                                                <label>Customer</label>
+                                                <app-combo-grid-virtual-scroll
+                                                    [currentActiveItemId]="{ field: 'accountNo', value: customer.value}"
+                                                    (itemSelected)="onSelectDataFormInfo($event, 'customer')"
+                                                    [selectedDisplayFields]="['shortName']"
+                                                    [dataSources]="customers | async"
+                                                    [displayFields]="displayFieldsCustomer" [height]="150"
+                                                    (remove)="resetFormControl(customer)" placeholder="Select Customer">
+                                                </app-combo-grid-virtual-scroll>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <div class="row">
+                                    <div class="col-lg-6"></div>
+                                    <div class="col-lg-6 m--align-right">
+                                        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
+                                            (click)="onSearchClearance()">
+                                            <span>
+                                                <i class="la la-search"></i>
+                                                <span>
+                                                    Search
+                                                </span>
+                                            </span>
+                                        </button>
+                                        <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase"
+                                            (click)="refreshData()">
+                                            <span>
+                                                <i class="la la-refresh"></i>
+                                                <span>
+                                                    Reset
+                                                </span>
+                                            </span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </form>
-
                         <br>
                         <div class="table-horizontal" style="max-height: 700px">
                             <table class="table table-striped table-brand dataTable" style="max-height:700px">
@@ -86,7 +103,7 @@
                                     </tr>
                                     <ng-container *ngIf="!isLoading && !!dataEcus?.length">
                                         <tr class=""
-                                            *ngFor="let item of dataEcus | filter: keyword: ['clearanceNo','hblid' , 'customerName'] let i=index; trackBy: trackByFn">
+                                            *ngFor="let item of dataEcus | filter: keyword: ['clearanceNo','hblid' , 'customerName'] let i=index; trackBy: trackByFn;">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
                                                     <label class="m-checkbox" *ngIf="!item.imprtStts">
