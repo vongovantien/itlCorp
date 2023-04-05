@@ -40,6 +40,6 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatPartnerForKeyinCharge> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria);
         Task<CatPartnerModel> GetPartnerByTaxCode (string taxCode);
 
-        List<CatPartnerViewModel2> GetParentPartnerSameSaleman(string salemanId);
+        List<CatPartnerViewModel2> GetParentPartnerSameSaleman(CatPartnerCriteria criteria);
     }
 }

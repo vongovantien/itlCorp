@@ -242,8 +242,8 @@ export class CatalogueRepo {
         }
     }
 
-    getACRefPartnerWithSaleman(salemanId: string = null) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetParentPartnerSameSaleman`, {salemanId: salemanId}, null).pipe(
+    getACRefPartnerWithSaleman(partnerId: string, salemanId: string, partnerGroup: number) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetParentPartnerSameSaleman`, { id: partnerId, saleman: salemanId, partnerGroup: partnerGroup }, null).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;

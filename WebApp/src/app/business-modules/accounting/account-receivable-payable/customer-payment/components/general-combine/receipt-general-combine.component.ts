@@ -13,6 +13,7 @@ import { filter, map, skipWhile, switchMap, takeUntil, tap } from 'rxjs/operator
 import { AppList } from 'src/app/app.list';
 import { AddGeneralCombineToReceipt, ReceiptCombineActionTypes, RemoveDebitCombine } from '../../store/actions';
 import { ICustomerPaymentState, ReceiptCombineExchangeState, ReceiptCombinePartnerState, ReceiptCombineSalemanState } from '../../store/reducers';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'receipt-general-combine',
@@ -112,7 +113,7 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
                     type: string,
                     salemanId: string,
                 }) => {
-                    return this._catalogueRepo.getACRefPartnerWithSaleman(data.salemanId);//.pipe(map(values => [data, ...values])) // * Khởi tạo giá trị là partner đang chọn.
+                    return this._catalogueRepo.getACRefPartnerWithSaleman(data.id, data.salemanId, CommonEnum.PartnerGroupEnum.AGENT);//.pipe(map(values => [data, ...values])) // * Khởi tạo giá trị là partner đang chọn.
                 }),
                 skipWhile((v) => v.length === 0),
                 filter(value => !!value.length),
