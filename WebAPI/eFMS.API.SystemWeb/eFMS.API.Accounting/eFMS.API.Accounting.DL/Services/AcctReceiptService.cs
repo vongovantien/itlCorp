@@ -2623,6 +2623,21 @@ namespace eFMS.API.Accounting.DL.Services
                         RefNo = x.BillingRefNo
                     }).ToList();
                     var hsDebit = UpdateAccountingDebitAR(paymentInv, SaveAction.SAVECANCEL);
+
+                    if (receiptCurrent.PaymentMethod.ToLower().Contains("credit"))
+                    {
+                        var creditReceipt = mapper.Map<AcctReceiptModel>(receiptCurrent);
+                        var hsCredit = UpdateCreditARCombine(new List<AcctReceiptModel>() { creditReceipt }, SaveAction.SAVECANCEL);
+                        if (!hsCredit.Success)
+                        {
+                            new LogHelper("eFMS_SaveCancel_UpdateCreditARCombine_LOG", hsCredit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(creditReceipt));
+                        }
+                        hsCredit = AddPaymentsCreditCombine(new List<AcctReceiptModel>() { creditReceipt }, SaveAction.SAVECANCEL);
+                        if (!hsCredit.Success)
+                        {
+                            new LogHelper("eFMS_SaveCancel_AddPaymentsCreditCombine_LOG", hsCredit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(creditReceipt));
+                        }
+                    }
                 }
                 return hs;
             }
@@ -4982,7 +4997,8 @@ namespace eFMS.API.Accounting.DL.Services
                     .ToList()
                     .OrderBy(x => x.PaymentType == "OTHER");
 
-                CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == result.CustomerId).FirstOrDefault();
+                var partners = catPartnerRepository.Get(x => x.Active == true);
+                var partnerInfo = partners.FirstOrDefault(x => x.Id == result.CustomerId);
                 result.CustomerName = partnerInfo?.ShortName;
 
                 var creditArs = creditMngtArRepository.Get(x => !string.IsNullOrEmpty(x.ReferenceNo));
@@ -5012,6 +5028,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         string _voucherId = string.Empty;
                         string _voucherIdre = string.Empty;
+                        partnerInfo = partners.FirstOrDefault(x => x.Id == acctPayment.PartnerId);
 
                         ReceiptInvoiceModel payment = new ReceiptInvoiceModel();
                         payment.Id = acctPayment.Id;
@@ -5071,6 +5088,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 var contract = catContractRepository.Get(x => x.Active == true);
                 result.SalemanId = result.AgreementId == null ? string.Empty : contract.First(x => x.Id == result.AgreementId)?.SaleManId;
+                result.SalemanName = result.SalemanId == null ? string.Empty : sysUserRepository.Where(x => x.Id == result.SalemanId).FirstOrDefault()?.Username;
                 //result.ARCBContractId = contract.First(x => x.PartnerId == receipt.ArcbpartnerId && x.SaleManId == result.SalemanId)?.Id.ToString();
                 SysOffice receiptOffice = officeRepository.Get(x => x.Id == (result.OfficeId ?? Guid.Empty))?.FirstOrDefault();
                 result.OfficeName = receiptOffice.ShortName;
@@ -5201,15 +5219,36 @@ namespace eFMS.API.Accounting.DL.Services
                 var generalCombines = receiptModels.Where(x => Common.CustomData.PaymentMethodGeneral.Any(c => c.Value == x.PaymentMethod)).ToList();
                 if (generalCombines.Count > 0)
                 {
-                    var existedGeneralCombine = DataContext.Get(x => x.Arcbno == generalCombines[0].Arcbno && x.CustomerId == generalCombines[0].CustomerId).ToList();
+                    var existedGeneralCombine = DataContext.Get(x => x.Arcbno == generalCombines[0].Arcbno && x.CustomerId == generalCombines[0].CustomerId && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL).ToList();
                     if (existedGeneralCombine != null && existedGeneralCombine.Count > 0)
                     {
-                        foreach (var model in generalCombines)
+                        var receiptIds = existedGeneralCombine.Select(x => x.Id.ToString()).ToList();
+                        var payments = acctPaymentRepository.Get(x => receiptIds.Any(z => z == x.ReceiptId.ToString()));
+                        var existedModels = from receipt in existedGeneralCombine
+                                            join pm in payments on receipt.Id equals pm.ReceiptId
+                                            select new
+                                            {
+                                                Id = receipt.Id,
+                                                CustomerId = pm.PartnerId,
+                                                PaymentMethod = receipt.PaymentMethod,
+                                                ObhpartnerId = receipt.ObhpartnerId,
+                                                OfficeId = pm.OfficeId
+                                            };
+                        var data = from item in generalCombines
+                                   join existedModel in existedModels on item.PaymentMethod equals existedModel.PaymentMethod
+                                   where item.Payments.FirstOrDefault().PartnerId == existedModel.CustomerId && item.ObhpartnerId == existedModel.ObhpartnerId && item.OfficeId == existedModel.OfficeId
+                                   select new
+                                   {
+                                       PartnerName = item.Payments.FirstOrDefault().PartnerName,
+                                       PartnerId = item.Payments.FirstOrDefault().PartnerId,
+                                       PaymentMethod = item.PaymentMethod,
+                                       ObhpartnerId = item.ObhpartnerId,
+                                       OfficeId = item.OfficeId
+                                   };
+                        if (data.Count() > 0)
                         {
-                            if (existedGeneralCombine.Any(x => x.CustomerId == model.CustomerId && x.PaymentMethod == model.PaymentMethod && x.ObhpartnerId == model.ObhpartnerId && x.OfficeId == model.OfficeId))
-                            {
-                                return new HandleState(false, (object)("Customer " + model.CustomerName + " with office and payment method has existed"));
-                            }
+                            var customerName = catPartnerRepository.Get(x=>x.Id == data.FirstOrDefault().PartnerId).FirstOrDefault()?.ShortName;
+                            return new HandleState(false, (object)("Customer " + customerName + " with office and payment method has existed"));
                         }
                     }
                 }
@@ -5247,7 +5286,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var result = new HandleState();
             var refIds = string.Join(";", receiptModel.Payments.Select(x => string.Join(";", x.RefIds)));
-            var accReceipts = DataContext.Get(x => x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL && !string.IsNullOrEmpty(x.Arcbno));
+            var accReceipts = DataContext.Get(x => x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL && x.Status != AccountingConstants.RECEIPT_STATUS_DONE && !string.IsNullOrEmpty(x.Arcbno));
             if (!string.IsNullOrEmpty(refIds))
             {
                 var paymentDB = acctPaymentRepository.Get(x => refIds.Contains(x.RefId));
@@ -5902,8 +5941,7 @@ namespace eFMS.API.Accounting.DL.Services
                         receiptModel.OfficeId = currentUser.OfficeID;
                         receiptModel.CompanyId = currentUser.CompanyID;
                         receiptModel.Status = AccountingConstants.RECEIPT_STATUS_DONE;
-                        receiptModel.UserModified = currentUser.UserID;
-                        receiptModel.DatetimeModified = DateTime.Now;
+                        receiptModel.Class = receiptModel.PaymentMethod;
                         receiptModel.PaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.PaidAmountVnd : receiptModel.PaidAmountUsd;
                         receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
 

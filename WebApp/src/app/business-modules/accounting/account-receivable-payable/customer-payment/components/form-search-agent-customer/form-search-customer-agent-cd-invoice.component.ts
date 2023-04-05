@@ -128,12 +128,24 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
 
 
         // * Listen partner current state.
-        this._store.select(IsReceiptCombineState)
-            .subscribe((data: boolean) => {
-                if (!!data) {
+        this._store.select(ReceiptCombineState)
+            .subscribe((data: any) => {
+                if (data.isCombineReceipt) {
                     this.isRequireAgreement = false;
-                    this.partnerId.disable();
                     this.isCombineReceipt = true;
+                    if (!!data.officeId) {
+                        this.office.setValue([data?.officeId]);
+                        this.formSearch.controls['office'].disable();
+                    } else {
+                        this._store.select(getCurrentUserState)
+                            .pipe(
+                                filter(c => !!c.userName),
+                                takeUntil(this.ngUnsubscribe)
+                            )
+                            .subscribe((c) => {
+                                this.office.setValue([c.officeId]);
+                            })
+                    }
                     this.partnerTypeState = 'AGENT';
 
                     this.dateTypeList = ['Accounting Date', 'Service Date', 'Issued Date'];
@@ -190,28 +202,24 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                             }
                         )
 
-
+                    this._store.select(getCurrentUserState)
+                        .pipe(
+                            filter(c => !!c.userName),
+                            takeUntil(this.ngUnsubscribe)
+                        )
+                        .subscribe((c) => {
+                            this.office.setValue([c.officeId]);
+                        })
+                    this._store.select(getCurrentUserState)
+                        .pipe(
+                            filter(c => !!c.userName),
+                            takeUntil(this.ngUnsubscribe)
+                        )
+                        .subscribe((c) => {
+                            this.office.setValue([c.officeId]);
+                        })
                 }
             });
-        this._store.select(ReceiptCombineState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (data: any) => {
-                    if (!!data?.officeId) {
-                        this.office.setValue([data?.officeId]);
-                        this.office.disable();
-                    } else {
-                        this._store.select(getCurrentUserState)
-                            .pipe(
-                                filter(c => !!c.userName),
-                                takeUntil(this.ngUnsubscribe)
-                            )
-                            .subscribe((c) => {
-                                this.office.setValue([c.officeId]);
-                            })
-                    }
-                }
-            )
 
     }
 

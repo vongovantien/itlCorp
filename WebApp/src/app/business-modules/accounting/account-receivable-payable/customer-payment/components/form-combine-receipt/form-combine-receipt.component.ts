@@ -117,7 +117,7 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
         switch (type) {
             case 'partner':
                 this.selectedPartner = data;
-                this.partnerId.setValue(data.contractId);
+                this.partnerId.setValue(data.id);
                 this._store.dispatch(ResetCombineInvoiceList());
                 this._store.dispatch(ResetInvoiceList());
                 // TODO Dispatch select partner combine.

@@ -2309,7 +2309,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 .Where(x => x.Active == true && (x.IsExpired == null || x.IsExpired == false));
             if (criteria.PartnerGroups != null)
             {
-                criteriaPartner = criteriaPartner.Where(x => grpCodes.Count == 0 || grpCodes.Any(z => z == x.PartnerGroup))
+                criteriaPartner = criteriaPartner.Where(x => grpCodes.Count == 0 || grpCodes.Any(z => x.PartnerGroup.Contains(z)))
                         .WhereIf(!string.IsNullOrEmpty(criteria.PartnerType), x => x.PartnerType == criteria.PartnerType);
                 criteriaContract = criteriaContract.WhereIf(!string.IsNullOrEmpty(criteria.Service), x => IsMatchService(x.SaleService, criteria.Service))
                         .WhereIf(!string.IsNullOrEmpty(criteria.Office), x => IsMatchService(x.SaleService, criteria.Service))

@@ -4,7 +4,7 @@
     <div class="m-portlet">
         <div class="m-portlet__body">
             <form-create-receipt-combine [isUpdate]="true" (onSynceCombine)="onSynceCombineToAccountant($event)"></form-create-receipt-combine>
-            <receipt-general-combine (onSaveReceipt)="onSaveReceipt($event)" [isUpdate]="true"></receipt-general-combine>
+            <receipt-general-combine (onSaveReceipt)="onSaveGeneralReceipt($event)" [isUpdate]="true"></receipt-general-combine>
             <receipt-cd-combine #CreditPayment listType="credit" [isUpdate]="true" (onSaveReceipt)="onSaveReceipt($event)"></receipt-cd-combine>
             <receipt-cd-combine #DebitPayment listType="debit" [isUpdate]="true" (onSaveReceipt)="onSaveReceipt($event)"></receipt-cd-combine>
         </div>

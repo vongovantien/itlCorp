@@ -23,7 +23,7 @@
                 </label>
                 <app-combo-grid-virtual-scroll #comboGridPartner
                     (itemSelected)="onSelectDataFormInfo($event, 'partner')" (remove)="resetFormControl(partnerId)"
-                    [currentActiveItemId]="{ field: 'contractId', value: partnerId.value }"
+                    [currentActiveItemId]="{ field: 'contractId', value: partnerId.value, hardValue: partnerName }"
                     [selectedDisplayFields]="['shortName','salemanName']" [dataSources]="partners | async"
                     [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
                     [disabled]="isUpdate">
