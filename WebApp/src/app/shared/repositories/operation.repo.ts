@@ -225,8 +225,12 @@ export class OperationRepo {
 
     }
 
-    getUserCustomClearance(page: number, size: number) {
-        return this._api.get(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetUserCustomClearance`, { page: page, size: size }).pipe(
+    getUserCustomClearance(body: any, page: number, size: number) {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetUserCustomClearance`, body, {
+            pageNumber: page,
+            pageSize: size
+        }).pipe(
+            catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }

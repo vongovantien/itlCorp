@@ -111,11 +111,11 @@ namespace eFMS.API.Operation.Controllers
         /// <param name="page"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        [HttpGet("GetUserCustomClearance")]
-        public IActionResult GetUserCustomClearance(int page, int size)
+        [HttpPost("GetUserCustomClearance")]
+        public IActionResult GetUserCustomClearance(CustomEcusCriteria ecusCustomCriteria, int pageNumber, int pageSize)
         {
-            var data = customsDeclarationService.GetUserCustomClearance(page, size, out int rowsCount);
-            var result = new { data, totalItems = rowsCount, page, size };
+            var data = customsDeclarationService.GetUserCustomClearance(ecusCustomCriteria, pageNumber, pageSize, out int rowsCount);
+            var result = new { data, totalItems = rowsCount, pageNumber, pageSize };
             return Ok(result);
         }
 
