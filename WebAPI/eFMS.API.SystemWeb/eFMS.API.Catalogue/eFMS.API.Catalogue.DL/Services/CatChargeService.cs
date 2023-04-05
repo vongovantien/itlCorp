@@ -582,9 +582,9 @@ namespace eFMS.API.Catalogue.DL.Services
                             item.SellingName = chargeDebit.ChargeNameEn;
                         }
                     }
-                    var arrOffice = item.Offices.Split(",").ToArray();
+                    var arrOffice = item.Offices?.Split(",").ToArray();
                     string officeStr = string.Empty;
-                    if (arrOffice.Length > 0)
+                    if (arrOffice?.Length > 0)
                     {
                         foreach (var o in arrOffice)
                         {
@@ -598,7 +598,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             }
                         }
                     }
-                    item.OfficesName = officeStr.TrimEnd(';');
+                    item.OfficesName = officeStr?.TrimEnd(';');
                     item.ServiceTypeId = Common.CommonData.GetServicesName(item.ServiceTypeId);
                 }
             }
