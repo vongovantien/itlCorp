@@ -142,6 +142,9 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatStandardChargeService, CatStandardChargeService>();
             services.AddTransient<ICatCityService, CatCityService>();
             services.AddTransient<ICatAddressPartnerService, CatAddressPartnerService>();
+            services.AddTransient<ICatDistrictService, CatDistrictService>();
+            services.AddTransient<ICatWardService, CatWardService>();
+
 
 
 

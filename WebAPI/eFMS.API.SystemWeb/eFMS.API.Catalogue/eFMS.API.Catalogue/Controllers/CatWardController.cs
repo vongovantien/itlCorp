@@ -27,24 +27,24 @@ namespace eFMS.API.Catalogue.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class CatCityController : ControllerBase
+    public class CatWardController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
-        private readonly ICatCityService catCityService;
+        private readonly ICatWardService catWardService;
         private readonly IMapper mapper;
         private readonly ICurrentUser currentUser;
-        public CatCityController(IStringLocalizer<LanguageSub> localizer, ICatCityService service,
+        public CatWardController(IStringLocalizer<LanguageSub> localizer, ICatWardService service,
            IMapper imapper,
            ICurrentUser user)
 
         {
             stringLocalizer = localizer;
-            catCityService = service;
+            catWardService = service;
             mapper = imapper;
             currentUser = user;
         }
         /// <summary>
-        /// get and paging the list of cities by conditions
+        /// get and paging the list of wards by cities
         /// </summary>
         /// <param name="criteria">search conditions</param>
         /// <param name="page">page to retrieve data</param>
@@ -52,27 +52,27 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("paging")]
-        public IActionResult Get(CatCityCriteria criteria, int page, int size)
+        public IActionResult Get(CatWardCriteria criteria, int page, int size)
         {
-            var data = catCityService.GetCities(criteria, page, size, out int rowCount);
+            var data = catWardService.GetWards(criteria, page, size, out int rowCount);
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
         /// <summary>
-        /// get the list of cities
+        /// get the list of wards
         /// </summary>
         /// <param name="criteria">search conditions</param>
         /// <returns></returns>
         [HttpPost]
         [Route("query")]
-        public IActionResult Get(CatCityCriteria criteria)
+        public IActionResult Get(CatWardCriteria criteria)
         {
-            var data = catCityService.Query(criteria);
+            var data = catWardService.Query(criteria);
             return Ok(data);
         }
 
         /// <summary>
-        /// get city by id
+        /// get ward by id
         /// </summary>
         /// <param name="id">id of data that need to retrieve</param>
         /// <returns></returns>
@@ -80,27 +80,27 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getById/{id}")]
         public IActionResult Get(int id)
         {
-            var result = catCityService.Get(x => x.Id == id).FirstOrDefault();
+            var result = catWardService.Get(x => x.Id == id).FirstOrDefault();
             return Ok(result);
         }
         /// <summary>
-        /// add new city
+        /// add new ward
         /// </summary>
-        /// <param name="catCity">object to add</param>
+        /// <param name="catWard">object to add</param>
         /// <returns></returns>
         [HttpPost]
         [Route("addNew")]
         [Authorize]
-        public IActionResult Add(CatCityModel catCity)
+        public IActionResult Add(CatWardModel catWard)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(0, catCity);
+            var checkExistMessage = CheckExist(0, catWard);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
 
-            var hs = catCityService.Add(catCity);
+            var hs = catWardService.Add(catWard);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -117,62 +117,62 @@ namespace eFMS.API.Catalogue.Controllers
         [Route("getAll")]
         public IActionResult GetAll()
         {
-            var data = catCityService.Get();
+            var data = catWardService.Get();
             return Ok(data);
         }
         /// <summary>
-        /// get data by country
+        /// get data by District
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("getCityByCountry")]
-        public IActionResult GetCitiesByCountry(string codeCountry)
+        [Route("getWardByDistrict")]
+        public IActionResult GetWardByDistrict(string codeDistrict)
         {
-            var data = catCityService.GetCitiesByCountry(codeCountry);
+            var data = catWardService.GetWardsByDistrict(codeDistrict);
             return Ok(data);
         }
         /// <summary>
-        /// get all cities by current language
+        /// get all wards by current language
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         [Route("GetByLanguage")]
         public IActionResult GetByLanguage()
         {
-            var results = catCityService.GetByLanguage();
+            var results = catWardService.GetByLanguage();
             return Ok(results);
         }
 
         /// <summary>
-        /// update an existed city
+        /// update an existed ward
         /// </summary>
-        /// <param name="catCity">object to update</param>
+        /// <param name="catWard">object to update</param>
         /// <returns></returns>
         [HttpPut]
         [Route("update")]
         [Authorize]
-        public IActionResult Update(CatCityModel catCity)
+        public IActionResult Update(CatWardModel catWard)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(catCity.Id, catCity);
+            var checkExistMessage = CheckExist(catWard.Id, catWard);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
 
-            var hs = catCityService.Update(catCity);
+            var hs = catWardService.Update(catWard);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
             }
-            catCityService.ClearCache();
+            catWardService.ClearCache();
             return Ok(result);
         }
 
         /// <summary>
-        /// delete an existed city
+        /// delete an existed ward
         /// </summary>
         /// <param name="id">id of data that need to delete</param>
         /// <returns></returns>
@@ -181,7 +181,7 @@ namespace eFMS.API.Catalogue.Controllers
         [Authorize]
         public IActionResult Delete(short id)
         {
-            var hs = catCityService.Delete(id);
+            var hs = catWardService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -207,9 +207,9 @@ namespace eFMS.API.Catalogue.Controllers
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
-                if (worksheet.Cells[1, 1].Value?.ToString() != "Province Code")
+                if (worksheet.Cells[1, 1].Value?.ToString() != "Code")
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'City Code' " });
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Code' " });
                 }
                 if (worksheet.Cells[1, 2].Value?.ToString() != "English Name")
                 {
@@ -223,26 +223,36 @@ namespace eFMS.API.Catalogue.Controllers
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Country' " });
                 }
+                if (worksheet.Cells[1, 5].Value?.ToString() != "Province")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Province' " });
+                }
+                if (worksheet.Cells[1, 6].Value?.ToString() != "District")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'District' " });
+                }
                 if (worksheet.Cells[1, 5].Value?.ToString() != "Inactive")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Inactive' " });
                 }
-                List<CatCityModel> list = new List<CatCityModel>();
+                List<CatWardModel> list = new List<CatWardModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
-                    var country = new CatCityModel
+                    var country = new CatWardModel
                     {
                         IsValid = true,
                         Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
                         NameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         NameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
                         CodeCountry = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                        Status = worksheet.Cells[row, 5].Value?.ToString().Trim().ToLower()
+                        CodeCity = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                        CodeDistrict = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        Status = worksheet.Cells[row, 7].Value?.ToString().Trim().ToLower()
                     };
                     list.Add(country);
                 }
 
-                var data = catCityService.CheckValidImport(list);
+                var data = catWardService.CheckValidImport(list);
                 var totalValidRows = data.Count(x => x.IsValid == true);
                 var results = new { data, totalValidRows };
                 return Ok(results);
@@ -251,16 +261,16 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
         /// <summary>
-        /// import list cities
+        /// import list wards
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("Import")]
         [Authorize]
-        public IActionResult Import([FromBody] List<CatCityModel> data)
+        public IActionResult Import([FromBody] List<CatWardModel> data)
         {
-            var result = catCityService.Import(data);
+            var result = catWardService.Import(data);
             if (result.Success)
             {
                 return Ok(result);
@@ -271,19 +281,19 @@ namespace eFMS.API.Catalogue.Controllers
             }
         }
 
-        private string CheckExist(int id, CatCityModel model)
+        private string CheckExist(int id, CatWardModel model)
         {
             string message = string.Empty;
             if (id == 0)
             {
-                if (catCityService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.CodeCountry.ToLower() == model.CodeCountry.ToLower()))
+                if (catWardService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.CodeDistrict.ToLower() == model.CodeDistrict.ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catCityService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id != id))
+                if (catWardService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id != id))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

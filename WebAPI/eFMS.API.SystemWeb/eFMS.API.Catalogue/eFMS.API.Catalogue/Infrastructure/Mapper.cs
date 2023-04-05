@@ -59,6 +59,9 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatStandardCharge, CatStandardChargeModel>();
             CreateMap<CatCity, CatCityModel>();
             CreateMap<CatAddressPartner, CatAddressPartnerModel>();
+            CreateMap<CatDistrict, CatDistrictModel>();
+            CreateMap<CatWard, CatWardModel>();
+
 
 
         }

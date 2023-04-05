@@ -22,35 +22,45 @@ using System.Threading;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
-    public class CatCityService : RepositoryBaseCache<CatCity, CatCityModel>, ICatCityService
+    public class CatWardService : RepositoryBaseCache<CatWard, CatWardModel>, ICatWardService
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
+        private readonly IContextBase<CatCity> catCityRepository;
         private readonly IContextBase<CatCountry> catCountryRepository;
+        private readonly IContextBase<CatDistrict> catDistrictRepository;
 
-        public CatCityService(IContextBase<CatCity> repository,
-           ICacheServiceBase<CatCity> cacheService,
+
+
+        public CatWardService(IContextBase<CatWard> repository,
+           ICacheServiceBase<CatWard> cacheService,
            IMapper mapper,
            IStringLocalizer<LanguageSub> localizer,
+           IContextBase<CatCity> catCityRepo,
            IContextBase<CatCountry> catCountryRepo,
+           IContextBase<CatDistrict> catDistrictRepo,
+
+
            ICurrentUser user) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
+            catCityRepository = catCityRepo;
             catCountryRepository = catCountryRepo;
+            catDistrictRepository = catDistrictRepo;
             SetChildren<CatPlace>("Id", "CountryId");
             SetChildren<CatPartner>("Id", "CountryId");
 
         }
 
         #region CRUD
-        public override HandleState Add(CatCityModel entity)
+        public override HandleState Add(CatWardModel entity)
         {
             entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
             entity.UserCreated = entity.UserModified = currentUser.UserID;
             entity.Active = true;
-            var city = mapper.Map<CatCity>(entity);
-            var result = DataContext.Add(city);
+            var Ward = mapper.Map<CatWard>(entity);
+            var result = DataContext.Add(Ward);
             if (result.Success)
             {
                 ClearCache();
@@ -72,16 +82,16 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         #endregion
 
-        public List<CatCityViewModel> GetByLanguage()
+        public List<CatWardViewModel> GetByLanguage()
         {
             var data = Get();
             if (data == null) return null;
             return GetDataByLanguage(data);
         }
 
-        public IQueryable<CatCityModel> GetCities(CatCityCriteria criteria, int page, int size, out int rowsCount)
+        public IQueryable<CatWardModel> GetWards(CatWardCriteria criteria, int page, int size, out int rowsCount)
         {
-            Expression<Func<CatCityModel, bool>> query = null;
+            Expression<Func<CatWardModel, bool>> query = null;
             if (criteria.All == null)
             {
                 query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -100,22 +110,28 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public HandleState Import(List<CatCityModel> data)
+        public HandleState Import(List<CatWardModel> data)
         {
             try
             {
-                var newList = new List<CatCity>();
+                var newList = new List<CatWard>();
                 foreach (var item in data)
                 {
                     bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
-                    var country = catCountryRepository.Where(x => x.Code == item.CodeCountry).FirstOrDefault();
+                    var city = catCityRepository.Where(x => x.Code == item.CodeCountry)?.FirstOrDefault();
+                    var country = catCityRepository.Where(x => x.Code == item.CodeCountry)?.FirstOrDefault();
+                    var district = catCityRepository.Where(x => x.Code == item.CodeDistrict)?.FirstOrDefault();
+
+
                     DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
-                    var city = new CatCity
+                    var ward = new CatWard
                     {
                         Code = item.Code,
                         NameEn = item.NameEn,
                         NameVn = item.NameVn,
-                        CodeCountry = country.Code,
+                        CodeCity = city?.Code,
+                        CodeCountry = country?.Code,
+                        CodeDistrict = district?.Code,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID,
@@ -123,7 +139,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         Active = active,
                         InactiveOn = inactiveDate
                     };
-                    newList.Add(city);
+                    newList.Add(ward);
                 }
                 var hs = DataContext.Add(newList);
                 DataContext.SubmitChanges();
@@ -140,9 +156,9 @@ namespace eFMS.API.Catalogue.DL.Services
             }
         }
 
-        public IQueryable<CatCityModel> Query(CatCityCriteria criteria)
+        public IQueryable<CatWardModel> Query(CatWardCriteria criteria)
         {
-            Expression<Func<CatCityModel, bool>> query = null;
+            Expression<Func<CatWardModel, bool>> query = null;
             if (criteria.All == null)
             {
                 query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -161,7 +177,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return data;
         }
 
-        public HandleState Update(CatCityModel model)
+        public HandleState Update(CatWardModel model)
         {
             model.DatetimeModified = DateTime.Now;
             model.UserModified = currentUser.UserID;
@@ -178,13 +194,13 @@ namespace eFMS.API.Catalogue.DL.Services
             return result;
         }
 
-        private List<CatCityViewModel> GetDataByLanguage(IQueryable<CatCity> data)
+        private List<CatWardViewModel> GetDataByLanguage(IQueryable<CatWard> data)
         {
             CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
-            var results = new List<CatCityViewModel>();
+            var results = new List<CatWardViewModel>();
             foreach (var item in data)
             {
-                var city = new CatCityViewModel
+                var city = new CatWardViewModel
                 {
                     Id = item.Id,
                     Code = item.Code,
@@ -194,59 +210,73 @@ namespace eFMS.API.Catalogue.DL.Services
                     UserModified = item.UserModified,
                     DatetimeModified = item.DatetimeModified,
                     Active = item.Active,
-                    InActiveOn = item.InactiveOn
+                    InActiveOn = item.InactiveOn,
+                    CodeDistrict = item.CodeDistrict,
+                    CodeCity = item.CodeCity,
+                    CodeCountry = item.CodeCountry
+
                 };
                 results.Add(city);
             }
             return results;
         }
 
-        public List<CatCityModel> CheckValidImport(List<CatCityModel> list)
+        public List<CatWardModel> CheckValidImport(List<CatWardModel> list)
         {
             var cities = Get();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.NameEn))
                 {
-                    item.NameEn = stringLocalizer[CatalogueLanguageSub.MSG_CITY_NAME_EN_EMPTY];
+                    item.NameEn = stringLocalizer[CatalogueLanguageSub.MSG_WARD_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.NameVn))
                 {
-                    item.NameVn = stringLocalizer[CatalogueLanguageSub.MSG_CITY_NAME_LOCAL_EMPTY];
+                    item.NameVn = stringLocalizer[CatalogueLanguageSub.MSG_WARD_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    item.Code = stringLocalizer[CatalogueLanguageSub.MSG_CITY_CODE_EMPTY];
+                    item.Code = stringLocalizer[CatalogueLanguageSub.MSG_WARD_CODE_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CodeDistrict))
+                {
+                    item.CodeCity = stringLocalizer[CatalogueLanguageSub.MSG_DISTRICT_CODE_EMPTY];
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.CodeCity))
+                {
+                    item.CodeCity = stringLocalizer[CatalogueLanguageSub.MSG_CITY_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CodeCountry))
                 {
-                    item.CodeCountry = stringLocalizer[CatalogueLanguageSub.MSG_COUNTRY_CODE_EMPTY];
+                    item.CodeCity = stringLocalizer[CatalogueLanguageSub.MSG_COUNTRY_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
                 {
-                    var city = cities.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower() && x.CodeCountry.ToUpper() == item.CodeCountry.ToUpper());
+                    var city = cities.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower() && x.CodeDistrict.ToUpper() == item.CodeDistrict.ToUpper());
                     if (city != null)
                     {
-                        item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CITY_EXISTED], item.Code);
+                        item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_WARD_EXISTED], item.Code);
                         item.IsValid = false;
                     }
-                    if (list.Count(x => x.Code.ToLower() == item.Code.ToLower() &&  x.CodeCountry.ToUpper() == item.CodeCountry.ToUpper()) > 1)
+                    if (list.Count(x => x.Code.ToLower() == item.Code.ToLower() && x.CodeDistrict.ToUpper() == item.CodeDistrict.ToUpper()) > 1)
                     {
-                        item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CITY_CODE_DUPLICATE], item.Code);
+                        item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_WARD_CODE_DUPLICATE], item.Code);
                         item.IsValid = false;
                     }
                 }
             });
             return list;
         }
-        public List<CatCity> GetCitiesByCountry(string CountryCode)
+        public List<CatWard> GetWardsByDistrict(string CityCode)
         {
             var data = DataContext.Get();
-            return data.Where(x => x.CodeCountry == CountryCode).ToList();
+            return data.Where(x => x.CodeDistrict == CityCode).ToList();
         }
     }
-}   
+}
