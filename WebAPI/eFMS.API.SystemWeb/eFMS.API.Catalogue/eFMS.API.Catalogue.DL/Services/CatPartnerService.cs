@@ -2801,10 +2801,11 @@ namespace eFMS.API.Catalogue.DL.Services
         /// </summary>
         /// <param name="salemanId"></param>
         /// <returns></returns>
-        public List<CatPartnerViewModel2> GetParentPartnerSameSaleman(string salemanId)
+        public List<CatPartnerViewModel2> GetParentPartnerSameSaleman(CatPartnerCriteria criteria)
         {
-            var partners = DataContext.Get(x => !string.IsNullOrEmpty(x.ParentId));
-            var contracts = contractRepository.Get(x => x.Active == true && x.SaleManId == salemanId);
+            string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
+            var partners = DataContext.Get(x => x.ParentId == criteria.Id && (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase));
+            var contracts = contractRepository.Get(x => x.Active == true && x.SaleManId == criteria.Saleman);
             var data = from pa in partners
                        join ct in contracts on pa.ParentId equals ct.PartnerId
                        select new CatPartnerViewModel2

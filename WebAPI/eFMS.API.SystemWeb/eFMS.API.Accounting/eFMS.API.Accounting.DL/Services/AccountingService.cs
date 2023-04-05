@@ -2875,7 +2875,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                  CustomerCode = partner.AccountNo,
                                                  CustomerName = partner.PartnerNameVn,
                                                  Description0 = GeneratePaymentReceiptDescription(receipt, type),
-                                                 PaymentMethod = GetPaymentMethodReceipt(receipt, type), // 16473
+                                                 PaymentMethod = !string.IsNullOrEmpty(receipt.Arcbno) ? receipt.PaymentMethod : GetPaymentMethodReceipt(receipt, type), // 16473
                                                  DataType = "PAYMENT",
                                                  LocalBranchCode = grpobh.InternalCode
                                              };
@@ -2888,7 +2888,7 @@ namespace eFMS.API.Accounting.DL.Services
                 List<PaymentDetailModel> details = new List<PaymentDetailModel>();
 
                 string obhAccountNo = string.Empty;
-                if(receiptItem.ObhpartnerId != Guid.Empty && receiptItem.ObhpartnerId != null)
+                if (receiptItem.ObhpartnerId != Guid.Empty && receiptItem.ObhpartnerId != null)
                 {
                     CatPartner partnerOBH = PartnerRepository.Get(x => x.Id == receiptItem.ObhpartnerId.ToString())?.FirstOrDefault();
                     if (partnerOBH != null)
@@ -2896,7 +2896,7 @@ namespace eFMS.API.Accounting.DL.Services
                         obhAccountNo = partnerOBH.AccountNo;
                     }
                 }
-                else if(receiptItem.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE
+                else if (receiptItem.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE
                     || type == "CLEAR_ADV")
                 {
                     obhAccountNo = result.CustomerCode;
@@ -2915,7 +2915,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    BankAccountNo = receiptItem.BankAccountNo,
                                                                    ObhPartnerCode = obhAccountNo,
                                                                    Description = receiptItem.Type == "Agent" ? ("Cấn trừ " + payment.BillingRefNo) : GeneratePaymentReceiptDescription(payment, type),
-                                                                   ChargeType = GetChargeTypeReceiptPayment(receiptItem, payment, type),
+                                                                   ChargeType = !string.IsNullOrEmpty(receiptItem.Arcbno) ? payment.Type : GetChargeTypeReceiptPayment(receiptItem, payment, type),
                                                                    DebitAccount = GetPaymentReceiptAccount(receiptItem, payment.Type, invoicegrp.AccountNo, type),
                                                                    NganhCode = "FWD",
                                                                    Stt_Cd_Htt = type == "COLL_ADV" ? string.Empty : invoicegrp.ReferenceNo
@@ -3310,7 +3310,14 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 if (key == "amount")
                 {
-                    _paidAmount = payment.PaymentAmountVnd;
+                    if (receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        _paidAmount = payment.PaymentAmountVnd;
+                    }
+                    else
+                    {
+                        _paidAmount = payment.PaymentAmountUsd;
+                    }
                 }
             }
 

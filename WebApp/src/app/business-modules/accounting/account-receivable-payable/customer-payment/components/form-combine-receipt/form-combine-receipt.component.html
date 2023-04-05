@@ -58,7 +58,7 @@
                     <div class="form-group"
                         [ngClass]="{'m-form__group has-danger':((!exchangeRate?.value && !exchangeRate.valid) || exchangeRate.value <= 0) }">
                         <label class="form-control-label">
-                            Exchange Rate:{{isUpdate}}
+                            Exchange Rate:
                         </label>
                         <input type="number" class="form-control m-input m-input--square font-15"
                             formControlName="exchangeRate" [attr.disabled]="isUpdate === true ? 'disabled' : null" numeric [decimals]="0"

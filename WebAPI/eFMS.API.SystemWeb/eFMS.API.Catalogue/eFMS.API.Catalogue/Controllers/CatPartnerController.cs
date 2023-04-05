@@ -676,11 +676,11 @@ namespace eFMS.API.Catalogue.Controllers
         /// </summary>
         /// <param name="salemanId"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Route("GetParentPartnerSameSaleman")]
-        public IActionResult GetParentPartnerSameSaleman(string salemanId)
+        public IActionResult GetParentPartnerSameSaleman(CatPartnerCriteria criteria)
         {
-            var data = catPartnerService.GetParentPartnerSameSaleman(salemanId);
+            var data = catPartnerService.GetParentPartnerSameSaleman(criteria);
             return Ok(data);
         }
     }

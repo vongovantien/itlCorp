@@ -128,9 +128,16 @@
                                                     <td>
                                                         {{cps.paymentMethod}}
                                                     </td>
-                                                    <td *ngIf="_receiptType === 'Agent' && cps?.arcbno">
-                                                        <a href="javascript:void(0)"
-                                                        (click)="goToARCBDetail(cps.arcbno)">{{cps.arcbno}}</a>
+                                                    <td>
+                                                        <div *ngIf="_receiptType === 'Agent' && cps?.arcbno">
+                                                            <ng-container *ngIf="cps.status != 'Cancel'; else CancelARCB">
+                                                                <a href="javascript:void(0)" (click)="goToARCBDetail(cps.arcbno)">{{cps.arcbno}}</a>
+                                                            </ng-container>
+                                                            <ng-template #CancelARCB>
+                                                                <a class="text-muted pointer">{{cps.arcbno}}
+                                                                </a>
+                                                            </ng-template>
+                                                        </div>
                                                     </td>
                                                     <td class="text-right">
                                                         <span>{{cps.finalPaidAmount | number :'.0-3'}}</span>
@@ -243,7 +250,7 @@
         </div>
     </ng-container>
     <ng-container *ngIf="_receiptType === 'Agent' && !!selectedReceipt?.arcbno">
-        <div class="menu-context__item" (click)="goToARCBDetail(selectedReceipt?.arcbno)">
+        <div class="menu-context__item" (click)="goToARCBDetail(selectedReceipt?.arcbno)" *ngIf="selectedReceipt?.status !== 'Cancel'">
             <span>
                 <i class="la la-pencil-square text-primary"></i>
                 <span>View & Edit Receipt Combine</span>
