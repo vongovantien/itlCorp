@@ -137,6 +137,10 @@
                                 (click)="sort('vatrate')">
                                 <span>Vat*</span>
                             </th>
+                            <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'typeOfFee'), 'sorting_desc': (!isDesc && sortKey == 'typeOfFee') }"
+                                (click)="sort('typeOfFee')">
+                                <span>Fee Type</span>
+                            </th>
                             <!-- <th [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'totalAmount'), 'sorting_desc': (!isDesc && sortKey == 'totalAmount') }"
                                 (click)="sort('totalAmount')">
                                 <span>Total Amount*</span>
@@ -245,6 +249,9 @@
                                     <span *ngIf="item.vatError === null">{{ item.vatrate }}</span>
                                     <span class="m--font-danger" *ngIf="item.vatError !== null">{{item.vatError
                                         }}</span>
+                                </td>
+                                <td>
+                                    <span>{{ item.typeOfFee }}</span>
                                 </td>
                                 <!-- <td>
                                     <span *ngIf="item.totalAmountError === null">{{ item.totalAmount }}</span>
