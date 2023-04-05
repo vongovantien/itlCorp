@@ -139,9 +139,7 @@
                                                 </div>
                                             </td>
                                             <td>{{item.partnerName}}</td>
-                                            <td>{{item.refNo}}{{isSubmitted}}{{isSubmitted && (item.paidAmountUsd < 0 ||
-                                                    item.paidAmountUsd===null || item.paidAmountUsd> item.unpaidAmountUsd)}}
-                                            </td>
+                                            <td>{{item.refNo}}</td>
                                             <td>{{item.unpaidAmountUsd}}</td>
                                             <td>
                                                 <div class="form-group "
@@ -199,6 +197,7 @@
                                     </tr>
                                 </tfoot>
                             </table>
+                            <div class="div"></div>
                         </div>
                     </ng-container>
                 </div>
@@ -334,7 +333,7 @@
                                                 </div>
                                             </td>
                                             <td>{{item.partnerName}}</td>
-                                            <td>{{item.refNo}}{{isSubmitted}}{{isSubmitted && (item.paidAmountUsd < 0 || item.paidAmountUsd === null || item.paidAmountUsd > item.unpaidAmountUsd)}}</td>
+                                            <td>{{item.refNo}}</td>
                                             <td>{{item.unpaidAmountUsd}}</td>
                                             <td>
                                                 <div class="form-group"
@@ -392,6 +391,7 @@
                                     </tr>
                                 </tfoot>
                             </table>
+                            <div class="div"></div>
                         </div>
                     </ng-container>
                 </div>

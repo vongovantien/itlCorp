@@ -147,7 +147,8 @@ export class ReceiptModel extends Receipt {
     receiptInternalOfficeCode: string = null;
     obhPartnerName: string = null;
     salemanId: string = null;
-    
+    salemanName: string = null;
+
     constructor(object?: any) {
         super();
         const self = this;

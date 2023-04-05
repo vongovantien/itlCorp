@@ -18,17 +18,10 @@
             <div class="combine-general-list-wrapper m-animate-fade-in">
                 <div class="table-wrapper table-editable m--margin-top-20" style="max-height:500px">
                     <table class="table table-brand dataTable-edit">
-                        <thead>
-                            <tr>
-                                <th class="m--w-90 first table-actions-col">
-                                </th>
-                                <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
-                                    [class]="sortClass(header.sortable ? header.field : '')"
-                                    (click)="sortBy(header.sortable ? header.field : '')">
-                                    <span>{{header.title}}</span>
-                                    <span class="sort-indicator"></span>
-                                </th>
-                            </tr>
+                        <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                            <th class="m--w-90 first table-actions-col">
+                    
+                            </th>
                         </thead>
                         <tbody class="tbody-group">
                             <ng-container *ngIf="!!generalReceipts.length">
@@ -43,8 +36,7 @@
                                             </ng-container>
                                             <ng-template #saveDraft>
                                                 <ng-container *ngIf="item.status === 'Draft'">
-                                                    <button type="button"
-                                                        class="btn btn-primary btn-sm  m-btn--icon m-btn--icon-only"
+                                                    <button type="button" class="btn btn-primary btn-sm  m-btn--icon m-btn--icon-only"
                                                         (click)="onSaveReceiptGroup('general', 'update', item)">
                                                         <i class="la la-save"></i>
                                                     </button>
@@ -52,8 +44,7 @@
                                             </ng-template>
                                             <ng-container *ngIf=" !item.status || item.status === 'Draft'">
                                                 <button type="button" (click)="checkAllowDelete(item, i)"
-                                                    class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
-                                                    title="Remove">
+                                                    class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only" title="Remove">
                                                     <i class="la la-trash"></i>
                                                 </button>
                                             </ng-container>
@@ -67,9 +58,8 @@
                                                     [currentActiveItemId]="{field:'id', value:item.partnerId}"
                                                     (itemSelected)="onSelectDataTableInfo($event, item, 'partnerId')"
                                                     [selectedDisplayFields]="['shortName']" [dataSources]="partners"
-                                                    [displayFields]="displayFieldsPartner" [height]="150"
-                                                    placeholder="Please Select" (remove)="item.partnerId = null"
-                                                    [disabled]="!!item.readonly" [clearable]="false">
+                                                    [displayFields]="displayFieldsPartner" [height]="150" placeholder="Please Select"
+                                                    (remove)="item.partnerId = null" [disabled]="!!item.readonly" [clearable]="false">
                                                 </app-combo-grid-virtual-scroll>
                                             </div>
                                         </div>
@@ -77,8 +67,7 @@
                                     <td>
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted  && (!item.paymentMethod || !!item.duplicate)}">
-                                            <select class="form-control" [(ngModel)]="item.paymentMethod"
-                                                placeholder="payment method"
+                                            <select class="form-control" [(ngModel)]="item.paymentMethod" placeholder="payment method"
                                                 (ngModelChange)="onSelectDataTableInfo($event, item, 'paymentMethod')">
                                                 <option [ngValue]="null" disabled>Please select</option>
                                                 <option *ngFor="let method of paymentMethods" [ngValue]="method.id">
@@ -91,8 +80,8 @@
                                         <div class="form-group "
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && (item.amountUsd < 0 || item.amountUsd === null)}">
                                             <ng-container *ngIf="!item.readonly else AmoutUsdTpl ">
-                                                <input type="number" class="form-control" [(ngModel)]="item.amountUsd"
-                                                    name="amountUsd" autoFormatCurrency [disabled]="isReadonly"
+                                                <input type="number" class="form-control" [(ngModel)]="item.amountUsd" name="amountUsd"
+                                                    autoFormatCurrency [disabled]="isReadonly"
                                                     (ngModelChange)="onSelectDataTableInfo($event, item,'amountUsd')">
                                             </ng-container>
                                             <ng-template #AmoutUsdTpl>
@@ -111,16 +100,15 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !!item.duplicate}">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !!item.duplicate}">
                                             <div class="list-master-unit">
                                                 <app-combo-grid-virtual-scroll #comboGridOffice
                                                     [currentActiveItemId]="{field:'id', value:item.obhPartnerId}"
                                                     (itemSelected)="onSelectDataTableInfo($event.id, item, 'obhPartnerId')"
                                                     [selectedDisplayFields]="['shortName']" [dataSources]="obhPartners"
                                                     [displayFields]="[{ field: 'accountNo', label: 'Partner Code' },{ field: 'shortName', label: 'Name ABBR' }]"
-                                                    [height]="150" placeholder="Please Select"
-                                                    (remove)="item.obhPartnerId = null" [disabled]="!!item.readonly">
+                                                    [height]="150" placeholder="Please Select" (remove)="item.obhPartnerId = null"
+                                                    [disabled]="!!item.readonly">
                                                 </app-combo-grid-virtual-scroll>
                                             </div>
                                         </div>
@@ -128,8 +116,7 @@
                                     <td>
                                         <div class="form-group"
                                             [ngClass]="{'m-form__group has-danger': isSubmitted  && (!item.officeId || !!item.duplicate)}">
-                                            <select class="form-control" [(ngModel)]="item.officeId"
-                                                placeholder="Office handle"
+                                            <select class="form-control" [(ngModel)]="item.officeId" placeholder="Office handle"
                                                 (ngModelChange)="onSelectDataTableInfo($event, item, 'officeId')">
                                                 <option [ngValue]="null" disabled>Please select</option>
                                                 <option *ngFor="let office of offices" [ngValue]="office.id">
@@ -141,8 +128,7 @@
                                     <td>
                                         <div class="form-group ">
                                             <ng-container *ngIf="!item.readonly; else notesTpl">
-                                                <input type="text" class="form-control" [(ngModel)]="item.notes"
-                                                    placeholder="Notes">
+                                                <input type="text" class="form-control" [(ngModel)]="item.notes" placeholder="Notes">
                                             </ng-container>
                                             <ng-template #notesTpl>
                                                 {{item.notes}}
@@ -156,20 +142,16 @@
                                                     {{item.receiptNo}}
                                                 </span>
                                                 <ng-container [ngSwitch]="item.status" *ngIf="!item.syncStatus">
-                                                    <span *ngSwitchCase="'Done'"
-                                                        class="badge badge-success m--margin-left-10">
+                                                    <span *ngSwitchCase="'Done'" class="badge badge-success m--margin-left-10">
                                                         {{item.status}}</span>
-                                                    <span *ngSwitchCase="'Draft'"
-                                                        class="badge badge-danger m--margin-left-10">
+                                                    <span *ngSwitchCase="'Draft'" class="badge badge-danger m--margin-left-10">
                                                         {{item.status}}</span>
                                                 </ng-container>
-    
+                    
                                                 <ng-container [ngSwitch]="item.syncStatus" *ngIf="item.syncStatus">
-                                                    <span *ngSwitchCase="'Synced'"
-                                                        class="badge badge-success m--margin-left-10">
+                                                    <span *ngSwitchCase="'Synced'" class="badge badge-success m--margin-left-10">
                                                         {{item.syncStatus}}</span>
-                                                    <span *ngSwitchCase="'Rejected'"
-                                                        class="badge badge-danger m--margin-left-10">
+                                                    <span *ngSwitchCase="'Rejected'" class="badge badge-danger m--margin-left-10">
                                                         {{item.syncStatus}}</span>
                                                 </ng-container>
                                             </span>
@@ -197,12 +179,11 @@
                             <tr app-table-none-record *ngIf="!generalReceipts.length">
                             </tr>
                             <!-- <tr app-table-row-loading *ngIf="(isLoading | async)">
-                            </tr> -->
+                                                </tr> -->
                             <tr>
                                 <ng-container *ngIf="!isUpdate">
                                     <td colspan=1>
-                                        <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add"
-                                            (click)="addGeneralItem()">
+                                        <a class="btn m-btn--icon m-btn--icon-only m--font-primary" title="Add" (click)="addGeneralItem()">
                                             <i class="fa fa-plus-circle fa-2x"></i>
                                         </a>
                                     </td>

@@ -90,11 +90,10 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
     }
 
     updateDetailForm(data: ReceiptModel) {
-        console.log('update existed');
         this.CreateReceiptCombineComponent.isUpdate = true;
         const formMapping = {
           paymentDate: !!data.paymentDate ? { startDate: new Date(data.paymentDate), endDate: new Date(data.paymentDate) } : null,
-          partnerId: data.agreementId,
+          partnerId: data.customerId,
           contractId: data.agreementId,
           paymentRefNo: data.paymentRefNo,
           exchangeRate: data.exchangeRate,
@@ -108,22 +107,34 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
         this._store.dispatch(UpdateExchangeRateReceiptCombine({ exchangeRate: data.exchangeRate }));
         // this.CreateReceiptCombineComponent.partnerName = data[0].customerName;
     
-        this.CreateReceiptCombineComponent.partners
-          .pipe(takeUntil(this.ngUnsubscribe))
-          .subscribe((items: any[]) => {
-            const partner = items.find(x => x.id === data.customerId && x.salemanId === data.salemanId);
-            this.CreateReceiptCombineComponent.partnerId.setValue(partner.contractId);
-            this.CreateReceiptCombineComponent.selectedPartner = partner;
-            this._store.dispatch(SelectPartnerReceiptCombine({
-              id: partner.id,
-              shortName: partner.shortName,
-              accountNo: partner.accountNo,
-              partnerNameEn: partner.partnerNameEn,
-              salemanId: partner.salemanId,
-              salemanName: partner.salemanName,
-              contractId: partner.contractId
-            }))
-          });
+        this.CreateReceiptCombineComponent.partnerId.setValue(data.customerId);
+        this.CreateReceiptCombineComponent.partnerName = data.customerName + ' - ' + data.salemanName;
+        this._store.dispatch(SelectPartnerReceiptCombine({
+          id: data.customerId,
+          shortName: data.customerName,
+          accountNo: '',
+          partnerNameEn: data.customerName,
+          salemanId: data.salemanId,
+          salemanName: data.salemanName,
+          contractId: data.agreementId
+        }))
+
+        // this.CreateReceiptCombineComponent.partners
+        //   .pipe(takeUntil(this.ngUnsubscribe))
+        //   .subscribe((items: any[]) => {
+        //     const partner = items.find(x => x.id === data.customerId && x.salemanId === data.salemanId);
+        //     this.CreateReceiptCombineComponent.partnerId.setValue(partner.contractId);
+        //     this.CreateReceiptCombineComponent.selectedPartner = partner;
+        //     this._store.dispatch(SelectPartnerReceiptCombine({
+        //       id: partner.id,
+        //       shortName: partner.shortName,
+        //       accountNo: partner.accountNo,
+        //       partnerNameEn: partner.partnerNameEn,
+        //       salemanId: partner.salemanId,
+        //       salemanName: partner.salemanName,
+        //       contractId: partner.contractId
+        //     }))
+        //   });
     }
 
     onAddDatatoList() {
@@ -253,7 +264,7 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
     
     saveReceipt(actionString: string, type: string = null, receipt: any = null) {
         let action: number;
-        if (this.conbineType === 'existing') {
+        if (this.conbineType === 'existing' && actionString === 'draft') {
             actionString = 'update';
         }
         switch (actionString) {
@@ -406,7 +417,7 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
         .subscribe((res: any) => {
             this.formCreateMapValue = {
                 arcbno: this.CreateReceiptCombineComponent.combineNo.value,
-                customerId: this.CreateReceiptCombineComponent.selectedPartner.id,
+                customerId: dataForm.partnerId,
                 paymentDate: !!dataForm.paymentDate.startDate ? formatDate(dataForm.paymentDate.startDate, 'yyyy-MM-dd', 'en') : null,
                 exchangeRate: !!dataForm.exchangeRate ? dataForm.exchangeRate : 1,
                 currencyId: !!dataForm.currency ? dataForm.currency : null,
@@ -484,9 +495,12 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
             this.ReceiptGeneralCombineComponent.generalReceipts.forEach((obj) => {
                 if (this.ReceiptGeneralCombineComponent.generalReceipts.filter(item => item.partnerId === obj.partnerId && item.paymentMethod === obj.paymentMethod && item.obhPartnerId === obj.obhPartnerId && item.officeId === obj.officeId).length > 1) {
                     obj.duplicate = true;
-                    return false;
+                }else{
+                    obj.duplicate = false;
                 }
             });
+            if(this.ReceiptGeneralCombineComponent.generalReceipts.some(item => item.duplicate))
+                return false;
         }
 
         if (!type || type === 'credit') {
@@ -514,24 +528,9 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
         return true;
     }
 
-    onSaveReceipt(data: any){
-        if(data.action === 'delete'){
-            this.onConfirmDeleteCP(data.receipt);
-        }
+    onSaveReceipt(data: any) {
         this.saveReceipt(data.action, data.type, data.receipt);
     }
-
     
-      onConfirmDeleteCP(selectedCPs: any) {
-        this._accountingRepo
-          .deleteCusPayment(selectedCPs.id)
-          .subscribe((res: any) => {
-            this._toastService.success(res.message);
-            console.log('route', 'combine'+ selectedCPs.arcbno);
-            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${selectedCPs.arcbno}`]);
-            // * search cps when success.
-    
-            // this.requestLoadListCustomerPayment();
-          });
-      }
+      
 }
