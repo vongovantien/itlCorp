@@ -681,7 +681,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                         return <AccountingInterface.IRequestFileType>{
                             Id: x.id,
                             action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
-                            fileName: url
+                            //fileName: url
                         };
                     });
                     return this._accoutingRepo.syncSettleToAccountant(syncModel)
