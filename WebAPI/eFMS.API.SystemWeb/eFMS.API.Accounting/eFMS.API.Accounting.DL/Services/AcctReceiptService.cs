@@ -704,7 +704,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH").OrderBy(x => x.DatetimeCreated);
             var partnerInfos = catPartnerRepository.Get(x => x.Id == result.CustomerId || x.ParentId == result.CustomerId);
-
+            var creditArs = creditMngtArRepository.Get(x => !string.IsNullOrEmpty(x.ReferenceNo));
             if (listOBH.Count() > 0)
             {
                 var OBHGrp = listOBH.GroupBy(x => new { x.BillingRefNo, x.Negative, x.CurrencyId });
@@ -750,6 +750,10 @@ namespace eFMS.API.Accounting.DL.Services
                         item.PartnerName = agnecy?.ShortName;
                         item.TaxCode = agnecy?.AccountNo;
                     }
+                    if (!string.IsNullOrEmpty(receipt.Arcbno) && receipt.PaymentMethod.ToLower().Contains("credit"))
+                    {
+                        item.ReferenceNo = creditArs.Where(x => x.Code == item.RefNo && x.Hblid == item.Hblid).FirstOrDefault()?.ReferenceNo;
+                    }
                 }
                 paymentReceipts.AddRange(items);
             }
@@ -764,6 +768,7 @@ namespace eFMS.API.Accounting.DL.Services
                     string _jobNo = string.Empty;
                     string _Hbl = string.Empty;
                     string _Mbl = string.Empty;
+                    string _ReferenceNo = string.Empty;
 
                     if (acctPayment.Hblid != null && acctPayment.Hblid != Guid.Empty)
                     {
@@ -781,6 +786,7 @@ namespace eFMS.API.Accounting.DL.Services
                             _Hbl = surcharge.Hblno;
                             _Mbl = surcharge.Mblno;
                             _jobNo = surcharge?.JobNo;
+                            _ReferenceNo = surcharge?.ReferenceNo;
                         }
                     }
 
@@ -850,6 +856,9 @@ namespace eFMS.API.Accounting.DL.Services
                         _creditNos = acctPayment.CreditNo.Split(",").ToList();
                     }
                     payment.CreditNos = _creditNos;
+
+                    payment.ReferenceNo = acctPayment.Type == "CREDIT" ? creditArs.First(x => x.Code == acctPayment.BillingRefNo && x.Hblid == acctPayment.Hblid)?.ReferenceNo : _ReferenceNo;
+
                     paymentReceipts.Add(payment);
                 }
             }
@@ -4901,7 +4910,7 @@ namespace eFMS.API.Accounting.DL.Services
                     foreach (var model in paymentGrp)
                     {
                         var payableExisted = paymentsCurrent.Where(x => x.PartnerId == model.Key.PartnerId && (x.TransactionType.Contains(AccountingConstants.TRANSACTION_TYPE_PAYABLE_CREDIT) || x.TransactionType == AccountingConstants.TRANSACTION_TYPE_PAYABLE_OBH)
-                        && (x.ReferenceNo == model.Key.ReferenceNo) && x.OfficeId == model.Key.OfficeId).FirstOrDefault();
+                        && (x.ReferenceNo == "A01F0000900043N1") && x.OfficeId == model.Key.OfficeId).FirstOrDefault();
                         var accPayablePayment = new AccAccountPayablePayment();
                         var creditPos = payableExisted.TotalAmount < 0 ? (-1) : 1; // Xét credit âm
                         accPayablePayment.Id = Guid.NewGuid();
@@ -5002,6 +5011,63 @@ namespace eFMS.API.Accounting.DL.Services
                 result.CustomerName = partnerInfo?.ShortName;
 
                 var creditArs = creditMngtArRepository.Get(x => !string.IsNullOrEmpty(x.ReferenceNo));
+
+                IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH").OrderBy(x => x.DatetimeCreated);
+                var partnerInfos = catPartnerRepository.Get(x => x.Id == result.CustomerId || x.ParentId == result.CustomerId);
+
+                if (listOBH.Count() > 0)
+                {
+                    var OBHGrp = listOBH.GroupBy(x => new { x.BillingRefNo, x.Negative, x.CurrencyId });
+
+                    List<ReceiptInvoiceModel> items = OBHGrp.Select(s => new ReceiptInvoiceModel
+                    {
+                        RefNo = s.Key.BillingRefNo,
+                        Type = "OBH",
+                        InvoiceNo = null,
+                        Amount = s.FirstOrDefault().RefAmount,
+                        UnpaidAmount = s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.FirstOrDefault().UnpaidPaymentAmountVnd : s.FirstOrDefault().UnpaidPaymentAmountUsd,
+                        UnpaidAmountVnd = s.FirstOrDefault().UnpaidPaymentAmountVnd,
+                        UnpaidAmountUsd = s.FirstOrDefault().UnpaidPaymentAmountUsd,
+                        PaidAmountVnd = s.Sum(x => x.PaymentAmountVnd),
+                        PaidAmountUsd = s.Sum(x => x.PaymentAmountUsd),
+                        TotalPaidVnd = s.Sum(x => x.PaymentAmountVnd),
+                        TotalPaidUsd = s.Sum(x => x.PaymentAmountUsd),
+                        Notes = s.FirstOrDefault().Note,
+                        OfficeId = s.FirstOrDefault().OfficeInvoiceId,
+                        OfficeName = officeRepository.Get(x => x.Id == s.FirstOrDefault().OfficeInvoiceId)?.FirstOrDefault().ShortName,
+                        DepartmentId = s.FirstOrDefault().DeptInvoiceId,
+                        DepartmentName = departmentRepository.Get(x => x.Id == s.FirstOrDefault().DeptInvoiceId)?.FirstOrDefault()?.DeptNameAbbr,
+                        CompanyId = s.FirstOrDefault().CompanyInvoiceId,
+                        RefIds = listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList(),
+                        CreditNo = s.FirstOrDefault().CreditNo,
+                        Hblid = s.FirstOrDefault().Hblid,
+                        Mbl = GetHBLInfo(s.FirstOrDefault().Hblid).MBL,
+                        Hbl = GetHBLInfo(s.FirstOrDefault().Hblid).HBLNo,
+                        JobNo = GetHBLInfo(s.FirstOrDefault().Hblid).JobNo,
+                        PaymentStatus = receipt.Type == "Customer" ? GetPaymentStatus(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList()) :
+                                        GetPaymentStatusAgent(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList(), s.FirstOrDefault().Hblid),
+                        ExchangeRateBilling = s.FirstOrDefault().ExchangeRateBilling,
+                        PartnerId = s.FirstOrDefault()?.PartnerId?.ToString(),
+                        Negative = s.FirstOrDefault()?.Negative,
+                        PaymentType = s.FirstOrDefault().PaymentType
+                    }).ToList();
+
+                    foreach (var item in items)
+                    {
+                        if (!string.IsNullOrEmpty(item.PartnerId))
+                        {
+                            var agnecy = partnerInfos.First(x => x.Id == item.PartnerId);
+                            item.PartnerName = agnecy?.ShortName;
+                            item.TaxCode = agnecy?.AccountNo;
+                        }
+                        if (!string.IsNullOrEmpty(receipt.Arcbno) && receipt.PaymentMethod.ToLower().Contains("credit"))
+                        {
+                            item.ReferenceNo = creditMngtArRepository.Get(x => x.Code == item.RefNo && x.Hblid == item.Hblid).FirstOrDefault()?.ReferenceNo;
+                        }
+                    }
+                    paymentReceipts.AddRange(items);
+                }
+
                 IEnumerable<AccAccountingPayment> listDebitCredit = acctPayments.Where(x => x.Type != "OBH").OrderBy(x => x.DatetimeCreated);
                 if (listDebitCredit.Count() > 0)
                 {

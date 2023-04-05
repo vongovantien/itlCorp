@@ -3,20 +3,21 @@ import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/cor
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppForm } from '@app';
 import { ConfirmPopupComponent } from '@common';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { AccountingConstants, RoutingConstants, SystemConstants } from '@constants';
 import { IReceiptCombineGroup, ReceiptInvoiceModel, ReceiptModel } from '@models';
 import { ActionsSubject, Store } from '@ngrx/store';
 import { AccountingRepo } from '@repositories';
 import { IAppState } from '@store';
 import groupBy from 'lodash/groupBy';
 import { ToastrService } from 'ngx-toastr';
-import { combineLatest } from 'rxjs';
-import { filter, map, take, takeUntil } from 'rxjs/operators';
+import { EMPTY, combineLatest, of } from 'rxjs';
+import { concatMap, filter, map, take, takeUntil } from 'rxjs/operators';
 import { ARCustomerPaymentReceiptCDCombineComponent } from '../components/cd-combine/receipt-cd-combine.component';
 import { ARCustomerPaymentFormCreateReceiptCombineComponent } from '../components/form-combine-receipt/form-combine-receipt.component';
 import { ARCustomerPaymentReceiptGeneralCombineComponent } from '../components/general-combine/receipt-general-combine.component';
-import { IsCombineReceipt, ReceiptCombineActionTypes, RegistTypeReceipt, ResetCombineInvoiceList, ResetInvoiceList, SelectedAgreementReceiptCombine, SelectPartnerReceiptCombine, UpdateExchangeRateReceiptCombine } from '../store/actions';
+import { AddCreditCombineToReceipt, AddDebitCombineToReceipt, IsCombineReceipt, ReceiptCombineActionTypes, RegistTypeReceipt, ResetCombineInvoiceList, ResetInvoiceList, SelectedAgreementReceiptCombine, SelectPartnerReceiptCombine, UpdateExchangeRateReceiptCombine } from '../store/actions';
 import { ReceiptCombineAgreementState, ReceiptCombineCreditListState, ReceiptCombineDeditListState, ReceiptCombineGeneralListState } from '../store/reducers';
+import { HttpErrorResponse } from '@angular/common/http';
 export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
     DRAFT_UPDATE = 1,
@@ -135,6 +136,44 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
         //       contractId: partner.contractId
         //     }))
         //   });
+    }
+
+    updateGeneralReceipt(data: ReceiptModel[]) {
+        const dataGeneral = data.filter(x => AccountingConstants.GENERAL_RECEIPT_PAYMENT_METHOD.some(item => item.id === x.paymentMethod));
+        const generalReceipts: any[] = [];
+        for(const item of dataGeneral) {
+          if(item.payments.length === 0){
+            continue;
+          }
+          const dataPush: any = item;
+          dataPush.partnerId = item.payments[0].partnerId;
+          dataPush.partnerName = item.payments[0].partnerName;
+          dataPush.receiptNo = item.paymentRefNo;
+          dataPush.userCreated = item.userNameCreated;
+          dataPush.isModified = true;
+          dataPush.amountUsd = item.payments[0].paidAmountUsd;
+          dataPush.amountVnd = item.payments[0].paidAmountVnd;
+          dataPush.datetimeModified = item.datetimeModified;
+          dataPush.obhPartnerId = item.obhpartnerId;
+          dataPush.notes = item.description;
+          generalReceipts.push(dataPush);
+        }
+        this.ReceiptGeneralCombineComponent.generalReceipts = generalReceipts;
+        this.ReceiptGeneralCombineComponent.isContainDraft = generalReceipts.some(x => x.status.toLowerCase() === 'draft');
+    }
+    
+    updateCreditDebitCombineReceipt(data: ReceiptModel[]) {
+        const creditList = data.filter(x => AccountingConstants.CREDIT_COMBINE_RECEIPT_PAYMENT_METHOD.some(item => item.id === x.paymentMethod))
+            .map((item: any) => item as ReceiptInvoiceModel);
+        const debitList = data.filter(x => AccountingConstants.DEBIT_COMBINE_RECEIPT_PAYMENT_METHOD.some(item => item.id === x.paymentMethod))
+            .map((item: any) => item as ReceiptInvoiceModel);
+        const creditCombineReceipts: IReceiptCombineGroup[] = [];
+        if (creditList.length > 0) {
+            this._store.dispatch(AddCreditCombineToReceipt({ creditCombineList: creditList }));
+        }
+        if (debitList.length > 0) {
+            this._store.dispatch(AddDebitCombineToReceipt({ debitCombineList: debitList }));
+        }
     }
 
     onAddDatatoList() {
@@ -297,14 +336,14 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
         }
 
         if (!type || type === 'credit') {
-            const creditReceipts = this.getDataCredit(actionString);
+            const creditReceipts = this.getDataCredit(actionString, receipt?.id);
             if (creditReceipts?.length) {
                 resultModel = [...resultModel, ...creditReceipts];
             }
         }
 
         if (!type || type === 'debit') {
-            const debitReceipts = this.getDataDebit(actionString);
+            const debitReceipts = this.getDataDebit(actionString, receipt?.id);
             if (debitReceipts?.length) {
                 resultModel = [...resultModel, ...debitReceipts];
             }
@@ -321,32 +360,43 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
 
     onSaveDataReceipt(models: any, action: number) {
         this._accountingRepo.saveCombineReceipt(models, action)
+            .pipe(concatMap((res: CommonInterface.IResult) => {
+                if (res.status) {
+                    this._toastService.success(res.message);
+                    this._store.dispatch(ResetCombineInvoiceList());
+                    this._store.dispatch(ResetInvoiceList());
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${res.data[0].arcbno}`]);
+                    if(this.conbineType === 'existing'){
+                        return EMPTY;
+                    }
+                    return this._accountingRepo.getByReceiptCombine(res.data[0].arcbno);
+                }else{
+                    this._toastService.warning(res.message);
+                }
+                of(res);
+            }),
+            takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (res: CommonInterface.IResult) => {
-                    console.log(res);
-                    if (res.status) {
-                        this._toastService.success(res.message);
-                        this._store.dispatch(ResetCombineInvoiceList());
-                        this._store.dispatch(ResetInvoiceList());
-                        console.log('route', 'combine'+ res.data[0].arcbno);
-                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${res.data[0].arcbno}`]);
+                (res: any) => {
+                    if (!!res && res.status === false) {
+                        this._toastService.error(res.message);
                         return;
                     }
-                    else{
-                        this._toastService.warning(res.message);
-                    }
+                    this.updateDetailForm(res[0]);
+                    this.CreateReceiptCombineComponent.isContainDraft = res.some(x => x.status === 'Done' && x?.syncStatus !== 'Synced');
+                    this.updateGeneralReceipt(res);
+                    this.updateCreditDebitCombineReceipt(res);
                 },
-                (res: any) => {
-                    this._toastService.error(res.message);
-                    // this.handleValidateReceiptResponse(res);
-                }
+                // (res: HttpErrorResponse) => {
+                //     this._toastService.error(res?.message);
+                // }
             )
     };
 
-    getDataCredit(action: string) {
+    getDataCredit(action: string, id: string = null) {
         let receiptModels: ReceiptModel[] = [];
         this.CreditPaymentReceiptCDCombineComponent.receiptCreditGroups
-        .filter((x: any) => !x.status || x.status.toLowerCase() === 'draft')
+        .filter((x: any) => (!x.status || x.status.toLowerCase() === 'draft') && (!id || x.id === id))
         .forEach((item: IReceiptCombineGroup) => {
             let model: ReceiptModel = new ReceiptModel(item);
             model.id = action !== 'draft' ? item.id : SystemConstants.EMPTY_GUID;
@@ -377,10 +427,10 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
         return receiptModels;
     }
 
-    getDataDebit(action: string) {
+    getDataDebit(action: string, id: string = null) {
         let receiptModels: ReceiptModel[] = [];
         this.DebitPaymentReceiptCDCombineComponent.receiptDebitGroups
-        .filter((x: any) => !x.status || x.status.toLowerCase() === 'draft')
+        .filter((x: any) => (!x.status || x.status.toLowerCase() === 'draft') && (!id || x.id === id))
         .forEach((item: IReceiptCombineGroup) => {
             let model: ReceiptModel = new ReceiptModel(item);
             model.id = action !== 'draft' ? item.id : SystemConstants.EMPTY_GUID;

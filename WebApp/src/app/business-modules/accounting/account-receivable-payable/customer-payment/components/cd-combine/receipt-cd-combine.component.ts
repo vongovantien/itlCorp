@@ -201,11 +201,12 @@ export class ARCustomerPaymentReceiptCDCombineComponent extends AppList implemen
         this.calculateTotal(item);
     }
 
-    onSaveReceiptGroup(type: string, action: string){
+    onSaveReceiptGroup(type: string, action: string, group: any = null){
         this.isSubmitted = true;
         const data = {
             type: type,
-            action: action 
+            action: action,
+            receipt: group
         }
         this.onSaveReceipt.emit(data);
     }

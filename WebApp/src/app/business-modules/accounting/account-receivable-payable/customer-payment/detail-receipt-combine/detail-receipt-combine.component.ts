@@ -247,40 +247,6 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
     )
   }
   
-  updateGeneralReceipt(data: ReceiptModel[]) {
-    const dataGeneral = data.filter(x => AccountingConstants.GENERAL_RECEIPT_PAYMENT_METHOD.some(item => item.id === x.paymentMethod));
-    const generalReceipts: any[] = [];
-    dataGeneral.forEach((item: any) => {
-      const dataPush = item;
-      dataPush.partnerId = item.payments[0].partnerId;
-      dataPush.partnerName = item.payments[0].partnerName;
-      dataPush.receiptNo = item.paymentRefNo;
-      dataPush.userCreated = item.userNameCreated;
-      dataPush.isModified = true;
-      dataPush.amountUsd = item.payments[0].paidAmountUsd;
-      dataPush.amountVnd = item.payments[0].paidAmountVnd;
-      dataPush.datetimeModified = item.datetimeModified;
-      dataPush.obhPartnerId = item.obhpartnerId;
-      dataPush.notes = item.description;
-      generalReceipts.push(dataPush);
-    })
-    this.ReceiptGeneralCombineComponent.generalReceipts = generalReceipts;
-    this.ReceiptGeneralCombineComponent.isContainDraft = generalReceipts.some(x => x.status.toLowerCase() === 'draft');
-  }
-
-  updateCreditDebitCombineReceipt(data: ReceiptModel[]) {
-    const creditList = data.filter(x => AccountingConstants.CREDIT_COMBINE_RECEIPT_PAYMENT_METHOD.some(item => item.id === x.paymentMethod))
-      .map((item: any) => item as ReceiptInvoiceModel);
-    const debitList = data.filter(x => AccountingConstants.DEBIT_COMBINE_RECEIPT_PAYMENT_METHOD.some(item => item.id === x.paymentMethod))
-      .map((item: any) => item as ReceiptInvoiceModel);
-    const creditCombineReceipts: IReceiptCombineGroup[] = [];
-    if (creditList.length > 0) {
-      this._store.dispatch(AddCreditCombineToReceipt({ creditCombineList: creditList }));
-    } 
-    if (debitList.length > 0) {
-      this._store.dispatch(AddDebitCombineToReceipt({ debitCombineList: debitList }));
-    }
-  }
   
   onSynceCombineToAccountant(isSynce: any) {
     this.getFormData();
@@ -344,7 +310,6 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
     }else{
       this.onSaveReceipt(data);
     }
-    this.getDetailReceiptCombine(this.CreateReceiptCombineComponent.combineNo.value);
   }
 
   onConfirmDeleteCP(selectedCPs: any) {
@@ -352,6 +317,8 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
       .deleteCusPayment(selectedCPs.id)
       .subscribe((res: any) => {
         this._toastService.success(res.message);
+        this._store.dispatch(ResetCombineInvoiceList());
+        this._store.dispatch(ResetInvoiceList());
         this.getDetailReceiptCombine(selectedCPs.arcbno);
       });
   }
