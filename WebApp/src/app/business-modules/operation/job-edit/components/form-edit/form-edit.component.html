@@ -113,7 +113,7 @@
                     <!-- <ng-select class="custom" [items]="productServices" placeholder="Please select"
                         formControlName="productService" [clearable]="false">
                     </ng-select> -->
-                    <ng-select *ngIf="transactionType!=='TKI',else truckingService" class="custom" disabled
+                    <ng-select *ngIf="transactionType!=='TK',else truckingService" class="custom" disabled
                         [items]="productServices" placeholder="Please select" [clearable]="false"
                         formControlName="productService">
                     </ng-select>
@@ -474,7 +474,7 @@
                         <span> Get From Declaration </span>
                     </span>
                 </button>
-                <ng-container *ngIf="opsTransaction?.linkSource !== 'Replicate' && transactionType!=='TKI'">
+                <ng-container *ngIf="opsTransaction?.linkSource !== 'Replicate' && transactionType!=='TK'">
                     <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase m--margin-right-10"
                         (click)="syncGoodInforToReplicateJob()">
                         <span>

@@ -4,11 +4,11 @@
             <app-breadcrumb></app-breadcrumb>
         </div>
         <div class="c-button-actions">
-            <app-permission-button *ngIf="transactionType!=='TKI'" type="export" title="Export"
+            <app-permission-button *ngIf="transactionType!=='TK'" type="export" title="Export"
                 [dpToggle]="dropdownMenuExport" position="bottomCenter" mode="dropdown">
             </app-permission-button>
-            <button class="btn btn-info dropdown-toggle" *ngIf="transactionType!=='TKI'"
-                [dpToggle]="dropdownMenuLinkOps" position="bottomCenter">
+            <button class="btn btn-info dropdown-toggle" *ngIf="transactionType!=='TK'" [dpToggle]="dropdownMenuLinkOps"
+                position="bottomCenter">
                 <i class="la la-refresh"></i>
                 More..
                 <span class="caret"></span>
@@ -20,7 +20,7 @@
                     type="import">
                 </app-permission-button>
                 <div class="dropdown-menu" aria-labelledby="">
-                    <a *ngIf="transactionType!=='TKI',else importTruckingInland"
+                    <a *ngIf="transactionType!=='TK',else importTruckingInland"
                         routerLink="/home/operation/job-management/import-charge" class="dropdown-item"
                         href="javascript:void(0)">Import
                         Charge</a>
@@ -246,7 +246,7 @@
 
 <app-context-menu #opsListContextMenu (clickOutside)="selectedShipment = null">
     <ng-container
-        *ngIf="!selectedShipment?.replicatedId && !selectedShipment?.isLocked && !selectedShipment?.linkSource && transactionType!=='TKI'">
+        *ngIf="!selectedShipment?.replicatedId && !selectedShipment?.isLocked && !selectedShipment?.linkSource && transactionType!=='TK'">
         <div class="menu-context__item" (click)="confirmReplicateJob()">
             <span><i class="la la-copy"></i><span> Replicate job</span></span>
         </div>
@@ -262,7 +262,7 @@
 
 <ng-template inject></ng-template>
 <app-dropdown #dropdownMenuLinkOps>
-    <a *ngIf="transactionType!=='TKI'" class=" dropdown-item pointer" (click)="chargeFromRep()">Charge From
+    <a *ngIf="transactionType!=='TK'" class=" dropdown-item pointer" (click)="chargeFromRep()">Charge From
         Replicate</a>
     <a class="dropdown-item pointer" *ngIf="menuSpecialPermission | async | specialPermission:'LinkChargeFormRep'"
         (click)="chargeFromJobRep()">Option Link Charge From Job List</a>

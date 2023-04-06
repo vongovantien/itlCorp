@@ -35,7 +35,7 @@ const routing: Routes = [
             {
                 path: "new-trucking-inland",
                 component: JobManagementCreateJobComponent,
-                data: { name: "New", transationType: 'TKI' }
+                data: { name: "New", transationType: 'TK' }
             },
             {
                 path: 'import-charge', component: JobManagementChargeImportComponent, data: { name: "Import Logistics Charge", transactionType: null }
@@ -51,7 +51,7 @@ const routing: Routes = [
             {
                 path: "trucking-inland-edit",
                 loadChildren: () => import('./../job-edit/job-edit.module').then(m => m.JobEditModule),
-                data: { name: 'Detail Job', tabSurcharge: 'BUY', allowLinkFee: true, transactionType: 'TKI' }
+                data: { name: 'Detail Job', tabSurcharge: 'BUY', allowLinkFee: true, transactionType: 'TK' }
             },
             {
                 path: "job-edit-link-fee",

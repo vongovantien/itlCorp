@@ -465,8 +465,8 @@ namespace eFMS.API.Documentation.DL.Services
             //PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
             var detail = GetBy(id);
             if (detail == null) return null;
-            var tranType = detail.TransactionType == "TKI" ? "TKI" : "CL";
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, detail.TransactionType == "TKI" ?Menu.opsTruckingInland:Menu.opsJobManagement);
+            var tranType = detail.TransactionType == "TK" ? "TK" : "CL";
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, detail.TransactionType == "TK" ?Menu.opsTruckingInland:Menu.opsJobManagement);
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(tranType, currentUser);
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             var permissionRangeDelete = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);

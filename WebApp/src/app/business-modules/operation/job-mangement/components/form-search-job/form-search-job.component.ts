@@ -71,7 +71,7 @@ export class JobManagementFormSearchComponent extends AppForm {
 
         this.initFormSearch();
         console.log(this.transactionType);
-        if (this.transactionType === 'TKI') {
+        if (this.transactionType === 'TK') {
             this.filterTypes = [
                 { title: 'Job Id', value: 'jobNo' },
                 { title: 'Custom No', value: 'clearanceNo' },

@@ -1491,6 +1491,18 @@ namespace eFMS.API.Documentation.DL.Services
             return users;
         }
 
+        private bool checkTranTypeImport(string MBL, string TranType)
+        {
+            if (TranType == "CL")
+            {
+                return opsTransRepository.Any(x => x.Mblno == MBL && x.TransactionType == null);
+            }
+            else
+            {
+                return opsTransRepository.Any(x => x.Mblno == MBL && x.TransactionType == "TK");
+            }
+        }
+
         public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list, string transactionType)
         {
             var listChargeOps = DataContext.Get(x => x.TransactionType == transactionType);
@@ -1501,6 +1513,12 @@ namespace eFMS.API.Documentation.DL.Services
             string TypeCompare = string.Empty;
             list.ForEach(item =>
             {
+                if (!checkTranTypeImport(item.Mblno, transactionType))
+                {
+                    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBL_NOT_VALID_TRANSACTIONTYPE]);
+                    item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE]);
+                    item.IsValid = false;
+                }
                 if (string.IsNullOrEmpty(item.Hblno))
                 {
                     item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_EMPTY]);
@@ -1775,7 +1793,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         item.Hblid = currentOpsJob.Hblid;
                         item.JobNo = currentOpsJob.JobNo;
-                        item.TransactionType = transactionType=="TK"?"TKI":"CL";
+                        item.TransactionType = transactionType=="TK"?"TK":"CL";
                         string jobNo = currentOpsJob.JobNo;
                         if (item.Type.ToLower() == "obh")
                         {
@@ -2133,7 +2151,14 @@ namespace eFMS.API.Documentation.DL.Services
                     IQueryable<OpsTransaction> opsTransaction = opsTransRepository.Get().ToLookup(x => x.JobNo)[jobNo].AsQueryable();
                     if (opsTransaction != null && opsTransaction.Count() > 0)
                     {
-                        transactionType = "CL";
+                        if (jobNo.Contains("LOG"))
+                        {
+                            transactionType = "CL";
+                        }
+                        else
+                        {
+                            transactionType = "TK";
+                        }
                     }
                     else
                     {
