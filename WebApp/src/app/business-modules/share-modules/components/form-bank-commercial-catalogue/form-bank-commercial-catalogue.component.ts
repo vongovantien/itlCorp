@@ -68,7 +68,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         this.initForm();
         this._store.dispatch(new GetCatalogueBankAction());
         this.banks = this._store.select(getCatalogueBankState);
-        console.log(this.bankDetail)
     }
 
     initForm() {
@@ -129,7 +128,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     }
 
     updateFormValue(data: Bank) {
-        console.log(data)
         this.bankDetail = data
         const formValue = {
             bankId: !!data.bankId ? data.bankId : null,
@@ -208,8 +206,8 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     onSendBankInfoToAccountantSystem(): void {
         if (this.formGroup.valid) {
             this.isSubmitted = true;
-            const action =  !!this.bankDetail && this.bankDetail.approveStatus !== CatalogueConstants.STATUS_APPROVAL.NEW ? 'UPDATE' : 'ADD';
-            this._catalogueRepo.syncBankInfoToAccountantSystem(this.bankDetail.id, action )
+            const action = !!this.bankDetail && this.bankDetail.approveStatus !== CatalogueConstants.STATUS_APPROVAL.NEW ? 'UPDATE' : 'ADD';
+            this._catalogueRepo.syncBankInfoToAccountantSystem(this.bankDetail.id, action)
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe(
                     (res: any) => {
@@ -288,14 +286,14 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         if (!!files && files.length > 0) {
             let validSize: boolean = true;
             for (let i = 0; i <= files?.length - 1; i++) {
-                const fileSize: number = files[i].size / Math.pow(1024, 2); //TODO Verify BE
-                if (fileSize >= 100) {
+                const fileSize: number = files[i].size / Math.pow(1024, 2);
+                if (fileSize >= SystemConstants.MAX_FILE_SIZE) {
                     validSize = false;
                     break;
                 }
             }
             if (!validSize) {
-                this._toastService.warning("maximum file size < 100Mb");
+                this._toastService.warning(`maximum file size < ${SystemConstants.MAX_FILE_SIZE}MB`);
                 return;
             }
             this.handleBankInfoFileUpload(files)
