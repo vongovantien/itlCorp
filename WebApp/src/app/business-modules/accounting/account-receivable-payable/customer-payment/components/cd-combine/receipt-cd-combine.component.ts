@@ -22,6 +22,7 @@ export class ARCustomerPaymentReceiptCDCombineComponent extends AppList implemen
     @Output() onSaveReceipt: EventEmitter<Partial<any>> = new EventEmitter<Partial<any>>();
 
     cdCombineList: ICDCombine[] = [];
+    headersCredit: CommonInterface.IHeaderTable[];
     paymentMethodsCredit: CommonInterface.ICommonTitleValue[] = [
         { title: 'Clear Credit From OBH', value: 'Clear Credit From OBH' },
         { title: 'Clear Credit From Paid AMT', value: 'Clear Credit From Paid AMT' }
@@ -87,6 +88,20 @@ export class ARCustomerPaymentReceiptCDCombineComponent extends AppList implemen
             { title: 'Acct Ref', field: '' },
         ];
 
+        this.headersCredit = [
+            { title: 'Agency Name', field: '', width: 200, },
+            { title: 'Billing No', field: '' },
+            { title: 'Unpaid', field: '' },
+            { title: 'Amount', field: '', width: 200, required: true },
+            { title: 'Remain', field: '' },
+            { title: 'HBL - MBL', field: '' },
+            { title: 'Note', field: '', width: 200 },
+            { title: 'Unpaid Local', field: '' },
+            { title: 'Amount Local', field: '' },
+            { title: 'Remain VND', field: '' },
+            { title: 'Voucher No', field: '' },
+            { title: 'Acct Ref', field: '' },
+        ];
         // this._store.select(ReceiptCombineExchangeState)
         //     .pipe(takeUntil(this.ngUnsubscribe))
         //     .subscribe((exchange: number) => { this.exchangeRate = exchange });

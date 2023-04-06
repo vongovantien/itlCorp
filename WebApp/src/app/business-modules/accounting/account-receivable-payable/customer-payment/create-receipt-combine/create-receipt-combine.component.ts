@@ -365,8 +365,8 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                     this._toastService.success(res.message);
                     this._store.dispatch(ResetCombineInvoiceList());
                     this._store.dispatch(ResetInvoiceList());
-                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${res.data[0].arcbno}`]);
-                    if(this.conbineType === 'existing'){
+                    if(!this.formCreateMapValue.arcbno || this.conbineType === 'existing'){
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${res.data[0].arcbno}`]);
                         return EMPTY;
                     }
                     return this._accountingRepo.getByReceiptCombine(res.data[0].arcbno);

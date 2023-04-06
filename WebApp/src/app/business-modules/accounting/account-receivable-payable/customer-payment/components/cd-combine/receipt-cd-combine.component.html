@@ -115,7 +115,7 @@
                         </div>
                         <div class="table-horizontal table-wrapper table-editable" style="max-height:700px">
                             <table class="table table-brand dataTable-edit">
-                                <thead app-table-header [headers]="headers"
+                                <thead app-table-header [headers]="headersCredit"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                     <th class="m--w-90 first table-actions-col">
     
@@ -173,7 +173,7 @@
                                             <td>{{item.unpaidAmountVnd | number: '1.0-2'}}</td>
                                             <td>{{item.paidAmountVnd | number: '1.0-2'}}</td>
                                             <td>{{item.remainAmountVnd | number: '1.0-2'}}</td>
-                                            <td>{{item.invoiceNo}}</td>
+                                            <td>{{item.voucherId}}</td>
                                             <td>{{item.referenceNo}}</td>
                                         </tr>
     

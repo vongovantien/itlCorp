@@ -34,7 +34,7 @@
                                         </app-permission-button>
                                     </ng-container>
                                 </td>
-                                <td class="text-info">{{item.taxCode}}-{{item.partnerName}}</td>
+                                <td class="text-info" *ngIf="(receiptType$ | async) !=='CUSTOMER'">{{item.taxCode}} - {{item.partnerName}}</td>
                                 <td class="text-primary">{{item.refNo}}</td>
                                 <td ALIGN="center" class="font-weight-bold">
                                     <ng-container *ngIf="item.type === 'ADV' && !isReadonly; else paymentOtherTypeTpl">

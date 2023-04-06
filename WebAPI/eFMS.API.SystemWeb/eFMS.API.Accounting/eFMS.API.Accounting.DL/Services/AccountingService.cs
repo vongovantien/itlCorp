@@ -67,7 +67,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         private readonly IAcctSettlementPaymentService settlementPaymentService;
-   
+        private readonly IContextBase<AccAccountPayable> accountPayableRepository;
+
         #endregion --Dependencies--
 
         readonly IQueryable<SysUser> users;
@@ -123,6 +124,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<CsTransaction> csTransactionRepo,
             IContextBase<OpsTransaction> opsTransactionRepo,
+            IContextBase<AccAccountPayable> accountPayableRepo,
             IMapper mapper) : base(repository, mapper)
         {
             AdvanceRepository = AdvanceRepo;
@@ -166,6 +168,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysEmailTemplateRepository = sysEmailTemplateRepo;
             csTransactionRepository = csTransactionRepo;
             opsTransactionRepository = opsTransactionRepo;
+            accountPayableRepository = accountPayableRepo;
             // ---
 
             users = UserRepository.Get();
@@ -2809,6 +2812,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 IQueryable<AccAccountingPayment> paymentsDebit = payments.Where(x => x.PaymentType != "CREDIT" && x.PaymentAmount != 0); // trường hợp treo OBH (paymentAmount = 0)
                 IQueryable<AccAccountingPayment> paymentNetOff = payments.Where(x => (x.NetOffVnd != null && x.NetOffVnd != 0) || (x.NetOffUsd != null && x.NetOffUsd != 0));
+                IQueryable<AccAccountingPayment> paymentsCredit = payments.Where(x => x.PaymentType == "CREDIT" && x.PaymentAmount != 0);
                 if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF)
                 {
                     PaymentModel paymentModelNetOff = GenerateReceiptSyncModel("NETOFF", receipt, paymentNetOff, out AcctReceiptSyncModel receiptSyncNetOff);
@@ -2845,6 +2849,13 @@ namespace eFMS.API.Accounting.DL.Services
                             PaymentModel paymentModelNetOff = GenerateReceiptSyncModel("NETOFF", receipt, paymentNetOff, out AcctReceiptSyncModel receiptSyncNetOff);
                             receiptSyncs.Add(receiptSyncNetOff);
                             data.Add(paymentModelNetOff);
+                        }
+
+                        if(paymentsCredit.Count() > 0)
+                        {
+                            PaymentModel paymentModelClearCredit = GenerateReceiptSyncModel("CREDIT", receipt, paymentsCredit, out AcctReceiptSyncModel receiptSyncCredit);
+                            receiptSyncs.Add(receiptSyncCredit);
+                            data.Add(paymentModelClearCredit);
                         }
                     }
                 }
@@ -2918,7 +2929,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    ChargeType = !string.IsNullOrEmpty(receiptItem.Arcbno) ? payment.Type : GetChargeTypeReceiptPayment(receiptItem, payment, type),
                                                                    DebitAccount = GetPaymentReceiptAccount(receiptItem, payment.Type, invoicegrp.AccountNo, type),
                                                                    NganhCode = "FWD",
-                                                                   Stt_Cd_Htt = type == "COLL_ADV" ? string.Empty : invoicegrp.ReferenceNo
+                                                                   Stt_Cd_Htt = type == "COLL_ADV" ? string.Empty : GetReferenceNoReceipt(invoicegrp, type)
                                                                };
                 if (queryPayments != null)
                 {
@@ -3191,7 +3202,7 @@ namespace eFMS.API.Accounting.DL.Services
         private string GeneratePaymentReceiptDescription(AcctReceipt receipt, string type)
         {
             string _des = "Thu công nợ khách hàng";
-            if (type == "NETOFF")
+            if (type == "NETOFF" || type == "CREDIT")
             {
                 if(receipt.Type == "Agent")
                 {
@@ -3220,7 +3231,7 @@ namespace eFMS.API.Accounting.DL.Services
         private string GeneratePaymentReceiptDescription(AccAccountingPayment payment, string type)
         {
             string _description = string.Empty;
-            if (type == "NETOFF")
+            if (type == "NETOFF" || type == "CREDIT")
             {
                 return "Công Nợ Cấn Trừ";
             }
@@ -3383,6 +3394,26 @@ namespace eFMS.API.Accounting.DL.Services
 
             return chargeType;
         }
+
+        /// <summary>
+        /// Get reference no of debit/credit combine
+        /// </summary>
+        /// <param name="invoice"></param>
+        /// <param name="_type"></param>
+        /// <returns></returns>
+        private string GetReferenceNoReceipt(AccAccountingManagement invoice, string _type)
+        {
+            if (_type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
+            {
+                var payables = accountPayableRepository.Get(x => x.VoucherNo == invoice.VoucherId && x.AcctManagementId.Contains(invoice.Id.ToString())).FirstOrDefault();
+                return payables?.ReferenceNo;
+            }
+            else
+            {
+                return invoice?.ReferenceNo;
+            }
+        }
+
         /// <summary>
         /// Add or Update Receipt Sync
         /// </summary>

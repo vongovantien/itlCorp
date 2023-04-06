@@ -825,7 +825,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.DepartmentName = dept?.DeptNameAbbr;
                     payment.OfficeName = office?.ShortName;
                     payment.RefIds = string.IsNullOrEmpty(acctPayment.RefId) ? null : acctPayment.RefId.Split(',').ToList();
-                    payment.PaymentStatus = acctPayment.Type == "DEBIT" ? (receipt.Type == "Customer" ? GetPaymentStatus(new List<string> { acctPayment.RefId }) : GetPaymentStatusAgent(new List<string> { acctPayment.RefId }, acctPayment.Hblid)) : null;
+                    payment.PaymentStatus = acctPayment.Type == "DEBIT" ? GetPaymentStatus(new List<string> { acctPayment.RefId }) : GetPaymentStatusAgent(new List<string> { acctPayment.RefId }, acctPayment.Hblid);
                     payment.JobNo = _jobNo;
                     payment.Mbl = _Mbl;
                     payment.Hbl = _Hbl;
@@ -833,8 +833,8 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.CreditNo = acctPayment.CreditNo;
                     payment.CreditAmountVnd = acctPayment.CreditAmountVnd;
                     payment.CreditAmountUsd = acctPayment.CreditAmountUsd;
-                    payment.VoucherId = acctPayment.Type == "CREDITNOTE" ? _voucherId : null;
-                    payment.VoucherIdre = acctPayment.Type == "CREDITNOTE" ? _voucherIdre : null;
+                    payment.VoucherId = acctPayment.Type == "CREDIT" ? _voucherId : null;
+                    payment.VoucherIdre = acctPayment.Type == "CREDIT" ? _voucherIdre : null;
                     payment.ExchangeRateBilling = acctPayment.ExchangeRateBilling;
                     payment.PartnerId = acctPayment?.PartnerId?.ToString();
                     if (!string.IsNullOrEmpty(payment.PartnerId))
@@ -1456,6 +1456,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
 
                         _payment.InvoiceNo = payment.InvoiceNo;
+                        _payment.VoucherNo = payment.VoucherId;
                         _payment.Type = payment.Type;  // OBH/DEBIT
 
                         if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
@@ -5024,6 +5025,7 @@ namespace eFMS.API.Accounting.DL.Services
                         RefNo = s.Key.BillingRefNo,
                         Type = "OBH",
                         InvoiceNo = null,
+                        VoucherId = s.FirstOrDefault().VoucherNo,
                         Amount = s.FirstOrDefault().RefAmount,
                         UnpaidAmount = s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.FirstOrDefault().UnpaidPaymentAmountVnd : s.FirstOrDefault().UnpaidPaymentAmountUsd,
                         UnpaidAmountVnd = s.FirstOrDefault().UnpaidPaymentAmountVnd,
@@ -5082,7 +5084,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if (acctPayment.Hblid != null && acctPayment.Hblid != Guid.Empty)
                         {
-                            var surcharge = surchargeRepository.Get(x => x.Hblid == acctPayment.Hblid).FirstOrDefault();
+                            var surcharge = surchargeRepository.Get(x => x.Hblid == acctPayment.Hblid && x.AcctManagementId != null && x.AcctManagementId.ToString().Contains(acctPayment.RefId)).FirstOrDefault();
                             if (surcharge != null)
                             {
                                 _Hbl = surcharge.Hblno;
@@ -5092,7 +5094,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                         }
 
-                        string _voucherId = string.Empty;
+                        //string _voucherId = string.Empty;
                         string _voucherIdre = string.Empty;
                         partnerInfo = partners.FirstOrDefault(x => x.Id == acctPayment.PartnerId);
 
@@ -5126,7 +5128,7 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.CreditNo = acctPayment.CreditNo;
                         payment.CreditAmountVnd = acctPayment.CreditAmountVnd;
                         payment.CreditAmountUsd = acctPayment.CreditAmountUsd;
-                        payment.VoucherId = acctPayment.Type == "CREDITNOTE" ? _voucherId : null;
+                        payment.VoucherId = acctPayment.Type == "CREDIT" ? acctPayment.VoucherNo : null;
                         payment.VoucherIdre = acctPayment.Type == "CREDITNOTE" ? _voucherIdre : null;
                         payment.ExchangeRateBilling = acctPayment.ExchangeRateBilling;
                         payment.PartnerId = acctPayment?.PartnerId?.ToString();
