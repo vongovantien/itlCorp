@@ -128,8 +128,8 @@
                                                     <td>
                                                         {{cps.paymentMethod}}
                                                     </td>
-                                                    <td>
-                                                        <div *ngIf="_receiptType === 'Agent' && cps?.arcbno">
+                                                    <td *ngIf="_receiptType === 'Agent'">
+                                                        <div *ngIf="cps?.arcbno">
                                                             <ng-container *ngIf="cps.status != 'Cancel'; else CancelARCB">
                                                                 <a href="javascript:void(0)" (click)="goToARCBDetail(cps.arcbno)">{{cps.arcbno}}</a>
                                                             </ng-container>

@@ -11,7 +11,7 @@ import { ActionsSubject, Store } from '@ngrx/store';
 import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { combineLatest, Observable } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { ResetCombineInvoiceList, ResetInvoiceList, SelectPartnerReceiptCombine, UpdateExchangeRateReceiptCombine } from '../../store/actions';
 import { ICustomerPaymentState, ReceiptCombineCreditListState, ReceiptCombineGeneralListState } from '../../store/reducers';
@@ -94,7 +94,7 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
     getExchangeRate(date: any = null) {
         if (!!date && !this.isUpdate) {
             this._catalogueRepo.convertExchangeRate(formatDate(new Date(date), 'yyyy-MM-dd', 'en-US'), 'USD')
-                .pipe(takeUntil(this.ngUnsubscribe))
+                .pipe(take(1))
                 .subscribe(
                     (value: {
                         id: number;
@@ -110,7 +110,7 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
     }
 
     onChangePaymentDate(date: any) {
-        this.getExchangeRate();
+        this.getExchangeRate(date.startDate);
     }
 
     onSelectDataFormInfo(data: any, type: string) {
