@@ -59,7 +59,7 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
     chooseFile(file: Event) {
         this.pager.totalItems = 0;
         if (file.target['files'] == null) { return; }
-        this._documentRepo.upLoadChargeFile(file.target['files'], this.transactionType)
+        this._documentRepo.upLoadChargeFile(file.target['files'], this.transactionType === null ? 'CL' : 'TK')
             .subscribe((response: any) => {
                 this.data = response.data;
                 this.pager.currentPage = 1;
@@ -148,7 +148,7 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
                 const criteriaCheckpointsObs = finalResult.map(x => ({
                     partnerId: x.paymentObjectId,
                     hblId: x.hblid,
-                    transactionType: 'CL',
+                    transactionType: this.transactionType === null ? 'CL' : 'TK',
                     type: x.type || 5
                 })).map(y => this._documentRepo.validateCheckPointContractPartner(y));
 

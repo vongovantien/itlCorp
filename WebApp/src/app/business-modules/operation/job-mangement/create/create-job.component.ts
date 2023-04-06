@@ -83,7 +83,7 @@ export class JobManagementCreateJobComponent extends AppForm {
             opsTransaction.csMawbcontainers = this.formCreateComponent.jobLinkAirSeaInfo?.containers || [];
             opsTransaction.containerDescription = this.formCreateComponent.jobLinkAirSeaInfo?.packageContainer
         }
-        if (this.transactionType === 'TKI') {
+        if (this.transactionType === 'TK') {
             opsTransaction.productService = 'Trucking';
         }
 
@@ -173,7 +173,7 @@ export class JobManagementCreateJobComponent extends AppForm {
                         } else {
                             this._toaster.success(res.message);
                             //this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
-                            if (this.transactionType === 'TKI') {
+                            if (this.transactionType === 'TK') {
                                 this._router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND_DETAIL}/${res.data}`]);
                             } else {
                                 this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
@@ -186,7 +186,7 @@ export class JobManagementCreateJobComponent extends AppForm {
     }
 
     gotoList() {
-        if (this.transactionType === 'TKI') {
+        if (this.transactionType === 'TK') {
             this._router.navigate([RoutingConstants.LOGISTICS.TRUCKING_INLAND]);
         }
 

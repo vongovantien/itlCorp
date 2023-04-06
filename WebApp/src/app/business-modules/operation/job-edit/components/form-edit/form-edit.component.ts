@@ -300,7 +300,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.deliveryDate = this.formEdit.controls['deliveryDate'];
         this.suspendTime = this.formEdit.controls['suspendTime'];
         this.clearanceDate = this.formEdit.controls['clearanceDate'];
-        if (this.transactionType === 'TKI') {
+        if (this.transactionType === 'TK') {
             this.initTruckingData();
         }
     }
