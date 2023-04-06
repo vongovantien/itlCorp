@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using OfficeOpenXml;
@@ -298,11 +299,28 @@ namespace eFMS.API.Catalogue.Controllers
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("ReviseBankInformation")]
+        [Authorize]
+        public async Task<IActionResult> ReviseBankInformation(Guid bankId)
+        {
+            var hs= await catBankService.ReviseBankInformation(bankId);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("SyncBankInfoToAccountantSystem")]
         [Authorize]
-        public async Task<IActionResult> SyncBankAccountToAccountantSystem(RequestBankModel request)
+        public async Task<IActionResult> SyncBankAccountToAccountantSystem(Guid bankId, ACTION action)
         {
             if (!ModelState.IsValid) return BadRequest();
             try
@@ -314,43 +332,44 @@ namespace eFMS.API.Catalogue.Controllers
                     Password = "br@vopro"
                 };
 
-                // 1. LOGIN
                 HttpResponseMessage responseFromApi = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api/Login", loginInfo, null);
                 BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
-
 
                 HttpResponseMessage response = new HttpResponseMessage();
                 BravoResponseModel responseModel = new BravoResponseModel();
 
                 if (loginResponse.Success == "1")
                 {
-                    var dataSend = await catBankService.GetModelBankInfoToSync(request.PartnerBank, request.Action);
+                    var requestModel = await catBankService.GetModelBankInfoToSync(bankId);
 
-                    switch (request.Action)
+                    switch (action)
                     {
                         case ACTION.ADD:
-                            response = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSBankInfoSyncAdd", dataSend, loginResponse.TokenKey);
+                            response = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSBankInfoSyncAdd", requestModel, loginResponse.TokenKey);
                             responseModel = await response.Content.ReadAsAsync<BravoResponseModel>();
                             break;
                         case ACTION.UPDATE:
-                            response = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSBankInfoSyncUpdate", dataSend, loginResponse.TokenKey);
+                            response = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSBankInfoSyncUpdate", requestModel, loginResponse.TokenKey);
                             responseModel = await response.Content.ReadAsAsync<BravoResponseModel>();
                             break;
                         default:
                             break;
                     }
-                    return Ok();
                 }
 
                 if (responseModel.Success == "1")
                 {
-                    ResultHandle result = new ResultHandle { Status = true, Message = "Sync data thành công", Data = null };
-                    return Ok(hs);
+                    var catBankModel = await catBankService.Get(x => x.Id == bankId).FirstOrDefaultAsync();
+                    catBankModel.ApproveStatus = "Processing";
+                    hs = catBankService.Update(catBankModel, x => x.Id == bankId);
+
+                    ResultHandle result = new ResultHandle { Status = true, Message = "Sync Data to Accountant System Successful", Data = responseModel };
+                    return Ok(result);
                 }
                 else
                 {
-                    ResultHandle result = new ResultHandle { Status = false, Message = responseModel.Msg + "\n" + responseModel.Msg, Data = null };
-                    return BadRequest(hs);
+                    ResultHandle result = new ResultHandle { Status = false, Message = "Sync Data Fail", Data = responseModel };
+                    return BadRequest(result);
                 }
             }
             catch (Exception ex)

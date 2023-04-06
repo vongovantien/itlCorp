@@ -172,7 +172,7 @@ export class CatalogueRepo {
             }, null, { "hideSpinner": "true" });
     }
 
-    getPartnerGroupsWithCriteria(data: any){
+    getPartnerGroupsWithCriteria(data: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`, data, null, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
@@ -1428,7 +1428,12 @@ export class CatalogueRepo {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStandardCharge/GetBy`, criteria);
     }
 
-    syncBankInfoToAccountantSystem(body: any) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/SyncBankInfoToAccountantSystem`, body);
+
+    reviseBankInformation(bankId: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/ReviseBankInformation`, null, { bankId: bankId});
+    }
+
+    syncBankInfoToAccountantSystem(bankId: any, action: string) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/SyncBankInfoToAccountantSystem`, null, { bankId: bankId, action: action });
     }
 }

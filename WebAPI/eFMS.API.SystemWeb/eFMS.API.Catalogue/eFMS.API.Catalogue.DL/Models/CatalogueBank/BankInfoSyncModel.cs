@@ -3,16 +3,10 @@ using System.Collections.Generic;
 
 namespace eFMS.API.Catalogue.DL.Models.CatalogueBank
 {
-    public class RequestBankModel
-    {
-        public ACTION Action { get; set; }
-
-        public CatBankModel PartnerBank { get; set; }
-    }
-    public class BankInForModel
+    public class BankSyncModel
     {
         public string CustomerCode { get; set; }
-        public BankDetail Details { get; set; }
+        public List<BankDetail> Details { get; set; }
         public List<AttachedDocument> AtchDocInfo { get; set; }
     }
 
@@ -27,7 +21,7 @@ namespace eFMS.API.Catalogue.DL.Models.CatalogueBank
 
     public class AttachedDocument
     {
-        public string AttachDocRowId { get; set; }
+        public Guid AttachDocRowId { get; set; }
         public DateTime? AttachDocDate { get; set; }
         public string AttachDocName { get; set; }
         public string AttachDocPath { get; set; }

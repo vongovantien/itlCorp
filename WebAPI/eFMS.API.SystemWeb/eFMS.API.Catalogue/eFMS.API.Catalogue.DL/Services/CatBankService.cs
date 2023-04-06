@@ -321,57 +321,52 @@ namespace eFMS.API.Catalogue.DL.Services
             return result.AsQueryable();
         }
 
-        public async Task<BankInForModel> GetModelBankInfoToSync(CatBankModel model, ACTION action)
+        public async Task<HandleState> ReviseBankInformation(Guid bankId)
+        {
+            var bankDetail = await DataContext.Where(x => x.Id == bankId).FirstOrDefaultAsync();
+            bankDetail.ApproveStatus = "Revise";
+            var hs = DataContext.Update(bankDetail, x => x.Id == bankId);
+
+            return hs;
+        }
+
+        public async Task<List<BankSyncModel>> GetModelBankInfoToSync(Guid bankId)
         {
             var hs = new HandleState();
-            switch (action)
-            {
-                case ACTION.ADD:
-                    if (!DataContext.Any(x => x.Id == model.Id))
-                    {
-                        model.Id = Guid.NewGuid();
-                        model.ApproveStatus = "New";
-                        model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
-                        model.UserCreated = model.UserModified = currentUser.UserID;
-                        hs = await DataContext.AddAsync(model);
-                    }
-
-                    break;
-                case ACTION.UPDATE:
-                    model.DatetimeModified = DateTime.Now;
-                    model.UserModified = currentUser.UserID;
-                    model.ApproveStatus = model.ApproveStatus == "Approved" || model.ApproveStatus == "Revise" ? "Revise" : "Processing";
-                    hs = DataContext.Update(model, x => x.Id == model.Id);
-                    break;
-                default:
-                    break;
-            }
-            CatPartner partner = await catPartnerRepository.Get(x => x.Id == model.PartnerId.ToString()).FirstOrDefaultAsync();
-
-            var files = sysImageRepository.Get(x => x.ObjectId == model.Id.ToString())
+            var bankDetail = await DataContext.Where(x => x.Id == bankId).FirstOrDefaultAsync();
+            var partnerBank = await catPartnerRepository.Get(x => x.Id == bankDetail.PartnerId.ToString()).FirstOrDefaultAsync();
+            var lstAttachedFile = await sysImageRepository.Get(x => x.ObjectId == bankDetail.Id.ToString())
                 .Select(x => new AttachedDocument
                 {
                     AttachDocDate = x.DateTimeCreated,
                     AttachDocName = x.Name,
                     AttachDocPath = x.Url,
-                }).ToList();
+                    AttachDocRowId = x.Id,
+                }).ToListAsync();
 
-            var bank = new BankDetail();
-            bank.BankName = model.BankNameVn;
-            bank.BankCode = model.Code;
-            bank.BankAccountNo = model.BankAccountNo;
-            bank.SwiftCode = model.SwiftCode;
-            bank.Address = model.BankAddress;
-
-            var result = new BankInForModel();
-            result.CustomerCode = partner.AccountNo;
-            result.Details = bank;
-            if (files?.Count > 0)
+            var lstbankDetail = new List<BankDetail>
             {
-                result.AtchDocInfo = files;
-            }
+                new BankDetail
+                {
+                    BankName = bankDetail.BankNameVn,
+                    BankCode = bankDetail.Code,
+                    BankAccountNo = bankDetail.BankAccountNo,
+                    SwiftCode = bankDetail.SwiftCode,
+                    Address = bankDetail.BankAddress
+                }
+            };
 
-            return result;
+            var lstBankRequest = new List<BankSyncModel>
+            {
+                new BankSyncModel
+                {
+                    Details = lstbankDetail,
+                    CustomerCode = partnerBank.AccountNo,
+                    AtchDocInfo = lstAttachedFile
+                }
+            };
+
+            return lstBankRequest;
         }
     }
 }

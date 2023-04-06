@@ -95,7 +95,7 @@
                                 <textarea class="form-control" cols="30" rows="5" formControlName="note"></textarea>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group">
                                 <label>Approval Status</label>
                                 <input type="text"
@@ -103,15 +103,16 @@
                                     formControlName="approveStatus">
                             </div>
                         </div>
-                        <div class="col-lg-3">
+                        <div class="col-lg-4">
                             <label></label>
                             <label></label>
                             <label></label>
                             <div class="form-group">
-                                <input style="display:none" type="file" #file
-                                    (change)="handleBankInfoFileUpload($event)">
-                                <button *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved' && bankDetail.approveStatus !== 'New'" style="margin-top:5px;" (click)="file.click()"
-                                    type="button" class="btn btn-success  m-btn--icon m-btn--uppercase margin-right-10">
+                                <input multiple style="display:none" type="file" #file (change)="chooseFileUpload($event)">
+                                <button
+                                    *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved'"
+                                    style="margin-top:5px;" (click)="file.click()" type="button"
+                                    class="btn btn-success  m-btn--icon m-btn--uppercase margin-right-10">
                                     <span>
                                         <i class="la la-plus"></i>
                                         <span>
@@ -120,14 +121,14 @@
                                     </span>
                                 </button>
                                 <span class="text-primary">
-                                    {{ !!fileList ? fileList[0].name : null}}
+                                    {{ !!files && !!files[0]?.name ? files[0]?.name : null}}
                                 </span>
                                 <br /><br />
-                                <ng-container *ngIf="!isLoading && !!files">
-                                    <li *ngFor="let file of files"><a [href]="file.url" target="_blank"
+                                <ng-container *ngIf="!isLoading && !!fileListDetail">
+                                    <li *ngFor="let file of fileListDetail"><a [href]="file.url" target="_blank"
                                             [title]="file.name" download>{{file.name}}</a>
                                         <span class="pointer text-center" *ngIf="!readonly">
-                                            <a title="Delete" (click)="onDeleteBankInfoFile(file.name)">
+                                            <a title="Delete" (click)="onDeleteBankInfoFile(file)">
                                                 <i class="la la-times fa-lg text-danger"></i>
                                             </a>
                                         </span>
@@ -140,14 +141,14 @@
                 <div class="row" *ngIf="isUpdate && !!bankDetail">
                     <div class="col-6">
                         <div class="m--align-left">
-                            Created: {{bankDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                            Created: {{!!bankDetail && bankDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
                             &nbsp;
                             By <span class="text-success">{{bankDetail.userCreatedName}}</span>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="m--align-left">
-                            Modified: {{bankDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                            Modified: {{!!bankDetail && bankDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
                             &nbsp;
                             By <span class="text-success">{{bankDetail.userModifiedName}}</span>
                         </div>
@@ -164,8 +165,10 @@
                         </span>
                     </span>
                 </button>
-                <button *ngIf="bankDetail?.approveStatus !== 'Processing' && bankDetail?.approveStatus !== 'Approved'"
-                    class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onSendBankInfoToAccountantSystem()">
+                <button
+                    *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved'"
+                    class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
+                    (click)="onSendBankInfoToAccountantSystem()">
                     <span>
                         <i class="la la-download"></i>
                         <span>
@@ -173,7 +176,7 @@
                         </span>
                     </span>
                 </button>
-                <button *ngIf="bankDetail?.approveStatus === 'Approved'"
+                <button *ngIf="!!bankDetail && bankDetail.approveStatus === 'Approved'"
                     class="btn btn-info  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onReviseBankInfo()">
                     <span>
                         <i class="la la-refresh"></i>
