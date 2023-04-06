@@ -1,5 +1,6 @@
+import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
 import { IReceiptState, receiptReducer } from './customer-payment.reducer';
-import { createFeatureSelector, ActionReducerMap, createSelector } from '@ngrx/store';
+import { IReceiptCombineState, receiptCombineReducer } from './receipt-combine.reducer';
 
 export interface ICustomerPaymentState {
     receipt: IReceiptState;

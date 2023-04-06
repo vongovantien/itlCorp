@@ -217,7 +217,7 @@ export class JobManagementComponent extends AppList implements OnInit {
                 (res: any) => {
                     if (res) {
                         //this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, id]);
-                        if (this.transactionType === 'TKI') {
+                        if (this.transactionType === 'TK') {
                             this._router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND_DETAIL}/`, id]);
                         } else {
                             this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, id]);
@@ -295,7 +295,7 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     gotoCreateJob() {
         //this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}/new`]);
-        if (this.transactionType === 'TKI') {
+        if (this.transactionType === 'TK') {
             this._router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND}/new-trucking-inland`]);
         } else {
             this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}/new`]);

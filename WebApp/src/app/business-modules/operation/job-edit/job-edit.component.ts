@@ -602,7 +602,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     gotoList() {
-        if (this.transactionType === 'TKI') {
+        if (this.transactionType === 'TK') {
             this._router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND}`]);
         } else {
             this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);

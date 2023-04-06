@@ -159,7 +159,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
                 this._toaster.clear();
                 this.customerName = data.shortName;
                 this.customerId.setValue(data.id);
-                this._catalogueRepo.GetListSalemanByShipmentType(data.id, this.transactionType === 'TKI' ? ChargeConstants.TK_CODE : ChargeConstants.CL_CODE, this.shipmentType.value)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, this.transactionType === 'TK' ? ChargeConstants.TK_CODE : ChargeConstants.CL_CODE, this.shipmentType.value)
                     .subscribe(
                         (res: any) => {
                             if (!!res) {
@@ -265,7 +265,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
         this.packageTypeId = this.formCreate.controls['packageTypeId'];
         this.sumCbm = this.formCreate.controls['sumCbm']
         this.containerDescription = this.formCreate.controls['containerDescription'];
-        if (this.transactionType === 'TKI') {
+        if (this.transactionType === 'TK') {
             this.initTruckingData();
         }
     }

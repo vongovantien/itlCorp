@@ -124,7 +124,7 @@ export class OpsCDNoteComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        if (res.transactionType === 'TKI') {
+                        if (res.transactionType === 'TK') {
                             this.transactionType = TransactionTypeEnum.TruckingInland;
                         } else {
                             this.transactionType = TransactionTypeEnum.CustomLogistic;

@@ -72,6 +72,8 @@
         // IMPORT SURCHARE 
         public static readonly string MSG_HBLNO_EMPTY = "MSG_HBLNO_EMPTY";
         public static readonly string MSG_MBLNO_EMPTY = "MSG_MBLNO_EMPTY";
+        public static readonly string MSG_MBL_NOT_VALID_TRANSACTIONTYPE = "MSG_MBL_NOT_VALID_TRANSACTIONTYPE";
+        public static readonly string MSG_HBL_NOT_VALID_TRANSACTIONTYPE = "MSG_HBL_NOT_VALID_TRANSACTIONTYPE";
         public static readonly string MSG_PARTNER_CODE_EMPTY = "MSG_PARTNER_CODE_EMPTY";
         public static readonly string MSG_CHARGE_CODE_EMPTY = "MSG_CHARGE_CODE_EMPTY";
         public static readonly string MSG_QTY_EMPTY = "MSG_QTY_EMPTY";
