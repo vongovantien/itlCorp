@@ -63,7 +63,6 @@ export class JobManagementComponent extends AppList implements OnInit {
         private _store: Store<fromOperationStore.IOperationState>,
         private _exportRepo: ExportRepo,
         private _spinner: NgxSpinnerService,
-        private _systemRepo: SystemRepo,
         private route: ActivatedRoute,
     ) {
         super();
