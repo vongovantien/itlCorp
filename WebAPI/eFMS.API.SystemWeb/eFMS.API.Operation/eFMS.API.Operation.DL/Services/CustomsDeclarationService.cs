@@ -152,13 +152,16 @@ namespace eFMS.API.Operation.DL.Services
                 rowsCount = 0;  
             }
 
-
             returnList = MapClearancesToClearanceModels(returnList.AsQueryable());
-            if (ecusCustomCriteria.ClearanceNo != null || (ecusCustomCriteria.CusType != null && ecusCustomCriteria.CusType!="All") || ecusCustomCriteria.CustomerNo != null)
+            if (ecusCustomCriteria.ClearanceNo != null || (ecusCustomCriteria.CusType != null && (ecusCustomCriteria.CusType != "All" && ecusCustomCriteria.ClearanceNo != null || !string.IsNullOrEmpty(ecusCustomCriteria.ClearanceNo))))
             {
-                returnList = returnList.Where(x => (ecusCustomCriteria.CusType == "hblNo" ? ecusCustomCriteria.ClearanceNo.Contains(x.Hblid) : ecusCustomCriteria.ClearanceNo.Contains(x.ClearanceNo) || string.IsNullOrEmpty(ecusCustomCriteria.ClearanceNo))
-                                                                                    && ((x.AccountNo ?? x.PartnerTaxCode) == ecusCustomCriteria.CustomerNo || string.IsNullOrEmpty(ecusCustomCriteria.CustomerNo))).ToList();
-
+                returnList = returnList.Where(x => (ecusCustomCriteria.CusType == "hblNo" ? ecusCustomCriteria.ClearanceNo.Contains(x.Hblid) : ecusCustomCriteria.ClearanceNo.Contains(x.ClearanceNo) 
+                || string.IsNullOrEmpty(ecusCustomCriteria.ClearanceNo))).ToList();
+                                                                                    
+            }
+            if ( ecusCustomCriteria.CustomerNo != null)
+            {
+                returnList = returnList.Where(x => ((x.AccountNo ?? x.PartnerTaxCode) == ecusCustomCriteria.CustomerNo || string.IsNullOrEmpty(ecusCustomCriteria.CustomerNo))).ToList();
             }
 
             // Perform pagination
