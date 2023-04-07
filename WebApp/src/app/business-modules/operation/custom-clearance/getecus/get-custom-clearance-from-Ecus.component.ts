@@ -163,14 +163,6 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         }
     }
 
-    refreshData() {
-        this.page = 1;
-        this.pageSize = this.numberToShow[2];
-        this.resetFormControl(this.customer);
-        this.formSearch.reset();
-        this.getListCleranceNotImported();
-    }
-
     updateJobToClearance() {
         const dataToUpdate = this.dataEcus.filter(x => x.isChecked === true);
         if (dataToUpdate.length > 0) {
@@ -195,8 +187,8 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
 
     onSelectDataFormInfo(data, type: string) {
         switch (type) {
-            case 'partner':
-                this.clearanceNo.setValue((data as Customer).accountNo);
+            case 'customer':
+                this.customer.setValue((data as Customer).accountNo);
                 break;
             default:
                 break;
@@ -207,6 +199,16 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         if (this.dataEcus) {
             this.dataEcus = this._sortService.sort(this.dataEcus, sort, this.order);
         }
+    }
+
+
+    refreshData() {
+        this.page = 1;
+        this.pageSize = this.numberToShow[2];
+        this.resetFormControl(this.customer);
+        this.formSearch.reset();
+        this.filterType.setValue(this.filterTypes[0].value);
+        this.getListCleranceNotImported();
     }
 
     close() {
