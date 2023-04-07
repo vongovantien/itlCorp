@@ -6,6 +6,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Remotion.Linq.Clauses.ResultOperators;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -35,7 +36,9 @@ namespace eFMS.API.Report.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<CatIncoterm> catIncotermRepository;
         private readonly IContextBase<SysImageDetail> imageDetailRepository;
-        private readonly IContextBase<SysAttachFileTemplate> sysattachRepository; 
+        private readonly IContextBase<SysAttachFileTemplate> sysattachRepository;
+        private readonly IContextBase<CatDepartment> deptRepository;
+        private readonly IContextBase<SysGroup> groupRepository;
 
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)opsRepository.DC;
 
@@ -64,6 +67,8 @@ namespace eFMS.API.Report.DL.Services
             IContextBase<SysImageDetail> imageDetailRepo,
             IContextBase<CsTransaction> tranRepo,
             IContextBase<SysAttachFileTemplate> sysattachRepo,
+            IContextBase<CatDepartment> deptRepo,
+            IContextBase<SysGroup> groupRepo,
         IContextBase<SysUserLevel> UserLevel)
         {
                 opsRepository = ops;
@@ -86,6 +91,8 @@ namespace eFMS.API.Report.DL.Services
                 imageDetailRepository = imageDetailRepo;
                 tranRepository = tranRepo;
                 sysattachRepository = sysattachRepo;
+            deptRepository = deptRepo;
+            groupRepository= groupRepo;
         }
 
         public List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria, int page, int size, out int rowsCount)
@@ -364,6 +371,8 @@ namespace eFMS.API.Report.DL.Services
                 data.GW = item.GrossWeight;
                 data.CW = item.ChargeWeight;
                 data.CBM = item.Cbm;
+                data.SaleInfo = getSaleManInfo(item.SalemanId);
+                data.PICInfo = getPICInfo(item.PersonInCharge);
 
                 data.Cont20 = item.Cont20 ?? 0;
                 data.Cont40 = item.Cont40 ?? 0;
@@ -610,6 +619,30 @@ namespace eFMS.API.Report.DL.Services
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
+        }
+
+        private SaleManInfo getSaleManInfo(string saleManId)
+        {
+            var saleMan = sysUserLevelRepo.Get(x => x.UserId == saleManId).FirstOrDefault();
+            var group = groupRepository.Get(x => x.Id == saleMan.GroupId).FirstOrDefault();
+            var dept=deptRepository.Get(x=>x.Id == saleMan.GroupId).FirstOrDefault();
+            return new SaleManInfo
+            {
+                DeptSaleMan = dept?.Code,
+                GroupSaleMan = group?.Code,
+            };
+        }
+
+        private PICInfo getPICInfo(string picId)
+        {
+            var pic = sysUserLevelRepo.Get(x => x.UserId == picId).FirstOrDefault();
+            var group = groupRepository.Get(x => x.Id == pic.GroupId).FirstOrDefault();
+            var dept = deptRepository.Get(x => x.Id == pic.GroupId).FirstOrDefault();
+            return new PICInfo
+            {
+                DeptPIC = dept?.Code,
+                GroupPIC = group?.Code,
+            };
         }
 
         private string GetCustomNoOldOfShipment(string jobNo)
