@@ -3,14 +3,14 @@ import { Component, EventEmitter, Input, NgZone, Output, QueryList, ViewChild, V
 import { AppList } from '@app';
 import { ReportPreviewComponent } from '@common';
 import { delayTime } from '@decorators';
-import { InjectViewContainerRefDirective } from '@directives';
+import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { CommonEnum } from '@enums';
 import { ICrystalReport } from '@interfaces';
 import { Partner, Surcharge, SysImage } from '@models';
 import { AccountingRepo, DocumentationRepo } from '@repositories';
 import { DataService, SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
-import { finalize, takeUntil } from 'rxjs/operators';
+import { finalize, switchMap, takeUntil } from 'rxjs/operators';
 
 import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
 import { SettlementExistingChargePopupComponent } from '../popup/existing-charge/existing-charge.popup';
@@ -60,6 +60,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
     @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
 
     groupShipments: ISettlementShipmentGroup[] = [];
     headers: CommonInterface.IHeaderTable[];
@@ -82,12 +83,14 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     requester: string = '';
     selectedGroupShipmentIndex: number;
 
-    detailSettlement: Observable<any>;
+    detailSettlement: any;
+
     isLoadingSurchargeList: boolean = false;
     isLoadingGroupShipment: boolean = false;
 
     listEdoc: any[] = [];
-    pageSize: number = this.numberToShow[1];
+
+    selectedSurchargeContextMenu: Surcharge;
 
     constructor(
         private readonly _sortService: SortService,
@@ -132,7 +135,14 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.subscriptionDuplicateChargeState();
 
         this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState);
-        this.detailSettlement = this._store.select(getSettlementPaymentDetailState);
+
+        this._store.select(getSettlementPaymentDetailState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (detail: any) => {
+                    this.detailSettlement = detail;
+                }
+            )
 
     }
 
@@ -155,6 +165,9 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                                 const totalCharge = detail?.settlement?.totalCharge || 1;
                                 const totalPage = Math.ceil(totalCharge / 20);
                                 if (this.page < totalPage) {
+                                    if (this.isLoadingSurchargeList) {
+                                        return;
+                                    }
                                     this.getNextSurcharge();
                                 } else {
                                     return;
@@ -164,17 +177,17 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     )
 
             });
-        })
+        }, 200, 95)
     }
 
     getNextSurcharge() {
-        this._store.dispatch(LoadListNoGroupSurcharge());
+        this.isLoadingSurchargeList = true;
         this.page++;
-        this._accountingRepo.getPagingSurchargeSettlement(this.settlementCode, this.page, 20)
-            .pipe(finalize(() => { this.isLoading = false; }))
-            .subscribe((res: CommonInterface.IResponsePaging) => {
-                if (!!res.data.length) {
-                    this.surcharges = [...this.surcharges, ...res.data || []];
+        this._accountingRepo.getListSurchargeDetailSettlement(this.settlementCode, this.page, 20)
+            .pipe(finalize(() => { this.isLoadingSurchargeList = false; }))
+            .subscribe((res: Surcharge[]) => {
+                if (!!res.length) {
+                    this.surcharges = [...this.surcharges, ...res || []];
                 }
             });
     }
@@ -484,7 +497,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     switchToGroup() {
         if (this.TYPE === 'GROUP') {
             this.TYPE = 'LIST';
-            if (!!this.surcharges.length) {
+            if (this.surcharges.length === this.detailSettlement?.settlement?.totalCharge) {
                 return;
             }
             if (!!this.settlementCode) {
@@ -496,7 +509,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                             this.surcharges = surcharges;
                         }
                     )
-
             }
         } else {
             this.TYPE = 'GROUP';
@@ -505,24 +517,48 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             }
             if (!!this.settlementCode) {
                 this.isLoadingGroupShipment = true;
-                this._accountingRepo.getListJobGroupSurchargeDetailSettlement(this.settlementCode)
-                    .pipe(finalize(() => this.isLoadingGroupShipment = false))
-                    .subscribe(
-                        (data: any) => {
-                            this.groupShipments = data || [];
-                            this.selectedIndexSurcharge = null;
-                            // if (this.isExistingSettlement === true) {
-                            this.groupShipments.forEach((groupItem: ISettlementShipmentGroup) => {
-                                const groupItemSurcharges = this.surcharges.filter((x: Surcharge) => {
-                                    return x.hblid == groupItem.hblId
-                                        && x.advanceNo == groupItem.advanceNo
-                                        && x.settlementCode === groupItem.settlementNo
-                                        && x.clearanceNo == groupItem.customNo
+                if (this.surcharges.length !== this.detailSettlement?.settlement?.totalCharge) {
+                    this._accountingRepo.getListSurchargeDetailSettlement(this.settlementCode)
+                        .pipe(
+                            switchMap((surcharges: Surcharge[]) => {
+                                this.surcharges = surcharges;
+                                return this._accountingRepo.getListJobGroupSurchargeDetailSettlement(this.settlementCode).pipe(
+                                    finalize(() => this.isLoadingGroupShipment = false),
+                                );
+                            })
+                        )
+                        .subscribe(
+                            (data: any) => {
+                                this.groupShipments = data || [];
+                                this.selectedIndexSurcharge = null;
+                                this.groupShipments.forEach((groupItem: ISettlementShipmentGroup) => {
+                                    const groupItemSurcharges = this.surcharges.filter((x: Surcharge) => {
+                                        return x.hblid == groupItem.hblId
+                                            && x.advanceNo == groupItem.advanceNo
+                                            && x.settlementCode === groupItem.settlementNo
+                                            && x.clearanceNo == groupItem.customNo
+                                    });
+                                    groupItem.chargeSettlements = groupItemSurcharges || [];
                                 });
-                                groupItem.chargeSettlements = groupItemSurcharges || [];
                             });
-                            // }
-                        });
+                } else {
+                    this._accountingRepo.getListJobGroupSurchargeDetailSettlement(this.settlementCode)
+                        .pipe(finalize(() => this.isLoadingGroupShipment = false))
+                        .subscribe(
+                            (data: any) => {
+                                this.groupShipments = data || [];
+                                this.selectedIndexSurcharge = null;
+                                this.groupShipments.forEach((groupItem: ISettlementShipmentGroup) => {
+                                    const groupItemSurcharges = this.surcharges.filter((x: Surcharge) => {
+                                        return x.hblid == groupItem.hblId
+                                            && x.advanceNo == groupItem.advanceNo
+                                            && x.settlementCode === groupItem.settlementNo
+                                            && x.clearanceNo == groupItem.customNo
+                                    });
+                                    groupItem.chargeSettlements = groupItemSurcharges || [];
+                                });
+                            });
+                }
             }
         }
     }
@@ -803,6 +839,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.groupShipments[this.selectedGroupShipmentIndex] = JSON.parse(JSON.stringify(oldData));  // ? Clone data
 
         }
+    }
+
+    onSelectSurchargeInContextMenu(surcharge) {
+        this.selectedSurchargeContextMenu = surcharge;
+        this.clearMenuContext(this.queryListMenuContext);
     }
 }
 

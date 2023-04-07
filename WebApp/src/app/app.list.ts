@@ -88,15 +88,15 @@ export abstract class AppList extends AppPage {
         this.requestList(e.data);
     }
 
-    protected listenScrollingEvent(cb: (d?: any) => void) {
+    protected listenScrollingEvent(cb: (d?: any) => void, delay: number = 200, bottom: number = 125) {
         if (!this.scroller) {
             return;
         }
         this.scroller.elementScrolled().pipe(
             map(() => this.scroller.measureScrollOffset('bottom')),
             pairwise(),
-            filter(([y1, y2]) => (y2 < y1 && y2 < 125)),
-            throttleTime(200),
+            filter(([y1, y2]) => (y2 < y1 && y2 < bottom)),
+            throttleTime(delay),
             takeUntil(this.ngUnsubscribe)
         ).subscribe(cb);
     }

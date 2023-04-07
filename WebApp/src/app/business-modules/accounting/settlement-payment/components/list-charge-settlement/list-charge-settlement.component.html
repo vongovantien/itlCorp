@@ -102,7 +102,8 @@
                 </ng-container>
                 <ng-container *ngIf="TYPE === 'LIST'">
                     <div class="table-horizontal">
-                        <cdk-virtual-scroll-viewport [itemSize]="33" style="max-height: 590px"
+                        <cdk-virtual-scroll-viewport [itemSize]="33" style="max-height: 590px" minBufferPx="500"
+                            maxBufferPx="800" [trackBy]="trackByFn"
                             [ngStyle]="{'height.px': (!surcharges.length && !(isLoading | async)) ? 135 : (!!surcharges.length ? surcharges.length : 1) * 30.25 + 48.25  }"
                             #scroller>
                             <table class="table table-striped table-brand dataTable scrolling-table">
@@ -180,9 +181,9 @@
                                                     </ng-template>
 
                                                     <span class="dropdown m-dropdown m-dropdown--inline m-0">
-                                                        <i class="la la-file-text"
-                                                            [dpToggle]="dropdownMenuPreviewPl"></i>
-                                                        <app-dropdown #dropdownMenuPreviewPl>
+                                                        <i class="la la-file-text" [contextMenu]="SurchargeContextMenu"
+                                                            (onTouch)="onSelectSurchargeInContextMenu(surcharge)"></i>
+                                                        <!-- <app-dropdown #dropdownMenuPreviewPl>
                                                             <a class="dropdown-item pointer"
                                                                 (click)="previewPLsheet(surcharge,'USD')">Preview PL
                                                                 with
@@ -191,7 +192,7 @@
                                                                 (click)="previewPLsheet(surcharge,'VND')">Preview PL
                                                                 with
                                                                 VND</a>
-                                                        </app-dropdown>
+                                                        </app-dropdown> -->
                                                     </span>
                                                     <ng-template #locktpl>
                                                         <span class="d-block" style="width:25px"></span>
@@ -269,6 +270,16 @@
                             </table>
                         </cdk-virtual-scroll-viewport>
                     </div>
+                    <ng-container *ngIf="!!settlementCode">
+                        <div class="m--margin-top-10 font-weight-bold">
+                            <div class="float-right badge badge-primary">
+                                {{detailSettlement?.settlement?.totalCharge}}
+                            </div>
+                            <div class="m--align-right foat-right">
+                                Total Items:
+                            </div>
+                        </div>
+                    </ng-container>
                 </ng-container>
             </div>
         </div>
@@ -295,3 +306,12 @@
 
 
 <ng-template inject></ng-template>
+
+<app-context-menu #SurchargeContextMenu (clickOutside)="selectedSurchargeContextMenu = null">
+    <a class="menu-context__item pointer" (click)="previewPLsheet(selectedSurchargeContextMenu,'USD')">
+        <span><i class="la la-print text-primary"></i><span> Preview PL with USD</span></span>
+    </a>
+    <a class="menu-context__item pointer" (click)="previewPLsheet(selectedSurchargeContextMenu,'VND')">
+        <span><i class="la la-print text-primary"></i><span> Preview PL with VND</span></span>
+    </a>
+</app-context-menu>

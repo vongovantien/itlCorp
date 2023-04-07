@@ -453,9 +453,9 @@
 <ng-template #scrollingList>
     <ng-container *ngIf="TYPE === 'LIST'">
         <div class="table-horizontal">
-            <cdk-virtual-scroll-viewport [itemSize]="30" style="max-height: 525px" [ngStyle]="{'height.px': (!soa.chargeShipments.length && !isLoading) 
+            <cdk-virtual-scroll-viewport [itemSize]="30" style="max-height: 475px" [ngStyle]="{'height.px': (!soa.chargeShipments.length && !isLoading) 
              ? 135 
-             : !!soa.chargeShipments.length ? soa.chargeShipments.length * 25 + 35 : 85 }" #scroller>
+             : !!soa.chargeShipments.length ? (soa.chargeShipments.length * 25 + 35) + 10.5 : 85 }" #scroller>
                 <table class="table table-striped table-brand dataTable">
                     <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)"></thead>
                     <tbody class="tbody-group">
