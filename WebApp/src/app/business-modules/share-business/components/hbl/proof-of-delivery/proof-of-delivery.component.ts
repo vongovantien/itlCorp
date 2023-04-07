@@ -12,6 +12,7 @@ import { of } from 'rxjs';
 import { catchError, concatMap, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
 import { SystemFileManageRepo } from 'src/app/shared/repositories/system-file-manage.repo';
+import { IEDocFile } from '../../edoc/document-type-attach/document-type-attach.component';
 @Component({
     selector: 'hbl-proof-of-delivery',
     templateUrl: './proof-of-delivery.component.html'
@@ -30,17 +31,21 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
         this._progressRef = this._ngProgress.ref();
     }
     hblid: string = '';
+    jobId: string = '';
     proofOfDelievey: ProofOfDelivery = new ProofOfDelivery();
     fileList: any = null;
     files: any = {};
+    listFileUpload: any[] = [];
 
     ngOnInit() {
         this._activedRoute.params
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 map((p: Params) => {
+                    console.log(p)
                     if (p.hblId) {
                         this.hblid = p.hblId;
+                        this.jobId = p.jobId;
                         this.getFilePOD();
                     } else {
                         this.hblid = SystemConstants.EMPTY_GUID;
@@ -89,33 +94,48 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
 
     handleFileInput(event: any) {
         this.fileList = event.target['files'];
-        // if (!!this.proofOfDelievey.hblid || this.hblid != SystemConstants.EMPTY_GUID) {
-        //     if (!!this.files && !!this.files.id && this.fileList.length > 0) {
-        //         this.deleteFilePOD();
-        //     } else {
-        //         this.uploadFilePOD();
-        //     }
-        // }
+        const listFileUpload = event.target['files']
+        for (let i = 0; i < listFileUpload.length; i++) {
+            listFileUpload[i].DocumentId = 0;
+            listFileUpload[i].docType = 'POD';
+            listFileUpload[i].Code = 'POD';
+            listFileUpload[i].aliasName = "POD" + '_'+ listFileUpload[i].name.substring(0, listFileUpload[i].name.lastIndexOf('.'));
+            this.listFileUpload.push(listFileUpload[i]);
+        }
         this.uploadFilePOD();
     }
 
     uploadFilePOD() {
         const hblId = this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid;
-        // this._documentRepo.uploadFileProofOfDelivery(hblId, this.fileList)
-        //     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-        //     .subscribe(
-        //         (res: CommonInterface.IResult) => {
-        //             if (res.status) {
-        //                 this.fileList = null;
-        //                 this._toastService.success("Upload file successfully!");
-        //                 if (!!hblId) {
-        //                     this.getFilePOD();
-        //                 }
-        //             }
-        //         }
-        //     );
-        this._systemFileManageRepo.uploadAttachedFileEdoc('Document', 'Shipment', hblId, this.fileList)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+        let eDocFileList: IEDocFile[] = [];
+        let files: any[] = [];
+        this.listFileUpload.forEach(x => {
+            files.push(x);
+            eDocFileList.push(({
+                JobId: x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
+                Code: x.Code,
+                TransactionType: "Shipment",
+                AliasName: x.aliasName,
+                BillingNo: '',
+                BillingType: SystemConstants.EMPTY_GUID,
+                HBL: hblId,
+                FileName: x.name,
+                Note: x.note !== undefined ? x.note : '',
+                BillingId: SystemConstants.EMPTY_GUID,
+                Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
+                DocumentId: x.DocumentId,
+                AccountingType: x.AccountingType,
+            }));
+        });
+        const eDocUploadFile = ({
+            ModuleName: "Document",
+            FolderName: "Shipment",
+            Id: this.hblid,
+            EDocFiles: eDocFileList,
+        })
+
+        this._systemFileManageRepo.uploadEDoc(eDocUploadFile, files, "Shipment")
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {

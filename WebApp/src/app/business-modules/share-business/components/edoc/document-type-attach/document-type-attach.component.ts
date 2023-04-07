@@ -36,7 +36,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() docTypeId: number = 0;
     @Input() documentTypes: any[] = [];
     @Input() readonly: boolean = false;
-    @Input() isPOD: boolean = false;
+    @Input() isAttachFilePOD: boolean = false;
 
     lstEdocExist: any[] = [];
     headers: CommonInterface.IHeaderTable[] = [];
@@ -266,6 +266,12 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 files[i].docType = docType;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             }
+            else if (this.isAttachFilePOD === true) {
+                files[i].Code = "POD"
+                files[i].aliasName = "POD" + '_'+ files[i].name.substring(0, files[i].name.lastIndexOf('.'));
+                files[i].docType = "POD";
+                files[i].DocumentId = 0
+            }
             this.listFile.push(files[i]);
         }
         if (fileList?.length > 0) {
@@ -299,6 +305,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     onSelectDataFormInfo(event: any, index: number, type: string) {
+        console.log(event)
         switch (type) {
             case 'docType':
                 this.enablePayeeINV[index] = false;
@@ -410,6 +417,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     AccountingType: x.AccountingType,
                 }));
             });
+
+
             this.EdocUploadFile = ({
                 ModuleName: this.typeFrom === 'Shipment' ? 'Document' : 'Accounting',
                 FolderName: this.typeFrom,
@@ -448,11 +457,14 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     this._toastService.warning("Please fill all field!");
                     return;
                 }
+                console.log(this.EdocUploadFile)
+                console.log(this.typeFrom)
                 this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files, this.typeFrom)
                     .pipe(catchError(this.catchError))
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
+
                                 this._toastService.success("Upload file successfully!");
                                 this.resetForm();
                                 this.hide();

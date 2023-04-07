@@ -1,5 +1,5 @@
 <div class="modal fade" role="dialog" bsModal #popup="bs-modal">
-    <div class="modal-dialog modal-md" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Mass Update POD</h5>
@@ -40,8 +40,8 @@
                                                 ngxDaterangepickerMd
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                                 formControlName="deliveryDateAll" placeholder="Please Select" readonly
-                                                [singleDatePicker]="true" (remove)="resetDeliveryDate()"
-                                                [alwaysShowCalendars]="true" [autoApply]="true" />
+                                                [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                                [autoApply]="true" />
                                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                                 <span>
                                                     <i class="la la-calendar"></i>
@@ -49,8 +49,9 @@
                                             </span>
                                             <ng-container
                                                 *ngIf="!!deliveryDateAll.value && !!deliveryDateAll.value.startDate">
-                                                <span class=" m-input-icon_clear" (click)="resetDeliveryDate()"><i
-                                                        class=" la la-times"></i></span>
+                                                <span class=" m-input-icon_clear"
+                                                    (click)="resetFormControl(deliveryDateAll)"><i
+                                                        class="la la-times"></i></span>
                                             </ng-container>
                                         </div>
                                     </div>
@@ -66,17 +67,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="m-portlet">
-                    <table class="table-sub">
-                        <thead>
-                            <tr class="text-left">
-                                <th *ngFor="let header of headers; let i = index; trackBy: trackByFn">
-                                    {{header.title}}
-                                </th>
-                            </tr>
-                        </thead>
+                <div>
+                    <table class="table table-brand">
+                        <thead app-table-header [headers]="headers"></thead>
                         <tbody>
-                            <tr *ngFor="let hbl of houseBillList">
+                            <tr *ngFor="let hbl of houseBillList; let i = index; trackBy: trackByFn" class="abc">
                                 <td>
                                     {{hbl.hwbno}}
                                 </td>
@@ -86,7 +81,7 @@
                                             placeholder="Delivery Person">
                                     </div>
                                 </td>
-                                <td>
+                                <td class="container-calendar">
                                     <div class="form-group">
                                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                             <input type="text" class="form-control m-input m-input--square"
@@ -100,9 +95,9 @@
                                                     <i class="la la-calendar"></i>
                                                 </span>
                                             </span>
-                                            <ng-container *ngIf="!!hbl.deliveryDate && !!hbl.deliveryDate?.startDate">
-                                                <span class=" m-input-icon_clear" (click)="resetDeliveryDate()"><i
-                                                        class=" la la-times"></i></span>
+                                            <ng-container *ngIf="!!hbl.deliveryDate && !!hbl.deliveryDate.startDate">
+                                                <span class=" m-input-icon_clear" (click)="resetDeliveryDate(i)"><i
+                                                        class="la la-times"></i></span>
                                             </ng-container>
                                         </div>
                                     </div>
@@ -111,18 +106,17 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <ng-container>
-                    <app-default-button [buttonSetting]="saveButtonSetting" (click)="updatePOD()">
-                    </app-default-button>
-                </ng-container>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <ng-container>
+                        <app-default-button [buttonSetting]="saveButtonSetting" (click)="updatePOD()">
+                        </app-default-button>
+                    </ng-container>
 
-                <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="onClosePopUp()">
-                </app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="onClosePopUp()">
+                    </app-default-button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<document-type-attach [housebills]="houseBillList" [documentTypes]="documentType" [isPOD]="true">
-</document-type-attach>
+    <document-type-attach [housebills]="houseBillList" [transactionType]="" [typeFrom]="'Shipment'" [isAttachFilePOD]="true" [jobId]="this.jobId">
+    </document-type-attach>

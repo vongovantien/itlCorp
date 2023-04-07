@@ -1,14 +1,4 @@
-.table-sub {
-    thead {
-        color: #fff;
-        background-color: #3966b6;
-        tr {
-            th,
-            td {
-                min-width: 100px;
-                padding: 8px 4px;
-                font-weight: 500;
-            }
-        }
-    }
+
+.container-calendar thead th {
+    background-color: transparent !important;
 }

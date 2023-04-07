@@ -21,7 +21,6 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
 using static eFMS.API.Common.Helpers.FileHelper;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
 {
@@ -144,6 +143,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             edocUploadMapModel.EDocFilesMap = lstDocMap;
             return edocUploadMapModel;
         }
+        private SysAttachFileTemplate getDocID(Guid? jobId)
+        {
+            if (_opsTranRepo.Any(x => x.Id == jobId))
+            {
+                return _attachFileTemplateRepo.Get(x => x.TransactionType == "CL" && x.Code == "POD").FirstOrDefault();
+            }
+            var tranType = _cstranRepo.Get(x => x.Id == jobId).FirstOrDefault();
+            return _attachFileTemplateRepo.Get(x => x.TransactionType == tranType.TransactionType && x.Code == "POD").FirstOrDefault();
+        }
         public async Task<HandleState> PostEDocAsync(EDocUploadModel model, List<IFormFile> files, string type)
         {
             HandleState result = new HandleState();
@@ -195,7 +203,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         list.Add(sysImage);
                         if (type == "Shipment")
                         {
-                            var attachTemplate = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault();
+                            var attachTemplate = new SysAttachFileTemplate();
+                            if (edoc.Code == "POD" && edoc.DocumentId == 0)
+                            {
+                                attachTemplate = getDocID(edoc.JobId);
+                            }
+                            else
+                            {
+                                attachTemplate = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault();
+                            }
+
                             var sysImageDetail = new SysImageDetail
                             {
                                 Id = Guid.NewGuid(),
@@ -883,7 +900,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
-        
+
         //Delete with Other case
         //private async Task<bool> DeleteImage(string billingNo, string billingType)
         //{
@@ -923,7 +940,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             try
             {
                 var edoc = _sysImageDetailRepo.Get(x => x.Id == edocId).FirstOrDefault();
-                if (jobId==Guid.Empty)
+                if (jobId == Guid.Empty)
                 {
                     if (edoc == null)
                     {
@@ -979,7 +996,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         }
                         else if (edoc.GenEdocId != null)
                         {
-                            var images = _sysImageDetailRepo.Get(x => x.BillingNo == edoc.BillingNo && x.GenEdocId != null && x.SysImageId==edoc.SysImageId).ToList();
+                            var images = _sysImageDetailRepo.Get(x => x.BillingNo == edoc.BillingNo && x.GenEdocId != null && x.SysImageId == edoc.SysImageId).ToList();
                             var edocIds = images.Select(x => x.Id).ToList();
                             //var imageIds = images.Select(x => x.SysImageId).ToList();
                             var delEdoc = await _sysImageDetailRepo.DeleteAsync(x => edocIds.Contains(x.Id));
@@ -1025,7 +1042,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 else
                 {
                     var edocExist = _sysImageDetailRepo.Get(x => x.SysImageId == edoc.SysImageId).ToList();
-                    if(edocExist != null)
+                    if (edocExist != null)
                     {
                         if (edocExist.Count == 1)
                         {
@@ -1865,9 +1882,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                                     GenEdocId = edocFrom.Id
                                                 };
                                                 edocs.Add(edoc);
-                                                }
                                             }
                                         }
+                                    }
                                 }
                             });
                         });
@@ -1901,7 +1918,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         //    docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "SM" && z.AccountingType == "Settlement")).FirstOrDefault().Id;
                                         //}
                                         int docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "BL" && z.AccountingType == "Settlement")).FirstOrDefault().Id;
-                                        var HBLCodes = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "HB"||z.Code=="BL") && z.Type == "General")).ToList();
+                                        var HBLCodes = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && ((z.Code == "HB" || z.Code == "BL") && z.Type == "General")).ToList();
                                         HBLCodes.ToList().ForEach(HBLCode =>
                                         {
                                             if (checEdocType(img.Id, HBLCode.Id))
@@ -1956,11 +1973,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         int docTypeId = 0;
                                         if (advSM != null)
                                         {
-                                            docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "INV"&&z.AccountingType== "ADV-Settlement")).FirstOrDefault().Id;
+                                            docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "INV" && z.AccountingType == "ADV-Settlement")).FirstOrDefault().Id;
                                         }
                                         else
                                         {
-                                            docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "INV" && z.AccountingType == "Settlement"&&z.PartnerType== "Supplier")).FirstOrDefault().Id;
+                                            docTypeId = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && (z.Code == "INV" && z.AccountingType == "Settlement" && z.PartnerType == "Supplier")).FirstOrDefault().Id;
                                         }
                                         var tranType = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code == "INV" && z.Type == "Accountant" && z.PartnerType == "Supplier" && z.AccountingType == "Settlement").FirstOrDefault();
                                         var INVCodes = _attachFileTemplateRepo.Get(z => z.TransactionType == x.tranType && z.Code.Contains("INV") && z.Type == "General").ToList();
@@ -2166,7 +2183,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             {
                 case "Settlement":
                     var settlId = _setleRepo.Get(x => x.SettlementNo == billingNo).FirstOrDefault().Id;
-                    images = _sysImageRepo.Get(x => x.ObjectId == settlId.ToString() && imgIds.Contains(x.Id)).Select(x=>x.Id).ToList();
+                    images = _sysImageRepo.Get(x => x.ObjectId == settlId.ToString() && imgIds.Contains(x.Id)).Select(x => x.Id).ToList();
                     break;
                 case "Advance":
                     var advId = _advRepo.Get(x => x.AdvanceNo == billingNo).FirstOrDefault().Id;
@@ -2184,7 +2201,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         public async Task<HandleState> UpdateEdocByAcc(EdocAccUpdateModel model)
         {
             var hsDel = new HandleState();
-            var result=  new HandleState(true,"Update EDoc Success");
+            var result = new HandleState(true, "Update EDoc Success");
             if (hsDel.Success)
             {
                 var listEdoc = new List<SysImageDetail>();

@@ -59,7 +59,8 @@
                                                         disabled>
                                                 </div>
                                             </td>
-                                            <td *ngIf="typeFrom==='Settlement'||typeFrom==='Shipment'">
+                                            <td
+                                                *ngIf="(typeFrom==='Settlement'||typeFrom==='Shipment') && !isAttachFilePOD; else attachPODFile">
                                                 <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.DocumentId||file
                                                         .DocumentId===null)) }" [title]="file.docTitle">
                                                     <div class="list-master">
@@ -74,6 +75,12 @@
                                                     </div>
                                                 </div>
                                             </td>
+                                            <ng-template #attachPODFile>
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" value="POD" disabled>
+                                                </div>
+                                            </ng-template>
+
                                             <td *ngIf="typeFrom==='SOA'">
                                                 <div class="form-group">
                                                     <input class="form-control" [disabled]="true" type="text"
@@ -141,7 +148,7 @@
                                                     </div>
                                                 </td>
                                             </ng-container>
-                                            <td class="disabled" *ngIf="typeFrom==='Shipment'||jobOnSettle">
+                                            <td class="disabled" *ngIf="(typeFrom==='Shipment'||jobOnSettle) && !isAttachFilePOD">
                                                 <div class="form-group ">
                                                     <input type="text" class="form-control " [ngModel]="jobNo" disabled>
                                                 </div>

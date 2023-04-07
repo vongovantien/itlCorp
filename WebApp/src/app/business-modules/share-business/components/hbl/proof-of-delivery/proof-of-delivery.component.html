@@ -33,7 +33,7 @@
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                 placeholder="Please Select" readonly [autoApply]="true" [singleDatePicker]="true"
                                 [alwaysShowCalendars]="true" [(ngModel)]="proofOfDelievey.deliveryDate" calendar
-                                [allowRemove]="proofOfDelievey.deliveryDate"
+                                [allowRemove]="!!proofOfDelievey.deliveryDate && !!proofOfDelievey.deliveryDate.startDate"
                                 (remove)="proofOfDelievey.deliveryDate = null" />
 
                         </div>
@@ -59,7 +59,6 @@
                         </span>
                         <br /><br />
                         <ng-container *ngIf="!isLoading && !!files && !!hblid">
-                            <!-- <a [href]="files.url" target="_blank" [title]="files.name" download>{{files.name}}</a> -->
                             <li *ngFor="let file of files"><a [href]="file.url" target="_blank" [title]="file.name"
                                     download>{{file.name}}</a>
                                 <span class="pointer text-center" *ngIf="!readonly">
