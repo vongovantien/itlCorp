@@ -112,7 +112,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
         this.listFileUpload.forEach(x => {
             files.push(x);
             eDocFileList.push(({
-                JobId: x.jobId !== undefined ? x.jobId : SystemConstants.EMPTY_GUID,
+                JobId: this.jobId,
                 Code: x.Code,
                 TransactionType: "Shipment",
                 AliasName: x.aliasName,
