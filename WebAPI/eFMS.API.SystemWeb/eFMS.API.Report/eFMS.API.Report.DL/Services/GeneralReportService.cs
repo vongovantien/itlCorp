@@ -374,7 +374,8 @@ namespace eFMS.API.Report.DL.Services
                 if (data.JobNo.Contains("LOG"))
                 {
                     var jobOPS=opsRepository.Get(x=>x.JobNo==item.JobNo).FirstOrDefault();
-                    data.SaleInfo.GroupSaleMan = groupRepository.Get(x => x.Id == short.Parse(jobOPS.SalesGroupId)).FirstOrDefault().ShortName;
+                    var saleGroupOPS = jobOPS.SalesGroupId.Split(';').FirstOrDefault();
+                    data.SaleInfo.GroupSaleMan = groupRepository.Get(x => x.Id == short.Parse(saleGroupOPS)).FirstOrDefault().ShortName;
                     data.SaleInfo.DeptSaleMan = deptRepository.Get(x => x.Id == short.Parse(jobOPS.SalesDepartmentId)).FirstOrDefault().DeptNameAbbr;
                 }
                 else
