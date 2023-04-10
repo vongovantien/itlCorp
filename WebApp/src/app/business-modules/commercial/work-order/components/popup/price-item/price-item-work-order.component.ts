@@ -1,6 +1,6 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { PopupBase } from '@app';
 import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
@@ -13,12 +13,9 @@ import { Observable, merge } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import {
     AddPriceItemWorkOrder,
-    AddPriceItemWorkOrderSuccess,
     IWorkOrderMngtState,
     ResetUpdatePriceItemWorkOrder,
-    SelectPriceItemWorkOrder,
     UpdatePriceItemWorkOrder,
-    UpdatePriceItemWorkOrderSuccess,
     workOrderDetailIsReadOnlyState,
     workOrderDetailTransationTypeState,
     WorkOrderPriceItemUpdateModeState
@@ -110,7 +107,7 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
 
         this.initForm();
 
-        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
         this._store.dispatch(new GetCatalogueUnitAction());
         this.units = this._store.select(getCatalogueUnitState);
 

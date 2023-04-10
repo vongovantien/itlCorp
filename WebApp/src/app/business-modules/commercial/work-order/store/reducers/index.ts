@@ -27,7 +27,7 @@ export const workOrderDetailActiveState = createSelector(workOrderState, (state:
 export const workOrderDetailStatusState = createSelector(workOrderState, (state: IWorkOrderMngtState) => state.detail?.status);
 export const workOrderDetailTransationTypeState = createSelector(workOrderState, (state: IWorkOrderMngtState) => state.detail?.transactionType);
 export const workOrderDetailLoadingState = createSelector(workOrderState, (state: IWorkOrderMngtState) => state.detail?.isLoading);
-export const WorkOrderListPricestate = createSelector(workOrderState, (state: IWorkOrderMngtState) => state.detail?.listPrice);
+export const WorkOrderListPricestate = createSelector(workOrderState, (state: IWorkOrderMngtState) => state.detail?.listPrice || []);
 export const WorkOrderPriceItemUpdateModeState = createSelector(workOrderState, (state: IWorkOrderMngtState) => (state.detail?.listPrice || []).find(x => x.mode === 'UPDATE'));
 
 
