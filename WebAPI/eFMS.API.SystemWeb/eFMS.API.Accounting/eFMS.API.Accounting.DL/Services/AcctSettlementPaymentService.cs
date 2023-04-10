@@ -21,6 +21,7 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -75,9 +76,11 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CsLinkCharge> csLinkChargeRepository;
         private readonly IContextBase<SysSettingFlow> settingflowRepository;
         private readonly IContextBase<SysImageDetail> imageDetailRepository;
+        private readonly IContextBase<CatContract> contractRepository;
         private string typeApproval = "Settlement";
         private decimal _decimalNumber = Constants.DecimalNumber;
         private IDatabaseUpdateService databaseUpdateService;
+        private readonly IStringLocalizer stringLocalizer;
 
         public AcctSettlementPaymentService(IContextBase<AcctSettlementPayment> repository,
             IMapper mapper,
@@ -118,7 +121,9 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CsLinkCharge> csLinkChargeRepo,
             IContextBase<SysSettingFlow> settingflowRepo,
             IContextBase<SysImageDetail> imageDetailRepo,
-        IContextBase<OpsStageAssigned> opsStageAssignedRepo) : base(repository, mapper)
+            IContextBase<OpsStageAssigned> opsStageAssignedRepo,
+            IContextBase<CatContract> contractRepo,
+            IStringLocalizer<AccountingLanguageSub> localizer) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = wUrl;
@@ -158,6 +163,8 @@ namespace eFMS.API.Accounting.DL.Services
             csLinkChargeRepository = csLinkChargeRepo;
             settingflowRepository = settingflowRepo;
             imageDetailRepository = imageDetailRepo;
+            contractRepository = contractRepo;
+            stringLocalizer = localizer;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -6444,23 +6451,40 @@ namespace eFMS.API.Accounting.DL.Services
                     validJobNo.AddRange(opsNoProfit);
                     validJobNo.AddRange(serviceNoProfit);
 
-                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH && validJobNo.Any(z => z == x.JobNo));
-                    if (surcharges.Count() <= 0)
-                    {
-                        return invalidShipment;
-                    }
                     var listSipment = new List<string>();
-                    // [CR:09/05/2022]: so sánh profit trên tổng của lô hàng
-                    var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
-                    foreach (var shipment in shipmentGrp)
+                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH && validJobNo.Any(z => z == x.JobNo));
+                    foreach (var jobNo in validJobNo)
                     {
-                        var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => x.AmountVnd ?? 0);
-                        var sellAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL).Sum(x => x.AmountVnd ?? 0);
-                        if (buyAmount > sellAmount)
+                        //[CR:10042023] shipment not checked no profit with no selling charges => not allow to settle
+                        var sellingCharges = surcharges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.JobNo == jobNo);
+                        if (sellingCharges.Count() <= 0)
                         {
-                            listSipment.Add(shipment.FirstOrDefault().JobNo);
+                            listSipment.Add(jobNo);
+                        }
+                        else
+                        {
+                            // [CR:09/05/2022]: so sánh profit trên tổng của lô hàng
+                            var shipment = surcharges.Where(x=>x.JobNo == jobNo);
+                            var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => x.AmountVnd ?? 0);
+                            var sellAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL).Sum(x => x.AmountVnd ?? 0);
+                            if (buyAmount > sellAmount)
+                            {
+                                listSipment.Add(shipment.FirstOrDefault().JobNo);
+                            }
                         }
                     }
+
+                    // [CR:09/05/2022]: so sánh profit trên tổng của lô hàng
+                    //var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
+                    //foreach (var shipment in shipmentGrp)
+                    //{
+                    //    var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => x.AmountVnd ?? 0);
+                    //    var sellAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL).Sum(x => x.AmountVnd ?? 0);
+                    //    if (buyAmount > sellAmount)
+                    //    {
+                    //        listSipment.Add(shipment.FirstOrDefault().JobNo);
+                    //    }
+                    //}
                     if (listSipment.Count > 0)
                     {
                         listSipment = listSipment.Distinct().ToList();
@@ -6476,6 +6500,67 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var data = GetSurchargeDetailSettlement(settlementNo, null, null, null, page, size);
             return data;
+        }
+
+        /// <summary>
+        /// Check prepaid shipment was confirmed with AR or not
+        /// </summary>
+        /// <param name="ShipmentCharges"></param>
+        /// <returns></returns>
+        public ResultHandle CheckConfirmPrepaidShipment(List<ShipmentChargeSettlement> ShipmentCharges)
+        {
+            ResultHandle result = new ResultHandle();
+            var hblIds = ShipmentCharges.Select(x => x.Hblid).ToList();
+            var office = sysOfficeRepo.First(x => x.Id == currentUser.OfficeID);
+            if (office.OfficeType == AccountingConstants.OFFICE_TYPE_OUTSOURCE)
+            {
+                return result;
+            }
+            var opsTransaction = opsTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && hblIds.Contains(x.Hblid));
+            var transactionDetail = csTransactionDetailRepo.Get(x => hblIds.Contains(x.Id));
+            var partners = catPartnerRepo.Get(x => x.Active == true);
+            var contracts = contractRepository.Get(x => x.Active == true && x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PREPAID && (x.IsExpired == false || x.IsExpired == null));
+            string salemanBOD = sysUserRepo.Get(x => x.Username == AccountingConstants.ITL_BOD)?.FirstOrDefault()?.Id;
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_BUY && hblIds.Contains(x.Hblid));
+            string messError = string.Empty;
+            foreach (var hbl in hblIds)
+            {
+                var opsDetail = opsTransaction.Where(x => x.Hblid == hbl).FirstOrDefault();
+                var transDetail = transactionDetail.Where(x => x.Id == hbl).FirstOrDefault();
+                {
+                    var existPrepaid = (from partner in partners
+                                        join contract in contracts on partner.Id.ToLower() equals contract.PartnerId.ToLower()
+                                        where partner.Id == (opsDetail == null ? transDetail.CustomerId : opsDetail.CustomerId) && contract.SaleManId == (opsDetail == null ? transDetail.SaleManId : opsDetail.SalemanId)
+                                        && contract.SaleManId != salemanBOD
+                                        select new
+                                        {
+                                            contract.SaleManId
+                                        }).FirstOrDefault();
+                    if (existPrepaid == null)
+                    {
+                        continue;
+                    }
+                    var chargesHbl = surcharges.Where(x => x.Hblid == hbl);
+                    if (chargesHbl.Count() > 0)
+                    {
+                        bool hasIssuedDebit = chargesHbl.All(x => !string.IsNullOrEmpty(x.DebitNo));
+                        if (!hasIssuedDebit)
+                        {
+                            messError = stringLocalizer[AccountingLanguageSub.MSG_SETTLEMENT_HAD_SHIPMENT_PREPAID_NOT_ISSUED_DEBIT, chargesHbl.FirstOrDefault().JobNo];
+                            return new ResultHandle() { Status = false, Message = messError };
+                        }
+                        var debitCodes = chargesHbl.Select(x => x.DebitNo).ToList();
+                        var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type == AccountingConstants.TYPE_SOA_DEBIT);
+                        var hasConfirm = debitNotes.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+                        if (!hasConfirm)
+                        {
+                            messError = stringLocalizer[AccountingLanguageSub.MSG_SETTLEMENT_HAD_SHIPMENT_PREPAID_NOT_ISSUED_DEBIT, chargesHbl.FirstOrDefault().JobNo];
+                            return new ResultHandle() { Status = false, Message = messError };
+                        }
+                    }
+                }
+            }
+            return result;
         }
     }
 }
