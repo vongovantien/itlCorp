@@ -60,7 +60,7 @@ namespace eFMS.API.Accounting.DL.Services
         public IQueryable<AccAccountPayableModel> Paging(AccountPayableCriteria criteria, int page, int size, out int rowsCount)
         {
             criteria.IsPaging = true;
-            var data = GetDataAcctPayable(criteria);
+            var data = GetDataAcctPayable(criteria, page * size);
             IQueryable<AccAccountPayableModel> result = null;
 
             int _totalItem = 0;
@@ -366,14 +366,14 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        private IQueryable<AcctPayablePaymentDetailModel> GetDataAcctPayable(AccountPayableCriteria criteria)
+        private IQueryable<AcctPayablePaymentDetailModel> GetDataAcctPayable(AccountPayableCriteria criteria, int? size = 1)
        {
             IQueryable<AcctPayablePaymentDetailModel> results = null;
 
             var payableData = QueryPayable(criteria);
             if(criteria.IsPaging == true)
             {
-                payableData = payableData.Take(300);
+                payableData = payableData.Take(size ?? 1);
             }
             if (payableData == null) return null;
             var paymentData = accountPayablePaymentRepository.Get(x => x.PaymentType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE);

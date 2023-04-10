@@ -148,6 +148,11 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
 
+        if(this.formCreate.isRequireAgreement && !this.formCreate.agreementId.value){
+            this._toastService.warning(`Partner does not have any agreement, Please check it again!`);
+            return;
+        }
+
         const receiptModel: ReceiptModel = this.getDataForm();
 
         this.paymentList = [];
@@ -246,9 +251,12 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 this._toastService.warning('Please you do process clear firstly!');
                 return;
             }
-            const hasRowTotalInvalid: boolean = this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
+            const hasRowTotalInvalid: boolean = this.type === 'CUSTOMER' ? 
+                this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd)) :
+                this.paymentList.some(x => x.totalPaidUsd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidUsd > x.unpaidAmountUsd));
             if (hasRowTotalInvalid) {
-                const rowInvalid: ReceiptInvoiceModel[] = this.paymentList.filter(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
+                const rowInvalid: ReceiptInvoiceModel[] = this.type === 'CUSTOMER' ? this.paymentList.filter(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd)) :
+                this.paymentList.filter(x => x.totalPaidUsd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidUsd > x.unpaidAmountUsd));
                 rowInvalid.forEach(x => {
                     x.isValid = false;
                 })
@@ -277,7 +285,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     checkValidateForm() {
         let valid: boolean = true;
         this.removeValidators(this.listInvoice.paymentMethod);
-        if (!this.formCreate.formSearchInvoice.valid
+        if (!this.formCreate.customerId.valid 
+            || (this.formCreate.isRequireAgreement && !this.formCreate.agreementId.value)
             || !this.listInvoice.form.valid
             || this.listInvoice.paidAmountVnd.value === null
             || this.listInvoice.paidAmountUsd.value === null
@@ -609,5 +618,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this.listInvoice.paidAmountVnd.setErrors({ validCus: true });
             return;
         }
+    }
+
+    onChangePaymentMethod(){
+        this.formCreate.getRequireAgreementAgent();
     }
 }

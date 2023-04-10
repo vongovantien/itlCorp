@@ -146,6 +146,13 @@
             <param name="key">String random</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingAgencyPayment(eFMS.API.ReportData.Models.Criteria.AccountingPaymentCriteria)">
+            <summary>
+            Export Statement Of Receivable - Agent
+            </summary>
+            <param name="paymentCriteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingPayableStandartReport(eFMS.API.ReportData.Models.Criteria.AccountPayableCriteria)">
             <summary>
             Export Accounting Payable Standart Report

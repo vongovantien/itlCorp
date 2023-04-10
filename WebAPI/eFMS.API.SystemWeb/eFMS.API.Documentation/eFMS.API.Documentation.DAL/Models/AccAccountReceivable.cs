@@ -35,5 +35,8 @@ namespace eFMS.API.Documentation.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public decimal? OverObh1to15Day { get; set; }
+        public decimal? OverObh16to30Day { get; set; }
+        public decimal? OverObh30day { get; set; }
     }
 }

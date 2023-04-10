@@ -619,12 +619,16 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return false;
             }
-            var query = surchargeRepository.Get(x => x.Hblid == detail.Hblid && (x.CreditNo != null || x.DebitNo != null || x.Soano != null || x.PaymentRefNo != null
+            var query = surchargeRepository.Get(x => x.Hblid == detail.Hblid && (!string.IsNullOrEmpty(x.CreditNo)
+                        || !string.IsNullOrEmpty(x.DebitNo)
+                        || !string.IsNullOrEmpty(x.Soano)
+                        || !string.IsNullOrEmpty(x.PaymentRefNo)
                         || !string.IsNullOrEmpty(x.AdvanceNo)
                         || !string.IsNullOrEmpty(x.VoucherId)
                         || !string.IsNullOrEmpty(x.PaySoano)
                         || !string.IsNullOrEmpty(x.SettlementCode)
                         || !string.IsNullOrEmpty(x.SyncedFrom)
+                        || !string.IsNullOrEmpty(x.PaySyncedFrom)
                         || !string.IsNullOrEmpty(x.LinkChargeId))
                         );
             if (query.Any() || accAdvanceRequestRepository.Any(x => x.JobId == detail.JobNo))

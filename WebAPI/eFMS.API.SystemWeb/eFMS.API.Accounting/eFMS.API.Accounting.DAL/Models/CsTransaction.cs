@@ -74,6 +74,7 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? Atd { get; set; }
         public bool? IsMawb { get; set; }
         public bool? NoProfit { get; set; }
+        public string TrackingStatus { get; set; }
 
         public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }

@@ -311,7 +311,7 @@ namespace eFMS.API.ReportData
             // Tạo header
             List<string> headers = new List<string>
             {
-                "No.", "Code", "English Name", "Local Name", "Type", "Inactive"
+                "No.", "Code", "English Name", "Local Name", "Type", "Services", "Apply Offices", "Charge Group", "Buying Mapping Code", "Buying Mapping Name", "Selling Mapping Code", "Selling Mapping Name", "Inactive"
             };
 
             for (int i = 0; i < headers.Count; i++)
@@ -326,14 +326,25 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[3, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet.Cells[3, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
-
-            worksheet.Cells[1, 1, 1, 6].Merge = true;
+            worksheet.Column(1).Width = 5;
+            worksheet.Column(2).Width = 25;
+            worksheet.Column(3).Width = 50;
+            worksheet.Column(4).Width = 50;
+            worksheet.Column(5).Width = 10;
+            worksheet.Column(6).Width = 90;
+            worksheet.Column(7).Width = 35;
+            worksheet.Column(8).Width = 15;
+            worksheet.Column(9).Width = 22;
+            worksheet.Column(10).Width = 43;
+            worksheet.Column(11).Width = 22;
+            worksheet.Column(12).Width = 43;
+            worksheet.Cells[1, 1, 1, 13].Merge = true;
             worksheet.Cells["A1"].Value = "CHARGE INFORMATION";
             worksheet.Cells["A1"].Style.Font.Size = 16;
             worksheet.Cells["A1"].Style.Font.Bold = true;
             worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             worksheet.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            //worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
             worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             for (int i = 0; i < listItems.Count; i++)
@@ -344,10 +355,28 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 4, 3].Value = item.ChargeNameEn;
                 worksheet.Cells[i + 4, 4].Value = item.ChargeNameVn;
                 worksheet.Cells[i + 4, 5].Value = item.Type;
-                worksheet.Cells[i + 4, 6].Value = item.Active == true ? "Active" : "Inactive";
+                worksheet.Cells[i + 4, 6].Value = item.ServiceTypeId;
+                worksheet.Cells[i + 4, 7].Value = item.OfficesName;
+                worksheet.Cells[i + 4, 8].Value = item.ChargeGroupName;
+                worksheet.Cells[i + 4, 9].Value = item.BuyingCode;
+                worksheet.Cells[i + 4, 10].Value = item.BuyingName;
+                worksheet.Cells[i + 4, 11].Value = item.SellingCode;
+                worksheet.Cells[i + 4, 12].Value = item.SellingName;
+                worksheet.Cells[i + 4, 13].Value = item.Active == true ? "Active" : "Inactive";
 
                 worksheet.Cells[i + 4, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 worksheet.Cells[i + 4, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                worksheet.Cells[i + 4, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[i + 4, 5].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                worksheet.Cells[i + 4, 8].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[i + 4, 8].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                worksheet.Cells[i + 4, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
+                worksheet.Cells[i + 4, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
+                worksheet.Cells[i + 4, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
+                worksheet.Cells[i + 4, 12].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
 
                 //Add border left right for cells
                 for (int j = 0; j < headers.Count; j++)

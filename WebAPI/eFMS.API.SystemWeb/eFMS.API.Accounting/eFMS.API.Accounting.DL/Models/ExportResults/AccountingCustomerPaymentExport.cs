@@ -24,6 +24,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public decimal? UnpaidAmountInvUsd { get; set; }
         public decimal? UnpaidAmountOBH { get; set; }
         public decimal? UnpaidAmountOBHUsd { get; set; }
+        public decimal? UnpaidAmountCreditUsd { get; set; }
         public decimal? PaidAmount { get; set; }
         public decimal? PaidAmountUsd { get; set; }
         public decimal? PaidAmountOBH { get; set; }

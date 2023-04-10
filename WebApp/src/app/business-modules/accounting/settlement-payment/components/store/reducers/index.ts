@@ -23,7 +23,7 @@ export const getSettlementPaymentDetailState = createSelector(settlementPayment,
 export const getGrpChargeSettlementPaymentDetailState = createSelector(settlementPayment, (state: ISettlementPaymentState) => state.detail?.settlement?.chargeNoGrpSettlement);
 export const getSettlementPaymentDetailLoadingState = createSelector(settlementPayment, (state: ISettlementPaymentState) => state.detail?.isLoading);
 export const getListEdocState = createSelector(settlementPayment, (state: ISettlementPaymentState) => state.detail?.eDocs);
-
+export const getSettlementPaymentDetailTotalChargeState = createSelector(settlementPayment, (state: ISettlementPaymentState) => state.detail?.settlement.settlement?.totalCharge);
 
 export const reducers: ActionReducerMap<ISettlementPaymentState> = {
     list: settlePaymentListreducer,
