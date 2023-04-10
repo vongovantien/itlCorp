@@ -29,5 +29,6 @@ namespace eFMS.API.Documentation.DL.IService
         Task<HandleState> DeletePrice(Guid id);
         Task<HandleState> SetActiveInactive(ActiveInactiveRequest request);
         CsWorkOrderViewUpdateModel GetById(Guid id);
+        bool CheckExist(WorkOrderRequest model);
     }
 }
