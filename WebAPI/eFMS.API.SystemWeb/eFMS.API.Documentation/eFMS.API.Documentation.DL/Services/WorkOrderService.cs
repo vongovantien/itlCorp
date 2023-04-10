@@ -99,13 +99,14 @@ namespace eFMS.API.Documentation.DL.Services
                 try
                 {
                     hs = DataContext.Delete(x => x.Id == Id);
-                    if(hs.Success)
+                    if (hs.Success)
                     {
                         var hsDeletePrice = await DeletePriceWorkOrder(Id);
-                        if(hsDeletePrice.Success)
+                        if (hsDeletePrice.Success)
                         {
                             trans.Commit();
-                        } else
+                        }
+                        else
                         {
                             string innerMes = hsDeletePrice?.Exception?.InnerException?.Message;
                             if (!string.IsNullOrEmpty(innerMes))
@@ -140,7 +141,7 @@ namespace eFMS.API.Documentation.DL.Services
                 try
                 {
                     var prices = await workOrderPriceRepo.GetAsync(x => x.WorkOrderId == Id);
-                    if(prices.Count == 0)
+                    if (prices.Count == 0)
                     {
                         return hs;
                     }
@@ -155,7 +156,8 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 tranSurcharge.Commit();
                                 trans.Commit();
-                            } else
+                            }
+                            else
                             {
                                 tranSurcharge.Rollback();
                             }
@@ -195,7 +197,7 @@ namespace eFMS.API.Documentation.DL.Services
             CsWorkOrderViewUpdateModel workOrderViewUpdateModel = mapper.Map<CsWorkOrderViewUpdateModel>(workOrder);
 
             var portIds = new List<Guid?>();
-            if(workOrderViewUpdateModel.Pol != null)
+            if (workOrderViewUpdateModel.Pol != null)
             {
                 portIds.Add(workOrder.Pol);
             }
@@ -220,7 +222,7 @@ namespace eFMS.API.Documentation.DL.Services
             workOrderViewUpdateModel.TransactionTypeName = GetTypeFromData.GetTranctionTypeName(workOrder.TransactionType);
 
             var listPriceWorkOrder = workOrderPriceRepo.Get(x => x.WorkOrderId == workOrder.Id).ToList();
-            if(listPriceWorkOrder.Count > 0)
+            if (listPriceWorkOrder.Count > 0)
             {
                 List<CsWorkOrderPriceModel> prices = new List<CsWorkOrderPriceModel>();
                 foreach (var item in listPriceWorkOrder)
@@ -261,7 +263,8 @@ namespace eFMS.API.Documentation.DL.Services
                         }
 
                         workOrderPriceModel.Surcharges = listModelSurcharges;
-                    } else
+                    }
+                    else
                     {
                         workOrderPriceModel.Surcharges = new List<CsWorkOrderSurchargeModel>();
                     }
@@ -346,7 +349,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialWorkOrder);
             PermissionRange permissionRangeList = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            if(permissionRangeList == PermissionRange.None)
+            if (permissionRangeList == PermissionRange.None)
             {
                 return new ResponsePagingModel<CsWorkOrderViewModel>
                 {
@@ -506,16 +509,18 @@ namespace eFMS.API.Documentation.DL.Services
                     if (hs.Success)
                     {
                         HandleState hsSurcharge = workOrderSurchargeRepo.SubmitChanges();
-                        if(hsSurcharge.Success)
+                        if (hsSurcharge.Success)
                         {
-                            trans.Commit(); 
-                        } else
+                            trans.Commit();
+                        }
+                        else
                         {
                             string innerMes = hsSurcharge?.Exception?.InnerException?.Message;
                             if (!string.IsNullOrEmpty(innerMes))
                             {
                                 throw new Exception(innerMes);
-                            } else
+                            }
+                            else
                             {
                                 throw new Exception(hsSurcharge?.Message?.ToString());
                             }
@@ -584,16 +589,16 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var item in list)
             {
                 CsWorkOrderPrice priceItem = mapper.Map<CsWorkOrderPrice>(item);
-               
+
                 priceItem.UserModified = currentUser.UserID;
                 priceItem.DatetimeModified = DateTime.Now;
-                
+
                 if (item.Surcharges != null && item.Surcharges.Count > 0)
                 {
                     var surchargesAdd = item.Surcharges.Where(x => x.Id == null || x.Id == Guid.Empty).ToList();
                     var surchargesModified = item.Surcharges.Where(x => x.Id != null && x.Id != Guid.Empty).ToList();
 
-                    if(surchargesAdd.Count > 0)
+                    if (surchargesAdd.Count > 0)
                     {
                         foreach (var i in surchargesAdd)
                         {
@@ -608,7 +613,7 @@ namespace eFMS.API.Documentation.DL.Services
                             newSurchargesInPriceItem.Add(mapper.Map<CsWorkOrderSurcharge>(i));
                         }
                     }
-                    if(surchargesModified.Count > 0)
+                    if (surchargesModified.Count > 0)
                     {
                         var surchargeModifiedIds = surchargesModified.Select(x => x.Id).ToList();
                         foreach (var i in surchargesModified)
@@ -627,14 +632,14 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             // ADD.
-            if(newSurchargesInPriceItem.Count > 0)
+            if (newSurchargesInPriceItem.Count > 0)
             {
                 foreach (var sur in newSurchargesInPriceItem)
                 {
                     workOrderSurchargeRepo.Add(sur, false);
                 }
             }
-               
+
             // UPDATE.
             if (updateSurchargesInPriceItem.Count > 0)
             {
@@ -653,7 +658,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             return workOrderPriceRepo.SubmitChanges();
         }
-        private async  Task<HandleState> UpdatePrice(List<CsWorkOrderPriceModel> list, CsWorkOrder workOrder)
+        private async Task<HandleState> UpdatePrice(List<CsWorkOrderPriceModel> list, CsWorkOrder workOrder)
         {
             var hs = new HandleState();
 
@@ -670,7 +675,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var listModified = list.Where(x => x.Id != null && x.Id != Guid.Empty).ToList();
 
                     List<HandleState> hsAddAndModified = new List<HandleState>();
-                    
+
                     if (listAdded.Count > 0 || listModified.Count > 0)
                     {
                         var tasks = new List<Task<HandleState>>();
@@ -737,7 +742,7 @@ namespace eFMS.API.Documentation.DL.Services
         public async Task<HandleState> DeletePrice(Guid id)
         {
             HandleState hs = new HandleState();
-           
+
             using (var trans = workOrderPriceRepo.DC.Database.BeginTransaction())
             {
                 try
@@ -749,7 +754,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var hsDeletePrice = await workOrderPriceRepo.DeleteAsync(x => x.Id == priceItemDelete.Id);
                         var surcharges = workOrderSurchargeRepo.Get(x => x.WorkOrderPriceId == id).ToList();
 
-                        if(hsDeletePrice.Success)
+                        if (hsDeletePrice.Success)
                         {
                             if (surcharges.Count > 0)
                             {
@@ -775,7 +780,8 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 trans.Commit();
                             }
-                        } else
+                        }
+                        else
                         {
                             string innerMes = hsDeletePrice?.Exception?.InnerException?.Message;
                             if (!string.IsNullOrEmpty(innerMes))
@@ -812,7 +818,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
 
                     CsWorkOrder workOrderEntity = DataContext.First(x => x.Id == model.Id);
-                    if(workOrderEntity == null)
+                    if (workOrderEntity == null)
                     {
                         return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
                     }
@@ -876,7 +882,7 @@ namespace eFMS.API.Documentation.DL.Services
                     workOrder.UserModified = currentUser.UserID;
 
                     hs = await DataContext.UpdateAsync(workOrder, x => x.Id == workOrder.Id);
-                    if(hs.Success)
+                    if (hs.Success)
                     {
                         trans.Commit();
                     }
@@ -892,6 +898,52 @@ namespace eFMS.API.Documentation.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public bool CheckExist(WorkOrderRequest model)
+        {
+            bool found = false;
+            List<CsWorkOrder> workorderSameCriteria = new List<CsWorkOrder>();
+            if (model.Id == Guid.Empty)
+            {
+                workorderSameCriteria = DataContext.Get(x => x.Active == true
+                && x.PartnerId == model.PartnerId
+                && x.Pol == model.Pol
+                && x.Pod == model.Pod
+                && x.SalesmanId == model.SalesmanId).ToList();
+            }
+            else
+            {
+                workorderSameCriteria = DataContext.Get(x => x.Active == true
+                && x.Id != model.Id
+                && x.PartnerId == model.PartnerId
+                && x.Pol == model.Pol
+                && x.Pod == model.Pod
+                && x.SalesmanId == model.SalesmanId).ToList();
+            }
+
+            if (workorderSameCriteria.Count > 0)
+            {
+                var workOrderIds = workorderSameCriteria.Select(x => x.Id);
+                if (model.ListPrice.Count > 0)
+                {
+                    foreach (var priceItem in model.ListPrice)
+                    {
+                        var worKorderPrices = workOrderPriceRepo.Any(x => !workOrderIds.Contains(x.Id)
+                        && priceItem.PartnerId == x.PartnerId
+                        && priceItem.QuantityFromRange == x.QuantityFromRange
+                        && priceItem.QuantityToRange == x.QuantityToRange);
+
+                        if (worKorderPrices)
+                        {
+                            found = true;
+                            break;
+                        }
+
+                    }
+                }
+            }
+            return found;
         }
     }
 }

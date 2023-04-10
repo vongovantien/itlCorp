@@ -101,6 +101,13 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(WorkOrderRequest model)
         {
+            if (!ModelState.IsValid) return BadRequest();
+            string checkExistMessage = CheckExist( model);
+            if (checkExistMessage.Length > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[checkExistMessage].Value });
+            }
+
             var hs = await workOrderService.SaveWorkOrder(model);
             string message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -112,6 +119,12 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPut]
         public async Task<IActionResult> Put(WorkOrderRequest model)
         {
+            if (!ModelState.IsValid) return BadRequest();
+            string checkExistMessage = CheckExist(model);
+            if (checkExistMessage.Length > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = "Work Order information was duplicated" });
+            }
             var hs = await workOrderService.UpdateWorkOrder(model);
             string message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -165,6 +178,16 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        private string CheckExist(WorkOrderRequest model)
+        {
+            var checkExist = workOrderService.CheckExist(model);
+            if (checkExist)
+            {
+                return stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+            }
+            return string.Empty;
         }
 
     }
