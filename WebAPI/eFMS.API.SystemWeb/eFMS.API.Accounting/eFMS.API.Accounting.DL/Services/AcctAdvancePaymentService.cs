@@ -4557,23 +4557,46 @@ namespace eFMS.API.Accounting.DL.Services
                     validJobNo.AddRange(opsNoProfit);
                     validJobNo.AddRange(serviceNoProfit);
 
-                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH && validJobNo.Any(z => z == x.JobNo));
-                    if (surcharges.Count() <= 0)
-                    {
-                        return invalidShipment;
-                    }
                     var listSipment = new List<string>();
-                    // [CR:09/05/2022]: so sánh profit trên tổng của lô hàng
-                    var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
-                    foreach (var shipment in shipmentGrp)
+                    var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH && validJobNo.Any(z => z == x.JobNo));
+                    foreach (var jobNo in validJobNo)
                     {
-                        var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => (x.AmountVnd ?? 0));
-                        var sellAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL).Sum(x => (x.AmountVnd ?? 0));
-                        if (buyAmount > sellAmount)
+                        //[CR:10042023] shipment not checked no profit with no selling charges => not allow to settle
+                        var sellingCharges = surcharges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.JobNo == jobNo);
+                        if (sellingCharges.Count() <= 0)
                         {
-                            listSipment.Add(shipment.FirstOrDefault().JobNo);
+                            listSipment.Add(jobNo);
+                        }
+                        else
+                        {
+                            // [CR:09/05/2022]: so sánh profit trên tổng của lô hàng
+                            var shipment = surcharges.Where(x => x.JobNo == jobNo);
+                            var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => x.AmountVnd ?? 0);
+                            var sellAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL).Sum(x => x.AmountVnd ?? 0);
+                            if (buyAmount > sellAmount)
+                            {
+                                listSipment.Add(shipment.FirstOrDefault().JobNo);
+                            }
                         }
                     }
+
+                    //var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_OBH && validJobNo.Any(z => z == x.JobNo));
+                    //if (surcharges.Count() <= 0)
+                    //{
+                    //    return invalidShipment;
+                    //}
+                    //var listSipment = new List<string>();
+                    // [CR:09/05/2022]: so sánh profit trên tổng của lô hàng
+                    //var shipmentGrp = surcharges.GroupBy(x => x.JobNo);
+                    //foreach (var shipment in shipmentGrp)
+                    //{
+                    //    var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => (x.AmountVnd ?? 0));
+                    //    var sellAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL).Sum(x => (x.AmountVnd ?? 0));
+                    //    if (buyAmount > sellAmount)
+                    //    {
+                    //        listSipment.Add(shipment.FirstOrDefault().JobNo);
+                    //    }
+                    //}
                     if (listSipment.Count > 0)
                     {
                         listSipment = listSipment.Distinct().ToList();
