@@ -82,7 +82,6 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
 
     initSearchDefaultValue() {
         this.filterTypes = [
-            { title: 'All', value: 'All' },
             { title: 'Custom No', value: 'clearanceNo' },
             { title: 'HBL No', value: 'hblNo' },
         ];
@@ -97,9 +96,10 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     }
 
     onSearchClearance(){
+        this.isSubmitted = true;
         const body: ISearchCustomClearance = {
             clearanceNo: !!this.clearanceNo.value ? this.clearanceNo.value.split('\n').map(item => item.trim()).join(';') : null,
-            cusType: (!this.filterType.value || this.filterType.value === this.filterTypes[0].value) ? null : this.filterType.value,
+            cusType: (!this.filterType.value || this.filterType.value === this.filterTypes[0].value && this.clearanceNo.value==null) ? null : this.filterType.value,
             customerNo: this.customer.value,
         };
         this._operationRepo.getUserCustomClearance(body, this.page, this.pageSize)
@@ -116,8 +116,10 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
 
     changeAllNotImported() {
         if (this.checkAllNotImported) {
-            this.dataEcus.forEach(x => {
-                x.isChecked = true;
+            this.dataEcus.forEach(x => {    
+                if(!x.imprtStts){
+                    x.isChecked = true;
+                }
             });
         } else {
             this.dataEcus.forEach(x => {
@@ -174,6 +176,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
                             this._toastrService.success(responses.message.value, '');
                             this.dataEcus.filter(x => x.isChecked).forEach(x => {
                                 x.imprtStts = true;
+                                x.isChecked = false;
                             });
                         }
                     }
@@ -211,12 +214,20 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         this.getListCleranceNotImported();
     }
 
+    updatePagingData(e: { page: number, pageSize: number, data: any }) {
+        this.page = e.page;
+        this.pageSize = e.pageSize;
+        this.requestList(e.data);
+    }
+
     close() {
+        this.isSubmitted = false;
         this.keyword = '';
         this.page = 1;
         this.pageSize = this.numberToShow[2];
         this.resetFormControl(this.customer);
         this.formSearch.reset();
+        this.filterType.setValue(this.filterTypes[0].value);
         this.hide();
     }
 }

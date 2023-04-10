@@ -15,43 +15,35 @@
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <label class="form-control-label">Clearance No</label>
-                                        <textarea rows="3" class="form-control" formControlName="clearanceNo"
-                                            placeholder="Clearance No">
+                                        <label required class="form-control-label">Reference No </label>
+                                        <ng-select class="custom" formControlName="filterType" [items]="filterTypes"
+                                            bindLabel="title" bindValue="value"
+                                            (remove)="resetFormControl(filterType)">
+                                        </ng-select>
+                                        <textarea rows="5" class="form-control" 
+                                        formControlName="clearanceNo" placeholder="Search Clearance No or HBLId">
                                         </textarea>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="row">
-                                        <div class="col-lg-6" style="max-width: 320px">
-                                            <div class="form-group">
-                                                <label class="form-control-label">Search Type</label>
-                                                <ng-select class="custom" formControlName="filterType"
-                                                    [items]="filterTypes" bindLabel="title" bindValue="value">
-                                                </ng-select>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6" style="max-width: 320px">
+                                        <div class="col-lg-12">
                                             <div class="form-group">
                                                 <label>Customer</label>
-                                                <app-combo-grid-virtual-scroll
-                                                    [currentActiveItemId]="{ field: 'accountNo', value: customer.value}"
-                                                    (itemSelected)="onSelectDataFormInfo($event, 'customer')"
-                                                    [selectedDisplayFields]="['shortName']"
-                                                    [dataSources]="customers | async"
-                                                    [displayFields]="displayFieldsCustomer" [height]="150"
+                                                <app-combo-grid-virtual-scroll [currentActiveItemId]="{ field: 'accountNo', value: customer.value}"
+                                                    (itemSelected)="onSelectDataFormInfo($event, 'customer')" [selectedDisplayFields]="['shortName']"
+                                                    [dataSources]="customers | async" [displayFields]="displayFieldsCustomer" [height]="150"
                                                     (remove)="resetFormControl(customer)" placeholder="Select Customer">
                                                 </app-combo-grid-virtual-scroll>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
+                            
                             <div class="form-actions">
                                 <div class="row">
-                                    <div class="col-lg-6"></div>
-                                    <div class="col-lg-6 m--align-right">
+                                    <div class="col-lg-12 m--align-right">
                                         <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase"
                                             (click)="onSearchClearance()">
                                             <span>
@@ -83,7 +75,7 @@
                                             <div class="table-actions">
                                                 <label class="m-checkbox">
                                                     <input type="checkbox" name="checkAllNotImported"
-                                                        [checked]="checkAllNotImported"
+                                                        [checked]="checkAllNotImported "
                                                         (change)="checkAllNotImported =! checkAllNotImported; changeAllNotImported()">
                                                     <span></span>
                                                 </label>
@@ -153,30 +145,8 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="pagination-nav">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="select-box" style="max-width: 190px">
-                                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                                            (change)="selectPageSize(pageSize)" name="pagesize">
-                                            <ng-container
-                                                *ngFor="let item of numberToShow; index as i; first as isFirst">
-                                                <option [ngValue]="item" [selected]="isFirst">{{item}} entries / page
-                                                </option>
-                                            </ng-container>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                                    <div class="float-right">
-                                        <pagination [boundaryLinks]="true" [totalItems]="totalItems"
-                                            [itemsPerPage]="pageSize" (pageChanged)="pageChanged($event)"
-                                            [(ngModel)]="page" [maxSize]=10>
-                                        </pagination>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+                                    (onChange)="updatePagingData($event)"></app-pagination>
                     </div>
                 </div>
                 <div class="modal-footer m--align-center">
