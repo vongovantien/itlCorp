@@ -176,7 +176,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 }
                                 if (lstTrackInfo.Count() > 0)
                                 {
-                                    hs = await DataContext.AddAsync(lstTrackInfo);
+                                    hs = await DataContext.AddAsync(lstTrackInfo, true);
                                 }
 
                                 shipmentExisted.TrackingStatus = statusShipment != string.Empty ? statusShipment : shipmentExisted.TrackingStatus;
