@@ -13,6 +13,7 @@ import { of } from 'rxjs';
 import { map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { IWorkOrderListState, LoadListWorkOrder, workOrderListState, workOrderLoadingState, workOrderPagingState, workOrderSearchState } from './store';
+import { getCurrentUserState } from '@store';
 
 @Component({
     selector: 'app-commercial-work-order',
@@ -51,6 +52,7 @@ export class CommercialWorkOrderComponent extends AppList implements OnInit {
     }
 
     ngOnInit(): void {
+        this.currentUser$ = this._store.select(getCurrentUserState);
         this.isLoading = of(false);
         this.headers = [
             { title: 'Work Order No.', field: 'code', sortable: true },

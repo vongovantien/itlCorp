@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import {
     AutofocusDirective, TwoDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective, NumericDirective, InjectViewContainerRefDirective, NoDblClickDirective, AutoFormatCurrencyDirective, IconCalendarDirective,
-    IConClearCalendarDirective, LoadModuleDirective, DisabledControlDirective, HasOwnerPermissionDirective, ClickStopPropagationDirective, FormatDecimalFormControlDirective, DropdownToggleDirective, ContextMenuDirective
+    IConClearCalendarDirective, LoadModuleDirective, DisabledControlDirective, HasOwnerPermissionDirective, ClickStopPropagationDirective, FormatDecimalFormControlDirective, DropdownToggleDirective, ContextMenuDirective, AutoExpandDirective
 } from '.';
 import { OverlayModule } from '@angular/cdk/overlay';
 
@@ -26,7 +26,8 @@ const APP_DIRECTIVES = [
     ClickStopPropagationDirective,
     FormatDecimalFormControlDirective,
     DropdownToggleDirective,
-    ContextMenuDirective
+    ContextMenuDirective,
+    AutoExpandDirective
 ];
 @NgModule({
     declarations: [

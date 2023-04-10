@@ -56,7 +56,7 @@
                             <div class="col-lg-2">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!type.valid) }">
-                                    <label required>Type</label>
+                                    <label required>Fee Type</label>
                                     <ng-select [items]="types" formControlName="type" class="custom"
                                         placeholder="Please select" bindLabel="title"
                                         (change)="onSelectDataFormInfo($event, 'type')" bindValue="value"

@@ -93,7 +93,7 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
     }
 
     duplicateCharge(index: number) {
-        this.isSubmitted = false;
+        // this.isSubmitted = false;
         var newsurcharge = new WorkOrderSurchargeModel(this.surcharges[index]);
         newsurcharge.id = SystemConstants.EMPTY_GUID;
         this.surcharges.push(cloneDeep(newsurcharge));
@@ -102,7 +102,7 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
     deleteCharge(index: number) {
         const deletedIndexItem = this.surcharges[index];
 
-        this.isSubmitted = false;
+        // this.isSubmitted = false;
         this.surcharges.splice(index, 1);
 
         this.cachedSurcharge.push(deletedIndexItem);
@@ -141,9 +141,10 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
     }
 
     onSelectDataTableInfo(data: any, surcharge: WorkOrderSurchargeModel, type: string) {
+        surcharge[type] = data;
         switch (type) {
             case 'chargeId':
-                surcharge.chargeId = data.id;
+                surcharge.chargeId = data.id || null;
                 surcharge.unitPrice = data.unitPrice || null;
                 surcharge.vatRate = data.vatrate || null;
                 if (data.chargeGroupName === 'Com') {
@@ -152,8 +153,10 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
                     surcharge.kickBack = false;
                 }
                 break;
-            case 'partnerId':
-                surcharge.partnerId = data;
+            case 'partnerType':
+                if (data !== 'Other') {
+                    surcharge.partnerId = null;
+                }
                 break;
             default:
                 break;

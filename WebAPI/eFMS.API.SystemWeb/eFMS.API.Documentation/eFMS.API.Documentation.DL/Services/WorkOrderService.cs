@@ -144,11 +144,10 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         return hs;
                     }
-                    var priceIds = prices.Select(x => x.Id);
 
                     using (var tranSurcharge = workOrderSurchargeRepo.DC.Database.BeginTransaction())
                     {
-                        var hsDeleteSurcharges = await workOrderSurchargeRepo.DeleteAsync(x => priceIds.Contains(x.WorkOrderPriceId));
+                        var hsDeleteSurcharges = await workOrderSurchargeRepo.DeleteAsync(x => x.WorkOrderId == Id);
                         if (hsDeleteSurcharges.Success)
                         {
                             var hsDeletePrices = await workOrderPriceRepo.DeleteAsync(x => x.WorkOrderId == Id);

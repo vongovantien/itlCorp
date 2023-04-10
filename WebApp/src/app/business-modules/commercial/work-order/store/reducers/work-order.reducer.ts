@@ -21,7 +21,7 @@ const initialState: IWorkOrderListState = {
 export const reducer = createReducer(
     initialState,
     on(WorkOrderActions.SearchListWorkOrder, (state: IWorkOrderListState, payload: any) => ({
-        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 30 }
+        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 15 }
     })),
     on(WorkOrderActions.LoadListWorkOrder, (state: IWorkOrderListState, payload: CommonInterface.IParamPaging) => ({
         ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size }

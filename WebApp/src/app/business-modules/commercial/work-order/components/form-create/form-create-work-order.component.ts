@@ -3,13 +3,13 @@ import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { ComboGridVirtualScrollComponent } from '@common';
 import { JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { Incoterm, Partner, PortIndex, User } from '@models';
+import { Customer, Incoterm, Partner, PortIndex, User } from '@models';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { GetCataloguePortAction, getCataloguePortLoadingState, getCataloguePortState, GetSystemUser, getSystemUsersLoadingState, getSystemUserState, IAppState } from '@store';
+import { GetCatalogueAgentAction, getCatalogueAgentLoadingState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortLoadingState, getCataloguePortState, GetSystemUser, getSystemUsersLoadingState, getSystemUserState, IAppState } from '@store';
 import { FormValidators } from '@validators';
 import { ToastrService } from 'ngx-toastr';
-import { Observable } from 'rxjs';
+import { Observable, pipe } from 'rxjs';
 import { filter, finalize, shareReplay, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { workOrderDetailIsReadOnlyState } from '../../store';
@@ -61,6 +61,7 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
     // transit: AbstractControl;
 
     partners: Observable<Partner[]>;
+    agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
     salesmans: User[] = [];
     incoterms: Observable<Incoterm[]>
@@ -77,19 +78,19 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
     isLoadingPort: Observable<boolean>;
     isLoadingPartner: boolean;
     isLoadingUser: boolean = false;
+    isLoadingAgent: Observable<boolean>;
 
     ngOnInit(): void {
-
-        this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
-        this.ports = this._store.select(getCataloguePortState);
-        this.isLoadingPort = this._store.select(getCataloguePortLoadingState);
-
         this.isLoadingPartner = true;
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL)
             .pipe(
                 shareReplay(),
                 finalize(() => this.isLoadingPartner = false)
             );
+
+        this._store.dispatch(new GetCatalogueAgentAction());
+        this.agents = this._store.select(getCatalogueAgentState);
+        this.isLoadingAgent = this._store.select(getCatalogueAgentLoadingState);
 
         this.initForm();
 
@@ -98,7 +99,17 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
     ngOnChanges(changes: SimpleChanges): void {
         if (changes.hasOwnProperty("transactionType") && !!changes.transactionType.currentValue) {
             this.incoterms = this._catalogueRepo.getIncoterm({ service: [changes.transactionType.currentValue] });
+
+            const isModeAir = ['AE', 'AI'].includes(changes.transactionType.currentValue);
+            if (isModeAir) {
+                this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port, modeOfTransport: CommonEnum.TRANSPORT_MODE.AIR })
+                    .pipe(shareReplay());
+            } else {
+                this.ports = this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.Port })
+                    .pipe(shareReplay());
+            }
         }
+
     }
 
     initForm() {
@@ -189,6 +200,9 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
             case 'pod':
                 this.pod.setValue(data.id);
                 this.podDescription.setValue((data as PortIndex).nameEn);
+                break;
+            case 'salesmanId':
+                this.salesmanName = data.fullName;
                 break;
             case 'partnerId':
                 this.isLoadingUser = true;
