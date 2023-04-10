@@ -167,7 +167,11 @@ namespace eFMS.API.Operation.DL.Services
             // Perform pagination
             int rowCount = returnList.Count();
             rowsCount = rowCount;
-            returnList = returnList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            if(returnList.Count()> pageSize)
+            {
+                // Handle case 1 item returned
+                returnList = returnList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            }
             return returnList;
         }
 
