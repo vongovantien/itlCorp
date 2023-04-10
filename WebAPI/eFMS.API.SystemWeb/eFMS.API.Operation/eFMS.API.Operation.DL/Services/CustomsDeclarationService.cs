@@ -1329,7 +1329,7 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_DATA_EXISTED]);
+                        result = new HandleState(409, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_DATA_EXISTED]);
                         string logErr = String.Format("Import thất bại {0} \n Tờ khai đang chọn đã tồn tại {1}.", currentUser.UserName, DateTime.Now);
                         new LogHelper("ECUS", logErr);
                     }

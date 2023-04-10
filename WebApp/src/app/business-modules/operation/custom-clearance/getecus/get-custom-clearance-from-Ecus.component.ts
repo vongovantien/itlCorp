@@ -3,8 +3,6 @@ import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
 import { FormGroup, FormBuilder, AbstractControl, FormControl } from '@angular/forms';
 import { OperationRepo } from "@repositories";
-import { PagerSetting } from "src/app/shared/models/layout/pager-setting.model";
-import { PAGINGSETTING } from "src/constants/paging.const";
 import { CustomClearanceFormSearchComponent } from "../components/form-search-custom-clearance/form-search-custom-clearance.component";
 import { catchError, finalize } from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
@@ -26,7 +24,6 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     formSearch: FormGroup;
     headers: CommonInterface.IHeaderTable[];
     requestList: any = null;
-    pager: PagerSetting = PAGINGSETTING;
     dataEcus: any[] = [];
     filterTypes: CommonInterface.ICommonTitleValue[];
     clearanceNo: AbstractControl;
@@ -36,6 +33,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
 
     dataSearch: ISearchCustomClearance;
     customers: Observable<Customer[]>;
+    numberToShow: number[] = [3, 15, 30, 50];
     displayFieldsCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
     constructor(
@@ -50,7 +48,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
 
     ngOnInit() {
         this.initSearchDefaultValue();
-        this.pageSize = this.numberToShow[2];
+        this.pageSize = this.numberToShow[0];
 
         this.headers = [
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
@@ -69,7 +67,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     }
 
     initForm() {
-        this.pageSize = this.numberToShow[2];
+        this.pageSize = this.numberToShow[0];
         this.formSearch = this._fb.group({
             clearanceNo: "",
             'customer': [],
@@ -172,7 +170,10 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (responses: CommonInterface.IResult | any) => {
-                        if (!!responses.message) {
+                        if(responses.success===false && responses.code=='409'){
+                            this._toastrService.warning(responses.message, '');
+                        }
+                        if (!!responses.message && !! responses.success) {
                             this._toastrService.success(responses.message.value, '');
                             this.dataEcus.filter(x => x.isChecked).forEach(x => {
                                 x.imprtStts = true;
@@ -207,7 +208,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
 
     refreshData() {
         this.page = 1;
-        this.pageSize = this.numberToShow[2];
+        this.pageSize = this.numberToShow[0];
         this.resetFormControl(this.customer);
         this.formSearch.reset();
         this.filterType.setValue(this.filterTypes[0].value);
@@ -224,7 +225,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         this.isSubmitted = false;
         this.keyword = '';
         this.page = 1;
-        this.pageSize = this.numberToShow[2];
+        this.pageSize = this.numberToShow[0];
         this.resetFormControl(this.customer);
         this.formSearch.reset();
         this.filterType.setValue(this.filterTypes[0].value);
