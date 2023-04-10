@@ -1,5 +1,14 @@
 export class SystemConstants {
-
+    public static readonly TRACKING_URL = {
+        UNITEDCARGO: {
+            Name: "unitedcargo.com",
+            Url: "https://www.unitedcargo.com/en/us/track"
+        },
+        TRACKTRACE: {
+            Name: "track-trace.com",
+            Url: "https://www.track-trace.com/aircargo"
+        }
+    };
     // Local Storage Key
     public static readonly CURRENT_CLIENT_LANGUAGE: string = 'CURRENT_CLIENT_LANGUAGE';
     public static readonly CURRENT_LANGUAGE: string = "CURRENT_LANGUAGE";

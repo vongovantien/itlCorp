@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
-import { Permission403PopupComponent } from '@common';
-import { ChargeConstants, RoutingConstants } from '@constants';
+import { InfoPopupComponent, Permission403PopupComponent } from '@common';
+import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
 import { DocumentationRepo } from '@repositories';
-import { DataService, DestroyService } from '@services';
 import Highcharts from 'highcharts/highcharts';
 import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
@@ -11,6 +10,7 @@ import { AppPage } from '../app.base';
 import { Shipment } from '../shared/models/operation/shipment';
 // import { Chart } from 'angular-highcharts';
 import { ToastrService } from 'ngx-toastr';
+import { InjectViewContainerRefDirective } from '../shared/directives/inject-view-container-ref.directive';
 
 @Component({
     selector: 'app-dashboard',
@@ -21,6 +21,8 @@ import { ToastrService } from 'ngx-toastr';
 export class DashboardComponent extends AppPage implements OnInit {
 
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+
     isShow: boolean = false;
     shipments: any[] = [];
     term$ = new BehaviorSubject<string>('');
@@ -220,7 +222,16 @@ export class DashboardComponent extends AppPage implements OnInit {
             .subscribe(
                 (res: CommonInterface.IResult | any) => {
                     if (!!res?.message) {
-                        this._toastService.warning(res.message);
+                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                            title: 'No Tracking Data Found',
+                            body: `
+                            <span>Sorry, we couldn't find any tracking data for you package, Please try tracking again links below:</span>
+                            <ul>
+                                <li> <a href="${SystemConstants.TRACKING_URL.TRACKTRACE.Url}">${SystemConstants.TRACKING_URL.TRACKTRACE.Name}</a></li>
+                                <li><a href="${SystemConstants.TRACKING_URL.UNITEDCARGO.Url}">${SystemConstants.TRACKING_URL.UNITEDCARGO.Name}</a></li>
+                            </ul>`,
+                            class: 'btn btn-brand'
+                        });
                         this.isSubmitted = true;
                     }
                     else {
