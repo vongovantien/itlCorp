@@ -14,18 +14,15 @@
                         <form [formGroup]="formSearch">
                             <div class="row">
                                 <div class="col-lg-6">
-                                    <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!this.filterType.value || !this.clearanceNo.value)}">
+                                    <div class="form-group">
                                         <label required class="form-control-label">Reference No </label>
                                         <ng-select class="custom" formControlName="filterType" [items]="filterTypes"
-                                            bindLabel="title" bindValue="value">
+                                            bindLabel="title" bindValue="value"
+                                            (remove)="resetFormControl(filterType)">
                                         </ng-select>
                                         <textarea rows="5" class="form-control" 
                                         formControlName="clearanceNo" placeholder="Search Clearance No or HBLId">
                                         </textarea>
-                                        <div class="form-control-feedback"
-                                            *ngIf="isSubmitted && (!this.filterType.value || !this.clearanceNo.value)">
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-6">

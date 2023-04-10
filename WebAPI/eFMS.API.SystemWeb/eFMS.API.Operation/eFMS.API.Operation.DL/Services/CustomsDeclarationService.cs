@@ -155,6 +155,10 @@ namespace eFMS.API.Operation.DL.Services
             returnList = MapClearancesToClearanceModels(returnList.AsQueryable());
             if (ecusCustomCriteria.ClearanceNo != null || (ecusCustomCriteria.CusType != null && (ecusCustomCriteria.CusType != "All" && ecusCustomCriteria.ClearanceNo != null || !string.IsNullOrEmpty(ecusCustomCriteria.ClearanceNo))))
             {
+                if (ecusCustomCriteria.CusType == "hblNo")
+                {
+                    returnList = returnList.Where(x => !string.IsNullOrEmpty(x.Hblid)).ToList();
+                }
                 returnList = returnList.Where(x => (ecusCustomCriteria.CusType == "hblNo" ? ecusCustomCriteria.ClearanceNo.Contains(x.Hblid) : ecusCustomCriteria.ClearanceNo.Contains(x.ClearanceNo) 
                 || string.IsNullOrEmpty(ecusCustomCriteria.ClearanceNo))).ToList();
                                                                                     
@@ -169,7 +173,7 @@ namespace eFMS.API.Operation.DL.Services
             rowsCount = rowCount;
             if(returnList.Count()> pageSize)
             {
-                // Handle case 1 item returned
+                // Handle case 1 item return
                 returnList = returnList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
             }
             return returnList;
