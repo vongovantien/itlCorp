@@ -4,6 +4,7 @@ import {
     IConClearCalendarDirective, LoadModuleDirective, DisabledControlDirective, HasOwnerPermissionDirective, ClickStopPropagationDirective, FormatDecimalFormControlDirective, DropdownToggleDirective, ContextMenuDirective, AutoExpandDirective
 } from '.';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { WindowRef } from './WindowRef';
 
 const APP_DIRECTIVES = [
     AutofocusDirective,
@@ -40,9 +41,12 @@ const APP_DIRECTIVES = [
         ...APP_DIRECTIVES
     ],
     providers: [
+        WindowRef
     ],
 })
 
 export class DirectiveModule {
 
 }
+
+
