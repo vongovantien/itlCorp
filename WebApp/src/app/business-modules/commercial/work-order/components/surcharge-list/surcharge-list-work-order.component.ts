@@ -1,5 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Charge, Partner, WorkOrderSurchargeModel } from '@models';
@@ -7,9 +6,9 @@ import { Store } from '@ngrx/store';
 import { CatalogueRepo } from '@repositories';
 import cloneDeep from 'lodash/cloneDeep';
 import { Observable } from 'rxjs';
-import { finalize, shareReplay, switchMap, switchMapTo, takeUntil, tap } from 'rxjs/operators';
+import { finalize, shareReplay, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { IWorkOrderMngtState, workOrderDetailActiveState, workOrderDetailIsReadOnlyState } from '../../store';
+import { workOrderDetailIsReadOnlyState } from '../../store';
 import { IWorkOrderDetailState } from '../../store/reducers/work-order-detail.reducer';
 
 @Component({
@@ -53,7 +52,7 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
 
     constructor(
         private readonly _catalogueRepo: CatalogueRepo,
-        private readonly _store: Store<IWorkOrderDetailState>
+        private readonly _store: Store<IWorkOrderDetailState>,
     ) {
         super();
     }
@@ -73,15 +72,6 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
             this.headers.push({ title: 'KB', field: 'kickBack', sortable: true, align: 'center' })
         }
 
-        this.charges = this._catalogueRepo.getCharges({
-            active: true,
-            serviceTypeId: this.transactionType,
-            type: this.utility.getChargeType(this.type),
-        }).pipe(
-            shareReplay(),
-            takeUntil(this.ngUnsubscribe),
-        )
-
         this.isReadonly = this._store.select(workOrderDetailIsReadOnlyState);
 
         this.isLoadingPartner = true;
@@ -90,6 +80,21 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
                 shareReplay(),
                 finalize(() => this.isLoadingPartner = false)
             );
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes.hasOwnProperty("transactionType") && !!changes.transactionType.currentValue) {
+            this.transactionType = changes.transactionType.currentValue;
+
+            this.charges = this._catalogueRepo.getCharges({
+                active: true,
+                serviceTypeId: this.transactionType,
+                type: this.utility.getChargeType(this.type),
+            }).pipe(
+                shareReplay(),
+                takeUntil(this.ngUnsubscribe),
+            )
+        }
     }
 
     duplicateCharge(index: number) {

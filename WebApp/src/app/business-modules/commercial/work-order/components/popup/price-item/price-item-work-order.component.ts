@@ -174,6 +174,7 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
     }
 
     initFreightCharge(transactionType: string) {
+        this.selectedPartnerName = null;
         this.frieghtCharges.length = 0;
         this.frieghtCharges.push({
             chargeName: `${this.getFreightChargeName(transactionType)}`,

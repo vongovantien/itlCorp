@@ -173,7 +173,6 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
             .subscribe(
                 (active: boolean) => {
                     this.isReadonly = active;
-                    console.log("isReadonly", this.isReadonly);
                     if (!!active) {
                         this.form.disable();
                     }
@@ -214,10 +213,12 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
                             if (!!salesmans.length) {
                                 this.salesmans = salesmans;
                                 this.salesmanId.setValue(salesmans[0].id);
+                                this.salesmanName = salesmans[0].employeeNameEn;
                             } else {
                                 this.salesmans = [];
                                 this.combogrid.displaySelectedStr = '';
                                 this.salesmanId.setValue(null);
+                                this.salesmanName = '';
                                 this._toast.warning(`Partner ${data.shortName} does not have any agreement`);
                             }
                             this._cd.detectChanges();
@@ -247,7 +248,6 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
     }
 
     getListSalesman(partnerId: string, transactionType: string) {
-        console.log(this.isReadonly);
         if (this.isReadonly) {
             return;
         }

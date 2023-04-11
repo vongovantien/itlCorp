@@ -103,12 +103,12 @@ export class CommercialFormSearchWorkOrderComponent extends AppForm implements O
                     .split(',')
                     .map((item: any) => item.trim()),
             partnerId: this.partnerId.value,
-            active: null,
+            active: this.active.value,
             pod: null,
             pol: null,
             source: null,
             salesmanId: this.salesmanId.value,
-            status: this.status.value,
+            status: null,
             transactionType: this.transactionType.value,
             approvedStatus: null,
         };
