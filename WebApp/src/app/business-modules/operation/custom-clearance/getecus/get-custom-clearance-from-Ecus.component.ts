@@ -13,7 +13,7 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 import { JobConstants } from "@constants";
 @Component({
     selector: 'get-custom-clearance-from-Ecus',
-    templateUrl: './get-custom-clearance-from-Ecus.html',
+    templateUrl: './get-custom-clearance-from-Ecus.component.html',
 })
 
 export class CustomClearanceFromEcus extends PopupBase implements OnInit {
@@ -94,15 +94,6 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         }
     }
 
-    /*
-        Function performs a search for custom clearance data.
-        Set a boolean flag this.isSubmitted to true to indicate that the search has been submitted (saved).
-        Create an object called body with properties corresponding to search criteria such as clearance number, customer type, and customer number.
-        Call a method `_operationRepo.getUserCustomClearance()` to perform the actual search and pass the search criteria as input.
-        The method returns data in `CommonInterface.IResponsePaging` format, which the function subscribes to and sets the `dataEcus` property and `totalItems` property accordingly.
-        The search is performed asynchronously using RxJS pipe and subscribe methods.
-        The finalize operator is used to set a boolean flag `isLoading` to false when the search is completed (regardless of whether it succeeds or fails).
-     */
     onSearchClearance(){
         this.isSubmitted = true;
         const body: ISearchCustomClearance = {
