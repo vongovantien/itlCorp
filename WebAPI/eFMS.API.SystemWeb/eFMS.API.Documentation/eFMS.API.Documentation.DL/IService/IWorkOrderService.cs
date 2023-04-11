@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
 {
-    public interface IWorkOrderService: IRepositoryBase<CsWorkOrder, CsWorkOrderModel>,  IPermissionBaseService<CsWorkOrder>
+    public interface IWorkOrderService: IContextBase<CsWorkOrder>,  IPermissionBaseService<CsWorkOrder>
     {
         //IQueryable<CsWorkOrder> Query(WorkOrderCriteria criteria);
         //IQueryable<CsWorkOrderModel> Paging(WorkOrderCriteria criteria, int page, int size, out int totalItem);
