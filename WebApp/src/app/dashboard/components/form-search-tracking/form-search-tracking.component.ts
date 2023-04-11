@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { AppForm } from 'src/app/app.form';
+import { RoutingConstants } from '@constants';
 
 @Component({
     selector: 'form-search-tracking',
@@ -59,16 +61,33 @@ export class FormSearchTrackingComponent extends AppForm {
         this.onChangeType.emit(this.typeShipment)
     }
 
-    onShowLoading(value){
+    onShowLoading(value) {
         this.onChangeBackGround.emit(value)
     }
 
     onSearchValue() {
-        if(!!this.searchObject.searchString){
+        if (!!this.searchObject.searchString) {
             this.onChangeKeyWork.emit({
                 [this.searchObject.field]: this.searchObject.searchString,
                 shipmentType: this.typeShipment
             })
         }
     }
+
+    onRedirectPage() {
+        if (!!this.searchObject.searchString) {
+            const mawb = this.searchObject.searchString
+            switch (this.searchObject.field) {
+                case "mawb":
+                    window.location.href = RoutingConstants.MAWB_TRACKING_URL + `/${mawb}`
+                    break;
+                case "hawb":
+                    window.location.href = RoutingConstants.HAWB_TRACKING_URL;
+                    break
+                default:
+                    break;
+            }
+        }
+    }
+
 }
