@@ -40,7 +40,7 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
                 TimeSpan interval = TimeSpan.FromSeconds(45);
                 await _busControl.ReceiveAsync<ExportDetailSettleModel>(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileQueue, async (models) =>
                 {
-                    var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + models.SettlementId, models.AccessToken);
+                    var responseFromApi = await HttpServiceExtension.GetApi("https://localhost:44300/" + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + models.SettlementId, models.AccessToken);
                     var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
                     var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, models.Lang, "");
                     var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
@@ -51,6 +51,7 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
                         FolderName = "Settlement",
                         ModuleName = "Accounting",
                         Id = models.SettlementId,
+                        UserCreated=dataObjects.Result.UserCreated
                     };
                     await _busControl.SendAsync(RabbitExchange.EFMS_FileManagement, RabbitConstants.PostAttachFileTemplateToEDocQueue, model);
                 }, batchSize: 3, maxMessagesInFlight: 10);
