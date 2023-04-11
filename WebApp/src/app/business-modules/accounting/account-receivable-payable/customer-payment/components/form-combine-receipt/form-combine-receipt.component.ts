@@ -1,7 +1,7 @@
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { formatDate } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ComboGridVirtualScrollComponent, ConfirmPopupComponent } from '@common';
 import { RoutingConstants } from '@constants';
@@ -64,7 +64,7 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
     }
 
     ngOnInit(): void {
-        this.partners = this._catalogueRepo.getPartnerGroupsWithCriteria({ partnerGroups: [CommonEnum.PartnerGroupEnum.AGENT], partnerType : 'Agent', isShowSaleman: true});
+        this.partners = this.isUpdate ? null : this._catalogueRepo.getPartnerGroupsWithCriteria({ partnerGroups: [CommonEnum.PartnerGroupEnum.AGENT], partnerType : 'Agent', isShowSaleman: true});
         this._activedRouter.data
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -110,7 +110,9 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
     }
 
     onChangePaymentDate(date: any) {
-        this.getExchangeRate(date.startDate);
+        if(!this.isUpdate){
+            this.getExchangeRate(date.startDate);
+        }
     }
 
     onSelectDataFormInfo(data: any, type: string) {
