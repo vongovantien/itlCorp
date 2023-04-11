@@ -17,12 +17,11 @@ import { getOperationClearanceDataSearch, getOperationClearanceList, getOperatio
 import { CustomsDeclarationLoadListAction } from '../store/actions/custom-clearance.action';
 import { HttpResponse } from '@angular/common/http';
 import { InjectViewContainerRefDirective } from '@directives';
-import { forkJoin } from 'rxjs';
 import { CustomClearanceFromEcus } from './getecus/get-custom-clearance-from-Ecus.component';
 
 @Component({
     selector: 'app-custom-clearance',
-    templateUrl: './custom-clearance.component.html',
+    templateUrl: './custom-clearance.component.html'
 })
 export class CustomClearanceComponent extends AppList {
     @ViewChild(Permission403PopupComponent) canNotAllowActionPopup: Permission403PopupComponent;
@@ -178,6 +177,7 @@ export class CustomClearanceComponent extends AppList {
                 },
             );
     }
+
     openPopupAdd() {
         this.getEcusActionPopup.getClearanceNotImported();
         this.getEcusActionPopup.show();
@@ -364,6 +364,9 @@ export class CustomClearanceComponent extends AppList {
 
     }
 
+    closeModal($event: any){
+        this.getListCustomsDeclaration();
+    }
 
 }
 
