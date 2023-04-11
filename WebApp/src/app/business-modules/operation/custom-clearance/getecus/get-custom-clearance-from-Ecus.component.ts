@@ -1,21 +1,21 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from "@angular/core";
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewContainerRef } from "@angular/core";
 import { PopupBase } from 'src/app/popup.base';
 import { SortService } from 'src/app/shared/services';
 import { FormGroup, FormBuilder, AbstractControl, FormControl } from '@angular/forms';
 import { OperationRepo } from "@repositories";
 import { CustomClearanceFormSearchComponent } from "../components/form-search-custom-clearance/form-search-custom-clearance.component";
-import { catchError, finalize } from "rxjs/operators";
+import { catchError, finalize} from "rxjs/operators";
 import { ToastrService } from "ngx-toastr";
 import { Observable } from "rxjs";
 import { Customer } from 'src/app/shared/models';
 import { CommonEnum } from "@enums";
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { JobConstants } from "@constants";
-
 @Component({
     selector: 'get-custom-clearance-from-Ecus',
-    templateUrl: './get-custom-clearance-from-Ecus.html'
+    templateUrl: './get-custom-clearance-from-Ecus.html',
 })
+
 export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     @ViewChild(CustomClearanceFormSearchComponent) CustomClearanceComponent: CustomClearanceFormSearchComponent;
     @Output() isCloseModal = new EventEmitter();
@@ -48,7 +48,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
 
     ngOnInit() {
         this.initSearchDefaultValue();
-        this.pageSize = this.numberToShow[0];
+        this.pageSize = this.numberToShow[1];
 
         this.headers = [
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
@@ -67,7 +67,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     }
 
     initForm() {
-        this.pageSize = this.numberToShow[0];
+        this.pageSize = this.numberToShow[1];
         this.formSearch = this._fb.group({
             clearanceNo: "",
             'customer': [],
@@ -86,6 +86,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
     }
 
     resetFormControl(control: FormControl | AbstractControl) {
+        //  reset a form control to its default or initial state.
         if (!!control && control instanceof FormControl) {
             control.setValue(null);
             control.markAsUntouched({ onlySelf: true });
@@ -93,6 +94,15 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         }
     }
 
+    /*
+        Function performs a search for custom clearance data.
+        Set a boolean flag this.isSubmitted to true to indicate that the search has been submitted (saved).
+        Create an object called body with properties corresponding to search criteria such as clearance number, customer type, and customer number.
+        Call a method `_operationRepo.getUserCustomClearance()` to perform the actual search and pass the search criteria as input.
+        The method returns data in `CommonInterface.IResponsePaging` format, which the function subscribes to and sets the `dataEcus` property and `totalItems` property accordingly.
+        The search is performed asynchronously using RxJS pipe and subscribe methods.
+        The finalize operator is used to set a boolean flag `isLoading` to false when the search is completed (regardless of whether it succeeds or fails).
+     */
     onSearchClearance(){
         this.isSubmitted = true;
         const body: ISearchCustomClearance = {
@@ -171,7 +181,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
                 .subscribe(
                     (responses: CommonInterface.IResult | any) => {
                         if(responses.success===false && responses.code=='409'){
-                            this._toastrService.warning(responses.message, '');
+                            this._toastrService.warning(responses.exception.Message, '');
                         }
                         if (!!responses.message && !! responses.success) {
                             this._toastrService.success(responses.message.value, '');
@@ -184,7 +194,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
                 );
         }
         else {
-            this._toastrService.warning("Chưa chọn clearance để save!", '');
+            this._toastrService.warning("Please select customs clearance!", '');
             this.changeAllNotImported();
         }
     }
@@ -208,7 +218,7 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
 
     refreshData() {
         this.page = 1;
-        this.pageSize = this.numberToShow[0];
+        this.pageSize = this.numberToShow[1];
         this.resetFormControl(this.customer);
         this.formSearch.reset();
         this.filterType.setValue(this.filterTypes[0].value);
@@ -225,10 +235,11 @@ export class CustomClearanceFromEcus extends PopupBase implements OnInit {
         this.isSubmitted = false;
         this.keyword = '';
         this.page = 1;
-        this.pageSize = this.numberToShow[0];
+        this.pageSize = this.numberToShow[1];
         this.resetFormControl(this.customer);
         this.formSearch.reset();
         this.filterType.setValue(this.filterTypes[0].value);
+        this.isCloseModal.emit();
         this.hide();
     }
 }
