@@ -156,6 +156,7 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
             case 'partnerType':
                 if (data !== 'Other') {
                     surcharge.partnerId = null;
+                    surcharge.partnerName = null;
                 }
                 break;
             default:

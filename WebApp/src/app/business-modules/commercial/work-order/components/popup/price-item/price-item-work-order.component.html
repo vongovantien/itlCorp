@@ -19,7 +19,7 @@
                             <label required>Co-loader</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                                 (remove)="partnerId.setValue(null)"
-                                [currentActiveItemId]="{field:'id', value: partnerId.value}"
+                                [currentActiveItemId]="{field:'id', value: partnerId.value, hardValue: selectedPartnerName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                                 [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
                                 [disabled]="(isReadonly | async)">

@@ -53,7 +53,7 @@
                             [currentActiveItemId]="{ field: 'id', value: shipperId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(shipperId)"
-                            placeholder="Select shipper">
+                            placeholder="Select shipper" [disabled]="isReadonly">
                         </app-combo-grid-virtual-scroll>
                         <textarea autoExpand rows="7" class="form-control m-input m-input--square"
                             formControlName="shipperDescription"></textarea>
@@ -155,7 +155,7 @@
                                         name="daterange" placeholder="Select date" [autoApply]="true"
                                         formControlName="effectiveDate" [alwaysShowCalendars]="true" readonly calendar
                                         [attr.disabled]="isReadonly"
-                                        [allowRemove]="!!effectiveDate.value && !!effectiveDate.value.startDate" />
+                                        [allowRemove]="!isReadonly && !!effectiveDate.value && !!effectiveDate.value.startDate" />
                                 </div>
                             </div>
                         </div>
@@ -170,7 +170,7 @@
                                         name="daterange" placeholder="Select date" [autoApply]="true"
                                         formControlName="expiredDate" [alwaysShowCalendars]="true" readonly calendar
                                         [attr.disabled]="isReadonly"
-                                        [allowRemove]="!!expiredDate.value && !!expiredDate.value.startDate" />
+                                        [allowRemove]="!isReadonly && !!expiredDate.value && !!expiredDate.value.startDate" />
                                 </div>
                             </div>
                         </div>
