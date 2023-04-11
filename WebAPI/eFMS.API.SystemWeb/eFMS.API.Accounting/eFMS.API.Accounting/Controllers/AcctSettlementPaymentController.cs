@@ -691,7 +691,7 @@ namespace eFMS.API.Accounting.Controllers
                 }
                 #endregion -- Check Settlement Payment Approving --
             }
-            return Ok(new ResultHandle());
+            return Ok(new ResultHandle { Status=true});
         }
 
         /// <summary>
