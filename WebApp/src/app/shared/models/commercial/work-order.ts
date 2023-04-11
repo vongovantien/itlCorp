@@ -39,6 +39,7 @@ export class WorkOrder {
     officeId: string = null;
     companyId: string = null;
     notes: string = null;
+    schedule: string = null;
 
     constructor(object?: Object) {
         const self = this;

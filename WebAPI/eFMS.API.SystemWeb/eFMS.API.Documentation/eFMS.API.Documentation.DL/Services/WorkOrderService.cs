@@ -151,19 +151,21 @@ namespace eFMS.API.Documentation.DL.Services
                     using (var tranSurcharge = workOrderSurchargeRepo.DC.Database.BeginTransaction())
                     {
                         var surchargesDelete = await workOrderSurchargeRepo.GetAsync(x => x.WorkOrderId == Id);
-                        if(surchargesDelete.Count == 0)
+                        if (surchargesDelete.Count == 0)
                         {
                             var hsDeletePrices = await workOrderPriceRepo.DeleteAsync(x => x.WorkOrderId == Id);
                             if (hsDeletePrices.Success)
                             {
                                 transPrice.Commit();
                                 return hs;
-                            } else
+                            }
+                            else
                             {
                                 throw new Exception("Xoá price thất bại");
 
                             }
-                        } else
+                        }
+                        else
                         {
                             var hsDeleteSurcharges = await workOrderSurchargeRepo.DeleteAsync(x => x.WorkOrderId == Id);
                             if (hsDeleteSurcharges.Success)
@@ -193,7 +195,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 }
                             }
                         }
-                        
+
                     }
                     return hs;
                 }
@@ -920,27 +922,31 @@ namespace eFMS.API.Documentation.DL.Services
             }
         }
 
-        public bool CheckExist(WorkOrderRequest model)
+        public bool CheckExist(WorkOrderRequest model, out CsWorkOrder workOrderDuplicate)
         {
             bool found = false;
+            workOrderDuplicate = null;
             List<CsWorkOrder> workorderSameCriteria = new List<CsWorkOrder>();
+            Expression<Func<CsWorkOrder, bool>> expression = x => x.Active == true;
+
             if (model.Id == Guid.Empty)
             {
-                workorderSameCriteria = Get(x => x.Active == true
-                && x.PartnerId == model.PartnerId
+                expression = expression.And(x => x.PartnerId == model.PartnerId
                 && x.Pol == model.Pol
                 && x.Pod == model.Pod
-                && x.SalesmanId == model.SalesmanId).ToList();
+                && x.TransactionType == model.TransactionType
+                && x.SalesmanId == model.SalesmanId);
             }
             else
             {
-                workorderSameCriteria = Get(x => x.Active == true
+                expression = expression.And(x => x.PartnerId == model.PartnerId
                 && x.Id != model.Id
-                && x.PartnerId == model.PartnerId
                 && x.Pol == model.Pol
                 && x.Pod == model.Pod
-                && x.SalesmanId == model.SalesmanId).ToList();
+                && x.TransactionType == model.TransactionType
+                && x.SalesmanId == model.SalesmanId);
             }
+            workorderSameCriteria = Get(expression).ToList();
 
             if (workorderSameCriteria.Count > 0)
             {
@@ -949,14 +955,15 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     foreach (var priceItem in model.ListPrice)
                     {
-                        var worKorderPrices = workOrderPriceRepo.Any(x => !workOrderIds.Contains(x.Id)
+                        var worKorderPrices = workOrderPriceRepo.Where(x => workOrderIds.Contains(x.WorkOrderId)
                         && priceItem.PartnerId == x.PartnerId
                         && priceItem.QuantityFromRange == x.QuantityFromRange
-                        && priceItem.QuantityToRange == x.QuantityToRange);
+                        && priceItem.QuantityToRange == x.QuantityToRange).ToList();
 
-                        if (worKorderPrices)
+                        if (worKorderPrices.Count > 0)
                         {
                             found = true;
+                            workOrderDuplicate = workorderSameCriteria.Where(x => x.Id == worKorderPrices.FirstOrDefault().WorkOrderId)?.FirstOrDefault();
                             break;
                         }
 
