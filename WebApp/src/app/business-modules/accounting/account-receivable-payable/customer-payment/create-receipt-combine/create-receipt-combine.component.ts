@@ -103,6 +103,7 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
         };
     
         this.CreateReceiptCombineComponent.form.patchValue(this.utility.mergeObject({ ...data }, formMapping));
+        this.CreateReceiptCombineComponent.form.get('paymentDate').disable();
         this.CreditPaymentReceiptCDCombineComponent.arcbno = data.arcbno;
         this.DebitPaymentReceiptCDCombineComponent.arcbno = data.arcbno;
         this._store.dispatch(UpdateExchangeRateReceiptCombine({ exchangeRate: data.exchangeRate }));
@@ -119,23 +120,6 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
           salemanName: data.salemanName,
           contractId: data.agreementId
         }))
-
-        // this.CreateReceiptCombineComponent.partners
-        //   .pipe(takeUntil(this.ngUnsubscribe))
-        //   .subscribe((items: any[]) => {
-        //     const partner = items.find(x => x.id === data.customerId && x.salemanId === data.salemanId);
-        //     this.CreateReceiptCombineComponent.partnerId.setValue(partner.contractId);
-        //     this.CreateReceiptCombineComponent.selectedPartner = partner;
-        //     this._store.dispatch(SelectPartnerReceiptCombine({
-        //       id: partner.id,
-        //       shortName: partner.shortName,
-        //       accountNo: partner.accountNo,
-        //       partnerNameEn: partner.partnerNameEn,
-        //       salemanId: partner.salemanId,
-        //       salemanName: partner.salemanName,
-        //       contractId: partner.contractId
-        //     }))
-        //   });
     }
 
     updateGeneralReceipt(data: ReceiptModel[]) {
@@ -145,18 +129,20 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
           if(item.payments.length === 0){
             continue;
           }
-          const dataPush: any = item;
-          dataPush.partnerId = item.payments[0].partnerId;
-          dataPush.partnerName = item.payments[0].partnerName;
-          dataPush.receiptNo = item.paymentRefNo;
-          dataPush.userCreated = item.userNameCreated;
-          dataPush.isModified = true;
-          dataPush.amountUsd = item.payments[0].paidAmountUsd;
-          dataPush.amountVnd = item.payments[0].paidAmountVnd;
-          dataPush.datetimeModified = item.datetimeModified;
-          dataPush.obhPartnerId = item.obhpartnerId;
-          dataPush.notes = item.description;
-          generalReceipts.push(dataPush);
+          for(const payment of item.payments){
+            const dataPush: any = Object.assign({}, item);
+            dataPush.partnerId = payment.partnerId;
+            dataPush.partnerName = payment.partnerName;
+            dataPush.receiptNo = item.paymentRefNo;
+            dataPush.userCreated = item.userNameCreated;
+            dataPush.isModified = true;
+            dataPush.amountUsd = payment.paidAmountUsd;
+            dataPush.amountVnd = payment.paidAmountVnd;
+            dataPush.datetimeModified = item.datetimeModified;
+            dataPush.notes = payment.notes;
+            dataPush.payments = payment;
+            generalReceipts.push(dataPush);
+          }
         }
         this.ReceiptGeneralCombineComponent.generalReceipts = generalReceipts;
         this.ReceiptGeneralCombineComponent.isContainDraft = generalReceipts.some(x => x.status.toLowerCase() === 'draft');
@@ -177,6 +163,29 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
     }
 
     onAddDatatoList() {
+        // Change payment date
+        this._actionStoreSubject
+            .pipe(
+                filter(x => x.type === ReceiptCombineActionTypes.UPDATE_EXCHANGE_RATE),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((data: any) => {
+                if (!!data) {
+                    this.generalList$.pipe(take(1))
+                        .subscribe(
+                            (generalList: any[]) => {
+                                if (!!generalList.length) {
+                                    this.ReceiptGeneralCombineComponent.generalReceipts.forEach((item: any) => {
+                                        if (!!item.amountUsd) {
+                                            item.amountVnd = (item.amountUsd * data.exchangeRate).toFixed(0) || 0;
+                                        }
+                                    });
+                                }
+                            });
+                }
+            });
+
+        // Update general receipt
         this._actionStoreSubject
         .pipe(
             filter(x => x.type === ReceiptCombineActionTypes.ADD_GENERAL_COMBINE_TO_RECEIPT),
@@ -201,6 +210,8 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                     });
             }
         });
+
+        // Update credit receipt
         this._actionStoreSubject
         .pipe(
             filter(x => x.type === ReceiptCombineActionTypes.ADD_CREDIT_COMBINE_TO_RECEIPT),
@@ -245,6 +256,7 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
             }
         )
 
+        // Update debit receipt
         this._actionStoreSubject
             .pipe(
                 filter(x => x.type === ReceiptCombineActionTypes.ADD_DEBIT_COMBINE_TO_RECEIPT),
@@ -480,49 +492,77 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
     getGeneralReceipts(action: string, id: string = null) {
         let receiptModels: ReceiptModel[] = [];
 
-        this.ReceiptGeneralCombineComponent.generalReceipts
-            .filter((x: any) => (!x.status || x.status.toLowerCase() === 'draft') && (!id || x.id === id))
-            .forEach((element: any) => {
-                let item: ReceiptModel = new ReceiptModel(element);
-                item.id = element.id;
-                item.type = 'Agent';
-                item.officeId = element.officeId;
-                item.currencyId = this.formCreateMapValue.currencyId;
-                item.customerId = this.formCreateMapValue.customerId;
-                item.paymentMethod = element.paymentMethod;
-                item.paymentDate = !this.formCreateMapValue.paymentDate ? null : this.formCreateMapValue.paymentDate;
-                item.paidAmount = item.paidAmountUsd = item.finalPaidAmount = item.finalPaidAmountUsd = element.amountUsd;//this.ReceiptGeneralCombineComponent.generalReceipts.reduce((acc, curr) => (acc += curr.amountUsd), 0);
-                item.paidAmountVnd = item.finalPaidAmountVnd = element.amountVnd;//this.ReceiptGeneralCombineComponent.generalReceipts.reduce((acc, curr) => (acc += curr.amountVnd), 0);
-                item.obhpartnerId = element.obhPartnerId;
-                item.description = element.notes;
-                item.agreementId = this.formCreateMapValue.contractId;//element.agreementId;
-                item.arcbno = this.CreateReceiptCombineComponent.combineNo.value;
-                item.exchangeRate = this.formCreateMapValue.exchangeRate;
+        if (!!id) {
+            const generals = this.ReceiptGeneralCombineComponent.generalReceipts
+                .filter((x: any) => (!x.status || x.status.toLowerCase() === 'draft') && (!id || x.id === id));
+            let item: ReceiptModel = new ReceiptModel(generals[0]);
+            item.type = 'Agent';
+            item.currencyId = this.formCreateMapValue.currencyId;
+            item.customerId = this.formCreateMapValue.customerId;
+            item.paymentDate = !this.formCreateMapValue.paymentDate ? null : this.formCreateMapValue.paymentDate;
+            item.agreementId = this.formCreateMapValue.contractId;
+            item.arcbno = this.CreateReceiptCombineComponent.combineNo.value;
+            item.exchangeRate = this.formCreateMapValue.exchangeRate;
+            item.payments = [];
+            generals.forEach((payment: any) => {
+                payment.payments.partnerId = payment.partnerId;
+                payment.payments.type = payment.paymentMethod;
+                payment.payments.paymentType = 'OTHER';
+                payment.payments.paidAmountUsd = payment.amountUsd;
+                payment.payments.paidAmountVnd = payment.amountVnd;
+                payment.payments.obhpartnerId = payment.obhpartnerId;
+                payment.payments.officeId = payment.officeId;
+                payment.payments.notes = payment.notes;
 
-                if (!element?.payments) {
-                    const payment: any = {
-                        id: SystemConstants.EMPTY_GUID,
-                        partnerId: element.partnerId,
-                        type: element.paymentMethod,
-                        paymentType: 'OTHER',
-                        paidAmountUsd: element.amountUsd,
-                        paidAmountVnd: element.amountVnd,
-                        officeId: element.officeId
-                    };
-                    item.payments.push(payment);
-                } else {
-                    element.payments.forEach((payment: any) => {
-                        payment.type = element.paymentMethod,
-                        payment.paymentType = 'OTHER',
-                        payment.paidAmountUsd = element.amountUsd,
-                        payment.paidAmountVnd = element.amountVnd,
-                        payment.officeId = element.officeId
+                item.payments.push(payment.payments);
+            })
+            receiptModels.push(item);
+        } else {
+            this.ReceiptGeneralCombineComponent.generalReceipts
+                .filter((x: any) => (!x.status || x.status.toLowerCase() === 'draft') && (!id || x.id === id))
+                .forEach((element: any) => {
+                    let item: ReceiptModel = new ReceiptModel(element);
+                    item.id = element.id;
+                    item.type = 'Agent';
+                    item.officeId = element.officeId;
+                    item.currencyId = this.formCreateMapValue.currencyId;
+                    item.customerId = this.formCreateMapValue.customerId;
+                    item.paymentMethod = element.paymentMethod;
+                    item.paymentDate = !this.formCreateMapValue.paymentDate ? null : this.formCreateMapValue.paymentDate;
+                    item.paidAmount = item.paidAmountUsd = item.finalPaidAmount = item.finalPaidAmountUsd = element.amountUsd;//this.ReceiptGeneralCombineComponent.generalReceipts.reduce((acc, curr) => (acc += curr.amountUsd), 0);
+                    item.paidAmountVnd = item.finalPaidAmountVnd = element.amountVnd;//this.ReceiptGeneralCombineComponent.generalReceipts.reduce((acc, curr) => (acc += curr.amountVnd), 0);
+                    item.obhpartnerId = element.obhPartnerId;
+                    // item.description = element.notes;
+                    item.agreementId = this.formCreateMapValue.contractId;//element.agreementId;
+                    item.arcbno = this.CreateReceiptCombineComponent.combineNo.value;
+                    item.exchangeRate = this.formCreateMapValue.exchangeRate;
 
-                        // item.payments.push(payment);
-                    })
-                }
-                receiptModels.push(item);
-            });
+                    if (!element?.payments) {
+                        const payment: any = {
+                            id: SystemConstants.EMPTY_GUID,
+                            partnerId: element.partnerId,
+                            type: element.paymentMethod,
+                            paymentType: 'OTHER',
+                            paidAmountUsd: element.amountUsd,
+                            paidAmountVnd: element.amountVnd,
+                            officeId: element.officeId,
+                            notes: element.notes
+                        };
+                        item.payments.push(payment);
+                    } else {
+                        item.payments = [];
+                        element.payments.partnerId = element.partnerId;
+                        element.payments.type = element.paymentMethod;
+                        element.payments.paymentType = 'OTHER';
+                        element.payments.paidAmountUsd = element.amountUsd;
+                        element.payments.paidAmountVnd = element.amountVnd;
+                        element.payments.notes = element.notes;
+                        element.payments.officeId = element.officeId;
+                        item.payments.push(element.payments);
+                    }
+                    receiptModels.push(item);
+                });
+        }
         return receiptModels;
     }
 

@@ -191,6 +191,18 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
         }
     }
 
+    confirmUpdateReceipt(type: string, action: string, data: any) {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            body: 'Do you want to save receipt ' + data.receiptNo + '?',
+            title: 'Alert',
+            labelCancel: 'No',
+            labelConfirm: 'Yes',
+            iconConfirm: 'la la-save'
+        }, () => {
+            this.onSaveReceiptGroup(type, action, data);
+        })
+    }
+    
     onSaveReceiptGroup(type: string, action: string, data: any = null) {
         if (action === 'draft') {
             this.onSaveReceipt.emit({ type: type, action: !!this.generalReceipts.length ? 'draft' : 'update', receipt: data });
@@ -202,24 +214,25 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
     checkAllowDelete(data: any, index: number) {
         if (!this.isUpdate) {
             this._store.dispatch(RemoveDebitCombine({ index: index, _typeList: 'general'}));
-        } else {
-            this._accountingRepo
-                .checkAllowDeleteCusPayment(data.id)
-                .subscribe((value: boolean) => {
-                    if (value) {
-                        const messageDelete = `Do you want to delete Receipt ${data.receiptNo} ? `;
-                        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
-                            title: 'Delete Receipt',
-                            body: messageDelete,
-                            labelConfirm: 'Yes',
-                            classConfirmButton: 'btn-danger',
-                            iconConfirm: 'la la-trash',
-                            center: true
-                        }, () => this.onSaveReceiptGroup('general', 'delete', data));
-                    } else {
-                        this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainer.viewContainerRef, { center: true });
-                    }
-                });
-        }
+        } 
+        // else {
+        //     this._accountingRepo
+        //         .checkAllowDeleteCusPayment(data.id)
+        //         .subscribe((value: boolean) => {
+        //             if (value) {
+        //                 const messageDelete = `Do you want to delete Receipt ${data.receiptNo} ? `;
+        //                 this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+        //                     title: 'Delete Receipt',
+        //                     body: messageDelete,
+        //                     labelConfirm: 'Yes',
+        //                     classConfirmButton: 'btn-danger',
+        //                     iconConfirm: 'la la-trash',
+        //                     center: true
+        //                 }, () => this.onSaveReceiptGroup('general', 'delete', data));
+        //             } else {
+        //                 this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainer.viewContainerRef, { center: true });
+        //             }
+        //         });
+        // }
     }
 }
