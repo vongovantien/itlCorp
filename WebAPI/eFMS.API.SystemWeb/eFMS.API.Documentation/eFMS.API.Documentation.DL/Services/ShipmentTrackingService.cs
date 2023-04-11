@@ -194,7 +194,7 @@ namespace eFMS.API.Documentation.DL.Services
                             logTrackingModel.ObjectsResponse = dataResponse;
 
                             MongoDbHelper.GetDatabase(DbHelper.DbHelper.MongoDBConnectionString);
-                            MongoDbHelper.Insert("SysTrackInfo", logTrackingModel);
+                            MongoDbHelper.Insert("TrackingResponse", logTrackingModel);
                             #endregion
                         }
 
