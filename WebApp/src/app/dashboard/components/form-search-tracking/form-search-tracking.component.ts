@@ -73,21 +73,4 @@ export class FormSearchTrackingComponent extends AppForm {
             })
         }
     }
-
-    onRedirectPage() {
-        if (!!this.searchObject.searchString) {
-            const mawb = this.searchObject.searchString
-            switch (this.searchObject.field) {
-                case "mawb":
-                    window.location.href = RoutingConstants.MAWB_TRACKING_URL + `/${mawb}`
-                    break;
-                case "hawb":
-                    window.location.href = RoutingConstants.HAWB_TRACKING_URL;
-                    break
-                default:
-                    break;
-            }
-        }
-    }
-
 }
