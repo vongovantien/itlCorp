@@ -83,7 +83,6 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
     id: string;
     workOrderId: string;
     title = 'New Price List';
-
     constructor(
         private readonly _fb: FormBuilder,
         private readonly _catalogueRepo: CatalogueRepo,

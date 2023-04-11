@@ -16,7 +16,7 @@
         <div class="m-portlet__body bg-white">
             <div class="table-wrapper table-editable table-horizontal" id="work-order-list-table"
                 [collapse]="isCollapsed" [isAnimated]="true" style="height:255px; max-height: 300px;"
-                [style.height.px]="!!surcharges.length ? 255 : (isReadonly | async) ? 111 : 165">
+                [style.height.px]="!!surcharges.length ? 255 : (isReadonly | async) ? 123 : 165">
                 <table class="table table-bordered dataTable-edit">
                     <thead app-table-header [headers]="headers" class="thead-light"
                         (onClick)="sortBy($event.sortField ? $event.sortField : '')">
