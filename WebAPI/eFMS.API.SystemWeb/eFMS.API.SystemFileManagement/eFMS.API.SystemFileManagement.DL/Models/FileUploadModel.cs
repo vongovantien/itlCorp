@@ -11,6 +11,8 @@ namespace eFMS.API.SystemFileManagement.DL.Models
         public Guid Id { get; set; }
         public string Child { get; set; }
         public string ModuleName { get; set; }
+        public string UserCreated { get; set; }
+
     }
 
     public class FileReportUpload
@@ -26,5 +28,6 @@ namespace eFMS.API.SystemFileManagement.DL.Models
         public Guid Id { get; set; }
         public string Child { get; set; }
         public string ModuleName { get; set; }
+        public string UserCreated { get; set; }
     }
 }

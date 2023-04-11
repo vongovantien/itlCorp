@@ -1191,7 +1191,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 {
                                     transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "AD", HBLId = opsJob.Hblid });
                                 }
-                            }
+                            } 
                             else
                             {
                                 var csJob = DC.CsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
@@ -1304,7 +1304,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     haveADV = true;
                 }
-            }
+             }
             var models = GetTransactionTypeJobBillingModel(billingType, billingId);
             var listAccountantTypes = new List<string> {
                 SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADVANCE,
@@ -1352,7 +1352,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         }
         private IQueryable<SysAttachFileTemplate> GetDocumentTypeWithTypeAttachTemplate(string type, string transactionType, string code, string accountingType, bool haveEdoc)
         {
-            Expression<Func<SysAttachFileTemplate, bool>> queryAttachTemplate = x => x.Type == type && x.TransactionType == transactionType;
+            var tranType=transactionType=="TK"||transactionType=="CL"?"CL":transactionType;
+            Expression<Func<SysAttachFileTemplate, bool>> queryAttachTemplate = x => x.Type == type && x.TransactionType == tranType;
             if (!string.IsNullOrEmpty(code))
             {
                 queryAttachTemplate = queryAttachTemplate.And(x => x.Code == code);
@@ -1408,8 +1409,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             Name = fileName + extension,
                             Folder = model.FolderName,
                             ObjectId = model.Id.ToString(),
-                            //UserCreated = currentUser.UserName,
-                            //UserModified = currentUser.UserName,
+                            UserCreated = string.IsNullOrEmpty(currentUser.UserName)?model.UserCreated: currentUser.UserName,
+                            UserModified = string.IsNullOrEmpty(currentUser.UserName) ? model.UserCreated : currentUser.UserName,
                             DateTimeCreated = DateTime.Now,
                             DatetimeModified = DateTime.Now,
                             ChildId = model.Child,
@@ -1454,12 +1455,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             var fFile = new FormFile(stream, 0, stream.Length, null, req.File.FileName);
             var fFiles = new List<IFormFile>() { fFile };
             var model = new FileUploadModel
-            {
+        {
                 Child = null,
                 Files = fFiles,
                 FolderName = req.FolderName,
                 ModuleName = req.ModuleName,
                 Id = req.Id,
+                UserCreated=req.UserCreated
             };
             var urlImage = "";
             List<SysImage> imageList = await UpLoadS3(model, true);

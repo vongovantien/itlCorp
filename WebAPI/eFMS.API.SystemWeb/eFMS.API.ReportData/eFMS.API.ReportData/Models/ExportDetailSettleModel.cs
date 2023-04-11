@@ -17,5 +17,6 @@ namespace eFMS.API.ReportData.Models
         public Guid Id { get; set; }
         public string Child { get; set; }
         public string ModuleName { get; set; }
+        public string UserCreated { get; set; }
     }
 }
