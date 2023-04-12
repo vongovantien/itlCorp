@@ -145,7 +145,9 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
         } else {
             this.transactionType = this.typeFrom;
             this.getDocumentType(this.typeFrom);
-            this.getEDoc(this.typeFrom);
+            if (this.typeFrom === 'Settlement') {
+                this.getEDoc(this.typeFrom);
+            }
         }
         this.headers = [
             { title: 'Alias Name', field: 'systemFileName', sortable: true },
@@ -163,16 +165,18 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
                     this.currentUser = res;
                 }
             )
-        this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
-            takeUntil(this.ngUnsubscribe)
-        )
-            .subscribe(
-                (data) => {
-                    if (!!data) {
-                        this.haveAdv = data.some(x => x.advanceNo !== null);
+        if (this.typeFrom === 'Settlement') {
+            this._store.select(getGrpChargeSettlementPaymentDetailState).pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+                .subscribe(
+                    (data) => {
+                        if (!!data) {
+                            this.haveAdv = data.some(x => x.advanceNo !== null);
+                        }
                     }
-                }
-            );
+                );
+        }
 
         this.getHblList();
     }
@@ -383,7 +387,7 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             this.listFileAttach.requestListEDocSettle();
         }
         this.listFileAttach.getEDoc(event);
-        this.getEDoc(this.transactionType);
+        //this.getEDoc(this.transactionType);
     }
 
     emitAttach(event: any) {

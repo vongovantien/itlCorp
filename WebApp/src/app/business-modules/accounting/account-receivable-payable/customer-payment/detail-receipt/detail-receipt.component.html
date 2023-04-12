@@ -40,7 +40,7 @@
 
                 <customer-payment-form-create-receipt [isUpdate]="true"></customer-payment-form-create-receipt>
 
-                <customer-payment-list-receipt [syncInfoTemplate]="syncInfoTemplate">
+                <customer-payment-list-receipt [syncInfoTemplate]="syncInfoTemplate" [isUpdate]="true">
                     <div class="row m--margin-top-20">
                         <div class="col-md-6">
                             <span>Created: {{receiptDetail?.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>

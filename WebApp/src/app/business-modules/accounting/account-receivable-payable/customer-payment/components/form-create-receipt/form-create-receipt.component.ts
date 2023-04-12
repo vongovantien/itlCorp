@@ -14,7 +14,7 @@ import { ComboGridVirtualScrollComponent } from '@common';
 import { Observable } from 'rxjs';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { ResetInvoiceList, SelectPartnerReceipt, SelectReceiptDate, SelectReceiptAgreement, SelectReceiptClass } from '../../store/actions';
-import { ReceiptTypeState } from '../../store/reducers';
+import { ReceiptPaymentMethodState, ReceiptTypeState } from '../../store/reducers';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -50,6 +50,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     isReadonly = null;
     customerName: string;
     contractNo: string;
+    isRequireAgreement: boolean = true;
 
     classReceipt: string[] = [
         AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT,
@@ -72,7 +73,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     }
     ngOnInit() {
         this.initForm();
-        this.getCustomerAgent();
 
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -80,7 +80,13 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 (partnerGroup) => {
                     if (!!partnerGroup) {
                         this.partnerTypeState = partnerGroup;
+                        if (this.partnerTypeState.toUpperCase() === 'CUSTOMER') {
+                            this.isRequireAgreement = true;
+                        }else{
+                            this.getRequireAgreementAgent();
+                        }
                     }
+                    this.getCustomerAgent();
                 }
             )
     }
@@ -92,7 +98,10 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             this.customers = customersFromService.data;
             return;
         }
-        this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER])
+        this._catalogueRepo.getPartnerGroupsWithCriteria({
+            partnerGroups: [CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]
+            , partnerType: this.partnerTypeState.toUpperCase() === 'CUSTOMER' ? 'Customer' : 'Agent'
+        })
             .subscribe(
                 (data) => {
                     this.customers = data;
@@ -100,12 +109,34 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             );
     }
 
+    getRequireAgreementAgent() {
+        if (this.class.value === AccountingConstants.RECEIPT_CLASS.ADVANCE || this.class.value === AccountingConstants.RECEIPT_CLASS.COLLECT_OBH) {
+            this.isRequireAgreement = true;
+            return;
+        }
+        this._store.select(ReceiptPaymentMethodState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (data) => {
+                    this.isRequireAgreement = false;
+                    if (!!data) {
+                        if (this.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT) {
+                            if (data.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE) || data.includes(AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL)) {
+                                this.isRequireAgreement = true;
+                            }
+                        }
+                        
+                    }
+                }
+            )
+    }
+
     initForm() {
         this.formSearchInvoice = this._fb.group({
             customerId: [null, Validators.required],
             date: [],
             paymentRefNo: [null],
-            agreementId: [null, Validators.required],
+            agreementId: this.isRequireAgreement ? [null, Validators.required] : [null],
             class: [this.classReceipt[0]],
             referenceNo: [{ value: null, disabled: true }]
         });
@@ -160,16 +191,20 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                                         this.onSelectDataFormInfo(d[0], 'agreement');
 
                                         // * Check partner group của đối tượng đang chọn có # với đối tượng phiếu thu muốn tạo
-                                        if (data.partnerType === this.partnerTypeState) {
-                                            this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: this.partnerTypeState }));
-                                            return;
-                                        }
+                                        // if (data.partnerType === this.partnerTypeState) {
+                                        //     this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: this.partnerTypeState }));
+                                        //     return;
+                                        // }
                                         this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerType.toUpperCase() }));
 
                                     } else {
                                         this.combogrid.displaySelectedStr = '';
                                         this.agreementId.setValue(null);
-                                        this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
+                                        if (this.isRequireAgreement) {
+                                            this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
+                                        } else {
+                                            this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerType.toUpperCase() }));
+                                        }
 
                                     }
                                 }
@@ -213,6 +248,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     onChangeReceiptType(type: string) {
         this._store.dispatch(SelectReceiptClass({ class: type }));
+        this.getRequireAgreementAgent();
         if (type === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT || type === AccountingConstants.RECEIPT_CLASS.NET_OFF) {
             this.isShowGetDebit = true;
             return;

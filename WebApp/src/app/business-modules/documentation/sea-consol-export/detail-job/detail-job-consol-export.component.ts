@@ -164,7 +164,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
                         this.isDuplicate = true;
                     } else {
                         //this._toastService.error(res.message);
-                        if (res.data.errorCode = 453) {
+                        if (res.data?.errorCode === 453) {
                             this.showHBLsInvalid(res.message);
                         } else {
                             this._toastService.error(res.message);
@@ -190,7 +190,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
 
                     } else {
-                        if (res.data.errorCode = 452) {
+                        if (res.data?.errorCode === 452) {
                             this.showHBLsInvalid(res.message);
                         } else {
                             this._toastService.error(res.message);
@@ -331,7 +331,6 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
                         const criteria: DocumentationInterface.ICheckPointCriteria = {
                             data: partnerIds,
                             transactionType: 'DOC',
-                            type: 5,
                             settlementCode: null,
                         };
                         return this._documentRepo.validateCheckPointMultiplePartner(criteria)

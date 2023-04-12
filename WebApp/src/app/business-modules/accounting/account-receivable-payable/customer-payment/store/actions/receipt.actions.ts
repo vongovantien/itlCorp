@@ -27,6 +27,7 @@ export enum ReceiptActionTypes {
     UPDATE_EXCHANGE_RATE = '[AR Receipt] Update Exchange Rate',
     DELETE_CREDIT_IN_DEBIT_ITEM = '[AR Receipt] Delete Credit In Debit Item',
     ADD_DEBIT_CREDIT_TO_RECEIPT = '[AR Receipt] Add debit Credit To Receipt',
+    SELECT_PAYMENT_METHOD_RECEIPT = '[AR Receipt] Select Payment Method Receipt',
 
     INSERT_DATA_SEARCH_CUSTOMER_PAYMENT = '[AR Receipt] Insert data search',
     LOAD_LIST = '[AR Receipt] Load List',
@@ -50,6 +51,7 @@ export const InsertAdvance = createAction(ReceiptActionTypes.INSERT_ADVANCE, pro
 export const SelectPartnerReceipt = createAction(ReceiptActionTypes.SELECT_PARTNER_RECEIPT, props<{ id: string, partnerGroup: string }>());
 export const SelectReceiptDate = createAction(ReceiptActionTypes.SELECT_DATE_RECEIPT, props<{ date: any }>());
 export const SelectReceiptAgreement = createAction(ReceiptActionTypes.SELECT_AGREEMENT, props<{ [key: string]: any; }>());
+export const SelectReceiptPaymentMethod = createAction(ReceiptActionTypes.SELECT_PAYMENT_METHOD_RECEIPT, props<{ paymentMethod: any }>());
 export const ToggleAutoConvertPaid = createAction(ReceiptActionTypes.TOGGLE_AUTO_CONVERT_PAID, props<{ isAutoConvert: boolean }>());
 export const SelectReceiptCurrency = createAction(ReceiptActionTypes.SELECT_CURRENCY, props<{ currency: string }>());
 export const SelectReceiptClass = createAction(ReceiptActionTypes.SELECT_CLASS, props<{ class: string }>());

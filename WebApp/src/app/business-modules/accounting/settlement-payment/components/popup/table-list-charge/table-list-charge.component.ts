@@ -513,7 +513,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 break;
             case 'obh':
                 const transactionType: string = this.utility.getServiceType(chargeItem.jobId) === 'CL' ? 'CL' : 'DOC';
-                const checkPoint = { partnerId: data.id, hblId: chargeItem.hblid, transactionType: transactionType, settlementCode: this.settlementCode };
+                const checkPoint = { partnerId: data.id, hblId: chargeItem.hblid, transactionType: transactionType, settlementCode: this.settlementCode, type: 9 };
                 this._documentRepo.validateCheckPointContractPartner(checkPoint)
                     .subscribe(
                         (res: CommonInterface.IResult) => {
