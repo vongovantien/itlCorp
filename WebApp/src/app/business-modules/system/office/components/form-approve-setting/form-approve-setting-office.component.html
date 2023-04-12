@@ -122,6 +122,7 @@
                     <div class="col font-weight-bold"> Credit Limit </div>
                     <div class="col font-weight-bold"> Over Payment Term </div>
                     <div class="col font-weight-bold"> Expired Agreement </div>
+                    <div class="col font-weight-bold"> OverDue OBH </div>
                     <div class="col font-weight-bold"> Apply Type </div>
                     <div class="col font-weight-bold"> Apply Partner </div>
                 </div>
@@ -135,6 +136,9 @@
                         </div>
                         <div class="col">
                             <app-switch [(ngModel)]="accountReceivable.expiredAgreement"></app-switch>
+                        </div>
+                        <div class="col">
+                            <app-switch [(ngModel)]="accountReceivable.isOverDueObh "></app-switch>
                         </div>
                         <div class="col">
                             <select [(ngModel)]="accountReceivable.applyType" class="form-control">
