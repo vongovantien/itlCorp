@@ -124,11 +124,11 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
                 this._toastService.warning("maximum file size < 100Mb");
                 return;
             }
-            this.uploadEdocFilePOD();
+            this.uploadFilePOD();
         }
     }
 
-    uploadEdocFilePOD() {
+    uploadFilePOD() {
         if (!!this.hblid) {
             let eDocFileList: IEDocFile[] = [];
             let files: any[] = [];
