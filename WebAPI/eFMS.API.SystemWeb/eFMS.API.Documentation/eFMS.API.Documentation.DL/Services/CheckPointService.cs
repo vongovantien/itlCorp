@@ -349,7 +349,7 @@ namespace eFMS.API.Documentation.DL.Services
                 
                 if (checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                 {
-                    if (criteria.TransactionType == "CL")
+                    if (criteria.TransactionType == "CL"||criteria.TransactionType=="TK")
                     {
                         var ops = opsTransactionRepository.First(x => x.Hblid == criteria.HblId);
                         currentSaleman = ops.SalemanId;
@@ -422,7 +422,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 } else
                 {
-                    if (criteria.TransactionType == "CL")
+                    if (criteria.TransactionType == "CL"|| criteria.TransactionType=="TK")
                     {
                         currentSaleman = opsTransactionRepository.First(x => x.Hblid == criteria.HblId)?.SalemanId;
                     }
@@ -552,7 +552,7 @@ namespace eFMS.API.Documentation.DL.Services
                             if (contract.IsExpired == true)
                             {
                                 // check shipment service date between contract effective date and expired date
-                                if (criteria.TransactionType == "CL")
+                                if (criteria.TransactionType == "CL"|| criteria.TransactionType == "TK")
                                 {
                                     var shipment = opsTransactionRepository.First(x => x.Hblid == criteria.HblId);
                                     if (shipment != null)
