@@ -77,10 +77,19 @@ export class FormValidators extends Validators {
         return null;
     }
 
+    // public static getDateWithoutTime(date: any) {
+    //     let year = date.getFullYear();
+    //     let month = date.getMonth();
+    //     let day = date.getDate();
+    //     return new Date(year, month, day);
+    // }
+
     public static validateNotFutureDate(controls: AbstractControl | FormControl): ValidationErrors {
-        if (controls.value != null) {
-            const inputDate: any = new Date(controls.value?.startDate);
-            const currentDate: any = new Date();
+        if (controls.value?.startDate !== null && controls.value !== null && controls.value?.startDate !== undefined) {
+            let inputDateParse = new Date(controls.value.startDate);
+            let currDateParse = new Date();
+            const inputDate: any = new Date(inputDateParse?.getFullYear(), inputDateParse?.getMonth(), inputDateParse?.getDate());
+            const currentDate: any = new Date(currDateParse?.getFullYear(), currDateParse?.getMonth(), currDateParse?.getDate());
             if (inputDate > currentDate) {
                 return { invalidDateFuture: true };
             }
