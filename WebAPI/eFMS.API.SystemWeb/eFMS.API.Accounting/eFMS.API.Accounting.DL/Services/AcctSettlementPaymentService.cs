@@ -6412,7 +6412,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public ResultHandle CheckConfirmPrepaidShipment(List<ShipmentChargeSettlement> ShipmentCharges)
         {
-            ResultHandle result = new ResultHandle();
+            ResultHandle result = new ResultHandle() { Status = true };
             var hblIds = ShipmentCharges.Select(x => x.Hblid).ToList();
             var office = sysOfficeRepo.First(x => x.Id == currentUser.OfficeID);
             if (office.OfficeType == AccountingConstants.OFFICE_TYPE_OUTSOURCE)
