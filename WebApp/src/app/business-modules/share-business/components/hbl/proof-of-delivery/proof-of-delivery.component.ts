@@ -1,24 +1,29 @@
 import { formatDate } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AppForm } from '@app';
+import { ConfirmPopupComponent } from '@common';
 import { SystemConstants } from '@constants';
+import { InjectViewContainerRefDirective } from '@directives';
+import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { DocumentationRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
-import { of } from 'rxjs';
-import { catchError, concatMap, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
+import { catchError, concatMap, finalize, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
 import { SystemFileManageRepo } from 'src/app/shared/repositories/system-file-manage.repo';
+import { getTransactionDetailCsTransactionState } from '../../../store';
 import { IEDocFile } from '../../edoc/document-type-attach/document-type-attach.component';
+import { Observable, of } from 'rxjs';
 @Component({
     selector: 'hbl-proof-of-delivery',
     templateUrl: './proof-of-delivery.component.html'
 })
 
 export class ShareBusinessProofOfDelieveyComponent extends AppForm {
+    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
     constructor(
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
@@ -30,44 +35,50 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
         super();
         this._progressRef = this._ngProgress.ref();
     }
+
     hblid: string = '';
     jobId: string = '';
     proofOfDelievey: ProofOfDelivery = new ProofOfDelivery();
     fileList: any = null;
     files: any = {};
     listFileUpload: any[] = [];
+    transactionType: string = '';
 
     ngOnInit() {
-        this._activedRoute.params
-            .pipe(
-                takeUntil(this.ngUnsubscribe),
-                map((p: Params) => {
-                    console.log(p)
-                    if (p.hblId) {
-                        this.hblid = p.hblId;
-                        this.jobId = p.jobId;
-                        this.getFilePOD();
-                    } else {
-                        this.hblid = SystemConstants.EMPTY_GUID;
-                    }
-                    return of(this.hblid);
-                }),
-                // * Get data delivery order
-                switchMap((p) => {
-                    return this._documentRepo.getProofOfDelivery(this.hblid);
-                }),
-                concatMap((data: ProofOfDelivery) => {
-                    // * Update deliveryOrder model from dataDefault.
-                    this.proofOfDelievey.deliveryDate = (!!data.deliveryDate) ? { startDate: new Date(data.deliveryDate), endDate: new Date(data.deliveryDate) } : null;
+        this._activedRoute.params.pipe(
+            takeUntil(this.ngUnsubscribe),
+            switchMap((p: Params) => {
+                this.hblid = p.hblId;
+                this.jobId = p.jobId;
+                return this._store.select(getTransactionDetailCsTransactionState).pipe(
+                    takeUntil(this.ngUnsubscribe),
+                    tap((res: CsTransaction) => {
+                        this.transactionType = res.transactionType;
+                        this.getProofOfDeliveryAttachedFiles();
+                    }),
+                    switchMap(() => this.getProofOfDelivery$())
+                );
+            })
+        ).subscribe();
+    }
+
+
+    getProofOfDelivery$(): Observable<ProofOfDelivery> {
+        if (!!this.hblid) {
+            return this._documentRepo.getProofOfDelivery(this.hblid).pipe(
+                tap((data: ProofOfDelivery) => {
+                    this.proofOfDelievey.deliveryDate = (!!data.deliveryDate)
+                        ? { startDate: new Date(data.deliveryDate), endDate: new Date(data.deliveryDate) }
+                        : null;
                     this.proofOfDelievey.referenceNo = data.referenceNo;
                     this.proofOfDelievey.deliveryPerson = data.deliveryPerson;
                     this.proofOfDelievey.note = data.note;
-                    return of(this.proofOfDelievey);
+                }),
+                map(() => this.proofOfDelievey)
+            );
+        }
 
-                })
-            )
-            .subscribe((res) => { console.log("subscribe", res); });
-
+        return of(this.proofOfDelievey);
     }
 
     saveProofOfDelivery() {
@@ -75,16 +86,13 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
         const deliveryDate = {
             deliveryDate: !!this.proofOfDelievey.deliveryDate && !!this.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : this.proofOfDelievey.deliveryDate.startDate == null ? null : this.proofOfDelievey.deliveryDate,
         };
-        this.proofOfDelievey.hblid = this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid;
+        this.proofOfDelievey.hblid = this.hblid;
         this._documentRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDelievey, deliveryDate))
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        if (this.fileList !== null && this.fileList.length !== 0 && Object.keys(this.files).length === 0) {
-                            this.uploadFilePOD();
-                        }
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -99,86 +107,98 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
             listFileUpload[i].DocumentId = 0;
             listFileUpload[i].docType = 'POD';
             listFileUpload[i].Code = 'POD';
-            listFileUpload[i].aliasName = "POD" + '_'+ listFileUpload[i].name.substring(0, listFileUpload[i].name.lastIndexOf('.'));
+            listFileUpload[i].aliasName = "POD" + '_' + listFileUpload[i].name.substring(0, listFileUpload[i].name.lastIndexOf('.'));
+            listFileUpload[i].transactionType = this.transactionType;
             this.listFileUpload.push(listFileUpload[i]);
         }
-        this.uploadFilePOD();
+        if (listFileUpload?.length > 0) {
+            let validSize: boolean = true;
+            for (let i = 0; i <= listFileUpload?.length - 1; i++) {
+                const fileSize: number = listFileUpload[i].size / Math.pow(1024, 2);
+                if (fileSize >= 100) {
+                    validSize = false;
+                    break;
+                }
+            }
+            if (!validSize) {
+                this._toastService.warning("maximum file size < 100Mb");
+                return;
+            }
+            this.uploadEdocFilePOD();
+        }
     }
 
-    uploadFilePOD() {
-        const hblId = this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid;
-        let eDocFileList: IEDocFile[] = [];
-        let files: any[] = [];
-        this.listFileUpload.forEach(x => {
-            files.push(x);
-            eDocFileList.push(({
-                JobId: this.jobId,
-                Code: x.Code,
-                TransactionType: "Shipment",
-                AliasName: x.aliasName,
-                BillingNo: '',
-                BillingType: SystemConstants.EMPTY_GUID,
-                HBL: hblId,
-                FileName: x.name,
-                Note: x.note !== undefined ? x.note : '',
-                BillingId: SystemConstants.EMPTY_GUID,
-                Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
-                DocumentId: x.DocumentId,
-                AccountingType: x.AccountingType,
-            }));
-        });
-        const eDocUploadFile = ({
-            ModuleName: "Document",
-            FolderName: "Shipment",
-            Id: this.hblid,
-            EDocFiles: eDocFileList,
-        })
+    uploadEdocFilePOD() {
+        if (!!this.hblid) {
+            let eDocFileList: IEDocFile[] = [];
+            let files: any[] = [];
+            this.listFileUpload.forEach(x => {
+                files.push(x);
+                eDocFileList.push(({
+                    JobId: this.jobId,
+                    Code: x.Code,
+                    TransactionType: this.transactionType,
+                    AliasName: x.aliasName,
+                    BillingNo: '',
+                    BillingType: SystemConstants.EMPTY_GUID,
+                    HBL: this.hblid,
+                    FileName: x.name,
+                    Note: x.note !== undefined ? x.note : '',
+                    BillingId: SystemConstants.EMPTY_GUID,
+                    Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
+                    DocumentId: x.DocumentId,
+                    AccountingType: x.AccountingType,
+                }));
+            });
+            const eDocUploadFile = ({
+                ModuleName: "Document",
+                FolderName: "Shipment",
+                Id: this.hblid,
+                EDocFiles: eDocFileList,
+            })
 
-        this._systemFileManageRepo.uploadEDoc(eDocUploadFile, files, "Shipment")
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this.fileList = null;
-                        this._toastService.success("Upload file successfully!");
-                        if (!!hblId) {
-                            this.getFilePOD();
+            this._systemFileManageRepo.uploadEDoc(eDocUploadFile, files, "Shipment")
+                .pipe(catchError(this.catchError), finalize(() => {
+                    this._progressRef.complete();
+                    this.isLoading = false;
+                }))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this.fileList = null;
+                            this.listFileUpload = [];
+                            this._toastService.success("Upload file successfully!");
+                            this.getProofOfDeliveryAttachedFiles();
                         }
                     }
-                }
-            );
+                );
+        }
     }
 
-    deleteFilePOD(fileName: string) {
+    onConfirmDelete(file: any) {
+        let messageDelete = `Do you want to delete this Attach File ? `;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Delete Attach File',
+            body: messageDelete,
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-danger',
+            iconConfirm: 'la la-trash',
+            center: true
+        }, () => this.deleteFilePOD(file))
+    }
+
+    deleteFilePOD(file: any) {
         this._progressRef.start();
-        const hblId = this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid;
-        // this._documentRepo.deletePODFilesAttach(this.files.id)
-        //     .pipe(catchError(this.catchError), finalize(() => {
-        //         this._progressRef.complete();
-        //         this.isLoading = false;
-        //     }))
-        //     .subscribe(
-        //         (res: any) => {
-        //             if (res.result.success) {
-        //                 this.uploadFilePOD();
-        //             } else {
-        //                 this._toastService.error("some thing wrong");
-        //             }
-        //         }
-        //     );
-        this._systemFileManageRepo.deleteFile('Document', 'Shipment', hblId, fileName)
+        this._systemFileManageRepo.deleteEdoc(file.id, file.jobId)
             .pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
             }))
             .subscribe(
                 (res: any) => {
-                    console.log(res);
-
                     if (res.status === true) {
-                        //this.uploadFilePOD();
                         this._toastService.success("Delete Success");
-                        this.getFilePOD();
+                        this.getProofOfDeliveryAttachedFiles();
                     } else {
                         this._toastService.error("Some Thing Wrong");
                     }
@@ -186,32 +206,21 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
             );
     }
 
-    getFilePOD() {
+    getProofOfDeliveryAttachedFiles() {
         this.isLoading = true;
-        // this._documentRepo.getPODFilesAttach(this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid).
-        //     pipe(catchError(this.catchError), finalize(() => {
-        //         this._progressRef.complete();
-        //         this.isLoading = false;
-        //     }))
-        //     .subscribe(
-        //         (res: any = []) => {
-        //             this.files = res;
-        //         }
-        //     );
-        this._systemFileManageRepo.getFile('Document', 'Shipment', this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid).
-            pipe(catchError(this.catchError), finalize(() => {
-                this._progressRef.complete();
-                this.isLoading = false;
-            }))
-            .subscribe(
-                (res: any = []) => {
-                    this.files = res;
-                    console.log(this.files);
-                }
-            );
+        if (!!this.transactionType && !!this.hblid) {
+            this._systemFileManageRepo.GetProofOfDeliveryAttachedFiles(this.transactionType, this.jobId, this.hblid).
+                pipe(catchError(this.catchError), finalize(() => {
+                    this._progressRef.complete();
+                    this.isLoading = false;
+                }))
+                .subscribe(
+                    (res: any = []) => {
+                        this.files = res;
+                    }
+                );
+        }
     }
-
-
 }
 
 

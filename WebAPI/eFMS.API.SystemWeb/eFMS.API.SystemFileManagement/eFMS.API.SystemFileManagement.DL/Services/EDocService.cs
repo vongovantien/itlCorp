@@ -10,6 +10,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver.Linq;
@@ -21,6 +22,7 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
 using static eFMS.API.Common.Helpers.FileHelper;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
 {
@@ -143,15 +145,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             edocUploadMapModel.EDocFilesMap = lstDocMap;
             return edocUploadMapModel;
         }
-        private SysAttachFileTemplate getDocID(Guid? jobId)
-        {
-            if (_opsTranRepo.Any(x => x.Id == jobId))
-            {
-                return _attachFileTemplateRepo.Get(x => x.TransactionType == "CL" && x.Code == "POD").FirstOrDefault();
-            }
-            var tranType = _cstranRepo.Get(x => x.Id == jobId).FirstOrDefault();
-            return _attachFileTemplateRepo.Get(x => x.TransactionType == tranType.TransactionType && x.Code == "POD").FirstOrDefault();
-        }
+
         public async Task<HandleState> PostEDocAsync(EDocUploadModel model, List<IFormFile> files, string type)
         {
             HandleState result = new HandleState();
@@ -204,9 +198,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         if (type == "Shipment")
                         {
                             var attachTemplate = new SysAttachFileTemplate();
-                            if (edoc.Code == "POD" && edoc.DocumentId == 0)
+                            if (edoc.Code == "POD" && !string.IsNullOrEmpty(edoc.TransactionType))
                             {
-                                attachTemplate = getDocID(edoc.JobId);
+                                attachTemplate = _attachFileTemplateRepo.Get(x => x.Code == "POD" && x.TransactionType == edoc.TransactionType).FirstOrDefault();
                             }
                             else
                             {
@@ -2245,6 +2239,45 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 }
             }
             return result;
+        }
+
+        public async Task<List<SysImageDetailModel>> GetProofOfDeliveryAttachedFiles(string transactionType, Guid jobId, Guid? hblId)
+        {
+            var docType = await _attachFileTemplateRepo.Get(x => x.Code == "POD" && x.TransactionType == transactionType).FirstOrDefaultAsync();
+            var listEdocFile = await _sysImageDetailRepo.GetAsync(x => x.JobId == jobId && x.DocumentTypeId == docType.Id);
+            var listFileReturn = listEdocFile.Where(x => x.Hblid == hblId || x.Hblid == Guid.Empty);
+
+            var result = (from file in listFileReturn
+                          join image in _sysImageRepo.Get() on file.SysImageId equals image.Id
+                          join template in _attachFileTemplateRepo.Get() on file.DocumentTypeId equals template.Id into gjTemplate
+                          from template in gjTemplate.DefaultIfEmpty()
+                          select new SysImageDetailModel
+                          {
+                              BillingNo = file.BillingNo,
+                              BillingType = file.BillingNo,
+                              DatetimeCreated = file.DatetimeCreated,
+                              DatetimeModified = file.DatetimeModified,
+                              DepartmentId = file.DepartmentId,
+                              DocumentTypeId = file.DocumentTypeId,
+                              ExpiredDate = file.ExpiredDate,
+                              GroupId = file.GroupId,
+                              Hblid = file.Hblid,
+                              Id = file.Id,
+                              JobId = file.JobId,
+                              OfficeId = file.OfficeId,
+                              Source = file.Source,
+                              SysImageId = file.SysImageId,
+                              SystemFileName = file.SystemFileName,
+                              UserCreated = file.UserCreated,
+                              UserFileName = file.UserFileName,
+                              UserModified = file.UserModified,
+                              ImageUrl = image != null ? image.Url : null,
+                              Note = file.Note,
+                              TransactionType = transactionType,
+                              DocumentCode = template?.Code
+                          });
+
+            return result.OrderByDescending(x => x.DatetimeCreated).ToList();
         }
     }
 }

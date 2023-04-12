@@ -1,13 +1,14 @@
 import { formatDate } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { DocumentationRepo } from '@repositories';
-import { getHBLSState, IShareBussinessState } from '@share-bussiness';
+import { IShareBussinessState, getHBLSState, getTransactionDetailCsTransactionState } from '@share-bussiness';
 import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
-import { catchError } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
 import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
 import { ShareDocumentTypeAttachComponent } from '../../edoc/document-type-attach/document-type-attach.component';
@@ -32,6 +33,8 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
     deliveryDateAll: AbstractControl;
     deliveryPersonAll: string = null;
     headersAttachFile: CommonInterface.IHeaderTable[];
+    transactionType: string = "";
+
     constructor(
         private _fb: FormBuilder,
         private _toast: ToastrService,
@@ -43,7 +46,7 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
         super();
         this._progressRef = this._progressService.ref();
     }
-    proofOfDelievey: ProofOfDelivery = new ProofOfDelivery();
+    proofOfDelivery: ProofOfDelivery = new ProofOfDelivery();
 
     ngOnInit() {
         this.headers = [
@@ -60,6 +63,9 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
         ]
         this.getHouseBillList();
         this.initForm();
+        this._store.select(getTransactionDetailCsTransactionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res: CsTransaction) => this.transactionType = res.transactionType)
     }
 
     initForm() {
@@ -109,14 +115,12 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
                 (res: CommonInterface.IResult) => {
                     if (res?.status) {
                         this._toast.success(res.message);
-                        const listTemp = this.houseBillList.map(x => ({
+                        const payload = this.houseBillList.map(x => ({
                             ...x,
                             deliveryDate: (!!x.deliveryDate && !!x.deliveryDate.startDate) ?
                                 formatDate(x.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
                         }));
-                        this._store.dispatch(new GetListHBLSuccessAction(listTemp));
-                        this.getHouseBillList();
-                        this.isUpdated.emit(true);
+                        this._store.dispatch(new GetListHBLSuccessAction(payload));
                     } else {
                         this._toast.error(res.message);
                     }
@@ -125,16 +129,19 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
             )
     }
 
-    getHouseBillList() {
+    getHouseBillList(): void {
         this._store.select(getHBLSState).subscribe((res: any[]) => {
-            const transformedList = res.map(x => ({
-                ...x,
-                deliveryDate: x.deliveryDate && { startDate: moment(x.deliveryDate), endDate: moment(x.deliveryDate) }
-            }));
-            this.houseBillList = transformedList;
-            console.log(this.houseBillList)
+            this.houseBillList = this.mapValueToForm(res)
         });
     }
+
+    mapValueToForm(houBillList: any[]): any[] {
+        return houBillList.map(x => ({
+            ...x,
+            deliveryDate: x.deliveryDate && { startDate: moment(x.deliveryDate), endDate: moment(x.deliveryDate) }
+        }));
+    }
+
 
     onClosePopUp() {
         this.isSubmitted = false;

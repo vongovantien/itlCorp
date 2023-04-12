@@ -72,7 +72,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     ngOnInit(): void {
         this.getJobList();
-        this.transactionType = this.typeFrom;
+        this.transactionType = this.isAttachFilePOD === true ? this.transactionType: this.typeFrom;
         this.configJob = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'jobId', label: 'JobID' },
@@ -268,9 +268,10 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             }
             else if (this.isAttachFilePOD === true) {
                 files[i].Code = "POD"
-                files[i].aliasName = "POD" + '_'+ files[i].name.substring(0, files[i].name.lastIndexOf('.'));
+                files[i].aliasName = "POD" + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
                 files[i].docType = "POD";
-                files[i].DocumentId = 0
+                files[i].DocumentId = 0;
+                files[i].transactionType = this.transactionType
             }
             this.listFile.push(files[i]);
         }
@@ -457,14 +458,11 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     this._toastService.warning("Please fill all field!");
                     return;
                 }
-                console.log(this.EdocUploadFile)
-                console.log(this.typeFrom)
                 this._systemFileManagerRepo.uploadEDoc(this.EdocUploadFile, files, this.typeFrom)
                     .pipe(catchError(this.catchError))
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
-
                                 this._toastService.success("Upload file successfully!");
                                 this.resetForm();
                                 this.hide();
