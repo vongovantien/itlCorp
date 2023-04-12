@@ -1032,32 +1032,16 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public List<sp_GetSurchargeRecently> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria)
         {
-            SqlParameter[] parameters = new SqlParameter[7];
-            if (criteria.TransactionType == TransactionTypeEnum.TruckingInland)
-            {
-                parameters = new[] {
+            var parameters = new[] {
                     new SqlParameter() { ParameterName = "@Type", Value = criteria.ChargeType },
                     new SqlParameter() { ParameterName = "@SupplierID", Value = criteria.ColoaderId },
                     new SqlParameter() { ParameterName = "@CustomerID", Value = criteria.CustomerId },
                     new SqlParameter() { ParameterName = "@OfficeID", Value = currentUser.OfficeID },
                     new SqlParameter() { ParameterName = "@ID", Value = criteria.JobId },
                     new SqlParameter() { ParameterName = "@SalemanID", Value = criteria.SalesmanId },
-                    new SqlParameter() { ParameterName = "@TransactionType", Value = "TK" },
-                };
-            }
-            else
-            {
-                parameters = new[]{
-                new SqlParameter(){ ParameterName = "@Type", Value = criteria.ChargeType },
-                new SqlParameter(){ ParameterName = "@SupplierID", Value = criteria.ColoaderId },
-                new SqlParameter(){ ParameterName = "@CustomerID", Value = criteria.CustomerId },
-                new SqlParameter(){ ParameterName = "@OfficeID", Value = currentUser.OfficeID },
-                new SqlParameter(){ ParameterName = "@ID", Value = criteria.JobId },
-                new SqlParameter(){ ParameterName = "@SalemanID", Value = criteria.SalesmanId },
-                new SqlParameter() { ParameterName = "@TransactionType", Value = null },
+                    new SqlParameter() { ParameterName = "@TransactionType", Value = criteria.TransactionType == TransactionTypeEnum.TruckingInland?"TK":null },
                 };
 
-            };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeRecently>(parameters);
             if (data.Count == 0)
             {
