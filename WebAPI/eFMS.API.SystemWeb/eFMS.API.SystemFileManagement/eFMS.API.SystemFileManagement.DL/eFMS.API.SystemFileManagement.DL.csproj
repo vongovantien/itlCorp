@@ -80,4 +80,8 @@
     <Folder Include="Helpers\" />
     <Folder Include="ViewModel\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\eFMS.API.SystemFileManagement.DAL\eFMS.API.SystemFileManagement.Service.csproj" />
+  </ItemGroup>
 </Project>

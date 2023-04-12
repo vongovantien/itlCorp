@@ -1,9 +1,11 @@
-import { ChangeDetectorRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, FormGroupDirective } from '@angular/forms';
-import { Bank, Partner, SysImage } from '@models';
+import { ConfirmPopupComponent } from '@common';
+import { CatalogueConstants, SystemConstants } from '@constants';
+import { Bank, SysImage } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
-import { CatalogueRepo, SystemRepo, SystemFileManageRepo } from '@repositories';
+import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { GetCatalogueBankAction, getCatalogueBankState } from '@store';
 import { FormValidators } from '@validators';
 import _cloneDeep from 'lodash/cloneDeep';
@@ -11,10 +13,8 @@ import _merge from 'lodash/merge';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { IEDocUploadFile } from 'src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component';
 import { PopupBase } from 'src/app/popup.base';
-import { ConfirmPopupComponent } from '@common';
-import { CatalogueConstants, SystemConstants } from '@constants';
-import { IEDocFile, IEDocUploadFile } from 'src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component';
 
 @Component({
     selector: 'popup-form-bank-commercial-catalogue',
@@ -43,7 +43,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     partnerId: string = '';
     bankId: any = null;
     isUpdate: boolean = false;
-    files: any = [];
     fileListUpload: any[] = [];
     fileListDetail: any[] = [];
     EdocUploadFile: IEDocUploadFile;
@@ -218,11 +217,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
                         } else {
                             this._toastService.error(res.message);
                         }
-                    },
-                    (error) => {
-                        console.error(error);
-                    }
-                )
+                    })
         }
     }
 
@@ -275,78 +270,30 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     }
 
     chooseFileUpload(event: any) {
-        const files = event.target['files'];
-        for (let i = 0; i < files.length; i++) {
-            files[i].docType = "Partner_Bank";
-            files[i].aliasName = "Partner_Bank" + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
-            this.fileListUpload.push(files[i]);
+        const files: FileList = event.target.files;
+        const isFileSizeValid = Array.from(files).every(file => file.size / 1024 ** 2 < SystemConstants.MAX_FILE_SIZE);
+
+        if (!isFileSizeValid) {
+            this._toastService.warning(`Maximum file size is ${SystemConstants.MAX_FILE_SIZE}MB`);
+            return;
         }
 
-        //Validate file size
-        if (!!files && files.length > 0) {
-            let validSize: boolean = true;
-            for (let i = 0; i <= files?.length - 1; i++) {
-                const fileSize: number = files[i].size / Math.pow(1024, 2);
-                if (fileSize >= SystemConstants.MAX_FILE_SIZE) {
-                    validSize = false;
-                    break;
-                }
-            }
-            if (!validSize) {
-                this._toastService.warning(`maximum file size < ${SystemConstants.MAX_FILE_SIZE}MB`);
-                return;
-            }
-            this.handleBankInfoFileUpload(files)
-        }
-        event.target.value = ''
-    }
-
-    handleBankInfoFileUpload(files: any[]) {
-        const listFile = [];
-        const edocFileList = [];
-
-        this.fileListUpload.forEach(x => {
-            listFile.push(x);
-            edocFileList.push(({
-                JobId: SystemConstants.EMPTY_GUID,
-                Code: "Partner_Bank",
-                TransactionType: null,
-                AliasName: x.aliasName,
-                BillingNo: '',
-                BillingType: SystemConstants.EMPTY_GUID,
-                HBL: SystemConstants.EMPTY_GUID,
-                FileName: x.name,
-                Note: x.note !== undefined ? x.note : '',
-                BillingId: SystemConstants.EMPTY_GUID,
-                Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
-                DocumentId: 0,
-                AccountingType: x.AccountingType,
-            }));
-        });
-        this.EdocUploadFile = ({
-            ModuleName: "Catalogue",
-            FolderName: "PartnerBank",
-            Id: this.bankDetail.id,
-            EDocFiles: edocFileList,
-        })
-        this._progressRef.start();
-        this._systemFileManagementRepo.uploadEDoc(this.EdocUploadFile, files, "Catalogue")
+        this.fileListUpload.push(...Array.from(files));
+        this._systemFileManagementRepo.uploadFile('Category', 'PartnerBank', this.bankDetail.id, this.fileListUpload)
             .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success("Upload file successfully!");
-                        this.getBankInfoFiles(this.bankDetail.id);
-                        this.fileListUpload = [];
-                    }
+            .subscribe((res: CommonInterface.IResult) => {
+                if (res.status) {
+                    this._toastService.success('File uploaded successfully!');
+                    this.getBankInfoFiles(this.bankDetail.id);
+                    this.fileListUpload = [];
                 }
-            );
+            });
+        event.target.value = '';
     }
 
     onDeleteBankInfoFile(file: any) {
         if (!!file) {
             this.selectedFile = file;
-            console.log(file)
             this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
                 body: 'Are you sure to delete this file ?',
                 labelCancel: 'No',

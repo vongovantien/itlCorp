@@ -59,6 +59,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\eFMS.API.SystemFileManagement.DAL\eFMS.API.SystemFileManagement.Service.csproj" />
+    <ProjectReference Include="..\eFMS.API.SystemFileManagement.DL\eFMS.API.SystemFileManagement.DL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="eFMS.API.Common">
       <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
     </Reference>
