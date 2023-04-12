@@ -3814,25 +3814,10 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public async Task<ResponsePagingModel<ChargeShipmentModel>> GetPagingSurchargeSOA(string soaNo, int page, int size)
+        public List<ChargeShipmentModel> GetListSurchargeDetailSOA(string soaNo, int page = -1, int size = 20)
         {
             var data = GetChargesForDetailSoa(soaNo, page, size);
-            var rowsCount = data.Count();
-
-            if (page == 0)
-            {
-                page = 1;
-                size = rowsCount;
-            }
-            var result = mapper.ProjectTo<ChargeShipmentModel>(data.AsQueryable());
-
-            return new ResponsePagingModel<ChargeShipmentModel>
-            {
-                Data = result,
-                Page = page,
-                Size = size,
-                TotalItems = rowsCount
-            };
+            return data;
         }
 
         public List<GroupShipmentModel> GetSOAGroupShipmentModels(string soaNo)

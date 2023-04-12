@@ -113,6 +113,6 @@ namespace eFMS.API.Accounting.DL.IService
         Task<ResultHandle> AutoRateReplicateFromSettle(Guid settleId);
         string CheckValidFeesOnShipment(CreateUpdateSettlementModel model);
         bool CheckSettleHasAutoRateCharges(string settlementNo);
-        ResponsePagingModel<ShipmentChargeSettlement> GetSurchargePagingSettlementPayment(string settlementNo, int page, int size);
+        List<ShipmentChargeSettlement> GetSurchargePagingSettlementPayment(string settlementNo, int page, int size);
     }
 }

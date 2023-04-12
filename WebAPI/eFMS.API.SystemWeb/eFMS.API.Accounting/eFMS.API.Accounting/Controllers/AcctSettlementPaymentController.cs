@@ -263,14 +263,6 @@ namespace eFMS.API.Accounting.Controllers
             var data = new { settlement, chargeGrpSettlement, chargeNoGrpSettlement };
             return Ok(data);
         }
-        [HttpGet]
-        [Route("GetSurchargePagingSettlementPayment")]
-        public IActionResult GetSurchargePagingSettlementPayment(string settlementNo, int page, int size)
-        {
-            ResponsePagingModel<ShipmentChargeSettlement> data = acctSettlementPaymentService.GetSurchargePagingSettlementPayment(settlementNo, page, size);
-            return Ok(data);
-        }
-
 
         /// <summary>
         /// Get Payment Management By Shipment
@@ -1156,11 +1148,18 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpGet]
         [Route("GetListSurchargeDetailSettlement")]
-        public IActionResult GetListSurchargeDetailSettlement(string settlementNo)
+        public IActionResult GetListSurchargeDetailSettlement(string settlementNo, int page, int size)
         {
-            var data = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlementNo);
-
-            return Ok(data);
+            if(page > 0)
+            {
+                var data = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlementNo, null, null, null, page, size);
+                return Ok(data);
+            }
+            else
+            {
+                var data = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlementNo);
+                return Ok(data);
+            }
         }
 
         [HttpGet]
