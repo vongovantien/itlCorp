@@ -1,11 +1,10 @@
 import { formatDate } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { DocumentationRepo } from '@repositories';
-import { IShareBussinessState, getHBLSState, getTransactionDetailCsTransactionState } from '@share-bussiness';
+import { IShareBussinessState, getHBLSState, getTransactionDetailCsTransactionType } from '@share-bussiness';
 import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -63,9 +62,9 @@ export class ShareBussinessMassUpdatePodComponent extends PopupBase implements O
         ]
         this.getHouseBillList();
         this.initForm();
-        this._store.select(getTransactionDetailCsTransactionState)
+        this._store.select(getTransactionDetailCsTransactionType)
             .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((res: CsTransaction) => this.transactionType = res.transactionType)
+            .subscribe((res: string) => this.transactionType = res)
     }
 
     initForm() {

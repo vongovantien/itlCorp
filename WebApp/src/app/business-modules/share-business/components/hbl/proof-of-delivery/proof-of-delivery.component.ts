@@ -1,22 +1,21 @@
 import { formatDate } from '@angular/common';
-import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { AppForm } from '@app';
 import { ConfirmPopupComponent } from '@common';
 import { SystemConstants } from '@constants';
 import { InjectViewContainerRefDirective } from '@directives';
-import { CsTransaction } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { DocumentationRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, concatMap, finalize, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, finalize, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { ProofOfDelivery } from 'src/app/shared/models/document/proof-of-delivery';
 import { SystemFileManageRepo } from 'src/app/shared/repositories/system-file-manage.repo';
-import { getTransactionDetailCsTransactionState } from '../../../store';
+import { getTransactionDetailCsTransactionType } from '../../../store';
 import { IEDocFile } from '../../edoc/document-type-attach/document-type-attach.component';
-import { Observable, of } from 'rxjs';
 @Component({
     selector: 'hbl-proof-of-delivery',
     templateUrl: './proof-of-delivery.component.html'
@@ -50,10 +49,10 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
             switchMap((p: Params) => {
                 this.hblid = p.hblId;
                 this.jobId = p.jobId;
-                return this._store.select(getTransactionDetailCsTransactionState).pipe(
+                return this._store.select(getTransactionDetailCsTransactionType).pipe(
                     takeUntil(this.ngUnsubscribe),
-                    tap((res: CsTransaction) => {
-                        this.transactionType = res.transactionType;
+                    tap((res: string) => {
+                        this.transactionType = res;
                         this.getProofOfDeliveryAttachedFiles();
                     }),
                     switchMap(() => this.getProofOfDelivery$())
