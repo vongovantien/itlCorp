@@ -1032,16 +1032,34 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public List<sp_GetSurchargeRecently> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria)
         {
-            var parameters = new[]{
+            SqlParameter[] parameters = new SqlParameter[7];
+            if (criteria.TransactionType == TransactionTypeEnum.TruckingInland)
+            {
+                parameters = new[] {
+                    new SqlParameter() { ParameterName = "@Type", Value = criteria.ChargeType },
+                    new SqlParameter() { ParameterName = "@SupplierID", Value = criteria.ColoaderId },
+                    new SqlParameter() { ParameterName = "@CustomerID", Value = criteria.CustomerId },
+                    new SqlParameter() { ParameterName = "@OfficeID", Value = currentUser.OfficeID },
+                    new SqlParameter() { ParameterName = "@ID", Value = criteria.JobId },
+                    new SqlParameter() { ParameterName = "@SalemanID", Value = criteria.SalesmanId },
+                    new SqlParameter() { ParameterName = "@TransactionType", Value = "TK" },
+                };
+            }
+            else
+            {
+                parameters = new[]{
                 new SqlParameter(){ ParameterName = "@Type", Value = criteria.ChargeType },
                 new SqlParameter(){ ParameterName = "@SupplierID", Value = criteria.ColoaderId },
                 new SqlParameter(){ ParameterName = "@CustomerID", Value = criteria.CustomerId },
                 new SqlParameter(){ ParameterName = "@OfficeID", Value = currentUser.OfficeID },
                 new SqlParameter(){ ParameterName = "@ID", Value = criteria.JobId },
                 new SqlParameter(){ ParameterName = "@SalemanID", Value = criteria.SalesmanId },
+                new SqlParameter() { ParameterName = "@TransactionType", Value = null },
+                };
+
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeRecently>(parameters);
-            if(data.Count == 0)
+            if (data.Count == 0)
             {
                 return null;
             }
@@ -1513,71 +1531,78 @@ namespace eFMS.API.Documentation.DL.Services
             string TypeCompare = string.Empty;
             list.ForEach(item =>
             {
-                if (!checkTranTypeImport(item.Mblno, transactionType))
+                if (!string.IsNullOrEmpty(item.Mblno)&& !string.IsNullOrEmpty(item.Hblno))
                 {
-                    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBL_NOT_VALID_TRANSACTIONTYPE]);
-                    item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE]);
-                    item.IsValid = false;
-                }
-                if (string.IsNullOrEmpty(item.Hblno))
-                {
-                    item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_EMPTY]);
-                    item.IsValid = false;
+                    if(!checkTranTypeImport(item.Mblno, transactionType))
+                    {
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBL_NOT_VALID_TRANSACTIONTYPE]);
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE]);
+                        item.IsValid = false;
+                    }
                 }
                 else
                 {
-                    //if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno) && x.Hwbno == item.Hblno))
-                    //{
-                    //    item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
-                    //    item.IsValid = false;
+                    if (string.IsNullOrEmpty(item.Hblno))
+                    {
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_EMPTY]);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        //if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno) && x.Hwbno == item.Hblno))
+                        //{
+                        //    item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
+                        //    item.IsValid = false;
 
-                    //}
-                    if(!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno.Trim()) && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
-                    {
-                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST_OFFICE], item.Hblno, currentUser.OfficeCode);
-                        item.IsValid = false;
-                    }    
-                }
-                if (string.IsNullOrEmpty(item.Mblno))
-                {
-                    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_EMPTY]);
-                    item.IsValid = false;
-                }
-                else
-                {
-                    //if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno)))
-                    //{
-                    //    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
-                    //    item.IsValid = false;
-                    //}
-                    if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno.Trim()) && x.OfficeId == currentUser.OfficeID))
-                    {
-                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST_OFFICE], item.Mblno, currentUser.OfficeCode);
-                        item.IsValid = false;
-                    }
-                    else if (!string.IsNullOrEmpty(item.Hblno) && !string.IsNullOrEmpty(item.Mblno))
-                    {
-                        if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno))
+                        //}
+                        if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno.Trim()) && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
                         {
-                            item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
-                            item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                            item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST_OFFICE], item.Hblno, currentUser.OfficeCode);
                             item.IsValid = false;
                         }
                     }
-                }
-                if (!string.IsNullOrEmpty(item.ClearanceNo))
-                {
-                    if (item.HBLNoError == null && item.MBLNoError == null)
+                    if (string.IsNullOrEmpty(item.Mblno))
                     {
-                        var jobNoCurrent = opsTransaction.Where(job => job.Hwbno == item.Hblno.Trim() && job.Mblno == item.Mblno.Trim() && job.OfficeId == currentUser.OfficeID).FirstOrDefault().JobNo;
-                        var customNo = customsDeclaration[item.ClearanceNo.Trim()].Any(x => x.JobNo != null && x.JobNo == jobNoCurrent);
-                        if (!customNo)
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_EMPTY]);
+                        item.IsValid = false;
+                    }
+                    else
+                    {
+                        //if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno)))
+                        //{
+                        //    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                        //    item.IsValid = false;
+                        //}
+                        if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno.Trim()) && x.OfficeId == currentUser.OfficeID))
                         {
-                            item.ClearanceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CUSTOM_NO_NOT_EXIST_JOB], jobNoCurrent);
+                            item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST_OFFICE], item.Mblno, currentUser.OfficeCode);
                             item.IsValid = false;
                         }
+                        else if (!string.IsNullOrEmpty(item.Hblno) && !string.IsNullOrEmpty(item.Mblno))
+                        {
+                            if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno))
+                            {
+                                item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
+                                item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                                item.IsValid = false;
+                            }
+                        }
                     }
-                }    
+                    if (!string.IsNullOrEmpty(item.ClearanceNo))
+                    {
+                        if (item.HBLNoError == null && item.MBLNoError == null)
+                        {
+                            var jobNoCurrent = opsTransaction.Where(job => job.Hwbno == item.Hblno.Trim() && job.Mblno == item.Mblno.Trim() && job.OfficeId == currentUser.OfficeID).FirstOrDefault().JobNo;
+                            var customNo = customsDeclaration[item.ClearanceNo.Trim()].Any(x => x.JobNo != null && x.JobNo == jobNoCurrent);
+                            if (!customNo)
+                            {
+                                item.ClearanceNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CUSTOM_NO_NOT_EXIST_JOB], jobNoCurrent);
+                                item.IsValid = false;
+                            }
+                        }
+                    }
+                }
+                  
                 if (string.IsNullOrEmpty(item.PartnerCode))
                 {
                     item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTNER_CODE_EMPTY]);

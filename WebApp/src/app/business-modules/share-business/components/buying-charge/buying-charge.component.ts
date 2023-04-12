@@ -112,6 +112,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             .subscribe(
                 (dataParam: CommonInterface.IDataParam) => {
                     this.serviceTypeId = dataParam.serviceId;
+                    console.log(dataParam);
+
                 }
             );
 
@@ -1347,7 +1349,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getRecentlyCharge() {
-        if (!this.shipment.transactionType) {
+        if (!this.shipment.transactionType || this.shipment.transactionType === 'TK') {
             this.getRecentlyChargeOps();
         }
         else {

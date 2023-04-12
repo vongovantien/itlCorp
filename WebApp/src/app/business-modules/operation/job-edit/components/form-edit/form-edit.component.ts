@@ -202,7 +202,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.salesmanName = this.opsTransaction.salesmanName;
 
         if (this.opsTransaction.isAllowChangeSaleman) {
-            this._catalogueRepo.GetListSalemanByShipmentType(this.opsTransaction.customerId, ChargeConstants.CL_CODE, this.shipmentType.value)
+            console.log(this.transactionType);
+            this._catalogueRepo.GetListSalemanByShipmentType(this.opsTransaction.customerId, this.transactionType === 'TK' ? ChargeConstants.TK_CODE : ChargeConstants.CL_CODE, this.shipmentType.value)
                 .subscribe((salesmans: any) => {
                     this.salesmans = salesmans;
                 })

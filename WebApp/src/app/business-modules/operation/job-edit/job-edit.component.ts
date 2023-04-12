@@ -251,6 +251,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     saveShipment() {
+        console.log(this.transactionType);
+
         this.lstMasterContainers.forEach((c: Container) => {
             c.mblid = this.jobId;
             c.hblid = this.hblid;
@@ -273,7 +275,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             const checkPoint = {
                 partnerId: this.opsTransaction.customerId,
                 salesmanId: this.opsTransaction.salemanId,
-                transactionType: 'CL',
+                transactionType: this.transactionType === 'TK' ? 'TK' : 'CL',
                 type: 8,
                 hblId: this.opsTransaction.hblid
             };

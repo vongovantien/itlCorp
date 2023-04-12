@@ -115,13 +115,14 @@ export class JobManagementCreateJobComponent extends AppForm {
 
     saveJob(model: OpsTransaction) {
         let objUpdateData = null;
+        console.log(this.transactionType);
 
         if (this.isSaveLink) {
             objUpdateData = this._documentRepo.validateCheckPointContractPartner({
                 partnerId: model.customerId,
                 salesmanId: model.salemanId,
                 hblId: SystemConstants.EMPTY_GUID,
-                transactionType: 'CL',
+                transactionType: this.transactionType === 'TK' ? 'TK' : 'CL',
                 type: 1
             }).pipe(
                 switchMap(
@@ -146,7 +147,7 @@ export class JobManagementCreateJobComponent extends AppForm {
                 partnerId: model.customerId,
                 salesmanId: model.salemanId,
                 hblId: SystemConstants.EMPTY_GUID,
-                transactionType: 'CL',
+                transactionType: this.transactionType === 'TK' ? 'TK' : 'CL',
                 type: 1
             }).pipe(
                 switchMap(
