@@ -58,8 +58,8 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn  m-btn--icon m-btn--uppercase"
-                        routerLink="/home/operation/job-management">
+                    <button *ngIf="transactionType==='TK', else closeOPS" type="button"
+                        class="btn  m-btn--icon m-btn--uppercase" routerLink="/home/operation/trucking-inland">
                         <span>
                             <i class="la la-ban"></i>
                             <span>
@@ -67,6 +67,17 @@
                             </span>
                         </span>
                     </button>
+                    <ng-template #closeOPS>
+                        <button *ngIf="transactionType==='TK', else closeOPS" type="button"
+                            class="btn  m-btn--icon m-btn--uppercase" routerLink="/home/operation/job-management">
+                            <span>
+                                <i class="la la-ban"></i>
+                                <span>
+                                    close
+                                </span>
+                            </span>
+                        </button>
+                    </ng-template>
                 </div>
             </div>
         </div>
@@ -192,7 +203,8 @@
                                 </td>
                                 <td>
                                     <span *ngIf="item.clearanceNoError === null"> {{item.clearanceNo}} </span>
-                                    <span class="m--font-danger" *ngIf="item.clearanceNoError !== null">{{ item.clearanceNoError }}</span>
+                                    <span class="m--font-danger" *ngIf="item.clearanceNoError !== null">{{
+                                        item.clearanceNoError }}</span>
                                 </td>
                                 <td>
                                     <span *ngIf="item.partnerCodeError === null">{{ item.partnerCode }}</span>
