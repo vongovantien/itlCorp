@@ -32,5 +32,6 @@ namespace eFMS.API.Operation.DL.IService
         bool CheckAllowUpdate(Guid? jobId);
         HandleState ImportClearancesOlaFromEcus();
         Task<HandleState> ReplicateCustomClearance(int Id);
+        List<CustomsDeclarationModel> GetUserCustomClearance(CustomEcusCriteria ecusCustomCriteria, int page, int size, out int rowsCount);
     }
 }
