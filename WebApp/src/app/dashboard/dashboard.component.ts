@@ -227,8 +227,7 @@ export class DashboardComponent extends AppPage implements OnInit {
                             body: `
                             <span>Sorry, we couldn't find any tracking data for you package, Please try tracking again links below:</span>
                             <ul>
-                                <li> <a href="${SystemConstants.TRACKING_URL.TRACKTRACE.Url}">${SystemConstants.TRACKING_URL.TRACKTRACE.Name}</a></li>
-                                <li><a href="${SystemConstants.TRACKING_URL.UNITEDCARGO.Url}">${SystemConstants.TRACKING_URL.UNITEDCARGO.Name}</a></li>
+                                ${SystemConstants.TRACKING_URL.map((item, index) => `<li><a ${index === 0 && 'class="h5"'} href="${item.Url}"target="_blank" >${item.Name}</a></li>`).join('')}
                             </ul>`,
                             class: 'btn btn-brand'
                         });
@@ -239,7 +238,6 @@ export class DashboardComponent extends AppPage implements OnInit {
                         this.isSubmitted = false;
                     }
                     this.isLoading = false;
-
                 }, (error: any) => {
                     console.log(error)
                     this.isSubmitted = true;
