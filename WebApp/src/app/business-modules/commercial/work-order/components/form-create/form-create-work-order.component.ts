@@ -213,7 +213,7 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
                             if (!!salesmans.length) {
                                 this.salesmans = salesmans;
                                 this.salesmanId.setValue(salesmans[0].id);
-                                this.salesmanName = salesmans[0].employeeNameEn;
+                                this.salesmanName = salesmans[0].username;
                             } else {
                                 this.salesmans = [];
                                 this.combogrid.displaySelectedStr = '';
