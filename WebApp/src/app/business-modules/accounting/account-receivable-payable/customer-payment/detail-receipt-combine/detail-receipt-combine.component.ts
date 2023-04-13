@@ -9,6 +9,7 @@ import { ToastrService } from 'ngx-toastr';
 import { pluck, switchMap, takeUntil, filter } from 'rxjs/operators';
 import { ARCustomerPaymentReceiptCDCombineComponent } from '../components/cd-combine/receipt-cd-combine.component';
 import { ARCustomerPaymentCreateReciptCombineComponent } from '../create-receipt-combine/create-receipt-combine.component';
+import _groupBy from 'lodash/groupBy';
 import { AddCreditCombineToReceipt, AddDebitCombineToReceipt, IsCombineReceipt, ReceiptCombineActionTypes, RegistTypeReceipt, ResetCombineInvoiceList, ResetInvoiceList } from '../store/actions';
 
 @Component({
@@ -251,7 +252,9 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
   onSynceCombineToAccountant(isSynce: any) {
     this.getFormData();
     const receiptSyncIds: AccountingInterface.IRequestString[] = [];
-    this.ReceiptGeneralCombineComponent.generalReceipts
+    const generalGroup = (_groupBy(this.ReceiptGeneralCombineComponent.generalReceipts, 'id') || []);
+    const generalReceipts = Object.keys(generalGroup).map(key => generalGroup[key][0]);
+    generalReceipts
       .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done')
       .forEach((element: any) => {
         const receiptSyncId: AccountingInterface.IRequestString = {
