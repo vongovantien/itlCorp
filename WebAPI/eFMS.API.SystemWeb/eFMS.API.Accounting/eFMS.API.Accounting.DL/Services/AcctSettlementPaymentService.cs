@@ -646,155 +646,173 @@ namespace eFMS.API.Accounting.DL.Services
                 settlementMap.PayeeName = catPartnerRepo.Get(x => x.Id == settlement.Payee)?.FirstOrDefault().ShortName;
             }
 
-            var totalChargeSM = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo).Count();
-            settlementMap.TotalCharge = totalChargeSM;
+            var surchargesSm = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo);
+            settlementMap.TotalCharge = surchargesSm.Count();
+            settlementMap.TotalGroup = surchargesSm.GroupBy(x => new { x.SettlementCode, x.Hblid, x.AdvanceNo, CustomNo = (string.IsNullOrEmpty(x.ClearanceNo) ? null : x.ClearanceNo) }).Count();
+
             return settlementMap;
         }
 
-        public List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo)
+        public List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo, int page = - 1, int size = 5)
         {
-            IQueryable<CsShipmentSurcharge> surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
-            IQueryable<AcctSettlementPayment> settlement = DataContext.Get();
-            IQueryable<OpsTransaction> opsTrans = opsTransactionRepo.Get();
-            IQueryable<CsTransactionDetail> csTransD = csTransactionDetailRepo.Get();
-            IQueryable<CsTransaction> csTrans = csTransactionRepo.Get();
-            IQueryable<CustomsDeclaration> cdNos = customsDeclarationRepo.Get();
-            IQueryable<AcctAdvanceRequest> advanceRequests = acctAdvanceRequestRepo.Get();
-            //IQueryable<AcctAdvancePayment> advances = acctAdvancePaymentRepo.Get(a => a.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@settlementNo", Value = settlementNo },
+            };
+            if (page > 0)
+            {
+                parameters = parameters.Concat(new[] { new SqlParameter("@Page", page), new SqlParameter("@Size", size) }).ToArray();
+            }
+            var dataSp = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetListJobGroupSurchargeDetailSettlement>(parameters);
+            var data = mapper.Map<List<ShipmentSettlement>>(dataSp);
+
+            foreach (var item in data)
+            {
+                item.ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo);
+            }
+            return data;
+
+            //IQueryable<CsShipmentSurcharge> surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
+            //IQueryable<AcctSettlementPayment> settlement = DataContext.Get();
+            //IQueryable<OpsTransaction> opsTrans = opsTransactionRepo.Get();
+            //IQueryable<CsTransactionDetail> csTransD = csTransactionDetailRepo.Get();
+            //IQueryable<CsTransaction> csTrans = csTransactionRepo.Get();
+            //IQueryable<CustomsDeclaration> cdNos = customsDeclarationRepo.Get();
+            //IQueryable<AcctAdvanceRequest> advanceRequests = acctAdvanceRequestRepo.Get();
+            ////IQueryable<AcctAdvancePayment> advances = acctAdvancePaymentRepo.Get(a => a.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
 
 
-            AcctSettlementPayment settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
-            if (settlement == null) return null;
-            //Quy đổi tỉ giá theo ngày Request Date, nếu exchange rate của ngày Request date không có giá trị thì lấy excharge rate mới nhất
-            //List<CatCurrencyExchange> currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
-            //if (currencyExchange.Count == 0)
+            //AcctSettlementPayment settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            //if (settlement == null) return null;
+            ////Quy đổi tỉ giá theo ngày Request Date, nếu exchange rate của ngày Request date không có giá trị thì lấy excharge rate mới nhất
+            ////List<CatCurrencyExchange> currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
+            ////if (currencyExchange.Count == 0)
+            ////{
+            ////    DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+            ////    currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            ////}
+
+            //var result = surcharge
+            //            .GroupBy(s => s.SettlementCode)
+            //            //.Where(g => g.Select(s => s.TransactionType).Distinct())
+            //            .Select(g => new
+            //            {
+            //                SettlementCode = g.Key,
+            //                TransactionTypes = g.Select(s => s.TransactionType).Distinct().ToList()
+            //            }).FirstOrDefault();
+            //IQueryable<ShipmentSettlement> dataOperation = Enumerable.Empty<ShipmentSettlement>().AsQueryable();
+            //IQueryable<ShipmentSettlement> dataDocument = Enumerable.Empty<ShipmentSettlement>().AsQueryable();
+            //bool isHasCl = result?.TransactionTypes.Where(transactionType => transactionType == "CL").FirstOrDefault() != null;
+            //bool isHasDoc = result?.TransactionTypes.Where(transactionType => transactionType != "CL").FirstOrDefault() != null;
+            //if (isHasCl)
             //{
-            //    DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
-            //    currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            //    dataOperation = from sur in surcharge
+            //                    join opst in opsTrans on sur.Hblid equals opst.Hblid
+            //                    //join cd in cdNos on opst.Hblid.ToString() equals cd.Hblid into cdNoGroups // list các tờ khai theo job
+            //                    //from cdNoGroup in cdNoGroups.DefaultIfEmpty()
+            //                    //join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
+            //                    //from settle in settle2.DefaultIfEmpty()
+            //                    //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+            //                    //from advGrp in advGrps.DefaultIfEmpty()
+            //                    // where sur.SettlementCode == settlementNo
+            //                    select new ShipmentSettlement
+            //                    {
+            //                        SettlementNo = sur.SettlementCode,
+            //                        JobId = sur.JobNo,
+            //                        HBL = sur.Hblno,
+            //                        MBL = sur.Mblno,
+            //                        HblId = sur.Hblid,
+            //                        CurrencyShipment = sur.CurrencyId,
+            //                        ShipmentId = opst.Id,
+            //                        Type = "OPS",
+            //                        AdvanceNo = sur.AdvanceNo,
+            //                        IsLocked = opst.IsLocked,
+            //                        CustomNo = sur.ClearanceNo
+            //                    };
             //}
-  
-            var result = surcharge
-                        .GroupBy(s => s.SettlementCode)
-                        //.Where(g => g.Select(s => s.TransactionType).Distinct())
-                        .Select(g => new
-                        {
-                            SettlementCode = g.Key,
-                            TransactionTypes = g.Select(s => s.TransactionType).Distinct().ToList()
-                        }).FirstOrDefault();
-            IQueryable<ShipmentSettlement> dataOperation = Enumerable.Empty<ShipmentSettlement>().AsQueryable();
-            IQueryable<ShipmentSettlement> dataDocument = Enumerable.Empty<ShipmentSettlement>().AsQueryable();
-            bool isHasCl = result?.TransactionTypes.Where(transactionType => transactionType == "CL").FirstOrDefault() != null;
-            bool isHasDoc = result?.TransactionTypes.Where(transactionType => transactionType != "CL").FirstOrDefault() != null;
-            if (isHasCl)
-            {
-                dataOperation = from sur in surcharge
-                                join opst in opsTrans on sur.Hblid equals opst.Hblid
-                                //join cd in cdNos on opst.Hblid.ToString() equals cd.Hblid into cdNoGroups // list các tờ khai theo job
-                                //from cdNoGroup in cdNoGroups.DefaultIfEmpty()
-                                //join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
-                                //from settle in settle2.DefaultIfEmpty()
-                                //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                                //from advGrp in advGrps.DefaultIfEmpty()
-                                // where sur.SettlementCode == settlementNo
-                                select new ShipmentSettlement
-                                {
-                                    SettlementNo = sur.SettlementCode,
-                                    JobId = sur.JobNo,
-                                    HBL = sur.Hblno,
-                                    MBL = sur.Mblno,
-                                    HblId = sur.Hblid,
-                                    CurrencyShipment = sur.CurrencyId,
-                                    ShipmentId = opst.Id,
-                                    Type = "OPS",
-                                    AdvanceNo = sur.AdvanceNo,
-                                    IsLocked = opst.IsLocked,
-                                    CustomNo = sur.ClearanceNo
-                                };
-            }
-            if (isHasDoc)
-            {
-                dataDocument = from sur in surcharge
-                               join cstd in csTransD on sur.Hblid equals cstd.Id
-                               join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                               from cst in cst2.DefaultIfEmpty()
-                               //join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
-                               //from settle in settle2.DefaultIfEmpty()
-                               //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                               //from advGrp in advGrps.DefaultIfEmpty()
-                               where sur.SettlementCode == settlementNo
-                               select new ShipmentSettlement
-                               {
-                                   SettlementNo = sur.SettlementCode,
-                                   JobId = sur.JobNo,
-                                   HBL = cstd.Hwbno,
-                                   MBL = cst.Mawb,
-                                   CurrencyShipment = sur.CurrencyId,
-                                   HblId = cstd.Id,
-                                   ShipmentId = cst.Id,
-                                   Type = "DOC",
-                                   AdvanceNo = sur.AdvanceNo,
-                                   IsLocked = cst.IsLocked,
-                                   CustomNo = sur.ClearanceNo
-                               };
-            }
+            //if (isHasDoc)
+            //{
+            //    dataDocument = from sur in surcharge
+            //                   join cstd in csTransD on sur.Hblid equals cstd.Id
+            //                   join cst in csTrans on cstd.JobId equals cst.Id into cst2
+            //                   from cst in cst2.DefaultIfEmpty()
+            //                   //join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
+            //                   //from settle in settle2.DefaultIfEmpty()
+            //                   //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+            //                   //from advGrp in advGrps.DefaultIfEmpty()
+            //                   where sur.SettlementCode == settlementNo
+            //                   select new ShipmentSettlement
+            //                   {
+            //                       SettlementNo = sur.SettlementCode,
+            //                       JobId = sur.JobNo,
+            //                       HBL = cstd.Hwbno,
+            //                       MBL = cst.Mawb,
+            //                       CurrencyShipment = sur.CurrencyId,
+            //                       HblId = cstd.Id,
+            //                       ShipmentId = cst.Id,
+            //                       Type = "DOC",
+            //                       AdvanceNo = sur.AdvanceNo,
+            //                       IsLocked = cst.IsLocked,
+            //                       CustomNo = sur.ClearanceNo
+            //                   };
+            //}
 
-            IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
+            //IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
-            var dataGroups = dataQueryUnionService.ToList()
-                                        .GroupBy(x => new { x.SettlementNo, x.HblId, x.AdvanceNo, CustomNo = (string.IsNullOrEmpty(x.CustomNo) ? null : x.CustomNo) }) /* case đặc biệt
-                                        1. Có tạm ứng - không có tk 
-                                        2. Có tạm ứng - Có tờ khai
-                                        */
-                .Select(x => new ShipmentSettlement
-                {
-                    SettlementNo = x.Key.SettlementNo,
-                    JobId = x.FirstOrDefault().JobId,
-                    HBL = x.FirstOrDefault().HBL,
-                    MBL = x.FirstOrDefault().MBL,
-                    CurrencyShipment = x.FirstOrDefault().CurrencyShipment,
-                    //TotalAmount = x.Sum(t => t.TotalAmount),
-                    HblId = x.Key.HblId,
-                    Type = x.FirstOrDefault().Type,
-                    ShipmentId = x.FirstOrDefault().ShipmentId,
-                    AdvanceNo = x.Key.AdvanceNo,
-                    IsLocked = x.FirstOrDefault().IsLocked,
-                    CustomNo = x.Key.CustomNo
-                });
+            //var dataGroups = dataQueryUnionService.ToList()
+            //                            .GroupBy(x => new { x.SettlementNo, x.HblId, x.AdvanceNo, CustomNo = (string.IsNullOrEmpty(x.CustomNo) ? null : x.CustomNo) }) /* case đặc biệt
+            //                            1. Có tạm ứng - không có tk 
+            //                            2. Có tạm ứng - Có tờ khai
+            //                            */
+            //    .Select(x => new ShipmentSettlement
+            //    {
+            //        SettlementNo = x.Key.SettlementNo,
+            //        JobId = x.FirstOrDefault().JobId,
+            //        HBL = x.FirstOrDefault().HBL,
+            //        MBL = x.FirstOrDefault().MBL,
+            //        CurrencyShipment = x.FirstOrDefault().CurrencyShipment,
+            //        //TotalAmount = x.Sum(t => t.TotalAmount),
+            //        HblId = x.Key.HblId,
+            //        Type = x.FirstOrDefault().Type,
+            //        ShipmentId = x.FirstOrDefault().ShipmentId,
+            //        AdvanceNo = x.Key.AdvanceNo,
+            //        IsLocked = x.FirstOrDefault().IsLocked,
+            //        CustomNo = x.Key.CustomNo
+            //    });
 
-            List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
-            foreach (ShipmentSettlement item in dataGroups)
-            {
-                // Lấy thông tin advance theo group settlement.
-                AdvanceInfo advInfo = GetAdvanceBalanceInfo(item.SettlementNo, item.HblId.ToString(), item.CurrencyShipment, item.AdvanceNo, item.CustomNo);
+            //List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
+            //foreach (ShipmentSettlement item in dataGroups)
+            //{
+            //    // Lấy thông tin advance theo group settlement.
+            //    AdvanceInfo advInfo = GetAdvanceBalanceInfo(item.SettlementNo, item.HblId.ToString(), item.CurrencyShipment, item.AdvanceNo, item.CustomNo);
 
-                int roundDecimal = 0;
-                if (item.CurrencyShipment != AccountingConstants.CURRENCY_LOCAL)
-                {
-                    roundDecimal = 3;
-                }
+            //    int roundDecimal = 0;
+            //    if (item.CurrencyShipment != AccountingConstants.CURRENCY_LOCAL)
+            //    {
+            //        roundDecimal = 3;
+            //    }
 
-                shipmentSettlement.Add(new ShipmentSettlement
-                {
-                    SettlementNo = item.SettlementNo,
-                    JobId = item.JobId,
-                    MBL = item.MBL,
-                    HBL = item.HBL,
-                    // TotalAmount = item.TotalAmount,
-                    CurrencyShipment = item.CurrencyShipment,
-                    // ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo, item.CustomNo),
-                    // ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo),
-                    HblId = item.HblId,
-                    ShipmentId = item.ShipmentId,
-                    Type = item.Type,
-                    TotalAmount = advInfo.TotalAmount ?? 0,
-                    AdvanceNo = advInfo.AdvanceNo,
-                    AdvanceAmount = advInfo.AdvanceAmount,
-                    Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
-                    CustomNo = advInfo.CustomNo,
-                    IsLocked = item.IsLocked,
-                    Files = new List<SysImage>()
-                });
-            }
+            //    shipmentSettlement.Add(new ShipmentSettlement
+            //    {
+            //        SettlementNo = item.SettlementNo,
+            //        JobId = item.JobId,
+            //        MBL = item.MBL,
+            //        HBL = item.HBL,
+            //        // TotalAmount = item.TotalAmount,
+            //        CurrencyShipment = item.CurrencyShipment,
+            //        // ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo, item.CustomNo),
+            //        // ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo),
+            //        HblId = item.HblId,
+            //        ShipmentId = item.ShipmentId,
+            //        Type = item.Type,
+            //        TotalAmount = advInfo.TotalAmount ?? 0,
+            //        AdvanceNo = advInfo.AdvanceNo,
+            //        AdvanceAmount = advInfo.AdvanceAmount,
+            //        Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
+            //        CustomNo = advInfo.CustomNo,
+            //        IsLocked = item.IsLocked,
+            //        Files = new List<SysImage>()
+            //    });
+            //}
 
             //IQueryable<SysImage> FileInShipmentSettlement = sysImageRepository.Get(x => x.Folder == "Settlement"
             //&& x.ObjectId == settleCurrent.Id.ToString()
@@ -824,7 +842,7 @@ namespace eFMS.API.Accounting.DL.Services
             //        item.Files = FileInShipmentSettlement.Where(x => x.ChildId == folderChild).ToList();
             //    }
             //}
-            return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
+            // return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
         }
 
         private List<SysImage> GetShipmentAttachFile(string settleCode, Guid hblId, string advanceNo, string customNo)
