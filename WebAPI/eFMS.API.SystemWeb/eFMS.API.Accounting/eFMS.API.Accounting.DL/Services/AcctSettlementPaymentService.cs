@@ -6490,6 +6490,10 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 listSipment.Add(shipment.FirstOrDefault().JobNo);
                             }
+                            if (model.Settlement.SettlementType == "DIRECT" && buyAmount == sellAmount)
+                            {
+                                listSipment.Add(shipment.FirstOrDefault().JobNo);
+                            }
                         }
                     }
 
