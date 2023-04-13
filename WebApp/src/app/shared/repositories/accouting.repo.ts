@@ -1047,8 +1047,8 @@ export class AccountingRepo {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListSurchargeDetailSettlement`, { settlementNo: settleNo }, { "hideSpinner": "true" });
     }
 
-    getListJobGroupSurchargeDetailSettlement(settleNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListJobGroupSurchargeDetailSettlement`, { settlementNo: settleNo }, { "hideSpinner": "true" });
+    getListJobGroupSurchargeDetailSettlement(settleNo: string, page: number, size: number) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListJobGroupSurchargeDetailSettlement`, { settlementNo: settleNo, page, size }, { "hideSpinner": "true" });
     }
 
     getAdjustDebitValue(model: any) {

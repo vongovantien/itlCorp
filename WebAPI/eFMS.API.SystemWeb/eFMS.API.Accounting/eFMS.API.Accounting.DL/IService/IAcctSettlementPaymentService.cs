@@ -28,7 +28,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         AcctSettlementPaymentModel GetSettlementPaymentById(Guid idSettlement);
 
-        List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo);
+        List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo, int page = -1, int size = 5);
 
         List<AdvancePaymentMngt> GetAdvancePaymentMngts(string jobId, string mbl, string hbl, string requester);
 
