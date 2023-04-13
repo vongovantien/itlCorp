@@ -16,7 +16,7 @@
         <div class="m-portlet__body bg-white">
             <div class="table-wrapper table-editable table-horizontal" id="work-order-list-table"
                 [collapse]="isCollapsed" [isAnimated]="true" style="height:255px; max-height: 300px;"
-                [style.height.px]="!!surcharges.length ? 255 : (isReadonly | async) ? 111 : 152">
+                [style.height.px]="!!surcharges.length ? 255 : (isReadonly | async) ? 123 : 165">
                 <table class="table table-bordered dataTable-edit">
                     <thead app-table-header [headers]="headers" class="thead-light"
                         (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -49,7 +49,8 @@
                                             bindLabel="title" bindValue="value" [clearable]="false"
                                             [(ngModel)]="surcharge.partnerType">
                                         </ng-select> -->
-                                        <select class="form-control border" [(ngModel)]="surcharge.partnerType"
+                                        <select class="form-control border" [ngModel]="surcharge.partnerType"
+                                            (ngModelChange)="onSelectDataTableInfo($event, surcharge, 'partnerType')"
                                             [disabled]="(isReadonly | async)">
                                             <option *ngFor="let crrcy of partnerTypes; trackBy: trackByFn"
                                                 [ngValue]="crrcy.value">
@@ -57,7 +58,9 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <div class="form-group ">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger': submitted 
+                                        && surcharge.partnerType === 'Other' 
+                                        && !surcharge.partnerId }">
                                             <ng-container
                                                 *ngIf="!(isReadonly | async) && surcharge.partnerType === 'Other'; else partner">
                                                 <div class="list-master-unit">
@@ -68,24 +71,26 @@
                                                         [dataSources]="partners | async"
                                                         [displayFields]="[{'field':'shortName','label':'Name'},{'field':'taxCode','label':'Code'}]"
                                                         [size]="15" placeholder="Please Select"
-                                                        (remove)="surcharge.partnerId = null" [clearable]="false">
+                                                        (remove)="surcharge.partnerId = null" [clearable]="false"
+                                                        placeholder="Please select">
                                                     </app-combo-grid-virtual-scroll>
                                                 </div>
                                             </ng-container>
-                                            <ng-template #charge>
+                                            <ng-template #partner>
                                                 <input type="text" class="form-control form-control--custom"
-                                                    [value]="surcharge.chargeName" disabled>
+                                                    [tooltip]="surcharge.partnerName" [value]="surcharge.partnerName"
+                                                    readonly placeholder="-">
                                             </ng-template>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!surcharge.chargeId) }">
+                                            [ngClass]="{'m-form__group has-danger': submitted && (!surcharge.chargeId) }">
                                             <ng-container *ngIf="!(isReadonly | async); else charge">
                                                 <div class="list-master-unit">
                                                     <app-combo-grid-virtual-scroll #comboGridCharge
                                                         [currentActiveItemId]="{field:'id', value: surcharge.chargeId}"
-                                                        (itemSelected)="onSelectDataTableInfo($event.id, surcharge, 'chargeId')"
+                                                        (itemSelected)="onSelectDataTableInfo($event, surcharge, 'chargeId')"
                                                         [selectedDisplayFields]="['chargeNameEn']"
                                                         [dataSources]="charges | async"
                                                         [displayFields]="configComboGridCharge" [height]="150"
@@ -96,21 +101,24 @@
                                             </ng-container>
                                             <ng-template #charge>
                                                 <input type="text" class="form-control form-control--custom"
-                                                    [value]="surcharge.chargeName" disabled>
+                                                    [tooltip]="surcharge.chargeName" [value]="surcharge.chargeName"
+                                                    readonly>
                                             </ng-template>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="form-group "
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !surcharge.unitPrice}">
-                                            <ng-container *ngIf="(isReadonly | async) else unitPrice">
-                                                <input type="number" class="form-control" disabled
-                                                    [value]="surcharge.unitPrice" autoFormatCurrency>
-                                            </ng-container>
-                                            <ng-template #unitPrice>
+                                            [ngClass]="{'m-form__group has-danger': submitted 
+                                            && (!surcharge.unitPrice || surcharge.unitPrice === null || surcharge.unitPrice === 'null')}">
+                                            <ng-container *ngIf="!(isReadonly | async) else unitPrice">
                                                 <input type="number" class="form-control"
                                                     [(ngModel)]="surcharge.unitPrice" placeholder="Unit Price"
                                                     autoFormatCurrency>
+                                            </ng-container>
+                                            <ng-template #unitPrice>
+                                                <input type="number" class="form-control" disabled
+                                                    [value]="surcharge.unitPrice" autoFormatCurrency
+                                                    placeholder="Unit Price">
                                             </ng-template>
                                         </div>
                                     </td>

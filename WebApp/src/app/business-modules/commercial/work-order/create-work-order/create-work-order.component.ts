@@ -73,6 +73,7 @@ export class CommercialCreateWorkOrderComponent extends AppForm implements OnIni
     sendRequest() { }
 
     submitWorkOrder(action: string) {
+        this._toast.clear();
         this.formWorkOrder.isSubmitted = true;
         if (!this.formWorkOrder.form.valid) {
             this._toast.warning(this.invalidFormText);

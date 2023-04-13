@@ -35,11 +35,11 @@
                         <label class="form-control-label" required>
                             Salesman
                         </label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'salesmanId')"
-                            (remove)="resetFormControl(salesmanId)"
-                            [currentActiveItemId]="{field:'id', value: salesmanId.value, hardValue: partnerName}"
-                            [selectedDisplayFields]="['username']" [dataSources]="salesmans | async"
-                            [loading]="(isLoadingUser | async)"
+                        <app-combo-grid-virtual-scroll #combogridSalesman
+                            (itemSelected)="onSelectDataFormInfo($event, 'salesmanId')"
+                            (remove)="resetFormControl(salesmanId)" [loading]="isLoadingUser"
+                            [currentActiveItemId]="{field:'id', value: salesmanId.value, hardValue: salesmanName}"
+                            [selectedDisplayFields]="['username']" [dataSources]="salesmans"
                             [displayFields]="[{ field: 'username', label: 'User Name' }, { field: 'employeeNameVn', label: 'Full Name' }]"
                             placeholder="Select salesman" [clearable]="false" [disabled]="isReadonly"
                             textColor="text-success">
@@ -53,9 +53,9 @@
                             [currentActiveItemId]="{ field: 'id', value: shipperId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(shipperId)"
-                            placeholder="Select shipper" v>
+                            placeholder="Select shipper" [disabled]="isReadonly">
                         </app-combo-grid-virtual-scroll>
-                        <textarea rows="7" class="form-control m-input m-input--square"
+                        <textarea autoExpand rows="7" class="form-control m-input m-input--square"
                             formControlName="shipperDescription"></textarea>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(consigneeId)"
                             placeholder="Select consignee" [disabled]="isReadonly">
                         </app-combo-grid-virtual-scroll>
-                        <textarea rows="7" class="form-control m-input m-input--square"
+                        <textarea autoExpand rows="7" class="form-control m-input m-input--square"
                             formControlName="consigneeDescription"></textarea>
                     </div>
                 </div>
@@ -77,11 +77,11 @@
                         <label>Agent Handling</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agentId')"
                             [currentActiveItemId]="{ field: 'id', value: agentId.value}"
-                            [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(agentId)"
-                            placeholder="Select agent" [disabled]="isReadonly">
+                            placeholder="Select agent" [disabled]="isReadonly" [loading]="isLoadingAgent">
                         </app-combo-grid-virtual-scroll>
-                        <textarea rows="7" class="form-control m-input m-input--square"
+                        <textarea autoExpand rows="7" class="form-control m-input m-input--square"
                             formControlName="agentDescription"></textarea>
                     </div>
                 </div>
@@ -123,7 +123,8 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Routing</label>
-                        <textarea rows="5" class="form-control" formControlName="route"></textarea>
+                        <textarea autoExpand maxRows="10" rows="5" class="form-control"
+                            formControlName="route"></textarea>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -155,7 +156,7 @@
                                         name="daterange" placeholder="Select date" [autoApply]="true"
                                         formControlName="effectiveDate" [alwaysShowCalendars]="true" readonly calendar
                                         [attr.disabled]="isReadonly"
-                                        [allowRemove]="!!effectiveDate.value && !!effectiveDate.value.startDate" />
+                                        [allowRemove]="!isReadonly && !!effectiveDate.value && !!effectiveDate.value.startDate" />
                                 </div>
                             </div>
                         </div>
@@ -170,7 +171,7 @@
                                         name="daterange" placeholder="Select date" [autoApply]="true"
                                         formControlName="expiredDate" [alwaysShowCalendars]="true" readonly calendar
                                         [attr.disabled]="isReadonly"
-                                        [allowRemove]="!!expiredDate.value && !!expiredDate.value.startDate" />
+                                        [allowRemove]="!isReadonly && !!expiredDate.value && !!expiredDate.value.startDate" />
                                 </div>
                             </div>
                         </div>
@@ -181,7 +182,7 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="">Schedule</label>
-                                <ng-select [items]="paymentMethods" formControlName="paymentMethod" class="custom"
+                                <ng-select [items]="['Daily', 'Monthly']" formControlName="schedule" class="custom"
                                     placeholder="All">
                                 </ng-select>
                             </div>
@@ -205,7 +206,8 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Notes</label>
-                        <textarea rows="5" class="form-control" formControlName="notes"></textarea>
+                        <textarea autoExpand maxRows="10" rows="5" class="form-control"
+                            formControlName="notes"></textarea>
                     </div>
                 </div>
             </form>
