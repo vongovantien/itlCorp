@@ -90,27 +90,17 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(200)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CodeCity)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.CodeCountry)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.CodeDistrict)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.CodeWard)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.CityId).HasColumnName("CityID");
 
                 entity.Property(e => e.ContactPerson).HasMaxLength(4000);
+
+                entity.Property(e => e.CountryId).HasColumnName("CountryID");
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.DistrictId).HasColumnName("DistrictID");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
@@ -131,6 +121,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.WardId).HasColumnName("WardID");
             });
 
             modelBuilder.Entity<CatArea>(entity =>
@@ -449,7 +441,9 @@ namespace eFMS.API.Catalogue.Service.Models
             {
                 entity.ToTable("catCity");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
 
                 entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
@@ -457,9 +451,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(10)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CodeCountry)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.CountryId).HasColumnName("CountryID");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
@@ -478,6 +470,10 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.NameVn)
                     .HasColumnName("Name_VN")
                     .HasMaxLength(4000);
+
+                entity.Property(e => e.PostalCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -901,21 +897,19 @@ namespace eFMS.API.Catalogue.Service.Models
             {
                 entity.ToTable("catDistrict");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
 
                 entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
+                entity.Property(e => e.CityId).HasColumnName("CityID");
+
                 entity.Property(e => e.Code)
-                    .HasMaxLength(10)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CodeCity)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.CodeCountry)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.CountryId).HasColumnName("CountryID");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
@@ -1391,6 +1385,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.WardId).HasColumnName("WardID");
+
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
 
@@ -1694,25 +1690,19 @@ namespace eFMS.API.Catalogue.Service.Models
             {
                 entity.ToTable("catWard");
 
-                entity.Property(e => e.Id).HasColumnName("ID");
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
 
                 entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
+                entity.Property(e => e.CityId).HasColumnName("CityID");
+
                 entity.Property(e => e.Code)
-                    .HasMaxLength(10)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CodeCity)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.CodeCountry)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.CodeDistrict)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.CountryId).HasColumnName("CountryID");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
@@ -1721,6 +1711,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.DatetimeModified)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.DistrictId).HasColumnName("DistrictID");
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 

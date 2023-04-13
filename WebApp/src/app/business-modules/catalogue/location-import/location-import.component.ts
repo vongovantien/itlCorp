@@ -78,31 +78,69 @@ export class LocationImportComponent extends AppList implements OnInit {
                         this.pagingData(this.data);
                     }
                 );
-        } else {
-            switch (this.type) {
-                case 'province':
-                    placeType = CommonEnum.PlaceTypeEnum.Province;
-                    break;
-                case 'district':
-                    placeType = CommonEnum.PlaceTypeEnum.District;
-                    break;
-                case 'ward':
-                    placeType = CommonEnum.PlaceTypeEnum.Ward;
-                    break;
-                default:
-                    break;
-            }
-            this._catalogueRepo.upLoadPlaceFile(file.target['files'], placeType)
+        } else if (this.type === 'city'){
+            this._catalogueRepo.uploadProvince(file.target['files'])
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe(
                     (res: { data: any[], totalValidRows: number }) => {
                         this.data = res.data;
+                        this.pager.currentPage = 1;
                         this.pager.totalItems = this.data.length;
                         this.totalValidRows = res.totalValidRows;
                         this.totalRows = this.data.length;
                         this.pagingData(this.data);
                     }
                 );
+        } else if (this.type === 'district'){
+            this._catalogueRepo.uploadDistrict(file.target['files'])
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: { data: any[], totalValidRows: number }) => {
+                        this.data = res.data;
+                        this.pager.currentPage = 1;
+                        this.pager.totalItems = this.data.length;
+                        this.totalValidRows = res.totalValidRows;
+                        this.totalRows = this.data.length;
+                        this.pagingData(this.data);
+                    }
+                );
+        }else if (this.type === 'town'){
+            this._catalogueRepo.uploadWard(file.target['files'])
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: { data: any[], totalValidRows: number }) => {
+                        this.data = res.data;
+                        this.pager.currentPage = 1;
+                        this.pager.totalItems = this.data.length;
+                        this.totalValidRows = res.totalValidRows;
+                        this.totalRows = this.data.length;
+                        this.pagingData(this.data);
+                    }
+                );
+            // switch (this.type) {
+            //     case 'province':
+            //         placeType = CommonEnum.PlaceTypeEnum.Province;
+            //         break;
+            //     case 'district':
+            //         placeType = CommonEnum.PlaceTypeEnum.District;
+            //         break;
+            //     case 'ward':
+            //         placeType = CommonEnum.PlaceTypeEnum.Ward;
+            //         break;
+            //     default:
+            //         break;
+            // }
+            // this._catalogueRepo.upLoadPlaceFile(file.target['files'], placeType)
+            //     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            //     .subscribe(
+            //         (res: { data: any[], totalValidRows: number }) => {
+            //             this.data = res.data;
+            //             this.pager.totalItems = this.data.length;
+            //             this.totalValidRows = res.totalValidRows;
+            //             this.totalRows = this.data.length;
+            //             this.pagingData(this.data);
+            //         }
+            //     );
         }
 
     }
@@ -184,21 +222,8 @@ export class LocationImportComponent extends AppList implements OnInit {
                             }
                         }
                     );
-            } else {
-                switch (this.type) {
-                    case 'province':
-                        break;
-                    case 'district':
-                        placeType = CommonEnum.PlaceTypeEnum.District;
-                        break;
-                    case 'ward':
-                        placeType = CommonEnum.PlaceTypeEnum.Ward;
-                        break;
-                    default:
-                        break;
-                }
-
-                this._catalogueRepo.importPlace(data)
+            } else if (this.type === 'city'){
+                this._catalogueRepo.importProvince(data)
                     .subscribe(
                         (res: any) => {
                             if (res.success) {
@@ -208,6 +233,51 @@ export class LocationImportComponent extends AppList implements OnInit {
                             }
                         }
                     );
+            } else if (this.type === 'district'){
+                this._catalogueRepo.importDistrict(data)
+                .subscribe(
+                    (res: any) => {
+                        if (res.success) {
+                            this._toastService.success(language.NOTIFI_MESS.IMPORT_SUCCESS);
+                            this.pager.totalItems = 0;
+                            this.reset();
+                        }
+                    }
+                );
+            } else if  (this.type === 'town'){
+                this._catalogueRepo.importWard(data)
+                .subscribe(
+                    (res: any) => {
+                        if (res.success) {
+                            this._toastService.success(language.NOTIFI_MESS.IMPORT_SUCCESS);
+                            this.pager.totalItems = 0;
+                            this.reset();
+                        }
+                    }
+                );
+                // switch (this.type) {
+                //     case 'province':
+                //         break;
+                //     case 'district':
+                //         placeType = CommonEnum.PlaceTypeEnum.District;
+                //         break;
+                //     case 'ward':
+                //         placeType = CommonEnum.PlaceTypeEnum.Ward;
+                //         break;
+                //     default:
+                //         break;
+                // }
+
+                // this._catalogueRepo.importPlace(data)
+                //     .subscribe(
+                //         (res: any) => {
+                //             if (res.success) {
+                //                 this._toastService.success(language.NOTIFI_MESS.IMPORT_SUCCESS);
+                //                 this.pager.totalItems = 0;
+                //                 this.reset();
+                //             }
+                //         }
+                //     );
             }
         }
     }

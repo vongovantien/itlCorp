@@ -68,10 +68,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.UserModified = currentUser.UserID;
                 entity.DatetimeModified = DateTime.Now;
                 entity.ShortNameAddress = model.ShortNameAddress;
-                entity.CodeCountry = model.CodeCountry;
-                entity.CodeCity = model.CodeCity;
-                entity.CodeDistrict = model.CodeDistrict;
-                entity.CodeWard = model.CodeWard;
                 entity.StreetAddress = model.StreetAddress;
                 entity.AddressType = model.AddressType;
                 entity.Location = model.Location;

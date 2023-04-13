@@ -74,7 +74,7 @@ export class AppDistrictComponent extends AppList implements OnInit {
     getProvince() {
         this._progressRef.start();
         this.isLoading = true;
-        this._catalogueRepo.pagingPlace(this.page, this.pageSize, this.dataSearch)
+        this._catalogueRepo.pagingDistrict(this.page, this.pageSize, this.dataSearch)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
                 this._progressRef.complete();
@@ -124,7 +124,7 @@ export class AppDistrictComponent extends AppList implements OnInit {
         this.confirmDeletePopup.hide();
 
         this._progressRef.start();
-        this._catalogueRepo.deletePlace(this.selectedDistrict.id)
+        this._catalogueRepo.deleteDistrict(this.selectedDistrict.id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {

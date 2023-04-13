@@ -321,7 +321,7 @@
                                 <app-combo-grid-virtual-scroll
                                     (itemSelected)="onSelectDataFormInfo($event, 'shippping-city')"
                                     [currentActiveItemId]="{ field: 'id', value: provinceShippingId.value, hardValue: shippingProvinceName}"
-                                    [selectedDisplayFields]="['name_EN']" [dataSources]="shippingProvinces"
+                                    [selectedDisplayFields]="['nameEn']" [dataSources]="shippingProvinces"
                                     [displayFields]="displayFieldCity" placeholder="Select country"
                                     (remove)="resetFormControl(provinceShippingId)" [size]="15">
                                 </app-combo-grid-virtual-scroll>
@@ -388,7 +388,7 @@
                                 <app-combo-grid-virtual-scroll
                                     (itemSelected)="onSelectDataFormInfo($event, 'billing-city')"
                                     [currentActiveItemId]="{ field: 'id', value: provinceId.value, hardValue: billingProvinceName}"
-                                    [selectedDisplayFields]="['name_EN']" [dataSources]="billingProvinces"
+                                    [selectedDisplayFields]="['nameEn']" [dataSources]="billingProvinces"
                                     [displayFields]="displayFieldCity" placeholder="Select city"
                                     (remove)="resetFormControl(provinceId)" [size]="15">
                                 </app-combo-grid-virtual-scroll>

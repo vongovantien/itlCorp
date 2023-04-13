@@ -78,7 +78,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("getById/{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get(Guid id)
         {
             var result = catWardService.Get(x => x.Id == id).FirstOrDefault();
             return Ok(result);
@@ -94,7 +94,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Add(CatWardModel catWard)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(0, catWard);
+            var checkExistMessage = CheckExist(string.Empty, catWard);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
@@ -126,9 +126,9 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("getWardByDistrict")]
-        public IActionResult GetWardByDistrict(string codeDistrict)
+        public IActionResult GetWardByDistrict(Guid districtID)
         {
-            var data = catWardService.GetWardsByDistrict(codeDistrict);
+            var data = catWardService.GetWardsByDistrict(districtID);
             return Ok(data);
         }
         /// <summary>
@@ -154,7 +154,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Update(CatWardModel catWard)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(catWard.Id, catWard);
+            var checkExistMessage = CheckExist(catWard.Id.ToString(), catWard);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
@@ -179,7 +179,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpDelete]
         [Route("delete/{id}")]
         [Authorize]
-        public IActionResult Delete(short id)
+        public IActionResult Delete(Guid id)
         {
             var hs = catWardService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -207,7 +207,7 @@ namespace eFMS.API.Catalogue.Controllers
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
-                if (worksheet.Cells[1, 1].Value?.ToString() != "Code")
+                if (worksheet.Cells[1, 1].Value?.ToString() != "Ward Code")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Code' " });
                 }
@@ -219,26 +219,26 @@ namespace eFMS.API.Catalogue.Controllers
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Local Name' " });
                 }
-                if (worksheet.Cells[1, 4].Value?.ToString() != "Country")
+                if (worksheet.Cells[1, 4].Value?.ToString() != "Country Code")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Country' " });
                 }
-                if (worksheet.Cells[1, 5].Value?.ToString() != "Province")
+                if (worksheet.Cells[1, 5].Value?.ToString() != "Province Code")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Province' " });
                 }
-                if (worksheet.Cells[1, 6].Value?.ToString() != "District")
+                if (worksheet.Cells[1, 6].Value?.ToString() != "District Code")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'District' " });
                 }
-                if (worksheet.Cells[1, 5].Value?.ToString() != "Inactive")
+                if (worksheet.Cells[1, 7].Value?.ToString() != "Inactive")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Inactive' " });
                 }
                 List<CatWardModel> list = new List<CatWardModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {
-                    var country = new CatWardModel
+                    var ward = new CatWardModel
                     {
                         IsValid = true,
                         Code = worksheet.Cells[row, 1].Value?.ToString().Trim(),
@@ -249,7 +249,7 @@ namespace eFMS.API.Catalogue.Controllers
                         CodeDistrict = worksheet.Cells[row, 6].Value?.ToString().Trim(),
                         Status = worksheet.Cells[row, 7].Value?.ToString().Trim().ToLower()
                     };
-                    list.Add(country);
+                    list.Add(ward);
                 }
 
                 var data = catWardService.CheckValidImport(list);
@@ -281,10 +281,10 @@ namespace eFMS.API.Catalogue.Controllers
             }
         }
 
-        private string CheckExist(int id, CatWardModel model)
+        private string CheckExist(string id, CatWardModel model)
         {
             string message = string.Empty;
-            if (id == 0)
+            if (id == string.Empty)
             {
                 if (catWardService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.CodeDistrict.ToLower() == model.CodeDistrict.ToLower()))
                 {
@@ -293,7 +293,7 @@ namespace eFMS.API.Catalogue.Controllers
             }
             else
             {
-                if (catWardService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id != id))
+                if (catWardService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id.ToString().ToLower() != id.ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

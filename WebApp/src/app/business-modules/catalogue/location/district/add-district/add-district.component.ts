@@ -105,17 +105,18 @@ export class AddDistrictPopupComponent extends PopupBase implements OnInit {
             const formData = this.formAddDistrict.getRawValue();
 
             const body = {
-                placeType: CommonEnum.PlaceTypeEnum.District,
+                // placeType: CommonEnum.PlaceTypeEnum.District,
+                id: formData.id,
                 code: formData.code,
                 nameEn: formData.nameEn,
                 nameVn: formData.nameVn,
                 countryId: formData.countryID,
-                provinceId: formData.provinceID,
+                cityId: formData.provinceID,
                 active: !!this.isUpdate ? formData.active : true,
-                placeTypeId: 'District'
+                // placeTypeId: 'District'
             };
             if (!!this.isUpdate) {
-                this._catalogueRepo.updatePlace(formData.id, body)
+                this._catalogueRepo.updateDistrict(body)
                     .pipe(
                         catchError(this.catchError),
                         finalize(() => {
@@ -128,7 +129,8 @@ export class AddDistrictPopupComponent extends PopupBase implements OnInit {
                         }
                     );
             } else {
-                this._catalogueRepo.addPlace(body)
+                body.id = '00000000-0000-0000-0000-000000000000';
+                this._catalogueRepo.addDistrict(body)
                     .pipe(
                         catchError(this.catchError),
                         finalize(() => {
@@ -161,7 +163,7 @@ export class AddDistrictPopupComponent extends PopupBase implements OnInit {
     }
 
     getProvinceByCountryId(id: string, sources: any[]) {
-        return sources.filter(x => x.countryID === id);
+        return sources.filter(x => x.countryId === id);
     }
 
     cancelAdd() {

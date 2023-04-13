@@ -17,11 +17,11 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public Guid? PartnerId { get; set; }
-        public string CodeCountry { get; set; }
-        public string CodeCity { get; set; }
-        public string CodeDistrict { get; set; }
-        public string CodeWard { get; set; }
         public string ContactPerson { get; set; }
         public string Tel { get; set; }
+        public short? CountryId { get; set; }
+        public Guid? CityId { get; set; }
+        public Guid? DistrictId { get; set; }
+        public Guid? WardId { get; set; }
     }
 }

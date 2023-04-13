@@ -18,8 +18,8 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatWardModel> Query(CatWardCriteria criteria);
         List<CatWardModel> CheckValidImport(List<CatWardModel> list);
         HandleState Import(List<CatWardModel> data);
-        HandleState Delete(short id);
+        HandleState Delete(Guid id);
         HandleState Update(CatWardModel model);
-        List<CatWard> GetWardsByDistrict(string code);
+        List<CatWard> GetWardsByDistrict(Guid districtID);
     }
 }

@@ -77,8 +77,8 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="id">id of data that need to retrieve</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("getById/{id}")]
-        public IActionResult Get(int id)
+        [Route("GetById/{id}")]
+        public IActionResult Get(Guid id)
         {
             var result = catCityService.Get(x => x.Id == id).FirstOrDefault();
             return Ok(result);
@@ -89,12 +89,12 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="catCity">object to add</param>
         /// <returns></returns>
         [HttpPost]
-        [Route("addNew")]
+        [Route("AddNew")]
         [Authorize]
         public IActionResult Add(CatCityModel catCity)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(0, catCity);
+            var checkExistMessage = CheckExist(string.Empty, catCity);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
@@ -114,10 +114,10 @@ namespace eFMS.API.Catalogue.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("getAll")]
+        [Route("GetAll")]
         public IActionResult GetAll()
         {
-            var data = catCityService.Get();
+            var data = catCityService.Get().ToList();
             return Ok(data);
         }
         /// <summary>
@@ -125,10 +125,10 @@ namespace eFMS.API.Catalogue.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("getCityByCountry")]
-        public IActionResult GetCitiesByCountry(string codeCountry)
+        [Route("GetCityByCountry")]
+        public IActionResult GetCityByCountry(short? countryId)
         {
-            var data = catCityService.GetCitiesByCountry(codeCountry);
+            var data = catCityService.GetCitiesByCountry(countryId);
             return Ok(data);
         }
         /// <summary>
@@ -154,7 +154,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Update(CatCityModel catCity)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(catCity.Id, catCity);
+            var checkExistMessage = CheckExist(catCity.Id.ToString(), catCity);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
@@ -179,7 +179,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpDelete]
         [Route("delete/{id}")]
         [Authorize]
-        public IActionResult Delete(short id)
+        public IActionResult Delete(Guid id)
         {
             var hs = catCityService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -219,11 +219,15 @@ namespace eFMS.API.Catalogue.Controllers
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Local Name' " });
                 }
-                if (worksheet.Cells[1, 4].Value?.ToString() != "Country")
+                if (worksheet.Cells[1, 4].Value?.ToString() != "Country Code")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Country' " });
                 }
-                if (worksheet.Cells[1, 5].Value?.ToString() != "Inactive")
+                if (worksheet.Cells[1, 5].Value?.ToString() != "Postal Code")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Country' " });
+                }
+                if (worksheet.Cells[1, 6].Value?.ToString() != "Inactive")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Inactive' " });
                 }
@@ -237,7 +241,8 @@ namespace eFMS.API.Catalogue.Controllers
                         NameEn = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         NameVn = worksheet.Cells[row, 3].Value?.ToString().Trim(),
                         CodeCountry = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                        Status = worksheet.Cells[row, 5].Value?.ToString().Trim().ToLower()
+                        PostalCode = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                        Status = worksheet.Cells[row, 6].Value?.ToString().Trim().ToLower()
                     };
                     list.Add(country);
                 }
@@ -271,19 +276,19 @@ namespace eFMS.API.Catalogue.Controllers
             }
         }
 
-        private string CheckExist(int id, CatCityModel model)
+        private string CheckExist(string id, CatCityModel model)
         {
             string message = string.Empty;
-            if (id == 0)
+            if (id == string.Empty)
             {
-                if (catCityService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.CodeCountry.ToLower() == model.CodeCountry.ToLower()))
+                if (catCityService.Any(x => x.Code.ToLower() == model.Code.ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catCityService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id != id))
+                if (catCityService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id.ToString().ToLower() != id.ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

@@ -77,7 +77,7 @@ export class AppWardComponent extends AppList implements OnInit {
     getWards() {
         this.isLoading = true;
         this._progressRef.start();
-        this._catalogueRepo.pagingPlace(this.page, this.pageSize, this.dataSearch)
+        this._catalogueRepo.pagingWard(this.page, this.pageSize, this.dataSearch)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
                 this._progressRef.complete();
@@ -127,7 +127,7 @@ export class AppWardComponent extends AppList implements OnInit {
         this.confirmDeletePopup.hide();
 
         this._progressRef.start();
-        this._catalogueRepo.deletePlace(this.selectedWard.id)
+        this._catalogueRepo.deleteWard(this.selectedWard.id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {

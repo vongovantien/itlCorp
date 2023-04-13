@@ -4,13 +4,11 @@ namespace eFMS.API.Catalogue.DL.ViewModels
 {
     public class CatDistrictViewModel
     {
-        public short Id { get; set; }
+        public Guid Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
-        public string CodeCity { get; set; }
         public string CityName { get; set; }
         public string CodeCountry { get; set; }
-        public string CountryName { get; set; }
         public string Note { get; set; }
         public string UserCreated { get; set; }
         public Nullable<DateTime> DatetimeCreated { get; set; }

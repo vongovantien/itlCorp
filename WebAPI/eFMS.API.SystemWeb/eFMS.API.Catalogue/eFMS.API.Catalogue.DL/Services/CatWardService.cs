@@ -56,11 +56,13 @@ namespace eFMS.API.Catalogue.DL.Services
         #region CRUD
         public override HandleState Add(CatWardModel entity)
         {
-            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
-            entity.UserCreated = entity.UserModified = currentUser.UserID;
-            entity.Active = true;
-            var Ward = mapper.Map<CatWard>(entity);
-            var result = DataContext.Add(Ward);
+            var ward = mapper.Map<CatWard>(entity);
+            ward.Id = Guid.NewGuid();
+            ward.DatetimeCreated = ward.DatetimeModified = DateTime.Now;
+            ward.Active = true;
+            ward.UserCreated = ward.UserModified = currentUser.UserID;
+            var result = DataContext.Add(ward, false);
+            DataContext.SubmitChanges();
             if (result.Success)
             {
                 ClearCache();
@@ -69,7 +71,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return result;
         }
 
-        public HandleState Delete(short id)
+        public HandleState Delete(Guid id)
         {
             //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
@@ -91,6 +93,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatWardModel> GetWards(CatWardCriteria criteria, int page, int size, out int rowsCount)
         {
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             Expression<Func<CatWardModel, bool>> query = null;
             if (criteria.All == null)
             {
@@ -107,7 +110,20 @@ namespace eFMS.API.Catalogue.DL.Services
                                                                 && (x.Active == criteria.Active || criteria.Active == null);
             }
             var data = Paging(query, page, size, x => x.DatetimeModified, false, out rowsCount);
-            return data;
+            List<CatWardModel> lst = new List<CatWardModel>();
+            lst = data.ToList();
+
+            lst.ForEach(x => {
+                var city = catCityRepository.Where(y => y.Id == x.CityId)?.FirstOrDefault();
+                var country = catCountryRepository.Where(y => y.Id == x.CountryId)?.FirstOrDefault();
+                var district = catDistrictRepository.Where(y => y.Id == x.DistrictId)?.FirstOrDefault();
+
+                x.DistrictName = currentCulture.IetfLanguageTag == "en-US" ? district?.NameEn : district?.NameVn;
+                x.ProvinceName = currentCulture.IetfLanguageTag == "en-US" ? city?.NameEn : city?.NameVn;
+                x.CountryName = currentCulture.IetfLanguageTag == "en-US" ? country?.NameEn : country?.NameVn;
+
+            });
+            return lst.AsQueryable();
         }
 
         public HandleState Import(List<CatWardModel> data)
@@ -118,26 +134,27 @@ namespace eFMS.API.Catalogue.DL.Services
                 foreach (var item in data)
                 {
                     bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
-                    var city = catCityRepository.Where(x => x.Code == item.CodeCountry)?.FirstOrDefault();
-                    var country = catCityRepository.Where(x => x.Code == item.CodeCountry)?.FirstOrDefault();
-                    var district = catCityRepository.Where(x => x.Code == item.CodeDistrict)?.FirstOrDefault();
+                    var city = catCityRepository.Where(x => x.Code == item.CodeCity)?.FirstOrDefault();
+                    var country = catCountryRepository.Where(x => x.Code == item.CodeCountry)?.FirstOrDefault();
+                    var district = catDistrictRepository.Where(x => x.Code == item.CodeDistrict)?.FirstOrDefault();
 
 
                     DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
                     var ward = new CatWard
                     {
+                        Id = Guid.NewGuid(),
                         Code = item.Code,
                         NameEn = item.NameEn,
                         NameVn = item.NameVn,
-                        CodeCity = city?.Code,
-                        CodeCountry = country?.Code,
-                        CodeDistrict = district?.Code,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID,
                         DatetimeModified = DateTime.Now,
                         Active = active,
-                        InactiveOn = inactiveDate
+                        InactiveOn = inactiveDate,
+                        CountryId = country?.Id,
+                        CityId = city?.Id,
+                        DistrictId = district?.Id
                     };
                     newList.Add(ward);
                 }
@@ -210,10 +227,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     UserModified = item.UserModified,
                     DatetimeModified = item.DatetimeModified,
                     Active = item.Active,
-                    InActiveOn = item.InactiveOn,
-                    CodeDistrict = item.CodeDistrict,
-                    CodeCity = item.CodeCity,
-                    CodeCountry = item.CodeCountry
+                    InActiveOn = item.InactiveOn
 
                 };
                 results.Add(city);
@@ -223,48 +237,51 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatWardModel> CheckValidImport(List<CatWardModel> list)
         {
-            var cities = Get();
+            var wards = Get();
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.NameEn))
                 {
-                    item.NameEn = stringLocalizer[CatalogueLanguageSub.MSG_WARD_NAME_EN_EMPTY];
+                    item.NameEnError = stringLocalizer[CatalogueLanguageSub.MSG_WARD_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.NameVn))
                 {
-                    item.NameVn = stringLocalizer[CatalogueLanguageSub.MSG_WARD_NAME_LOCAL_EMPTY];
+                    item.NameVnError = stringLocalizer[CatalogueLanguageSub.MSG_WARD_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    item.Code = stringLocalizer[CatalogueLanguageSub.MSG_WARD_CODE_EMPTY];
+                    item.CodeError = stringLocalizer[CatalogueLanguageSub.MSG_WARD_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CodeDistrict))
                 {
-                    item.CodeCity = stringLocalizer[CatalogueLanguageSub.MSG_DISTRICT_CODE_EMPTY];
+                    item.DistrictNameError = stringLocalizer[CatalogueLanguageSub.MSG_DISTRICT_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CodeCity))
                 {
-                    item.CodeCity = stringLocalizer[CatalogueLanguageSub.MSG_CITY_CODE_EMPTY];
+                    item.ProvinceNameError = stringLocalizer[CatalogueLanguageSub.MSG_CITY_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CodeCountry))
                 {
-                    item.CodeCity = stringLocalizer[CatalogueLanguageSub.MSG_COUNTRY_CODE_EMPTY];
+                    item.CodeCountryError = stringLocalizer[CatalogueLanguageSub.MSG_COUNTRY_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
                 {
-                    var city = cities.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower() && x.CodeDistrict.ToUpper() == item.CodeDistrict.ToUpper());
-                    if (city != null)
+                    var ward = wards.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
+                    item.CountryName = catCountryRepository.Where(x => x.Code.ToLower() == item.CodeCountry.ToLower())?.FirstOrDefault()?.NameEn;
+                    item.ProvinceName = catCityRepository.Where(x => x.Code.ToLower() == item.CodeCity.ToLower())?.FirstOrDefault()?.NameEn;
+                    item.DistrictName = catDistrictRepository.Where(x => x.Code.ToLower() == item.CodeDistrict.ToLower())?.FirstOrDefault()?.NameEn;
+                    if (ward != null)
                     {
                         item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_WARD_EXISTED], item.Code);
                         item.IsValid = false;
                     }
-                    if (list.Count(x => x.Code.ToLower() == item.Code.ToLower() && x.CodeDistrict.ToUpper() == item.CodeDistrict.ToUpper()) > 1)
+                    if (list.Count(x => x.Code.ToLower() == item.Code.ToLower()) > 1)
                     {
                         item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_WARD_CODE_DUPLICATE], item.Code);
                         item.IsValid = false;
@@ -273,10 +290,10 @@ namespace eFMS.API.Catalogue.DL.Services
             });
             return list;
         }
-        public List<CatWard> GetWardsByDistrict(string CityCode)
+        public List<CatWard> GetWardsByDistrict(Guid districtID)
         {
             var data = DataContext.Get();
-            return data.Where(x => x.CodeDistrict == CityCode).ToList();
+            return data.Where(x => x.DistrictId == districtID).ToList();
         }
     }
 }

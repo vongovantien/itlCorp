@@ -5,7 +5,7 @@ namespace eFMS.API.Catalogue.Service.Models
 {
     public partial class CatWard
     {
-        public short Id { get; set; }
+        public Guid Id { get; set; }
         public string Code { get; set; }
         public string NameVn { get; set; }
         public string NameEn { get; set; }
@@ -15,8 +15,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-        public string CodeDistrict { get; set; }
-        public string CodeCity { get; set; }
-        public string CodeCountry { get; set; }
+        public short? CountryId { get; set; }
+        public Guid? CityId { get; set; }
+        public Guid? DistrictId { get; set; }
     }
 }

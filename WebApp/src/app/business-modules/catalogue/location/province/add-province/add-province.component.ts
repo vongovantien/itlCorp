@@ -69,7 +69,7 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
         this.nameVn = this.formProvince.controls['nameVn'];
         this.country = this.formProvince.controls['country'];
         this.active = this.formProvince.controls['active'];
-        this.id = this.formProvince.controls['id'];
+        // this.id = this.formProvince.controls['id'];
     }
 
     getCountry() {
@@ -91,16 +91,14 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
 
             const body = {
                 id: formData.id,
-                placeType: CommonEnum.PlaceTypeEnum.Province,
                 code: formData.code,
                 nameEn: formData.nameEn,
                 nameVn: formData.nameVn,
-                countryId: formData.country || 1, // * 1 = VN 
+                countryId: formData.country, // * 1 = VN 
                 active: !!this.isUpdate ? formData.active : true,
-                placeTypeId: 'Province'
             };
             if (this.isUpdate) {
-                this._catalogueRepo.updatePlace(formData.id, body)
+                this._catalogueRepo.updateProvince(body)
                     .pipe(
                         catchError(this.catchError),
                         finalize(() => {
@@ -114,7 +112,7 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
                     );
             } else {
                 body.id = '00000000-0000-0000-0000-000000000000';
-                this._catalogueRepo.addPlace(body)
+                this._catalogueRepo.addProvince(body)
                     .pipe(
                         catchError(this.catchError),
                         finalize(() => {

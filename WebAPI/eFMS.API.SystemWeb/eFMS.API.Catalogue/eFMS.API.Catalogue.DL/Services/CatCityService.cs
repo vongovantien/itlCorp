@@ -46,11 +46,13 @@ namespace eFMS.API.Catalogue.DL.Services
         #region CRUD
         public override HandleState Add(CatCityModel entity)
         {
-            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
-            entity.UserCreated = entity.UserModified = currentUser.UserID;
-            entity.Active = true;
             var city = mapper.Map<CatCity>(entity);
-            var result = DataContext.Add(city);
+            city.Id = Guid.NewGuid();
+            city.DatetimeCreated = city.DatetimeModified = DateTime.Now;
+            city.Active = true;
+            city.UserCreated = city.UserModified = currentUser.UserID;
+            var result = DataContext.Add(city, false);
+            DataContext.SubmitChanges();
             if (result.Success)
             {
                 ClearCache();
@@ -59,7 +61,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return result;
         }
 
-        public HandleState Delete(short id)
+        public HandleState Delete(Guid id)
         {
             //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
@@ -81,6 +83,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatCityModel> GetCities(CatCityCriteria criteria, int page, int size, out int rowsCount)
         {
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             Expression<Func<CatCityModel, bool>> query = null;
             if (criteria.All == null)
             {
@@ -97,7 +100,13 @@ namespace eFMS.API.Catalogue.DL.Services
                                                                 && (x.Active == criteria.Active || criteria.Active == null);
             }
             var data = Paging(query, page, size, x => x.DatetimeModified, false, out rowsCount);
-            return data;
+            List<CatCityModel> lst = new List<CatCityModel>();
+            lst = data.ToList();
+            lst.ForEach(x => {
+                var country = catCountryRepository.Where(y => y.Id == x.CountryId)?.FirstOrDefault();
+                x.CountryName = currentCulture.IetfLanguageTag == "en-US" ? country?.NameEn : country?.NameVn;
+            });
+            return lst.AsQueryable();
         }
 
         public HandleState Import(List<CatCityModel> data)
@@ -112,16 +121,18 @@ namespace eFMS.API.Catalogue.DL.Services
                     DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
                     var city = new CatCity
                     {
+                        Id = Guid.NewGuid(),
                         Code = item.Code,
                         NameEn = item.NameEn,
                         NameVn = item.NameVn,
-                        CodeCountry = country.Code,
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID,
                         DatetimeModified = DateTime.Now,
                         Active = active,
-                        InactiveOn = inactiveDate
+                        InactiveOn = inactiveDate,
+                        CountryId = country?.Id, 
+                        PostalCode = item.PostalCode
                     };
                     newList.Add(city);
                 }
@@ -208,45 +219,46 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (string.IsNullOrEmpty(item.NameEn))
                 {
-                    item.NameEn = stringLocalizer[CatalogueLanguageSub.MSG_CITY_NAME_EN_EMPTY];
+                    item.NameEnError = stringLocalizer[CatalogueLanguageSub.MSG_CITY_NAME_EN_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.NameVn))
                 {
-                    item.NameVn = stringLocalizer[CatalogueLanguageSub.MSG_CITY_NAME_LOCAL_EMPTY];
+                    item.NameVnError = stringLocalizer[CatalogueLanguageSub.MSG_CITY_NAME_LOCAL_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.Code))
                 {
-                    item.Code = stringLocalizer[CatalogueLanguageSub.MSG_CITY_CODE_EMPTY];
+                    item.CodeError = stringLocalizer[CatalogueLanguageSub.MSG_CITY_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.CodeCountry))
                 {
-                    item.CodeCountry = stringLocalizer[CatalogueLanguageSub.MSG_COUNTRY_CODE_EMPTY];
+                    item.CodeCountryError = stringLocalizer[CatalogueLanguageSub.MSG_COUNTRY_CODE_EMPTY];
                     item.IsValid = false;
                 }
                 else
                 {
-                    var city = cities.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower() && x.CodeCountry.ToUpper() == item.CodeCountry.ToUpper());
+                    var city = cities?.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
+                    item.CountryName = catCountryRepository.Where(x => x.Code.ToLower() == item.CodeCountry.ToLower())?.FirstOrDefault()?.NameEn;
                     if (city != null)
                     {
-                        item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CITY_EXISTED], item.Code);
+                        item.CodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CITY_EXISTED], item.Code);
                         item.IsValid = false;
                     }
                     if (list.Count(x => x.Code.ToLower() == item.Code.ToLower() &&  x.CodeCountry.ToUpper() == item.CodeCountry.ToUpper()) > 1)
                     {
-                        item.Code = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CITY_CODE_DUPLICATE], item.Code);
+                        item.CodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CITY_CODE_DUPLICATE], item.Code);
                         item.IsValid = false;
                     }
                 }
             });
             return list;
         }
-        public List<CatCity> GetCitiesByCountry(string CountryCode)
+        public List<CatCity> GetCitiesByCountry(short? countryId)
         {
             var data = DataContext.Get();
-            return data.Where(x => x.CodeCountry == CountryCode).ToList();
+            return data.Where(x => x.CountryId == countryId || countryId == null).ToList();
         }
     }
 }   

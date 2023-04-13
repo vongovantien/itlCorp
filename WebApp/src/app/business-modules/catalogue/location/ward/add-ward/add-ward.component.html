@@ -77,8 +77,8 @@
                             <div class="col-lg-8">
                                 <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event,'province')"
                                     [currentActiveItemId]="{ field: 'id', value: provinceID.value}"
-                                    [selectedDisplayFields]="['name_EN']" [dataSources]="provinces"
-                                    [displayFields]="[{field: 'code', label: 'Code'}, {field: 'name_EN', label: 'Name' }]"
+                                    [selectedDisplayFields]="['nameEn']" [dataSources]="provinces"
+                                    [displayFields]="[{field: 'code', label: 'Code'}, {field: 'nameEn', label: 'Name' }]"
                                     [height]="150" [disabled]="!countryID.valid">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback" *ngIf="isSubmitted && !provinceID.valid">

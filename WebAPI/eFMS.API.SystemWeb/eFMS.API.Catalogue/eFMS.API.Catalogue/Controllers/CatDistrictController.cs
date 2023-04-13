@@ -78,7 +78,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("getById/{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get(Guid id)
         {
             var result = catDistrictService.Get(x => x.Id == id).FirstOrDefault();
             return Ok(result);
@@ -94,7 +94,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Add(CatDistrictModel catDistrict)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(0, catDistrict);
+            var checkExistMessage = CheckExist(catDistrict.Id.ToString(), catDistrict);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
@@ -126,9 +126,9 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("getDistrictByCity")]
-        public IActionResult GetDistrictByCity(string codeCity)
+        public IActionResult GetDistrictByCity(Guid? cityId)
         {
-            var data = catDistrictService.GetDistrictsByCity(codeCity);
+            var data = catDistrictService.GetDistrictsByCity(cityId);
             return Ok(data);
         }
         /// <summary>
@@ -154,7 +154,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Update(CatDistrictModel catDistrict)
         {
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(catDistrict.Id, catDistrict);
+            var checkExistMessage = CheckExist(catDistrict.Id.ToString(), catDistrict);
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
@@ -179,7 +179,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpDelete]
         [Route("delete/{id}")]
         [Authorize]
-        public IActionResult Delete(short id)
+        public IActionResult Delete(Guid id)
         {
             var hs = catDistrictService.Delete(id);
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -219,15 +219,15 @@ namespace eFMS.API.Catalogue.Controllers
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Local Name' " });
                 }
-                if (worksheet.Cells[1, 4].Value?.ToString() != "Country")
+                if (worksheet.Cells[1, 4].Value?.ToString() != "Country Code")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Country' " });
                 }
-                if (worksheet.Cells[1, 5].Value?.ToString() != "Province")
+                if (worksheet.Cells[1, 5].Value?.ToString() != "Province Code")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Province' " });
                 }
-                if (worksheet.Cells[1, 5].Value?.ToString() != "Inactive")
+                if (worksheet.Cells[1, 6].Value?.ToString() != "Inactive")
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Inactive' " });
                 }
@@ -276,19 +276,19 @@ namespace eFMS.API.Catalogue.Controllers
             }
         }
 
-        private string CheckExist(int id, CatDistrictModel model)
+        private string CheckExist(string id, CatDistrictModel model)
         {
             string message = string.Empty;
-            if (id == 0)
+            if (id == string.Empty)
             {
-                if (catDistrictService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.CodeCity.ToLower() == model.CodeCity.ToLower()))
+                if (catDistrictService.Any(x => x.Code.ToLower() == model.Code.ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catDistrictService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id != id))
+                if (catDistrictService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id.ToString().ToLower() != id.ToLower()))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

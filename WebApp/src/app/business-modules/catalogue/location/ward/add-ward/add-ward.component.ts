@@ -105,13 +105,32 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
             );
     }
 
-    getDistrict() {
-        this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.District })
-            .subscribe(
-                (res: any) => {
-                    this.districts = this.initDistrict = res;
-                }
-            );
+    getDistrict(provinceId?: any) {
+        // this._catalogueRepo.getPlace({ placeType: CommonEnum.PlaceTypeEnum.District })
+        //     .subscribe(
+        //         (res: any) => {
+        //             this.districts = this.initDistrict = res;
+        //         }
+        //     );
+        if (provinceId) {
+            this._catalogueRepo.getDistrictsByProvince(provinceId)
+                .pipe(catchError(this.catchError), finalize(() => { }))
+                .subscribe(
+                    (res) => {
+                        this.districts = this.initDistrict = res;
+                    }
+                );
+        }
+        else {
+            this._catalogueRepo.getDistricts()
+                .pipe(catchError(this.catchError), finalize(() => { }))
+                .subscribe(
+                    (res) => {
+                        this.districts = this.initDistrict = res;
+                    }
+                );
+        }
+
     }
 
     saveWard() {
@@ -120,20 +139,20 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
 
             const formData = this.formAddWard.getRawValue();
             const body = {
-                placeType: CommonEnum.PlaceTypeEnum.Ward,
+                // placeType: CommonEnum.PlaceTypeEnum.Ward,
                 code: formData.code,
                 nameEn: formData.nameEn,
                 nameVn: formData.nameVn,
                 id: formData.id,
                 active: !!this.isUpdate ? formData.active : true,
-                countryID: formData.countryID,
-                provinceID: formData.provinceID,
-                districtID: formData.districtID,
-                placeTypeId: 'Ward'
+                countryId: formData.countryID,
+                cityId: formData.provinceID,
+                districtId: formData.districtID,
+                // placeTypeId: 'Ward'
             };
 
             if (!!this.isUpdate) {
-                this._catalogueRepo.updatePlace(formData.id, body)
+                this._catalogueRepo.updateWard(body)
                     .pipe(
                         catchError(this.catchError),
                         finalize(() => {
@@ -146,7 +165,8 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
                         }
                     );
             } else {
-                this._catalogueRepo.addPlace(body)
+                body.id = '00000000-0000-0000-0000-000000000000';
+                this._catalogueRepo.addWard(body)
                     .pipe(
                         catchError(this.catchError),
                         finalize(() => {
@@ -197,6 +217,7 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
                 break;
             case 'district':
                 this.districtID.setValue(data.id);
+
                 break;
             default:
                 break;
@@ -204,10 +225,10 @@ export class AddWardPopupComponent extends PopupBase implements OnInit {
     }
 
     getProvinceByCountryId(id: string, sources: any[]) {
-        return sources.filter(x => x.countryID === id);
+        return sources.filter(x => x.countryId === id);
     }
 
     getDistricyByProvinceId(id: string, sources: any[]) {
-        return sources.filter(x => x.provinceID === id);
+        return sources.filter(x => x.cityId === id);
     }
 }
