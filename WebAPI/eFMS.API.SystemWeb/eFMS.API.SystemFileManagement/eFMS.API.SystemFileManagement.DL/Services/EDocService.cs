@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver.Linq;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -1676,12 +1677,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     BucketName = _bucketName,
                     Key = key
                 };
+                new LogHelper("Ex Open File", JsonConvert.SerializeObject(request));
                 GetObjectResponse response = await _client.GetObjectAsync(request);
+                new LogHelper("Ex Open File", JsonConvert.SerializeObject(response));
                 if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
                 return new HandleState(true, response.ResponseStream);
             }
             catch (Exception ex)
             {
+                new LogHelper("Ex Open File", JsonConvert.SerializeObject(ex));
                 return new HandleState(ex.ToString());
             }
         }
