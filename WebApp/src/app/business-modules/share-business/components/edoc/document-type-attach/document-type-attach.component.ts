@@ -36,6 +36,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() docTypeId: number = 0;
     @Input() documentTypes: any[] = [];
     @Input() readonly: boolean = false;
+    @Input() isAttachFilePOD: boolean = false;
 
     lstEdocExist: any[] = [];
     headers: CommonInterface.IHeaderTable[] = [];
@@ -71,7 +72,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     ngOnInit(): void {
         this.getJobList();
-        this.transactionType = this.typeFrom;
+        this.transactionType = this.isAttachFilePOD === true ? this.transactionType: this.typeFrom;
         this.configJob = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'jobId', label: 'JobID' },
@@ -268,6 +269,13 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 files[i].docType = docType;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             }
+            else if (this.isAttachFilePOD === true) {
+                files[i].Code = "POD"
+                files[i].aliasName = "POD" + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
+                files[i].docType = "POD";
+                files[i].DocumentId = 0;
+                files[i].transactionType = this.transactionType
+            }
             this.listFile.push(files[i]);
         }
         if (fileList?.length > 0) {
@@ -301,6 +309,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     onSelectDataFormInfo(event: any, index: number, type: string) {
+        console.log(event)
         switch (type) {
             case 'docType':
                 this.enablePayeeINV[index] = false;
@@ -413,6 +422,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     AccountingType: x.AccountingType,
                 }));
             });
+
+
             this.EdocUploadFile = ({
                 ModuleName: this.typeFrom === 'Shipment' ? 'Document' : 'Accounting',
                 FolderName: this.typeFrom,
