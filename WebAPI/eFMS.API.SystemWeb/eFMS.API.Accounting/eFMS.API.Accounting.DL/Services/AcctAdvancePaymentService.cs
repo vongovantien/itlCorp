@@ -4573,7 +4573,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var shipment = surcharges.Where(x => x.JobNo == jobNo);
                             var buyAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY).Sum(x => x.AmountVnd ?? 0);
                             var sellAmount = shipment.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL).Sum(x => x.AmountVnd ?? 0);
-                            if (buyAmount > sellAmount)
+                            if (buyAmount >= sellAmount)
                             {
                                 listSipment.Add(shipment.FirstOrDefault().JobNo);
                             }
