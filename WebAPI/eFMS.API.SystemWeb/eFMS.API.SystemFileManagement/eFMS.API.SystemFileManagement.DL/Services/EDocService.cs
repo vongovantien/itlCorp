@@ -1703,9 +1703,9 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     BucketName = _bucketName,
                     Key = key
                 };
-                new LogHelper("Ex Open File", JsonConvert.SerializeObject(request));
+                new LogHelper("Request Open File", JsonConvert.SerializeObject(request));
                 GetObjectResponse response = await _client.GetObjectAsync(request);
-                new LogHelper("Ex Open File", JsonConvert.SerializeObject(response));
+                new LogHelper("Response Open File", JsonConvert.SerializeObject(response));
                 if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
                 return new HandleState(true, response.ResponseStream);
             }
