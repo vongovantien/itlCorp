@@ -972,7 +972,7 @@ namespace eFMS.API.Catalogue.DL.Services
                              PaymentTerm = c.PaymentTerm,
                              SaleManName = g1.Username,
                              UserCreatedName = g2.Username,
-                             Service = GetContractServicesName(c.SaleService),
+                             Service = Common.CommonData.GetServicesName(c.SaleService),
                              Office = GetContractOfficeName(c.OfficeId),
                              PartnerType = p.PartnerType
                          };
@@ -1002,7 +1002,7 @@ namespace eFMS.API.Catalogue.DL.Services
                              PaymentTerm = c.PaymentTerm,
                              SaleManName = g1.Username,
                              UserCreatedName = g2.Username,
-                             Service = GetContractServicesName(c.SaleService),
+                             Service = Common.CommonData.GetServicesName(c.SaleService),
                              Office = GetContractOfficeName(c.OfficeId),
                              PartnerType = p.PartnerType
                          };
