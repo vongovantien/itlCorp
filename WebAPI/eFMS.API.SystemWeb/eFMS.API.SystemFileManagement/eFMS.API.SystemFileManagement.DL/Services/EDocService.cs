@@ -1354,7 +1354,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Hblid = billingType == "Shipment" ? Guid.Parse(billingId) : Guid.Empty,
                     };
 
-                    await _sysImageDetailRepo.AddAsync(imageDetail, false);
+                    await _sysImageDetailRepo.AddAsync(imageDetail);
                 }
 
                 result = _sysImageDetailRepo.SubmitChanges();
@@ -1420,8 +1420,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             Name = fileName + extension,
                             Folder = model.FolderName,
                             ObjectId = model.Id.ToString(),
-                            UserCreated = string.IsNullOrEmpty(currentUser.UserName)?model.UserCreated: currentUser.UserName,
-                            UserModified = string.IsNullOrEmpty(currentUser.UserName) ? model.UserCreated : currentUser.UserName,
+                            UserCreated = !string.IsNullOrEmpty(model.UserCreated) ?model.UserCreated: "",
+                            UserModified = !string.IsNullOrEmpty(model.UserCreated) ? model.UserCreated : "",
                             DateTimeCreated = DateTime.Now,
                             DatetimeModified = DateTime.Now,
                             ChildId = model.Child,
