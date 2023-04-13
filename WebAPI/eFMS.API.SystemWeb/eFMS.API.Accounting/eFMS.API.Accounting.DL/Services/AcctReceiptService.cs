@@ -2857,7 +2857,7 @@ namespace eFMS.API.Accounting.DL.Services
                 data.GroupShipmentsAgency = newItem.AsQueryable();
                 return data;
             }
-            var groupShipmentAgency = debitAgents.Select(s => new GroupShimentAgencyModel
+            var groupShipmentAgency = debitAgents.OrderBy(x => x.RefNo).Select(s => new GroupShimentAgencyModel
             {
                 Hblid = s.Hblid,
                 JobNo = s.JobNo,
@@ -2884,11 +2884,11 @@ namespace eFMS.API.Accounting.DL.Services
             List<string> partnerIds = new List<string>();
             if (!string.IsNullOrEmpty(criteria.PartnerId))
             {
-                 partnerIds = partner.Where(x => x.ParentId == criteria.PartnerId).Select(x => x.Id).ToList();
+                partnerIds = partner.Where(x => x.ParentId == criteria.PartnerId).Select(x => x.Id).ToList();
             }
             var payables = accountPayableRepository.Get(x => (partnerIds.Count == 0 || partnerIds.Contains(x.PartnerId)) && !string.IsNullOrEmpty(x.ReferenceNo) && x.Status != "Paid" && x.TransactionType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE);
             var creditManagementAr = creditMngtArRepository.Get(x => (partnerIds.Count == 0 || partnerIds.Contains(x.PartnerId)) && !string.IsNullOrEmpty(x.ReferenceNo));
-            
+
             //if (!string.IsNullOrEmpty(criteria.PartnerId))
             //{
             //    var partnerIds = partner.Where(x => x.ParentId == criteria.PartnerId).Select(x => x.Id).ToList();
@@ -2914,11 +2914,11 @@ namespace eFMS.API.Accounting.DL.Services
                         payables = payables.Where(x => criteria.ReferenceNos.Contains(x.BillingNo));
                         break;
                     //case "ReceiptNo":
-                        //payables = payables.Where(x => false);
-                        //break;
+                    //payables = payables.Where(x => false);
+                    //break;
                     //case "CreditNote":
                     //    payables = payables.Where(x => criteria.ReferenceNos.Contains(x.BillingNo));
-                        //break;
+                    //break;
                     case "HBL":
                         creditManagementAr = creditManagementAr.Where(x => criteria.ReferenceNos.Contains(x.Hblno));
                         var hblNos = creditManagementAr.Select(x => x.Code).ToList();
@@ -3052,7 +3052,7 @@ namespace eFMS.API.Accounting.DL.Services
                 data.GroupShipmentsAgency = newItem.AsQueryable();
                 return data;
             }
-            var groupShipmentAgency = result.Select(s => new GroupShimentAgencyModel
+            var groupShipmentAgency = result.OrderBy(x => x.RefNo).Select(s => new GroupShimentAgencyModel
             {
                 Hblid = s.Hblid,
                 JobNo = s.JobNo,
