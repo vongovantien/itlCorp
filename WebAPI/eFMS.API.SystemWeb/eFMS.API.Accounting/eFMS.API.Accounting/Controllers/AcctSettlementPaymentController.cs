@@ -7,6 +7,7 @@ using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
+using eFMS.API.Accounting.Service.ViewModels;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
@@ -1164,9 +1165,9 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpGet]
         [Route("GetListJobGroupSurchargeDetailSettlement")]
-        public IActionResult GetListJobGroupSurchargeDetailSettlement(string settlementNo)
+        public IActionResult GetListJobGroupSurchargeDetailSettlement(string settlementNo, int page, int size)
         {
-            var data = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlementNo);
+            var data = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlementNo, page, size);
 
             return Ok(data);
         }
