@@ -1395,7 +1395,7 @@ button {
 
 .collapse {
     &.in {
-        overflow: auto !important;
+        overflow: initial !important;
     }
 }
 
