@@ -47,6 +47,7 @@ export class SettlementPayment {
     issuedSoa: boolean = false;
 
     totalCharge: number = null;
+    totalGroup: number = null;
 
     constructor(object?: any) {
         const self = this;

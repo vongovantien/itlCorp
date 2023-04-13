@@ -52,6 +52,7 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<sp_GetSurchargeDetailSettlement, ShipmentChargeSettlement>().ReverseMap();
             CreateMap<ChargeShipmentModel, ChargeShipmentModel>();
             CreateMap<ShipmentChargeSettlement, ShipmentChargeSettlement>();
+            CreateMap<sp_GetListJobGroupSurchargeDetailSettlement, ShipmentSettlement>().ReverseMap();
         }
     }
 }
