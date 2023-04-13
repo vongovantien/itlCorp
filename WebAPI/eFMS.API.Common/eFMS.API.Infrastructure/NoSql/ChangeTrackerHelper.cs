@@ -62,12 +62,12 @@ namespace eFMS.API.Infrastructure.NoSql
                                 ActionType = EntityState.Modified,
                                 ActionName = "Modified",
                                 DatetimeModified = DateTime.Now,
-                                UserModified = currentUser?.UserID,
-                                UserNameModified = currentUser?.UserName,
-                                // CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
-                                // OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
-                                DepartmentId = currentUser?.DepartmentId,
-                                GroupId = currentUser?.GroupId,
+                                UserModified = currentUser != null ? currentUser?.UserID : "",
+                                UserNameModified = currentUser != null ? currentUser?.UserName : "",
+                                CompanyId = currentUser != null ? currentUser?.CompanyID.ToString() : "",
+                                OfficeId = currentUser != null ? currentUser?.OfficeID.ToString() : "",
+                                DepartmentId = currentUser != null ? currentUser?.DepartmentId : 0,
+                                GroupId = currentUser != null ? currentUser?.GroupId : 0,
                                 // UserModified = change.CurrentValues["UserModified"]?.ToString()
                             };
                             log.ItemObject = change.Entity;
@@ -129,12 +129,12 @@ namespace eFMS.API.Infrastructure.NoSql
                             ActionType = EntityState.Modified,
                             ActionName = "Modified",
                             DatetimeModified = DateTime.Now,
-                            UserModified = currentUser?.UserID,
-                            UserNameModified = currentUser?.UserName,
-                            // CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
-                            // OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
-                            DepartmentId = currentUser?.DepartmentId,
-                            GroupId = currentUser?.GroupId,
+                            UserModified = currentUser != null ? currentUser?.UserID : "",
+                            UserNameModified = currentUser != null ? currentUser?.UserName : "",
+                            CompanyId = currentUser != null ? currentUser?.CompanyID.ToString() : "",
+                            OfficeId = currentUser != null ? currentUser?.OfficeID.ToString() : "",
+                            DepartmentId = currentUser != null ? currentUser?.DepartmentId : 0,
+                            GroupId = currentUser != null ? currentUser?.GroupId : 0,
                         };
                         log.ItemObject = newChange;
                         log.Function = currentUser?.Action;
@@ -168,12 +168,12 @@ namespace eFMS.API.Infrastructure.NoSql
                         ActionType = EntityState.Added,
                         ActionName = "Added",
                         DatetimeModified = DateTime.Now,
-                        UserModified = currentUser?.UserID,
-                        UserNameModified = currentUser?.UserName,
-                        // CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
-                        // OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
-                        DepartmentId = currentUser?.DepartmentId,
-                        GroupId = currentUser?.GroupId,
+                        UserModified = currentUser != null ? currentUser?.UserID : "",
+                        UserNameModified = currentUser != null ? currentUser?.UserName : "",
+                        CompanyId = currentUser != null ? currentUser?.CompanyID.ToString() : "",
+                        OfficeId = currentUser != null ? currentUser?.OfficeID.ToString() : "",
+                        DepartmentId = currentUser != null ? currentUser?.DepartmentId : 0,
+                        GroupId = currentUser != null ? currentUser?.GroupId : 0,
                     };
                     log.ItemObject = add.Entity;
                     log.Function = currentUser?.Action;
@@ -206,12 +206,12 @@ namespace eFMS.API.Infrastructure.NoSql
                         ActionType = EntityState.Added,
                         ActionName = "Added",
                         DatetimeModified = DateTime.Now,
-                        UserModified = currentUser?.UserID,
-                        UserNameModified = currentUser?.UserName,
-                        // CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
-                        // OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
-                        DepartmentId = currentUser?.DepartmentId,
-                        GroupId = currentUser?.GroupId,
+                        UserModified = currentUser != null ? currentUser?.UserID : "",
+                        UserNameModified = currentUser != null ? currentUser?.UserName : "",
+                        CompanyId = currentUser != null ? currentUser?.CompanyID.ToString() : "",
+                        OfficeId = currentUser != null ? currentUser?.OfficeID.ToString() : "",
+                        DepartmentId = currentUser != null ? currentUser?.DepartmentId : 0,
+                        GroupId = currentUser != null ? currentUser?.GroupId : 0,
                     };
                     log.ItemObject = addEntity;
                     log.Function = currentUser?.Action;
@@ -243,12 +243,12 @@ namespace eFMS.API.Infrastructure.NoSql
                         ActionType = EntityState.Deleted,
                         ActionName = "Deleted",
                         DatetimeModified = DateTime.Now,
-                        UserModified = currentUser?.UserID,
-                        UserNameModified = currentUser?.UserName,
-                        // CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
-                        // OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
-                        DepartmentId = currentUser?.DepartmentId,
-                        GroupId = currentUser?.GroupId,
+                        UserModified = currentUser != null ? currentUser?.UserID : "",
+                        UserNameModified = currentUser != null ? currentUser?.UserName : "",
+                        CompanyId = currentUser != null ? currentUser?.CompanyID.ToString() : "",
+                        OfficeId = currentUser != null ? currentUser?.OfficeID.ToString() : "",
+                        DepartmentId = currentUser != null ? currentUser?.DepartmentId : 0,
+                        GroupId = currentUser != null ? currentUser?.GroupId : 0,
                     };
                     log.ItemObject = delete.Entity;
                     log.Function = currentUser?.Action;
@@ -281,12 +281,12 @@ namespace eFMS.API.Infrastructure.NoSql
                         ActionType = EntityState.Deleted,
                         ActionName = "Deleted",
                         DatetimeModified = DateTime.Now,
-                        UserModified = currentUser?.UserID,
-                        UserNameModified = currentUser?.UserName,
-                        // CompanyId = true ? currentUser?.CompanyID.ToString() : string.Empty,
-                        // OfficeId = true ? currentUser?.OfficeID.ToString() : string.Empty,
-                        DepartmentId = currentUser?.DepartmentId,
-                        GroupId = currentUser?.GroupId,
+                        UserModified = currentUser != null ? currentUser?.UserID : "",
+                        UserNameModified = currentUser != null ? currentUser?.UserName : "",
+                        CompanyId = currentUser != null ? currentUser?.CompanyID.ToString() : "",
+                        OfficeId = currentUser != null ? currentUser?.OfficeID.ToString() : "",
+                        DepartmentId = currentUser != null ? currentUser?.DepartmentId : 0,
+                        GroupId = currentUser != null ? currentUser?.GroupId : 0,
                     };
                     log.ItemObject = deleteEntity;
                     log.Function = currentUser?.Action;

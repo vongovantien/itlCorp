@@ -600,6 +600,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return lst.AsQueryable();
         }
+
         public IQueryable<CatChargeModel> QueryByPermission(CatChargeCriteria criteria, PermissionRange range)
         {
             IQueryable<CatChargeModel> data = null;
