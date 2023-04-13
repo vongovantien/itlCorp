@@ -1,5 +1,5 @@
 import { coerceBooleanProperty } from "@angular/cdk/coercion";
-import { Component, EventEmitter, Input, NgZone, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, NgZone, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { AppList } from '@app';
 import { ReportPreviewComponent } from '@common';
 import { delayTime } from '@decorators';
@@ -10,7 +10,7 @@ import { Partner, Surcharge, SysImage } from '@models';
 import { AccountingRepo, DocumentationRepo } from '@repositories';
 import { DataService, SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
-import { finalize, switchMap, takeUntil } from 'rxjs/operators';
+import { finalize, takeUntil } from 'rxjs/operators';
 
 import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
 import { SettlementExistingChargePopupComponent } from '../popup/existing-charge/existing-charge.popup';
@@ -25,7 +25,7 @@ import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import cloneDeep from 'lodash/cloneDeep';
-import { BehaviorSubject, Observable, pipe } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { ShareDocumentTypeAttachComponent } from "src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component";
 import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState, getSettlementPaymentDetailTotalChargeState, LoadListNoGroupSurcharge } from '../store';
 import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
@@ -57,6 +57,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
     @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
     @ViewChild('scroller') scroller: CdkVirtualScrollViewport;
+    @ViewChild('groupJobContainerRef') groupJobContainerRef: ElementRef;
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
     @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>
@@ -91,6 +92,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     listEdoc: any[] = [];
 
     selectedSurchargeContextMenu: Surcharge;
+    pageGroup: number = 1;
 
     constructor(
         private readonly _sortService: SortService,
@@ -143,7 +145,6 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     this.detailSettlement = detail;
                 }
             )
-
     }
 
     ngAfterViewInit(): void {
@@ -177,7 +178,24 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     )
 
             });
-        }, 200, 95)
+        }, 200, 95);
+    }
+
+    scroll = (): void => {
+        console.log("listening scrolling...");
+        const itemsContainer = this.groupJobContainerRef.nativeElement;
+        const scrollBottom = itemsContainer.scrollHeight - itemsContainer.scrollTop - itemsContainer.clientHeight;
+
+        if (scrollBottom <= 0) {
+            const totalGroup = this.detailSettlement.settlement?.totalGroup || 1;
+            const totalPageGroup = Math.ceil(totalGroup / 5);
+            if (this.pageGroup < totalPageGroup) {
+                if (this.isLoadingGroupShipment) {
+                    return;
+                }
+                this.getNextGroupShipment();
+            }
+        }
     }
 
     getNextSurcharge() {
@@ -188,6 +206,18 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             .subscribe((res: Surcharge[]) => {
                 if (!!res.length) {
                     this.surcharges = [...this.surcharges, ...res || []];
+                }
+            });
+    }
+
+    getNextGroupShipment() {
+        this.isLoadingGroupShipment = true;
+        this.pageGroup++;
+        this._accountingRepo.getListJobGroupSurchargeDetailSettlement(this.settlementCode, this.pageGroup, 5)
+            .pipe(finalize(() => { this.isLoadingGroupShipment = false; }))
+            .subscribe((res: any) => {
+                if (!!res.length) {
+                    this.groupShipments = [...this.groupShipments, ...res || []];
                 }
             });
     }
@@ -499,65 +529,21 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             if (this.surcharges.length === this.detailSettlement?.settlement?.totalCharge) {
                 return;
             }
-            if (!!this.settlementCode) {
-                this.isLoadingSurchargeList = true;
-                this._accountingRepo.getListSurchargeDetailSettlement(this.settlementCode)
-                    .pipe(finalize(() => this.isLoadingSurchargeList = false))
-                    .subscribe(
-                        (surcharges: Surcharge[]) => {
-                            this.surcharges = surcharges;
-                        }
-                    )
-            }
         } else {
             this.TYPE = 'GROUP';
+            this.groupJobContainerRef.nativeElement.addEventListener('scroll', this.scroll, true);
             if (!!this.groupShipments.length) {
                 return;
             }
             if (!!this.settlementCode) {
                 this.isLoadingGroupShipment = true;
-                if (this.surcharges.length !== this.detailSettlement?.settlement?.totalCharge) {
-                    this._accountingRepo.getListSurchargeDetailSettlement(this.settlementCode)
-                        .pipe(
-                            switchMap((surcharges: Surcharge[]) => {
-                                this.surcharges = surcharges;
-                                return this._accountingRepo.getListJobGroupSurchargeDetailSettlement(this.settlementCode).pipe(
-                                    finalize(() => this.isLoadingGroupShipment = false),
-                                );
-                            })
-                        )
-                        .subscribe(
-                            (data: any) => {
-                                this.groupShipments = data || [];
-                                this.selectedIndexSurcharge = null;
-                                this.groupShipments.forEach((groupItem: ISettlementShipmentGroup) => {
-                                    const groupItemSurcharges = this.surcharges.filter((x: Surcharge) => {
-                                        return x.hblid == groupItem.hblId
-                                            && x.advanceNo == groupItem.advanceNo
-                                            && x.settlementCode === groupItem.settlementNo
-                                            && x.clearanceNo == groupItem.customNo
-                                    });
-                                    groupItem.chargeSettlements = groupItemSurcharges || [];
-                                });
-                            });
-                } else {
-                    this._accountingRepo.getListJobGroupSurchargeDetailSettlement(this.settlementCode)
-                        .pipe(finalize(() => this.isLoadingGroupShipment = false))
-                        .subscribe(
-                            (data: any) => {
-                                this.groupShipments = data || [];
-                                this.selectedIndexSurcharge = null;
-                                this.groupShipments.forEach((groupItem: ISettlementShipmentGroup) => {
-                                    const groupItemSurcharges = this.surcharges.filter((x: Surcharge) => {
-                                        return x.hblid == groupItem.hblId
-                                            && x.advanceNo == groupItem.advanceNo
-                                            && x.settlementCode === groupItem.settlementNo
-                                            && x.clearanceNo == groupItem.customNo
-                                    });
-                                    groupItem.chargeSettlements = groupItemSurcharges || [];
-                                });
-                            });
-                }
+                this._accountingRepo.getListJobGroupSurchargeDetailSettlement(this.settlementCode, 1, 5)
+                    .pipe(finalize(() => this.isLoadingGroupShipment = false))
+                    .subscribe(
+                        (data: any) => {
+                            this.groupShipments = data || [];
+                            this.selectedIndexSurcharge = null;
+                        });
             }
         }
     }

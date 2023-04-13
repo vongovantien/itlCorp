@@ -59,8 +59,10 @@
             </div>
         </div>
         <div [ngClass]="!!STATE && STATE === 'WRITE' && TYPE === 'LIST' ? 'col-lg-8' : 'col-lg-12'">
-            <div class="float-right badge badge-primary" *ngIf="!!groupShipments.length">
-                {{TYPE === 'LIST' ? groupShipments.length : surcharges.length}}
+            <div class="float-right badge badge-primary"
+                *ngIf="!!settlementCode && detailSettlement?.settlement?.totalGroup">
+                {{TYPE === 'LIST' ? detailSettlement?.settlement?.totalGroup :
+                detailSettlement?.settlement?.totalCharge}}
             </div>
             <div class="m--align-right foat-right">
                 <a class="pointer icon-switch" (click)="switchToGroup()"
@@ -74,7 +76,8 @@
     <div class="row m--margin-top-10">
         <div class="col-12">
             <div class="shipment-list-wrapper m-animate-fade-in">
-                <ng-container *ngIf="TYPE === 'GROUP'">
+                <div class="list-group-sm" style="max-height: 800px; overflow: auto;" #groupJobContainerRef
+                    [style.display]="TYPE === 'LIST' ? 'none': 'block'">
                     <accordion [isAnimated]="true">
                         <accordion-group *ngFor="let item of groupShipments; let i = index; trackBy: trackByFn"
                             [isOpen]="openAllCharge" class="m--margin-bottom-20">
@@ -82,7 +85,8 @@
                                 (onClick)="onClickHeadingShipment(item)"
                                 (onCheck)="onCheckBoxShipmentItemInGroupShipment($event, i)"
                                 (onPrintPlUSD)="previewPLsheet(item,'USD')" (onPrintPlVND)="previewPLsheet(item, 'VND')"
-                                (onViewFiles)="viewShipmentAttachFile(item)"></shipment-item>
+                                (onViewFiles)="viewShipmentAttachFile(item)">
+                            </shipment-item>
                             <table-surcharge-settlement [data]="item" #tableSurcharge
                                 (onChangeCheckBox)="onChangeCheckBoxSurChargeListInGroupShipment($event, i)"
                                 (onClickSurcharge)="openSurchargeDetail($event,null,'update')"
@@ -95,95 +99,92 @@
                             <tbody class="tbody-group">
                                 <tr *ngIf="(!(isLoading | async) && !isLoadingGroupShipment) && !groupShipments.length"
                                     app-table-none-record [colspan]="headers.length + 2"></tr>
-                                <tr app-table-row-loading *ngIf="(isLoading | async) || isLoadingGroupShipment"></tr>
+                                <tr app-table-row-loading *ngIf="(isLoading | async) || isLoadingGroupShipment"
+                                    [body]="'Loading data'">
+                                </tr>
                             </tbody>
                         </table>
                     </div>
-                </ng-container>
-                <ng-container *ngIf="TYPE === 'LIST'">
-                    <div class="table-horizontal">
-                        <cdk-virtual-scroll-viewport [itemSize]="33" style="max-height: 590px" minBufferPx="500"
-                            maxBufferPx="800" [trackBy]="trackByFn"
-                            [ngStyle]="{'height.px': (!surcharges.length && !(isLoading | async)) ? 135 : (!!surcharges.length ? surcharges.length : 1) * 30.25 + 48.25  }"
-                            #scroller>
-                            <table class="table table-striped table-brand dataTable scrolling-table">
-                                <thead app-table-header [headers]="headers" (onClick)="sortSurcharge($event)">
-                                    <th class="m--w-50 first">
-                                        <label class="m-checkbox">
-                                            <input type="checkbox" [(ngModel)]="isCheckAll"
-                                                (change)="checkUncheckAllCharge()">
-                                            <span></span>
-                                        </label>
-                                    </th>
-                                    <th class="last"></th>
-                                </thead>
-                                <tbody class="tbody-group">
-                                    <ng-container
-                                        *ngFor="let surcharge of surcharges | filter: keyword:['jobId', 'hbl', 'mbl', 'chargeName', 'payer', 'obhPartnerName']; let i = index; trackBy: trackByFn">
-                                        <tr class="" [class.selected-row]="i === selectedIndexSurcharge"
-                                            [class.bg-warning]="!surcharge.isDuplicate && surcharge.isFromShipment"
-                                            [class.invalid-row]="surcharge.isDuplicate"
-                                            [class.bg-locked]="surcharge.isLocked">
-                                            <td class=" table-actions-col">
-                                                <div class="table-actions" [class.d-flex]="surcharge.isLocked">
-                                                    <!-- Phí chứng từ -->
-                                                    <ng-container
-                                                        *ngIf="surcharge.isFromShipment;else chargeFromShipmentTpl">
-                                                        <ng-container *ngIf="!surcharge.isLocked;else lockIconTpl">
+                </div>
+                <div class="table-horizontal" [style.display]="TYPE === 'GROUP' ? 'none': 'block'">
+                    <cdk-virtual-scroll-viewport [itemSize]="33" style="max-height: 590px" minBufferPx="500"
+                        maxBufferPx="800"
+                        [ngStyle]="{'height.px': (!surcharges.length && !(isLoading | async)) ? 135 : (!!surcharges.length ? surcharges.length : 1) * 30.25 + 48.25  }"
+                        #scroller>
+                        <table class="table table-striped table-brand dataTable scrolling-table">
+                            <thead app-table-header [headers]="headers" (onClick)="sortSurcharge($event)">
+                                <th class="m--w-50 first">
+                                    <label class="m-checkbox">
+                                        <input type="checkbox" [(ngModel)]="isCheckAll"
+                                            (change)="checkUncheckAllCharge()">
+                                        <span></span>
+                                    </label>
+                                </th>
+                                <th class="last"></th>
+                            </thead>
+                            <tbody class="tbody-group">
+                                <ng-container
+                                    *ngFor="let surcharge of surcharges | filter: keyword:['jobId', 'hbl', 'mbl', 'chargeName', 'payer', 'obhPartnerName']; let i = index; trackBy: trackByFn">
+                                    <tr class="" [class.selected-row]="i === selectedIndexSurcharge"
+                                        [class.bg-warning]="!surcharge.isDuplicate && surcharge.isFromShipment"
+                                        [class.invalid-row]="surcharge.isDuplicate"
+                                        [class.bg-locked]="surcharge.isLocked">
+                                        <td class=" table-actions-col">
+                                            <div class="table-actions" [class.d-flex]="surcharge.isLocked">
+                                                <!-- Phí chứng từ -->
+                                                <ng-container
+                                                    *ngIf="surcharge.isFromShipment;else chargeFromShipmentTpl">
+                                                    <ng-container *ngIf="!surcharge.isLocked;else lockIconTpl">
+                                                    </ng-container>
+                                                    <label class="m-checkbox">
+                                                        <input type="checkbox" (change)="onChangeCheckBoxCharge()"
+                                                            value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
+                                                        <span></span>
+                                                    </label>
+
+                                                    <ng-container *ngIf="!surcharge.isLocked">
+                                                        <ng-container *ngIf="!readonly">
+                                                            <span [class.m--margin-right-20]="surcharge.isFromShipment">
+                                                                <ng-container *ngIf="!surcharge.isFromShipment">
+                                                                    <a (click)="openCopySurcharge(surcharge)"
+                                                                        title="Copy" class="pointer">
+                                                                        <i class="la la-copy"></i>
+                                                                    </a>
+                                                                </ng-container>
+                                                            </span>
                                                         </ng-container>
-                                                        <label class="m-checkbox">
+                                                    </ng-container>
+                                                </ng-container>
+                                                <!-- Phí hiện trường -->
+                                                <ng-template #chargeFromShipmentTpl>
+                                                    <label class="m-checkbox"
+                                                        *ngIf="!surcharge.isLocked;else lockIconTpl">
+                                                        <ng-container
+                                                            *ngIf="surcharge.hasNotSynce && !surcharge.linkChargeId && !surcharge.chargeAutoRated">
                                                             <input type="checkbox" (change)="onChangeCheckBoxCharge()"
                                                                 value="{{surcharge}}"
                                                                 [(ngModel)]="surcharge.isSelected">
                                                             <span></span>
-                                                        </label>
-
-                                                        <ng-container *ngIf="!surcharge.isLocked">
-                                                            <ng-container *ngIf="!readonly">
-                                                                <span
-                                                                    [class.m--margin-right-20]="surcharge.isFromShipment">
-                                                                    <ng-container *ngIf="!surcharge.isFromShipment">
-                                                                        <a (click)="openCopySurcharge(surcharge)"
-                                                                            title="Copy" class="pointer">
-                                                                            <i class="la la-copy"></i>
-                                                                        </a>
-                                                                    </ng-container>
-                                                                </span>
-                                                            </ng-container>
+                                                        </ng-container>
+                                                    </label>
+                                                    <ng-container *ngIf="!surcharge.isLocked;else locktpl">
+                                                        <ng-container *ngIf="!readonly">
+                                                            <span [class.m--margin-right-20]="surcharge.isFromShipment">
+                                                                <ng-container *ngIf="!surcharge.isFromShipment">
+                                                                    <a (click)="openCopySurcharge(surcharge)"
+                                                                        title="Copy" class="pointer">
+                                                                        <i class="la la-copy"></i>
+                                                                    </a>
+                                                                </ng-container>
+                                                            </span>
                                                         </ng-container>
                                                     </ng-container>
-                                                    <!-- Phí hiện trường -->
-                                                    <ng-template #chargeFromShipmentTpl>
-                                                        <label class="m-checkbox"
-                                                            *ngIf="!surcharge.isLocked;else lockIconTpl">
-                                                            <ng-container
-                                                                *ngIf="surcharge.hasNotSynce && !surcharge.linkChargeId && !surcharge.chargeAutoRated">
-                                                                <input type="checkbox"
-                                                                    (change)="onChangeCheckBoxCharge()"
-                                                                    value="{{surcharge}}"
-                                                                    [(ngModel)]="surcharge.isSelected">
-                                                                <span></span>
-                                                            </ng-container>
-                                                        </label>
-                                                        <ng-container *ngIf="!surcharge.isLocked;else locktpl">
-                                                            <ng-container *ngIf="!readonly">
-                                                                <span
-                                                                    [class.m--margin-right-20]="surcharge.isFromShipment">
-                                                                    <ng-container *ngIf="!surcharge.isFromShipment">
-                                                                        <a (click)="openCopySurcharge(surcharge)"
-                                                                            title="Copy" class="pointer">
-                                                                            <i class="la la-copy"></i>
-                                                                        </a>
-                                                                    </ng-container>
-                                                                </span>
-                                                            </ng-container>
-                                                        </ng-container>
-                                                    </ng-template>
+                                                </ng-template>
 
-                                                    <span class="dropdown m-dropdown m-dropdown--inline m-0">
-                                                        <i class="la la-file-text" [contextMenu]="SurchargeContextMenu"
-                                                            (onTouch)="onSelectSurchargeInContextMenu(surcharge)"></i>
-                                                        <!-- <app-dropdown #dropdownMenuPreviewPl>
+                                                <span class="dropdown m-dropdown m-dropdown--inline m-0">
+                                                    <i class="la la-file-text" [contextMenu]="SurchargeContextMenu"
+                                                        (onTouch)="onSelectSurchargeInContextMenu(surcharge)"></i>
+                                                    <!-- <app-dropdown #dropdownMenuPreviewPl>
                                                             <a class="dropdown-item pointer"
                                                                 (click)="previewPLsheet(surcharge,'USD')">Preview PL
                                                                 with
@@ -193,93 +194,98 @@
                                                                 with
                                                                 VND</a>
                                                         </app-dropdown> -->
+                                                </span>
+                                                <ng-template #locktpl>
+                                                    <span class="d-block" style="width:25px"></span>
+                                                </ng-template>
+                                                <ng-template #lockIconTpl>
+                                                    <span>
+                                                        <button type="button" title="Shipment has been locked"
+                                                            class="btn btn-fault btn-sm  m-btn--icon m-btn--icon-only">
+                                                            <i class="fa fa-lock font-18" style="font-size:18px"></i>
+                                                        </button>
                                                     </span>
-                                                    <ng-template #locktpl>
-                                                        <span class="d-block" style="width:25px"></span>
-                                                    </ng-template>
-                                                    <ng-template #lockIconTpl>
-                                                        <span>
-                                                            <button type="button" title="Shipment has been locked"
-                                                                class="btn btn-fault btn-sm  m-btn--icon m-btn--icon-only">
-                                                                <i class="fa fa-lock font-18"
-                                                                    style="font-size:18px"></i>
-                                                            </button>
-                                                        </span>
-                                                    </ng-template>
-                                                </div>
-                                            </td>
-                                            <td
-                                                [class.text-underline]="!surcharge.isLocked || surcharge.isFromShipment">
-                                                <a (click)="updateChargeWithJob(surcharge,i)" class="pointer"
-                                                    *ngIf="!surcharge.isLocked || surcharge.isFromShipment; else lockShipmentTpl">
+                                                </ng-template>
+                                            </div>
+                                        </td>
+                                        <td [class.text-underline]="!surcharge.isLocked || surcharge.isFromShipment">
+                                            <a (click)="updateChargeWithJob(surcharge,i)" class="pointer"
+                                                *ngIf="!surcharge.isLocked || surcharge.isFromShipment; else lockShipmentTpl">
+                                                {{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}
+                                            </a>
+                                            <ng-template #lockShipmentTpl>
+                                                <a class="pointer">
                                                     {{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}
                                                 </a>
-                                                <ng-template #lockShipmentTpl>
-                                                    <a class="pointer">
-                                                        {{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}
-                                                    </a>
-                                                </ng-template>
-                                            </td>
-                                            <td [class.text-underline]="STATE === 'WRITE'" class="text-primary pointer"
-                                                (click)="openSurchargeDetail(surcharge, i, 'update')">
-                                                {{surcharge.chargeCode}}
-                                            </td>
-                                            <td [class.text-underline]="STATE === 'WRITE'" class="text-primary pointer"
-                                                (click)="openSurchargeDetail(surcharge, i, 'update')">
-                                                {{surcharge.chargeName}}
-                                            </td>
-                                            <td>{{surcharge.quantity}}</td>
-                                            <td>{{surcharge.unitName}}</td>
-                                            <td>{{surcharge.unitPrice | number: '.0-3'}}</td>
-                                            <td>{{surcharge.currencyId}}</td>
-                                            <td>{{surcharge.vatrate}}</td>
-                                            <td>{{surcharge.total | number: '.0-3'}}</td>
-                                            <td>{{surcharge.amountVnd | number: '.0-3'}}</td>
-                                            <td>{{surcharge.vatAmountVnd | number: '.0-3'}}</td>
-                                            <td>{{surcharge.amountVnd + surcharge.vatAmountVnd| number: '.0-3'}}
-                                            </td>
-                                            <td>{{surcharge.payer }}</td>
-                                            <td>{{surcharge.obhPartnerName }}</td>
-                                            <td>{{surcharge.invoiceNo}}</td>
-                                            <td>{{surcharge.seriesNo}}</td>
-                                            <td>
-                                                {{!!surcharge.invoiceDate ? (surcharge.invoiceDate | date:
-                                                'dd/MM/yyyy')
-                                                :
-                                                ''}}
-                                            </td>
-                                            <td>{{surcharge.vatPartnerShortName}}</td>
-                                            <td>{{surcharge.clearanceNo}}</td>
-                                            <td>{{surcharge.contNo}}</td>
-                                            <td>{{surcharge.notes}}</td>
-                                            <td class="text-danger">
-                                                <ng-container
-                                                    *ngIf="!surcharge.isFromShipment && surcharge.type === 'OBH' && !!surcharge.syncedFrom">
-                                                    {{surcharge.syncedFromBy}}
-                                                </ng-container>
-                                            </td>
-                                            <td class="text-underline text-primary pointer"
-                                                (click)="showPaymentManagement(surcharge)">Payment Management</td>
-                                        </tr>
-                                    </ng-container>
-                                    <tr *ngIf="(!(isLoading | async) && !isLoadingSurchargeList) && !surcharges.length"
-                                        app-table-none-record [colspan]="headers.length + 2"></tr>
-                                    <tr app-table-row-loading *ngIf="(isLoading | async) || isLoadingSurchargeList">
+                                            </ng-template>
+                                        </td>
+                                        <td [class.text-underline]="STATE === 'WRITE'" class="text-primary pointer"
+                                            (click)="openSurchargeDetail(surcharge, i, 'update')">
+                                            {{surcharge.chargeCode}}
+                                        </td>
+                                        <td [class.text-underline]="STATE === 'WRITE'" class="text-primary pointer"
+                                            (click)="openSurchargeDetail(surcharge, i, 'update')">
+                                            {{surcharge.chargeName}}
+                                        </td>
+                                        <td>{{surcharge.quantity}}</td>
+                                        <td>{{surcharge.unitName}}</td>
+                                        <td>{{surcharge.unitPrice | number: '.0-3'}}</td>
+                                        <td>{{surcharge.currencyId}}</td>
+                                        <td>{{surcharge.vatrate}}</td>
+                                        <td>{{surcharge.total | number: '.0-3'}}</td>
+                                        <td>{{surcharge.amountVnd | number: '.0-3'}}</td>
+                                        <td>{{surcharge.vatAmountVnd | number: '.0-3'}}</td>
+                                        <td>{{surcharge.amountVnd + surcharge.vatAmountVnd| number: '.0-3'}}
+                                        </td>
+                                        <td>{{surcharge.payer }}</td>
+                                        <td>{{surcharge.obhPartnerName }}</td>
+                                        <td>{{surcharge.invoiceNo}}</td>
+                                        <td>{{surcharge.seriesNo}}</td>
+                                        <td>
+                                            {{!!surcharge.invoiceDate ? (surcharge.invoiceDate | date:
+                                            'dd/MM/yyyy')
+                                            :
+                                            ''}}
+                                        </td>
+                                        <td>{{surcharge.vatPartnerShortName}}</td>
+                                        <td>{{surcharge.clearanceNo}}</td>
+                                        <td>{{surcharge.contNo}}</td>
+                                        <td>{{surcharge.notes}}</td>
+                                        <td class="text-danger">
+                                            <ng-container
+                                                *ngIf="!surcharge.isFromShipment && surcharge.type === 'OBH' && !!surcharge.syncedFrom">
+                                                {{surcharge.syncedFromBy}}
+                                            </ng-container>
+                                        </td>
+                                        <td class="text-underline text-primary pointer"
+                                            (click)="showPaymentManagement(surcharge)">Payment Management</td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        </cdk-virtual-scroll-viewport>
-                    </div>
-                    <ng-container *ngIf="!!settlementCode">
-                        <div class="m--margin-top-10 font-weight-bold">
-                            <div class="float-right badge badge-primary">
+                                </ng-container>
+                                <tr *ngIf="(!(isLoading | async) && !isLoadingSurchargeList) && !surcharges.length"
+                                    app-table-none-record [colspan]="headers.length + 2"></tr>
+                                <tr app-table-row-loading *ngIf="(isLoading | async) || isLoadingSurchargeList"
+                                    [body]="'Loading data'">
+                                </tr>
+                            </tbody>
+                        </table>
+                    </cdk-virtual-scroll-viewport>
+                </div>
+                <ng-container *ngIf="!!settlementCode">
+                    <div class="m--margin-top-10 font-weight-bold">
+                        <div class="float-right badge badge-primary m--margin-left-5">
+                            <ng-container *ngIf="TYPE === 'LIST'; else TplgroupTotal">
                                 {{detailSettlement?.settlement?.totalCharge}}
-                            </div>
-                            <div class="m--align-right foat-right">
-                                Total Items:
-                            </div>
+                            </ng-container>
+                            <ng-template #TplgroupTotal>
+                                <ng-container *ngIf="!!groupShipments.length">
+                                    {{detailSettlement?.settlement?.totalGroup}}
+                                </ng-container>
+                            </ng-template>
                         </div>
-                    </ng-container>
+                        <div class="m--align-right foat-right">
+                            Total Items:
+                        </div>
+                    </div>
                 </ng-container>
             </div>
         </div>
