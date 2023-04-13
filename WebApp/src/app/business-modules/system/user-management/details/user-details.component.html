@@ -7,7 +7,8 @@
             </div>
             <div class="col-6">
                 <div class="m--align-right">
-
+                    <button *ngIf="userLevels?.length > 0" class="btn btn-info m-btn--icon m-btn--uppercase m--margin-right-10" (click)="addPartnerFromUserData()"><img
+                            src="assets/icons/icon-get-data.png" alt="icon" width="15px">&nbsp; Create Partner Data</button>
                     <app-default-button class="m--margin-right-10" [buttonSetting]="saveButtonSetting"
                         (onClick)="updateUser()">
                     </app-default-button>
@@ -18,7 +19,6 @@
                             <span> Cancel </span>
                         </span>
                     </button>
-
                 </div>
             </div>
 
