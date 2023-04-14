@@ -92,7 +92,6 @@ export class AccountingRepo {
             );
     }
 
-
     getListShipmentDocumentOperation() {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/GetShipments`)
             .pipe(
@@ -1022,12 +1021,16 @@ export class AccountingRepo {
         );
     }
 
-    getListSurchargeDetailSettlement(settleNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/getListSurchargeDetailSettlement`, { settlementNo: settleNo });
+    getListSurchargeDetailSettlement(settleNo: string, page: number = - 1, size: number = 20) {
+        if (page > 0) {
+            return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListSurchargeDetailSettlement`, { settlementNo: settleNo, page, size }, { "hideSpinner": "true" });
+
+        }
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListSurchargeDetailSettlement`, { settlementNo: settleNo }, { "hideSpinner": "true" });
     }
 
-    getListJobGroupSurchargeDetailSettlement(settleNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListJobGroupSurchargeDetailSettlement`, { settlementNo: settleNo }, { "hideSpinner": "true" });
+    getListJobGroupSurchargeDetailSettlement(settleNo: string, page: number, size: number) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListJobGroupSurchargeDetailSettlement`, { settlementNo: settleNo, page, size }, { "hideSpinner": "true" });
     }
 
     getAdjustDebitValue(model: any) {
@@ -1071,6 +1074,17 @@ export class AccountingRepo {
 
     confirmCdNotePrepaid(body: any) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPrePaidPayment`, body);
+    }
+
+    getSurchargeGroupSOA(soaNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetSurchargeGroupSOA`, { soaNo }, { "hideSpinner": "true" });
+    }
+
+    getListSurchargeDetailSOA(soaNo: string, page: number = -1, size: number = 20) {
+        if (page > 0) {
+            return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetListSurchargeDetailSOA`, { soaNo, page, size }, { "hideSpinner": "true" });
+        }
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetListSurchargeDetailSOA`, { soaNo }, { "hideSpinner": "true" });
     }
 }
 

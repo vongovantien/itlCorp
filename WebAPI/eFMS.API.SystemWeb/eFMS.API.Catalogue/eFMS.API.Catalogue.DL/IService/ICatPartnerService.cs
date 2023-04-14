@@ -5,6 +5,7 @@ using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -39,6 +40,7 @@ namespace eFMS.API.Catalogue.DL.IService
         List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType, string office);
         IQueryable<CatPartnerForKeyinCharge> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria);
         Task<CatPartnerModel> GetPartnerByTaxCode (string taxCode);
+        Task<HandleState> AddPartnerFromUserData(Guid userId);
 
     }
 }

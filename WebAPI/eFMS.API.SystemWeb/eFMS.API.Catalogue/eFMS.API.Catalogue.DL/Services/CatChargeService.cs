@@ -28,7 +28,8 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatChargeDefaultAccount> chargeDefaultRepository;
         private readonly ICatCurrencyService currencyService;
         private readonly ICatUnitService catUnitService;
-
+        private readonly IContextBase<SysOffice> sysOfficeRepository;
+        private readonly ICatChargeGroupService catChargeGroupService;
 
         public CatChargeService(IContextBase<CatCharge> repository,
             ICacheServiceBase<CatCharge> cacheService,
@@ -37,6 +38,8 @@ namespace eFMS.API.Catalogue.DL.Services
             ICurrentUser user,
             IContextBase<CatChargeDefaultAccount> chargeDefaultRepo,
             ICatCurrencyService currService,
+            IContextBase<SysOffice> sysOfficeRepo,
+            ICatChargeGroupService catChargeGroup,
             ICatUnitService unitService) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -44,6 +47,9 @@ namespace eFMS.API.Catalogue.DL.Services
             currencyService = currService;
             currentUser = user;
             catUnitService = unitService;
+            sysOfficeRepository = sysOfficeRepo;
+            catChargeGroupService = catChargeGroup;
+
             SetChildren<CsShipmentSurcharge>("Id", "ChargeId");
             SetChildren<CatPartnerCharge>("Id", "ChargeId");
         }
@@ -515,7 +521,11 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = query.And(x => !string.IsNullOrEmpty(x.Offices) && x.Offices.ToLower().Contains(criteria.OfficeId.ToLower()));
             } 
             var list = DataContext.Get(query);
-            var catChargeLst = (from charge in list select new CatChargeModel
+            var chargeGroup = catChargeGroupService.Get();
+            var catChargeLst = (from charge in list
+                                join chgroup in chargeGroup on charge.ChargeGroup equals chgroup.Id into chargeGrp
+                                from chgroup in chargeGrp.DefaultIfEmpty()
+                                select new CatChargeModel
                                 {
                                     Id = charge.Id,
                                     Code = charge.Code,
@@ -539,9 +549,57 @@ namespace eFMS.API.Catalogue.DL.Services
                                     OfficeId = charge.OfficeId,
                                     CompanyId = charge.CompanyId,
                                     ChargeGroup = charge.ChargeGroup,
-            })?.OrderBy(x => x.DatetimeModified).AsQueryable();
-            return catChargeLst;
+                                    ChargeGroupName = chgroup != null ? chgroup.Name : null,
+                                    CreditCharge = charge.CreditCharge != null ? charge.CreditCharge : null,
+                                    DebitCharge = charge.DebitCharge != null ? charge.DebitCharge : null,
+                                    Offices = charge.Offices
 
+                                })?.OrderBy(x => x.DatetimeModified);
+            List<CatChargeModel> lst = new List<CatChargeModel>();
+            lst = catChargeLst.ToList();
+            if (lst.Count() > 0)
+            {
+                foreach (var item in lst)
+                {
+                    if (!String.IsNullOrEmpty(item.CreditCharge.ToString()))
+                    {
+                        var chargeCredit = DataContext.Get(x => x.Id == item.CreditCharge).FirstOrDefault();
+                        if (chargeCredit != null)
+                        {
+                            item.BuyingCode = chargeCredit.Code;
+                            item.BuyingName = chargeCredit.ChargeNameEn;
+                        }
+                    }
+                    if (!String.IsNullOrEmpty(item.DebitCharge.ToString()))
+                    {
+                        var chargeDebit = DataContext.Get(x => x.Id == item.DebitCharge).FirstOrDefault();
+                        if (chargeDebit != null)
+                        {
+                            item.SellingCode = chargeDebit.Code;
+                            item.SellingName = chargeDebit.ChargeNameEn;
+                        }
+                    }
+                    var arrOffice = item.Offices?.Split(",").ToArray();
+                    string officeStr = string.Empty;
+                    if (arrOffice?.Length > 0)
+                    {
+                        foreach (var o in arrOffice)
+                        {
+                            if (!String.IsNullOrEmpty(o))
+                            {
+                                var office = sysOfficeRepository.Where(x => x.Id.ToString().ToLower() == o.ToLower()).FirstOrDefault();
+                                if (office != null)
+                                {
+                                    officeStr += office.Code.ToUpper() + ";";
+                                }
+                            }
+                        }
+                    }
+                    item.OfficesName = officeStr?.TrimEnd(';');
+                    item.ServiceTypeId = Common.CommonData.GetServicesName(item.ServiceTypeId);
+                }
+            }
+            return lst.AsQueryable();
         }
 
         public IQueryable<CatChargeModel> QueryByPermission(CatChargeCriteria criteria, PermissionRange range)

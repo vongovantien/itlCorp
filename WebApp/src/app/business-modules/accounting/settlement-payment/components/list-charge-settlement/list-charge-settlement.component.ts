@@ -1,9 +1,9 @@
 import { coerceBooleanProperty } from "@angular/cdk/coercion";
-import { Component, EventEmitter, Input, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, NgZone, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { AppList } from '@app';
 import { ReportPreviewComponent } from '@common';
 import { delayTime } from '@decorators';
-import { InjectViewContainerRefDirective } from '@directives';
+import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { CommonEnum } from '@enums';
 import { ICrystalReport } from '@interfaces';
 import { Partner, Surcharge, SysImage } from '@models';
@@ -25,9 +25,10 @@ import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import cloneDeep from 'lodash/cloneDeep';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { ShareDocumentTypeAttachComponent } from "src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component";
-import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
+import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState, getSettlementPaymentDetailTotalChargeState, LoadListNoGroupSurcharge } from '../store';
+import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -55,9 +56,12 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentFilePopup: SettlementShipmentAttachFilePopupComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
     @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
+    @ViewChild('scroller') scroller: CdkVirtualScrollViewport;
+    @ViewChild('groupJobContainerRef') groupJobContainerRef: ElementRef;
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
     @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
 
     groupShipments: ISettlementShipmentGroup[] = [];
     headers: CommonInterface.IHeaderTable[];
@@ -80,19 +84,24 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     requester: string = '';
     selectedGroupShipmentIndex: number;
 
-    detailSettlement: Observable<any>;
+    detailSettlement: any;
 
     isLoadingSurchargeList: boolean = false;
     isLoadingGroupShipment: boolean = false;
 
     listEdoc: any[] = [];
+
+    selectedSurchargeContextMenu: Surcharge;
+    pageGroup: number = 1;
+
     constructor(
         private readonly _sortService: SortService,
         private readonly _toastService: ToastrService,
         private readonly _documenRepo: DocumentationRepo,
         private readonly _dataService: DataService,
         private readonly _store: Store<ISettlementPaymentState>,
-        private readonly _accountingRepo: AccountingRepo
+        private readonly _accountingRepo: AccountingRepo,
+        private readonly _ngZone: NgZone
     ) {
         super();
     }
@@ -128,9 +137,89 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.subscriptionDuplicateChargeState();
 
         this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState);
-        this.detailSettlement = this._store.select(getSettlementPaymentDetailState);
 
+        this._store.select(getSettlementPaymentDetailState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (detail: any) => {
+                    this.detailSettlement = detail;
+                }
+            )
+    }
 
+    ngAfterViewInit(): void {
+        this.listenScrollingEvent(() => {
+            this._ngZone.run(() => {
+                this._store.select(getSettlementPaymentDetailState)
+                    .pipe(
+                        takeUntil(this.ngUnsubscribe),
+                    )
+                    .subscribe(
+                        (detail: any) => {
+                            if (!this.settlementCode) {
+                                return;
+                            }
+                            if (!!this.settlementCode && (detail?.settlement?.statusApproval === 'New' || detail?.settlement?.statusApproval === 'Denied')) {
+                                return;
+
+                            } else {
+                                const totalCharge = detail?.settlement?.totalCharge || 1;
+                                const totalPage = Math.ceil(totalCharge / 20);
+                                if (this.page < totalPage) {
+                                    if (this.isLoadingSurchargeList) {
+                                        return;
+                                    }
+                                    this.getNextSurcharge();
+                                } else {
+                                    return;
+                                }
+                            }
+                        }
+                    )
+
+            });
+        }, 200, 95);
+    }
+
+    scroll = (): void => {
+        console.log("listening scrolling...");
+        const itemsContainer = this.groupJobContainerRef.nativeElement;
+        const scrollBottom = itemsContainer.scrollHeight - itemsContainer.scrollTop - itemsContainer.clientHeight;
+
+        if (scrollBottom <= 0) {
+            const totalGroup = this.detailSettlement.settlement?.totalGroup || 1;
+            const totalPageGroup = Math.ceil(totalGroup / 5);
+            if (this.pageGroup < totalPageGroup) {
+                if (this.isLoadingGroupShipment) {
+                    return;
+                }
+                this.getNextGroupShipment();
+            }
+        }
+    }
+
+    getNextSurcharge() {
+        this.isLoadingSurchargeList = true;
+        this.page++;
+        this._accountingRepo.getListSurchargeDetailSettlement(this.settlementCode, this.page, 20)
+            .pipe(finalize(() => { this.isLoadingSurchargeList = false; }))
+            .subscribe((res: Surcharge[]) => {
+                if (!!res.length) {
+                    this.surcharges = [...this.surcharges, ...res || []];
+                }
+            });
+    }
+
+    getNextGroupShipment() {
+        this.isLoadingGroupShipment = true;
+        this.pageGroup++;
+        this._accountingRepo.getListJobGroupSurchargeDetailSettlement(this.settlementCode, this.pageGroup, 5)
+            .pipe(finalize(() => { this.isLoadingGroupShipment = false; }))
+            .subscribe((res: any) => {
+                if (!!res.length) {
+                    this.groupShipments = [...this.groupShipments, ...res || []];
+                }
+            });
     }
 
 
@@ -437,44 +526,23 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     switchToGroup() {
         if (this.TYPE === 'GROUP') {
             this.TYPE = 'LIST';
-            if (!!this.surcharges.length) {
+            if (this.surcharges.length === this.detailSettlement?.settlement?.totalCharge) {
                 return;
-            }
-            if (!!this.settlementCode) {
-                this.isLoadingSurchargeList = true;
-                this._accountingRepo.getListSurchargeDetailSettlement(this.settlementCode)
-                    .pipe(finalize(() => this.isLoadingSurchargeList = false))
-                    .subscribe(
-                        (surcharges: Surcharge[]) => {
-                            this.surcharges = surcharges;
-                        }
-                    )
-
             }
         } else {
             this.TYPE = 'GROUP';
+            this.groupJobContainerRef.nativeElement.addEventListener('scroll', this.scroll, true);
             if (!!this.groupShipments.length) {
                 return;
             }
             if (!!this.settlementCode) {
                 this.isLoadingGroupShipment = true;
-                this._accountingRepo.getListJobGroupSurchargeDetailSettlement(this.settlementCode)
+                this._accountingRepo.getListJobGroupSurchargeDetailSettlement(this.settlementCode, 1, 5)
                     .pipe(finalize(() => this.isLoadingGroupShipment = false))
                     .subscribe(
                         (data: any) => {
                             this.groupShipments = data || [];
                             this.selectedIndexSurcharge = null;
-                            // if (this.isExistingSettlement === true) {
-                            this.groupShipments.forEach((groupItem: ISettlementShipmentGroup) => {
-                                const groupItemSurcharges = this.surcharges.filter((x: Surcharge) => {
-                                    return x.hblid == groupItem.hblId
-                                        && x.advanceNo == groupItem.advanceNo
-                                        && x.settlementCode === groupItem.settlementNo
-                                        && x.clearanceNo == groupItem.customNo
-                                });
-                                groupItem.chargeSettlements = groupItemSurcharges || [];
-                            });
-                            // }
                         });
             }
         }
@@ -756,6 +824,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.groupShipments[this.selectedGroupShipmentIndex] = JSON.parse(JSON.stringify(oldData));  // ? Clone data
 
         }
+    }
+
+    onSelectSurchargeInContextMenu(surcharge) {
+        this.selectedSurchargeContextMenu = surcharge;
+        this.clearMenuContext(this.queryListMenuContext);
     }
 }
 

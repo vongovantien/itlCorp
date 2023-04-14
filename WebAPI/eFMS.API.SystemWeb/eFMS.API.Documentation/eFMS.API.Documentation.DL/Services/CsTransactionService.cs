@@ -531,6 +531,7 @@ namespace eFMS.API.Documentation.DL.Services
                             || !string.IsNullOrEmpty(surcharge.AdvanceNo)
                             || !string.IsNullOrEmpty(surcharge.VoucherId)
                             || !string.IsNullOrEmpty(surcharge.SyncedFrom)
+                            || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
                             || surcharge.AcctManagementId != null
                          select detail);
             var data = DataContext.Get(x => x.Id == jobId).FirstOrDefault();
@@ -796,8 +797,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return 0;
             }
-            var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
-            var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
+            var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId && x.Active==true).Select(t => t.UserId).ToList();
+            var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId && x.Active == true).Select(t => t.UserId).ToList();
 
             var SalemansIds = csTransactionDetailRepo.Get(x => x.JobId == id).Select(t => t.SaleManId).ToArray();
             ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(detail.TransactionType, currentUser);
@@ -818,7 +819,8 @@ namespace eFMS.API.Documentation.DL.Services
         private int GetPermissionToUpdate(ModelUpdate model, PermissionRange permissionRange, string transactionType)
         {
             int code = 0;
-            if (permissionRange == PermissionRange.None)
+
+            if (permissionRange == PermissionRange.None) 
             {
                 code = 403;
                 return code;

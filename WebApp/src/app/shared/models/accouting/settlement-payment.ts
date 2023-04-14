@@ -45,7 +45,10 @@ export class SettlementPayment {
     bankCode: string = null;
     dueDate: string = '';
     issuedSoa: boolean = false;
-    
+
+    totalCharge: number = null;
+    totalGroup: number = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

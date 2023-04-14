@@ -224,6 +224,16 @@ export class OperationRepo {
         return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/ReplicateClearance`, null, { id });
 
     }
+
+    getUserCustomClearance(body: any, page: number, size: number) {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/GetUserCustomClearance`, body, {
+            pageNumber: page,
+            pageSize: size
+        }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 
 

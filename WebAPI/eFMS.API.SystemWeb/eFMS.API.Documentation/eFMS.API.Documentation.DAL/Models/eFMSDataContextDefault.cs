@@ -3840,9 +3840,9 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Pol).HasColumnName("POL");
 
-                entity.Property(e => e.Route).HasMaxLength(250);
-
                 entity.Property(e => e.SalesmanId).HasColumnName("SalesmanID");
+
+                entity.Property(e => e.Schedule).HasMaxLength(50);
 
                 entity.Property(e => e.ShipmentType)
                     .HasMaxLength(50)

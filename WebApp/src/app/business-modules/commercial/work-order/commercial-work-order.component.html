@@ -8,6 +8,8 @@
                 position="bottomCenter">
             </app-permission-button>
 
+            <app-permission-button title="Import" type="import">
+            </app-permission-button>
             <app-permission-button title="Export" type="export">
             </app-permission-button>
 
@@ -43,7 +45,7 @@
                                             </button> -->
                                             <ng-container *ngIf="!item.active">
                                                 <app-permission-button type="delete" [user]="item.userCreated"
-                                                    (onClick)="showConfirmDelete(item)"></app-permission-button>
+                                                    (onClick)="deleteWorkOrder(item)"></app-permission-button>
                                             </ng-container>
                                         </div>
                                     </td>
@@ -51,7 +53,7 @@
                                         <!-- <a class="pointer" [routerLink]="'./' + item.id" target="_blank">
                                             {{ item.code }}
                                         </a> -->
-                                        <a class="pointer" (click)="gotoDetail(item.id)">
+                                        <a class="pointer" (click)="viewDetailWorkOrder(item)">
                                             {{ item.code }}
                                         </a>
                                         <!-- <span class="m-badge m-badge--success m--margin-left-10">
@@ -130,18 +132,23 @@
 
 
 <app-context-menu #workOrderContextMenu (clickOutside)="selectedWorkOrder = null">
-    <div class="menu-context__item" (click)="activeWorkOrder(selectedWorkOrder)">
-        <span><i class="la la-check text-primary"></i><span> Active / Inactive</span></span>
-    </div>
+    <ng-container *ngIf="(currentUser$ | async)?.userType === 'Super Admin'">
+        <div class="menu-context__item" (click)="activeWorkOrder(selectedWorkOrder)">
+            <span><i class="la la-check text-primary"></i><span> Active / Inactive</span></span>
+        </div>
+    </ng-container>
+
     <div class="menu-context__item" (click)="viewDetailWorkOrder(selectedWorkOrder)">
         <span><i class="la la-edit text-primary"></i><span> Edit</span></span>
     </div>
     <ng-container *ngIf="!selectedWorkOrder?.active">
-        <div class="menu-context__item" (click)="deleteWorkOrder(selectedWorkOrder)">
-            <span><i class="la la-edit text-primary"></i><span> Delete</span></span>
+        <div class="menu-context__item">
+            <app-permission-button type="delete" (onClick)="deleteWorkOrder(selectedWorkOrder)"
+                [user]="selectedWorkOrder?.userCreated" class="icon" icon="la la-trash text-danger" mode="context-menu"
+                title="Delete">
+            </app-permission-button>
         </div>
     </ng-container>
-
 </app-context-menu>
 
 <ng-template inject></ng-template>

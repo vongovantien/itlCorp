@@ -194,7 +194,7 @@ namespace eFMS.IdentityServer.DL.Services
             // switch company
             if (permissionInfo == null)
             {
-                var usrLvCompany = userLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId != null && lv.CompanyId == companyId);
+                var usrLvCompany = userLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId != null && lv.Active== true && lv.CompanyId == companyId);
                 var usrLvCompanyDefault = usrLvCompany.Where(x => x.IsDefault == true)?.FirstOrDefault();
                 userLevel = usrLvCompanyDefault != null ? usrLvCompanyDefault : usrLvCompany.FirstOrDefault();
             }
@@ -203,6 +203,7 @@ namespace eFMS.IdentityServer.DL.Services
             {
                 var usrLvOffice = userLevelRepository.Get(lv => lv.UserId == userId
                 && lv.OfficeId == permissionInfo.OfficeID
+                && lv.Active == true
                 && lv.CompanyId == companyId
                 );
 
@@ -214,6 +215,7 @@ namespace eFMS.IdentityServer.DL.Services
             {
                 var usrLvGrpDept = userLevelRepository.Get(lv => lv.UserId == userId
                 && lv.OfficeId == permissionInfo.OfficeID
+                && lv.Active == true
                 && lv.CompanyId == companyId
                 && lv.DepartmentId == permissionInfo.DepartmentID
                 && lv.GroupId == permissionInfo.GroupID

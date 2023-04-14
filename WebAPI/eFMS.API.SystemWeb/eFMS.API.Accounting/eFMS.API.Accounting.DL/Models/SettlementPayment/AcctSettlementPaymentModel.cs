@@ -12,5 +12,7 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public bool IsApproved { get; set; }
         public bool IsShowBtnDeny { get; set; }
         public string PayeeName { get; set; }
+        public int TotalCharge { get; set; }
+        public int TotalGroup { get; set; }
     }
 }

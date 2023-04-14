@@ -115,6 +115,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPost("GetListVoucherToSync")]
         public IActionResult GetListVoucherToSync(List<Guid> Ids)
         {
+            currentUser.Action = "GetListVoucherToSync";
             var data = accountingService.GetListVoucherToSyncBravo(Ids);
             return Ok(data);
         }
@@ -122,6 +123,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPost("GetListSettleToSync")]
         public IActionResult GetListSettleToSync(List<Guid> Ids)
         {
+            currentUser.Action = "GetListSettleToSync";
             var data = accountingService.GetListSettlementToSyncBravo(Ids);
             return Ok(data);
         }
@@ -1064,6 +1066,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("GetListCdNoteDebit")]
         public IActionResult GetListCdNoteDebit(List<RequestGuidTypeListModel> request)
         {
+            currentUser.Action = "GetListCdNoteDebit";
             List<Guid> Ids = request.Where(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE).Select(x => x.Id).ToList();
             List<SyncModel> list = (Ids.Count > 0) ? accountingService.GetListCdNoteToSync(Ids) : new List<SyncModel>();
             return Ok(list);
@@ -1077,6 +1080,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("GetListSOADebit")]
         public IActionResult GetListSOADebit(List<RequestStringTypeListModel> request)
         {
+            currentUser.Action = "GetListSOADebit";
             List<string> Ids = request.Where(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
             List<SyncModel> list = (Ids.Count > 0) ? accountingService.GetListSoaToSync(Ids) : new List<SyncModel>();
             return Ok(list);

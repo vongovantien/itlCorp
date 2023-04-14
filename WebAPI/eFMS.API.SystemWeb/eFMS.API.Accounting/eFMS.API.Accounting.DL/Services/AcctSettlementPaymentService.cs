@@ -24,6 +24,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
@@ -31,6 +32,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -644,169 +646,203 @@ namespace eFMS.API.Accounting.DL.Services
                 settlementMap.PayeeName = catPartnerRepo.Get(x => x.Id == settlement.Payee)?.FirstOrDefault().ShortName;
             }
 
+            var surchargesSm = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo);
+            settlementMap.TotalCharge = surchargesSm.Count();
+            settlementMap.TotalGroup = surchargesSm.GroupBy(x => new { x.SettlementCode, x.Hblid, x.AdvanceNo, CustomNo = (string.IsNullOrEmpty(x.ClearanceNo) ? null : x.ClearanceNo) }).Count();
+
             return settlementMap;
         }
 
-        public List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo)
+        public List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo, int page = - 1, int size = 5)
         {
-            IQueryable<CsShipmentSurcharge> surcharge = csShipmentSurchargeRepo.Get();
-            IQueryable<AcctSettlementPayment> settlement = DataContext.Get();
-            IQueryable<OpsTransaction> opsTrans = opsTransactionRepo.Get();
-            IQueryable<CsTransactionDetail> csTransD = csTransactionDetailRepo.Get();
-            IQueryable<CsTransaction> csTrans = csTransactionRepo.Get();
-            IQueryable<CustomsDeclaration> cdNos = customsDeclarationRepo.Get();
-            IQueryable<AcctAdvanceRequest> advanceRequests = acctAdvanceRequestRepo.Get();
-            //IQueryable<AcctAdvancePayment> advances = acctAdvancePaymentRepo.Get(a => a.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@settlementNo", Value = settlementNo },
+            };
+            if (page > 0)
+            {
+                parameters = parameters.Concat(new[] { new SqlParameter("@Page", page), new SqlParameter("@Size", size) }).ToArray();
+            }
+            var dataSp = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetListJobGroupSurchargeDetailSettlement>(parameters);
+            var data = mapper.Map<List<ShipmentSettlement>>(dataSp);
+
+            foreach (var item in data)
+            {
+                item.ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo);
+            }
+            return data;
+
+            //IQueryable<CsShipmentSurcharge> surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
+            //IQueryable<AcctSettlementPayment> settlement = DataContext.Get();
+            //IQueryable<OpsTransaction> opsTrans = opsTransactionRepo.Get();
+            //IQueryable<CsTransactionDetail> csTransD = csTransactionDetailRepo.Get();
+            //IQueryable<CsTransaction> csTrans = csTransactionRepo.Get();
+            //IQueryable<CustomsDeclaration> cdNos = customsDeclarationRepo.Get();
+            //IQueryable<AcctAdvanceRequest> advanceRequests = acctAdvanceRequestRepo.Get();
+            ////IQueryable<AcctAdvancePayment> advances = acctAdvancePaymentRepo.Get(a => a.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
 
 
-            AcctSettlementPayment settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
-            if (settlement == null) return null;
-            //Quy đổi tỉ giá theo ngày Request Date, nếu exchange rate của ngày Request date không có giá trị thì lấy excharge rate mới nhất
-            //List<CatCurrencyExchange> currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
-            //if (currencyExchange.Count == 0)
+            //AcctSettlementPayment settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
+            //if (settlement == null) return null;
+            ////Quy đổi tỉ giá theo ngày Request Date, nếu exchange rate của ngày Request date không có giá trị thì lấy excharge rate mới nhất
+            ////List<CatCurrencyExchange> currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settleCurrent.RequestDate.Value.Date).ToList();
+            ////if (currencyExchange.Count == 0)
+            ////{
+            ////    DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+            ////    currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            ////}
+
+            //var result = surcharge
+            //            .GroupBy(s => s.SettlementCode)
+            //            //.Where(g => g.Select(s => s.TransactionType).Distinct())
+            //            .Select(g => new
+            //            {
+            //                SettlementCode = g.Key,
+            //                TransactionTypes = g.Select(s => s.TransactionType).Distinct().ToList()
+            //            }).FirstOrDefault();
+            //IQueryable<ShipmentSettlement> dataOperation = Enumerable.Empty<ShipmentSettlement>().AsQueryable();
+            //IQueryable<ShipmentSettlement> dataDocument = Enumerable.Empty<ShipmentSettlement>().AsQueryable();
+            //bool isHasCl = result?.TransactionTypes.Where(transactionType => transactionType == "CL").FirstOrDefault() != null;
+            //bool isHasDoc = result?.TransactionTypes.Where(transactionType => transactionType != "CL").FirstOrDefault() != null;
+            //if (isHasCl)
             //{
-            //    DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
-            //    currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            //    dataOperation = from sur in surcharge
+            //                    join opst in opsTrans on sur.Hblid equals opst.Hblid
+            //                    //join cd in cdNos on opst.Hblid.ToString() equals cd.Hblid into cdNoGroups // list các tờ khai theo job
+            //                    //from cdNoGroup in cdNoGroups.DefaultIfEmpty()
+            //                    //join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
+            //                    //from settle in settle2.DefaultIfEmpty()
+            //                    //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+            //                    //from advGrp in advGrps.DefaultIfEmpty()
+            //                    // where sur.SettlementCode == settlementNo
+            //                    select new ShipmentSettlement
+            //                    {
+            //                        SettlementNo = sur.SettlementCode,
+            //                        JobId = sur.JobNo,
+            //                        HBL = sur.Hblno,
+            //                        MBL = sur.Mblno,
+            //                        HblId = sur.Hblid,
+            //                        CurrencyShipment = sur.CurrencyId,
+            //                        ShipmentId = opst.Id,
+            //                        Type = "OPS",
+            //                        AdvanceNo = sur.AdvanceNo,
+            //                        IsLocked = opst.IsLocked,
+            //                        CustomNo = sur.ClearanceNo
+            //                    };
+            //}
+            //if (isHasDoc)
+            //{
+            //    dataDocument = from sur in surcharge
+            //                   join cstd in csTransD on sur.Hblid equals cstd.Id
+            //                   join cst in csTrans on cstd.JobId equals cst.Id into cst2
+            //                   from cst in cst2.DefaultIfEmpty()
+            //                   //join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
+            //                   //from settle in settle2.DefaultIfEmpty()
+            //                   //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+            //                   //from advGrp in advGrps.DefaultIfEmpty()
+            //                   where sur.SettlementCode == settlementNo
+            //                   select new ShipmentSettlement
+            //                   {
+            //                       SettlementNo = sur.SettlementCode,
+            //                       JobId = sur.JobNo,
+            //                       HBL = cstd.Hwbno,
+            //                       MBL = cst.Mawb,
+            //                       CurrencyShipment = sur.CurrencyId,
+            //                       HblId = cstd.Id,
+            //                       ShipmentId = cst.Id,
+            //                       Type = "DOC",
+            //                       AdvanceNo = sur.AdvanceNo,
+            //                       IsLocked = cst.IsLocked,
+            //                       CustomNo = sur.ClearanceNo
+            //                   };
             //}
 
-            IQueryable<ShipmentSettlement> dataOperation = from sur in surcharge
-                                                           join opst in opsTrans on sur.Hblid equals opst.Hblid
-                                                           join cd in cdNos on opst.Hblid.ToString() equals cd.Hblid into cdNoGroups // list các tờ khai theo job
-                                                           from cdNoGroup in cdNoGroups.DefaultIfEmpty()
-                                                           join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
-                                                           from settle in settle2.DefaultIfEmpty()
-                                                           join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                                                           from advGrp in advGrps.DefaultIfEmpty()
-                                                           where sur.SettlementCode == settlementNo
-                                                           select new ShipmentSettlement
-                                                           {
-                                                               SettlementNo = sur.SettlementCode,
-                                                               JobId = opst.JobNo,
-                                                               HBL = opst.Hwbno,
-                                                               MBL = opst.Mblno,
-                                                               HblId = opst.Hblid,
-                                                               CurrencyShipment = settle.SettlementCurrency,
-                                                               // TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
-                                                               ShipmentId = opst.Id,
-                                                               Type = "OPS",
-                                                               AdvanceNo = advGrp.AdvanceNo,
-                                                               IsLocked = opst.IsLocked,
-                                                               CustomNo = sur.ClearanceNo
-                                                           };
+            //IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
-            IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
-                                                          join cstd in csTransD on sur.Hblid equals cstd.Id
-                                                          join cst in csTrans on cstd.JobId equals cst.Id into cst2
-                                                          from cst in cst2.DefaultIfEmpty()
-                                                          join settle in settlement on sur.SettlementCode equals settle.SettlementNo into settle2
-                                                          from settle in settle2.DefaultIfEmpty()
-                                                          join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                                                          from advGrp in advGrps.DefaultIfEmpty()
-                                                          where sur.SettlementCode == settlementNo
-                                                          select new ShipmentSettlement
-                                                          {
-                                                              SettlementNo = sur.SettlementCode,
-                                                              JobId = cst.JobNo,
-                                                              HBL = cstd.Hwbno,
-                                                              MBL = cst.Mawb,
-                                                              CurrencyShipment = settle.SettlementCurrency,
-                                                              // TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
-                                                              HblId = cstd.Id,
-                                                              ShipmentId = cst.Id,
-                                                              Type = "DOC",
-                                                              AdvanceNo = advGrp.AdvanceNo,
-                                                              IsLocked = cst.IsLocked,
-                                                              CustomNo = sur.ClearanceNo
+            //var dataGroups = dataQueryUnionService.ToList()
+            //                            .GroupBy(x => new { x.SettlementNo, x.HblId, x.AdvanceNo, CustomNo = (string.IsNullOrEmpty(x.CustomNo) ? null : x.CustomNo) }) /* case đặc biệt
+            //                            1. Có tạm ứng - không có tk 
+            //                            2. Có tạm ứng - Có tờ khai
+            //                            */
+            //    .Select(x => new ShipmentSettlement
+            //    {
+            //        SettlementNo = x.Key.SettlementNo,
+            //        JobId = x.FirstOrDefault().JobId,
+            //        HBL = x.FirstOrDefault().HBL,
+            //        MBL = x.FirstOrDefault().MBL,
+            //        CurrencyShipment = x.FirstOrDefault().CurrencyShipment,
+            //        //TotalAmount = x.Sum(t => t.TotalAmount),
+            //        HblId = x.Key.HblId,
+            //        Type = x.FirstOrDefault().Type,
+            //        ShipmentId = x.FirstOrDefault().ShipmentId,
+            //        AdvanceNo = x.Key.AdvanceNo,
+            //        IsLocked = x.FirstOrDefault().IsLocked,
+            //        CustomNo = x.Key.CustomNo
+            //    });
 
-                                                          };
-            IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
+            //List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
+            //foreach (ShipmentSettlement item in dataGroups)
+            //{
+            //    // Lấy thông tin advance theo group settlement.
+            //    AdvanceInfo advInfo = GetAdvanceBalanceInfo(item.SettlementNo, item.HblId.ToString(), item.CurrencyShipment, item.AdvanceNo, item.CustomNo);
 
-            var dataGroups = dataQueryUnionService.ToList()
-                                        .GroupBy(x => new { x.SettlementNo, x.HblId, x.AdvanceNo, CustomNo = (string.IsNullOrEmpty(x.CustomNo) ? null : x.CustomNo) }) /* case đặc biệt
-                                        1. Có tạm ứng - không có tk 
-                                        2. Có tạm ứng - Có tờ khai
-                                        */
-                .Select(x => new ShipmentSettlement
-                {
-                    SettlementNo = x.Key.SettlementNo,
-                    JobId = x.FirstOrDefault().JobId,
-                    HBL = x.FirstOrDefault().HBL,
-                    MBL = x.FirstOrDefault().MBL,
-                    CurrencyShipment = x.FirstOrDefault().CurrencyShipment,
-                    //TotalAmount = x.Sum(t => t.TotalAmount),
-                    HblId = x.Key.HblId,
-                    Type = x.FirstOrDefault().Type,
-                    ShipmentId = x.FirstOrDefault().ShipmentId,
-                    AdvanceNo = x.Key.AdvanceNo,
-                    IsLocked = x.FirstOrDefault().IsLocked,
-                    CustomNo = x.Key.CustomNo
-                });
+            //    int roundDecimal = 0;
+            //    if (item.CurrencyShipment != AccountingConstants.CURRENCY_LOCAL)
+            //    {
+            //        roundDecimal = 3;
+            //    }
 
-            List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
-            foreach (ShipmentSettlement item in dataGroups)
-            {
-                // Lấy thông tin advance theo group settlement.
-                AdvanceInfo advInfo = GetAdvanceBalanceInfo(item.SettlementNo, item.HblId.ToString(), item.CurrencyShipment, item.AdvanceNo, item.CustomNo);
+            //    shipmentSettlement.Add(new ShipmentSettlement
+            //    {
+            //        SettlementNo = item.SettlementNo,
+            //        JobId = item.JobId,
+            //        MBL = item.MBL,
+            //        HBL = item.HBL,
+            //        // TotalAmount = item.TotalAmount,
+            //        CurrencyShipment = item.CurrencyShipment,
+            //        // ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo, item.CustomNo),
+            //        // ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo),
+            //        HblId = item.HblId,
+            //        ShipmentId = item.ShipmentId,
+            //        Type = item.Type,
+            //        TotalAmount = advInfo.TotalAmount ?? 0,
+            //        AdvanceNo = advInfo.AdvanceNo,
+            //        AdvanceAmount = advInfo.AdvanceAmount,
+            //        Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
+            //        CustomNo = advInfo.CustomNo,
+            //        IsLocked = item.IsLocked,
+            //        Files = new List<SysImage>()
+            //    });
+            //}
 
-                int roundDecimal = 0;
-                if (item.CurrencyShipment != AccountingConstants.CURRENCY_LOCAL)
-                {
-                    roundDecimal = 3;
-                }
+            //IQueryable<SysImage> FileInShipmentSettlement = sysImageRepository.Get(x => x.Folder == "Settlement"
+            //&& x.ObjectId == settleCurrent.Id.ToString()
+            //&& !string.IsNullOrEmpty(x.ChildId));
 
-                shipmentSettlement.Add(new ShipmentSettlement
-                {
-                    SettlementNo = item.SettlementNo,
-                    JobId = item.JobId,
-                    MBL = item.MBL,
-                    HBL = item.HBL,
-                    // TotalAmount = item.TotalAmount,
-                    CurrencyShipment = item.CurrencyShipment,
-                    // ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo, item.CustomNo),
-                    // ChargeSettlements = GetSurchargeDetailSettlement(item.SettlementNo, item.HblId, item.AdvanceNo, item.CustomNo),
-                    HblId = item.HblId,
-                    ShipmentId = item.ShipmentId,
-                    Type = item.Type,
+            //if (FileInShipmentSettlement.Count() > 0)
+            //{
+            //    List<string> hblIds = FileInShipmentSettlement.Select(x => x.ChildId.Substring(0, x.ChildId.IndexOf("/"))).ToList();
+            //    var shipmentSettlementHasFile = shipmentSettlement.Where(x => hblIds.Contains(x.HblId.ToString()));
 
-                    TotalAmount = advInfo.TotalAmount ?? 0,
-                    AdvanceNo = advInfo.AdvanceNo,
-                    AdvanceAmount = advInfo.AdvanceAmount,
-                    Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
-                    CustomNo = advInfo.CustomNo,
-                    IsLocked = item.IsLocked,
-                    Files = new List<SysImage>()
-                });
-            }
+            //    if (shipmentSettlementHasFile.Count() == 0)
+            //    {
+            //        return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
+            //    }
+            //    foreach (ShipmentSettlement item in shipmentSettlementHasFile)
+            //    {
+            //        string folderChild = string.Format("{0}/", item.HblId.ToString());
+            //        if (!string.IsNullOrEmpty(item.AdvanceNo))
+            //        {
+            //            folderChild += item.AdvanceNo + "/";
+            //        }
+            //        if (!string.IsNullOrEmpty(item.CustomNo))
+            //        {
+            //            folderChild += item.CustomNo + "/";
+            //        }
 
-            IQueryable<SysImage> FileInShipmentSettlement = sysImageRepository.Get(x => x.Folder == "Settlement"
-            && x.ObjectId == settleCurrent.Id.ToString()
-            && !string.IsNullOrEmpty(x.ChildId));
-
-            if (FileInShipmentSettlement.Count() > 0)
-            {
-                List<string> hblIds = FileInShipmentSettlement.Select(x => x.ChildId.Substring(0, x.ChildId.IndexOf("/"))).ToList();
-                var shipmentSettlementHasFile = shipmentSettlement.Where(x => hblIds.Contains(x.HblId.ToString()));
-
-                if (shipmentSettlementHasFile.Count() == 0)
-                {
-                    return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
-                }
-                foreach (ShipmentSettlement item in shipmentSettlementHasFile)
-                {
-                    string folderChild = string.Format("{0}/", item.HblId.ToString());
-                    if (!string.IsNullOrEmpty(item.AdvanceNo))
-                    {
-                        folderChild += item.AdvanceNo + "/";
-                    }
-                    if (!string.IsNullOrEmpty(item.CustomNo))
-                    {
-                        folderChild += item.CustomNo + "/";
-                    }
-
-                    item.Files = FileInShipmentSettlement.Where(x => x.ChildId == folderChild).ToList();
-                }
-            }
-            return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
+            //        item.Files = FileInShipmentSettlement.Where(x => x.ChildId == folderChild).ToList();
+            //    }
+            //}
+            // return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
         }
 
         private List<SysImage> GetShipmentAttachFile(string settleCode, Guid hblId, string advanceNo, string customNo)
@@ -5746,7 +5782,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         }
 
-        public List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null)
+        public List<ShipmentChargeSettlement> GetSurchargeDetailSettlement(string settlementNo, Guid? HblId = null, string advanceNo = null, string clearanceNo = null, int page = -1, int size = 30)
         {
             var parameters = new[]{
                 new SqlParameter(){ ParameterName = "@SettlementNo", Value = settlementNo },
@@ -5763,8 +5799,106 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 parameters = parameters.Concat(new[] { new SqlParameter("@ClearanceNo", clearanceNo) }).ToArray();
             }
-            List<sp_GetSurchargeDetailSettlement> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSettlement>(parameters);
-            var data = mapper.Map<List<ShipmentChargeSettlement>>(listSurcharges);
+            if (page > 0)
+            {
+                parameters = parameters.Concat(new[] { new SqlParameter("@Page", page), new SqlParameter("@Size", size) }).ToArray();
+            }
+            // List<sp_GetSurchargeDetailSettlement> listSurcharges = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeDetailSettlement>(parameters);
+            // var data = mapper.Map<List<ShipmentChargeSettlement>>(listSurcharges);
+
+            var data = new List<ShipmentChargeSettlement>();
+            using (SqlConnection connection = new SqlConnection(DbHelper.DbHelper.ConnectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    using (SqlCommand command = new SqlCommand("sp_GetSurchargeDetailSettlement", connection))
+                    {
+                        command.CommandTimeout = 300;
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddRange(parameters);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var item = new ShipmentChargeSettlement
+                                {
+                                    Id = Guid.Parse(reader["Id"].ToString()),
+                                    Type = reader["Type"].ToString(),
+                                    KickBack = reader["KickBack"] == DBNull.Value ? false : (bool?)reader["KickBack"],
+                                    ChargeId = Guid.Parse(reader["ChargeId"].ToString()),
+                                    ChargeName = reader["ChargeName"].ToString(),
+                                    ChargeCode = reader["ChargeCode"].ToString(),
+                                    ChargeGroup = reader["ChargeGroup"] == DBNull.Value ? Guid.Empty : Guid.Parse(reader["ChargeGroup"].ToString()),
+                                    UnitId = reader["UnitId"] == DBNull.Value ? (short)0 : (short)reader["UnitId"],
+                                    UnitName = reader["UnitName"].ToString(),
+                                    Hblid = Guid.Parse(reader["HBLID"].ToString()),
+                                    JobId = reader["JobId"].ToString(),
+                                    MBL = reader["MBL"].ToString(),
+                                    HBL = reader["HBL"].ToString(),
+                                    SettlementCode = reader["SettlementCode"].ToString(),
+                                    AdvanceNo = reader["AdvanceNo"] == DBNull.Value ? null : reader["AdvanceNo"].ToString(),
+                                    OriginAdvanceNo = reader["OriginAdvanceNo"] == DBNull.Value ? null : reader["OriginAdvanceNo"].ToString(),
+                                    FinalExchangeRate = reader["FinalExchangeRate"] == DBNull.Value ? 1 : (decimal)reader["FinalExchangeRate"],
+                                    Quantity = reader["Quantity"] == DBNull.Value ? 0 : (decimal)reader["Quantity"],
+                                    UnitPrice = reader["UnitPrice"] == DBNull.Value ? 0 : (decimal)reader["UnitPrice"],
+                                    CurrencyId = reader["CurrencyId"].ToString(),
+                                    Vatrate = reader["Vatrate"] == DBNull.Value ? 0 : (decimal)reader["Vatrate"],
+                                    NetAmount = reader["NetAmount"] == DBNull.Value ? 0 : (decimal)reader["NetAmount"],
+                                    Total = reader["Total"] == DBNull.Value ? 0 : (decimal)reader["Total"],
+                                    AmountVnd = reader["AmountVND"] == DBNull.Value ? 0 : (decimal)reader["AmountVND"],
+                                    AmountUSD = reader["AmountUSD"] == DBNull.Value ? 0 : (decimal)reader["AmountUSD"],
+                                    VatAmountVnd = reader["VatAmountVnd"] == DBNull.Value ? 0 : (decimal)reader["VatAmountVnd"],
+                                    VatAmountUSD = reader["VatAmountUSD"] == DBNull.Value ? 0 : (decimal)reader["VatAmountUSD"],
+                                    TotalAmountVnd = reader["TotalAmountVnd"] == DBNull.Value ? 0 : (decimal)reader["TotalAmountVnd"],
+                                    PayerId = reader["PayerId"] == DBNull.Value ? null : reader["PayerId"].ToString(),
+                                    VatPartnerId = reader["VatPartnerId"] == DBNull.Value ? string.Empty : reader["VatPartnerId"].ToString(),
+                                    PaymentObjectId = reader["PaymentObjectId"] == DBNull.Value ? string.Empty : reader["PaymentObjectId"].ToString(),
+                                    VatPartnerShortName = reader["VatPartnerShortName"] == DBNull.Value ? string.Empty : reader["VatPartnerShortName"].ToString(),
+                                    InvoiceNo = reader["InvoiceNo"] == DBNull.Value ? string.Empty : reader["InvoiceNo"].ToString(),
+                                    SeriesNo = reader["SeriesNo"] == DBNull.Value ? string.Empty : reader["SeriesNo"].ToString(),
+                                    InvoiceDate = reader["InvoiceDate"] == DBNull.Value ? null : (DateTime?)reader["InvoiceDate"],
+                                    ClearanceNo = reader["clearanceNo"] == DBNull.Value ? null : reader["clearanceNo"].ToString(),
+                                    ContNo = reader["ContNo"] == DBNull.Value ? string.Empty : reader["ContNo"].ToString(),
+                                    Notes = reader["Notes"] == DBNull.Value ? string.Empty : reader["Notes"].ToString(),
+                                    IsFromShipment = reader["IsFromShipment"] == DBNull.Value ? false : (bool?)reader["IsFromShipment"],
+                                    TypeOfFee = reader["TypeOfFee"] == DBNull.Value ? string.Empty : reader["TypeOfFee"].ToString(),
+                                    SyncedFrom = reader["SyncedFrom"] == DBNull.Value ? string.Empty : reader["SyncedFrom"].ToString(),
+                                    PaySyncedFrom = reader["PaySyncedFrom"] == DBNull.Value ? null : reader["PaySyncedFrom"].ToString(),
+                                    Soano = reader["SOANo"] == DBNull.Value ? string.Empty : reader["SOANo"].ToString(),
+                                    PaySoano = reader["PaySOANo"] == DBNull.Value ? string.Empty : reader["PaySOANo"].ToString(),
+                                    CreditNo = reader["CreditNo"] == DBNull.Value ? string.Empty : reader["CreditNo"].ToString(),
+                                    DebitNo = reader["DebitNo"] == DBNull.Value ? string.Empty : reader["DebitNo"].ToString(),
+                                    LinkChargeId = reader["LinkChargeId"] == DBNull.Value ? null : reader["LinkChargeId"].ToString(),
+                                    SyncedFromBy = reader["SyncedFromBy"] == DBNull.Value ? string.Empty : reader["SyncedFromBy"].ToString(),
+                                    PICName = reader["PICName"] == DBNull.Value ? string.Empty : reader["PICName"].ToString(),
+                                    ShipmentId = Guid.Parse(reader["ShipmentId"].ToString()),
+                                    IsLocked = reader["IsLocked"] == DBNull.Value ? false : (bool?)reader["IsLocked"],
+                                    TypeService = reader["TypeService"] == DBNull.Value ? string.Empty : reader["TypeService"].ToString(),
+                                    Payer = reader["Payer"] == DBNull.Value ? string.Empty : reader["Payer"].ToString(),
+                                    HasNotSynce = (bool?)reader["HasNotSynce"],
+                                    HadIssued = (bool?)reader["HadIssued"],
+                                    PayeeIssued = (bool?)reader["PayeeIssued"],
+                                    OBHPartnerIssued = (bool?)reader["OBHPartnerIssued"],
+                                    ChargeAutoRated = (bool?)reader["ChargeAutoRated"],
+                                };
+
+                                data.Add(item);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    new LogHelper("GetDataExportAccountantError", ex.Message?.ToString());
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
             return data;
         }
 
@@ -6354,6 +6488,12 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return invalidShipment;
+        }
+
+        public List<ShipmentChargeSettlement> GetSurchargePagingSettlementPayment(string settlementNo, int page, int size)
+        {
+            var data = GetSurchargeDetailSettlement(settlementNo, null, null, null, page, size);
+            return data;
         }
     }
 }

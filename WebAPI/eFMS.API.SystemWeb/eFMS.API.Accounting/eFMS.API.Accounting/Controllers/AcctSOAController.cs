@@ -7,6 +7,7 @@ using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -17,6 +18,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -540,6 +542,31 @@ namespace eFMS.API.Accounting.Controllers
                 });
             }
             return Ok(dt);
+        }
+
+
+        [HttpGet]
+        [Route("GetListSurchargeDetailSOA")]
+        public IActionResult GetListSurchargeDetailSOA(string soaNo, int page, int size)
+        {
+            if (page > 0)
+            {
+                List<ChargeShipmentModel> data = acctSOAService.GetListSurchargeDetailSOA(soaNo, page, size);
+                return Ok(data);
+            }
+            else
+            {
+                List<ChargeShipmentModel> data = acctSOAService.GetListSurchargeDetailSOA(soaNo);
+                return Ok(data);
+            }
+        }
+
+        [HttpGet]
+        [Route("GetSurchargeGroupSOA")]
+        public async Task<IActionResult> GetSurchargeGroupSOA(string soaNo)
+        {
+            var data = acctSOAService.GetSOAGroupShipmentModels(soaNo);
+            return Ok(data);
         }
     }
 }

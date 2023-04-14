@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
-    public class WorkOrderService : RepositoryBase<CsWorkOrder, CsWorkOrderModel>, IWorkOrderService
+    public class WorkOrderService : Base<CsWorkOrder>, IWorkOrderService
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
@@ -37,10 +37,11 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatPartner> catPartnerRepo;
         private readonly IContextBase<CatPlace> catPlaceRepo;
         private readonly IContextBase<CatUnit> catUnitrepo;
+        private readonly IMapper mapper;
         public WorkOrderService(IOptions<Settings> settings,
             IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsWorkOrder> repository,
-            IMapper mapper,
+            IMapper _mapper,
             ICurrentUser currUser,
             IContextBase<CsWorkOrderPrice> workOrderPrice,
             IContextBase<CsWorkOrderSurcharge> workOrderSurcharge,
@@ -49,7 +50,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPartner> catPartner,
             IContextBase<CatPlace> catPlace,
             IContextBase<CatUnit> catUnit
-            ) : base(repository, mapper)
+            ) : base(settings, currUser)
         {
             stringLocalizer = localizer;
             currentUser = currUser;
@@ -60,11 +61,12 @@ namespace eFMS.API.Documentation.DL.Services
             catPartnerRepo = catPartner;
             catPlaceRepo = catPlace;
             catUnitrepo = catUnit;
+            mapper = _mapper;
         }
 
         public bool CheckAllowPermissionAction(Guid id, PermissionRange range)
         {
-            CsWorkOrder wo = DataContext.Get(o => o.Id == id).FirstOrDefault();
+            CsWorkOrder wo = Get(o => o.Id == id).FirstOrDefault();
             if (wo == null)
             {
                 return false;
@@ -88,24 +90,25 @@ namespace eFMS.API.Documentation.DL.Services
         public async Task<HandleState> Delete(Guid Id)
         {
             var hs = new HandleState();
-            CsWorkOrder workOrder = DataContext.Get(x => x.Id == Id).FirstOrDefault();
+            CsWorkOrder workOrder = Get(x => x.Id == Id).FirstOrDefault();
             if (workOrder == null)
             {
                 return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
             }
 
-            using (var trans = DataContext.DC.Database.BeginTransaction())
+            using (var trans = DC.Database.BeginTransaction())
             {
                 try
                 {
-                    hs = DataContext.Delete(x => x.Id == Id);
-                    if(hs.Success)
+                    hs = Delete(x => x.Id == Id);
+                    if (hs.Success)
                     {
                         var hsDeletePrice = await DeletePriceWorkOrder(Id);
-                        if(hsDeletePrice.Success)
+                        if (hsDeletePrice.Success)
                         {
                             trans.Commit();
-                        } else
+                        }
+                        else
                         {
                             string innerMes = hsDeletePrice?.Exception?.InnerException?.Message;
                             if (!string.IsNullOrEmpty(innerMes))
@@ -135,68 +138,88 @@ namespace eFMS.API.Documentation.DL.Services
         private async Task<HandleState> DeletePriceWorkOrder(Guid Id)
         {
             var hs = new HandleState();
-            using (var trans = workOrderPriceRepo.DC.Database.BeginTransaction())
+            using (var transPrice = workOrderPriceRepo.DC.Database.BeginTransaction())
             {
                 try
                 {
                     var prices = await workOrderPriceRepo.GetAsync(x => x.WorkOrderId == Id);
-                    if(prices.Count == 0)
+                    if (prices.Count == 0)
                     {
                         return hs;
                     }
-                    var priceIds = prices.Select(x => x.Id);
 
                     using (var tranSurcharge = workOrderSurchargeRepo.DC.Database.BeginTransaction())
                     {
-                        var hsDeleteSurcharges = await workOrderSurchargeRepo.DeleteAsync(x => priceIds.Contains(x.WorkOrderPriceId));
-                        if (hsDeleteSurcharges.Success)
+                        var surchargesDelete = await workOrderSurchargeRepo.GetAsync(x => x.WorkOrderId == Id);
+                        if (surchargesDelete.Count == 0)
                         {
                             var hsDeletePrices = await workOrderPriceRepo.DeleteAsync(x => x.WorkOrderId == Id);
                             if (hsDeletePrices.Success)
                             {
-                                tranSurcharge.Commit();
-                                trans.Commit();
-                            } else
+                                transPrice.Commit();
+                                return hs;
+                            }
+                            else
                             {
-                                tranSurcharge.Rollback();
+                                throw new Exception("Xoá price thất bại");
+
                             }
                         }
                         else
                         {
-                            string innerMes = hsDeleteSurcharges?.Exception?.InnerException?.Message;
-                            if (!string.IsNullOrEmpty(innerMes))
+                            var hsDeleteSurcharges = await workOrderSurchargeRepo.DeleteAsync(x => x.WorkOrderId == Id);
+                            if (hsDeleteSurcharges.Success)
                             {
-                                throw new Exception(innerMes);
+                                var hsDeletePrices = await workOrderPriceRepo.DeleteAsync(x => x.WorkOrderId == Id);
+                                if (hsDeletePrices.Success)
+                                {
+                                    tranSurcharge.Commit();
+                                    transPrice.Commit();
+                                }
+                                else
+                                {
+                                    tranSurcharge.Rollback();
+                                    throw new Exception("Xoá thát bại");
+                                }
                             }
                             else
                             {
-                                throw new Exception(hsDeleteSurcharges?.Message?.ToString());
+                                string innerMes = hsDeleteSurcharges?.Exception?.InnerException?.Message;
+                                if (!string.IsNullOrEmpty(innerMes))
+                                {
+                                    throw new Exception(innerMes);
+                                }
+                                else
+                                {
+                                    throw new Exception(hsDeleteSurcharges?.Message?.ToString());
+                                }
                             }
                         }
+
                     }
                     return hs;
                 }
                 catch (Exception ex)
                 {
-                    trans.Rollback();
+                    transPrice.Rollback();
                     return new HandleState((object)ex.Message);
                 }
                 finally
                 {
-                    trans.Dispose();
+                    transPrice.Dispose();
                 }
             }
         }
 
         public CsWorkOrderViewUpdateModel GetById(Guid id)
         {
-            CsWorkOrder workOrder = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            CsWorkOrder workOrder = Get(x => x.Id == id).FirstOrDefault();
             if (workOrder == null) return new CsWorkOrderViewUpdateModel();
 
             CsWorkOrderViewUpdateModel workOrderViewUpdateModel = mapper.Map<CsWorkOrderViewUpdateModel>(workOrder);
 
             var portIds = new List<Guid?>();
-            if(workOrderViewUpdateModel.Pol != null)
+            if (workOrderViewUpdateModel.Pol != null)
             {
                 portIds.Add(workOrder.Pol);
             }
@@ -212,15 +235,16 @@ namespace eFMS.API.Documentation.DL.Services
             string partnerId = workOrder.PartnerId.ToString();
             workOrderViewUpdateModel.PartnerName = catPartnerRepo.Get(x => x.Id == partnerId)?.FirstOrDefault()?.ShortName;
 
-            var userIds = new List<string> { workOrder.UserCreated, workOrder.UserModified };
+            var userIds = new List<string> { workOrder.UserCreated, workOrder.UserModified, workOrder.SalesmanId?.ToString() };
             var users = sysUserRepo.Get(x => userIds.Contains(x.Id)).ToList();
             workOrderViewUpdateModel.UserNameCreated = users.Where(x => x.Id == workOrder.UserCreated)?.FirstOrDefault()?.Username;
             workOrderViewUpdateModel.UserNameModified = users.Where(x => x.Id == workOrder.UserModified)?.FirstOrDefault()?.Username;
+            workOrderViewUpdateModel.SalesmanName = users.Where(x => x.Id == workOrder.SalesmanId.ToString())?.FirstOrDefault()?.Username;
 
             workOrderViewUpdateModel.TransactionTypeName = GetTypeFromData.GetTranctionTypeName(workOrder.TransactionType);
 
             var listPriceWorkOrder = workOrderPriceRepo.Get(x => x.WorkOrderId == workOrder.Id).ToList();
-            if(listPriceWorkOrder.Count > 0)
+            if (listPriceWorkOrder.Count > 0)
             {
                 List<CsWorkOrderPriceModel> prices = new List<CsWorkOrderPriceModel>();
                 foreach (var item in listPriceWorkOrder)
@@ -261,7 +285,8 @@ namespace eFMS.API.Documentation.DL.Services
                         }
 
                         workOrderPriceModel.Surcharges = listModelSurcharges;
-                    } else
+                    }
+                    else
                     {
                         workOrderPriceModel.Surcharges = new List<CsWorkOrderSurchargeModel>();
                     }
@@ -346,7 +371,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialWorkOrder);
             PermissionRange permissionRangeList = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
-            if(permissionRangeList == PermissionRange.None)
+            if (permissionRangeList == PermissionRange.None)
             {
                 return new ResponsePagingModel<CsWorkOrderViewModel>
                 {
@@ -381,7 +406,7 @@ namespace eFMS.API.Documentation.DL.Services
         private IQueryable<CsWorkOrder> QueryData(WorkOrderCriteria criteria)
         {
             var criteriaBuilder = BuildCriteriaQuery(criteria);
-            var query = criteriaBuilder.Apply(DataContext.Get());
+            var query = criteriaBuilder.Apply(Get());
             return query;
         }
 
@@ -428,7 +453,7 @@ namespace eFMS.API.Documentation.DL.Services
                .WhereIf(criteria.Active != null,
                     x => x.Active == criteria.Active);
 
-            var query = criteriaBuilder.Apply(DataContext.Get());
+            var query = criteriaBuilder.Apply(Get());
             return query;
         }
 
@@ -443,7 +468,7 @@ namespace eFMS.API.Documentation.DL.Services
                 .WhereIf(range == PermissionRange.Company, x => x.UserCreated == currentUser.UserID)
                 .WhereIf(range == PermissionRange.None, x => x.CompanyId == currentUser.CompanyID);
 
-            var query = criteriaBuilder.Apply(DataContext.Get());
+            var query = criteriaBuilder.Apply(Get());
             return query;
         }
 
@@ -466,7 +491,7 @@ namespace eFMS.API.Documentation.DL.Services
                     model.Active = false;
                     model.Code = StringHelper.RandomString(7); // TODO
                     CsWorkOrder workOrder = mapper.Map<CsWorkOrder>(model);
-                    result = DataContext.Add(workOrder);
+                    result = await AddAsync(workOrder);
 
                     if (result.Success)
                     {
@@ -506,16 +531,18 @@ namespace eFMS.API.Documentation.DL.Services
                     if (hs.Success)
                     {
                         HandleState hsSurcharge = workOrderSurchargeRepo.SubmitChanges();
-                        if(hsSurcharge.Success)
+                        if (hsSurcharge.Success)
                         {
-                            trans.Commit(); 
-                        } else
+                            trans.Commit();
+                        }
+                        else
                         {
                             string innerMes = hsSurcharge?.Exception?.InnerException?.Message;
                             if (!string.IsNullOrEmpty(innerMes))
                             {
                                 throw new Exception(innerMes);
-                            } else
+                            }
+                            else
                             {
                                 throw new Exception(hsSurcharge?.Message?.ToString());
                             }
@@ -584,16 +611,16 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var item in list)
             {
                 CsWorkOrderPrice priceItem = mapper.Map<CsWorkOrderPrice>(item);
-               
+
                 priceItem.UserModified = currentUser.UserID;
                 priceItem.DatetimeModified = DateTime.Now;
-                
+
                 if (item.Surcharges != null && item.Surcharges.Count > 0)
                 {
                     var surchargesAdd = item.Surcharges.Where(x => x.Id == null || x.Id == Guid.Empty).ToList();
                     var surchargesModified = item.Surcharges.Where(x => x.Id != null && x.Id != Guid.Empty).ToList();
 
-                    if(surchargesAdd.Count > 0)
+                    if (surchargesAdd.Count > 0)
                     {
                         foreach (var i in surchargesAdd)
                         {
@@ -608,7 +635,7 @@ namespace eFMS.API.Documentation.DL.Services
                             newSurchargesInPriceItem.Add(mapper.Map<CsWorkOrderSurcharge>(i));
                         }
                     }
-                    if(surchargesModified.Count > 0)
+                    if (surchargesModified.Count > 0)
                     {
                         var surchargeModifiedIds = surchargesModified.Select(x => x.Id).ToList();
                         foreach (var i in surchargesModified)
@@ -627,14 +654,14 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             // ADD.
-            if(newSurchargesInPriceItem.Count > 0)
+            if (newSurchargesInPriceItem.Count > 0)
             {
                 foreach (var sur in newSurchargesInPriceItem)
                 {
                     workOrderSurchargeRepo.Add(sur, false);
                 }
             }
-               
+
             // UPDATE.
             if (updateSurchargesInPriceItem.Count > 0)
             {
@@ -653,7 +680,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             return workOrderPriceRepo.SubmitChanges();
         }
-        private async  Task<HandleState> UpdatePrice(List<CsWorkOrderPriceModel> list, CsWorkOrder workOrder)
+        private async Task<HandleState> UpdatePrice(List<CsWorkOrderPriceModel> list, CsWorkOrder workOrder)
         {
             var hs = new HandleState();
 
@@ -670,7 +697,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var listModified = list.Where(x => x.Id != null && x.Id != Guid.Empty).ToList();
 
                     List<HandleState> hsAddAndModified = new List<HandleState>();
-                    
+
                     if (listAdded.Count > 0 || listModified.Count > 0)
                     {
                         var tasks = new List<Task<HandleState>>();
@@ -737,7 +764,7 @@ namespace eFMS.API.Documentation.DL.Services
         public async Task<HandleState> DeletePrice(Guid id)
         {
             HandleState hs = new HandleState();
-           
+
             using (var trans = workOrderPriceRepo.DC.Database.BeginTransaction())
             {
                 try
@@ -749,7 +776,7 @@ namespace eFMS.API.Documentation.DL.Services
                         var hsDeletePrice = await workOrderPriceRepo.DeleteAsync(x => x.Id == priceItemDelete.Id);
                         var surcharges = workOrderSurchargeRepo.Get(x => x.WorkOrderPriceId == id).ToList();
 
-                        if(hsDeletePrice.Success)
+                        if (hsDeletePrice.Success)
                         {
                             if (surcharges.Count > 0)
                             {
@@ -775,7 +802,8 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 trans.Commit();
                             }
-                        } else
+                        }
+                        else
                         {
                             string innerMes = hsDeletePrice?.Exception?.InnerException?.Message;
                             if (!string.IsNullOrEmpty(innerMes))
@@ -806,13 +834,13 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var result = new HandleState();
 
-            using (var trans = await DataContext.DC.Database.BeginTransactionAsync())
+            using (var trans = await DC.Database.BeginTransactionAsync())
             {
                 try
                 {
 
-                    CsWorkOrder workOrderEntity = DataContext.First(x => x.Id == model.Id);
-                    if(workOrderEntity == null)
+                    CsWorkOrder workOrderEntity = First(x => x.Id == model.Id);
+                    if (workOrderEntity == null)
                     {
                         return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
                     }
@@ -835,7 +863,7 @@ namespace eFMS.API.Documentation.DL.Services
                     workOrder.SyncedStatus = workOrderEntity.SyncedStatus;
                     workOrder.Active = workOrderEntity.Active;
 
-                    result = DataContext.Update(workOrder, x => x.Id == workOrder.Id);
+                    result = Update(workOrder, x => x.Id == workOrder.Id);
                     if (result.Success)
                     {
                         HandleState hsUpdatePrice = await UpdatePrice(model.ListPrice, workOrder);
@@ -861,13 +889,13 @@ namespace eFMS.API.Documentation.DL.Services
         public async Task<HandleState> SetActiveInactive(ActiveInactiveRequest request)
         {
             var hs = new HandleState();
-            CsWorkOrder workOrder = DataContext.Get(x => x.Id == request.Id).FirstOrDefault();
+            CsWorkOrder workOrder = Get(x => x.Id == request.Id).FirstOrDefault();
             if (workOrder == null)
             {
                 return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND]);
             }
 
-            using (var trans = await DataContext.DC.Database.BeginTransactionAsync())
+            using (var trans = await DC.Database.BeginTransactionAsync())
             {
                 try
                 {
@@ -875,8 +903,8 @@ namespace eFMS.API.Documentation.DL.Services
                     workOrder.DatetimeModified = DateTime.Now;
                     workOrder.UserModified = currentUser.UserID;
 
-                    hs = await DataContext.UpdateAsync(workOrder, x => x.Id == workOrder.Id);
-                    if(hs.Success)
+                    hs = await UpdateAsync(workOrder, x => x.Id == workOrder.Id);
+                    if (hs.Success)
                     {
                         trans.Commit();
                     }
@@ -892,6 +920,57 @@ namespace eFMS.API.Documentation.DL.Services
                     trans.Dispose();
                 }
             }
+        }
+
+        public bool CheckExist(WorkOrderRequest model, out CsWorkOrder workOrderDuplicate)
+        {
+            bool found = false;
+            workOrderDuplicate = null;
+            List<CsWorkOrder> workorderSameCriteria = new List<CsWorkOrder>();
+            Expression<Func<CsWorkOrder, bool>> expression = x => x.Active == true;
+
+            if (model.Id == Guid.Empty)
+            {
+                expression = expression.And(x => x.PartnerId == model.PartnerId
+                && x.Pol == model.Pol
+                && x.Pod == model.Pod
+                && x.TransactionType == model.TransactionType
+                && x.SalesmanId == model.SalesmanId);
+            }
+            else
+            {
+                expression = expression.And(x => x.PartnerId == model.PartnerId
+                && x.Id != model.Id
+                && x.Pol == model.Pol
+                && x.Pod == model.Pod
+                && x.TransactionType == model.TransactionType
+                && x.SalesmanId == model.SalesmanId);
+            }
+            workorderSameCriteria = Get(expression).ToList();
+
+            if (workorderSameCriteria.Count > 0)
+            {
+                var workOrderIds = workorderSameCriteria.Select(x => x.Id);
+                if (model.ListPrice.Count > 0)
+                {
+                    foreach (var priceItem in model.ListPrice)
+                    {
+                        var worKorderPrices = workOrderPriceRepo.Where(x => workOrderIds.Contains(x.WorkOrderId)
+                        && priceItem.PartnerId == x.PartnerId
+                        && priceItem.QuantityFromRange == x.QuantityFromRange
+                        && priceItem.QuantityToRange == x.QuantityToRange).ToList();
+
+                        if (worKorderPrices.Count > 0)
+                        {
+                            found = true;
+                            workOrderDuplicate = workorderSameCriteria.Where(x => x.Id == worKorderPrices.FirstOrDefault().WorkOrderId)?.FirstOrDefault();
+                            break;
+                        }
+
+                    }
+                }
+            }
+            return found;
         }
     }
 }
