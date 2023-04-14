@@ -193,7 +193,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             KeyS3 = key
                         };
                         list.Add(sysImage);
-                        if (type == "Shipment" || type == "Catalogue")
+                        if (type == "Shipment")
                         {
                             var attachTemplate = _attachFileTemplateRepo.Get(x => x.Code == edoc.Code).FirstOrDefault();
                             var sysImageDetail = new SysImageDetail

@@ -8,7 +8,7 @@ export const environment = {
         WEB_URL: "uat-api-efms.itlvn.com",
         ACCOUNTING: "uat-api-efms.itlvn.com/Accounting",
         DOCUMENTATION: "uat-api-efms.itlvn.com/Documentation",
-        CATALOGUE: "localhost:44341",
+        CATALOGUE: "uat-api-efms.itlvn.com/Catalogue",
         OPERATION: "uat-api-efms.itlvn.com/Operation",
         SYSTEM: "uat-api-efms.itlvn.com/System",
         REPORT: "https://uat-api-efms.itlvn.com/ReportPreview/Default.aspx",
@@ -17,7 +17,7 @@ export const environment = {
         INDENTITY_SERVER_URL: "https://uat-api-efms.itlvn.com/identityserver",
         EXPORT_CRYSTAL: "uat-api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
         PARTNER_API: "uat-api-efms.itlvn.com/partner",
-        FILE_SYSTEM: "localhost:44329",
+        FILE_SYSTEM: "uat-api-efms.itlvn.com/File",
         REPORT_MANAGEMENT: "uat-api-efms.itlvn.com/Report"
     },
     AUTHORIZATION:
