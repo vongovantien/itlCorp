@@ -406,14 +406,14 @@ namespace eFMS.API.Report.DL.Services
                 data.CBM = item.Cbm;
                 if (data.JobNo.Contains("LOG"))
                 {
-                    var jobOPS = opsRepository.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
-                    var saleFirstGroupOPS = jobOPS.SalesGroupId.Split(';').FirstOrDefault();
-                    var saleGroupId = short.Parse(saleFirstGroupOPS);
-                    var saleDeptId = short.Parse(jobOPS.SalesDepartmentId);
+                    //var jobOPS = opsRepository.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
+                    //var saleFirstGroupOPS = jobOPS.SalesGroupId.Split(';').FirstOrDefault();
+                    //var saleGroupId = short.Parse(saleFirstGroupOPS);
+                    //var saleDeptId = short.Parse(jobOPS.SalesDepartmentId);
                     //data.SaleInfo.GroupSaleMan = groupRepository.Get(x => x.Id == saleGroupId).FirstOrDefault().ShortName;
                     //data.SaleInfo.DeptSaleMan = deptRepository.Get(x => x.Id == saleDeptId).FirstOrDefault().DeptNameAbbr;
-                    var grouSale=groupDic.Where(x=>x.Key == saleGroupId).FirstOrDefault();
-                    var deptSale=deptDic.Where(x=>x.Key== saleDeptId).FirstOrDefault();
+                    var grouSale=groupDic.Where(x=>x.Key == item.GroupId).FirstOrDefault();
+                    var deptSale=deptDic.Where(x=>x.Key== item.DepartmentId).FirstOrDefault();
                     data.SaleInfo = new SaleManInfo() {
                     DeptSaleMan=deptSale.Value,
                     GroupSaleMan=grouSale.Value
@@ -434,12 +434,12 @@ namespace eFMS.API.Report.DL.Services
                     //}
                     //data.PICInfo.GroupPIC = groupRepository.Get(x => x.Id == jobCS.GroupId).FirstOrDefault().ShortName;
                     //data.SaleInfo.DeptSaleMan = deptRepository.Get(x => x.Id == jobCS.DepartmentId).FirstOrDefault().DeptNameAbbr;
-                    var saleGroupId = int.Parse(saleFristGroupId);
-                    var saleDeptId = short.Parse(jobCSDeatil.SalesDepartmentId);
-                    var grouSale = groupDic.Where(x => x.Key == saleGroupId).FirstOrDefault();
-                    var deptSale = deptDic.Where(x => x.Key == saleDeptId).FirstOrDefault();
-                    var groupPIC = groupDic.Where(x => x.Key == jobCS.GroupId).FirstOrDefault();
-                    var deptPIC = groupDic.Where(x => x.Key == jobCS.DepartmentId).FirstOrDefault();
+                    //var saleGroupId = int.Parse(saleFristGroupId);
+                    //var saleDeptId = short.Parse(jobCSDeatil.SalesDepartmentId);
+                    var grouSale = groupDic.Where(x => x.Key == int.Parse(saleFristGroupId)).FirstOrDefault();
+                    var deptSale = deptDic.Where(x => x.Key == short.Parse(jobCSDeatil.SalesDepartmentId)).FirstOrDefault();
+                    var groupPIC = groupDic.Where(x => x.Key == item.GroupId).FirstOrDefault();
+                    var deptPIC = deptDic.Where(x => x.Key == item.DepartmentId).FirstOrDefault();
                     var saleInfo = new SaleManInfo() {
                     DeptSaleMan=deptSale.Value,
                     GroupSaleMan=grouSale.Value,
