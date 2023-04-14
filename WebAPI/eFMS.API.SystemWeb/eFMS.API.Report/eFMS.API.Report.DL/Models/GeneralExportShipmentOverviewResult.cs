@@ -76,5 +76,20 @@ namespace eFMS.API.Report.DL.Models
         public decimal? TotalCustomBuy { get; set; }
         public string BookingNo { get; set; }
         public string ReferenceNo { get; set; }
+        public SaleManInfo SaleInfo { get; set; }
+        public PICInfo PICInfo { get; set; }
+
+    }
+
+    public class SaleManInfo
+    {
+        public string GroupSaleMan { get; set; }
+        public string DeptSaleMan { get; set; }
+    }
+
+    public class PICInfo
+    {
+        public string GroupPIC { get; set; }
+        public string DeptPIC { get; set; }
     }
 }
