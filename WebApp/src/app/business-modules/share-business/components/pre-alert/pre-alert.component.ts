@@ -68,6 +68,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     isPOD: boolean = false; // Proof of delivery
     isSendHbl: boolean = false; // Send HBL (Sea Services)
     isSendHawb: boolean = false; // Send HAWB (Air Services)
+    isDbtInv: boolean = false; // Send Debit Note/Invoice (All Service)
     // Import
     isExitsArrivalNotice: boolean = false;
     isCheckedArrivalNotice: boolean = false;
@@ -188,6 +189,8 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             case "Send S.I":
                 this.isSI = true;
                 break;
+            case "Send Debit/Invoice":
+                this.isDbtInv = true;
         }
     }
 
@@ -666,6 +669,11 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     // }
 
     //#region Content Mail
+    getDebitInvMailContent(hblId: string, jobId: string){
+        this.sendMailButtonName = "Debit Note & Credit Note";
+        this.getInfoMailDebitInv(hblId, jobId);
+    }
+
     getContentMail(serviceId: string, hblId: string, jobId: string) {
         switch (serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
@@ -860,6 +868,15 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     });
                 },
             );
+    }
+
+    getInfoMailDebitInv(hblId: string, jobId:string) {
+        this._progressRef.start();
+        this._documentRepo.getInfoMailDebitInv(hblId, jobId)
+        .pipe(
+            catchError(this.catchError),
+            finalize(() => {this._progressRef.complete(); })
+        )
     }
     //#endregion Content Mail
 
