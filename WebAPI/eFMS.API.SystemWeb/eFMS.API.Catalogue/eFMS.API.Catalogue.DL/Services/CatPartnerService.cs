@@ -2613,6 +2613,10 @@ namespace eFMS.API.Catalogue.DL.Services
                                                             && (x.IsExpired == null || x.IsExpired == false)
                                                             && IsMatchService(x.SaleService, criteria.Service)
                                                             && IsMatchOffice(x.OfficeId, criteria.Office);
+            if (!string.IsNullOrEmpty(criteria.ContractType) && criteria.ContractType != "Prepaid")
+            {
+                queryContract = queryContract.And(x => x.ContractType != "Prepaid");
+            }
             IQueryable<CatContract> contractAgents = contractRepository.Get(queryContract);
 
             queryAgentForKeyIn = from p in dataAgents
