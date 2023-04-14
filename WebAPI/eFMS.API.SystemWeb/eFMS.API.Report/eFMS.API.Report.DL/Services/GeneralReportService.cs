@@ -279,10 +279,43 @@ namespace eFMS.API.Report.DL.Services
             return dataShipment;
         }
 
+        private Dictionary<int, string> getDicSalePICInfo(List<int> ids, string type)
+        {
+            var result = new Dictionary<int, string>();
+            if (type == "group")
+            {
+                ids.ForEach(x =>
+                {
+                    var groupItem = groupRepository.Get(z => z.Id == x).FirstOrDefault();
+                    if (groupItem != null)
+                    {
+                        result.Add(x, groupItem.ShortName);
+                    }
+                });
+            }
+            else
+            {
+                ids.ForEach(x =>
+                {
+                    var deptItem = deptRepository.Get(z => z.Id == x).FirstOrDefault();
+                    if (deptItem != null)
+                    {
+                        result.Add(x, deptItem.DeptNameAbbr);
+                    }
+                });
+            }
+            return result;
+        }
+
         public IQueryable<GeneralExportShipmentOverviewResult> GeneralExportShipmentOverview(GeneralReportCriteria criteria)
         {
             List<GeneralExportShipmentOverviewResult> lstShipment = new List<GeneralExportShipmentOverviewResult>();
             var dataShipment = GetDataGeneralReport(criteria);
+            var groupIds=dataShipment.GroupBy(x=>x.GroupId).Select(x => x.FirstOrDefault().GroupId).ToList();
+            var deptIds=dataShipment.GroupBy(x=>x.DepartmentId).Select(x => x.FirstOrDefault().DepartmentId).ToList();
+            var groupDic = getDicSalePICInfo(groupIds,"group");
+            var deptDic= getDicSalePICInfo(deptIds, "dept");
+
             if (!dataShipment.Any()) return lstShipment.AsQueryable();
             //var lstSurchage = surCharge.Get();
             //var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
@@ -373,23 +406,48 @@ namespace eFMS.API.Report.DL.Services
                 data.CBM = item.Cbm;
                 if (data.JobNo.Contains("LOG"))
                 {
-                    var jobOPS=opsRepository.Get(x=>x.JobNo==item.JobNo).FirstOrDefault();
-                    var saleGroupOPS = jobOPS.SalesGroupId.Split(';').FirstOrDefault();
-                    data.SaleInfo.GroupSaleMan = groupRepository.Get(x => x.Id == short.Parse(saleGroupOPS)).FirstOrDefault().ShortName;
-                    data.SaleInfo.DeptSaleMan = deptRepository.Get(x => x.Id == short.Parse(jobOPS.SalesDepartmentId)).FirstOrDefault().DeptNameAbbr;
+                    var jobOPS = opsRepository.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
+                    var saleFirstGroupOPS = jobOPS.SalesGroupId.Split(';').FirstOrDefault();
+                    var saleGroupId = short.Parse(saleFirstGroupOPS);
+                    var saleDeptId = short.Parse(jobOPS.SalesDepartmentId);
+                    //data.SaleInfo.GroupSaleMan = groupRepository.Get(x => x.Id == saleGroupId).FirstOrDefault().ShortName;
+                    //data.SaleInfo.DeptSaleMan = deptRepository.Get(x => x.Id == saleDeptId).FirstOrDefault().DeptNameAbbr;
+                    var grouSale=groupDic.Where(x=>x.Key == saleGroupId).FirstOrDefault();
+                    var deptSale=deptDic.Where(x=>x.Key== saleDeptId).FirstOrDefault();
+                    data.SaleInfo = new SaleManInfo() {
+                    DeptSaleMan=deptSale.Value,
+                    GroupSaleMan=grouSale.Value
+                    };
                 }
                 else
                 {
                     var jobCS = tranRepository.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
-                    var jobCSDeatil=detailRepository.Get(x=>x.JobId==jobCS.Id&&x.Hwbno==item.HwbNo).FirstOrDefault();
-                    if (jobCSDeatil.SalesGroupId!=null&&jobCSDeatil.SalesDepartmentId!=null)
-                    {
-                        var saleGroupId=jobCSDeatil.SalesGroupId.Split(';').FirstOrDefault();
-                        data.SaleInfo.GroupSaleMan = groupRepository.Get(x => x.Id== int.Parse(saleGroupId)).FirstOrDefault().ShortName;
-                        data.SaleInfo.DeptSaleMan = deptRepository.Get(x => x.Id == short.Parse(jobCSDeatil.SalesDepartmentId)).FirstOrDefault().DeptNameAbbr;
-                    }
-                    data.PICInfo.GroupPIC = groupRepository.Get(x => x.Id == jobCS.GroupId).FirstOrDefault().ShortName;
-                    data.SaleInfo.DeptSaleMan = deptRepository.Get(x => x.Id == jobCS.DepartmentId).FirstOrDefault().DeptNameAbbr;
+                    var jobCSDeatil = detailRepository.Get(x => x.JobId == jobCS.Id && x.Hwbno == item.HwbNo).FirstOrDefault();
+                    var saleFristGroupId = jobCSDeatil.SalesGroupId.Split(';').FirstOrDefault();
+                    //if (jobCSDeatil.SalesGroupId != null && jobCSDeatil.SalesDepartmentId != null)
+                    //{
+                    //    var saleFristGroupId = jobCSDeatil.SalesGroupId.Split(';').FirstOrDefault();
+                    //    var saleGroup = groupRepository.Get(x => x.Id == int.Parse(saleFristGroupId)).FirstOrDefault();
+                    //    var saleDept = deptRepository.Get(x => x.Id == short.Parse(jobCSDeatil.SalesDepartmentId)).FirstOrDefault();
+                    //    data.SaleInfo.GroupSaleMan = saleGroup.ShortName;
+                    //    data.SaleInfo.DeptSaleMan = saleDept.DeptNameAbbr;
+                    //}
+                    //data.PICInfo.GroupPIC = groupRepository.Get(x => x.Id == jobCS.GroupId).FirstOrDefault().ShortName;
+                    //data.SaleInfo.DeptSaleMan = deptRepository.Get(x => x.Id == jobCS.DepartmentId).FirstOrDefault().DeptNameAbbr;
+                    var saleGroupId = int.Parse(saleFristGroupId);
+                    var saleDeptId = short.Parse(jobCSDeatil.SalesDepartmentId);
+                    var grouSale = groupDic.Where(x => x.Key == saleGroupId).FirstOrDefault();
+                    var deptSale = deptDic.Where(x => x.Key == saleDeptId).FirstOrDefault();
+                    var groupPIC = groupDic.Where(x => x.Key == jobCS.GroupId).FirstOrDefault();
+                    var deptPIC = groupDic.Where(x => x.Key == jobCS.DepartmentId).FirstOrDefault();
+                    var saleInfo = new SaleManInfo() {
+                    DeptSaleMan=deptSale.Value,
+                    GroupSaleMan=grouSale.Value,
+                    };
+                    var picInfo = new PICInfo() {
+                    DeptPIC=deptPIC.Value,
+                    GroupPIC=groupPIC.Value
+                    };
                 }
                 data.Cont20 = item.Cont20 ?? 0;
                 data.Cont40 = item.Cont40 ?? 0;
