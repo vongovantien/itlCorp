@@ -125,7 +125,7 @@
                                 </td>
                                 <td class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (charge.currencyId === 'USD' && charge.total > 100000)}">
-                                    <input type="text" class="form-control" [(ngModel)]="charge.total" readonly disabled
+                                    <input type="text" class="form-control" [value]="charge.total" readonly disabled
                                         currencyMask placeholder="Total">
                                 </td>
                                 <td class="disabled">
