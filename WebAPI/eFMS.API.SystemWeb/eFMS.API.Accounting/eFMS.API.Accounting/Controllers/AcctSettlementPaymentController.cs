@@ -434,6 +434,12 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     return BadRequest(_result);
                 }
+                _result = acctSettlementPaymentService.CheckConfirmPrepaidShipment(model.ShipmentCharge);
+                if (!_result.Status)
+                {
+                    return BadRequest(_result);
+
+                }
             }
             else
             {
@@ -497,6 +503,12 @@ namespace eFMS.API.Accounting.Controllers
                 if (!_result.Status)
                 {
                     return BadRequest(_result);
+                }
+                _result = acctSettlementPaymentService.CheckConfirmPrepaidShipment(model.ShipmentCharge);
+                if (!_result.Status)
+                {
+                    return BadRequest(_result);
+
                 }
             }
             else
@@ -604,6 +616,12 @@ namespace eFMS.API.Accounting.Controllers
                 if (!_result.Status)
                 {
                     return BadRequest(_result);
+                }
+                _result = acctSettlementPaymentService.CheckConfirmPrepaidShipment(model.ShipmentCharge);
+                if (!_result.Status)
+                {
+                    return BadRequest(_result);
+
                 }
             }
             else
