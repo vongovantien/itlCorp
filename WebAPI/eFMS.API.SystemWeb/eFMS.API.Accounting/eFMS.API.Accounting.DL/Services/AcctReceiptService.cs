@@ -25,7 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -3283,45 +3282,66 @@ namespace eFMS.API.Accounting.DL.Services
             //});
             #endregion
             var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TYPE);
-            var invoice = expQuery.Apply(acctMngtRepository.Get());
+            var invoice = expQuery.Apply(acctMngtRepository.Get())?.Take(100);
             var surcharges = surchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.AcctManagementId != null && !string.IsNullOrEmpty(x.SyncedFrom));
+            var offices = officeRepository.Get();
+            var department = departmentRepository.Get();
             var query = from inv in invoice
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
-                        select new { inv, sur };
+                        select new
+                        {
+                            inv,
+                            sur.Hblid,
+                            sur.JobNo,
+                            sur.Hblno,
+                            sur.Mblno,
+                            sur.ClearanceNo,
+                            sur.Soano,
+                            sur.DebitNo,
+                            sur.InvoiceNo,
+                            sur.AmountUsd,
+                            sur.VatAmountUsd,
+                            sur.AmountVnd,
+                            sur.VatAmountVnd,
+                            sur.SyncedFrom,
+                            sur.FinalExchangeRate,
+                            sur.ReferenceNo
+                        };
 
             if (criteria.ReferenceNos.Count > 0)
             {
                 switch (criteria.SearchType)
                 {
                     case "HBL":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.Hblno, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "MBL":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "Job No":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "Customs No":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "VAT Invoice":
                         invoice = invoice.Where(x => criteria.ReferenceNos.Contains(x.InvoiceNoReal, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "SOA":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Soano, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.Soano, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "Debit/Credit/Invoice":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.DebitNo, StringComparer.OrdinalIgnoreCase)
-                        || criteria.ReferenceNos.Contains(x.sur.InvoiceNo, StringComparer.OrdinalIgnoreCase)
-                        || criteria.ReferenceNos.Contains(x.sur.Soano, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.DebitNo, StringComparer.OrdinalIgnoreCase)
+                        || criteria.ReferenceNos.Contains(x.InvoiceNo, StringComparer.OrdinalIgnoreCase)
+                        || criteria.ReferenceNos.Contains(x.Soano, StringComparer.OrdinalIgnoreCase));
                         break;
                     default:
                         break;
                 }
             }
 
-            List<string> childPartnerIds = catPartnerRepository.Get(x => x.ParentId == criteria.PartnerId)
+            var partners = catPartnerRepository.Get(x => x.Active == true && (x.Id == criteria.PartnerId || x.ParentId == criteria.PartnerId));
+            List<string> childPartnerIds = partners.Where(x => x.ParentId == criteria.PartnerId)
                         .Select(x => x.Id)
                         .ToList();
             var debitsAr = debitMngtArRepository.Get(q => q.PartnerId == criteria.PartnerId || childPartnerIds.Contains(q.PartnerId));
@@ -3334,25 +3354,25 @@ namespace eFMS.API.Accounting.DL.Services
                 return null;
 
             var data = from acct in query
-                       join inv in debitsAr on new { AcctManagementId = acct.inv.Id, acct.sur.Hblid } equals new { AcctManagementId = (inv.AcctManagementId ?? Guid.Empty), Hblid = (inv.Hblid ?? Guid.Empty) } into debitGrp
+                       join inv in debitsAr on new { AcctManagementId = acct.inv.Id, acct.Hblid } equals new { AcctManagementId = (inv.AcctManagementId ?? Guid.Empty), Hblid = (inv.Hblid ?? Guid.Empty) } into debitGrp
                        from inv in debitGrp.DefaultIfEmpty()
                        select new
                        {
                            acct,
-                           RefNo = inv == null ? (acct.sur.SyncedFrom.Contains("SOA") ? acct.sur.Soano : acct.sur.DebitNo) : inv.RefNo,
+                           RefNo = inv == null ? (acct.SyncedFrom.Contains("SOA") ? acct.Soano : acct.DebitNo) : inv.RefNo,
                            Type = AccountingConstants.ACCOUNTANT_TYPE_DEBIT,
                            //PartnerId = acct.PartnerId,
                            //RefIds = new List<string> { acct.Id.ToString() },
-                           Hblid = acct.sur.Hblid,
-                           JobNo = acct.sur.JobNo,
-                           Mbl = acct.sur.Mblno,
-                           Hbl = acct.sur.Hblno,
-                           UnpaidAmount = inv != null ? inv.UnpaidAmount : (acct.inv.Currency == AccountingConstants.CURRENCY_LOCAL ? (acct.sur.AmountVnd + acct.sur.VatAmountVnd) : (acct.sur.AmountUsd + acct.sur.VatAmountUsd)),
-                           UnpaidAmountUsd = inv != null ? inv.UnpaidAmountUsd : (acct.sur.AmountUsd + acct.sur.VatAmountUsd),
-                           UnpaidAmountVnd = inv != null ? inv.UnpaidAmountVnd : (acct.sur.AmountVnd + acct.sur.VatAmountVnd),
-                           RemainAmount = inv != null ? (inv.UnpaidAmountUsd ?? 0) : (acct.sur.AmountUsd + acct.sur.VatAmountUsd),
-                           RemainAmountUsd = inv != null ? (inv.UnpaidAmountUsd ?? 0) : (acct.sur.AmountUsd + acct.sur.VatAmountUsd),
-                           RemainAmountVnd = inv != null ? (inv.UnpaidAmountVnd ?? 0) : (acct.sur.AmountVnd + acct.sur.VatAmountVnd),
+                           Hblid = acct.Hblid,
+                           JobNo = acct.JobNo,
+                           Mbl = acct.Mblno,
+                           Hbl = acct.Hblno,
+                           UnpaidAmount = inv != null ? inv.UnpaidAmount : (acct.inv.Currency == AccountingConstants.CURRENCY_LOCAL ? (acct.AmountVnd + acct.VatAmountVnd) : (acct.AmountUsd + acct.VatAmountUsd)),
+                           UnpaidAmountUsd = inv != null ? inv.UnpaidAmountUsd : (acct.AmountUsd + acct.VatAmountUsd),
+                           UnpaidAmountVnd = inv != null ? inv.UnpaidAmountVnd : (acct.AmountVnd + acct.VatAmountVnd),
+                           RemainAmount = inv != null ? (inv.UnpaidAmountUsd ?? 0) : (acct.AmountUsd + acct.VatAmountUsd),
+                           RemainAmountUsd = inv != null ? (inv.UnpaidAmountUsd ?? 0) : (acct.AmountUsd + acct.VatAmountUsd),
+                           RemainAmountVnd = inv != null ? (inv.UnpaidAmountVnd ?? 0) : (acct.AmountVnd + acct.VatAmountVnd),
                            PaymentStatus = inv != null ? inv.PaymentStatus : acct.inv.PaymentStatus,
                            DebitStatus = inv != null ? inv.PaymentStatus : AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID,
                            //InvoiceNo = acct.InvoiceNoReal,
@@ -3363,13 +3383,13 @@ namespace eFMS.API.Accounting.DL.Services
                            //DueDate = acct.PaymentDueDate,
                            //OfficeId = acct.OfficeId,
                            //CompanyId = acct.CompanyId,
-                           ExchangeRateBilling = acct.inv.Currency != AccountingConstants.CURRENCY_LOCAL ? acct.sur.FinalExchangeRate : GetExchangeRateDebitBilling(acct.sur.Soano, acct.sur.DebitNo),
+                           ExchangeRateBilling = acct.inv.Currency != AccountingConstants.CURRENCY_LOCAL ? acct.FinalExchangeRate : GetExchangeRateDebitBilling(acct.Soano, acct.DebitNo),
                            isExistDebitAR = inv != null ? true : false,
-                           ReferenceNo = acct.sur.ReferenceNo
+                           ReferenceNo = acct.ReferenceNo
 
                        };
             data = data.Where(x => x.DebitStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
-            var groupData = data.OrderBy(x => x.RefNo).GroupBy(x => new { x.RefNo, x.Type, x.acct.inv.PartnerId, x.Hblid });
+            var groupData = data.GroupBy(x => new { x.RefNo, x.Type, x.acct.inv.PartnerId, x.Hblid });
             var result = groupData.Select(inv => new AgencyDebitCreditModel
             {
                 RefNo = inv.Key.RefNo,
@@ -3396,16 +3416,17 @@ namespace eFMS.API.Accounting.DL.Services
                 OfficeId = inv.FirstOrDefault().acct.inv.OfficeId,
                 CompanyId = inv.FirstOrDefault().acct.inv.CompanyId,
                 ExchangeRateBilling = inv.FirstOrDefault().ExchangeRateBilling,
-                ReferenceNo = inv.FirstOrDefault().ReferenceNo
-            });
-            var partners = catPartnerRepository.Get();
-            var offices = officeRepository.Get();
-
+                ReferenceNo = inv.FirstOrDefault().ReferenceNo,
+                DepartmentId = GetDepartmentId(inv.Key.RefNo)
+            }).ToList();
+            
             var joinData = from d in result
                            join par in partners on d.PartnerId equals par.Id into parGrp
                            from par in parGrp.DefaultIfEmpty()
                            join ofi in offices on d.OfficeId equals ofi.Id into ofiGrp
                            from ofi in ofiGrp.DefaultIfEmpty()
+                           join dept in department on d.DepartmentId equals dept.Id into deptGrp
+                           from dept in deptGrp.DefaultIfEmpty()
                            select new AgencyDebitCreditModel
                            {
                                RefNo = d.RefNo,
@@ -3428,7 +3449,7 @@ namespace eFMS.API.Accounting.DL.Services
                                PaymentStatus = d.PaymentStatus,
                                OfficeId = d.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
-                               CompanyId = d.CompanyId,
+                               //CompanyId = d.CompanyId,
                                RefIds = d.RefIds,
                                Mbl = d.Mbl,
                                Hbl = d.Hbl,
@@ -3436,12 +3457,11 @@ namespace eFMS.API.Accounting.DL.Services
                                Hblid = d.Hblid,
                                ExchangeRateBilling = d.ExchangeRateBilling,
                                PaymentType = d.Type,
-                               DepartmentId = GetDepartmentId(d.RefNo),
-                               DepartmentName = GetDepartmentName(d.RefNo),
+                               DepartmentId = d.DepartmentId,
+                               DepartmentName = dept != null ? dept.DeptNameAbbr : null,
                                ReferenceNo = d.ReferenceNo
                            };
-
-            return joinData;
+            return joinData.AsQueryable();
         }
 
         /// <summary>
@@ -3460,38 +3480,59 @@ namespace eFMS.API.Accounting.DL.Services
             var surcharges = surchargeRepository.Get(x => x.AcctManagementId != null && x.Type == AccountingConstants.TYPE_CHARGE_OBH && (!string.IsNullOrEmpty(x.SyncedFrom) || !string.IsNullOrEmpty(x.PaySyncedFrom)));
             var query = from inv in invoiceTemps
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
-                        select new { inv, sur };
+                        select new
+                        {
+                            inv,
+                            sur.Hblid,
+                            sur.JobNo,
+                            sur.Hblno,
+                            sur.Mblno,
+                            sur.ClearanceNo,
+                            sur.Soano,
+                            sur.DebitNo,
+                            sur.InvoiceNo,
+                            sur.AmountUsd,
+                            sur.VatAmountUsd,
+                            sur.AmountVnd,
+                            sur.VatAmountVnd,
+                            sur.SyncedFrom,
+                            sur.FinalExchangeRate,
+                            sur.ReferenceNo
+                        };
+
             if (criteria.ReferenceNos.Count > 0)
             {
                 switch (criteria.SearchType)
                 {
                     case "HBL":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.Hblno, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "MBL":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "Job No":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "Customs No":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "VAT Invoice":
                         break;
                     case "SOA":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Soano, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.Soano, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "Debit/Credit/Invoice":
-                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.DebitNo, StringComparer.OrdinalIgnoreCase)
-                        || criteria.ReferenceNos.Contains(x.sur.InvoiceNo, StringComparer.OrdinalIgnoreCase)
-                        || criteria.ReferenceNos.Contains(x.sur.Soano, StringComparer.OrdinalIgnoreCase));
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.DebitNo, StringComparer.OrdinalIgnoreCase)
+                        || criteria.ReferenceNos.Contains(x.InvoiceNo, StringComparer.OrdinalIgnoreCase)
+                        || criteria.ReferenceNos.Contains(x.Soano, StringComparer.OrdinalIgnoreCase));
                         break;
                     default:
                         break;
                 }
             }
-            List<string> childPartnerIds = catPartnerRepository.Get(x => x.ParentId == criteria.PartnerId)
+
+            var partners = catPartnerRepository.Get(x => x.Active == true && (x.Id == criteria.PartnerId || x.ParentId == criteria.PartnerId));
+            List<string> childPartnerIds = partners.Where(x => x.ParentId == criteria.PartnerId)
                         .Select(x => x.Id)
                         .ToList();
             var debitsAr = debitMngtArRepository.Get(q => q.PartnerId == criteria.PartnerId || childPartnerIds.Contains(q.PartnerId));
@@ -3499,38 +3540,33 @@ namespace eFMS.API.Accounting.DL.Services
                 return null;
 
             var dataOBH = from acct in query
-                          join inv in debitsAr on new { AcctManagementId = acct.inv.Id, acct.sur.Hblid } equals new { AcctManagementId = (inv.AcctManagementId ?? Guid.Empty), Hblid = (inv.Hblid ?? Guid.Empty) } into debitGrp
+                          join inv in debitsAr on new { AcctManagementId = acct.inv.Id, acct.Hblid } equals new { AcctManagementId = (inv.AcctManagementId ?? Guid.Empty), Hblid = (inv.Hblid ?? Guid.Empty) } into debitGrp
                           from inv in debitGrp.DefaultIfEmpty()
                           select new
                           {
                               acct,
-                              RefNo = inv == null ? (acct.sur.SyncedFrom.Contains("SOA") ? acct.sur.Soano : acct.sur.DebitNo) : inv.RefNo,
+                              RefNo = inv == null ? (acct.SyncedFrom.Contains("SOA") ? acct.Soano : acct.DebitNo) : inv.RefNo,
                               Type = AccountingConstants.ACCOUNTANT_TYPE_DEBIT,
-                              Hblid = acct.sur.Hblid,
-                              JobNo = acct.sur.JobNo,
-                              Mbl = acct.sur.Mblno,
-                              Hbl = acct.sur.Hblno,
-                              UnpaidAmount = inv != null ? inv.UnpaidAmount : (acct.inv.Currency == AccountingConstants.CURRENCY_LOCAL ? (acct.sur.AmountVnd + acct.sur.VatAmountVnd) : (acct.sur.AmountUsd + acct.sur.VatAmountUsd)),
-                              UnpaidAmountUsd = inv != null ? inv.UnpaidAmountUsd : (acct.sur.AmountUsd + acct.sur.VatAmountUsd),
-                              UnpaidAmountVnd = inv != null ? inv.UnpaidAmountVnd : (acct.sur.AmountVnd + acct.sur.VatAmountVnd),
-                              RemainAmount = inv != null ? (inv.UnpaidAmountUsd - (inv.PaidAmountUsd ?? 0)) : (acct.sur.AmountUsd + acct.sur.VatAmountUsd),
-                              RemainAmountUsd = inv != null ? (inv.UnpaidAmountUsd - (inv.PaidAmountUsd ?? 0)) : (acct.sur.AmountUsd + acct.sur.VatAmountUsd),
-                              RemainAmountVnd = inv != null ? (inv.UnpaidAmountVnd - (inv.PaidAmountVnd ?? 0)) : (acct.sur.AmountVnd + acct.sur.VatAmountVnd),
+                              UnpaidAmount = inv != null ? inv.UnpaidAmount : (acct.inv.Currency == AccountingConstants.CURRENCY_LOCAL ? (acct.AmountVnd + acct.VatAmountVnd) : (acct.AmountUsd + acct.VatAmountUsd)),
+                              UnpaidAmountUsd = inv != null ? inv.UnpaidAmountUsd : (acct.AmountUsd + acct.VatAmountUsd),
+                              UnpaidAmountVnd = inv != null ? inv.UnpaidAmountVnd : (acct.AmountVnd + acct.VatAmountVnd),
+                              RemainAmount = inv != null ? (inv.UnpaidAmountUsd - (inv.PaidAmountUsd ?? 0)) : (acct.AmountUsd + acct.VatAmountUsd),
+                              RemainAmountUsd = inv != null ? (inv.UnpaidAmountUsd - (inv.PaidAmountUsd ?? 0)) : (acct.AmountUsd + acct.VatAmountUsd),
+                              RemainAmountVnd = inv != null ? (inv.UnpaidAmountVnd - (inv.PaidAmountVnd ?? 0)) : (acct.AmountVnd + acct.VatAmountVnd),
                               PaymentStatus = inv != null ? inv.PaymentStatus : acct.inv.PaymentStatus,
                               OBHStatus = inv != null ? inv.PaymentStatus : AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID,
-                              ExchangeRateBilling = GetExchangeRateDebitBilling(acct.sur.Soano, acct.sur.DebitNo),
+                              ExchangeRateBilling = GetExchangeRateDebitBilling(acct.Soano, acct.DebitNo),
                               isExistDebitAR = inv != null ? true : false,
-                              ReferenceNo = acct.sur.ReferenceNo
+                              ReferenceNo = acct.ReferenceNo
                           };
             dataOBH = dataOBH.Where(x => x.OBHStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
             //(g.acct.sur.SyncedFrom == "CDNOTE" ? g.acct.sur.DebitNo : (g.acct.sur.SyncedFrom == "SOA" ? g.acct.sur.Soano : null))
-            var grpInvoiceCharge = dataOBH.OrderBy(x => x.RefNo).GroupBy(g => new { g.acct.inv.PartnerId, RefNo = g.RefNo, g.acct.sur.JobNo, g.acct.sur.Mblno, g.acct.sur.Hblno, g.acct.sur.Hblid })
+            var grpInvoiceCharge = dataOBH.OrderBy(x => x.RefNo).GroupBy(g => new { g.acct.inv.PartnerId, RefNo = g.RefNo, g.acct.JobNo, g.acct.Mblno, g.acct.Hblno, g.acct.Hblid })
                 .Select(s => new
                 {
                     s.Key.PartnerId,
                     s.Key.RefNo,
                     Invoice = s.Select(se => se.acct.inv),
-                    Surcharge = s.Select(se => se.acct.sur),
                     Job = s.Key,
                     s.FirstOrDefault().isExistDebitAR
                 ,
@@ -3562,16 +3598,19 @@ namespace eFMS.API.Accounting.DL.Services
                 Hbl = se.Job.Hblno,
                 Hblid = se.Job.Hblid,
                 ExchangeRateBilling = GetExchangeRateDebitOBHBilling(se.RefNo),
-                ReferenceNo = se.Invoice.FirstOrDefault().ReferenceNo
-            });
+                ReferenceNo = se.Invoice.FirstOrDefault().ReferenceNo,
+                DepartmentId = GetDepartmentId(se.RefNo)
+            }).ToList();
 
-            var partners = catPartnerRepository.Get();
             var offices = officeRepository.Get();
+            var department = departmentRepository.Get();
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
                            from par in parGrp.DefaultIfEmpty()
                            join ofi in offices on inv.OfficeId equals ofi.Id into ofiGrp
                            from ofi in ofiGrp.DefaultIfEmpty()
+                           join dept in department on inv.DepartmentId equals dept.Id into deptGrp
+                           from dept in deptGrp.DefaultIfEmpty()
                            select new AgencyDebitCreditModel
                            {
                                RefNo = inv.RefNo,
@@ -3602,11 +3641,13 @@ namespace eFMS.API.Accounting.DL.Services
                                Hblid = inv.Hblid,
                                ExchangeRateBilling = inv.ExchangeRateBilling,
                                PaymentType = inv.Type,
-                               DepartmentId = GetDepartmentId(inv.RefNo),
-                               DepartmentName = GetDepartmentName(inv.RefNo),
+                               DepartmentId = inv.DepartmentId,
+                               DepartmentName = dept != null ? dept.DeptNameAbbr : null,
+                               //DepartmentId = GetDepartmentId(inv.RefNo),
+                               //DepartmentName = GetDepartmentName(inv.RefNo),
                                ReferenceNo = inv.ReferenceNo
                            };
-            return joinData;
+            return joinData.AsQueryable();
         }
 
         private CriteriaBuilder<AccAccountingManagement> InvoiceExpressionQuery(CustomerDebitCreditCriteria criteria, string type)
