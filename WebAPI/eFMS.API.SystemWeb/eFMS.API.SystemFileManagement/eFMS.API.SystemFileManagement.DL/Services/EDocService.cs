@@ -1679,7 +1679,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 };
                 new LogHelper("Request Open File", JsonConvert.SerializeObject(request));
                 GetObjectResponse response = await _client.GetObjectAsync(request);
-                new LogHelper("Response Open File", JsonConvert.SerializeObject(response));
+                //new LogHelper("Response Open File", JsonConvert.SerializeObject(response.));
                 if (response.HttpStatusCode != HttpStatusCode.OK) { return new HandleState("Stream file error"); }
                 return new HandleState(true, response.ResponseStream);
             }
