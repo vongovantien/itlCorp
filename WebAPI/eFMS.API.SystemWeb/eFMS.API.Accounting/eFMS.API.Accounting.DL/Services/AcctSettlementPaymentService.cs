@@ -5889,6 +5889,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     PayeeIssued = (bool?)reader["PayeeIssued"],
                                     OBHPartnerIssued = (bool?)reader["OBHPartnerIssued"],
                                     ChargeAutoRated = (bool?)reader["ChargeAutoRated"],
+                                    OBHPartnerName = reader["OBHPartnerName"] == DBNull.Value ? string.Empty : reader["OBHPartnerName"].ToString(),
                                 };
 
                                 data.Add(item);
