@@ -665,17 +665,17 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         let sub = this.selectAttachPopup.onSelect
             .pipe(
                 takeUntil(this.ngUnsubscribe),
-                concatMap((value: any) => {
-                    if (!!value) {
-                        const previewSource = this.getPreviewSource(settle.id, value);
-                        return previewSource;
-                    }
-                    return of(false);
-                }),
-                map((exportData: any) => {
-                    if (!exportData) throw new Error("error: ");
-                    return exportData?.data // url preview
-                }),
+                // concatMap((value: any) => {
+                //     if (!!value) {
+                //         const previewSource = this.getPreviewSource(settle.id, value);
+                //         return previewSource;
+                //     }
+                //     return of(false);
+                // }),
+                // map((exportData: any) => {
+                //     if (!exportData) throw new Error("error: ");
+                //     return exportData?.data // url preview
+                // }),
                 concatMap((url: any) => {
                     const syncModel = [settle].map((x: SettlementPayment) => {
                         return <AccountingInterface.IRequestFileType>{
