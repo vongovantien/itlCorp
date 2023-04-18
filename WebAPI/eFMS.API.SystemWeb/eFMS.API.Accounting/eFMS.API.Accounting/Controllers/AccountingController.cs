@@ -26,6 +26,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using eFMS.API.Infrastructure.RabbitMQ;
+using Microsoft.AspNetCore.Authentication.Twitter;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -548,6 +549,17 @@ namespace eFMS.API.Accounting.Controllers
                         {
                             return BadRequest(result);
                         }
+                        listAdd.ForEach(async x =>
+                        {
+                            var modelSuccess = new
+                            {
+                                SettlementId = x.Stt,
+                                Lang = "EN",
+                                Action = "eDOC",
+                                AccessToken= Request.Headers["Authorization"].ToString()
+                        };
+                            await _busControl.SendAsync(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileQueue, modelSuccess);
+                        });
                         return Ok(result);
                     }
                     return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
