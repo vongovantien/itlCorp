@@ -1562,7 +1562,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             this.stageType = "SEND_HB"
         }
         if (this.isDbtInv){
-            this.stageType = "S_INV";
+            this.stageType = "SEND_INV";
         }
         if (this.stageType.length !== 0) {
             this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId })
