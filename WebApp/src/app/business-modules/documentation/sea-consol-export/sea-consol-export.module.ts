@@ -66,6 +66,10 @@ const routing: Routes = [
                         path: 'prealert', component: ShareBusinessReAlertComponent,
                         data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.SCE_CODE },
                     },
+                    {
+                        path: 'cdnote', component: ShareBusinessReAlertComponent,
+                        data: { name: 'Send Debit Invoice', level: 7, serviceId: ChargeConstants.SCE_CODE},
+                    }
                 ]
             },
 

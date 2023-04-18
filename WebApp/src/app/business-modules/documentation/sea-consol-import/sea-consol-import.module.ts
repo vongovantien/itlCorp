@@ -17,6 +17,8 @@ import { SeaConsolImportManifestComponent } from './manifest/sea-consol-import-m
 import { SeaConsolImportLazyLoadModule } from './sea-consol-import-lazy-load.module';
 import { DeactivateGuardService } from '@core';
 import { ShareSeaServiceModule } from '../share-sea/share-sea-service.module';
+import { ChargeConstants } from '@constants';
+import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
 
 const routing: Routes = [
     {
@@ -45,6 +47,10 @@ const routing: Routes = [
                 path: 'manifest', component: SeaConsolImportManifestComponent,
                 data: { name: "Manifest", },
             },
+            {
+                path: 'cdnote', component: ShareBusinessReAlertComponent,
+                data: { name: 'Send Debit Invoice', level: 7, serviceId: ChargeConstants.SCI_CODE},
+            }
         ]
     },
 ];

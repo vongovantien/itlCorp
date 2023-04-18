@@ -7,7 +7,7 @@ import { ToastrService } from "ngx-toastr";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
-import { AccountingConstants, RoutingConstants, SystemConstants } from "@constants";
+import { AccountingConstants, ChargeConstants, RoutingConstants, SystemConstants } from "@constants";
 import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/payment-method.popup";
 import { of, throwError } from "rxjs";
 import { ShareBussinessAdjustDebitValuePopupComponent } from "src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup";
@@ -15,10 +15,8 @@ import { InjectViewContainerRefDirective } from "@directives";
 import { ICrystalReport } from "@interfaces";
 import { DetailCDNoteBase } from "../../cd-note/detail-cd-note.base";
 import { Store } from "@ngrx/store";
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { getCurrentUserState, IAppState } from "@store";
+import { ActivatedRoute, Router, Routes } from '@angular/router';
 import { HttpErrorResponse } from "@angular/common/http";
-import { C } from "@angular/cdk/keycodes";
 
 @Component({
     selector: 'cd-note-detail-air-popup',
@@ -53,12 +51,11 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends DetailCDNoteBas
         protected _accountantRepo: AccountingRepo,
         protected _exportRepo: ExportRepo,
         protected _router: Router,
-        private _store: Store<IAppState>,
     ) {
         super(_documentationRepo, _sortService, _toastService, _accountantRepo, _fileMngtRepo, _exportRepo);
         this.requestSort = this.sortChargeCdNote;
     }
-
+    
     ngOnInit() {
     }
 
@@ -467,13 +464,11 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends DetailCDNoteBas
                     if (res.status) {
                         switch (type) {
                             case 'DebitNote/Invoice':
-                                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/hbl/${this.CdNoteDetail.listSurcharges[0].hblid}/arrivalnotice`]);
+                                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/cdnote`]);
                                 break;
                         }
                     }
                 },
             );
-
-
     }
 }
