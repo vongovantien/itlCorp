@@ -353,7 +353,7 @@ namespace eFMS.API.Accounting.Controllers
                 // Cập nhật cấn trừ debit
                 if (receiptModel.Type == "Agent" && isCalDebit)
                 {
-                    var hsDebit = acctReceiptService.UpdateAccountingDebitAR(receiptModel.Payments, saveAction);
+                    var hsDebit = acctReceiptService.UpdateAccountingDebitAR(receiptModel.Payments, receiptModel.Id, saveAction);
                     if (!hsDebit.Success)
                     {
                         new LogHelper("eFMS_SaveReceipt_UpdateDebitAR_LOG", hsDebit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
@@ -527,7 +527,7 @@ namespace eFMS.API.Accounting.Controllers
                 // Cập nhật cấn trừ debit
                 foreach (var receiptModel in debitReceipts)
                 {
-                    var hsDebit = acctReceiptService.UpdateAccountingDebitAR(receiptModel.Payments, saveAction);
+                    var hsDebit = acctReceiptService.UpdateAccountingDebitAR(receiptModel.Payments, receiptModel.Id, saveAction);
                     if (!hsDebit.Success)
                     {
                         new LogHelper("eFMS_SaveReceipt_UpdateDebitAR_LOG", hsDebit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));

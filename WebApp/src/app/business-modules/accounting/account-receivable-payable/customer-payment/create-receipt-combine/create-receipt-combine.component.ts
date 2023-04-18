@@ -426,8 +426,8 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
             model.exchangeRate = this.formCreateMapValue.exchangeRate;
             item.cdCombineList.forEach((x: any) => {
                 const payment = x;
-                payment.type = 'CREDIT';
-                payment.paymentType = 'CREDIT';
+                // payment.type = item.type;
+                payment.paymentType = x.type;
                 payment.amount = payment.unpaidAmountUsd;
                 payment.totalPaidUsd = payment.paidAmountUsd;
                 payment.totalPaidVnd = payment.paidAmountVnd;
@@ -460,8 +460,8 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
             model.exchangeRate = this.formCreateMapValue.exchangeRate;
             item.cdCombineList.forEach((x: any) => {
                 const payment = x;
-                payment.type = 'DEBIT';
-                payment.paymentType = 'DEBIT';
+                // payment.type = x.type;
+                payment.paymentType = x.type;
                 payment.amount = payment.unpaidAmountUsd;
                 payment.totalPaidUsd = payment.paidAmountUsd;
                 payment.totalPaidVnd = payment.paidAmountVnd;
@@ -578,19 +578,24 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                     || item.amountVnd === null
                     || item.amountVnd < 0
                     || !item.officeId) {
+                    this._toastService.warning("Paid amount must be less than or equal to the Unpaid amount");
                     return false;
                 }
             }
 
-            this.ReceiptGeneralCombineComponent.generalReceipts.forEach((obj) => {
-                if (this.ReceiptGeneralCombineComponent.generalReceipts.filter(item => item.partnerId === obj.partnerId && item.paymentMethod === obj.paymentMethod && item.obhPartnerId === obj.obhPartnerId && item.officeId === obj.officeId).length > 1) {
-                    obj.duplicate = true;
-                }else{
-                    obj.duplicate = false;
+            if (!!this.ReceiptGeneralCombineComponent.generalReceipts?.length) {
+                this.ReceiptGeneralCombineComponent.generalReceipts.forEach((obj) => {
+                    if (this.ReceiptGeneralCombineComponent.generalReceipts.filter(item => item.partnerId === obj.partnerId && item.paymentMethod === obj.paymentMethod && item.obhPartnerId === obj.obhPartnerId && item.officeId === obj.officeId).length > 1) {
+                        obj.duplicate = true;
+                    } else {
+                        obj.duplicate = false;
+                    }
+                });
+                if (this.ReceiptGeneralCombineComponent.generalReceipts.some(item => item.duplicate)) {
+                    this._toastService.warning("Duplicate general detail, Please check it again!");
+                    return false;
                 }
-            });
-            if(this.ReceiptGeneralCombineComponent.generalReceipts.some(item => item.duplicate))
-                return false;
+            }
         }
 
         if (!type || type === 'credit') {
@@ -600,8 +605,10 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                     this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
                     return false;
                 }
-                if (cdList.cdCombineList.some(item => item.paidAmountUsd < 0 || item.paidAmountUsd === null || item.paidAmountUsd > item.unpaidAmountUsd))
+                if (cdList.cdCombineList.some(item => item.paidAmountUsd < 0 || item.paidAmountUsd === null || item.paidAmountUsd > item.unpaidAmountUsd)){
+                    this._toastService.warning("Paid amount must be less than or equal to the Unpaid amount");
                     return false;
+                }
             }
         }
         if (!type || type === 'debit') {
@@ -611,8 +618,10 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                     this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
                     return false;
                 }
-                if (cdList.cdCombineList.some(item => item.paidAmountUsd < 0 || item.paidAmountUsd === null || item.paidAmountUsd > item.unpaidAmountUsd))
+                if (cdList.cdCombineList.some(item => item.paidAmountUsd < 0 || item.paidAmountUsd === null || item.paidAmountUsd > item.unpaidAmountUsd)){
+                    this._toastService.warning("Paid amount must be less than or equal to the Unpaid amount");
                     return false;
+                }
             }
         }
         return true;
