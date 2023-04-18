@@ -28,5 +28,6 @@ namespace eFMS.API.System.Service.Models
         public bool? ApprovalAdvance { get; set; }
         public bool? ApprovalSettlement { get; set; }
         public bool? AlertAtd { get; set; }
+        public bool? OverPaymentTermOBH { get; set; }
     }
 }
