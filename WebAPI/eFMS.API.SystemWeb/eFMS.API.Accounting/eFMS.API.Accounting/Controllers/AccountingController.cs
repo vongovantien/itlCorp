@@ -486,6 +486,13 @@ namespace eFMS.API.Accounting.Controllers
                         //}
                         resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", listAdd, loginResponse.TokenKey);
                         responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+                        while (responseAddModel.Success == "2")
+                        {
+                            //var idx=listAdd.IndexOf(x=>x.)
+                            listAdd = listAdd.Where(x=>x.Stt.ToString()!=responseAddModel.Stt).ToList();
+                            resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSVoucherDataSyncAdd", listAdd, loginResponse.TokenKey);
+                            responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+                        }
 
                         #region -- Ghi Log --
                         var modelLog = new SysActionFuncLogModel
