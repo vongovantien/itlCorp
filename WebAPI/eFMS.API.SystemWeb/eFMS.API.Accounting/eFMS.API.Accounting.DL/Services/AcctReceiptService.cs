@@ -2905,7 +2905,8 @@ namespace eFMS.API.Accounting.DL.Services
             List<string> partnerIds = new List<string>();
             if (!string.IsNullOrEmpty(criteria.PartnerId))
             {
-                partnerIds = partner.Where(x => x.Id == criteria.PartnerId || x.ParentId == criteria.PartnerId).Select(x => x.Id).ToList();
+                var currentPartner = partner.FirstOrDefault(x => x.Id == criteria.PartnerId);
+                partnerIds = partner.Where(x => x.Id == criteria.PartnerId || x.ParentId == currentPartner.ParentId).Select(x => x.Id).ToList();
             }
             var payables = accountPayableRepository.Get(x => (partnerIds.Count == 0 || partnerIds.Contains(x.PartnerId)) && !string.IsNullOrEmpty(x.ReferenceNo) && x.Status != "Paid" && x.TransactionType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE);
             var creditManagementAr = creditMngtArRepository.Get(x => (partnerIds.Count == 0 || partnerIds.Contains(x.PartnerId)) && !string.IsNullOrEmpty(x.ReferenceNo));
@@ -3362,10 +3363,12 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
 
-            var partners = catPartnerRepository.Get(x => x.Active == true && (x.Id == criteria.PartnerId || x.ParentId == criteria.PartnerId));
-            List<string> childPartnerIds = partners.Where(x => x.ParentId == criteria.PartnerId)
+            var partners = catPartnerRepository.Get(x => x.Active == true);
+            var currentPartner = partners.Where(x => x.Id == criteria.PartnerId).FirstOrDefault();
+            List<string> childPartnerIds = partners.Where(x => x.ParentId == currentPartner.ParentId)
                         .Select(x => x.Id)
                         .ToList();
+            partners = partners.Where(x => x.ParentId == currentPartner.ParentId || x.Id == criteria.PartnerId);
             var debitsAr = debitMngtArRepository.Get(q => q.PartnerId == criteria.PartnerId || childPartnerIds.Contains(q.PartnerId));
             if (criteria.Service != null && criteria.Service.Count > 0)
             {
@@ -3562,10 +3565,12 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
 
-            var partners = catPartnerRepository.Get(x => x.Active == true && (x.Id == criteria.PartnerId || x.ParentId == criteria.PartnerId));
-            List<string> childPartnerIds = partners.Where(x => x.ParentId == criteria.PartnerId)
+            var partners = catPartnerRepository.Get(x => x.Active == true);
+            var currentPartner = partners.FirstOrDefault(x => x.Id == criteria.PartnerId);
+            List<string> childPartnerIds = partners.Where(x => x.ParentId == currentPartner.ParentId)
                         .Select(x => x.Id)
                         .ToList();
+            partners = partners.Where(x => x.Id == criteria.PartnerId || x.ParentId == currentPartner.ParentId);
             var debitsAr = debitMngtArRepository.Get(q => q.PartnerId == criteria.PartnerId || childPartnerIds.Contains(q.PartnerId));
             if (query.FirstOrDefault() == null)
                 return null;
@@ -3691,7 +3696,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Get Vat Invoice có Payment Status # Paid
             // Ds các đối tượng con
-            List<string> childPartnerIds = catPartnerRepository.Get(x => x.ParentId == criteria.PartnerId)
+            var currentPartner = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
+            List<string> childPartnerIds = catPartnerRepository.Get(x => x.ParentId == currentPartner.ParentId)
                     .Select(x => x.Id)
                     .ToList();
             var criteriaBuilder = new CriteriaBuilder<AccAccountingManagement>()
