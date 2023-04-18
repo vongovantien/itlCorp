@@ -39,6 +39,7 @@ export class WorkOrder {
     officeId: string = null;
     companyId: string = null;
     notes: string = null;
+    schedule: string = null;
 
     constructor(object?: Object) {
         const self = this;
@@ -126,8 +127,8 @@ export class WorkOrderSurcharge {
 }
 
 export class WorkOrderSurchargeModel extends WorkOrderSurcharge {
-    partnerName: string;
-    chargeName: string;
+    partnerName: string = null;
+    chargeName: string = null;
 }
 
 export class WorkOrderViewUpdateModel extends WorkOrderModel {
@@ -143,6 +144,7 @@ export class WorkOrderViewUpdateModel extends WorkOrderModel {
 
 export class WorkOrderViewModel {
     id: string;
+    userCreated: string;
     userNameCreated: string;
     userNameModified: string;
     partnerName: string;

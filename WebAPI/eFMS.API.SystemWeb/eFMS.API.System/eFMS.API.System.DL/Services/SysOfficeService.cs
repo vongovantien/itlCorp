@@ -221,7 +221,7 @@ namespace eFMS.API.System.DL.Services
                 var hs = new HandleState();
                 List<SysOffice> results = null;
 
-                var sysLevel = sysLevelRepository?.Get(lv => lv.UserId == userId && lv.CompanyId == companyId).Select(x => x.OfficeId).ToList();
+                var sysLevel = sysLevelRepository?.Get(lv => lv.UserId == userId && lv.Active == true && lv.CompanyId == companyId).Select(x => x.OfficeId).ToList();
                 if (sysLevel == null)
                 {
                     return null;

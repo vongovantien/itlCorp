@@ -1,6 +1,6 @@
 import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Router } from '@angular/router';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { RoutingConstants } from '@constants';
 import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 import { CommonEnum } from '@enums';
@@ -12,7 +12,8 @@ import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
 import { map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { IWorkOrderListState, LoadDetailWorkOrder, LoadListWorkOrder, workOrderListState, workOrderLoadingState, workOrderPagingState, workOrderSearchState } from './store';
+import { IWorkOrderListState, LoadListWorkOrder, workOrderListState, workOrderLoadingState, workOrderPagingState, workOrderSearchState } from './store';
+import { getCurrentUserState } from '@store';
 
 @Component({
     selector: 'app-commercial-work-order',
@@ -51,6 +52,7 @@ export class CommercialWorkOrderComponent extends AppList implements OnInit {
     }
 
     ngOnInit(): void {
+        this.currentUser$ = this._store.select(getCurrentUserState);
         this.isLoading = of(false);
         this.headers = [
             { title: 'Work Order No.', field: 'code', sortable: true },
@@ -95,7 +97,6 @@ export class CommercialWorkOrderComponent extends AppList implements OnInit {
 
     requestListWorkOrder() {
         this._store.dispatch(LoadListWorkOrder({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
-
     }
 
     getWorkOrders() {
@@ -127,13 +128,11 @@ export class CommercialWorkOrderComponent extends AppList implements OnInit {
 
     gotoDetail(workOrder: WorkOrderViewModel) {
         this._router.navigate([`${RoutingConstants.COMMERCIAL.WO}/`, workOrder]);
-
     }
 
     onSelectWorkOrder(workOrder: WorkOrderViewModel) {
         this.selectedWorkOrder = workOrder;
         this.clearMenuContext(this.queryListMenuContext);
-
     }
 
     activeWorkOrder(wo: WorkOrderViewModel) {
@@ -159,7 +158,14 @@ export class CommercialWorkOrderComponent extends AppList implements OnInit {
     }
 
     viewDetailWorkOrder(wo: WorkOrderViewModel) {
-        this._router.navigate([`${RoutingConstants.COMMERCIAL.WO}/`, this.selectedWorkOrder.id]);
+        this._documentationRepo.checkAllowDetailWorkOrder(wo.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate([`${RoutingConstants.COMMERCIAL.WO}/`, wo.id]);
+                } else {
+                    this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainerRef.viewContainerRef, { center: true });
+                }
+            })
     }
 
     deleteWorkOrder(wo: WorkOrderViewModel) {
@@ -184,10 +190,6 @@ export class CommercialWorkOrderComponent extends AppList implements OnInit {
                         )
                     });
                 }
-            }
-            )
-
+            })
     }
-
-
 }

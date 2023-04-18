@@ -1,6 +1,13 @@
 <div class="work-order-wrapper m-animate-fade-in">
 
-    <app-sub-header> </app-sub-header>
+    <app-sub-header>
+        <div class="c-button-actions">
+            <app-default-button [buttonSetting]="saveButtonSetting"
+                (onClick)="submitClick('save')"></app-default-button>
+            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
+            </app-default-button>
+        </div>
+    </app-sub-header>
 
     <div class="m-content">
 

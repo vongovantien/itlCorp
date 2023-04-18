@@ -101,6 +101,13 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(WorkOrderRequest model)
         {
+            if (!ModelState.IsValid) return BadRequest();
+            string checkExistMessage = CheckExist(model, out CsWorkOrder workOrderDuplicate);
+            if (checkExistMessage.Length > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = string.Format(@"Work Order information was duplicated with {0}", workOrderDuplicate.Code) });
+            }
+
             var hs = await workOrderService.SaveWorkOrder(model);
             string message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -112,6 +119,12 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPut]
         public async Task<IActionResult> Put(WorkOrderRequest model)
         {
+            if (!ModelState.IsValid) return BadRequest();
+            string checkExistMessage = CheckExist(model, out CsWorkOrder workOrderDuplicate);
+            if (checkExistMessage.Length > 0)
+            {
+                return Ok(new ResultHandle { Status = false, Message = string.Format(@"Work Order information was duplicated with {0}", workOrderDuplicate.Code) });
+            }
             var hs = await workOrderService.UpdateWorkOrder(model);
             string message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -165,6 +178,17 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        private string CheckExist(WorkOrderRequest model, out CsWorkOrder workOrderDuplicate)
+        {
+            var checkExist = workOrderService.CheckExist(model, out CsWorkOrder workOrder);
+            workOrderDuplicate = workOrder;
+            if (checkExist)
+            {
+                return stringLocalizer[LanguageSub.MSG_OBJECT_DUPLICATED].Value;
+            }
+            return string.Empty;
         }
 
     }

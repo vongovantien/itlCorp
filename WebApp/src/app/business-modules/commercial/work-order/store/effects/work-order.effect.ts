@@ -5,7 +5,7 @@ import { LoadListWorkOrderSuccess, LoadListWorkOrderFail, WorkOrderActionTypes, 
 import { map, catchError, switchMap } from "rxjs/operators";
 import { Observable, of } from "rxjs";
 import { Action } from "@ngrx/store";
-import { WorkOrderViewUpdateModel } from "@models";
+import { ToastrService } from "ngx-toastr";
 
 @Injectable()
 export class WorkOrderEffects {
@@ -13,6 +13,7 @@ export class WorkOrderEffects {
     constructor(
         private actions$: Actions,
         private _documentationRepo: DocumentationRepo,
+        private _toastService: ToastrService
     ) { }
 
     getListWorkOrderEffect$: Observable<Action> = createEffect(() => this.actions$
@@ -46,7 +47,14 @@ export class WorkOrderEffects {
                 (param: { index: number, id: string }) => this._documentationRepo.deletePriceItem(param.id)
                     .pipe(
                         catchError(() => of(DeletePriceItemWorkOrderFail())),
-                        map((data: WorkOrderViewUpdateModel) => DeletePriceItemWorkOrderSuccess({ index: param.index })),
+                        map((data: CommonInterface.IResult) => {
+                            if (data.status) {
+                                this._toastService.success(data.message);
+                                return DeletePriceItemWorkOrderSuccess({ index: param.index })
+                            }
+                            this._toastService.error(data.message);
+                            return DeletePriceItemWorkOrderFail();
+                        }),
                     )
             )
         ));

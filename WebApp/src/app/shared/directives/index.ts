@@ -19,7 +19,7 @@ export * from './format-decimal-form-control.directive';
 export * from './interger-input.directive';
 export * from './dropdown-toggle.directive';
 export * from './context-menu.directive';
-
+export * from './auto-expand.directive';
 
 
 

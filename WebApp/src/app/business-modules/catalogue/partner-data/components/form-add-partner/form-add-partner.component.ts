@@ -628,15 +628,17 @@ export class FormAddPartnerComponent extends AppForm {
         }
     }
     getInforCompanyByTaxCode(taxCode: string) {
-        this._catalogueRepo.getInForCompanyByTaxCode(taxCode).pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: Partner) => {
-                    if (!!res) {
-                        this.inforCompany = res;
-                        this.setValueInforCompany();
+        if (!!taxCode && taxCode.trim().length !== 0) {
+            this._catalogueRepo.getInForCompanyByTaxCode(taxCode).pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (res: Partner) => {
+                        if (!!res) {
+                            this.inforCompany = res;
+                            this.setValueInforCompany();
+                        }
                     }
-                }
-            );
+                );
+        }
     }
 
     setValueInforCompany() {
@@ -659,5 +661,5 @@ export class FormAddPartnerComponent extends AppForm {
             this.partnerForm.controls["addressShippingEn"].setValue(this.inforCompany.addressShippingEn)
         }
     }
-    
+
 }
