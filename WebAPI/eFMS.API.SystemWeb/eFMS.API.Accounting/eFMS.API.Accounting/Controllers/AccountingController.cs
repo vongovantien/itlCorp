@@ -26,6 +26,7 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using eFMS.API.Infrastructure.RabbitMQ;
+using Microsoft.AspNetCore.Authentication.Twitter;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -552,8 +553,9 @@ namespace eFMS.API.Accounting.Controllers
                             {
                                 SettlementId = x.Stt,
                                 Lang = "EN",
-                                Action = "eDOC"
-                            };
+                                Action = "eDOC",
+                                AccessToken= Request.Headers["Authorization"].ToString()
+                        };
                             await _busControl.SendAsync(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileQueue, modelSuccess);
                         });
                         return Ok(result);
