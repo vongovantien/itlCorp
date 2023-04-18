@@ -459,19 +459,19 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         let sub = this.selectAttachPopup.onSelect
             .pipe(
                 takeUntil(this.ngUnsubscribe),
-                concatMap((value: any) => {
-                    if (!!value) {
-                        const smSyncIds: string[] = settlementSyncList.map(x => x.id);
-                        const mapV: { key: any, id: string }[] = Array(settlementSyncList.length).fill(value).map((value, i) => {
-                            return { key: value, id: smSyncIds[i] }
-                        })
-                        const source = mapV.map(x => this.getPreviewSource(x.id, x.key))
-                        return forkJoin(source);
-                    }
-                    return of(false);
-                }),
-                concatMap((data: CommonInterface.IResult[]) => {
-                    if (!!data.length) {
+                // concatMap((value: any) => {
+                //     if (!!value) {
+                //         const smSyncIds: string[] = settlementSyncList.map(x => x.id);
+                //         const mapV: { key: any, id: string }[] = Array(settlementSyncList.length).fill(value).map((value, i) => {
+                //             return { key: value, id: smSyncIds[i] }
+                //         })
+                //         const source = mapV.map(x => this.getPreviewSource(x.id, x.key))
+                //         return forkJoin(source);
+                //     }
+                //     return of(false);
+                // }),
+                concatMap((data: any) => {
+                    if (!!data) {
                         const advSyncModel = settlementSyncList.map((x: SettlementPayment) => {
                             return <AccountingInterface.IRequestFileType>{
                                 Id: x.id,
