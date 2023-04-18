@@ -184,6 +184,8 @@ export class ARCustomerPaymentReceiptCDCombineComponent extends AppList implemen
 
         for (let index = 0; index < model.cdCombineList.length; index++) {
             const item: ICDCombine = model.cdCombineList[index];
+            item.remainAmountUsd = item.unpaidAmountUsd - item.paidAmountUsd;
+            item.remainAmountVnd = item.unpaidAmountVnd - item.paidAmountVnd;
             totalData.totalUnpaidAmountUsd += (+(item.unpaidAmountUsd) ?? 0);
             totalData.totalUnpaidAmountVnd += (+(item.unpaidAmountVnd) ?? 0);
             totalData.totalPaidAmountUsd += (+(item.paidAmountUsd) ?? 0);

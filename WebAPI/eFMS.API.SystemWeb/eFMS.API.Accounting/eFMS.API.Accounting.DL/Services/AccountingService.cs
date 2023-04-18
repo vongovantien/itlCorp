@@ -2804,7 +2804,7 @@ namespace eFMS.API.Accounting.DL.Services
             receiptSyncs = new List<AcctReceiptSyncModel>();
             if (ids == null || ids.Count() == 0) return data;
 
-            IQueryable<AcctReceipt> receipts = receiptRepository.Get(x => ids.Contains(x.Id));
+            IQueryable<AcctReceipt> receipts = receiptRepository.Get(x => ids.Contains(x.Id) && x.SyncStatus != AccountingConstants.STATUS_SYNCED);
 
             foreach (var receipt in receipts)
             {

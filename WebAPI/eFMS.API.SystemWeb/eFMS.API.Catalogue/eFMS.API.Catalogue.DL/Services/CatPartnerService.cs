@@ -2808,7 +2808,8 @@ namespace eFMS.API.Catalogue.DL.Services
         public List<CatPartnerViewModel2> GetParentPartnerSameSaleman(CatPartnerCriteria criteria)
         {
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
-            var partners = DataContext.Get(x => x.ParentId == criteria.Id && (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase));
+            var partner = DataContext.Get(x => x.Id == criteria.Id).FirstOrDefault();
+            var partners = DataContext.Get(x => x.ParentId == partner.ParentId && (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase));
             var contracts = contractRepository.Get(x => x.Active == true && x.SaleManId == criteria.Saleman);
             var data = from pa in partners
                        join ct in contracts on pa.ParentId equals ct.PartnerId

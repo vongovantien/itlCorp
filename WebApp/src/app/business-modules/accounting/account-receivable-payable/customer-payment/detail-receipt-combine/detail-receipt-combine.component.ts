@@ -255,7 +255,7 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
     const generalGroup = (_groupBy(this.ReceiptGeneralCombineComponent.generalReceipts, 'id') || []);
     const generalReceipts = Object.keys(generalGroup).map(key => generalGroup[key][0]);
     generalReceipts
-      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done')
+      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done'  && x?.syncStatus !== 'Synced')
       .forEach((element: any) => {
         const receiptSyncId: AccountingInterface.IRequestString = {
           id: element.id,
@@ -265,7 +265,7 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
       });
 
     this.DebitPaymentReceiptCDCombineComponent.receiptDebitGroups
-      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done')
+      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done'  && x?.syncStatus !== 'Synced')
       .forEach((item: IReceiptCombineGroup) => {
         const receiptSyncId: AccountingInterface.IRequestString = {
           id: item.id,
@@ -275,7 +275,7 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
       });
 
     this.CreditPaymentReceiptCDCombineComponent.receiptCreditGroups
-      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done')
+      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done'  && x?.syncStatus !== 'Synced')
       .forEach((item: IReceiptCombineGroup) => {
         const receiptSyncId: AccountingInterface.IRequestString = {
           id: item.id,
