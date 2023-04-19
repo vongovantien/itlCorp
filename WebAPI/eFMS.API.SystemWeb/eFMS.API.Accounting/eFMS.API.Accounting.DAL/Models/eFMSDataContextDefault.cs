@@ -208,7 +208,7 @@ namespace eFMS.API.Accounting.Service.Models
                     .ValueGeneratedNever();
 
                 entity.Property(e => e.AcctId)
-                    .HasMaxLength(30)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");

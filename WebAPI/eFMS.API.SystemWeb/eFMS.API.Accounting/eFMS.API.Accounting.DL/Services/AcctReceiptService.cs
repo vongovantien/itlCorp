@@ -1067,8 +1067,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var debitAR = debitMngtArRepository.Get(x => x.Hblid == hblId && invoiceIds.Contains(x.AcctManagementId.ToString()));
                 var creditAR = from payment in accountPayableRepository.Get(x => invoiceIds.Contains(x.AcctManagementId))
                                join credit in creditMngtArRepository.Get(x => x.Hblid == hblId) on new { payment.PartnerId, payment.ReferenceNo } equals new { credit.PartnerId, credit.ReferenceNo }
-                               join payable in accountPayableRepository.Get(x => !string.IsNullOrEmpty(x.ReferenceNo)) on new { credit.ReferenceNo, BillingNo = credit.Code } equals new { payable.ReferenceNo, payable.BillingNo }
-                               select payable;
+                               select credit;
                 if (debitAR.Count() > 0)
                 {
                     bool isPaid = debitAR.All(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
@@ -1084,7 +1083,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 if(creditAR.Count() > 0)
                 {
-                    _paymentStatus = creditAR.FirstOrDefault()?.Status ?? _paymentStatus;
+                    _paymentStatus = creditAR.FirstOrDefault()?.PaymentStatus ?? _paymentStatus;
                 }
                 else
                 {
@@ -2525,16 +2524,25 @@ namespace eFMS.API.Accounting.DL.Services
                     receiptCurrent.Class == AccountingConstants.CLEAR_CREDIT_FROM_PAID_AMT)
                 {
                     // kiểm tra hóa đơn phát sinh payment # với payment trong receipt current.
-                    List<string> receiptCurrentPaymentInvoiceList = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Select(x => x.InvoiceNo).ToList();
-                    List<string> receiptCurrentPaymentVoucherList = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Select(x => x.VoucherNo).ToList();
+                    List<string> receiptCurrentPaymentInvoiceList = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo).ToList();
+                    List<string> receiptCurrentPaymentVoucherList = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Where(x => !string.IsNullOrEmpty(x.VoucherNo)).Select(x => x.VoucherNo).ToList();
 
+                    List<string> parentPartners = new List<string>();
+                    if (!string.IsNullOrEmpty(receiptCurrent.Arcbno))
+                    {
+                        var parent = catPartnerRepository.Get(x => x.Id == receiptCurrent.CustomerId).FirstOrDefault()?.ParentId; 
+                        if (parent != null)
+                        {
+                            parentPartners.AddRange(catPartnerRepository.Get(x => x.ParentId == parent).Select(x => x.Id));
+                        }
+                    }
                     IQueryable<AccAccountingPayment> hasPayments = acctPaymentRepository.Get(x => x.ReceiptId != receiptCurrent.Id
-                    && x.PartnerId == receiptCurrent.CustomerId
-                    && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                    && (x.PartnerId == receiptCurrent.CustomerId || parentPartners.Contains(x.PartnerId))
+                    && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH || x.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
                     && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) > 0
-                    && (receiptCurrentPaymentInvoiceList.Any(invoice => invoice == x.InvoiceNo) || receiptCurrentPaymentVoucherList.Any(voucher => voucher == x.VoucherNo))
+                    && (receiptCurrentPaymentInvoiceList.Count == 0 || receiptCurrentPaymentInvoiceList.Any(invoice => invoice == x.InvoiceNo))
+                    && (receiptCurrentPaymentVoucherList.Count == 0 || receiptCurrentPaymentVoucherList.Any(voucher => voucher == x.VoucherNo))
                     );
-
                     if (hasPayments.Count() > 0)
                     {
                         var query = from p in hasPayments
@@ -2575,21 +2583,21 @@ namespace eFMS.API.Accounting.DL.Services
                             throw new Exception("Có lỗi khi update cấn trừ hóa đơn" + hsUpdateInvoiceOfPayment.Message.ToString());
                         }
                         // Cập nhật Netoff cho CREDIT or SOA.
-                        List<AccAccountingPayment> paymentCredit = paymentsReceipt.Where(x => (x.Type != "DEBIT" && x.Type != "OBH")).ToList();
-                        if (paymentCredit.Count > 0)
-                        {
-                            foreach (var item in paymentCredit)
-                            {
-                                if (item.Type == "CREDITNOTE")
-                                {
-                                    UpdateNetOffCredit(item, true);
-                                }
-                                if (item.Type == "CREDITSOA")
-                                {
-                                    UpdateNetOffSoa(item, true);
-                                }
-                            }
-                        }
+                        //List<AccAccountingPayment> paymentCredit = paymentsReceipt.Where(x => (x.Type != "DEBIT" && x.Type != "OBH")).ToList();
+                        //if (paymentCredit.Count > 0)
+                        //{
+                        //    foreach (var item in paymentCredit)
+                        //    {
+                        //        if (item.Type == "CREDITNOTE")
+                        //        {
+                        //            UpdateNetOffCredit(item, true);
+                        //        }
+                        //        if (item.Type == "CREDITSOA")
+                        //        {
+                        //            UpdateNetOffSoa(item, true);
+                        //        }
+                        //    }
+                        //}
                         // Cập nhật Cus Advance của Agreement
                         if (receiptCurrent.AgreementId != null)
                         {
@@ -2631,7 +2639,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (receiptCurrent.PaymentMethod.ToLower().Contains("credit"))
                     {
                         var creditReceipt = mapper.Map<AcctReceiptModel>(receiptCurrent);
-                        var paymentInv = paymentDeitOBH.Where(x => x.Type != "DEBIT").Select(x => new ReceiptInvoiceModel
+                        var paymentInv = paymentDeitOBH.Where(x => x.Type != "DEBIT" && x.Negative != true).Select(x => new ReceiptInvoiceModel
                         {
                             CurrencyId = x.CurrencyId,
                             Type = x.Type,
@@ -2927,10 +2935,10 @@ namespace eFMS.API.Accounting.DL.Services
                 switch (criteria.SearchType)
                 {
                     case "VatInvoice":
-                        payables = payables.Where(x => criteria.ReferenceNos.Contains(x.InvoiceNo));
+                        payables = payables.Where(x => criteria.ReferenceNos.Contains(x.InvoiceNo) || criteria.ReferenceNos.Contains(x.VoucherNo));
                         break;
                     case "Debit/Credit/Invoice":
-                        payables = payables.Where(x => criteria.ReferenceNos.Contains(x.BillingNo) || criteria.ReferenceNos.Contains(x.InvoiceNo));
+                        payables = payables.Where(x => criteria.ReferenceNos.Contains(x.BillingNo) || criteria.ReferenceNos.Contains(x.InvoiceNo) || criteria.ReferenceNos.Contains(x.VoucherNo));
                         break;
                     case "Soa":
                     case "CreditNote":
@@ -4964,13 +4972,13 @@ namespace eFMS.API.Accounting.DL.Services
                         if (creditItem != null)
                         {
                             // Check status credit
-                            if (creditItem.RemainUsd < creditItem.AmountUsd)
-                            {
-                                creditItem.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
-                            }
-                            else if (creditItem.RemainUsd == 0)
+                            if (creditItem.RemainUsd == 0)
                             {
                                 creditItem.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+                            }
+                            else if (creditItem.RemainUsd != 0 && creditItem.RemainUsd < creditItem.AmountUsd)
+                            {
+                                creditItem.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
                             }
                             else
                             {
@@ -5006,7 +5014,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var payable = accountPayableRepository.Get(x => x.BillingNo == model.RefNo && model.RefIds.Contains(x.AcctManagementId) && x.PartnerId == model.PartnerId
                         && (x.TransactionType.Contains(AccountingConstants.TRANSACTION_TYPE_PAYABLE_CREDIT) || x.TransactionType == AccountingConstants.TRANSACTION_TYPE_PAYABLE_OBH)).FirstOrDefault();
                         IQueryable<AccAccountPayablePayment> existPayment = payablePaymentRepository.Get(x => x.OfficeId == model.OfficeId && x.PaymentNo == payable.VoucherNo
-                            && x.ReferenceNo == payable.ReferenceNo && x.PartnerId == model.PartnerId && x.AcctId == receipt.Arcbno);
+                            && x.ReferenceNo == payable.ReferenceNo && x.PartnerId == model.PartnerId && x.AcctId == receipt.Id.ToString());
                         List<Guid> deletePayable = existPayment.Select(x => x.Id).ToList();
 
                         foreach (var item in existPayment)
@@ -5057,7 +5065,7 @@ namespace eFMS.API.Accounting.DL.Services
                         accPayablePayment.PartnerId = partner.Id;
                         accPayablePayment.PaymentNo = payableExisted.VoucherNo;
                         accPayablePayment.ReferenceNo = model.Key.ReferenceNo;
-                        accPayablePayment.AcctId = receipt.Arcbno;
+                        accPayablePayment.AcctId = receipt.Id.ToString();
                         accPayablePayment.PaymentType = payableExisted.TransactionType;
                         accPayablePayment.Currency = model.invoices.FirstOrDefault().CurrencyId;
                         accPayablePayment.ExchangeRate = model.invoices.FirstOrDefault()?.ExchangeRateBilling;
@@ -6210,7 +6218,10 @@ namespace eFMS.API.Accounting.DL.Services
                         receiptModel.Status = AccountingConstants.RECEIPT_STATUS_DONE;
                         receiptModel.Class = receiptModel.PaymentMethod;
                         var _officeCode = officeRepository.Get(x => x.Id == receiptModel.OfficeId).FirstOrDefault()?.Code;
-                        receiptModel.PaymentRefNo = GenerateReceiptNoV2(receiptModel, _officeCode);
+                        if (string.IsNullOrEmpty(receiptModel.PaymentRefNo))
+                        {
+                            receiptModel.PaymentRefNo = GenerateReceiptNoV2(receiptModel, _officeCode);
+                        }
                         //receiptModel.PaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.PaidAmountVnd : receiptModel.PaidAmountUsd;
                         receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
                         receiptModel.PaidAmount = receiptModel.PaidAmountUsd = receiptModel.FinalPaidAmountUsd;
