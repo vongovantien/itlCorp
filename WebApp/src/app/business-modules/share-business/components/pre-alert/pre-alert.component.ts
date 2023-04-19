@@ -376,9 +376,6 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     checkExistDebitNote() {
-        if(!!this.isDbtInv){
-            this.hblId = this.hawbDetails.map(x => x.id).values().next().value;
-        }
         this._documentRepo.getListCDNoteWithHbl(this.hblId, this.jobId)
             .pipe(
                 catchError(this.catchError),

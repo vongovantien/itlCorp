@@ -734,7 +734,7 @@ namespace eFMS.API.Documentation.DL.Services
             var _subject = template.Subject;
             _subject = _subject.Replace("{{MAWB}}", string.IsNullOrEmpty(shipmentInfo.Mawb) ? string.Empty : shipmentInfo.Mawb);
             _subject = _subject.Replace("{{Hwbno}}", string.IsNullOrEmpty(hwbNos) ? string.Empty : ("/ " + hwbNos));
-            _subject = _subject.Replace("{{PO}}", string.Empty);
+            // _subject = _subject.Replace("{{PO}}", string.Empty);
             _subject = _subject.Replace("{{HAWB}}", hwbNos);
 
             var _body = template.Body;
