@@ -19,7 +19,7 @@ import { combineLatest } from 'rxjs/internal/observable/combineLatest';
 
 export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase {
     @Output() onAddToReceipt: EventEmitter<any> = new EventEmitter<any>();
-    typeToGet: string = 'credit';
+    typeToGet: string = 'Debit';
     
     type: string = null;
 
