@@ -2,8 +2,8 @@
     <div class="modal-dialog c-modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Get {{type === 'CUSTOMER' ? "Customer's" : "Agency's"}} Debit</h5>
-                <button type="button" class="close" aria-label="Close" (click)=close();this.hide()>
+                <h5 class="modal-title">Get {{type === 'CUSTOMER' ? "Customer's" : "Agency's"}} {{typeToGet}}</h5>
+                <button type="button" class="close" aria-label="Close" (click)=close()>
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -50,7 +50,7 @@
                                                 <span class="text-primary">
                                                     {{debit.invoiceNo}}
                                                     <ng-container
-                                                        *ngIf="debit.paymentType === 'DEBIT' || debit.paymentType === 'OBH'">
+                                                        *ngIf="debit.paymentType === 'DEBIT' || debit.paymentType === 'OBH' || debit.paymentType === 'CREDIT'">
                                                         <ng-container [ngSwitch]="debit.paymentStatus">
                                                             <span class="m-badge m-badge--success m-badge--wide"
                                                                 *ngSwitchCase="'Paid'">
@@ -223,7 +223,7 @@
                                                 <td [class.text-right]="invoice.paymentType === 'OBH'">
                                                     <span class="text-primary">
                                                         {{invoice.invoiceNo}}
-                                                        <ng-container *ngIf="invoice.paymentType === 'DEBIT'">
+                                                        <ng-container *ngIf="invoice.paymentType === 'DEBIT' || invoice.paymentType === 'CREDIT'">
                                                             <ng-container [ngSwitch]="invoice.paymentStatus">
                                                                 <span class="m-badge m-badge--success m-badge--wide"
                                                                     *ngSwitchCase="'Paid'">
@@ -311,7 +311,7 @@
                                                         [class.text-right]="invoice.paymentType === 'OBH'">
                                                         {{invoice.invoiceNo}}
                                                         <ng-container
-                                                            *ngIf="invoice.paymentType === 'DEBIT' || invoice.paymentType === 'OBH'">
+                                                            *ngIf="invoice.paymentType === 'DEBIT' || invoice.paymentType === 'OBH' || invoice.paymentType === 'CREDIT'">
                                                             <ng-container [ngSwitch]="invoice.paymentStatus">
                                                                 <span class="m-badge m-badge--success m-badge--wide"
                                                                     *ngSwitchCase="'Paid'">
@@ -495,7 +495,7 @@
                         </span>
                     </span>
                 </button>
-                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="close();this.hide()">
+                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="close()">
                     <span>
                         <i class="la la-ban"></i>
                         <span>

@@ -702,7 +702,8 @@ namespace eFMS.API.Accounting.DL.Services
                 .OrderBy(x => x.PaymentType == "OTHER");
 
             IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH").OrderBy(x => x.DatetimeCreated);
-            var partnerInfos = catPartnerRepository.Get(x => x.Id == result.CustomerId || x.ParentId == result.CustomerId);
+            var parentPartner = catPartnerRepository.Get(x => x.Id == result.CustomerId).FirstOrDefault()?.ParentId;
+            var partnerInfos = catPartnerRepository.Get(x => x.Id == result.CustomerId || x.ParentId == parentPartner);
             var creditArs = creditMngtArRepository.Get(x => !string.IsNullOrEmpty(x.ReferenceNo));
             if (listOBH.Count() > 0)
             {
@@ -745,7 +746,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     if (!string.IsNullOrEmpty(item.PartnerId))
                     {
-                        var agnecy = partnerInfos.First(x => x.Id == item.PartnerId);
+                        var agnecy = partnerInfos.FirstOrDefault(x => x.Id == item.PartnerId);
                         item.PartnerName = agnecy?.ShortName;
                         item.TaxCode = agnecy?.AccountNo;
                     }
@@ -838,7 +839,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.PartnerId = acctPayment?.PartnerId?.ToString();
                     if (!string.IsNullOrEmpty(payment.PartnerId))
                     {
-                        var agency = partnerInfos.First(x => x.Id == acctPayment.PartnerId);
+                        var agency = partnerInfos.FirstOrDefault(x => x.Id == acctPayment.PartnerId);
                         payment.PartnerName = agency?.ShortName;
                         payment.TaxCode = agency?.AccountNo;
                     }
@@ -856,7 +857,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     payment.CreditNos = _creditNos;
 
-                    payment.ReferenceNo = acctPayment.Type == "CREDIT" ? creditArs.First(x => x.Code == acctPayment.BillingRefNo && x.Hblid == acctPayment.Hblid)?.ReferenceNo : _ReferenceNo;
+                    payment.ReferenceNo = acctPayment.Type == "CREDIT" ? creditArs.FirstOrDefault(x => x.Code == acctPayment.BillingRefNo && x.Hblid == acctPayment.Hblid)?.ReferenceNo : _ReferenceNo;
 
                     paymentReceipts.Add(payment);
                 }
@@ -868,7 +869,7 @@ namespace eFMS.API.Accounting.DL.Services
             //CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == result.CustomerId).FirstOrDefault();
             if (!string.IsNullOrEmpty(result.CustomerId))
             {
-                result.CustomerName = partnerInfos.First(x => x.Id == result.CustomerId)?.ShortName;
+                result.CustomerName = partnerInfos.FirstOrDefault(x => x.Id == result.CustomerId)?.ShortName;
             }
 
             SysOffice receiptOffice = officeRepository.Get(x => x.Id == (result.OfficeId ?? Guid.Empty))?.FirstOrDefault();
@@ -5150,12 +5151,12 @@ namespace eFMS.API.Accounting.DL.Services
                 var partners = catPartnerRepository.Get(x => x.Active == true);
                 var partnerInfo = partners.FirstOrDefault(x => x.Id == result.CustomerId);
                 result.CustomerName = partnerInfo?.ShortName;
-                result.ObhPartnerName = result.ObhpartnerId == null ? null : partners.First(x => x.Id == result.ObhpartnerId.ToString())?.ShortName;
+                result.ObhPartnerName = result.ObhpartnerId == null ? null : partners.FirstOrDefault(x => x.Id == result.ObhpartnerId.ToString())?.ShortName;
                 result.UserNameCreated = sysUserRepository.Where(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
                 result.UserNameModified = sysUserRepository.Where(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
 
                 var contract = catContractRepository.Get(x => x.Active == true);
-                result.SalemanId = result.AgreementId == null ? string.Empty : contract.First(x => x.Id == result.AgreementId)?.SaleManId;
+                result.SalemanId = result.AgreementId == null ? string.Empty : contract.FirstOrDefault(x => x.Id == result.AgreementId)?.SaleManId;
                 result.SalemanName = result.SalemanId == null ? string.Empty : sysUserRepository.Where(x => x.Id == result.SalemanId).FirstOrDefault()?.Username;
                 SysOffice receiptOffice = officeRepository.Get(x => x.Id == (result.OfficeId ?? Guid.Empty))?.FirstOrDefault();
                 result.OfficeName = receiptOffice.ShortName;
@@ -5174,7 +5175,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var partners = catPartnerRepository.Get(x => x.Active == true);
                 var partnerInfo = partners.FirstOrDefault(x => x.Id == result.CustomerId);
                 result.CustomerName = partnerInfo?.ShortName;
-                result.ObhPartnerName = result.ObhpartnerId == null ? null : partners.First(x => x.Id == result.ObhpartnerId.ToString())?.ShortName;
+                result.ObhPartnerName = result.ObhpartnerId == null ? null : partners.FirstOrDefault(x => x.Id == result.ObhpartnerId.ToString())?.ShortName;
 
                 var creditArs = creditMngtArRepository.Get(x => !string.IsNullOrEmpty(x.ReferenceNo));
 
@@ -5223,7 +5224,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         if (!string.IsNullOrEmpty(item.PartnerId))
                         {
-                            var agnecy = partnerInfos.First(x => x.Id == item.PartnerId);
+                            var agnecy = partnerInfos.FirstOrDefault(x => x.Id == item.PartnerId);
                             item.PartnerName = agnecy?.ShortName;
                             item.TaxCode = agnecy?.AccountNo;
                         }
@@ -5304,7 +5305,7 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.NetOffUsd = acctPayment.NetOffUsd;
                         payment.NetOffVnd = acctPayment.NetOffVnd;
                         payment.RefCurrency = acctPayment.RefCurrency;
-                        payment.ReferenceNo = acctPayment.Type == "CREDIT" ? creditArs.First(x => x.Code == acctPayment.BillingRefNo && x.Hblid == acctPayment.Hblid)?.ReferenceNo : _ReferenceNo;
+                        payment.ReferenceNo = acctPayment.Type == "CREDIT" ? creditArs.FirstOrDefault(x => x.Code == acctPayment.BillingRefNo && x.Hblid == acctPayment.Hblid)?.ReferenceNo : _ReferenceNo;
 
                         List<string> _creditNos = new List<string>();
                         if (!string.IsNullOrEmpty(acctPayment.CreditNo))
@@ -5320,7 +5321,7 @@ namespace eFMS.API.Accounting.DL.Services
                 result.UserNameModified = sysUserRepository.Where(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
 
                 var contract = catContractRepository.Get(x => x.Active == true);
-                result.SalemanId = result.AgreementId == null ? string.Empty : contract.First(x => x.Id == result.AgreementId)?.SaleManId;
+                result.SalemanId = result.AgreementId == null ? string.Empty : contract.FirstOrDefault(x => x.Id == result.AgreementId)?.SaleManId;
                 result.SalemanName = result.SalemanId == null ? string.Empty : sysUserRepository.Where(x => x.Id == result.SalemanId).FirstOrDefault()?.Username;
                 //result.ARCBContractId = contract.First(x => x.PartnerId == receipt.ArcbpartnerId && x.SaleManId == result.SalemanId)?.Id.ToString();
                 SysOffice receiptOffice = officeRepository.Get(x => x.Id == (result.OfficeId ?? Guid.Empty))?.FirstOrDefault();

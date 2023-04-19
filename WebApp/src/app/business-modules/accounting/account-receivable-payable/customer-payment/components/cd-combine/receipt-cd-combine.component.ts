@@ -15,7 +15,7 @@ import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-a
     templateUrl: './receipt-cd-combine.component.html',
 })
 export class ARCustomerPaymentReceiptCDCombineComponent extends AppList implements OnInit {
-    @ViewChild(ARCustomerPaymentCustomerAgentDebitPopupComponent) debitPopup: ARCustomerPaymentCustomerAgentDebitPopupComponent;
+    @ViewChild(ARCustomerPaymentCustomerAgentDebitPopupComponent, { static: false }) debitPopup: ARCustomerPaymentCustomerAgentDebitPopupComponent;
 
     @Input() listType: string;
     @Input() isUpdate: boolean = false;
