@@ -323,7 +323,7 @@ namespace eFMS.API.Accounting.Controllers
                     await CalculateOverDueAsync(new List<string>() { receiptModel.CustomerId });
                 });
 
-                if (receiptModel.PaymentMethod.ToLower().Contains("credit"))
+                if (receiptModel.PaymentMethod.ToLower().Contains("credit") && saveAction == SaveAction.SAVEDONE)
                 {
                     var hsCredit = acctReceiptService.UpdateCreditARCombine(new List<AcctReceiptModel>() { receiptModel }, saveAction);
                     if (!hsCredit.Success)

@@ -343,9 +343,14 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     }
 
     reset() {
+        const partner = this.partnerId.value;
         this.formSearch.reset();
         this.initForm();
         this.date.setValue(null);
+        if(this.isCombineReceipt){
+            this.partnerId.setValue(partner);
+            this.customerFromReceipt = partner;
+        }
         this.isSubmitted = false;
     }
 }
