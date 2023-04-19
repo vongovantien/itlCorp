@@ -23,7 +23,7 @@ export class FlowSetting {
     approvalAdvance: boolean = false;
     approvalSettlement: boolean = false;
     alertAtd: boolean = false;
-    isOverDueObh: boolean = false;
+    overPaymentTermOBH: boolean = false;
 
     constructor(data?: any) {
         const self = this;
