@@ -27,6 +27,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using eFMS.API.Infrastructure.RabbitMQ;
 using Microsoft.AspNetCore.Authentication.Twitter;
+using System.Security.Policy;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -46,6 +47,7 @@ namespace eFMS.API.Accounting.Controllers
         public IBackgroundTaskQueue _queue { get; }
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IRabbitBus _busControl;
+        private readonly IOptions<ApiUrl> _apiUrl;
 
         public AccountingController(
             IStringLocalizer<LanguageSub> localizer,
@@ -56,7 +58,8 @@ namespace eFMS.API.Accounting.Controllers
             ISysImageService SysImageService,
             IBackgroundTaskQueue queue, 
             IServiceScopeFactory serviceScopeFactory,
-            IRabbitBus busControl
+            IRabbitBus busControl,
+            IOptions<ApiUrl> apiUrl
             )
         {
             stringLocalizer = localizer;
@@ -64,6 +67,7 @@ namespace eFMS.API.Accounting.Controllers
             webUrl = appSettings;
             actionFuncLogService = actionFuncLog;
             currentUser = currUser;
+            _apiUrl = apiUrl;
             loginInfo = new BravoLoginModel
             {
                 UserName = "bravo",
@@ -556,9 +560,11 @@ namespace eFMS.API.Accounting.Controllers
                                 SettlementId = x.Stt,
                                 Lang = "EN",
                                 Action = "eDOC",
-                                AccessToken= Request.Headers["Authorization"].ToString()
-                        };
+                                AccessToken = Request.Headers["Authorization"].ToString()
+                            };
+                            new LogHelper("Push Rabbit SyncSettlementToAccountantSystem",  JsonConvert.SerializeObject(modelSuccess));
                             await _busControl.SendAsync(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileQueue, modelSuccess);
+                            // await HttpClientService.GetApi(_apiUrl.Value.Url + "/Export/api/v1/EN/AccountingReport/ExportDetailSettlementPayment?settlementId=" + x.Stt + "&action=Add", Request.Headers["Authorization"].ToString());
                         });
                         return Ok(result);
                     }

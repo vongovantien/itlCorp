@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 using System.Net.Http;
 using Swashbuckle.AspNetCore.Swagger;
 using eFMS.API.ReportData.Helpers;
+using eFMS.API.Common.Helpers;
 
 namespace eFMS.API.ReportData.Service.BackGroundServices
 {
@@ -37,13 +38,16 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
         {
             try
             {
-                TimeSpan interval = TimeSpan.FromSeconds(45);
+                new LogHelper("GenFileSyncSMBackgroundService", "STARTED at " + DateTime.Now);
                 await _busControl.ReceiveAsync<ExportDetailSettleModel>(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileQueue, async (models) =>
                 {
+                    new LogHelper("GenFileSyncSMBackgroundService", "STARTED at " + DateTime.Now + "\n " + JsonConvert.SerializeObject(models));
+
                     var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + models.SettlementId, models.AccessToken);
+                    new LogHelper("responseFromApi",  DateTime.Now + "\n " + JsonConvert.SerializeObject(responseFromApi));
                     var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
                     var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, models.Lang, "");
-                    var file = new FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
+                    var file = new Helpers.FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
                     var model = new FileUploadAttachTemplateModel
                     {
                         Child = null,
@@ -51,13 +55,16 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
                         FolderName = "Settlement",
                         ModuleName = "Accounting",
                         Id = models.SettlementId,
-                        UserCreated=dataObjects.Result.UserCreated
+                        UserCreated = dataObjects.Result.UserCreated
                     };
+                    new LogHelper("FileModel", DateTime.Now + "\n " + JsonConvert.SerializeObject(model.File.FileName));
                     await _busControl.SendAsync(RabbitExchange.EFMS_FileManagement, RabbitConstants.PostAttachFileTemplateToEDocQueue, model);
+
                 }, batchSize: 3, maxMessagesInFlight: 10);
             }
             catch (Exception ex)
             {
+                new LogHelper("GenFileSyncSMBackgroundService", " ERROR at " + DateTime.Now + " " + ex.ToString() + " ");
                 throw;
             }
         }
@@ -66,12 +73,12 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
         {
             try
             {
-                new Common.Helpers.LogHelper("GenFileSyncSMBackgroundService", "STOPPED at " + DateTime.Now);
+                new LogHelper("GenFileSyncSMBackgroundService", "STOPPED at " + DateTime.Now);
                 await base.StopAsync(stoppingToken);
             }
             catch (Exception ex)
             {
-                new Common.Helpers.LogHelper("GenFileSyncSMBackgroundService", " ERROR at " + DateTime.Now + " " + ex.ToString() + " ");
+                new LogHelper("GenFileSyncSMBackgroundService", " ERROR at " + DateTime.Now + " " + ex.ToString() + " ");
                 throw;
             }
 
