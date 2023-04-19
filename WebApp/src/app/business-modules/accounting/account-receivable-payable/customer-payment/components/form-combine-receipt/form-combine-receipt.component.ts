@@ -15,6 +15,7 @@ import { take, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
 import { ResetCombineInvoiceList, ResetInvoiceList, SelectPartnerReceiptCombine, UpdateExchangeRateReceiptCombine } from '../../store/actions';
 import { ICustomerPaymentState, ReceiptCombineCreditListState, ReceiptCombineGeneralListState } from '../../store/reducers';
+import { InjectViewContainerRefDirective } from '@directives';
 
 type COMBINE_TYPE = 'NEW' | 'EXISTING';
 @Component({
@@ -23,6 +24,7 @@ type COMBINE_TYPE = 'NEW' | 'EXISTING';
 })
 export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm implements OnInit {
     @ViewChild('comboGridPartner') combogridPartner: ComboGridVirtualScrollComponent;
+    @ViewChild(InjectViewContainerRefDirective) injectViewContainer: InjectViewContainerRefDirective;
     
     @Output() onSynceCombine: EventEmitter<any> = new EventEmitter<any>();
     @Input() isUpdate: boolean = false;
@@ -166,7 +168,7 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
             });
 
         if (dataList.length > 0) {
-            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainer.viewContainerRef, {
                 body: 'Do you want to exit without saving?',
             }, () => {
                 this.gotoList();
@@ -177,7 +179,7 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
     }
 
     confirmSync() {
-        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainer.viewContainerRef, {
             title: 'Sync To Accountant System',
             body: 'Are you sure to send these data to accountant system',
             iconConfirm: 'la la-cloud-upload',

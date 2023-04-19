@@ -2501,14 +2501,14 @@ namespace eFMS.API.Accounting.DL.Services
                     return new HandleState((object)"Trạng thái của phiếu thu không hợp lệ");
                 }
 
-                if(receiptCurrent.Class == AccountingConstants.RECEIPT_CLASS_ADVANCE)
+                if (receiptCurrent.Class == AccountingConstants.RECEIPT_CLASS_ADVANCE)
                 {
-                    var hasReceiptNewest = DataContext.Get(x => x.CustomerId == receiptCurrent.CustomerId 
-                    && x.Id != receiptCurrent.Id 
+                    var hasReceiptNewest = DataContext.Get(x => x.CustomerId == receiptCurrent.CustomerId
+                    && x.Id != receiptCurrent.Id
                     && x.Status == AccountingConstants.RECEIPT_STATUS_DONE
                     && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) > 0
                     );
-                    if(hasReceiptNewest.Count() > 0)
+                    if (hasReceiptNewest.Count() > 0)
                     {
                         CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == receiptCurrent.CustomerId).FirstOrDefault();
                         string _customerName = partnerInfo?.ShortName;
@@ -2517,19 +2517,24 @@ namespace eFMS.API.Accounting.DL.Services
                             ));
                     }
                 }
-                else if(receiptCurrent.Class == AccountingConstants.RECEIPT_CLASS_CLEAR_DEBIT)
+                else if (receiptCurrent.Class == AccountingConstants.RECEIPT_CLASS_CLEAR_DEBIT ||
+                    receiptCurrent.Class == AccountingConstants.CLEAR_DEBIT_FROM_OBH ||
+                    receiptCurrent.Class == AccountingConstants.CLEAR_DEBIT_FROM_PAID_AMT ||
+                    receiptCurrent.Class == AccountingConstants.CLEAR_CREDIT_FROM_OBH ||
+                    receiptCurrent.Class == AccountingConstants.CLEAR_CREDIT_FROM_PAID_AMT)
                 {
                     // kiểm tra hóa đơn phát sinh payment # với payment trong receipt current.
                     List<string> receiptCurrentPaymentInvoiceList = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Select(x => x.InvoiceNo).ToList();
-                    
+                    List<string> receiptCurrentPaymentVoucherList = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Select(x => x.VoucherNo).ToList();
+
                     IQueryable<AccAccountingPayment> hasPayments = acctPaymentRepository.Get(x => x.ReceiptId != receiptCurrent.Id
                     && x.PartnerId == receiptCurrent.CustomerId
                     && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
                     && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) > 0
-                    && receiptCurrentPaymentInvoiceList.Any(invoice => invoice == x.InvoiceNo)
+                    && (receiptCurrentPaymentInvoiceList.Any(invoice => invoice == x.InvoiceNo) || receiptCurrentPaymentVoucherList.Any(voucher => voucher == x.VoucherNo))
                     );
 
-                    if(hasPayments.Count() > 0)
+                    if (hasPayments.Count() > 0)
                     {
                         var query = from p in hasPayments
                                     join r in DataContext.Get() on p.ReceiptId equals r.Id
@@ -2661,7 +2666,8 @@ namespace eFMS.API.Accounting.DL.Services
                             RefIds = new List<string> { x.RefId },
                             Hblid = x.Hblid,
                             PartnerId = x.PartnerId,
-                            RefNo = x.BillingRefNo
+                            RefNo = x.BillingRefNo,
+                            OfficeId = x.OfficeId
                         }).ToList();
                         var hsDebit = UpdateAccountingDebitAR(paymentInv, receiptId, SaveAction.SAVECANCEL);
                         if (!hsDebit.Success)
@@ -2906,17 +2912,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.PartnerId))
             {
                 var currentPartner = partner.FirstOrDefault(x => x.Id == criteria.PartnerId);
-                partnerIds = partner.Where(x => x.Id == criteria.PartnerId || x.ParentId == currentPartner.ParentId).Select(x => x.Id).ToList();
+                partnerIds = partner.Where(x => x.ParentId == currentPartner.ParentId).Select(x => x.Id).ToList();
             }
             var payables = accountPayableRepository.Get(x => (partnerIds.Count == 0 || partnerIds.Contains(x.PartnerId)) && !string.IsNullOrEmpty(x.ReferenceNo) && x.Status != "Paid" && x.TransactionType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE);
             var creditManagementAr = creditMngtArRepository.Get(x => (partnerIds.Count == 0 || partnerIds.Contains(x.PartnerId)) && !string.IsNullOrEmpty(x.ReferenceNo));
 
-            //if (!string.IsNullOrEmpty(criteria.PartnerId))
-            //{
-            //    var partnerIds = partner.Where(x => x.ParentId == criteria.PartnerId).Select(x => x.Id).ToList();
-            //    payables = payables.Where(q => partnerIds.Contains(q.PartnerId));
-            //    creditManagementAr = creditManagementAr.Where(x => partnerIds.Contains(x.PartnerId));
-            //}
             if (criteria.Office != null && criteria.Office.Count > 0)
             {
                 payables = payables.Where(x => x.OfficeId != null && criteria.Office.Contains(x.OfficeId.ToString()));
@@ -3364,11 +3364,23 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var partners = catPartnerRepository.Get(x => x.Active == true);
-            var currentPartner = partners.Where(x => x.Id == criteria.PartnerId).FirstOrDefault();
-            List<string> childPartnerIds = partners.Where(x => x.ParentId == currentPartner.ParentId)
-                        .Select(x => x.Id)
-                        .ToList();
-            partners = partners.Where(x => x.ParentId == currentPartner.ParentId || x.Id == criteria.PartnerId);
+            List<string> childPartnerIds = new List<string>();
+            if (criteria.IsCombineReceipt)
+            {
+                var currentPartner = partners.Where(x => x.Id == criteria.PartnerId).FirstOrDefault();
+                childPartnerIds = partners.Where(x => x.ParentId == currentPartner.ParentId)
+                            .Select(x => x.Id)
+                            .ToList();
+                partners = partners.Where(x => x.Id == criteria.PartnerId || childPartnerIds.Contains(x.ParentId));
+            }
+            else
+            {
+                partners = partners.Where(x => x.Active == true && (x.Id == criteria.PartnerId || x.ParentId == criteria.PartnerId));
+                childPartnerIds = partners.Where(x => x.ParentId == criteria.PartnerId)
+                            .Select(x => x.Id)
+                            .ToList();
+            }
+
             var debitsAr = debitMngtArRepository.Get(q => q.PartnerId == criteria.PartnerId || childPartnerIds.Contains(q.PartnerId));
             if (criteria.Service != null && criteria.Service.Count > 0)
             {
@@ -3395,9 +3407,9 @@ namespace eFMS.API.Accounting.DL.Services
                            UnpaidAmount = inv != null ? inv.UnpaidAmount : (acct.inv.Currency == AccountingConstants.CURRENCY_LOCAL ? (acct.AmountVnd + acct.VatAmountVnd) : (acct.AmountUsd + acct.VatAmountUsd)),
                            UnpaidAmountUsd = inv != null ? inv.UnpaidAmountUsd : (acct.AmountUsd + acct.VatAmountUsd),
                            UnpaidAmountVnd = inv != null ? inv.UnpaidAmountVnd : (acct.AmountVnd + acct.VatAmountVnd),
-                           PaidAmount = inv != null ? inv.PaidAmount : (acct.AmountUsd + acct.VatAmountUsd),
-                           PaidAmountUsd = inv != null ? inv.PaidAmountUsd : (acct.AmountUsd + acct.VatAmountUsd),
-                           PaidAmountVnd = inv != null ? inv.PaidAmountVnd : (acct.AmountVnd + acct.VatAmountVnd),
+                           //PaidAmount = inv != null ? inv.PaidAmount : (acct.AmountUsd + acct.VatAmountUsd),
+                           //PaidAmountUsd = inv != null ? inv.PaidAmountUsd : (acct.AmountUsd + acct.VatAmountUsd),
+                           //PaidAmountVnd = inv != null ? inv.PaidAmountVnd : (acct.AmountVnd + acct.VatAmountVnd),
                            //RemainAmount = inv != null ? (inv.UnpaidAmountUsd ?? 0) : (acct.AmountUsd + acct.VatAmountUsd),
                            //RemainAmountUsd = inv != null ? (inv.UnpaidAmountUsd ?? 0) : (acct.AmountUsd + acct.VatAmountUsd),
                            //RemainAmountVnd = inv != null ? (inv.UnpaidAmountVnd ?? 0) : (acct.AmountVnd + acct.VatAmountVnd),
@@ -3431,9 +3443,9 @@ namespace eFMS.API.Accounting.DL.Services
                 UnpaidAmount = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().UnpaidAmount : inv.Sum(x => x.UnpaidAmount),
                 UnpaidAmountUsd = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().UnpaidAmountUsd : inv.Sum(x => x.UnpaidAmountUsd),
                 UnpaidAmountVnd = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().UnpaidAmountVnd : inv.Sum(x => x.UnpaidAmountVnd),
-                PaidAmount = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().PaidAmount : inv.Sum(x => x.PaidAmount),
-                PaidAmountUsd = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().PaidAmountUsd : inv.Sum(x => x.PaidAmountUsd),
-                PaidAmountVnd = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().PaidAmountVnd : inv.Sum(x => x.PaidAmountVnd),
+                PaidAmount = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().UnpaidAmount : inv.Sum(x => x.UnpaidAmount),
+                PaidAmountUsd = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().UnpaidAmountUsd : inv.Sum(x => x.UnpaidAmountUsd),
+                PaidAmountVnd = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().UnpaidAmountVnd : inv.Sum(x => x.UnpaidAmountVnd),
                 //PaidAmount = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().RemainAmount : inv.Sum(x => x.RemainAmount),
                 //PaidAmountUsd = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().RemainAmountUsd : inv.Sum(x => x.RemainAmountUsd),
                 //PaidAmountVnd = inv.FirstOrDefault().isExistDebitAR == true ? inv.FirstOrDefault().RemainAmountVnd : inv.Sum(x => x.RemainAmountVnd),
@@ -3472,9 +3484,9 @@ namespace eFMS.API.Accounting.DL.Services
                                UnpaidAmount = d.UnpaidAmount,
                                UnpaidAmountVnd = d.UnpaidAmountVnd,
                                UnpaidAmountUsd = d.UnpaidAmountUsd,
-                               PaidAmount = d.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID ? d.UnpaidAmount : d.PaidAmount,
-                               PaidAmountVnd = d.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID ? d.UnpaidAmountVnd : d.PaidAmountVnd,
-                               PaidAmountUsd = d.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID ? d.UnpaidAmountUsd : d.PaidAmountUsd,
+                               PaidAmount = d.PaidAmount,
+                               PaidAmountVnd = d.PaidAmountVnd,
+                               PaidAmountUsd = d.PaidAmountUsd,
                                //RemainAmount = d.UnpaidAmount - d.PaidAmount,
                                //RemainAmountVnd = d.UnpaidAmountVnd - d.PaidAmountVnd,
                                //RemainAmountUsd = d.UnpaidAmountUsd - d.PaidAmountUsd,
@@ -3566,11 +3578,22 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var partners = catPartnerRepository.Get(x => x.Active == true);
-            var currentPartner = partners.FirstOrDefault(x => x.Id == criteria.PartnerId);
-            List<string> childPartnerIds = partners.Where(x => x.ParentId == currentPartner.ParentId)
-                        .Select(x => x.Id)
-                        .ToList();
-            partners = partners.Where(x => x.Id == criteria.PartnerId || x.ParentId == currentPartner.ParentId);
+            List<string> childPartnerIds = new List<string>();
+            if (criteria.IsCombineReceipt)
+            {
+                var currentPartner = partners.FirstOrDefault(x => x.Id == criteria.PartnerId);
+                childPartnerIds = partners.Where(x => x.ParentId == currentPartner.ParentId)
+                            .Select(x => x.Id)
+                            .ToList();
+                partners = partners.Where(x => x.Id == criteria.PartnerId || childPartnerIds.Contains(x.ParentId));
+            }
+            else
+            {
+                partners = partners.Where(x => x.Active == true && (x.Id == criteria.PartnerId || x.ParentId == criteria.PartnerId));
+                childPartnerIds = partners.Where(x => x.ParentId == criteria.PartnerId)
+                            .Select(x => x.Id)
+                            .ToList();
+            }
             var debitsAr = debitMngtArRepository.Get(q => q.PartnerId == criteria.PartnerId || childPartnerIds.Contains(q.PartnerId));
             if (query.FirstOrDefault() == null)
                 return null;
@@ -3696,10 +3719,20 @@ namespace eFMS.API.Accounting.DL.Services
         {
             //Get Vat Invoice có Payment Status # Paid
             // Ds các đối tượng con
-            var currentPartner = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
-            List<string> childPartnerIds = catPartnerRepository.Get(x => x.ParentId == currentPartner.ParentId)
-                    .Select(x => x.Id)
-                    .ToList();
+            List<string> childPartnerIds = new List<string>();
+            if (criteria.IsCombineReceipt)
+            {
+                var currentPartner = catPartnerRepository.Get(x => x.Id == criteria.PartnerId).FirstOrDefault();
+                childPartnerIds = catPartnerRepository.Get(x => x.ParentId == currentPartner.ParentId)
+                        .Select(x => x.Id)
+                        .ToList();
+            }
+            else
+            {
+                childPartnerIds = catPartnerRepository.Get(x => x.ParentId == criteria.PartnerId)
+                     .Select(x => x.Id)
+                        .ToList();
+            }
             var criteriaBuilder = new CriteriaBuilder<AccAccountingManagement>()
                 .Where(q => q.Type == type && q.PaymentStatus != "Paid")
               .WhereIf(!string.IsNullOrEmpty(criteria.PartnerId),
@@ -4871,7 +4904,7 @@ namespace eFMS.API.Accounting.DL.Services
                 RefIds = string.Join(";", x.RefIds.Select(z => z)),
                 UserId = currentUser.UserID,
                 DepartmentId = currentUser.DepartmentId,
-                OfficeId = currentUser.OfficeID,
+                OfficeId = x.OfficeId,
                 CompanyId = currentUser.CompanyID
             }).ToList();
             var parameters = new[]{
@@ -5490,7 +5523,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    }).FirstOrDefault();
                 if (existedItem != null)
                 {
-                    var errMessage = string.Format("There is {0} - {1} in the Draft {2}, please you update Done that receipt or Remove it first?", existedItem.RefNo, existedItem.Hbl, existedItem.PaymentRefNo);
+                    var errMessage = string.Format("There is {0} - {1} in the Draft {2}, please update Done that receipt or Remove it first?", existedItem.RefNo, existedItem.Hbl, existedItem.PaymentRefNo);
                     return new HandleState(false, (object)errMessage);
                 }
             }

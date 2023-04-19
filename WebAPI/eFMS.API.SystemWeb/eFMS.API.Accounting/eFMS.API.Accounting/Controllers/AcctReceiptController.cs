@@ -217,7 +217,7 @@ namespace eFMS.API.Accounting.Controllers
             var hsDuplicate = acctReceiptService.CheckExitedCombineReceipt(new List<AcctReceiptModel>() { receiptModel });
             if (!hsDuplicate.Success)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = hsDuplicate.Message?.ToString() });
+                return Ok(new ResultHandle { Status = false, Message = hsDuplicate.Message?.ToString() });
             }
             if (saveAction == SaveAction.SAVEDONE)
             {
