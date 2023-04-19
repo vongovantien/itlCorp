@@ -339,8 +339,14 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                         this._store.dispatch(ResetInvoiceList());
                         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`]);
                         return;
+                    } else {
+                        if (!!res.message) {
+                            this._toastService.warning(res.message);
+                        } else {
+                            this._toastService.error("Create data fail, Please check again!");
+                        }
+                        return;
                     }
-                    this._toastService.error("Create data fail, Please check again!");
                 },
                 (res: HttpErrorResponse) => {
                     this.handleValidateReceiptResponse(res);

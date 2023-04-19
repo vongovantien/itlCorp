@@ -312,6 +312,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                         },
                     );
                 }else{
+                    body.isCombineReceipt = this.isCombineReceipt;
                     this._accountingRepo.getDataIssueAgencyPayment(body)
                     .pipe(catchError(this.catchError))
                     .subscribe(
