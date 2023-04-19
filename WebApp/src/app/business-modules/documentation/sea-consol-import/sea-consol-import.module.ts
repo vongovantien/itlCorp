@@ -48,8 +48,8 @@ const routing: Routes = [
                 data: { name: "Manifest", },
             },
             {
-                path: 'cdnote', component: ShareBusinessReAlertComponent,
-                data: { name: 'Send Debit Invoice', level: 7, serviceId: ChargeConstants.SCI_CODE},
+                path: 'prealert', component: ShareBusinessReAlertComponent,
+                data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.SCE_CODE },
             }
         ]
     },

@@ -124,7 +124,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         private _spinner: NgxSpinnerService,
         private _router: Router,
         private _cd: ChangeDetectorRef,
-        private _systemfileManageRepo: SystemFileManageRepo
+        private _systemfileManageRepo: SystemFileManageRepo,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -134,8 +134,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         this.subscription = combineLatest([
             this._activedRouter.params,
             this._activedRouter.data,
+            this._activedRouter.queryParams
         ]).pipe(
-            map(([params, qParams]) => ({ ...params, ...qParams })),
+            map(([params, qParams, namingParams]) => ({ ...params, ...qParams, ...namingParams })),
             take(1),
             takeUntil(this.ngUnsubscribe)
         ).subscribe(
@@ -144,7 +145,14 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.jobId = params.jobId;
                     this.hblId = !params.hblId || params.hblId === 'undefined' ? SystemConstants.EMPTY_GUID : params.hblId;
                     this.serviceId = params.serviceId;
-                    this.name = params.name;
+                   
+                    if(params.name === "Send_Debit_Invoice"){
+                        this.name = "Send Debit Invoice"
+                    }
+                    else{
+                        this.name = params.name;
+                    }
+
                     this.checkReportType();
 
                     this.hblRptName = (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE || this.serviceId === ChargeConstants.SCE_CODE) ? "HBL" : "HAWB";

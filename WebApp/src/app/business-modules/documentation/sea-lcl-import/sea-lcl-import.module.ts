@@ -45,10 +45,6 @@ const routing: Routes = [
                     name: "House Bill",
                 },
             },
-            {
-                path: 'cdnote', component: ShareBusinessReAlertComponent,
-                data: { name: 'Send Debit Invoice', level: 7, serviceId: ChargeConstants.SLI_CODE},
-            }
         ]
     },
 ];

@@ -48,10 +48,6 @@ const routing: Routes = [
                 path: 'manifest', component: SeaFclImportManifestComponent,
                 data: { name: "Manifest", },
             },
-            {
-                path: 'cdnote', component: ShareBusinessReAlertComponent,
-                data: { name: 'Send Debit Invoice', level: 7, serviceId: ChargeConstants.SFI_CODE},
-            }
         ]
     },
 ];
