@@ -4,11 +4,14 @@ variables:
   APP_OUT_PATH_PROD_EN: "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-en"
   APP_OUT_PATH_PROD_VI: "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-vi"
 
+  FRONTEND_IMAGE_CURRENTVER: jackchuong/itl:efms-webapp-frontend-1.0.0
+
 image: node:12
 
 stages:
   - install
   - build
+  - deploy
 
 install_dependency:
   stage: install
@@ -106,3 +109,33 @@ build_prod_vi:
     name: "angular_build_prod_vi"
     paths:
       - $APP_OUT_PATH_PROD_VI
+
+build_image_frontend_final:
+  stage: build
+  image: docker:20.10.9
+  script:
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASS
+    - docker build -f dockerfile-frontend -t $FRONTEND_IMAGE_CURRENTVER ./WebApp
+    - docker push $FRONTEND_IMAGE_CURRENTVER
+  only:
+    refs:
+      - feature-itl
+    changes:
+      - WebApp/**/*
+  when: manual
+
+deploy_k8s:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  script:
+  - kubectl config get-contexts
+  - kubectl config use-context efms/eFMS-WebApp:efms-agent
+  - kubectl apply -f kubernetes-configs/manifest.yaml
+  only:
+    refs:
+      - feature-itl
+    changes:
+      - WebApp/**/* # only run when php source code change
+  when: manual
