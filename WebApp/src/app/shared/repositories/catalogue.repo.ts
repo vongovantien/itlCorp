@@ -172,7 +172,7 @@ export class CatalogueRepo {
             }, null, { "hideSpinner": "true" });
     }
 
-    getPartnerGroupsWithCriteria(data: any){
+    getPartnerGroupsWithCriteria(data: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`, data, null, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
@@ -1434,6 +1434,49 @@ export class CatalogueRepo {
             map((res: any) => {
                 return res;
             })
+        );
+    }
+
+    getPartnerBank(partnerId: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerBank/GetByPartner`, { partnerId: partnerId }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getDetailPartnerBank(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerBank/GetDetail`, { id: id }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    addNewPartnerBank(data: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerBank/AddNew`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    updatePartnerBank(data: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerBank/Update`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    deletePartnerBank(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerBank/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
         );
     }
 }

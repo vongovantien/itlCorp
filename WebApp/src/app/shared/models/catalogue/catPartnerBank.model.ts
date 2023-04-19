@@ -1,8 +1,7 @@
-export class Bank {
+export class PartnerBank {
     id: string = '';
     code: string = '';
-    bankNameVn: string = '';
-    bankNameEn: string = '';
+    bankName: string = '';
     userCreated: string = '';
     datetimeCreated: string = '';
     userModified: string;
@@ -11,10 +10,12 @@ export class Bank {
     inactiveOn: string = '';
     userCreatedName: string = '';
     userModifiedName: string = '';
-
+    bankCode: string = '';
     swiftCode: string = '';
     bankAccountNo: string = '';
     bankAddress: string = '';
+    partnerId: string = '';
+    bankId: string = '';
     note: string = '';
     source: string = '';
     bankAccountName: string = '';
