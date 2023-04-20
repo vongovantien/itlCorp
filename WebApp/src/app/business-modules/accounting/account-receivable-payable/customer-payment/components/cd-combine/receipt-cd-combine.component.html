@@ -127,9 +127,9 @@
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
                                                     <ng-container>
-                                                        <ng-container *ngIf="grp.status !== 'Done'">
+                                                        <ng-container *ngIf="!grp?.status || (grp.status === 'Draft' && grp.cdCombineList.length > 1)">
                                                             <button type="button"
-                                                                (click)="confirmDeleteInvoiceItem(item, y, 'credit')"
+                                                                (click)="confirmDeleteInvoiceItem(item, i, y, 'credit')"
                                                                 class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
                                                                 title="Remove">
                                                                 <i class="la la-trash"></i>
@@ -322,9 +322,9 @@
                                         <tr *ngFor="let item of grp.cdCombineList; let y = index; trackBy: trackByFn">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
-                                                    <ng-container *ngIf="grp.status !== 'Done'">
+                                                    <ng-container *ngIf="!grp?.status || (grp.status === 'Draft' && grp.cdCombineList.length > 1)">
                                                         <button type="button"
-                                                            (click)="confirmDeleteInvoiceItem(item, y, 'debit')"
+                                                            (click)="confirmDeleteInvoiceItem(item, i, y, 'debit')"
                                                             class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
                                                             title="Remove">
                                                             <i class="la la-trash"></i>

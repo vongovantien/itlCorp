@@ -1357,6 +1357,15 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 var hs = acctPaymentRepository.SubmitChanges();
+                if (hs.Success)
+                {
+                    var idPayments = results.Select(x => x.Id).ToList();
+                    var paymentOBHDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && x.Type == "OBH" && !idPayments.Contains(x.Id)).Select(x => x.Id);
+                    if (paymentOBHDelete.Count() > 0)
+                    {
+                        acctPaymentRepository.Delete(x => paymentOBHDelete.Contains(x.Id));
+                    }
+                }
                 return hs;
             }
             catch (Exception ex)
@@ -1373,6 +1382,7 @@ namespace eFMS.API.Accounting.DL.Services
             var existingPayment = acctPaymentRepository.Get(x=> x.ReceiptId == receipt.Id).ToList();
             try
             {
+                var listIdUpds = new List<Guid>();
                 foreach (ReceiptInvoiceModel payment in payments)
                 {
                     AccAccountingPayment _payment = new AccAccountingPayment();
@@ -1432,6 +1442,8 @@ namespace eFMS.API.Accounting.DL.Services
                             _creditNo = string.Join(",", payment.CreditNos);
                         }
                         _payment.CreditNo = _creditNo;
+
+                        listIdUpds.Add(_payment.Id);
                         acctPaymentRepository.Update(_payment, x => x.Id == _payment.Id, false);
                     }
                     else
@@ -1519,11 +1531,20 @@ namespace eFMS.API.Accounting.DL.Services
                             _creditNo = string.Join(",", payment.CreditNos);
                         }
                         _payment.CreditNo = _creditNo;
+                        listIdUpds.Add(_payment.Id);
 
                         acctPaymentRepository.Add(_payment, false);
                     }
                 }
                 var hs = acctPaymentRepository.SubmitChanges();
+                if (hs.Success)
+                {
+                    var paymentOBHDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && x.Type != "OBH" && !listIdUpds.Contains(x.Id)).Select(x => x.Id);
+                    if (paymentOBHDelete.Count() > 0)
+                    {
+                        acctPaymentRepository.Delete(x => paymentOBHDelete.Contains(x.Id));
+                    }
+                }
                 return hs;
             }
             catch(Exception ex)
@@ -2924,7 +2945,7 @@ namespace eFMS.API.Accounting.DL.Services
                 partnerIds = partner.Where(x => x.ParentId == currentPartner.ParentId).Select(x => x.Id).ToList();
             }
             var payables = accountPayableRepository.Get(x => (partnerIds.Count == 0 || partnerIds.Contains(x.PartnerId)) && !string.IsNullOrEmpty(x.ReferenceNo) && x.Status != "Paid" && x.TransactionType != AccountingConstants.PAYMENT_TYPE_NAME_ADVANCE);
-            var creditManagementAr = creditMngtArRepository.Get(x => (partnerIds.Count == 0 || partnerIds.Contains(x.PartnerId)) && !string.IsNullOrEmpty(x.ReferenceNo));
+            var creditManagementAr = creditMngtArRepository.Get(x => (partnerIds.Count == 0 || partnerIds.Contains(x.PartnerId)) && !string.IsNullOrEmpty(x.ReferenceNo) && x.PaymentStatus != "Paid");
 
             if (criteria.Office != null && criteria.Office.Count > 0)
             {
@@ -4800,7 +4821,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             HandleState hs = new HandleState();
 
-            List<AcctReceipt> receiptListAsync = await DataContext.GetAsync(x => x.Id == Id);
+            List<AcctReceipt> receiptListAsync = await DataContext.GetAsync(x => x.Id == Id && string.IsNullOrEmpty(x.Arcbno));
             if (receiptListAsync.Count == 0)
             {
                 return hs;
@@ -5756,11 +5777,13 @@ namespace eFMS.API.Accounting.DL.Services
                             if (receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_DONE) return new HandleState((object)"Not allow save draft. Receipt has been done");
                             if (receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_CANCEL) return new HandleState((object)"Not allow save draft. Receipt has canceled");
 
+                            model.PaymentRefNo = string.IsNullOrEmpty(model.PaymentRefNo) ? receiptCurrent.PaymentRefNo : model.PaymentRefNo;
                             receiptCurrent.UserModified = currentUser.UserID;
                             receiptCurrent.DatetimeModified = DateTime.Now;
                             receiptCurrent.PaymentMethod = model.PaymentMethod;
                             receiptCurrent.OfficeId = model.OfficeId;
                             receiptCurrent.Description = model.Description;
+                            model.Class = model.PaymentMethod; // Class = Payment Method
                             receiptCurrent.PaidAmount = model.PaidAmountUsd;
                             receiptCurrent.FinalPaidAmount = model.FinalPaidAmountUsd;
                             model.PaidAmount = model.PaidAmountUsd = model.FinalPaidAmountUsd;
@@ -6075,6 +6098,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         receipt.UserModified = currentUser.UserID;
                         receipt.DatetimeModified = DateTime.Now;
+                        receipt.Class = receiptModel.Key.PaymentMethod; // Class = Payment Method
 
                         receipt.Status = AccountingConstants.RECEIPT_STATUS_DONE;
                         receipt.PaidAmount = existedReceipt.Sum(x => x.PaidAmountUsd ?? 0);
@@ -6303,6 +6327,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         receiptModel.UserModified = currentUser.UserID;
                         receiptModel.DatetimeModified = DateTime.Now;
+                        receiptModel.Class = receiptModel.PaymentMethod;
 
                         receiptModel.Status = AccountingConstants.RECEIPT_STATUS_DONE;
                         receiptModel.DatetimeModified = DateTime.Now;

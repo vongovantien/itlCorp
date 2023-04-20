@@ -379,10 +379,10 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                             x.invoices.forEach(invoice => {
                                 for (let i = 0; i < result.length; i++) {
 
-                                    if (result[i].isSelected === true && invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl) {
+                                    if (result[i].isSelected === true && invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl && invoice.type === result[i].type) {
                                         invoice.isSelected = true;
                                     }
-                                    if ((invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl) || invoice.refNo === result[i].refNo) {
+                                    if ((invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl && invoice.type === result[i].type) || invoice.refNo === result[i].refNo) {
                                         const index = x.invoices.indexOf(invoice);
                                         x.invoices.splice(index, 1);
                                     }
@@ -423,10 +423,10 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                         this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
                             x.invoices.forEach(invoice => {
                                 result.forEach(t => {
-                                    if (t.isSelected === true && invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl) {
+                                    if (t.isSelected === true && invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl && invoice.type === t.type) {
                                         invoice.isSelected = true;
                                     }
-                                    if ((invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl)) {
+                                    if ((invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl && invoice.type === t.type)) {
                                         const index = x.invoices.indexOf(invoice);
                                         x.invoices.splice(index, 1);
                                     }

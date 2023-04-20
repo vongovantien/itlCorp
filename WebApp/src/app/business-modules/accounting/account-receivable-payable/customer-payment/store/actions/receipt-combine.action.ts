@@ -45,5 +45,5 @@ export const IsCombineReceipt = createAction(ReceiptCombineActionTypes.IS_ADD_CO
 export const RegistDebitListTypeReceipt = createAction(ReceiptCombineActionTypes.DEBIT_LIST_TYPE_RECEIPT, props<{ listType: string }>());
 export const RegistCreditInvoiceListSuccess = createAction(ReceiptCombineActionTypes.GET_CREDIT_INVOICE_LIST_SUCCESS, props<{ creditInvoiceList: AgencyReceiptModel }>());
 export const RegistDebitInvoiceListSuccess = createAction(ReceiptCombineActionTypes.GET_DEBIT_INVOICE_LIST_SUCCESS, props<{ debitInvoiceList: AgencyReceiptModel }>());
-export const RemoveDebitCombine = createAction(ReceiptCombineActionTypes.REMOVE_DEBIT_COMBINE, props<{ index: number, _typeList: string }>());
+export const RemoveDebitCombine = createAction(ReceiptCombineActionTypes.REMOVE_DEBIT_COMBINE, props<{ indexGrp: number, index: number, _typeList: string }>());
 export const ResetCombineInvoiceList = createAction(ReceiptCombineActionTypes.RESET_INVOICE);

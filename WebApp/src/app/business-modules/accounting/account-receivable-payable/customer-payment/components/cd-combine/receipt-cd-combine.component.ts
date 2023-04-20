@@ -182,7 +182,7 @@ export class ARCustomerPaymentReceiptCDCombineComponent extends AppList implemen
             totalRemainUsd: 0,
         };
 
-        for (let index = 0; index < model.cdCombineList.length; index++) {
+        for (let index = 0; index < model.cdCombineList?.length; index++) {
             const item: ICDCombine = model.cdCombineList[index];
             item.remainAmountUsd = item.unpaidAmountUsd - item.paidAmountUsd;
             item.remainAmountVnd = item.unpaidAmountVnd - item.paidAmountVnd;
@@ -204,17 +204,17 @@ export class ARCustomerPaymentReceiptCDCombineComponent extends AppList implemen
         model = this.calculateTotal(model);
     }
 
-    confirmDeleteInvoiceItem(item: IReceiptCombineGroup, index: number, type: string) {
-        this.selectedIndexItem = index;
-        this.onDeleteInvoiceItem(item, index, type);
+    confirmDeleteInvoiceItem(item: IReceiptCombineGroup, grpIndex: number, itemIndex: number, type: string) {
+        this.selectedIndexItem = itemIndex;
+        this.onDeleteInvoiceItem(item, grpIndex, itemIndex, type);
         
     }
 
-    onDeleteInvoiceItem(item: any, index: number, type: string) {
+    onDeleteInvoiceItem(item: any, grpIndex: number, itemIndex: number, type: string) {
         if (this.selectedIndexItem === undefined) {
             return;
         }
-        this._store.dispatch(RemoveDebitCombine({ index: this.selectedIndexItem, _typeList: type }));
+        this._store.dispatch(RemoveDebitCombine({ indexGrp: grpIndex, index: this.selectedIndexItem, _typeList: type }));
         this.calculateTotal(item);
     }
 

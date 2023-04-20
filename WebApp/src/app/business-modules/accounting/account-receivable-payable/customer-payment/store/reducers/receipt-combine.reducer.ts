@@ -7,7 +7,7 @@ export interface IReceiptCombineState {
     debitInvoiceList: AgencyReceiptModel;
     generalCombineList: any[],
     debitCombineList: any[],//ReceiptInvoiceModel
-    creditCombineList: ReceiptInvoiceModel[],
+    creditCombineList: any[],//ReceiptInvoiceModel[],
     isLoading: boolean;
     isLoaded: boolean;
     partnerId: string;
@@ -62,10 +62,26 @@ export const receiptCombineManagementReducer = createReducer(
     on(ReceiptCombineActions.RegistDebitInvoiceListSuccess, (state: IReceiptCombineState, payload: any) => ({ ...state, debitInvoiceList: payload.debitInvoiceList })),
     on(ReceiptCombineActions.RemoveDebitCombine, (state: IReceiptCombineState, payload: any) => {
         if (payload._typeList === 'debit') {
-            return { ...state, debitCombineList: [...state.debitCombineList.slice(0, payload.index), ...state.debitCombineList.slice(payload.index + 1)] }
-        } else if(payload._typeList === 'credit') {
-            return { ...state, creditCombineList: [...state.creditCombineList.slice(0, payload.index), ...state.creditCombineList.slice(payload.index + 1)] }
-        } else if(payload._typeList === 'general') {
+            if (!state.debitCombineList[payload.indexGrp]?.status) {
+                return { ...state, debitCombineList: [...state.debitCombineList.slice(0, payload.index), ...state.debitCombineList.slice(payload.index + 1)] };
+            } else {
+                const debitCombineListRemain = state.debitCombineList.filter((item, index) => index !== payload.indexGrp);
+                const debitCombineListDelete = state.debitCombineList.filter((item, index) => index === payload.indexGrp).map(item => {
+                    return { ...item, payments: [...item.payments.slice(0, payload.index), ...item.payments.slice(payload.index + 1)] }
+                });
+                return { ...state, debitCombineList: [...debitCombineListRemain, ...debitCombineListDelete.filter(item => item.payments.length !== 0)] }
+            }
+        } else if (payload._typeList === 'credit') {
+            if (!state.creditCombineList[payload.indexGrp]?.status) {
+                return { ...state, creditCombineList: [...state.creditCombineList.slice(0, payload.index), ...state.creditCombineList.slice(payload.index + 1)] };
+            } else {
+                const creditCombineListRemain = state.creditCombineList.filter((item, index) => index !== payload.indexGrp);
+                const creditCombineListDelete = state.creditCombineList.filter((item, index) => index === payload.indexGrp).map(item => {
+                    return { ...item, payments: [...item.payments.slice(0, payload.index), ...item.payments.slice(payload.index + 1)] }
+                });
+                return { ...state, creditCombineList: [...creditCombineListRemain, ...creditCombineListDelete.filter(item => item.payments.length !== 0)] }
+            }
+        } else if (payload._typeList === 'general') {
             return { ...state, generalCombineList: [...state.generalCombineList.slice(0, payload.index), ...state.generalCombineList.slice(payload.index + 1)] }
         }
     }),
