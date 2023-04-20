@@ -1,5 +1,5 @@
 variables:
-  FRONTEND_IMAGE_CURRENTVER: jackchuong/itl:efms-webapp-frontend-1.4.3
+  FRONTEND_IMAGE_CURRENTVER: jackchuong/itl:efms-webapp-frontend-1.4.4
 
 stages:
   - build
