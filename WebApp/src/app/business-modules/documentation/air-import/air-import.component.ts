@@ -101,10 +101,10 @@ export class AirImportComponent extends AppList {
                         this.dataSearch = criteria.dataSearch;
                     } else {
                         this.dataSearch = this.defaultDataSearch;
-                        this.page = criteria.page;
-                        this.pageSize = criteria.pageSize;
-                        this.requestSearchShipment();
                     }
+                    this.page = criteria.page;
+                    this.pageSize = criteria.pageSize;
+                    this.requestSearchShipment();
                 }
             );
     }
@@ -157,6 +157,7 @@ export class AirImportComponent extends AppList {
     onSearchShipment($event: any) {
         $event.transactionType = this.transactionService;
         this.dataSearch = $event;
+        console.log($event);
 
         this.loadListHouseBillExpanding();
     }
