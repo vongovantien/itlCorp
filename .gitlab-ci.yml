@@ -1,8 +1,6 @@
 variables:
   FRONTEND_IMAGE_CURRENTVER: jackchuong/itl:efms-webapp-frontend-1.0.0
 
-image: node:12
-
 stages:
   - build
   - deploy
@@ -27,27 +25,29 @@ deploy_k8s:
     name: bitnami/kubectl:latest
     entrypoint: [""]
   script:
-    - kubectl config get-contexts
+  #  - kubectl config get-contexts
     - kubectl config use-context efms/eFMS-WebApp:efms-agent
-    - kubectl apply -f kubernetes-configs/manifest.yaml
-  #- kubectl -n efms set image deployment.apps/efms-frontend efms-frontend=$FRONTEND_IMAGE_CURRENTVER
-  #- kubectl annotate deployment.apps/web kubernetes.io/change-cause="upgrade version to $FRONTEND_IMAGE_CURRENTVER"
+  #  - kubectl apply -f kubernetes-configs/manifest.yaml
+  - kubectl -n efms set image deployment.apps/efms-frontend efms-frontend=$FRONTEND_IMAGE_CURRENTVER
+  - kubectl annotate deployment.apps/efms-frontend kubernetes.io/change-cause="upgrade version to $FRONTEND_IMAGE_CURRENTVER"
   only:
     refs:
       - feature-itl
     changes:
-      - WebApp/**/* # only run when php source code change
+      - WebApp/**/*
   when: manual
-#rollback_k8s:
-#  stage: deploy
-#  image:
-#    name: bitnami/kubectl:latest
-#    entrypoint: [""]
-#  script:
-#    - kubectl rollout undo deployment.apps/efms-frontend
-#  only:
-#    refs:
-#      - feature-itl
-#    changes:
-#      - WebApp/**/* # only run when php source code change
-#  when: manual
+
+rollback_k8s:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
+  script:
+    - kubectl config use-context efms/eFMS-WebApp:efms-agent    
+    - kubectl rollout undo deployment.apps/efms-frontend
+  only:
+    refs:
+      - feature-itl
+    changes:
+      - WebApp/**/*
+  when: manual
