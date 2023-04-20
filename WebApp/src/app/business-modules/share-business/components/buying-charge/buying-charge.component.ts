@@ -86,6 +86,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     selectedCs: CsShipmentSurcharge;
     messageConfirmRevertLinkFee: string = "Do you want to Revert these Fees?";
     noProfit: boolean | any = false;
+    transactionType: string;
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
@@ -107,13 +108,14 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         this.getSurcharge();
 
+
         this._activedRoute.data
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (dataParam: CommonInterface.IDataParam) => {
-                    this.serviceTypeId = dataParam.serviceId;
+                    this.serviceTypeId = dataParam.serviceId === 'CL' ? dataParam?.transactionType === 'TK' ? 'TK' : 'CL' : dataParam.serviceId;
                     console.log(dataParam);
-
+                    this.transactionType = dataParam.transactionType;
                 }
             );
 
@@ -242,7 +244,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (partners: Partner[]) => {
                     this.listPartner = partners;
                     this._cd.markForCheck();
-
                 }
             );
 
@@ -266,6 +267,17 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     this.containers = containers;
                 }
             );
+    }
+
+    getTranType() {
+        if (this.service === 'logistic') {
+            if (this.transactionType === 'TK') {
+                return 'TK';
+            }
+            return 'CL';
+        } else {
+            return 'DOC';
+        }
     }
 
     getShipmentDetail() {

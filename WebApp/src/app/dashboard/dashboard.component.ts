@@ -137,6 +137,8 @@ export class DashboardComponent extends AppPage implements OnInit {
 
     gotoActionLink(service: string) {
         switch (service) {
+            case 'Trucking':
+                return this.router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND_DETAIL}/${this.selectedShipment.id}`]);
             case ChargeConstants.AE_CODE:
                 //return this.router.navigate([`home/documentation/air-export/${this.selectedShipment.id}`]);
                 return this.router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.selectedShipment.id}`]);

@@ -57,6 +57,7 @@ namespace eFMS.API.Documentation.DL.Common
 
         public static readonly string SEF_HBL = "HBL";
         public static readonly string OPS_SHIPMENT = "LOG";
+        public static readonly string TKI_SHIPMENT = "TKI";
         public static readonly string CLEARANCE_FROM_EFMS = "eFMS";
         public static readonly string CLEARANCE_FROM_REPLICATE = "Replicate";
         public static readonly string NON_CARRIER_PARTNER_CODE = "NONCARRIER";

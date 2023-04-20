@@ -343,7 +343,7 @@ namespace eFMS.API.Documentation.DL.Services
             return model;
         }
 
-        public string CreateJobNoOps()
+        public string CreateJobNoOps(string transactionType)
         {
             SysOffice office = null;
             string prefixJob = string.Empty;
@@ -353,7 +353,14 @@ namespace eFMS.API.Documentation.DL.Services
                 office = sysOfficeRepo.Get(x => x.Id == currentUserOffice).FirstOrDefault();
                 prefixJob = SetPrefixJobIdByOfficeCode(office?.Code);
             }
-            prefixJob += DocumentConstants.OPS_SHIPMENT;
+            if (transactionType == "TK")
+            {
+                prefixJob += DocumentConstants.TKI_SHIPMENT;
+            }
+            else
+            {
+                prefixJob += DocumentConstants.OPS_SHIPMENT;
+            }
             var currentShipment = GetOpsTransactionToGenerateJobNo(office);
             int countNumberJob = 0;
             if (currentShipment != null)
@@ -993,7 +1000,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, model, customerContract);
-                opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
+                opsTransaction.JobNo = CreateJobNoOps(null); //Generate JobNo [17/12/2020]
 
                 bool existedJobNo = CheckExistJobNo(opsTransaction.Id, opsTransaction.JobNo);
                 if (existedJobNo == true)
@@ -1302,7 +1309,7 @@ namespace eFMS.API.Documentation.DL.Services
                             try
                             {
                                 OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item, customerContract);
-                                opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
+                                opsTransaction.JobNo = CreateJobNoOps(null); //Generate JobNo [17/12/2020]
 
                                 bool existedJobNo = CheckExistJobNo(opsTransaction.Id, opsTransaction.JobNo);
                                 if (existedJobNo == true)
@@ -2123,7 +2130,7 @@ namespace eFMS.API.Documentation.DL.Services
                     Guid? _replicateId = model.ReplicatedId;
 
                     model.Hblid = Guid.NewGuid();
-                    model.JobNo = CreateJobNoOps();
+                    model.JobNo = CreateJobNoOps(model.TransactionType);
                     model.UserModified = currentUser.UserID;
                     model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
                     model.UserCreated = currentUser.UserID;

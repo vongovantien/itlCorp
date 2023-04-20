@@ -311,7 +311,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
     getSalesmanList(selectedShipmentType: any) {
         this.shipmentType.setValue(selectedShipmentType);
         if (!!this.customerId.value) {
-            this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value)
+            this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, this.transactionType === 'TK' ? ChargeConstants.TK_CODE : ChargeConstants.CL_CODE, this.shipmentType.value)
                 .subscribe(
                     (res: any) => {
                         if (!!res) {

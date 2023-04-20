@@ -449,7 +449,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                         this.headerComponent.resetBreadcrumb("Detail Job");
                         this.editForm.isSubmitted = false;
 
-                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId]);
+                        if (this.transactionType === 'TK') {
+                            this._router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND_DETAIL}/`, this.jobId]);
+                        } else {
+                            this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId]);
+                        }
                     } else {
                         this._toastService.warning(res.message);
                     }
