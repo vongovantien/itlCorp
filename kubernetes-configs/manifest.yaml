@@ -47,6 +47,7 @@ spec:
       - name: dockerhub
       containers:
       - image: jackchuong/itl:efms-webapp-frontend-1.0.0
+        imagePullPolicy: Always
         name: efms-frontend
         volumeMounts:
         - name: 'dockerhub'
