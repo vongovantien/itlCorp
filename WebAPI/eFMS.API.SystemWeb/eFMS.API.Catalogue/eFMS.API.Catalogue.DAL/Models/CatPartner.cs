@@ -80,6 +80,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public string IdentityNo { get; set; }
         public DateTime? DateId { get; set; }
         public string PlaceId { get; set; }
-        public string AcctSysMappingId { get; set; }
     }
 }

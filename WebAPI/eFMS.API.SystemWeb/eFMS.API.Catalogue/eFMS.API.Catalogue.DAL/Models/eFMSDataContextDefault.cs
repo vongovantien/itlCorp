@@ -574,8 +574,6 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.FirstShipmentDate).HasColumnType("datetime");
 
-                entity.Property(e => e.IsOverDueObh).HasColumnName("IsOverDueOBH");
-
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
                     .IsUnicode(false);
@@ -860,10 +858,6 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.AccountNo)
                     .HasMaxLength(150)
                     .IsUnicode(false);
-
-                entity.Property(e => e.AcctSysMappingId)
-                    .HasColumnName("AcctSysMappingID")
-                    .HasMaxLength(200);
 
                 entity.Property(e => e.Active).HasDefaultValueSql("((1))");
 
@@ -1287,8 +1281,6 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.Property(e => e.WardId).HasColumnName("WardID");
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
@@ -2909,10 +2901,6 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.SuspendTime).HasMaxLength(150);
-
-                entity.Property(e => e.TransactionType)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
