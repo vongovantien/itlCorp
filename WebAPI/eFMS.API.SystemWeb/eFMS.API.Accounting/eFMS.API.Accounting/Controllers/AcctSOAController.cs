@@ -546,11 +546,19 @@ namespace eFMS.API.Accounting.Controllers
 
 
         [HttpGet]
-        [Route("GetPagingSurchargeSOA")]
-        public async Task<IActionResult> GetPagingSurchargeSOA(string soaNo, int page, int size)
+        [Route("GetListSurchargeDetailSOA")]
+        public IActionResult GetListSurchargeDetailSOA(string soaNo, int page, int size)
         {
-            ResponsePagingModel<ChargeShipmentModel> data = await acctSOAService.GetPagingSurchargeSOA(soaNo, page, size);
-            return Ok(data);
+            if (page > 0)
+            {
+                List<ChargeShipmentModel> data = acctSOAService.GetListSurchargeDetailSOA(soaNo, page, size);
+                return Ok(data);
+            }
+            else
+            {
+                List<ChargeShipmentModel> data = acctSOAService.GetListSurchargeDetailSOA(soaNo);
+                return Ok(data);
+            }
         }
 
         [HttpGet]

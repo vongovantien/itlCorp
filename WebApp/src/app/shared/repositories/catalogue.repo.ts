@@ -1427,4 +1427,13 @@ export class CatalogueRepo {
     getStandChargeByType(criteria: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatStandardCharge/GetBy`, criteria);
     }
+
+    addPartnerFromUserData(userId: string) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartner/AddPartnerFromUserData`, null, { userId: userId }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
 }

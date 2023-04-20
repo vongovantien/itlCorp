@@ -7,6 +7,7 @@ using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
+using eFMS.API.Accounting.Service.ViewModels;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
@@ -263,14 +264,6 @@ namespace eFMS.API.Accounting.Controllers
             var data = new { settlement, chargeGrpSettlement, chargeNoGrpSettlement };
             return Ok(data);
         }
-        [HttpGet]
-        [Route("GetSurchargePagingSettlementPayment")]
-        public IActionResult GetSurchargePagingSettlementPayment(string settlementNo, int page, int size)
-        {
-            ResponsePagingModel<ShipmentChargeSettlement> data = acctSettlementPaymentService.GetSurchargePagingSettlementPayment(settlementNo, page, size);
-            return Ok(data);
-        }
-
 
         /// <summary>
         /// Get Payment Management By Shipment
@@ -441,6 +434,12 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     return BadRequest(_result);
                 }
+                _result = acctSettlementPaymentService.CheckConfirmPrepaidShipment(model.ShipmentCharge);
+                if (!_result.Status)
+                {
+                    return BadRequest(_result);
+
+                }
             }
             else
             {
@@ -504,6 +503,12 @@ namespace eFMS.API.Accounting.Controllers
                 if (!_result.Status)
                 {
                     return BadRequest(_result);
+                }
+                _result = acctSettlementPaymentService.CheckConfirmPrepaidShipment(model.ShipmentCharge);
+                if (!_result.Status)
+                {
+                    return BadRequest(_result);
+
                 }
             }
             else
@@ -611,6 +616,12 @@ namespace eFMS.API.Accounting.Controllers
                 if (!_result.Status)
                 {
                     return BadRequest(_result);
+                }
+                _result = acctSettlementPaymentService.CheckConfirmPrepaidShipment(model.ShipmentCharge);
+                if (!_result.Status)
+                {
+                    return BadRequest(_result);
+
                 }
             }
             else
@@ -1156,18 +1167,25 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpGet]
         [Route("GetListSurchargeDetailSettlement")]
-        public IActionResult GetListSurchargeDetailSettlement(string settlementNo)
+        public IActionResult GetListSurchargeDetailSettlement(string settlementNo, int page, int size)
         {
-            var data = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlementNo);
-
-            return Ok(data);
+            if(page > 0)
+            {
+                var data = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlementNo, null, null, null, page, size);
+                return Ok(data);
+            }
+            else
+            {
+                var data = acctSettlementPaymentService.GetSurchargeDetailSettlement(settlementNo);
+                return Ok(data);
+            }
         }
 
         [HttpGet]
         [Route("GetListJobGroupSurchargeDetailSettlement")]
-        public IActionResult GetListJobGroupSurchargeDetailSettlement(string settlementNo)
+        public IActionResult GetListJobGroupSurchargeDetailSettlement(string settlementNo, int page, int size)
         {
-            var data = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlementNo);
+            var data = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlementNo, page, size);
 
             return Ok(data);
         }

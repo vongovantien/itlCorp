@@ -21,13 +21,7 @@
                 </span>
             </ng-template>
             <a class="dropdown m-dropdown m-dropdown--inline">
-                <i class="la la-file-text" [dpToggle]="dropdownMenuShipmentItem"></i>
-                <app-dropdown #dropdownMenuShipmentItem>
-                    <a class="dropdown-item pointer" ClickStopPropagation (click)="previewPLsheet($event,'USD')">Preview
-                        PL with USD</a>
-                    <a class="dropdown-item pointer" ClickStopPropagation (click)="previewPLsheet($event,'VND')">Preview
-                        PL with VND</a>
-                </app-dropdown>
+                <i class="la la-file-text" [contextMenu]="contextMenuShipmentItem"></i>
             </a>
         </div>
     </div>
@@ -122,3 +116,12 @@
         <i class="la la-lock text-white" style="position: absolute;top:3px; right:0;"></i>
     </ng-container>
 </div>
+
+<app-context-menu #contextMenuShipmentItem>
+    <a class="menu-context__item pointer" (click)="previewPLsheet($event,'USD')">
+        <span><i class="la la-print text-primary"></i><span> Preview PL with USD</span></span>
+    </a>
+    <a class="menu-context__item pointer" (click)="previewPLsheet($event,'VND')">
+        <span><i class="la la-print text-primary"></i><span> Preview PL with VND</span></span>
+    </a>
+</app-context-menu>

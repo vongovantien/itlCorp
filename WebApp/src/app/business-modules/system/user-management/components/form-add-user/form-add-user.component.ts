@@ -17,6 +17,7 @@ import { Store } from '@ngrx/store';
 
 import { CookieService } from 'ngx-cookie-service';
 import crypto_js from 'crypto-js';
+import { CatalogueRepo } from '@repositories';
 @Component({
     selector: 'app-form-add-user',
     templateUrl: './form-add-user.component.html'
@@ -25,7 +26,7 @@ export class FormAddUserComponent extends AppList {
     formGroup: FormGroup;
     isSubmited: boolean = false;
     isDetail: boolean = false;
-    SelectedUser: any = {};
+    selectedUser: any = {};
     staffcode: AbstractControl;
     username: AbstractControl;
     employeeNameVn: AbstractControl;
@@ -39,7 +40,6 @@ export class FormAddUserComponent extends AppList {
     description: AbstractControl;
     ldap: AbstractControl;
     personalId: AbstractControl;
-    userLevels: UserLevel[] = [];
     headersuslv: CommonInterface.IHeaderTable[];
     //
     creditLimit: AbstractControl;
@@ -101,6 +101,7 @@ export class FormAddUserComponent extends AppList {
         private _spinner: NgxSpinnerService,
         private _store: Store<IAppState>,
         private cookieService: CookieService,
+        private catalogueRepo: CatalogueRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -136,7 +137,7 @@ export class FormAddUserComponent extends AppList {
             description: [],
             ldap: [true],
             //
-            creditLimit: [],
+            creditLimit: [20000000],
             creditRate: [],
             personalId: [],
             userRole: [this.userRoles[0],

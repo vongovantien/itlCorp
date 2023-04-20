@@ -16,15 +16,18 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -44,6 +47,7 @@ namespace eFMS.API.Operation.DL.Services
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private readonly IContextBase<SysOffice> sysOfficeRepository;
         readonly IContextBase<CsShipmentSurcharge> csShipmentSurchargeRepo;
+        private readonly ICacheServiceBase<CustomsDeclarationModel> cachedService;
 
         public CustomsDeclarationService(IContextBase<CustomsDeclaration> repository, IMapper mapper,
             IEcusConnectionService ecusCconnection
@@ -59,6 +63,7 @@ namespace eFMS.API.Operation.DL.Services
             IContextBase<CsShipmentSurcharge> csShipmentSurcharge,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<SysOffice> sysOffice,
+            ICacheServiceBase<CustomsDeclarationModel> customCacheDeclarationSerice,
         IContextBase<CatPartner> customerRepo) : base(repository, mapper)
         {
             ecusCconnectionService = ecusCconnection;
@@ -75,11 +80,103 @@ namespace eFMS.API.Operation.DL.Services
             csShipmentSurchargeRepo = csShipmentSurcharge;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
             sysOfficeRepository = sysOffice;
+            cachedService = customCacheDeclarationSerice;
         }
 
         public IQueryable<CustomsDeclarationModel> GetAll()
         {
             return Get();
+        }
+
+        public List<CustomsDeclarationModel> GetUserCustomClearance(CustomEcusCriteria ecusCustomCriteria, int pageNumber, int pageSize, out int rowsCount)
+        {
+            List<CustomsDeclarationModel> returnList = new List<CustomsDeclarationModel>();          
+            string userId = currentUser.UserID;
+            string[] searchingKeys = null;
+            var connections = ecusCconnectionService.Get(x => x.UserId == userId && x.Active == true);
+            var result = new HandleState();
+
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None)
+            {
+                rowsCount = 0;
+                return null;
+            }
+            Expression<Func<CustomsDeclaration, bool>> query = x => x.Source != OperationConstants.FROM_REPLICATE && (ecusCustomCriteria.ClearanceNo.Contains(x.ClearanceNo) || string.IsNullOrEmpty(ecusCustomCriteria.ClearanceNo))
+                                                                                    && (x.Type == ecusCustomCriteria.CusType || string.IsNullOrEmpty(ecusCustomCriteria.CusType))
+                                                                                    && ((x.AccountNo ?? x.PartnerTaxCode) == ecusCustomCriteria.CustomerNo || string.IsNullOrEmpty(ecusCustomCriteria.CustomerNo));
+
+
+            var lists = new List<CustomsDeclaration>();
+            try
+            {
+                var dataCached = cachedService.Get();
+                if (dataCached != null && dataCached.Count > 0)
+                {
+                    returnList = dataCached;
+                }
+                else
+                {
+                    // clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
+                    // Loc xong set cache, case > 1 connect
+                    // cachedService.Set(clearanceEcus, TimeSpan.FromSeconds(30));
+                    foreach (var item in connections)
+                    {
+                        var clearanceEcus = new List<DTOKHAIMD>();
+                        clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
+
+                        if (clearanceEcus == null)
+                        {
+                            rowsCount = 0;                            
+                            return returnList;
+                        }
+
+                        var clearencesNotExsitInFMS = clearanceEcus.Where(x => !checkExistEcusInEFMS(x.SOTK.ToString()));
+                        if (clearencesNotExsitInFMS.Count() > 0)
+                        {
+                            foreach (var d in clearencesNotExsitInFMS)
+                            {
+                                var newClearance = MapEcusClearanceToCustom(d, d.SOTK?.ToString().Trim());
+                                newClearance.Source = OperationConstants.FromEcus;
+                                returnList.Add(mapper.Map<CustomsDeclarationModel>(newClearance));
+                            }
+                        }
+                    }
+                    cachedService.Set(returnList, TimeSpan.FromSeconds(10));
+                }
+            }
+            catch (Exception ex)
+            {
+                result = new HandleState(ex.Message);
+                rowsCount = 0;  
+            }
+
+            returnList = MapClearancesToClearanceModels(returnList.AsQueryable());
+            if (ecusCustomCriteria.ClearanceNo != null || (ecusCustomCriteria.CusType != null && (ecusCustomCriteria.CusType != "All" && ecusCustomCriteria.ClearanceNo != null || !string.IsNullOrEmpty(ecusCustomCriteria.ClearanceNo))))
+            {
+                if (ecusCustomCriteria.CusType == "hblNo")
+                {
+                    returnList = returnList.Where(x => !string.IsNullOrEmpty(x.Hblid)).ToList();
+                }
+                returnList = returnList.Where(x => (ecusCustomCriteria.CusType == "hblNo" ? ecusCustomCriteria.ClearanceNo.Contains(x.Hblid) : ecusCustomCriteria.ClearanceNo.Contains(x.ClearanceNo) 
+                || string.IsNullOrEmpty(ecusCustomCriteria.ClearanceNo))).ToList();
+                                                                                    
+            }
+            if ( ecusCustomCriteria.CustomerNo != null)
+            {
+                returnList = returnList.Where(x => ((x.AccountNo ?? x.PartnerTaxCode) == ecusCustomCriteria.CustomerNo || string.IsNullOrEmpty(ecusCustomCriteria.CustomerNo))).ToList();
+            }
+
+            // Perform pagination
+            int rowCount = returnList.Count();
+            rowsCount = rowCount;
+            if(returnList.Count()> pageSize)
+            {
+                // Handle case 1 item return
+                returnList = returnList.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            }
+            return returnList;
         }
 
         public HandleState ImportClearancesFromEcus()
@@ -1196,27 +1293,61 @@ namespace eFMS.API.Operation.DL.Services
 
         public HandleState Import(List<CustomsDeclarationModel> data)
         {
+            var result = new HandleState();
             try
             {
-                foreach (var item in data)
+                if (data.Count > 0)
                 {
-                    item.DatetimeCreated = DateTime.Now;
-                    item.DatetimeModified = DateTime.Now;
-                    item.UserCreated = item.UserModified = currentUser.UserID;
-                    item.Source = OperationConstants.FromEFMS;
-                    item.GroupId = currentUser.GroupId;
-                    item.DepartmentId = currentUser.DepartmentId;
-                    item.OfficeId = currentUser.OfficeID;
-                    item.CompanyId = currentUser.CompanyID;
-                }
+                    foreach (var item in data)
+                    {
+                        item.DatetimeCreated = DateTime.Now;
+                        item.DatetimeModified = DateTime.Now;
+                        item.UserCreated = item.UserModified = currentUser.UserID;
+                        item.Source = OperationConstants.FromEFMS;
+                        item.GroupId = currentUser.GroupId;
+                        item.DepartmentId = currentUser.DepartmentId;
+                        item.OfficeId = currentUser.OfficeID;
+                        item.CompanyId = currentUser.CompanyID;
+                    }
+                    var data_not_in_efms = data.Where(x => !checkExistEcusInEFMS(x.ClearanceNo.ToString())).ToList();
+                    if (data.Count() > 0 && data_not_in_efms.Count() > 0)
+                    {
+                        HandleState hs = Add(data_not_in_efms);
+                        if (hs.Success)
+                        {
+                            result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, data.Count]);
 
-                var hs = Add(data);
-                return hs;
+                            string logErr = String.Format("Import Ecus thành công {0} \n {1} Tờ khai {2}", currentUser.UserName, data.Count, DateTime.Now);
+                            new LogHelper("ECUS", logErr);
+                        }
+                        else
+                        {
+                            result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, 0]);
+                            string logErr = String.Format("{0} Import thất bại {1} Tờ khai do {2} at {3}", currentUser.UserName, data.Count, hs.Message, DateTime.Now);
+                            new LogHelper("ECUS", logErr);
+                        }
+                    }
+                    else
+                    {
+                        result = new HandleState(409, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_DATA_EXISTED]);
+                        string logErr = String.Format("Import thất bại {0} \n Tờ khai đang chọn đã tồn tại {1}.", currentUser.UserName, DateTime.Now);
+                        new LogHelper("ECUS", logErr);
+                    }
+                }
+                else
+                {
+                    result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA]);
+                    string logErr = String.Format("Import thất bại {0} \n {1} Tờ khai {2}", currentUser.UserName, data.Count, DateTime.Now);
+                    new LogHelper("ECUS", logErr);
+                }
             }
             catch (Exception ex)
             {
-                return new HandleState(ex.Message);
+                string logErr = String.Format("Lỗi import Ecus {0} \n {1} {2}", currentUser.UserID, ex.ToString(), DateTime.Now);
+                new LogHelper("ECUS", logErr);
+                result = new HandleState(ex.Message);
             }
+            return result;
         }
 
         public List<CustomsDeclarationModel> GetCustomsShipmentNotLocked()

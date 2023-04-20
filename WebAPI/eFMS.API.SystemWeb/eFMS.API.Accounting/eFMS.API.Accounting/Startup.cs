@@ -2,7 +2,6 @@
 using eFMS.API.Accounting.DL.Services;
 using eFMS.API.Accounting.Infrastructure;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
-using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.API.Common.Globals;
 using eFMS.API.Infrastructure;
 using Microsoft.AspNetCore.Builder;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using eFMS.API.Accounting.DL.IService;
 
 namespace eFMS.API.Accounting
 {
@@ -48,6 +48,8 @@ namespace eFMS.API.Accounting
             services.AddInfrastructure<LanguageSub>(Configuration);
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
+            services.AddHostedService<ReceivableCalculatingBackgroundService>();
+            services.AddScoped<IAccAccountReceivableHostedService, AccAccountReceivableHostedService>();
             services.SetUpRabbitMq(Configuration);
         }
 

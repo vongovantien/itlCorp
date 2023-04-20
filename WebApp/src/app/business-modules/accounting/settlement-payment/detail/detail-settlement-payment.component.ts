@@ -292,6 +292,9 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                 ),
                 concatMap(
                     (v) => {
+                        if (v?.status === false) {
+                            return of(v);
+                        }
                         if (!v) {
                             let data: CommonInterface.IResult = ({
                                 data: null,

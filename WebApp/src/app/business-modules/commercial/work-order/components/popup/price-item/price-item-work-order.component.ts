@@ -1,6 +1,6 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { PopupBase } from '@app';
 import { ChargeConstants, JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
@@ -13,12 +13,9 @@ import { Observable, merge } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import {
     AddPriceItemWorkOrder,
-    AddPriceItemWorkOrderSuccess,
     IWorkOrderMngtState,
     ResetUpdatePriceItemWorkOrder,
-    SelectPriceItemWorkOrder,
     UpdatePriceItemWorkOrder,
-    UpdatePriceItemWorkOrderSuccess,
     workOrderDetailIsReadOnlyState,
     workOrderDetailTransationTypeState,
     WorkOrderPriceItemUpdateModeState
@@ -86,7 +83,6 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
     id: string;
     workOrderId: string;
     title = 'New Price List';
-
     constructor(
         private readonly _fb: FormBuilder,
         private readonly _catalogueRepo: CatalogueRepo,
@@ -110,7 +106,7 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
 
         this.initForm();
 
-        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER);
         this._store.dispatch(new GetCatalogueUnitAction());
         this.units = this._store.select(getCatalogueUnitState);
 
@@ -159,8 +155,8 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
                             unitPriceBuying: res.unitPriceBuying,
                             vatSelling: res.vatrateSelling,
                             vatBuying: res.vatrateBuying,
-                            currencyIdBuying: this.transactionType.includes('A') ? 'USD' : 'VND',
-                            currencyIdSelling: this.transactionType.includes('A') ? 'USD' : 'VND',
+                            currencyIdBuying: res.currencyIdBuying,
+                            currencyIdSelling: res.currencyIdSelling,
                             notes: res.notes,
                             chargeIdbuying: res.chargeIdBuying,
                             chargeIdSelling: res.chargeIdSelling,
@@ -178,6 +174,7 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
     }
 
     initFreightCharge(transactionType: string) {
+        this.selectedPartnerName = null;
         this.frieghtCharges.length = 0;
         this.frieghtCharges.push({
             chargeName: `${this.getFreightChargeName(transactionType)}`,

@@ -95,19 +95,20 @@ export class CommercialFormSearchWorkOrderComponent extends AppForm implements O
 
     submitSearch() {
         const body: IWorkOrderCriteria = {
-            referenceNos: !!this.referenceNo.value ? this.referenceNo.value
-                .trim()
-                .replace(SystemConstants.CPATTERN.LINE, ',')
-                .trim()
-                .split(',')
-                .map((item: any) => item.trim()) : [],
+            referenceNos: !(this.referenceNo.value?.trim()) ? [] :
+                this.referenceNo.value
+                    .trim()
+                    .replace(SystemConstants.CPATTERN.LINE, ',')
+                    .trim()
+                    .split(',')
+                    .map((item: any) => item.trim()),
             partnerId: this.partnerId.value,
-            active: null,
+            active: this.active.value,
             pod: null,
             pol: null,
             source: null,
             salesmanId: this.salesmanId.value,
-            status: this.status.value,
+            status: null,
             transactionType: this.transactionType.value,
             approvedStatus: null,
         };
@@ -117,7 +118,7 @@ export class CommercialFormSearchWorkOrderComponent extends AppForm implements O
 
     resetSearch() {
         this.form.reset();
-        this._store.dispatch(SearchListWorkOrder({}))
+        this._store.dispatch(SearchListWorkOrder({}));
     }
 
     subscriptionSearchParamState() {

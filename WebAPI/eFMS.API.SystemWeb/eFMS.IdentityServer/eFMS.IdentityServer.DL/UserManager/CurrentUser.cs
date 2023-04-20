@@ -27,6 +27,10 @@ namespace eFMS.IdentityServer.DL.UserManager
         {
             get
             {
+                if(currentUser == null)
+                {
+                    return "";
+                }
                 userId = !string.IsNullOrEmpty(currentUser.FirstOrDefault(x => x.Type == "id")?.Value) ? currentUser.FirstOrDefault(x => x.Type == "id")?.Value : userId;
                 return userId;
             }
@@ -38,6 +42,10 @@ namespace eFMS.IdentityServer.DL.UserManager
         {
             get
             {
+                if (currentUser == null)
+                {
+                    return "";
+                }
                 userName = !string.IsNullOrEmpty(currentUser.FirstOrDefault(x => x.Type == "userName")?.Value) ? currentUser.FirstOrDefault(x => x.Type == "userName")?.Value : userName;
                 return userName;
             }
@@ -49,6 +57,10 @@ namespace eFMS.IdentityServer.DL.UserManager
         {
             get
             {
+                if (currentUser == null)
+                {
+                    return Guid.Empty;
+                }
                 companyId = currentUser.FirstOrDefault(x => x.Type == "companyId")?.Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "companyId").Value) : companyId;
                 return companyId;
             }
@@ -60,6 +72,10 @@ namespace eFMS.IdentityServer.DL.UserManager
         {
             get
             {
+                if (currentUser == null)
+                {
+                    return Guid.Empty;
+                }
                 officeId = currentUser.FirstOrDefault(x => x.Type == "officeId")?.Value != null ? new Guid(currentUser.FirstOrDefault(x => x.Type == "officeId").Value) : officeId;
                 return officeId;
             }
@@ -71,6 +87,10 @@ namespace eFMS.IdentityServer.DL.UserManager
         {
             get
             {
+                if (currentUser == null)
+                {
+                    return 0;
+                }
                 if (groupId == null && currentUser.FirstOrDefault(x => x.Type == "groupId") != null)
                 {
                     groupId = (short)Convert.ToInt32(currentUser.FirstOrDefault(x => x.Type == "groupId")?.Value);
@@ -88,6 +108,10 @@ namespace eFMS.IdentityServer.DL.UserManager
         {
             get
             {
+                if (currentUser == null)
+                {
+                    return 0;
+                }
                 if (departmentId == null && currentUser.FirstOrDefault(x => x.Type == "departmentId") != null)
                 {
                     var _departmentId = currentUser.FirstOrDefault(x => x.Type == "departmentId").Value;
