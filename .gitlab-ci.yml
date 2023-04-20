@@ -1,5 +1,5 @@
 variables:
-  FRONTEND_IMAGE_CURRENTVER: jackchuong/itl:efms-webapp-frontend-1.0.0
+  FRONTEND_IMAGE_CURRENTVER: jackchuong/itl:efms-webapp-frontend-1.4.3
 
 stages:
   - build
@@ -43,7 +43,8 @@ rollback_k8s:
     name: bitnami/kubectl:latest
     entrypoint: [""]
   script:
-    - kubectl config use-context efms/eFMS-WebApp:efms-agent    
+    - kubectl config use-context efms/eFMS-WebApp:efms-agent
+    - kubectl rollout history deployment.apps/efms-frontend    
     - kubectl rollout undo deployment.apps/efms-frontend
   only:
     refs:
