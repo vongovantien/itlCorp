@@ -131,7 +131,7 @@ export class ARCustomerPaymentReceiptCDCombineComponent extends AppList implemen
                     else {
                         this.debitPopup.agencyDebitModel = new AgencyReceiptModel();
                     }
-                    this.debitPopup.show();
+                    this.debitPopup.show({ backdrop: false });
                 })
         } else {
             this._store.select(ReceiptCombineCreditInvoiceState)
@@ -141,7 +141,7 @@ export class ARCustomerPaymentReceiptCDCombineComponent extends AppList implemen
                     } else {
                         this.debitPopup.agencyDebitModel = new AgencyReceiptModel();
                     }
-                    this.debitPopup.show();
+                    this.debitPopup.show({ backdrop: false });
                 })
         }
         //     // if (!!this.date.value?.startDate) {

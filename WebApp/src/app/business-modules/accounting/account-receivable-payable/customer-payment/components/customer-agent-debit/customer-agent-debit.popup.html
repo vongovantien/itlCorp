@@ -73,17 +73,17 @@
                                                 <!-- <ng-container *ngIf="debit.paymentType === 'CREDIT';else notCredit1">
                                                     {{(-debit.unpaidAmountVnd) | number}}
                                                 </ng-container> -->
-                                                <ng-template #notCredit1>
+                                                <ng-container>
                                                     {{debit.unpaidAmountVnd | number}}
-                                                </ng-template>
+                                                </ng-container>
                                             </td>
                                             <td ALIGN="right">
                                                 <!-- <ng-container *ngIf="debit.paymentType === 'CREDIT';else notCredit2">
                                                     {{(-debit.unpaidAmountUsd) | number: '1.2-2'}}
                                                 </ng-container> -->
-                                                <ng-template #notCredit2>
+                                                <ng-container>
                                                     {{debit.unpaidAmountUsd | number: '1.2-2'}}
-                                                </ng-template>
+                                                </ng-container>
                                             </td>
                                             <td>
                                                 <span class="text-primary">{{debit.taxCode}}</span>
