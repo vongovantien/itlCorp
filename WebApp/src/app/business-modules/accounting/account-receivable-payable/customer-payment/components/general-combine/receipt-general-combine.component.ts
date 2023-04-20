@@ -213,7 +213,7 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
 
     checkAllowDelete(data: any, index: number) {
         if (!this.isUpdate) {
-            this._store.dispatch(RemoveDebitCombine({ index: index, _typeList: 'general'}));
+            this._store.dispatch(RemoveDebitCombine({ indexGrp: 0, index: index, _typeList: 'general'}));
         } 
         // else {
         //     this._accountingRepo

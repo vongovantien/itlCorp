@@ -408,6 +408,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             acctCredit.AmountUsd = acctCredit.RemainUsd = item.Sum(x => x.AmountUsd + x.VatAmountUsd);
                             acctCredit.AmountVnd = acctCredit.RemainVnd = totalVnd;
                         }
+                        acctCredit.PaymentStatus = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
                         acctCredit.CompanyId = currentUser.CompanyID;
                         acctCredit.OfficeId = office.Id.ToString();
                         acctCredit.DepartmentId = currentUser.DepartmentId;
