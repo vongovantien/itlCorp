@@ -61,14 +61,14 @@
                             <div class="row">
                                 <div class="col-lg-8">
                                     <div class="form-group"
-                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankNameEn.valid || !bankNameEn.value)}">
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankName.valid || !bankName.value)}">
                                         <label required>Bank Name</label>
                                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
                                             [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
-                                            [displayFields]="displayFieldPort" (remove)="resetFormControl(bankCode)"
-                                            placeholder="Please Select Bank Name" formControlName="bankNameEn">
+                                            [displayFields]="displayFieldPort" (remove)="resetBankName()"
+                                            placeholder="Please Select Bank Name" formControlName="bankName">
                                         </app-combo-grid-virtual-scroll>
-                                        <div class="form-control-feedback" *ngIf="isSubmitted && bankNameEn.invalid">
+                                        <div class="form-control-feedback" *ngIf="isSubmitted && bankName.invalid">
                                             Bank Name is required
                                         </div>
                                     </div>
@@ -76,7 +76,7 @@
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label required>Bank Code</label>
-                                        <input disabled type="text" class="form-control" formControlName="bankCode">
+                                        <input type="text" class="form-control" formControlName="bankCode">
                                     </div>
                                 </div>
                             </div>

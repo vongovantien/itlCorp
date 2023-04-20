@@ -28,6 +28,7 @@ export * from './catalogue/district.model';
 export * from './catalogue/catBank.model';
 export * from './catalogue/catStandardCharge.model';
 export { ContractPartner } from './catalogue/catContractPartner.model';
+export * from './catalogue/catPartnerBank.model';
 
 export { SoaCharge, SOA } from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
