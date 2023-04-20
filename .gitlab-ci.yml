@@ -1,116 +1,11 @@
 variables:
-  PROJECT_PATH: "$CI_PROJECT_DIR"
-  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/uat/eFMS-en"
-  APP_OUT_PATH_PROD_EN: "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-en"
-  APP_OUT_PATH_PROD_VI: "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-vi"
-
   FRONTEND_IMAGE_CURRENTVER: jackchuong/itl:efms-webapp-frontend-1.0.0
 
 image: node:12
 
 stages:
-  - install
   - build
   - deploy
-
-install_dependency:
-  stage: install
-  script:
-    - node --version
-    - echo "start job_build"
-    - cd WebApp
-    - npm install
-    - npm install -g @angular/cli
-  only:
-    - feature-itl
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - WebApp/node_modules
-      - WebApp/package-lock.json
-  when: manual
-
-build_uat:
-  stage: build
-  when: manual
-  script:
-    - cd WebApp
-    - node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=uat-en
-    - echo "end job_build"
-  only:
-    - feature-itl
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - WebApp/node_modules
-      - WebApp/package-lock.json
-    policy: pull
-  artifacts:
-    name: "angular_build"
-    paths:
-      - $APP_OUTPUT_PATH
-
-build_test:
-  stage: build
-  when: manual
-  script:
-    - echo "start job_build"
-    - cd WebApp
-    - npm run build:test:en
-    - echo "end job_build"
-  only:
-    - feature/dev
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - WebApp/node_modules
-    policy: pull
-  artifacts:
-    name: "angular_build"
-    paths:
-      - $APP_OUTPUT_PATH
-
-build_prod_en:
-  stage: build
-  when: manual
-  script:
-    - node --version
-    - echo "start job_build"
-    - cd WebApp
-    - npm run build:prod:en
-    - echo "end job_build"
-  only:
-    - production
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - WebApp/node_modules
-    policy: pull
-  artifacts:
-    name: "angular_build_prod_en"
-    paths:
-      - $APP_OUT_PATH_PROD_EN
-
-build_prod_vi:
-  stage: build
-  when: manual
-  script:
-    - node --version
-    - echo "start job_build"
-    - cd WebApp
-    - npm run build:prod:vi
-    - echo "end job_build"
-  only:
-    - production
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - WebApp/node_modules
-    policy: pull
-  artifacts:
-    name: "angular_build_prod_vi"
-    paths:
-      - $APP_OUT_PATH_PROD_VI
 
 build_image_frontend_final:
   stage: build
@@ -132,9 +27,9 @@ deploy_k8s:
     name: bitnami/kubectl:latest
     entrypoint: [""]
   script:
-  - kubectl config get-contexts
-  - kubectl config use-context efms/eFMS-WebApp:efms-agent
-  - kubectl apply -f kubernetes-configs/manifest.yaml
+    - kubectl config get-contexts
+    - kubectl config use-context efms/eFMS-WebApp:efms-agent
+    - kubectl apply -f kubernetes-configs/manifest.yaml
   #- kubectl -n efms set image deployment.apps/efms-frontend efms-frontend=$FRONTEND_IMAGE_CURRENTVER
   #- kubectl annotate deployment.apps/web kubernetes.io/change-cause="upgrade version to $FRONTEND_IMAGE_CURRENTVER"
   only:
@@ -143,7 +38,6 @@ deploy_k8s:
     changes:
       - WebApp/**/* # only run when php source code change
   when: manual
-
 #rollback_k8s:
 #  stage: deploy
 #  image:

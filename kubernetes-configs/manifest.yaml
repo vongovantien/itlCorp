@@ -6,14 +6,14 @@ metadata:
 spec:
   provider: vault
   secretObjects:
-  - data:
-    - key: .dockerconfigjson
-      objectName: dockerconfigjson
-    secretName: dockerhub
-    type: kubernetes.io/dockerconfigjson
+    - data:
+        - key: .dockerconfigjson
+          objectName: dockerconfigjson
+      secretName: dockerhub
+      type: kubernetes.io/dockerconfigjson
   parameters:
-    roleName: 'efms-role'
-    vaultAddress: 'http://vault:8200'
+    roleName: "efms-role"
+    vaultAddress: "http://vault:8200"
     objects: |
       - objectName: dockerconfigjson
         secretPath: "common-use/data/dockerhub"
@@ -44,21 +44,21 @@ spec:
     spec:
       serviceAccountName: efms-sa
       imagePullSecrets:
-      - name: dockerhub
+        - name: dockerhub
       containers:
-      - image: jackchuong/itl:efms-webapp-frontend-1.0.0
-        imagePullPolicy: Always
-        name: efms-frontend
-        volumeMounts:
-        - name: 'dockerhub'
-          mountPath: '/mnt/dockerhubcred'
+        - image: jackchuong/itl:efms-webapp-frontend-1.0.0
+          imagePullPolicy: Always
+          name: efms-frontend
+          volumeMounts:
+            - name: "dockerhub"
+              mountPath: "/mnt/dockerhubcred"
       volumes:
-      - name: dockerhub
-        csi:
-          driver: 'secrets-store.csi.k8s.io'
-          readOnly: true
-          volumeAttributes:
-            secretProviderClass: 'dockerhub-spc'
+        - name: dockerhub
+          csi:
+            driver: "secrets-store.csi.k8s.io"
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "dockerhub-spc"
 ---
 apiVersion: v1
 kind: Service
@@ -69,10 +69,10 @@ spec:
   selector:
     app: efms-frontend
   ports:
-  - name: efms-frontend
-    port: 80
-    protocol: TCP
-    targetPort: 80
+    - name: efms-frontend
+      port: 80
+      protocol: TCP
+      targetPort: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -90,13 +90,13 @@ spec:
   #    - test.api.eoms.itlvn.com
   #  secretName: itlvn.com-tls
   rules:
-  - host: kenny.itlvn.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: efms-frontend-svc
-            port:
-              number: 80
+    - host: kenny.itlvn.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: efms-frontend-svc
+                port:
+                  number: 80
