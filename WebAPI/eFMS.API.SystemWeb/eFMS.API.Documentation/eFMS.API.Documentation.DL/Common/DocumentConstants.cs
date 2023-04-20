@@ -20,7 +20,7 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string SEND_DO_CODE = "S_DO";
         public static readonly string SEND_AL_CODE = "S_AL";
         public static readonly string SEND_HB_CODE = "S_HB";
-
+        public static readonly string SEND_INV_CODE = "S_INV";
 
         //tracking constants
         public const string IN_TRANSIT = "IN TRANSIT";
@@ -38,6 +38,7 @@ namespace eFMS.API.Documentation.DL.Common
         public const string SEND_AN = "SEND_AN";
         public const string SEND_DO = "SEND_DO";
         public const string SEND_HB = "SEND_HB";
+        public const string SEND_INV = "SEND_INV";
 
         //container constants
         public static readonly string NO_CONTAINER = "No cont";

@@ -242,5 +242,18 @@ namespace eFMS.API.Documentation.Controllers
             var hs = sendMailService.GetDataOustandingDebit(salemanId);
             return Ok(hs);
         }
+
+        /// <summary>
+        /// Get Mail Info Proof Of Delivery HBL Air Export- Air Import
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <returns></returns>
+        [HttpGet("GetInfoMailDebitInvoice")]
+        [Authorize]
+        public IActionResult GetInfoMailDebitInvoice(Guid hblId, Guid jobId)
+        {
+            var data = sendMailService.GetInfoMailDebitInvoice(hblId, jobId);
+            return Ok(data);
+        }
     }
 }

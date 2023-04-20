@@ -717,6 +717,90 @@ namespace eFMS.API.Documentation.DL.Services
             return emailContent;
         }
 
+        public EmailContentModel GetInfoMailDebitInvoice(Guid hblId, Guid jobId)
+        {
+            var shipmentInfo = DataContext.First(x => x.Id == jobId);
+            if (shipmentInfo == null) return null;
+
+            var _housebills = detailRepository.Get(x => hblId.Equals(x.Id));
+            var hwbNos = string.Join(" - ", _housebills.Select(x => x.Hwbno).Distinct());
+            var mawb = !string.IsNullOrEmpty(shipmentInfo.Mawb) ? shipmentInfo.Mawb : string.Join(";", _housebills.Select(x => x.Mawb).Distinct());
+
+            // Email PIC
+            var _picId = !string.IsNullOrEmpty(shipmentInfo.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == shipmentInfo.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+
+            var template = sysEmailTemplateRepo.Get(x => x.Code == "DEBIT-INVOICE-REALERT").FirstOrDefault();
+            var _subject = template.Subject;
+            _subject = _subject.Replace("{{MAWB}}", string.IsNullOrEmpty(shipmentInfo.Mawb) ? string.Empty : shipmentInfo.Mawb);
+            _subject = _subject.Replace("{{Hwbno}}", string.IsNullOrEmpty(hwbNos) ? string.Empty : ("/ " + hwbNos));
+            // _subject = _subject.Replace("{{PO}}", string.Empty);
+            _subject = _subject.Replace("{{HAWB}}", hwbNos);
+
+            var _body = template.Body;
+            _body = _body.Replace("{{MAWB}}", shipmentInfo.Mawb);
+            _body = _body.Replace("{{Flight}}", shipmentInfo.FlightVesselName);
+            _body = _body.Replace("{{ETD}}", (shipmentInfo.Etd != null) ? shipmentInfo.Etd.Value.ToString("dd MMM, yyyy") : string.Empty);
+            _body = _body.Replace("{{ATA}}", (shipmentInfo.Ata != null) ? shipmentInfo.Ata.Value.ToString("dd MMM, yyyy") : string.Empty);
+            var numOrder = 1;
+            var contenEmail = string.Empty;
+            foreach (var _hbl in _housebills)
+            {
+                //var _content = template.Content;
+                var _shipper = catPartnerRepo.Get(x => x.Id == _hbl.ShipperId).FirstOrDefault();
+                var _consignee = catPartnerRepo.Get(x => x.Id == _hbl.ConsigneeId).FirstOrDefault();
+
+                _body = _body.Replace("{{Hwbno}}", _hbl.Hwbno);
+                _body = _body.Replace("{{QTy}}", _hbl.PackageQty?.ToString());
+                _body = _body.Replace("{{FlightNo}}", _hbl?.FlightNo);
+                _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _hbl.GrossWeight));
+                _body = _body.Replace("{{CW}}", string.Format("{0:n2}", _hbl.ChargeWeight));
+                _body = _body.Replace("{{HAWB}}", _hbl.Hwbno);
+                _body = _body.Replace("{{UserName}}", _consignee?.PartnerNameEn);
+                _subject = _subject.Replace("{{Consignee}}", _consignee?.PartnerNameEn);
+
+                var _desOfGoodArrs = string.IsNullOrEmpty(_hbl.DesOfGoods) ? null : _hbl.DesOfGoods.Split("\n").Where(x => !string.IsNullOrEmpty(x));
+                var _desOfGood = string.Empty;
+                if (_desOfGoodArrs != null && _desOfGoodArrs.Count() > 0)
+                {
+                    _desOfGood += _desOfGoodArrs.First();
+                    _desOfGoodArrs = _desOfGoodArrs.Skip(1);
+                    foreach (var item in _desOfGoodArrs)
+                    {
+                        _desOfGood += string.Format("<div style=\"margin-left: 10px;\">{0}</div>", item);
+                    }
+                }
+                _body = _body.Replace("{{NQGoods}}", _desOfGood);
+                numOrder += 1;
+            }
+
+            _body = _body.Replace("{{Hwbno}}", hwbNos);
+            _body = _body.Replace("{{MAWB}}", mawb);
+            _body = _body.Replace("{{Routing}}", shipmentInfo.Route);
+            _body = _body.Replace("{{pic}}", picEmail);
+            // Get email from of person in charge
+            var groupUser = sysGroupRepo.Get(x => x.Id == shipmentInfo.GroupId).FirstOrDefault();
+
+            _body = _body.Replace("{{emailGroup}}", groupUser.Email);
+            // Get email from of person in charge
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerInfo))
+            {
+                var customers = _housebills.Select(x => x.CustomerId).Distinct().ToList();
+                partnerInfo = string.Join(";", catPartnerRepo.Get(x => customers.Any(z => z == x.Id)).Select(x => x.Email));
+            }
+
+            var emailContent = new EmailContentModel();
+            var mailFrom = string.IsNullOrEmpty(picEmail) ? "Info FMS" : picEmail;
+            emailContent.From = mailFrom;
+            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo;
+            emailContent.Cc = groupUser?.Email; // @"air@itlvn.com";
+            emailContent.Subject = _subject;
+            emailContent.Body = _body;
+            emailContent.AttachFiles = new List<string>();
+            return emailContent;
+        }
+
         #region Mail info Sea Import - Export
         // Mail Info: Sea Import
         public EmailContentModel GetInfoMailHBLSeaImport(Guid hblId, string serviceId)
