@@ -28,8 +28,8 @@ deploy_k8s:
   #  - kubectl config get-contexts
     - kubectl config use-context efms/eFMS-WebApp:efms-agent
   #  - kubectl apply -f kubernetes-configs/manifest.yaml
-  - kubectl -n efms set image deployment.apps/efms-frontend efms-frontend=$FRONTEND_IMAGE_CURRENTVER
-  - kubectl annotate deployment.apps/efms-frontend kubernetes.io/change-cause="upgrade version to $FRONTEND_IMAGE_CURRENTVER"
+    - kubectl -n efms set image deployment.apps/efms-frontend efms-frontend=$FRONTEND_IMAGE_CURRENTVER
+    - kubectl annotate deployment.apps/efms-frontend kubernetes.io/change-cause="upgrade version to $FRONTEND_IMAGE_CURRENTVER"
   only:
     refs:
       - feature-itl
