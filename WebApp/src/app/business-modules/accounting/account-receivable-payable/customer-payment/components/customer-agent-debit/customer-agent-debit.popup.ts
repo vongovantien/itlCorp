@@ -382,7 +382,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                                     if (result[i].isSelected === true && invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl && invoice.type === result[i].type) {
                                         invoice.isSelected = true;
                                     }
-                                    if ((invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl && invoice.type === result[i].type) || invoice.refNo === result[i].refNo) {
+                                    if ((invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl && invoice.type === result[i].type)) {
                                         const index = x.invoices.indexOf(invoice);
                                         x.invoices.splice(index, 1);
                                     }
