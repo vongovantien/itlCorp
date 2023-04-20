@@ -44,8 +44,8 @@ rollback_k8s:
     entrypoint: [""]
   script:
     - kubectl config use-context efms/eFMS-WebApp:efms-agent
-    - kubectl rollout history deployment.apps/efms-frontend    
-    - kubectl rollout undo deployment.apps/efms-frontend
+    - kubectl -n efms rollout history deployment.apps/efms-frontend    
+    - kubectl -n efms rollout undo deployment.apps/efms-frontend
   only:
     refs:
       - feature-itl
