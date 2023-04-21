@@ -2,6 +2,7 @@
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
+using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,9 +50,9 @@ namespace eFMS.API.Documentation.Controllers
                 return Ok(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SHIPMENT_NOT_EXIST].Value });
             }
 
-            var data = await shipmentTrackingService.TrackShipmentProgress(model);
+            var dataReturn = await shipmentTrackingService.TrackShipmentProgress(model);
 
-            return Ok(data);
-        }
+            return Ok(new ResultHandle { Status = true, Message = "Tracking success", Data = dataReturn });
+            }
     }
 }

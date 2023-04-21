@@ -42,7 +42,7 @@ export class DashboardComponent extends AppPage implements OnInit {
         // this.selectedDate = Date.now();
         // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
-    isSubmitted: Boolean = true;
+    isShowBackground: Boolean = true;
     ngOnInit() {
         this.initBasicData();
         // * Search autocomplete shipment.
@@ -213,36 +213,39 @@ export class DashboardComponent extends AppPage implements OnInit {
     }
 
     onChangeLoading(event) {
-        this.isSubmitted = event;
+        this.isShowBackground = event;
     }
 
     trackShipmentProgress(obj: any) {
         this.isLoading = true
         this._documentRepo.trackShipmentProgress(obj).pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (res: CommonInterface.IResult | any) => {
-                    if (!!res?.message) {
-                        this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
-                            title: 'No Tracking Data Found',
-                            body: `
-                            <span>Sorry, we couldn't find any tracking data for you package, Please try tracking again links below:</span>
-                            <ul>
-                                ${SystemConstants.TRACKING_URL.map((item, index) => `<li><a ${index === 0 && 'class="h5"'} href="${item.Url}"target="_blank" >${item.Name}</a></li>`).join('')}
-                            </ul>`,
-                            class: 'btn btn-brand'
-                        });
-                        this.isSubmitted = true;
+                (res: CommonInterface.IResult) => {
+                    if (!!res && res.status) {
+                        this.shipmentTracking = res.data;
+                        if (!!res.data.trackInfos && res.data.trackInfos.length > 0) {
+                            this._toastService.success(res.message)
+                        }
+                        else {
+
+                            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                title: 'No Tracking Data Found',
+                                body: `
+                                <span>Sorry, we couldn't find any tracking data for you package, Please try tracking again links below:</span>
+                                <ul class = 'list-unstyled'>
+                                    ${SystemConstants.TRACKING_URL.map((item, index) => `<li><a ${index === 0 && 'class="h5"'} href="${item.Url}"target="_blank" >${item.Name}</a></li>`).join('')}
+                                </ul>`,
+                                class: 'btn btn-brand'
+                            });
+                        }
+                        this.isShowBackground = false;
                     }
                     else {
-                        this.shipmentTracking = res;
-                        this.isSubmitted = false;
+                        this._toastService.warning(res.message);
+                        this.isShowBackground = true;
                     }
                     this.isLoading = false;
-                }, (error: any) => {
-                    console.log(error)
-                    this.isSubmitted = true;
-                    this.isLoading = false;
-                });
+                })
     }
 
     //https://www.npmjs.com/package/angular-highcharts

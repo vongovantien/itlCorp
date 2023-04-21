@@ -49,7 +49,7 @@
             <div class="m-portlet__body">
                 <form-search-tracking (onChangeBackGround)="onChangeLoading($event)" (onChangeType)="getType($event)"
                     (onChangeKeyWork)="getValueSearch($event)"></form-search-tracking>
-                <ng-container *ngIf="isSubmitted === true">
+                <ng-container *ngIf="isShowBackground === true">
                     <div *ngIf="isLoading === true" class="loader-container m--margin-top-10">
                         <img src="assets/icons/loader.gif" alt="Loading...">
                     </div>
@@ -63,7 +63,7 @@
     </div>
 </div>
 
-<ng-container *ngIf="isSubmitted === false">
+<ng-container *ngIf="isShowBackground === false">
     <div class="m-content py-0">
         <div class="m-portlet">
             <div class="m-portlet__head alert-block__heading pointer">
@@ -160,7 +160,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="!shipmentTracking?.trackInfos?.length" class="d-flex justify-content-center">
+            <div *ngIf="!shipmentTracking.trackInfos?.length" class="d-flex justify-content-center">
                 <div class="no-data-image">
 
                 </div>

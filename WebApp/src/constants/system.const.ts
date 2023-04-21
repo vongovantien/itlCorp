@@ -4,30 +4,6 @@ export class SystemConstants {
             Name: "www.track-trace.com",
             Url: "https://www.track-trace.com/aircargo"
         },
-        {
-            Name: "www.unitedcargo.com",
-            Url: "https://www.unitedcargo.com/en/us/track"
-        },
-        {
-            Name: "www.hkaircargo.com",
-            Url: "https://www.hkaircargo.com/track-your-shipment"
-        },
-        {
-            Name: "www.cargo.vietjetair.com",
-            Url: "https://cargo.vietjetair.com/FrmAWBTracking.aspx"
-        },
-        {
-            Name: "www.maskargo.com",
-            Url: "https://www.maskargo.com/online_awb_info/index.php"
-        },
-        {
-            Name: "www.cathaycargo.com",
-            Url: "https://www.cathaycargo.com/ManageYourShipment/TrackYourShipment/"
-        },
-        {
-            Name: "www.eskycargo.emirates.com",
-            Url: "https://eskycargo.emirates.com/app/offerandorder/#/home/find-offer"
-        }
     ];
 
     // Local Storage Key
