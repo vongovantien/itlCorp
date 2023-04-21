@@ -16,8 +16,6 @@ export class Bank {
     swiftCode: string = '';
     bankAccountNo: string = '';
     bankAddress: string = '';
-    partnerId: string = '';
-    bankId: string = '';
     note: string = '';
     source: string = '';
     bankAccountName: string = '';

@@ -14,152 +14,161 @@
             </div>
         </div>
         <div class="m-portlet__body bg-white">
-            <div class="table-wrapper table-editable table-horizontal" id="work-order-list-table"
-                [collapse]="isCollapsed" [isAnimated]="true" style="height:255px; max-height: 300px;"
-                [style.height.px]="!!surcharges.length ? 255 : (isReadonly | async) ? 111 : 152">
-                <table class="table table-bordered dataTable-edit">
-                    <thead app-table-header [headers]="headers" class="thead-light"
-                        (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                        <th class="m--w-50 first table-actions-col">
-                            Actions
-                        </th>
-                    </thead>
-                    <tbody>
-                        <ng-container *ngIf="!!surcharges.length">
-                            <ng-container *ngFor="let surcharge of surcharges; let i = index; trackBy: trackByFn">
-                                <tr class="collapse-toggle-row">
-                                    <td class="table-actions-col">
-                                        <ng-container *ngIf="!(isReadonly | async)">
-                                            <div class="table-actions">
-                                                <button class="btn m-btn--icon m-btn--icon-only m--font-success"
-                                                    title="Duplicate" (click)="duplicateCharge(i)"><i
-                                                        class="la la-copy"></i>
-                                                </button>
-                                                <button type="button" (click)="deleteCharge(i)"
-                                                    class="btn m-btn--icon m-btn--icon-only m--font-danger"
-                                                    title="Remove">
-                                                    <i class="la la-trash"></i>
-                                                </button>
+            <div class="table-wrapper table-editable table-horizontal" [collapse]="isCollapsed" [isAnimated]="true">
+                <div id="work-order-list-table">
+                    <table class="table table-bordered dataTable-edit">
+                        <thead app-table-header [headers]="headers" class="thead-light"
+                            (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                            <th class="m--w-50 first table-actions-col">
+                                Actions
+                            </th>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngIf="!!surcharges.length">
+                                <ng-container *ngFor="let surcharge of surcharges; let i = index; trackBy: trackByFn">
+                                    <tr class="collapse-toggle-row">
+                                        <td class="table-actions-col">
+                                            <ng-container *ngIf="!(isReadonly | async)">
+                                                <div class="table-actions">
+                                                    <button class="btn m-btn--icon m-btn--icon-only m--font-success"
+                                                        title="Duplicate" (click)="duplicateCharge(i)"><i
+                                                            class="la la-copy"></i>
+                                                    </button>
+                                                    <button type="button" (click)="deleteCharge(i)"
+                                                        class="btn m-btn--icon m-btn--icon-only m--font-danger"
+                                                        title="Remove">
+                                                        <i class="la la-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </ng-container>
+
+                                        </td>
+                                        <td>
+                                            <!-- <ng-select [items]="partnerTypes" class="custom" placeholder="Please select"
+                                                bindLabel="title" bindValue="value" [clearable]="false"
+                                                [(ngModel)]="surcharge.partnerType">
+                                            </ng-select> -->
+                                            <select class="form-control border" [ngModel]="surcharge.partnerType"
+                                                (ngModelChange)="onSelectDataTableInfo($event, surcharge, 'partnerType')"
+                                                [disabled]="(isReadonly | async)">
+                                                <option *ngFor="let crrcy of partnerTypes; trackBy: trackByFn"
+                                                    [ngValue]="crrcy.value">
+                                                    {{crrcy.title}}</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="form-group" [ngClass]="{'m-form__group has-danger': submitted 
+                                            && surcharge.partnerType === 'Other' 
+                                            && !surcharge.partnerId }">
+                                                <ng-container
+                                                    *ngIf="!(isReadonly | async) && surcharge.partnerType === 'Other'; else partner">
+                                                    <div class="list-master-unit">
+                                                        <app-combo-grid-virtual-scroll
+                                                            [currentActiveItemId]="{field:'id', value: surcharge.partnerId}"
+                                                            (itemSelected)="onSelectDataTableInfo($event.id, surcharge, 'partnerId')"
+                                                            [selectedDisplayFields]="['shortName']"
+                                                            [dataSources]="partners | async"
+                                                            [displayFields]="[{'field':'shortName','label':'Name'},{'field':'taxCode','label':'Code'}]"
+                                                            [size]="15" placeholder="Please Select"
+                                                            (remove)="surcharge.partnerId = null" [clearable]="false"
+                                                            placeholder="Please select">
+                                                        </app-combo-grid-virtual-scroll>
+                                                    </div>
+                                                </ng-container>
+                                                <ng-template #partner>
+                                                    <input type="text" class="form-control form-control--custom"
+                                                        [tooltip]="surcharge.partnerName"
+                                                        [value]="surcharge.partnerName" readonly placeholder="-">
+                                                </ng-template>
                                             </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group"
+                                                [ngClass]="{'m-form__group has-danger': submitted && (!surcharge.chargeId) }">
+                                                <ng-container *ngIf="!(isReadonly | async); else charge">
+                                                    <div class="list-master-unit">
+                                                        <app-combo-grid-virtual-scroll #comboGridCharge
+                                                            [currentActiveItemId]="{field:'id', value: surcharge.chargeId}"
+                                                            (itemSelected)="onSelectDataTableInfo($event, surcharge, 'chargeId')"
+                                                            [selectedDisplayFields]="['chargeNameEn']"
+                                                            [dataSources]="charges | async"
+                                                            [displayFields]="configComboGridCharge" [height]="150"
+                                                            placeholder="Please Select"
+                                                            (remove)="surcharge.chargeId = null" [clearable]="false">
+                                                        </app-combo-grid-virtual-scroll>
+                                                    </div>
+                                                </ng-container>
+                                                <ng-template #charge>
+                                                    <input type="text" class="form-control form-control--custom"
+                                                        [tooltip]="surcharge.chargeName" [value]="surcharge.chargeName"
+                                                        readonly>
+                                                </ng-template>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group "
+                                                [ngClass]="{'m-form__group has-danger': submitted 
+                                                && (!surcharge.unitPrice || surcharge.unitPrice === null || surcharge.unitPrice === 'null')}">
+                                                <ng-container *ngIf="!(isReadonly | async) else unitPrice">
+                                                    <input type="number" class="form-control"
+                                                        [(ngModel)]="surcharge.unitPrice" placeholder="Unit Price"
+                                                        autoFormatCurrency>
+                                                </ng-container>
+                                                <ng-template #unitPrice>
+                                                    <input type="number" class="form-control" disabled
+                                                        [value]="surcharge.unitPrice" autoFormatCurrency
+                                                        placeholder="Unit Price">
+                                                </ng-template>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <select class="form-control border" [(ngModel)]="surcharge.currencyId"
+                                                [disabled]="(isReadonly | async)">
+                                                <option *ngFor="let crrcy of ['VND','USD']; trackBy: trackByFn"
+                                                    [ngValue]="crrcy">
+                                                    {{crrcy}}</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <ng-container *ngIf="(isReadonly | async) else vatrate">
+                                                    <input type="number" class="form-control" disabled
+                                                        [value]="surcharge.vatrate" autoFormatCurrency>
+                                                </ng-container>
+                                                <ng-template #vatrate>
+                                                    <input type="number" class="form-control"
+                                                        [(ngModel)]="surcharge.vatrate" placeholder="%"
+                                                        autoFormatCurrency>
+                                                </ng-template>
+                                            </div>
+                                        </td>
+                                        <ng-container *ngIf="surcharge.type === 'BUY'">
+                                            <td align="center">
+                                                <app-switch [(ngModel)]="surcharge.kickBack"
+                                                    [disabled]="(isReadonly | async) ? 'disabled': null">
+                                                </app-switch>
+                                            </td>
                                         </ng-container>
 
+                                    </tr>
+                                </ng-container>
+                            </ng-container>
+                            <tr *ngIf="!surcharges.length" app-table-none-record>
+                            </tr>
+                            <ng-container *ngIf="!(isReadonly | async)">
+                                <tr>
+                                    <td colspan="1" class="fixed-side ng-star-inserted">
+                                        <a title="Add" class="btn m-btn--icon m-btn--icon-only m--font-primary"
+                                            (click)="addCharge()">
+                                            <i class="fa fa-plus-circle fa-2x"></i>
+                                        </a>
                                     </td>
-                                    <td>
-                                        <!-- <ng-select [items]="partnerTypes" class="custom" placeholder="Please select"
-                                            bindLabel="title" bindValue="value" [clearable]="false"
-                                            [(ngModel)]="surcharge.partnerType">
-                                        </ng-select> -->
-                                        <select class="form-control border" [(ngModel)]="surcharge.partnerType"
-                                            [disabled]="(isReadonly | async)">
-                                            <option *ngFor="let crrcy of partnerTypes; trackBy: trackByFn"
-                                                [ngValue]="crrcy.value">
-                                                {{crrcy.title}}</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <div class="form-group ">
-                                            <ng-container
-                                                *ngIf="!(isReadonly | async) && surcharge.partnerType === 'Other'; else partner">
-                                                <div class="list-master-unit">
-                                                    <app-combo-grid-virtual-scroll
-                                                        [currentActiveItemId]="{field:'id', value: surcharge.partnerId}"
-                                                        (itemSelected)="onSelectDataTableInfo($event.id, surcharge, 'partnerId')"
-                                                        [selectedDisplayFields]="['shortName']"
-                                                        [dataSources]="partners | async"
-                                                        [displayFields]="[{'field':'shortName','label':'Name'},{'field':'taxCode','label':'Code'}]"
-                                                        [size]="15" placeholder="Please Select"
-                                                        (remove)="surcharge.partnerId = null" [clearable]="false">
-                                                    </app-combo-grid-virtual-scroll>
-                                                </div>
-                                            </ng-container>
-                                            <ng-template #charge>
-                                                <input type="text" class="form-control form-control--custom"
-                                                    [value]="surcharge.chargeName" disabled>
-                                            </ng-template>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && (!surcharge.chargeId) }">
-                                            <ng-container *ngIf="!(isReadonly | async); else charge">
-                                                <div class="list-master-unit">
-                                                    <app-combo-grid-virtual-scroll #comboGridCharge
-                                                        [currentActiveItemId]="{field:'id', value: surcharge.chargeId}"
-                                                        (itemSelected)="onSelectDataTableInfo($event.id, surcharge, 'chargeId')"
-                                                        [selectedDisplayFields]="['chargeNameEn']"
-                                                        [dataSources]="charges | async"
-                                                        [displayFields]="configComboGridCharge" [height]="150"
-                                                        placeholder="Please Select" (remove)="surcharge.chargeId = null"
-                                                        [clearable]="false">
-                                                    </app-combo-grid-virtual-scroll>
-                                                </div>
-                                            </ng-container>
-                                            <ng-template #charge>
-                                                <input type="text" class="form-control form-control--custom"
-                                                    [value]="surcharge.chargeName" disabled>
-                                            </ng-template>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="form-group "
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted && !surcharge.unitPrice}">
-                                            <ng-container *ngIf="(isReadonly | async) else unitPrice">
-                                                <input type="number" class="form-control" disabled
-                                                    [value]="surcharge.unitPrice" autoFormatCurrency>
-                                            </ng-container>
-                                            <ng-template #unitPrice>
-                                                <input type="number" class="form-control"
-                                                    [(ngModel)]="surcharge.unitPrice" placeholder="Unit Price"
-                                                    autoFormatCurrency>
-                                            </ng-template>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <select class="form-control border" [(ngModel)]="surcharge.currencyId"
-                                            [disabled]="(isReadonly | async)">
-                                            <option *ngFor="let crrcy of ['VND','USD']; trackBy: trackByFn"
-                                                [ngValue]="crrcy">
-                                                {{crrcy}}</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <div class="form-group">
-                                            <ng-container *ngIf="(isReadonly | async) else vatrate">
-                                                <input type="number" class="form-control" disabled
-                                                    [value]="surcharge.vatrate" autoFormatCurrency>
-                                            </ng-container>
-                                            <ng-template #vatrate>
-                                                <input type="number" class="form-control"
-                                                    [(ngModel)]="surcharge.vatrate" placeholder="%" autoFormatCurrency>
-                                            </ng-template>
-                                        </div>
-                                    </td>
-                                    <ng-container *ngIf="surcharge.type === 'BUY'">
-                                        <td align="center">
-                                            <app-switch [(ngModel)]="surcharge.kickBack"
-                                                [disabled]="(isReadonly | async) ? 'disabled': null">
-                                            </app-switch>
-                                        </td>
-                                    </ng-container>
-
                                 </tr>
                             </ng-container>
-                        </ng-container>
-                        <tr *ngIf="!surcharges.length" app-table-none-record>
-                        </tr>
-                        <ng-container *ngIf="!(isReadonly | async)">
-                            <tr>
-                                <td colspan="1" class="fixed-side ng-star-inserted">
-                                    <a title="Add" class="btn m-btn--icon m-btn--icon-only m--font-primary"
-                                        (click)="addCharge()">
-                                        <i class="fa fa-plus-circle fa-2x"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        </ng-container>
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

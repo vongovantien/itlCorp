@@ -50,15 +50,14 @@ export class CommercialBankListComponent extends AppList {
         ];
     }
 
-    getListBank(partnerId: string) {
+    getPartnerBank(partnerId: string) {
         this.isLoading = true;
-        this._catalogueRepo.getListBankByPartnerById(partnerId)
+        this._catalogueRepo.getPartnerBank(partnerId)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             })).subscribe(
                 (res: Bank[]) => {
                     this.partnerBanks = res || [];
-
                 }
             );
     }
@@ -73,23 +72,11 @@ export class CommercialBankListComponent extends AppList {
         this.formUpdateBankPopup.show();
     }
 
-    gotoDetailBank(id: string, index: number = null) {
+    gotoDetailPartnerBank(id: string) {
         this.formUpdateBankPopup.isUpdate = true;
         this.formUpdateBankPopup.partnerId = this.partnerId;
-        !!this.formUpdateBankPopup.partnerId ? this.indexLstBank = null : this.indexLstBank = index;
-        if (!!this.formUpdateBankPopup.partnerId) {
-            this._catalogueRepo.getDetailBankById(id)
-                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                .subscribe(
-                    (res: Bank) => {
-                        if (!!res) {
-                            this.formUpdateBankPopup.updateFormValue(res);
-                            this.formUpdateBankPopup.id = res.id
-                            this.formUpdateBankPopup.show();
-                        }
-                    }
-                );
-        }
+        this.formUpdateBankPopup.getDetailPartnerBank(id);
+        this.formUpdateBankPopup.show();
     }
 
     sortLocal(sort: string): void {
@@ -97,23 +84,23 @@ export class CommercialBankListComponent extends AppList {
     }
 
 
-    onDeleteBank(id: string) {
+    onDeletePartnerBank(id: string) {
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             title: 'Confirm',
-            body: 'Do you want to delete this bank account',
+            body: 'Do you want to delete this bank account ?',
             labelConfirm: 'Ok'
-        }, () => { this.handleDeleteBank(id) });
+        }, () => { this.handleDeletePartnerBank(id) });
     }
 
 
-    handleDeleteBank(id: string) {
-        this._catalogueRepo.deleteBank(id)
+    handleDeletePartnerBank(id: string) {
+        this._catalogueRepo.deletePartnerBank(id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.getListBank(this.partnerId);
+                        this.getPartnerBank(this.partnerId);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -124,7 +111,8 @@ export class CommercialBankListComponent extends AppList {
     onRequestBank($event: any) {
         const data = $event;
         if (data === true) {
-            this.getListBank(this.partnerId);
+            this.formUpdateBankPopup.hide();
+            this.getPartnerBank(this.partnerId);
         }
     }
 }

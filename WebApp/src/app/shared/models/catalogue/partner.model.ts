@@ -94,6 +94,8 @@ export class Partner {
 
     countryShippingName: string = null;
     countryName: string = null;
+    officeId: string = null;
+    officeName: string = null;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

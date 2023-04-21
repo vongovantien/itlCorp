@@ -42,8 +42,8 @@ export class ShareAirServiceDIMVolumePopupComponent extends PopupBase implements
 
     selectedIndexDIMItem: number;
 
-    applyDIM: string;
-    roundUp: string;
+    applyDIM: string = '';
+    roundUp: string = '';
 
     $applyDIM: BehaviorSubject<string> = new BehaviorSubject(this.applyDIM);
     $roundUp: BehaviorSubject<string> = new BehaviorSubject(this.roundUp);

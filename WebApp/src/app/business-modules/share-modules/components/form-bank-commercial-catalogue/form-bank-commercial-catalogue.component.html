@@ -57,33 +57,27 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankNameEn.valid || !bankNameEn.value)}">
-                                <label required>Bank Name</label>
-                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
-                                    [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
-                                    [displayFields]="displayFieldPort" (remove)="resetFormControl(bankCode)"
-                                    placeholder="Please Select Bank Name" formControlName="bankNameEn">
-                                </app-combo-grid-virtual-scroll>
-                                <div class="form-control-feedback" *ngIf="isSubmitted && bankNameEn.invalid">
-                                    Bank Name is required
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2">
-                            <div class="form-group">
-                                <label>Bank Code</label>
-                                <input type="text" class="form-control" formControlName="bankCode">
-                            </div>
-                        </div>
                         <div class="col-lg-6">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': (isSubmitted || beneficiaryAddress.dirty)  && !beneficiaryAddress.valid}">
-                                <label required>Beneficiary Address</label>
-                                <input type="text" class="form-control" formControlName="beneficiaryAddress">
-                                <div class="form-control-feedback" *ngIf="isSubmitted && beneficiaryAddress.invalid">
-                                    Beneficiary address is required
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !bankName.valid || !bankName.value)}">
+                                        <label required>Bank Name</label>
+                                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
+                                            [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
+                                            [displayFields]="displayFieldPort" (remove)="resetBankName()"
+                                            placeholder="Please Select Bank Name" formControlName="bankName">
+                                        </app-combo-grid-virtual-scroll>
+                                        <div class="form-control-feedback" *ngIf="isSubmitted && bankName.invalid">
+                                            Bank Name is required
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label required>Bank Code</label>
+                                        <input type="text" class="form-control" formControlName="bankCode">
+                                    </div>
                                 </div>
                             </div>
                         </div>

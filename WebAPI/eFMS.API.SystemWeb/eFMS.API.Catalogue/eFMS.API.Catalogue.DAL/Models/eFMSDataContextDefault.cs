@@ -32,6 +32,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<CatIncoterm> CatIncoterm { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
+        public virtual DbSet<CatPartnerBank> CatPartnerBank { get; set; }
         public virtual DbSet<CatPartnerCharge> CatPartnerCharge { get; set; }
         public virtual DbSet<CatPartnerEmail> CatPartnerEmail { get; set; }
         public virtual DbSet<CatPartnerGroup> CatPartnerGroup { get; set; }
@@ -1057,6 +1058,45 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.ZipCodeShipping)
                     .HasMaxLength(150)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatPartnerBank>(entity =>
+            {
+                entity.ToTable("catPartnerBank");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ApproveDescription).HasMaxLength(200);
+
+                entity.Property(e => e.ApproveStatus).HasMaxLength(50);
+
+                entity.Property(e => e.BankAccountName).HasMaxLength(200);
+
+                entity.Property(e => e.BankAccountNo).HasMaxLength(200);
+
+                entity.Property(e => e.BankAddress).HasMaxLength(200);
+
+                entity.Property(e => e.BankId).HasColumnName("BankID");
+
+                entity.Property(e => e.BeneficiaryAddress).HasMaxLength(200);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
+
+                entity.Property(e => e.Source).HasMaxLength(50);
+
+                entity.Property(e => e.SwiftCode).HasMaxLength(200);
+
+                entity.Property(e => e.UserCreated).HasMaxLength(50);
+
+                entity.Property(e => e.UserModified).HasMaxLength(50);
             });
 
             modelBuilder.Entity<CatPartnerCharge>(entity =>

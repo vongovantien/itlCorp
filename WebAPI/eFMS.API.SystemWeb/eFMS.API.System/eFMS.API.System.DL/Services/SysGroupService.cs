@@ -203,16 +203,16 @@ namespace eFMS.API.System.DL.Services
             {
                 List<CatDepartmentGroupCriteria> results = null;
                 // Các department user đc phân.
-                var currentUserDepartments = sysLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId == officeId && lv != null)?.Select(l => l.DepartmentId).ToList();
+                var currentUserDepartments = sysLevelRepository.Get(lv => lv.UserId == userId && lv.Active == true && lv.OfficeId == officeId && lv != null)?.Select(l => l.DepartmentId).ToList();
                 if (currentUserDepartments.Count() > 0)
                 {
                     // các groups user đc phân
-                    var currentUserGroups = sysLevelRepository.Get(lv => lv.UserId == userId && lv.DepartmentId == currentUserDepartments.First())?.Select(l => l.GroupId).ToList(); 
+                    var currentUserGroups = sysLevelRepository.Get(lv => lv.UserId == userId && lv.Active == true && lv.DepartmentId == currentUserDepartments.First())?.Select(l => l.GroupId).ToList(); 
                     if (currentUserGroups.Count() > 0)
                     {
-                        IQueryable<CatDepartmentGroupCriteria> query = from lv in sysLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId == officeId)
+                        IQueryable<CatDepartmentGroupCriteria> query = from lv in sysLevelRepository.Get(lv => lv.UserId == userId && lv.Active == true && lv.OfficeId == officeId)
                                     join dp in departmentRepository.Get() on lv.DepartmentId equals dp.Id
-                                    join sg in DataContext.Get() on lv.GroupId equals sg.Id
+                                    join sg in DataContext.Get() on lv.GroupId equals sg.Id 
                                     select new CatDepartmentGroupCriteria
                                     {
                                         UserId = lv.UserId,
