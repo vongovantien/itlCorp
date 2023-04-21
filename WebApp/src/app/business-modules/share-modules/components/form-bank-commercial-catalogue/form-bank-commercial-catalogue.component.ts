@@ -12,7 +12,6 @@ import _cloneDeep from 'lodash/cloneDeep';
 import _merge from 'lodash/merge';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { IEDocUploadFile } from 'src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component';
 import { PopupBase } from 'src/app/popup.base';
@@ -28,6 +27,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
 
     formGroup: FormGroup;
     formDirective: FormGroupDirective;
+
     bankAccountNo: AbstractControl;
     bankAccountName: AbstractControl;
     bankAddress: AbstractControl;
@@ -35,6 +35,9 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     bankName: AbstractControl;
     bankCode: AbstractControl;
     note: AbstractControl;
+    beneficiaryAddress: AbstractControl;
+    approveStatus: AbstractControl;
+
     bankDetail: PartnerBank;
     banks: Observable<Bank[]>;
     partnerId: string = '';
@@ -73,7 +76,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
             bankAccountName: [null, FormValidators.required],
             bankAddress: [null, FormValidators.required],
             bankName: [null, FormValidators.required],
-            bankCode: [{ value: null, disabled: true }, FormValidators.required],
             bankNameEn: [null, FormValidators.required],
             bankCode: [{ value: null, disabled: true }],
             swiftCode: [null],
@@ -147,8 +149,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
             swiftCode: !!data.swiftCode ? data.swiftCode : null,
             bankName: !!data.bankName ? data.bankName : null,
             bankCode: !!data.bankCode ? data.code : null,
-            bankNameEn: !!data.bankNameEn ? data.bankNameEn : null,
-            bankCode: !!data.code ? data.code : null,
             approveStatus: !!data.approveStatus ? data.approveStatus : null,
             beneficiaryAddress: !!data.beneficiaryAddress ? data.beneficiaryAddress : null,
             source: !!data.source ? data.source : null,
@@ -191,47 +191,9 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
                         }
                     );
             }
-            if (!!this.partnerId) {
-                if (!this.isUpdate) {
-                    this._catalogueRepo.addBank(mergeObj)
-                        .pipe(catchError(this.catchError))
-                        .subscribe(
-                            (res: any) => {
-                                if (res.status) {
-                                    this._toastService.success('New data added');
-                                    this.onRequest.emit(true);
-                                    this.hide();
-                                } else {
-                                    this._toastService.error("Opps", "Something getting error!");
-                                }
-                            }
-                        );
-                } else {
-                    mergeObj.id = this.id
-                    this._catalogueRepo.updateBank(mergeObj)
-                        .pipe(catchError(this.catchError))
-                        .subscribe(
-                            (res: any) => {
-                                if (res.status) {
-                                    this._toastService.success(res.message);
-                                    this.onRequest.emit(true);
-                                    this.hide();
-
-                                } else {
-                                    this._toastService.error("Opps", "Something getting error!");
-                                }
-                            }
-                        );
-                }
-                this.isSubmitted = false;
-                this.bankDetail = null;
-                this.formGroup.reset()
-            }
-            else {
-                this.onRequest.emit(mergeObj);
-            }
         }
     }
+
     resetBankName() {
         this.bankName.setValue(null)
         this.bankCode.setValue(null)

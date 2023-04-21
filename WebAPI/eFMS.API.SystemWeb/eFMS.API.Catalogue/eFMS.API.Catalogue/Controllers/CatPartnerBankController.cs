@@ -13,6 +13,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using eFMS.API.Catalogue.DL.Models.CatalogueBank;
+using eFMS.API.Common.Helpers;
+using ITL.NetCore.Common;
+using System.Net.Http;
+using Microsoft.Extensions.Options;
+using eFMS.API.Accounting.DL.IService;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -29,7 +35,9 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPartnerBankService catPartnerBankService;
         private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
-
+        IOptions<ESBUrl> webUrl;    
+        private readonly IActionFuncLogService actionFuncLogService;
+        private readonly BravoLoginModel loginInfo;
         /// <summary>
         ///
         /// </summary>
@@ -38,12 +46,18 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="currUser">inject interface ICurrentUser</param>
         /// <param name="hostingEnvironment">inject interface IHostingEnvironment</param>
         public CatPartnerBankController(IStringLocalizer<LanguageSub> localizer, ICatPartnerBankService service,
-            ICurrentUser currUser, IHostingEnvironment hostingEnvironment)
+            ICurrentUser currUser, IHostingEnvironment hostingEnvironment, IActionFuncLogService actionFuncLog)
         {
             stringLocalizer = localizer;
             catPartnerBankService = service;
             currentUser = currUser;
             _hostingEnvironment = hostingEnvironment;
+            actionFuncLogService = actionFuncLogService;
+            loginInfo = new BravoLoginModel
+            {
+                UserName = "bravo",
+                Password = "br@vopro"
+            };
         }
 
         /// <summary>
@@ -143,6 +157,73 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("SyncBankInfoToAccountantSystem")]
+        [Authorize]
+        public async Task<IActionResult> SyncBankAccountToAccountantSystem(Guid bankId, ACTION action)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            try
+            {
+                HandleState hs = new HandleState();
+                var loginInfo = new BravoLoginModel
+                {
+                    UserName = "bravo",
+                    Password = "br@vopro"
+                };
+
+                HttpResponseMessage responseFromApi = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api/Login", loginInfo, null);
+                BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
+
+                HttpResponseMessage response = new HttpResponseMessage();
+                BravoResponseModel responseModel = new BravoResponseModel();
+
+                if (loginResponse.Success == "1")
+                {
+                    var requestModel = await catPartnerBankService.GetModelBankInfoToSync(bankId);
+
+                    switch (action)
+                    {
+                        case ACTION.ADD:
+                            response = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSBankInfoSyncAdd", requestModel, loginResponse.TokenKey);
+                            responseModel = await response.Content.ReadAsAsync<BravoResponseModel>();
+                            break;
+                        case ACTION.UPDATE:
+                            response = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSBankInfoSyncUpdate", requestModel, loginResponse.TokenKey);
+                            responseModel = await response.Content.ReadAsAsync<BravoResponseModel>();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (responseModel.Success == "1")
+                {
+                    var catBankModel = await catBankService.Get(x => x.Id == bankId).FirstOrDefaultAsync();
+                    catBankModel.ApproveStatus = "Processing";
+                    hs = catBankService.Update(catBankModel, x => x.Id == bankId);
+
+                    ResultHandle result = new ResultHandle { Status = true, Message = "Sync Data to Accountant System Successful", Data = responseModel };
+                    return Ok(result);
+                }
+                else
+                {
+                    ResultHandle result = new ResultHandle { Status = false, Message = "Sync Data Fail", Data = responseModel };
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
+            }
         }
     }
 }

@@ -23,8 +23,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public string Source { get; set; }
         public Guid? BankId { get; set; }
         public string BankAccountName { get; set; }
-        public string ApproveStatus { get; set; }
-        public string BeneficiaryAddress { get; set; }
-        public string ApproveDescription { get; set; }
     }
 }
