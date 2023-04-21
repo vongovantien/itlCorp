@@ -288,6 +288,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
 
         } else {
             if (this.isCombineReceipt) {
+                body.isCombineReceipt = this.isCombineReceipt;
                 if(this.typeToGet.toLowerCase() === 'credit'){
                     this._accountingRepo.getDataIssueCreditAgency(body)
                     .pipe(catchError(this.catchError))
@@ -312,7 +313,6 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                         },
                     );
                 }else{
-                    body.isCombineReceipt = this.isCombineReceipt;
                     this._accountingRepo.getDataIssueAgencyPayment(body)
                     .pipe(catchError(this.catchError))
                     .subscribe(
