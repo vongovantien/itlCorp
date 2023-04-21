@@ -5807,7 +5807,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_DONE) return new HandleState((object)"Not allow save draft. Receipt has been done");
                             if (receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_CANCEL) return new HandleState((object)"Not allow save draft. Receipt has canceled");
 
-                            model.PaymentRefNo = string.IsNullOrEmpty(model.PaymentRefNo) ? receiptCurrent.PaymentRefNo : model.PaymentRefNo;
+                            receiptCurrent.PaymentRefNo = string.IsNullOrEmpty(model.PaymentRefNo) ? receiptCurrent.PaymentRefNo : model.PaymentRefNo;
                             receiptCurrent.UserModified = currentUser.UserID;
                             receiptCurrent.DatetimeModified = DateTime.Now;
                             receiptCurrent.PaymentMethod = model.PaymentMethod;
