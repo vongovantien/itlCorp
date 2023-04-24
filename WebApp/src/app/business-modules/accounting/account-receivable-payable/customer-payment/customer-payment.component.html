@@ -119,15 +119,6 @@
                                                             'VND'?cps.paidAmountVnd:cps.paidAmountUsd) | number
                                                             :'.0-3'}}</span>
                                                     </td>
-                                                    <td style="min-width: 500px; white-space:initial">
-                                                        <span>{{cps.description}}</span>
-                                                    </td>
-                                                    <td>
-                                                        {{cps.class}}
-                                                    </td>
-                                                    <td>
-                                                        {{cps.paymentMethod}}
-                                                    </td>
                                                     <td *ngIf="_receiptType === 'Agent'">
                                                         <div *ngIf="cps?.arcbno">
                                                             <ng-container *ngIf="cps.status != 'Cancel'; else CancelARCB">
@@ -138,6 +129,15 @@
                                                                 </a>
                                                             </ng-template>
                                                         </div>
+                                                    </td>
+                                                    <td style="min-width: 500px; white-space:initial">
+                                                        <span>{{cps.description}}</span>
+                                                    </td>
+                                                    <td>
+                                                        {{cps.class}}
+                                                    </td>
+                                                    <td>
+                                                        {{cps.paymentMethod}}
                                                     </td>
                                                     <td class="text-right">
                                                         <span>{{cps.finalPaidAmount | number :'.0-3'}}</span>
