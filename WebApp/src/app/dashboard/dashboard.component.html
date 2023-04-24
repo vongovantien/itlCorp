@@ -49,10 +49,10 @@
             <div class="m-portlet__body">
                 <form-search-tracking (onChangeBackGround)="onChangeLoading($event)" (onChangeType)="getType($event)"
                     (onChangeKeyWork)="getValueSearch($event)"></form-search-tracking>
+                <div *ngIf="isLoading === true" class="loader-container m--margin-top-10">
+                    <img src="assets/icons/loader.gif" alt="Loading...">
+                </div>
                 <ng-container *ngIf="isShowBackground === true">
-                    <div *ngIf="isLoading === true" class="loader-container m--margin-top-10">
-                        <img src="assets/icons/loader.gif" alt="Loading...">
-                    </div>
                     <div class="dashboard-background">
                         <div class="dashboard-background--image">
                         </div>
