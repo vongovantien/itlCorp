@@ -1,30 +1,29 @@
-﻿using eFMS.API.ForPartner.Service.Models;
-using eFMS.API.ForPartner.DL.Models;
-using ITL.NetCore.Connection.BL;
-using System;
-using ITL.NetCore.Connection.EF;
-using eFMS.IdentityServer.DL.UserManager;
-using AutoMapper;
-using System.Linq;
-using ITL.NetCore.Common;
-using Microsoft.Extensions.Localization;
-using Microsoft.AspNetCore.Hosting;
-using eFMS.API.Common.Helpers;
-using Microsoft.Extensions.Options;
+﻿using AutoMapper;
 using eFMS.API.Common;
+using eFMS.API.Common.Helpers;
 using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
-using System.Collections.Generic;
-using Newtonsoft.Json;
-using eFMS.API.ForPartner.Service.Contexts;
-using ITL.NetCore.Connection;
-using System.Data.SqlClient;
-using eFMS.API.ForPartner.Service.ViewModels;
-using System.Data;
+using eFMS.API.ForPartner.DL.Models;
 using eFMS.API.ForPartner.DL.ViewModel;
-using eFMS.API.ForPartner.DL.Models.Receivable;
-using System.Threading.Tasks;
+using eFMS.API.ForPartner.Service.Contexts;
+using eFMS.API.ForPartner.Service.Models;
+using eFMS.API.ForPartner.Service.ViewModels;
+using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
+using ITL.NetCore.Connection.BL;
+using ITL.NetCore.Connection.EF;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.ForPartner.DL.Service
 {
@@ -586,7 +585,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     invoice.SalesmanId = acctSOARepository.Get(x => x.Soano == firstCharge.Soano && x.Customer == partner.Id).FirstOrDefault()?.SalemanId;
                 }
-                if(string.IsNullOrEmpty(invoice.SalesmanId))
+                if (string.IsNullOrEmpty(invoice.SalesmanId))
                 {
                     invoice.SalesmanId = acctCdNoteRepo.Get(x => x.Code == firstCharge.DebitNo && x.PartnerId == partner.Id).FirstOrDefault()?.SalemanId;
                 }
@@ -740,7 +739,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         {
                             return new HandleState((object)"Không tìm thấy hóa đơn");
                         }
-                       
+
                         if (accPaymentService.CheckInvoicePayment(new List<Guid> { invoiceToDelete.Id }))
                         {
                             return new HandleState((object)string.Format("Hóa đơn {0} đã tồn tại phiếu thu, vui lòng check lại với bộ Phận Thu Công Nợ (AR) ", invoiceToDelete.InvoiceNoReal));
@@ -805,7 +804,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             {
                                 charge.AcctManagementId = null;
                                 charge.ReferenceNo = null;
-                                if(charge.Type == ForPartnerConstants.TYPE_CHARGE_SELL)
+                                if (charge.Type == ForPartnerConstants.TYPE_CHARGE_SELL)
                                 {
                                     charge.InvoiceNo = null;
                                     charge.SeriesNo = null;
@@ -1341,7 +1340,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 return result;
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new HandleState((object)"Error");
             }
@@ -1553,7 +1552,7 @@ namespace eFMS.API.ForPartner.DL.Service
             settlement.ReasonReject = reason;
 
             var surcharges = surchargeRepo.Get(x => x.SettlementCode == settlement.SettlementNo).ToList();
-            if(surcharges.Any(x => x.Type == ForPartnerConstants.TYPE_CHARGE_BUY && x.AcctManagementId != null
+            if (surcharges.Any(x => x.Type == ForPartnerConstants.TYPE_CHARGE_BUY && x.AcctManagementId != null
             || (x.Type == ForPartnerConstants.TYPE_CHARGE_OBH && x.PayerAcctManagementId != null)))
             {
                 return new HandleState((object)string.Format("{0} đã đồng bộ dữ liệu AP", settlement.SettlementNo));
@@ -1804,7 +1803,8 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     return new HandleState((object)existInvoice);
                 }
-            } else
+            }
+            else
             {
                 if (surcharges.Any(x => x.Type == ForPartnerConstants.TYPE_CHARGE_BUY && x.AcctManagementId != null
                 || (x.Type == ForPartnerConstants.TYPE_CHARGE_OBH && x.PayerAcctManagementId != null)))
@@ -2304,7 +2304,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
                 return new HandleState(result.Status, "Success");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new HandleState((object)"Error");
             }
@@ -2385,9 +2385,23 @@ namespace eFMS.API.ForPartner.DL.Service
                 .Select(s => new
                 {
                     voucherData = s.FirstOrDefault(),
-                   
-                    surcharges = s.Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd,
-                        c.InvoiceNo, c.InvoiceDate, c.SerieNo, c.ExchangeRate, c.BravoRefNo, c.Currency }).ToList()
+
+                    surcharges = s.Select(c => new
+                    {
+                        c.VoucherNo,
+                        c.VoucherDate,
+                        c.ChargeId,
+                        c.AmountVnd,
+                        c.AmountUsd,
+                        c.VatAmountVnd,
+                        c.VatAmountUsd,
+                        c.InvoiceNo,
+                        c.InvoiceDate,
+                        c.SerieNo,
+                        c.ExchangeRate,
+                        c.BravoRefNo,
+                        c.Currency
+                    }).ToList()
                 })
                 .ToList();
 
@@ -2412,32 +2426,33 @@ namespace eFMS.API.ForPartner.DL.Service
 
                     var surchargesIds = item.surcharges.Select(x => x.ChargeId).ToList();
                     var surcharges = surchargeRepo.Get(x => surchargesIds.Contains(x.Id)).ToList();
-                    if(item.voucherData.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE && surcharges.Count == 0)
+                    if (item.voucherData.JobNo != ForPartnerConstants.TRANSACTION_TYPE_BALANCE && surcharges.Count == 0)
                     {
                         return new ResultHandle() { Status = false, Message = string.Format("Không tìm thấy ds charge {0}", string.Join(",", surchargesIds)) };
                     }
-                    if(itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL)
+                    if (itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL)
                     {
                         _totalAmountVnd = item.surcharges.Sum(x => x.AmountVnd + x.VatAmountVnd);  // có lệch giữa efms-bravo vnd vs usd?.
-                    } else
+                    }
+                    else
                     {
                         _totalAmountUsd = item.surcharges.Sum(x => x.VatAmountUsd + x.AmountUsd);
                     }
 
                     // Get saleman nếu có chứng từ
-                    var soaNoList = surcharges.Where(x => !string.IsNullOrEmpty(x.Soano)).Select(x=>x.Soano).Distinct().ToList();
+                    var soaNoList = surcharges.Where(x => !string.IsNullOrEmpty(x.Soano)).Select(x => x.Soano).Distinct().ToList();
                     var salesManId = string.Empty;
                     if (soaNoList.Count > 0)
                     {
                         salesManId = acctSOARepository.Get(x => soaNoList.Any(z => z == x.Soano) && x.Customer == customer.Id).FirstOrDefault()?.SalemanId;
                     }
-                    if(string.IsNullOrEmpty(salesManId))
+                    if (string.IsNullOrEmpty(salesManId))
                     {
                         var debitNoList = surcharges.Where(x => !string.IsNullOrEmpty(x.DebitNo)).Select(x => x.DebitNo).Distinct().ToList();
-                        if(debitNoList.Count > 0)
+                        if (debitNoList.Count > 0)
                         {
-                            salesManId = acctCdNoteRepo.Get(x => debitNoList.Any(z=>z== x.Code) && x.PartnerId == customer.Id).FirstOrDefault()?.SalemanId;
-                        }                        
+                            salesManId = acctCdNoteRepo.Get(x => debitNoList.Any(z => z == x.Code) && x.PartnerId == customer.Id).FirstOrDefault()?.SalemanId;
+                        }
                     }
 
                     AccAccountingManagement voucher = new AccAccountingManagement
@@ -2660,11 +2675,12 @@ namespace eFMS.API.ForPartner.DL.Service
                         return new ResultHandle() { Status = false, Message = updateSurchargeVoucher.Message };
                     }
                 }
-            } else
+            }
+            else
             {
                 rs.Message = "Dữ liệu động bộ không có thông tin để tạo voucher.";
             }
-            
+
             return rs;
         }
 
@@ -2929,13 +2945,13 @@ namespace eFMS.API.ForPartner.DL.Service
                 hsDeletVoucher = new HandleState(false);
             }
 
-            if(hsDeletVoucher.Success)
+            if (hsDeletVoucher.Success)
             {
                 switch (model.DocType)
                 {
                     case "SOA":
                         var soa = acctSOARepository.First(x => x.Soano == model.DocCode);
-                        if(soa != null)
+                        if (soa != null)
                         {
                             soa.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                             soa.UserModified = currentUser.UserID;

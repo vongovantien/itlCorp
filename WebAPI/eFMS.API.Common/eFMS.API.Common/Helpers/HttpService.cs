@@ -23,7 +23,7 @@ namespace eFMS.API.Common.Helpers
 
                 if (!string.IsNullOrEmpty(token))
                 {
-                    token = token.Split()[1]; // remove bearer
+                    token = token.Split().Length > 1 ? token.Split()[1] : token; // remove bearer
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 }
 

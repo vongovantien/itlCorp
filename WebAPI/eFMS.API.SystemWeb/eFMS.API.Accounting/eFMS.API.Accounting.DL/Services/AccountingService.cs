@@ -207,7 +207,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                              ExchangeRate = GetExchangeRate(ad.RequestDate, ad.AdvanceCurrency),
                                                              DueDate = ad.PaymentTerm,
                                                              PaymentMethod = ad.PaymentMethod == "Bank" ? "Bank Transfer" : ad.PaymentMethod,
-                                                             
+
                                                          };
                 List<BravoAdvanceModel> data = queryAdv.ToList();
                 foreach (var item in data)
@@ -373,7 +373,7 @@ namespace eFMS.API.Accounting.DL.Services
                             item.Payee = settle.Payee;
                             item.CurrencyCode = settle.SettlementCurrency;
                             item.SettleAmount = settle.Amount;
-
+                            item.BankAccountNo = settle.BankAccountNo;
                             // Ds Surcharge của settlement.
                             //IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == item.ReferenceNo);
                             var surcharges = GetShipmentSurchargesData(item.ReferenceNo, "SETTLEMENT").AsQueryable();
@@ -763,7 +763,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     charges.Add(charge);
 
-                    if(string.IsNullOrEmpty(hblId))
+                    if (string.IsNullOrEmpty(hblId))
                     {
                         hblId = surcharge.Hblid.ToString();
                     }
@@ -867,7 +867,7 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
                         // tính net amount và vat amount theo phí
-                        if (currencyId == AccountingConstants.CURRENCY_LOCAL) 
+                        if (currencyId == AccountingConstants.CURRENCY_LOCAL)
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
                             _taxMoney = surcharge.VatAmountVnd ?? 0;
@@ -922,7 +922,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.IsRefund = 0;
 
                         charges.Add(charge);
-                        if(string.IsNullOrEmpty(hblId))
+                        if (string.IsNullOrEmpty(hblId))
                         {
                             hblId = surcharge.Hblid.ToString();
                         }
@@ -1216,7 +1216,7 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
                         // tính net amount và vat amount theo phí
-                        
+
                         if (currencyId == AccountingConstants.CURRENCY_LOCAL)
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
@@ -1529,7 +1529,7 @@ namespace eFMS.API.Accounting.DL.Services
                     data = invalidSVouchers;
                     return new HandleState("Danh sách voucher không hợp lệ");
                 }
-                
+
                 {
                     try
                     {
@@ -1781,7 +1781,7 @@ namespace eFMS.API.Accounting.DL.Services
             return customerName;
         }
 
-        private string  GetLinkCdNote(string cdNoteNo, Guid jobId, string currency)
+        private string GetLinkCdNote(string cdNoteNo, Guid jobId, string currency)
         {
             string _link = string.Empty;
             if (cdNoteNo.Contains("CL"))
@@ -2669,7 +2669,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             if ((catagory == "SOA_DEBIT" || catagory == "CDNOTE_DEBIT" || catagory == "CDNOTE_INVOICE") && emailReceiveDebit?.FirstOrDefault() != null)
             {
-                emails =emailReceiveDebit?.FirstOrDefault().EmailInfo.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+                emails = emailReceiveDebit?.FirstOrDefault().EmailInfo.Split(';').Where(x => x.ToString() != string.Empty).ToList();
             }
             if ((catagory == "SOA_CREDIT" || catagory == "CDNOTE_CREDIT") && emailReceiveCredit?.FirstOrDefault() != null)
             {
@@ -2786,7 +2786,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var smUserNotify = sysUserNotifyRepository.SubmitChanges();
                     trans.Commit();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     trans.Rollback();
                 }
@@ -3148,7 +3148,7 @@ namespace eFMS.API.Accounting.DL.Services
             string account = invoiceAccountNo;
             if (type == "COLL_ADV")
             {
-                if(receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                if (receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
                     account = "13114";
                 }
@@ -3196,7 +3196,7 @@ namespace eFMS.API.Accounting.DL.Services
                         return receipt.PaymentRefNo + "CR";
                     }
                 case "COLL_ADV":
-                    return receipt.PaymentRefNo + "_AD"; 
+                    return receipt.PaymentRefNo + "_AD";
                 default:
                     return receipt.PaymentRefNo;
             }
@@ -3213,7 +3213,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 return "Công Nợ Cấn Trừ";
             }
-           
+
             if (type == "COLL_ADV")
             {
                 if (string.IsNullOrEmpty(receipt.Description))
@@ -3238,7 +3238,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return "Công Nợ Cấn Trừ";
             }
-            if(type == "COLL_ADV")
+            if (type == "COLL_ADV")
             {
                 return "Công Nợ thu ứng trước";
             }
@@ -3555,7 +3555,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             var debit = cdNoteRepository.Get(x => x.Code == item)?.FirstOrDefault();
                             if (debit == null) continue;
-                            if(debit?.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
+                            if (debit?.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
                             {
                                 messageError = stringLocalizer[AccountingLanguageSub.MSG_SOA_DEBIT_PREPAID_NOT_BE_CONFIRMED];
                                 break;
@@ -3615,7 +3615,7 @@ namespace eFMS.API.Accounting.DL.Services
             //        });
             //    }
             //}
-            
+
             string queryParamUrlAttachFile = string.Format(@"/en/#/home/tool/file-management/user-attach-file?module={0}&folder={1}&objectId={2}&billingNo={3}", "Accounting", folder, objectId, billingNo);
             results.Add(new BravoAttachDoc
             {

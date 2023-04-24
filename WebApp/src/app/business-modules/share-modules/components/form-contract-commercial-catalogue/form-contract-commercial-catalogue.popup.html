@@ -549,7 +549,7 @@
                                             </span>
                                         </ng-container>
                                         <ng-container *ngIf="!isLoading && !!files && isUpdate">
-                                            <li *ngFor="let file of files">
+                                            <p *ngFor="let file of files">
                                                 <a [href]="file.url" target="_blank" [title]="file.name"
                                                     download>{{file.name}}</a>
                                                 <span class="pointer text-center">
@@ -557,7 +557,7 @@
                                                         <i class="la la-times fa-lg text-danger"></i>
                                                     </a>
                                                 </span>
-                                            </li>
+                                            </p>
                                         </ng-container>
                                     </div>
                                 </div>

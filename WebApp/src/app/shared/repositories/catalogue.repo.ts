@@ -1489,4 +1489,13 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+
+    reviseBankInformation(bankId: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerBank/ReviseBankInformation`, null, { bankId: bankId});
+    }
+
+    syncBankInfoToAccountantSystem(requestList: any[]) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerBank/SyncBankInfoToAccountantSystem`, requestList);
+    }
 }

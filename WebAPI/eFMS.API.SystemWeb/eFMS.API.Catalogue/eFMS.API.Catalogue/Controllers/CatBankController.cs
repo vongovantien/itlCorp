@@ -42,8 +42,10 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="service">inject interface ICatBankService</param>
         /// <param name="currUser">inject interface ICurrentUser</param>
         /// <param name="hostingEnvironment">inject interface IHostingEnvironment</param>
-        public CatBankController(IStringLocalizer<LanguageSub> localizer, ICatBankService service,
-            ICurrentUser currUser, IHostingEnvironment hostingEnvironment)
+        public CatBankController(IStringLocalizer<LanguageSub> localizer,
+            ICatBankService service,
+            ICurrentUser currUser,
+            IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catBankService = service;
@@ -116,7 +118,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult Post(CatBankModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            if(model.PartnerId == null)
+            if (model.PartnerId == null)
             {
                 var checkExistMessage = CheckExist(string.Empty, model);
                 if (checkExistMessage.Length > 0)
@@ -154,8 +156,7 @@ namespace eFMS.API.Catalogue.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
                 }
             }
-     
-           
+
             var hs = catBankService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -206,7 +207,7 @@ namespace eFMS.API.Catalogue.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
             }
@@ -274,15 +275,6 @@ namespace eFMS.API.Catalogue.Controllers
         }
 
 
-        [HttpGet]
-        [Route("GetBankByPartnerId/{id}")]
-        [Authorize]
-        public async Task<IActionResult> GetBankByPartnerId(Guid id)
-        {
-            var data = await catBankService.GetBankByPartnerId(id);
-            return Ok(data);
-        }
-
         private string CheckExist(string id, CatBankModel model)
         {
             string message = string.Empty;
@@ -302,6 +294,5 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return message;
         }
-
     }
 }

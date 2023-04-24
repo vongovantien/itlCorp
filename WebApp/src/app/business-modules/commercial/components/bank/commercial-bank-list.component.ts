@@ -67,6 +67,7 @@ export class CommercialBankListComponent extends AppList {
         this.formUpdateBankPopup.partnerId = this.partnerId;
         if (!this.formUpdateBankPopup.isUpdate) {
             this.formUpdateBankPopup.formGroup.reset();
+            this.formUpdateBankPopup.beneficiaryAddress.setValue(this.partner.addressShippingVn);
         }
         this.formUpdateBankPopup.show();
     }

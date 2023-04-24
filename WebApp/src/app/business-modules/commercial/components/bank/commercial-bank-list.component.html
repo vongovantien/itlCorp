@@ -4,7 +4,6 @@
         <div class="collapse show" id="data-partner">
             <div class="row m--margin-bottom-10">
                 <div class="col-lg-12 d-flex align-items-center justify-content-between">
-
                     <div class="form-group col-lg-4 p-1">
                         <div class="m-input-icon m-input-icon--right">
                             <input type="text" class="form-control m-input m-input--square" placeholder="Search"
@@ -39,7 +38,8 @@
                                         <app-permission-button *ngIf="!!partner && partner.permission?.allowUpdate"
                                             type="detail" (onClick)="gotoDetailPartnerBank(bank.id)">
                                         </app-permission-button>
-                                        <app-permission-button *ngIf="!!partner && partner.permission?.allowDelete"
+                                        <app-permission-button
+                                            *ngIf="!!partner && !!bank && partner.permission?.allowDelete && bank.approveStatus !== 'Approved' && bank.approveStatus !=='Processing'"
                                             type="delete" (onClick)="onDeletePartnerBank(bank.id)">
                                         </app-permission-button>
                                     </div>

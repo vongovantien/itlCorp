@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Models.Catalogue;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
 using eFMS.IdentityServer.DL.UserManager;
@@ -10,6 +11,7 @@ using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,18 +23,23 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IContextBase<CatBank> catBankRepository;
         private readonly IStringLocalizer stringLocalizer;
-
+        private readonly IContextBase<CatPartner> catPartnerRepository;
+        private readonly IContextBase<SysImage> sysImageRepository;
         public CatPartnerBankService(IContextBase<CatPartnerBank> repository,
             IMapper mapper,
             IContextBase<SysUser> sysUserRepo,
             IContextBase<CatBank> catBankRepo,
             IStringLocalizer<LanguageSub> localizer,
-            ICurrentUser currUser) : base(repository, mapper)
+            ICurrentUser currUser,
+            IContextBase<CatPartner> catPartnerRepo,
+            IContextBase<SysImage> sysImageRepo) : base(repository, mapper)
         {
             currentUser = currUser;
             sysUserRepository = sysUserRepo;
             stringLocalizer = localizer;
             catBankRepository = catBankRepo;
+            catPartnerRepository = catPartnerRepo;
+            sysImageRepository = sysImageRepo;
         }
 
         #region CRUD
@@ -44,6 +51,7 @@ namespace eFMS.API.Catalogue.DL.Services
             newItem.DatetimeCreated = newItem.DatetimeModified = DateTime.Now;
             newItem.UserCreated = newItem.UserModified = currentUser.UserID;
             newItem.Active = true;
+            newItem.ApproveStatus = "New";
             try
             {
                 result = await DataContext.AddAsync(newItem);
@@ -73,6 +81,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                  BankName = catBank.BankNameEn,
                                  BankCode = catBank.Code,
                                  Source = catBank.Source,
+                                 ApproveStatus = partner.ApproveStatus,
                                  UserCreated = partner.UserCreated,
                                  UserModified = partner.UserModified,
                                  DatetimeCreated = partner.DatetimeCreated,
@@ -102,6 +111,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                  BankName = catBank.BankNameEn,
                                  BankCode = catBank.Code,
                                  Source = catBank.Source,
+                                 ApproveStatus = partner.ApproveStatus,
                                  UserCreated = partner.UserCreated,
                                  UserModified = partner.UserModified,
                                  DatetimeCreated = partner.DatetimeCreated,
@@ -133,7 +143,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 return result;
             }
             catch (Exception ex)
-            {   
+            {
                 result = new HandleState(ex.Message);
             }
             return result;
@@ -145,5 +155,73 @@ namespace eFMS.API.Catalogue.DL.Services
             return hs;
         }
         #endregion
+
+        public async Task<HandleState> ReviseBankInformation(Guid bankId)
+        {
+            var bankDetail = await DataContext.Where(x => x.Id == bankId).FirstOrDefaultAsync();
+            bankDetail.ApproveStatus = "Revise";
+            var hs = DataContext.Update(bankDetail, x => x.Id == bankId);
+
+            return hs;
+        }
+
+        public async Task<List<BankSyncModel>> GetListPartnerBankInfoToSync(List<Guid> partnerBankIds)
+        {
+            var hs = new HandleState();
+            var dataReturn = new List<BankSyncModel>();
+            var bankDetails = await DataContext.WhereAsync(x => partnerBankIds.Contains(x.Id));
+            foreach (var item in bankDetails)
+            {
+                var partner = await catPartnerRepository.Get(x => x.Id == item.PartnerId.ToString()).FirstOrDefaultAsync();
+                var bank = await catBankRepository.Get(x => x.Id == item.BankId).FirstOrDefaultAsync();
+
+                var lstbankDetail = new List<BankDetail>
+                {
+                    new BankDetail
+                    {
+                        BankName = bank.BankNameEn,
+                        BankCode = bank.Code,
+                        BankAccountNo = item.BankAccountNo,
+                        SwiftCode = item.SwiftCode,
+                        Address = item.BankAddress
+                    }
+                };
+
+                var lstAttachedFile = await sysImageRepository.Get(x => x.ObjectId == item.Id.ToString())
+                .Select(x => new AttachedDocument
+                {
+                    AttachDocDate = x.DateTimeCreated,
+                    AttachDocName = x.Name,
+                    AttachDocPath = x.Url,
+                    AttachDocRowId = x.Id,
+                }).ToListAsync();
+
+                var dataSync = new BankSyncModel
+                {
+                    Details = lstbankDetail,
+                    CustomerCode = partner.AccountNo,
+                    AtchDocInfo = lstAttachedFile
+                };
+                dataReturn.Add(dataSync);
+            }
+
+
+            return dataReturn;
+        }
+
+        public async Task<HandleState> UpdateByStatus(List<Guid> Ids, string status)
+        {
+            var hs = new HandleState();
+            var partnerBanks = DataContext.Get(x => Ids.Contains(x.Id));
+
+            foreach (var item in partnerBanks)
+            {
+                item.ApproveStatus = status;
+                hs = await DataContext.UpdateAsync(item, x => x.Id == item.Id, false);
+            }
+
+            hs = DataContext.SubmitChanges();
+            return hs;
+        }
     }
 }

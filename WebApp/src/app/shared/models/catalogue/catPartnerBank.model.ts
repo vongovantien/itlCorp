@@ -19,6 +19,8 @@ export class PartnerBank {
     note: string = '';
     source: string = '';
     bankAccountName: string = '';
+    approveStatus: string = '';
+    beneficiaryAddress: string = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
