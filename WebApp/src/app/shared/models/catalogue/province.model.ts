@@ -1,8 +1,8 @@
 export class ProviceModel {
     id: string;
     code: string;
-    name_EN: string;
-    name_VN: string;
+    nameEn: string;
+    nameVn: string;
     areaID: string;
     countryID: number;
     countryNameVN: string;

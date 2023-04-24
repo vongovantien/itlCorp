@@ -1,8 +1,8 @@
 export class DistrictModel {
     id: string;
     code: string;
-    name_VN: string;
-    name_EN: string;
+    nameVn: string;
+    nameEn: string;
     provinceID: string;
     provinceNameEN: string;
     provinceNameVN: string;

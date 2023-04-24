@@ -10,9 +10,9 @@ namespace eFMS.API.ReportData.Models
         public string Code { get; set; }
         public string NameEn { get; set; }
         public string NameVn { get; set; }
-        public string DistrictNameEN { get; set; }
-        public string ProvinceNameEN { get; set; }
-        public string CountryNameEN { get; set; }
+        public string DistrictName { get; set; }
+        public string ProvinceName { get; set; }
+        public string CountryName { get; set; }
         public bool? Active { get; set; }
     }
 }

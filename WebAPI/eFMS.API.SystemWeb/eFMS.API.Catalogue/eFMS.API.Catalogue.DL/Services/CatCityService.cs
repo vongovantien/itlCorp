@@ -26,17 +26,20 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
+        private readonly IContextBase<SysUser> sysUserRepository;
         private readonly IContextBase<CatCountry> catCountryRepository;
 
         public CatCityService(IContextBase<CatCity> repository,
            ICacheServiceBase<CatCity> cacheService,
            IMapper mapper,
            IStringLocalizer<LanguageSub> localizer,
+           IContextBase<SysUser> sysUserRepo,
            IContextBase<CatCountry> catCountryRepo,
            ICurrentUser user) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
+            sysUserRepository = sysUserRepo;
             catCountryRepository = catCountryRepo;
             SetChildren<CatPlace>("Id", "CountryId");
             SetChildren<CatPartner>("Id", "CountryId");
@@ -154,6 +157,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatCityModel> Query(CatCityCriteria criteria)
         {
             Expression<Func<CatCityModel, bool>> query = null;
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             if (criteria.All == null)
             {
                 query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -169,18 +173,46 @@ namespace eFMS.API.Catalogue.DL.Services
                             && (x.Active == criteria.Active || criteria.Active == null);
             }
             var data = Get(query);
-            return data;
+            List<CatCityModel> lst = new List<CatCityModel>();
+            lst = data.ToList();
+            lst.ForEach(x => {
+                var country = catCountryRepository.Where(y => y.Id == x.CountryId)?.FirstOrDefault();
+                x.CountryName = currentCulture.IetfLanguageTag == "en-US" ? country?.NameEn : country?.NameVn;
+            });
+            return lst.AsQueryable();
         }
 
+        public CatCityModel GetDetail(Guid id)
+        {
+            ClearCache();
+            CatCityModel queryDetail = Get(x => x.Id == id).FirstOrDefault();
+
+            // Get usercreate name
+            if (queryDetail.UserCreated != null)
+                queryDetail.UserCreatedName = sysUserRepository.Get(x => x.Id == queryDetail.UserCreated)?.FirstOrDefault()?.Username;
+            // Get usermodified name
+            if (queryDetail.UserCreated != null)
+                queryDetail.UserModifiedName = sysUserRepository.Get(x => x.Id == queryDetail.UserModified)?.FirstOrDefault()?.Username;
+
+            return queryDetail;
+
+        }
         public HandleState Update(CatCityModel model)
         {
-            model.DatetimeModified = DateTime.Now;
-            model.UserModified = currentUser.UserID;
-            if (model.Active == false)
+            var city = GetDetail(model.Id);
+            var entity = mapper.Map<CatCity>(city);
+            entity.DatetimeModified = DateTime.Now;
+            entity.UserModified = currentUser.UserID;
+            entity.Code = model.Code;
+            entity.NameEn = model.NameEn;
+            entity.NameVn = model.NameVn;
+            entity.CountryId = model.CountryId;
+            entity.Active = model.Active;
+            if (entity.Active == false)
             {
-                model.InactiveOn = DateTime.Now;
+                entity.InactiveOn = DateTime.Now;
             }
-            var result = Update(model, x => x.Id == model.Id);
+            var result = DataContext.Update(entity, x => x.Id == model.Id);
             if (result.Success)
             {
                 ClearCache();
@@ -240,13 +272,14 @@ namespace eFMS.API.Catalogue.DL.Services
                 else
                 {
                     var city = cities?.FirstOrDefault(x => x.Code.ToLower() == item.Code.ToLower());
-                    item.CountryName = catCountryRepository.Where(x => x.Code.ToLower() == item.CodeCountry.ToLower())?.FirstOrDefault()?.NameEn;
+                    var country = catCountryRepository.Where(x => x.Code.ToLower() == item.CodeCountry.ToLower())?.FirstOrDefault();
+                    item.CountryName = country?.NameEn;
                     if (city != null)
                     {
                         item.CodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CITY_EXISTED], item.Code);
                         item.IsValid = false;
                     }
-                    if (list.Count(x => x.Code.ToLower() == item.Code.ToLower() &&  x.CodeCountry.ToUpper() == item.CodeCountry.ToUpper()) > 1)
+                    if (list.Count(x => x.Code.ToLower() == item.Code.ToLower() &&  x.CountryId == country.Id) > 1)
                     {
                         item.CodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CITY_CODE_DUPLICATE], item.Code);
                         item.IsValid = false;

@@ -206,7 +206,7 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 1].Value = item.Code;
                 worksheet.Cells[i + 2, 2].Value = item.NameEn;
                 worksheet.Cells[i + 2, 3].Value = item.NameVn;
-                worksheet.Cells[i + 2, 4].Value = item.CountryNameEN;
+                worksheet.Cells[i + 2, 4].Value = item.CountryName;
                 string inactivechar = "";
                 if (item.Active == true)
                 {
@@ -264,9 +264,9 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 1].Value = item.Code;
                 worksheet.Cells[i + 2, 2].Value = item.NameEn;
                 worksheet.Cells[i + 2, 3].Value = item.NameVn;
-                worksheet.Cells[i + 2, 4].Value = item.DistrictNameEN;
-                worksheet.Cells[i + 2, 5].Value = item.ProvinceNameEN;
-                worksheet.Cells[i + 2, 6].Value = item.CountryNameEN;
+                worksheet.Cells[i + 2, 4].Value = item.DistrictName;
+                worksheet.Cells[i + 2, 5].Value = item.ProvinceName;
+                worksheet.Cells[i + 2, 6].Value = item.CountryName;
                 string inactivechar = "";
                 if (item.Active == true)
                 {
@@ -538,8 +538,8 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 1].Value = item.Code;
                 worksheet.Cells[i + 2, 2].Value = item.NameEn;
                 worksheet.Cells[i + 2, 3].Value = item.NameVn;
-                worksheet.Cells[i + 2, 4].Value = item.ProvinceNameEN;
-                worksheet.Cells[i + 2, 5].Value = item.CountryNameEN;
+                worksheet.Cells[i + 2, 4].Value = item.ProvinceName;
+                worksheet.Cells[i + 2, 5].Value = item.CountryName;
                 string inactivechar = "";
                 if (item.Active == true)
                 {

@@ -281,14 +281,15 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == string.Empty)
             {
-                if (catCityService.Any(x => x.Code.ToLower() == model.Code.ToLower()))
+                if (catCityService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.CountryId == model.CountryId))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catCityService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id.ToString().ToLower() != id.ToLower()))
+                if (catCityService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id.ToString().ToLower() != id.ToLower()
+                && x.CountryId == model.CountryId))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }

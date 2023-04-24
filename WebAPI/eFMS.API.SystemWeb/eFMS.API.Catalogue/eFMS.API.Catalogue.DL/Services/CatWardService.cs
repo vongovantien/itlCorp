@@ -29,7 +29,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatCity> catCityRepository;
         private readonly IContextBase<CatCountry> catCountryRepository;
         private readonly IContextBase<CatDistrict> catDistrictRepository;
-
+        private readonly IContextBase<SysUser> sysUserRepository;
 
 
         public CatWardService(IContextBase<CatWard> repository,
@@ -39,12 +39,14 @@ namespace eFMS.API.Catalogue.DL.Services
            IContextBase<CatCity> catCityRepo,
            IContextBase<CatCountry> catCountryRepo,
            IContextBase<CatDistrict> catDistrictRepo,
+           IContextBase<SysUser> sysUserRepo,
 
 
            ICurrentUser user) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
+            sysUserRepository = sysUserRepo;
             catCityRepository = catCityRepo;
             catCountryRepository = catCountryRepo;
             catDistrictRepository = catDistrictRepo;
@@ -176,6 +178,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatWardModel> Query(CatWardCriteria criteria)
         {
             Expression<Func<CatWardModel, bool>> query = null;
+            CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
             if (criteria.All == null)
             {
                 query = x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -191,18 +194,53 @@ namespace eFMS.API.Catalogue.DL.Services
                             && (x.Active == criteria.Active || criteria.Active == null);
             }
             var data = Get(query);
-            return data;
-        }
+            List<CatWardModel> lst = new List<CatWardModel>();
+            lst = data.ToList();
+            lst.ForEach(x => {
+                var city = catCityRepository.Where(y => y.Id == x.CityId)?.FirstOrDefault();
+                var country = catCountryRepository.Where(y => y.Id == x.CountryId)?.FirstOrDefault();
+                var district = catDistrictRepository.Where(y => y.Id == x.DistrictId)?.FirstOrDefault();
 
+                x.DistrictName = currentCulture.IetfLanguageTag == "en-US" ? district?.NameEn : district?.NameVn;
+                x.ProvinceName = currentCulture.IetfLanguageTag == "en-US" ? city?.NameEn : city?.NameVn;
+                x.CountryName = currentCulture.IetfLanguageTag == "en-US" ? country?.NameEn : country?.NameVn;
+
+            });
+            return lst.AsQueryable();
+        }
+        public CatWardModel GetDetail(Guid id)
+        {
+            ClearCache();
+            CatWardModel queryDetail = Get(x => x.Id == id).FirstOrDefault();
+
+            // Get usercreate name
+            if (queryDetail.UserCreated != null)
+                queryDetail.UserCreatedName = sysUserRepository.Get(x => x.Id == queryDetail.UserCreated)?.FirstOrDefault()?.Username;
+            // Get usermodified name
+            if (queryDetail.UserCreated != null)
+                queryDetail.UserModifiedName = sysUserRepository.Get(x => x.Id == queryDetail.UserModified)?.FirstOrDefault()?.Username;
+
+            return queryDetail;
+
+        }
         public HandleState Update(CatWardModel model)
         {
-            model.DatetimeModified = DateTime.Now;
-            model.UserModified = currentUser.UserID;
-            if (model.Active == false)
+            var ward = GetDetail(model.Id);
+            var entity = mapper.Map<CatWard>(ward);
+            entity.DatetimeModified = DateTime.Now;
+            entity.UserModified = currentUser.UserID;
+            entity.Code = model.Code;
+            entity.NameEn = model.NameEn;
+            entity.NameVn = model.NameVn;
+            entity.CountryId = model.CountryId;
+            entity.CityId = model.CityId;
+            entity.DistrictId = model.DistrictId;
+            entity.Active = model.Active;
+            if (entity.Active == false)
             {
-                model.InactiveOn = DateTime.Now;
+                entity.InactiveOn = DateTime.Now;
             }
-            var result = Update(model, x => x.Id == model.Id);
+            var result = DataContext.Update(entity, x => x.Id == model.Id);
             if (result.Success)
             {
                 ClearCache();

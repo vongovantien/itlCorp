@@ -17,5 +17,8 @@ namespace eFMS.API.Catalogue.DL.Models
         public string DistrictNameError { get; set; }
         public bool IsValid { get; set; }
         public string Status { get; set; }
+        public string UserCreatedName { get; set; }
+        public string UserModifiedName { get; set; }
+
     }
 }

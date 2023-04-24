@@ -23,7 +23,7 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
     code: AbstractControl;
     nameEn: AbstractControl;
     nameVn: AbstractControl;
-    country: AbstractControl;
+    countryId: AbstractControl;
     id: AbstractControl;
     active: AbstractControl;
 
@@ -56,7 +56,7 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
             nameVn: ['', Validators.compose([
                 Validators.required
             ])],
-            country: ['', Validators.compose([
+            countryId: ['', Validators.compose([
                 Validators.required
             ])],
             active: [true],
@@ -67,7 +67,7 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
         this.code = this.formProvince.controls['code'];
         this.nameEn = this.formProvince.controls['nameEn'];
         this.nameVn = this.formProvince.controls['nameVn'];
-        this.country = this.formProvince.controls['country'];
+        this.countryId = this.formProvince.controls['countryId'];
         this.active = this.formProvince.controls['active'];
         // this.id = this.formProvince.controls['id'];
     }
@@ -77,7 +77,7 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
             .subscribe(
                 (res: any) => {
                     this.countries = res;
-                    this.country.setValue(this.countries[0].id);
+                    //this.country.setValue(this.countries[0].id);
                 }
             );
     }
@@ -94,10 +94,11 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
                 code: formData.code,
                 nameEn: formData.nameEn,
                 nameVn: formData.nameVn,
-                countryId: formData.country, // * 1 = VN 
+                countryId: formData.countryId, // * 1 = VN 
                 active: !!this.isUpdate ? formData.active : true,
             };
             if (this.isUpdate) {
+                
                 this._catalogueRepo.updateProvince(body)
                     .pipe(
                         catchError(this.catchError),

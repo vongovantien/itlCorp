@@ -28,9 +28,9 @@ export class AddDistrictPopupComponent extends PopupBase implements OnInit {
     code: AbstractControl;
     nameEn: AbstractControl;
     nameVn: AbstractControl;
-    countryID: AbstractControl;
+    countryId: AbstractControl;
     active: AbstractControl;
-    provinceID: AbstractControl;
+    cityId: AbstractControl;
     id: AbstractControl;
 
     isUpdate: boolean = false;
@@ -62,10 +62,10 @@ export class AddDistrictPopupComponent extends PopupBase implements OnInit {
             nameVn: ['', Validators.compose([
                 Validators.required
             ])],
-            countryID: ['', Validators.compose([
+            countryId: ['', Validators.compose([
                 Validators.required
             ])],
-            provinceID: ['', Validators.compose([
+            cityId: ['', Validators.compose([
                 Validators.required
             ])],
             active: [true],
@@ -74,10 +74,10 @@ export class AddDistrictPopupComponent extends PopupBase implements OnInit {
         this.code = this.formAddDistrict.controls['code'];
         this.nameEn = this.formAddDistrict.controls['nameEn'];
         this.nameVn = this.formAddDistrict.controls['nameVn'];
-        this.countryID = this.formAddDistrict.controls['countryID'];
+        this.countryId = this.formAddDistrict.controls['countryId'];
         this.id = this.formAddDistrict.controls['id'];
         this.active = this.formAddDistrict.controls['active'];
-        this.provinceID = this.formAddDistrict.controls['provinceID'];
+        this.cityId = this.formAddDistrict.controls['cityId'];
     }
 
     getCountry() {
@@ -110,8 +110,8 @@ export class AddDistrictPopupComponent extends PopupBase implements OnInit {
                 code: formData.code,
                 nameEn: formData.nameEn,
                 nameVn: formData.nameVn,
-                countryId: formData.countryID,
-                cityId: formData.provinceID,
+                countryId: formData.countryId,
+                cityId: formData.cityId,
                 active: !!this.isUpdate ? formData.active : true,
                 // placeTypeId: 'District'
             };
@@ -149,13 +149,13 @@ export class AddDistrictPopupComponent extends PopupBase implements OnInit {
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'country':
-                this.countryID.setValue(data.id);
-                this.provinceID.setValue(null);
+                this.countryId.setValue(data.id);
+                this.cityId.setValue(null);
 
                 this.provinces = this.getProvinceByCountryId(data.id, this.initProvince);
                 break;
             case 'province':
-                this.provinceID.setValue(data.id);
+                this.cityId.setValue(data.id);
                 break;
             default:
                 break;

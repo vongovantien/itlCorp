@@ -56,19 +56,19 @@
                         </div>
 
                         <div class="form-group row"
-                            [ngClass]="{'m-form__group has-danger': (country.dirty && !country.valid) || (isSubmitted && !country.valid)}">
+                            [ngClass]="{'m-form__group has-danger': (countryId.dirty && !countryId.valid) || (isSubmitted && !countryId.valid)}">
                             <label class="col-lg-4 col-form-label form-control-lab" required>
                                 Country
                             </label>
                             <div class="col-lg-8">
-                                <app-combo-grid-virtual-scroll (itemSelected)="country.setValue($event.id)"
-                                    [currentActiveItemId]="{ field: 'id', value: country.value}"
+                                <app-combo-grid-virtual-scroll (itemSelected)="countryId.setValue($event.id)"
+                                    [currentActiveItemId]="{ field: 'id', value: countryId.value}"
                                     [selectedDisplayFields]="['nameEn']" [dataSources]="countries"
                                     [displayFields]="[{field: 'code', label: 'Code'}, {field: 'nameEn', label: 'Name' }]"
                                     [height]="150">
                                 </app-combo-grid-virtual-scroll>
                                 <div class="form-control-feedback"
-                                    *ngIf="isSubmitted && (country.errors | equalError: 'required') || (country.errors | equalError: 'required') && country.dirty">
+                                    *ngIf="isSubmitted && (countryId.errors | equalError: 'required') || (countryId.errors | equalError: 'required') && countryId.dirty">
                                     Country is required
                                 </div>
                             </div>

@@ -286,14 +286,19 @@ namespace eFMS.API.Catalogue.Controllers
             string message = string.Empty;
             if (id == string.Empty)
             {
-                if (catWardService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.CodeDistrict.ToLower() == model.CodeDistrict.ToLower()))
+                if (catWardService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.DistrictId.ToString().ToLower() == model.DistrictId.ToString().ToLower()
+                    && x.CityId.ToString().ToLower() == model.CityId.ToString().ToLower()
+                    && x.CountryId == model.CountryId))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
             }
             else
             {
-                if (catWardService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id.ToString().ToLower() != id.ToLower()))
+                if (catWardService.Any(x => x.Code.ToLower() == model.Code.ToLower() && x.Id.ToString().ToLower() != id.ToLower()  
+                    && x.DistrictId.ToString().ToLower() == model.DistrictId.ToString().ToLower() 
+                    && x.CityId.ToString().ToLower() == model.CityId.ToString().ToLower()
+                    && x.CountryId == model.CountryId))
                 {
                     message = stringLocalizer[LanguageSub.MSG_CODE_EXISTED].Value;
                 }
