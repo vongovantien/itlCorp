@@ -141,7 +141,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 #region SellingNoVat
                 IQueryable<SalesmanSurcharge> _chargeWithSalemanSell = Enumerable.Empty<SalesmanSurcharge>().AsQueryable();
-                if (fe.Service == "CL")
+                if (fe.Service == "CL"|| fe.Service == "TK")
                 {
                     _chargeWithSalemanSell = from ops in opsJob
                                              join sur in surcharges on ops.Hblid equals sur.Hblid into grpOps
@@ -266,7 +266,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 #region OBH Amount
                 IQueryable<SalesmanSurcharge> _chargeWithSalemanOBH = Enumerable.Empty<SalesmanSurcharge>().AsQueryable();
-                if (fe.Service == "CL")
+                if (fe.Service == "CL"||fe.Service=="TK")
                 {
                     _chargeWithSalemanOBH = from ops in opsJob
                                             join sur in surchargesOBH on ops.Hblid equals sur.Hblid into grpOps

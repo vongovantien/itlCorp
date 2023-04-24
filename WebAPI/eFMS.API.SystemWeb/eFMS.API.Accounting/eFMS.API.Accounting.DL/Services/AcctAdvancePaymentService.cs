@@ -903,7 +903,7 @@ namespace eFMS.API.Accounting.DL.Services
             var ops = opsTransactionRepo.Get(x => x.Hblid == hblId).FirstOrDefault();
             if (ops != null)
             {
-                transactionType = "CL";
+                transactionType = ops?.TransactionType;
             }
             else
             {
@@ -2781,7 +2781,7 @@ namespace eFMS.API.Accounting.DL.Services
                     IQueryable<OpsTransaction> opsTransaction = opsTransactionRepo.Get(x => x.JobNo == jobNo);
                     if (opsTransaction != null && opsTransaction.Count() > 0)
                     {
-                        transactionType = "CL";
+                        transactionType = opsTransaction.FirstOrDefault().TransactionType;
                     }
                     else
                     {
@@ -2901,7 +2901,7 @@ namespace eFMS.API.Accounting.DL.Services
                         ShipmentTypeModel shipmentTypeModel = new ShipmentTypeModel();
                         shipmentTypeModel.JobNo = item;
                         shipmentTypeModel.TransactionType = type;
-                        if (shipmentTypeModel.TransactionType == "CL")
+                        if (shipmentTypeModel.TransactionType == "CL"|| shipmentTypeModel.TransactionType == "TK")
                         {
                             var dataOps = opsTransactionRepo.Get(x => x.JobNo == item).FirstOrDefault();
                             shipmentTypeModel.isCheckedCreditRate = settingFlowRepository.Any(x => x.OfficeId == dataOps.OfficeId && x.CreditLimit == true);
@@ -2926,7 +2926,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if (item.isCheckedCreditRate == true || item.isCheckedPaymentTerm == true || item.isCheckedExpiredDate == true)
                         {
                             CatContract agreement = new CatContract();
-                            if (item.TransactionType == "CL")
+                            if (item.TransactionType == "CL"||item.TransactionType == "TK")
                             {
                                 OpsTransaction opsTransaction = new OpsTransaction();
                                 opsTransaction = opsTransactionRepo.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
