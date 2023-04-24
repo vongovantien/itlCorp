@@ -1652,6 +1652,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _payment.CreditAmountUsd = -payment.CreditAmountUsd;
                     _payment.Hblid = payment.Hblid;
                     _payment.PartnerId = payment.PartnerId;
+                    _payment.VoucherNo = payment.VoucherNo;
 
 
                     _payment.Negative = true;
@@ -5594,7 +5595,8 @@ namespace eFMS.API.Accounting.DL.Services
         private HandleState CheckExistCreditDebitTransaction(AcctReceiptModel receiptModel)
         {
             var result = new HandleState();
-            var refIds = string.Join(";", receiptModel.Payments.Select(x => string.Join(";", x.RefIds)));
+            var refIds = string.Join(";", receiptModel.Payments.Where(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH ||
+                x.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).Select(x => string.Join(";", x.RefIds)));
             var accReceipts = DataContext.Get(x => x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL && x.Status != AccountingConstants.RECEIPT_STATUS_DONE && x.Type == "Agent");
             if (!string.IsNullOrEmpty(refIds))
             {
