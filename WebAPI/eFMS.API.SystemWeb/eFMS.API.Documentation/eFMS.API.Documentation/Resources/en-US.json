@@ -112,5 +112,5 @@
   "MSG_VAT_PARTER_CODE_NOT_EXIST": "VAT Partner code {0} not exist",
   "MSG_VAT_PARTER_CODE_EMPTY": "VAT Partner Field is empty",
   "MSG_MBL_NOT_VALID_TRANSACTIONTYPE": "MBL {0} not exist in service {1}",
-  "MSG_HBL_NOT_VALID_TRANSACTIONTYPE" "HBL {0} not exist in service {1}"
+  "MSG_HBL_NOT_VALID_TRANSACTIONTYPE": "HBL {0} not exist in service {1}"
 }

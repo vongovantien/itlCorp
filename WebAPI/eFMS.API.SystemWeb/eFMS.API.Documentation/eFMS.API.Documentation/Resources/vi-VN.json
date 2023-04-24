@@ -80,5 +80,5 @@
   "MSG_MBLNO_NOT_EXIST_OFFICE": "mbl no '{0}' không tồn tại ở office {1}",
   "MSG_CUSTOM_NO_NOT_EXIST_JOB": "Custom No không tồn tại trong {0}",
   "MSG_MBL_NOT_VALID_TRANSACTIONTYPE": "MBL {0} không tồn tại trong service {1}",
-  "MSG_HBL_NOT_VALID_TRANSACTIONTYPE" "HBL {0} không tồn tại trong service {1}"
+  "MSG_HBL_NOT_VALID_TRANSACTIONTYPE": "HBL {0} không tồn tại trong service {1}"
 }
