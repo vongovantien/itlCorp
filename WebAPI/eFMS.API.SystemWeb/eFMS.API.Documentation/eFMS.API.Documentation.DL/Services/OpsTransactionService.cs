@@ -1522,6 +1522,7 @@ namespace eFMS.API.Documentation.DL.Services
                 existedMblHbl = DataContext.Any(x => x.Hwbno == hblNo
                 && x.Mblno == mblNo
                 && x.CurrentStatus != TermData.Canceled
+                && x.OfficeId == currentUser.OfficeID
                 );
             }
             else
@@ -1530,6 +1531,7 @@ namespace eFMS.API.Documentation.DL.Services
                 && x.CurrentStatus != TermData.Canceled
                 && x.Hwbno == model.Hwbno
                 && x.Mblno == model.Mblno
+                && x.OfficeId == currentUser.OfficeID
                 ).ToList();
                 if (duplicateHBLMBL.Count > 0)
                 {
