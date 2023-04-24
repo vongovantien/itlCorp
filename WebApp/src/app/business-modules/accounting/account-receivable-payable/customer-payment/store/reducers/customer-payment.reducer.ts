@@ -65,7 +65,9 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.ResetInvoiceList, (state: IReceiptState) => ({ ...state, isLoading: true, creditList: [], debitList: [], agreement: {} })),
     on(ReceiptActions.InsertAdvance, (state: IReceiptState, payload: any) => ({
         ...state,
-        debitList: [...state.debitList, payload.data]
+        debitList: [...state.debitList, payload.data],
+        creditList: [...state.creditList, payload.data],
+        partnerId: null
     })),
     on(ReceiptActions.RemoveInvoice, (state: IReceiptState, payload: any) => ({
         ...state, debitList: [...state.debitList.slice(0, payload.index), ...state.debitList.slice(payload.index + 1)]
