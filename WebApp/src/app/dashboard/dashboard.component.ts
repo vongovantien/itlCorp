@@ -231,7 +231,7 @@ export class DashboardComponent extends AppPage implements OnInit {
                             this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
                                 title: 'No Tracking Data Found',
                                 body: `
-                                <span>Sorry, we couldn't find any tracking data for you package, Please try tracking again links below:</span>
+                                <span>No package tracking data found. Please try tracking again using the links provided below:</span>
                                 <ul class = 'list-unstyled'>
                                     ${SystemConstants.TRACKING_URL.map((item, index) => `<li><a ${index === 0 && 'class="h5"'} href="${item.Url}"target="_blank" >${item.Name}</a></li>`).join('')}
                                 </ul>`,
