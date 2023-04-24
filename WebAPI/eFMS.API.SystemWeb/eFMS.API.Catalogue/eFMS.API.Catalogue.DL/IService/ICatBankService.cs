@@ -1,5 +1,4 @@
 ﻿using eFMS.API.Catalogue.DL.Models;
-using eFMS.API.Catalogue.DL.Models.CatalogueBank;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
 using ITL.NetCore.Common;
@@ -7,7 +6,6 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.IService
 {
@@ -21,8 +19,5 @@ namespace eFMS.API.Catalogue.DL.IService
         CatBankModel GetDetail(Guid id);
         List<CatBankImportModel> CheckValidImport(List<CatBankImportModel> list);
         HandleState Import(List<CatBankImportModel> data);
-        Task<IQueryable<CatBankModel>> GetBankByPartnerId(Guid id);
-        Task<HandleState> ReviseBankInformation(Guid bankId);
-        Task<List<BankSyncModel>> GetModelBankInfoToSync(Guid bankId);
     }
 }

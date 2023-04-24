@@ -1,4 +1,4 @@
-﻿namespace eFMS.API.Catalogue.DL.Models.CatalogueBank
+﻿namespace eFMS.API.Catalogue.DL.Models.Catalogue
 {
     public class BravoResponseModel
     {

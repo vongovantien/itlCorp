@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
-using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
@@ -16,37 +15,38 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.ForPartner.DL.Service
 {
-    public class CatBankService : RepositoryBase<CatBank, CatBankModel>, ICatBankService
+    public class CatPartnerBankService : RepositoryBase<CatPartnerBank, CatPartnerBankModel>, ICatPartnerBankService
     {
         private readonly IContextBase<CatPartner> catPartnerRepository;
         private readonly IContextBase<SysPartnerApi> sysPartnerApiRepository;
         private readonly IOptions<AuthenticationSetting> configSetting;
-        public CatBankService(IContextBase<CatBank> repository, IContextBase<CatPartner> catParnerRepo, IContextBase<SysPartnerApi> sysPartnerApiRepo, IOptions<AuthenticationSetting> config, IMapper mapper) : base(repository, mapper)
+        public CatPartnerBankService(IContextBase<CatPartnerBank> repository,
+            IContextBase<CatPartner> catParnerRepo,
+            IContextBase<SysPartnerApi> sysPartnerApiRepo,
+            IOptions<AuthenticationSetting> config,
+            IMapper mapper) : base(repository, mapper)
         {
             catPartnerRepository = catParnerRepo;
             sysPartnerApiRepository = sysPartnerApiRepo;
             configSetting = config;
         }
-        public async Task<HandleState> UpdateBankInfoSyncStatus(BankStatusUpdateModel model)
+
+        public async Task<HandleState> UpdatePartnerBankInfoSyncStatus(BankStatusUpdateModel model)
         {
             try
             {
                 var hs = new HandleState();
                 var partner = await catPartnerRepository.Get(x => x.AccountNo == model.PartnerCode).FirstOrDefaultAsync();
-                if (partner != null)
-                {
-                    var listBank = await DataContext.WhereAsync(x => x.PartnerId.ToString() == partner.Id);
-                    foreach (var item in model.BankInfo)
-                    {
-                        var updateItem = listBank.FirstOrDefault(x => x.BankAccountNo == item.BankAccountno);
-                        updateItem.ApproveDescription = item.Description;
-                        updateItem.ApproveStatus = item.ApproveStatus;
-                        hs = await DataContext.UpdateAsync(updateItem, x => x.Id == updateItem.Id);
-                    }
-                    return hs;
-                }
 
-                return new HandleState(LanguageSub.MSG_DATA_NOT_FOUND);
+                var listBank = await DataContext.WhereAsync(x => x.PartnerId.ToString() == partner.Id);
+                foreach (var item in model.BankInfo)
+                {
+                    var updateItem = listBank.FirstOrDefault(x => x.BankAccountNo == item.BankAccountno);
+                    updateItem.ApproveDescription = item.Description;
+                    updateItem.ApproveStatus = item.ApproveStatus;
+                    hs = await DataContext.UpdateAsync(updateItem, x => x.Id == updateItem.Id);
+                }
+                return hs;
             }
             catch (Exception)
             {

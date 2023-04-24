@@ -2,7 +2,7 @@
 
 namespace eFMS.API.ForPartner.DL.Models
 {
-    public class CatBankModel : CatBank
+    public class CatPartnerBankModel : CatPartnerBank
     {
     }
 }

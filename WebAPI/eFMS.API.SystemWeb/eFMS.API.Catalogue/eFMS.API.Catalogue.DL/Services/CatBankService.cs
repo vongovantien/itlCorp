@@ -2,7 +2,6 @@
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
-using eFMS.API.Catalogue.DL.Models.CatalogueBank;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
@@ -11,7 +10,6 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.Caching;
 using ITL.NetCore.Connection.EF;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
@@ -55,7 +53,6 @@ namespace eFMS.API.Catalogue.DL.Services
             bank.DatetimeCreated = bank.DatetimeModified = DateTime.Now;
             bank.Active = true;
             bank.UserCreated = bank.UserModified = currentUser.UserID;
-            bank.ApproveStatus = "New";
             var result = DataContext.Add(bank, false);
             DataContext.SubmitChanges();
             if (result.Success)
@@ -84,8 +81,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.Code = model.Code;
                 entity.Note = model.Note;
                 entity.Active = model.Active;
-                entity.BeneficiaryAddress = model.BeneficiaryAddress;
-                entity.ApproveStatus = model.ApproveStatus;
 
                 if (entity.Active == false)
                     entity.InactiveOn = DateTime.Now;
@@ -319,54 +314,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var result = _mapper.Map<List<CatBankModel>>(data);
 
             return result.AsQueryable();
-        }
-
-        public async Task<HandleState> ReviseBankInformation(Guid bankId)
-        {
-            var bankDetail = await DataContext.Where(x => x.Id == bankId).FirstOrDefaultAsync();
-            bankDetail.ApproveStatus = "Revise";
-            var hs = DataContext.Update(bankDetail, x => x.Id == bankId);
-
-            return hs;
-        }
-
-        public async Task<List<BankSyncModel>> GetModelBankInfoToSync(Guid bankId)
-        {
-            var hs = new HandleState();
-            var bankDetail = await DataContext.Where(x => x.Id == bankId).FirstOrDefaultAsync();
-            var partnerBank = await catPartnerRepository.Get(x => x.Id == bankDetail.PartnerId.ToString()).FirstOrDefaultAsync();
-            var lstAttachedFile = await sysImageRepository.Get(x => x.ObjectId == bankDetail.Id.ToString())
-                .Select(x => new AttachedDocument
-                {
-                    AttachDocDate = x.DateTimeCreated,
-                    AttachDocName = x.Name,
-                    AttachDocPath = x.Url,
-                    AttachDocRowId = x.Id,
-                }).ToListAsync();
-
-            var lstbankDetail = new List<BankDetail>
-            {
-                new BankDetail
-                {
-                    BankName = bankDetail.BankNameVn,
-                    BankCode = bankDetail.Code,
-                    BankAccountNo = bankDetail.BankAccountNo,
-                    SwiftCode = bankDetail.SwiftCode,
-                    Address = bankDetail.BankAddress
-                }
-            };
-
-            var lstBankRequest = new List<BankSyncModel>
-            {
-                new BankSyncModel
-                {
-                    Details = lstbankDetail,
-                    CustomerCode = partnerBank.AccountNo,
-                    AtchDocInfo = lstAttachedFile
-                }
-            };
-
-            return lstBankRequest;
         }
     }
 }

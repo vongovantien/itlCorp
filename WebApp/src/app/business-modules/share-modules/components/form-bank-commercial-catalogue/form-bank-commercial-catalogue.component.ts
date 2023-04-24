@@ -76,7 +76,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
             bankAccountName: [null, FormValidators.required],
             bankAddress: [null, FormValidators.required],
             bankName: [null, FormValidators.required],
-            bankNameEn: [null, FormValidators.required],
             bankCode: [{ value: null, disabled: true }],
             swiftCode: [null],
             note: [null],
@@ -97,6 +96,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     }
 
     getFormData() {
+        console.log(this.bankId)
         this.isSubmitted = true;
         if (this.formGroup.valid) {
             const formBody = this.formGroup.getRawValue();
@@ -160,6 +160,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
 
     onSubmitBankInfo() {
         const mergeObj = this.getFormData();
+        console.log(mergeObj)
         if (this.formGroup.valid) {
             if (!this.isUpdate) {
                 this._catalogueRepo.addNewPartnerBank(mergeObj)
@@ -212,22 +213,25 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     }
 
     onSendBankInfoToAccountantSystem(): void {
-        if (this.formGroup.valid) {
-            this.isSubmitted = true;
-            const action = !!this.bankDetail && this.bankDetail.approveStatus !== CatalogueConstants.STATUS_APPROVAL.NEW ? 'UPDATE' : 'ADD';
-            this._catalogueRepo.syncBankInfoToAccountantSystem(this.bankDetail.id, action)
-                .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: any) => {
-                        if (!!res && res.status) {
-                            this._toastService.success(res.message);
-                            this.onRequest.emit(true);
-                            this.hide();
-                        } else {
-                            this._toastService.error(res.message);
-                        }
-                    })
-        }
+        this.isSubmitted = true;
+        const requestList = [
+            {
+                Id: this.bankDetail.id,
+                action: this.bankDetail.approveStatus === CatalogueConstants.STATUS_APPROVAL.NEW ? 'ADD' : 'UPDATE',
+            }
+        ];
+        this._catalogueRepo.syncBankInfoToAccountantSystem(requestList)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (!!res && res.status) {
+                        this._toastService.success(res.message);
+                        this.onRequest.emit(true);
+                        this.hide();
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                })
     }
 
     onReviseBankInfo(): void {

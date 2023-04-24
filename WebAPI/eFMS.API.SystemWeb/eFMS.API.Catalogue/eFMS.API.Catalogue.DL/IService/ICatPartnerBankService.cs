@@ -1,5 +1,5 @@
 ﻿using eFMS.API.Catalogue.DL.Models;
-using eFMS.API.Catalogue.DL.Models.Criteria;
+using eFMS.API.Catalogue.DL.Models.Catalogue;
 using eFMS.API.Catalogue.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -17,5 +17,8 @@ namespace eFMS.API.Catalogue.DL.IService
         Task<CatPartnerBankModel> GetDetail(Guid Id);
         IQueryable<CatPartnerBankModel> GetByPartner(Guid partnerId);
         Task<HandleState> Delete(Guid Id);
+        Task<HandleState> ReviseBankInformation(Guid bankId);
+        Task<List<BankSyncModel>> GetListPartnerBankInfoToSync(List<Guid> partnerBankIds);
+        Task<HandleState> UpdateByStatus(List<Guid> ids, string status);
     }
 }

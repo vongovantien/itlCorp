@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.Catalogue.DL.Models.CatalogueBank
+namespace eFMS.API.Catalogue.DL.Models.Catalogue
 {
     public class BankSyncModel
     {
@@ -25,10 +25,5 @@ namespace eFMS.API.Catalogue.DL.Models.CatalogueBank
         public DateTime? AttachDocDate { get; set; }
         public string AttachDocName { get; set; }
         public string AttachDocPath { get; set; }
-    }
-    public enum ACTION
-    {
-        ADD,
-        UPDATE
     }
 }

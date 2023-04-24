@@ -1482,10 +1482,10 @@ export class CatalogueRepo {
 
 
     reviseBankInformation(bankId: any) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/ReviseBankInformation`, null, { bankId: bankId});
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerBank/ReviseBankInformation`, null, { bankId: bankId});
     }
 
-    syncBankInfoToAccountantSystem(bankId: any, action: string) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/SyncBankInfoToAccountantSystem`, null, { bankId: bankId, action: action });
+    syncBankInfoToAccountantSystem(requestList: any[]) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerBank/SyncBankInfoToAccountantSystem`, requestList);
     }
 }

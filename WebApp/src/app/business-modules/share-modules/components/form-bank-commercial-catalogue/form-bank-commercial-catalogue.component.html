@@ -81,6 +81,16 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group">
+                                        <label required>Beneficiary Address</label>
+                                        <input type="text" class="form-control" formControlName="beneficiaryAddress">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-lg-6">
@@ -89,7 +99,7 @@
                                 <textarea class="form-control" cols="30" rows="5" formControlName="note"></textarea>
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div *ngIf="isUpdate" class="col-md-2">
                             <div class="form-group">
                                 <label>Approval Status</label>
                                 <input type="text"
@@ -102,7 +112,8 @@
                             <label></label>
                             <label></label>
                             <div class="form-group">
-                                <input multiple style="display:none" type="file" #file (change)="chooseFileUpload($event)">
+                                <input multiple style="display:none" type="file" #file
+                                    (change)="chooseFileUpload($event)">
                                 <button
                                     *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved'"
                                     style="margin-top:5px;" (click)="file.click()" type="button"
@@ -121,7 +132,8 @@
                                 <ng-container *ngIf="!isLoading && !!fileListDetail">
                                     <li *ngFor="let file of fileListDetail"><a [href]="file.url" target="_blank"
                                             [title]="file.name" download>{{file.name}}</a>
-                                        <span class="pointer text-center" *ngIf="!readonly">
+                                        <span class="pointer text-center"
+                                            *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved'">
                                             <a title="Delete" (click)="onDeleteBankInfoFile(file)">
                                                 <i class="la la-times fa-lg text-danger"></i>
                                             </a>

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.ForPartner.DL.IService
 {
-    public interface ICatBankService : IRepositoryBase<CatBank, CatBankModel>, IForPartnerApiService
+    public interface ICatPartnerBankService : IRepositoryBase<CatPartnerBank, CatPartnerBankModel>, IForPartnerApiService
     {
-        Task<HandleState> UpdateBankInfoSyncStatus(BankStatusUpdateModel model);
+        Task<HandleState> UpdatePartnerBankInfoSyncStatus(BankStatusUpdateModel model);
     }
 }

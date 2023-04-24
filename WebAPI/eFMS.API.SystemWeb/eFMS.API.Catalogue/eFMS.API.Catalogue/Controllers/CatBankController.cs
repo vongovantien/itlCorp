@@ -18,11 +18,6 @@ using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
-using eFMS.API.Catalogue.DL.Models.CatalogueBank;
-using ITL.NetCore.Common;
-using System.Net.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -49,7 +44,6 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="hostingEnvironment">inject interface IHostingEnvironment</param>
         public CatBankController(IStringLocalizer<LanguageSub> localizer,
             ICatBankService service,
-            IOptions<ESBUrl> webUrl,
             ICurrentUser currUser,
             IHostingEnvironment hostingEnvironment)
         {
@@ -278,37 +272,6 @@ namespace eFMS.API.Catalogue.Controllers
                 return Ok(result);
             else
                 return BadRequest(new ResultHandle { Status = false, Message = hs.Exception.Message });
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("GetBankByPartnerId/{id}")]
-        [Authorize]
-        public async Task<IActionResult> GetBankByPartnerId(Guid id)
-        {
-            var data = await catBankService.GetBankByPartnerId(id);
-            return Ok(data);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("ReviseBankInformation")]
-        [Authorize]
-        public async Task<IActionResult> ReviseBankInformation(Guid bankId)
-        {
-            var hs= await catBankService.ReviseBankInformation(bankId);
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-
-            return Ok(result);
         }
 
 

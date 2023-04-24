@@ -38,8 +38,9 @@
                                         <app-permission-button *ngIf="!!partner && partner.permission?.allowUpdate"
                                             type="detail" (onClick)="gotoDetailPartnerBank(bank.id)">
                                         </app-permission-button>
-                                        <app-permission-button *ngIf="!!partner && partner.permission?.allowDelete && bank?.approveStatus !== 'Approved'"
-                                            type="delete" (onClick)="onDeleteBank(bank.id)">
+                                        <app-permission-button
+                                            *ngIf="!!partner && !!bank && partner.permission?.allowDelete && bank.approveStatus !== 'Approved' && bank.approveStatus !=='Processing'"
+                                            type="delete" (onClick)="onDeletePartnerBank(bank.id)">
                                         </app-permission-button>
                                     </div>
                                 </td>
@@ -64,4 +65,3 @@
 </div>
 <popup-form-bank-commercial-catalogue (onRequest)="onRequestBank($event)"></popup-form-bank-commercial-catalogue>
 <ng-template inject></ng-template>
-
