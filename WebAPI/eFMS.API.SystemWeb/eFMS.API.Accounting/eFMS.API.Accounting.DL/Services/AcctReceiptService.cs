@@ -4035,7 +4035,7 @@ namespace eFMS.API.Accounting.DL.Services
                         IQueryable<CsTransaction> transactions = null;
                         if (criteria.Service != null && criteria.Service.Count > 0)
                         {
-                            if (criteria.Service.Contains("CL"))
+                            if (criteria.Service.Contains("CL")|| criteria.Service.Contains("TK"))
                             {
                                 operations = opsTransactionRepository.Get(x => x.CurrentStatus != TermData.Canceled && (x.ServiceDate.HasValue ? x.ServiceDate.Value.Date >= criteria.FromDate.Value.Date && x.ServiceDate.Value.Date <= criteria.ToDate.Value.Date : false));
                             }

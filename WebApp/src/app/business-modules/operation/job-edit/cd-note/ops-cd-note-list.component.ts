@@ -124,6 +124,8 @@ export class OpsCDNoteComponent extends AppList {
             .subscribe(
                 (res: any) => {
                     if (!!res) {
+                        console.log(res);
+
                         if (res.transactionType === 'TK') {
                             this.transactionType = TransactionTypeEnum.TruckingInland;
                         } else {
@@ -325,7 +327,7 @@ export class OpsCDNoteComponent extends AppList {
                             objectId: jobId,
                             hblId: hblid,
                             templateCode: templateCode,
-                            transactionType: 'CL'
+                            transactionType: this.transactionType === TransactionTypeEnum.TruckingInland ? 'TK' : 'CL'
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
                     }
@@ -399,7 +401,7 @@ export class OpsCDNoteComponent extends AppList {
             sourcePreview$ = this._documentRepo.validateCheckPointContractPartner({
                 partnerId: this.selectedCdNote.partnerId,
                 hblId: hblidCdNote,
-                transactionType: 'CL',
+                transactionType: this.transactionType === TransactionTypeEnum.TruckingInland ? 'TK' : 'CL',
                 type: 3
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {
@@ -452,7 +454,7 @@ export class OpsCDNoteComponent extends AppList {
             sourcePreview$ = this._documentRepo.validateCheckPointContractPartner({
                 partnerId: this.selectedCdNote.partnerId,
                 hblId: this.selectedCdNote.hblid,
-                transactionType: 'CL',
+                transactionType: this.transactionType === TransactionTypeEnum.TruckingInland ? 'TK' : 'CL',
                 type: 3
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {

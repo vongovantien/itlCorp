@@ -3920,7 +3920,9 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.SuspendTime).HasMaxLength(150);
 
-                entity.Property(e => e.TransactionType).HasMaxLength(50);
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

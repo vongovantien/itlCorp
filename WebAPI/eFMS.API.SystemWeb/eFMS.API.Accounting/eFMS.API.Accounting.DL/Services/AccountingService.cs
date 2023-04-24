@@ -1787,6 +1787,9 @@ namespace eFMS.API.Accounting.DL.Services
             if (cdNoteNo.Contains("CL"))
             {
                 _link = string.Format("home/operation/job-management/job-edit/{0}?tab=CDNOTE&view={1}&export={2}", jobId.ToString(), cdNoteNo, currency);
+            }else if (cdNoteNo.Contains("TK"))
+            {
+                _link = string.Format("home/operation/trucking-inland/trucking-inland-edit/{0}?tab=CDNOTE&view={1}&export={2}", jobId.ToString(), cdNoteNo, currency);
             }
             else
             {
@@ -1942,9 +1945,9 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else
             {
-                if (cdNoteNo.Contains("IT"))
+                if (cdNoteNo.Contains("TK"))
                 {
-                    _serviceName = "Inland Trucking";
+                    _serviceName = "Trucking Inland";
                 }
                 else if (cdNoteNo.Contains("AE"))
                 {
@@ -2250,7 +2253,7 @@ namespace eFMS.API.Accounting.DL.Services
         private string GetDescriptionForSyncAcct(string chargeName, string transactionType, string clearanceNo, string mblNo, string hblNo)
         {
             var _description = string.Empty;
-            if (transactionType == "CL")
+            if (transactionType == "CL"|| transactionType == "TK")
             {
                 var _customNo = !string.IsNullOrEmpty(clearanceNo) ? string.Format("TK:{0}", clearanceNo) : string.Empty;
                 _description = string.Format("{0} {1} {2}", chargeName, hblNo, _customNo); //Format: ChargeName + HBL + ClearanceNo cũ nhất [CR: 13-01-2020]
@@ -2273,7 +2276,7 @@ namespace eFMS.API.Accounting.DL.Services
             string _billEntryNo = null;
             if (!string.IsNullOrEmpty(surcharge.Hblno))
             {
-                if (surcharge.TransactionType == "CL")
+                if (surcharge.TransactionType == "CL"|| surcharge.TransactionType == "TK")
                 {
                     _billEntryNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) ? surcharge.ClearanceNo : surcharge.Hblno;
                 }

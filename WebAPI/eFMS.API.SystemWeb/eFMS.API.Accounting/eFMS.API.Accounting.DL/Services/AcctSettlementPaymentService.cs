@@ -5225,7 +5225,7 @@ namespace eFMS.API.Accounting.DL.Services
             var ops = opsTransactionRepo.Get(x => x.Hblid == hblId).FirstOrDefault();
             if (ops != null)
             {
-                transactionType = "CL";
+                transactionType = ops?.TransactionType;
             }
             else
             {

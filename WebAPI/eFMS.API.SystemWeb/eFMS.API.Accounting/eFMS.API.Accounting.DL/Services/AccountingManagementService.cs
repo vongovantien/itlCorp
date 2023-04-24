@@ -1792,7 +1792,7 @@ namespace eFMS.API.Accounting.DL.Services
                     else
                     {
                         IQueryable<OpsTransaction> opsTransaction = opsTransactionRepo.Get(x => x.JobNo == jobNo);
-                        listTransactionType.Add("CL");
+                        listTransactionType.Add(opsTransaction.FirstOrDefault()?.TransactionType);
                     }
                 }
             }

@@ -164,7 +164,7 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
         this._documentationRepo.getDetailsCDNote(cd.jobId, cd.debitNote)
             .pipe(
                 switchMap((detail) => {
-                    if (cd.transactionType === 'CL') {
+                    if (cd.transactionType === 'CL' || cd.transactionType === 'TK') {
                         return this._documentationRepo.previewOPSCdNote({ jobId: cd.jobId, creditDebitNo: cd.debitNote, currency: 'VND', exportFormatType: _format });
                     } else if (cd.transactionType === 'AE' || cd.transactionType === 'AI') {
                         return this._documentationRepo.previewAirCdNote({ jobId: cd.jobId, creditDebitNo: cd.debitNote, currency: 'VND', exportFormatType: _format });
@@ -193,7 +193,7 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
         this._documentationRepo.getDetailsCDNote(cd.jobId, cd.debitNote)
             .pipe(
                 switchMap((detail) => {
-                    if (cd.transactionType === 'CL') {
+                    if (cd.transactionType === 'CL' || cd.transactionType === 'TK') {
                         return this._documentationRepo.previewOPSCdNote({ jobId: cd.jobId, creditDebitNo: cd.debitNote, currency: currency });
                     } else if (cd.transactionType === 'AE' || cd.transactionType === 'AI') {
                         return this._documentationRepo.previewAirCdNote({ jobId: cd.jobId, creditDebitNo: cd.debitNote, currency: currency });

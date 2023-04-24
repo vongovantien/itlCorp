@@ -23,7 +23,7 @@ namespace eFMS.API.Accounting.DL.Common
             new CommonData { Value = "SLI", DisplayName = "Sea LCL Import" },
             new CommonData { Value = "SCE", DisplayName = "Sea Consol Export" },
             new CommonData { Value = "SCI", DisplayName = "Sea Consol Import" },
-            new CommonData { Value = "IT", DisplayName = "Inland Trucking " }
+            new CommonData { Value = "TK", DisplayName = "Trucking Inland" }
         };
 
         //Define list status of SOA
