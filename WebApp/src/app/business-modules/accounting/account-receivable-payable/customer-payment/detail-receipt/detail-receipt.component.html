@@ -66,7 +66,7 @@
                             (onClick)="confirmDoneReceipt()">
                         </app-permission-button>
                     </ng-container>
-                    <ng-container *ngIf="receiptDetail?.status === 'Done' && !!receiptDetail.isReceiptBankFee">
+                    <ng-container *ngIf="receiptDetail?.status === 'Done' && !!receiptDetail.isReceiptBankFee && !receiptDetail?.arcbno">
                         <app-permission-button type="add" title="Bank Fee/Other" class="primary" icon="la la-bank"
                             [dpToggle]="dropdownMenuBankFee" mode="dropdown">
                         </app-permission-button>
