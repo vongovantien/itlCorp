@@ -315,7 +315,7 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
     onSaveAdjustDebit() {
         this.getDetailCdNote(this.jobId, this.cdNote);
     }
-    exportItem(jobId: string, code:string, format: string) {
+    exportItem(jobId: string, code: string, format: string) {
         let url: string;
         let _format = 0;
         switch (format) {
@@ -332,31 +332,31 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
                 _format = 5;
                 break;
         }
-        this._documentationRepo.getDetailsCDNote(jobId, code) 
-        .pipe(
-            switchMap(() => {
-                if (this.cdNote.includes('CL')) {
-                    return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: code, currency: 'VND', exportFormatType: _format });
-                }
-                else if (this.cdNote.includes('AE') || this.cdNote.includes('AI')) {
-                    return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: code, currency: 'VND', exportFormatType: _format });
-                }
-                return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: code, currency: 'VND', exportFormatType: _format });
-            }),
-            concatMap((x) => {
-                url = x.pathReportGenerate;
-                return this._exportRepo.exportCrystalReportPDF(x);
-            })
-        ).subscribe(
-            (res: any) => {
+        this._documentationRepo.getDetailsCDNote(jobId, code)
+            .pipe(
+                switchMap(() => {
+                    if (this.cdNote.includes('CL') || this.cdNote.includes('TK')) {
+                        return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: code, currency: 'VND', exportFormatType: _format });
+                    }
+                    else if (this.cdNote.includes('AE') || this.cdNote.includes('AI')) {
+                        return this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: code, currency: 'VND', exportFormatType: _format });
+                    }
+                    return this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: code, currency: 'VND', exportFormatType: _format });
+                }),
+                concatMap((x) => {
+                    url = x.pathReportGenerate;
+                    return this._exportRepo.exportCrystalReportPDF(x);
+                })
+            ).subscribe(
+                (res: any) => {
 
-            },
-            (error) => {
-                this._exportRepo.downloadExport(url);
-            },
-            () => {
-                console.log(url);
-            }
-        );  
+                },
+                (error) => {
+                    this._exportRepo.downloadExport(url);
+                },
+                () => {
+                    console.log(url);
+                }
+            );
     }
 }

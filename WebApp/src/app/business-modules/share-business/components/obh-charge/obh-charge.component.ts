@@ -149,7 +149,9 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             case 'receiver':
                 switch (partnerType.value) {
                     case CommonEnum.PartnerGroupEnum.CUSTOMER:
-                        const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
+                        console.log(this.transactionType);
+
+                        const transactionType: string = this.service === 'logistic' ? this.transactionType === 'TK' ? 'TK' : 'CL' : 'DOC';
                         this._documentRepo.validateCheckPointContractPartner({
                             partnerId: this.hbl.customerId,
                             transactionType: transactionType,
@@ -225,7 +227,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             case 'receiver':
                 this._toastService.clear();
                 if (!!partnerData && !!this.hbl) {
-                    const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
+                    const transactionType: string = this.service === 'logistic' ? this.transactionType === 'TK' ? 'TK' : 'CL' : 'DOC';
                     this._documentRepo.validateCheckPointContractPartner({
                         partnerId: partnerData.id,
                         transactionType: transactionType,

@@ -154,7 +154,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
             { text: 'Sea FCL Import', id: 'SFI' },
             { text: 'Sea LCL Export', id: 'SLE' },
             { text: 'Sea LCL Import', id: 'SLI' },
-            { text: 'Trucking Inland', id: 'Tk' },
+            { text: 'Trucking Inland', id: 'TK' },
         ];
     }
 

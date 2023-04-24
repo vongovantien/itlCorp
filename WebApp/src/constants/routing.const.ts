@@ -111,6 +111,7 @@ export class RoutingConstants {
             ['SLE', this.DOCUMENTATION.SEA_LCL_EXPORT],
             ['SLI', this.DOCUMENTATION.SEA_LCL_IMPORT],
             ['CL', this.LOGISTICS.JOB_MANAGEMENT],
+            ['TK', this.LOGISTICS.TRUCKING_INLAND],
         ]).get(transactionType);
     }
 

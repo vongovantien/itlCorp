@@ -671,14 +671,14 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     onSubmitDuplicateConfirm() {
-        this._documentRepo.getPartnerForCheckPointInShipment(this.opsTransaction.hblid, 'CL')
+        this._documentRepo.getPartnerForCheckPointInShipment(this.opsTransaction.hblid, this.transactionType === 'TK' ? 'TK' : 'CL')
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 switchMap((partnerIds: string[]) => {
                     if (!!partnerIds.length) {
                         const criteria: DocumentationInterface.ICheckPointCriteria = {
                             data: partnerIds,
-                            transactionType: 'CL',
+                            transactionType: this.transactionType === 'TK' ? 'TK' : 'CL',
                             settlementCode: null,
                         };
                         return this._documentRepo.validateCheckPointMultiplePartner(criteria)
@@ -779,7 +779,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             objectId: this.opsTransaction.id,
                             hblId: this.opsTransaction.hblid,
                             templateCode: 'PLSheet',
-                            transactionType: 'CL'
+                            transactionType: this.transactionType === 'TK' ? 'TK' : 'CL'
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
                     }

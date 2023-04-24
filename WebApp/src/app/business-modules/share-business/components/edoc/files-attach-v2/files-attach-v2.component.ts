@@ -15,6 +15,7 @@ import { getTransactionDetailCsTransactionState } from '../../../store';
 import { IEDocFile, IEDocUploadFile, ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
 import { AppShareEDocBase } from '../edoc.base';
 import { ShareListFilesAttachComponent } from '../list-file-attach/list-file-attach.component';
+import { log } from 'console';
 @Component({
     selector: 'files-attach-v2',
     templateUrl: './files-attach-v2.component.html',
@@ -134,9 +135,12 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
                     .pipe(takeUntil(this.ngUnsubscribe))
                     .subscribe(
                         (res: any) => {
-                            this.transactionType = 'CL';
-                            this.getDocumentType('CL');
-                            this.getEDoc('CL');
+                            console.log(res);
+                            console.log(this.transactionType);
+                            this.transactionType = res.transactionType;
+                            //this.transactionType = this.transactionType === 'TK' ? 'TK' : 'CL';
+                            this.getDocumentType(this.transactionType);
+                            this.getEDoc(this.transactionType);
                             this.jobNo = res.opstransaction?.jobNo;
                             this.isLocked = res.opstransaction?.isLocked;
                         }
