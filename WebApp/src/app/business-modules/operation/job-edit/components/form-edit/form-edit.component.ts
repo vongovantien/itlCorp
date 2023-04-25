@@ -208,6 +208,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                     this.salesmans = salesmans;
                 })
         }
+        console.log(this.transactionType);
 
     }
 
@@ -342,7 +343,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                     return;
                 }
 
-                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.CL_CODE, this.shipmentType.value)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, this.transactionType === 'TK' ? 'TK' : ChargeConstants.CL_CODE, this.shipmentType.value)
                     .subscribe(
                         (res: any) => {
                             if (!!res) {
@@ -443,7 +444,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     getSalesmanList(data: any) {
         this.shipmentType.setValue(data);
-        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value, this.opsTransaction.officeId)
+        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, this.transactionType === 'TK' ? 'TK' : ChargeConstants.CL_CODE, this.shipmentType.value, this.opsTransaction.officeId)
             .subscribe(
                 (res: any) => {
                     if (!!res) {
