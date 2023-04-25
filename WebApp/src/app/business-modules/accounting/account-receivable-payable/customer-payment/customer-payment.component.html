@@ -117,7 +117,7 @@
                                                     <td class="text-right">
                                                         <span>{{(cps.currencyId ===
                                                             'VND'?cps.paidAmountVnd:cps.paidAmountUsd) | number
-                                                            :'.0-3'}}</span>
+                                                            :'.2-3'}}</span>
                                                     </td>
                                                     <td *ngIf="_receiptType === 'Agent'">
                                                         <div *ngIf="cps?.arcbno">
@@ -140,7 +140,7 @@
                                                         {{cps.paymentMethod}}
                                                     </td>
                                                     <td class="text-right">
-                                                        <span>{{cps.finalPaidAmount | number :'.0-3'}}</span>
+                                                        <span>{{cps.finalPaidAmount | number :'.2-3'}}</span>
                                                     </td>
                                                     <td>
                                                         <span>{{cps.currencyId}}</span>
