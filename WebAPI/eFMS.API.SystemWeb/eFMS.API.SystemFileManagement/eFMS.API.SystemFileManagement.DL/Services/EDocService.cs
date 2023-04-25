@@ -145,6 +145,38 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             edocUploadMapModel.EDocFilesMap = lstDocMap;
             return edocUploadMapModel;
         }
+        private SysImageDetail MapToJobITL(SysImageDetail edoc)
+        {
+            var isRep = _opsTranRepo.Any(x => x.ReplicatedId == edoc.JobId);
+            if (isRep)
+            {
+                var jobITL= _opsTranRepo.Where(x => x.ReplicatedId == edoc.JobId);
+                return new SysImageDetail()
+                {
+                    BillingNo = edoc.BillingNo,
+                    BillingType = edoc.BillingType,
+                    JobId = jobITL.FirstOrDefault().Id,
+                    Id = Guid.NewGuid(),
+                    DatetimeCreated = edoc.DatetimeCreated,
+                    DatetimeModified = edoc.DatetimeModified,
+                    DepartmentId = edoc.DepartmentId,
+                    DocumentTypeId = edoc.DocumentTypeId,
+                    ExpiredDate = edoc.ExpiredDate,
+                    GenEdocId = edoc.GenEdocId,
+                    GroupId = edoc.GroupId,
+                    Hblid = edoc.Hblid,
+                    Note = edoc.Note,
+                    OfficeId = edoc.OfficeId,
+                    Source = edoc.Source,
+                    SysImageId = edoc.SysImageId,
+                    SystemFileName = edoc.SystemFileName,
+                    UserCreated = edoc.UserCreated,
+                    UserFileName = edoc.UserFileName,
+                    UserModified = edoc.UserModified,
+                };
+            }
+            return null;
+        }
         public async Task<HandleState> PostEDocAsync(EDocUploadModel model, List<IFormFile> files, string type)
         {
             HandleState result = new HandleState();
@@ -157,6 +189,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     List<SysImage> list = new List<SysImage>();
                     List<SysImageDetail> listDetail = new List<SysImageDetail>();
+                    List<SysImageDetail> listRepDetail = new List<SysImageDetail>();
 
                     string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(edoc.File.FileName)));
 
@@ -219,9 +252,17 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 Source = model.FolderName,
                                 Note = edoc.Note
                             };
-
                             listDetail.Add(sysImageDetail);
+                            listRepDetail.Add(sysImageDetail);
                             _sysImageDetailRepo.Add(sysImageDetail, false);
+                            var imageDetailClone = sysImageDetail;
+                            var mapRepToITL = MapToJobITL(imageDetailClone);
+                            if (mapRepToITL != null)
+                            {
+                                //listDetail.Add(mapRepToITL);
+                                _sysImageDetailRepo.Add(mapRepToITL, false);
+                                //_sysImageDetailRepo.SubmitChanges();
+                            }
                         }
                         else if (type == "Settlement")
                         {
@@ -960,6 +1001,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             }
                             else
                             {
+                                if(_opsTranRepo.Any(x=>x.ReplicatedId==edoc.JobId))
+                                {
+                                    var itlJob=_opsTranRepo.Get(x=>x.ReplicatedId==edoc.JobId).FirstOrDefault();
+                                    await _sysImageDetailRepo.DeleteAsync(x => x.SystemFileName == edoc.SystemFileName&&x.SysImageId==edoc.SysImageId&&x.JobId== itlJob.Id);
+                                }
                                 var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
                                 var rsDelete = deleteFile(image.KeyS3);
                                 if (rsDelete != null)
