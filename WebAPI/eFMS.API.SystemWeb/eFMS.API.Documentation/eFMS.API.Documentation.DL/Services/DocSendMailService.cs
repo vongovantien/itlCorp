@@ -781,7 +781,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == shipmentInfo.GroupId).FirstOrDefault();
 
-            _body = _body.Replace("{{emailGroup}}", groupUser.Email);
+            _body = _body.Replace("{{emailGroup}}", groupUser?.Email);
             // Get email from of person in charge
             var partnerInfo = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.Email; //Email to
             if (string.IsNullOrEmpty(partnerInfo))
