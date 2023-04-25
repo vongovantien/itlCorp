@@ -2567,31 +2567,54 @@ namespace eFMS.API.Accounting.DL.Services
                     );
                     if (hasPayments.Count() > 0)
                     {
-                        var query = from p in hasPayments
-                                    join r in DataContext.Get() on p.ReceiptId equals r.Id
-                                    where r.Status == AccountingConstants.RECEIPT_STATUS_DONE
-                                    select new { r.Id, r.PaymentMethod, p.InvoiceNo, p.VoucherNo, r.PaymentRefNo };
+                        var query = (from p in hasPayments
+                                     join r in DataContext.Get() on p.ReceiptId equals r.Id
+                                     where r.Status == AccountingConstants.RECEIPT_STATUS_DONE
+                                     select new { r.Id, r.PaymentMethod, r.PaymentRefNo, p.InvoiceNo, p.VoucherNo, p.RefId, p.Type, p.Hblid }).FirstOrDefault();
 
-                        if (query != null && query.Count() > 0)
+                        if (query != null)
                         {
-                            return new HandleState((object)string.Format(
-                                "You can not cancel this receipt, because {0} - {1} have payment time later than this receipt. please cancel the lastest receipts first!",
-                                query.FirstOrDefault().PaymentMethod.ToLower().Contains("credit") ? query.FirstOrDefault()?.VoucherNo : query.FirstOrDefault()?.InvoiceNo,
-                                query.FirstOrDefault()?.PaymentRefNo
+                            if (query.PaymentMethod.ToLower().Contains("credit"))
+                            {
+                                var payable = accountPayableRepository.Get(x => !string.IsNullOrEmpty(x.ReferenceNo) && x.AcctManagementId == query.RefId).FirstOrDefault();
+                                return new HandleState((object)string.Format(
+                                    "You can not cancel this receipt, because {0} - {1} - {2} have payment time later than this receipt. Please cancel the lastest receipts first!",
+                                        payable?.BillingNo, query.Type, query.PaymentRefNo
                                 ));
+                            }
+                            else
+                            {
+                                var debitAR = debitMngtArRepository.Get(x => x.AcctManagementId.ToString() == query.RefId && x.Hblid == query.Hblid).FirstOrDefault();
+                                return new HandleState((object)string.Format(
+                                    "You can not cancel this receipt, because {0} - {1} - {2} have payment time later than this receipt. Please cancel the lastest receipts first!",
+                                        debitAR?.RefNo, query.Type, query.PaymentRefNo
+                                ));
+                            }
                         }
 
-                        var receiptDraft = from p in hasPayments
-                                    join r in DataContext.Get() on p.ReceiptId equals r.Id
-                                    where r.Status == AccountingConstants.RECEIPT_STATUS_DRAFT
-                                    select new { r.Id, r.PaymentMethod, p.InvoiceNo, p.VoucherNo, r.PaymentRefNo };
-                        if (receiptDraft != null && receiptDraft.Count() > 0)
+                        var receiptDraft = (from p in hasPayments
+                                            join r in DataContext.Get() on p.ReceiptId equals r.Id
+                                            where r.Status == AccountingConstants.RECEIPT_STATUS_DRAFT
+                                            select new { r.Id, r.PaymentMethod, p.InvoiceNo, p.VoucherNo, r.PaymentRefNo, p.RefId, p.Hblid, p.Type }).FirstOrDefault();
+                        if (receiptDraft != null)
                         {
-                            return new HandleState((object)string.Format(
-                                "You can not cancel this receipt, because {0} - {1} have payment time later than this receipt. Please remove the lastest receipts first!",
-                                receiptDraft.FirstOrDefault().PaymentMethod.ToLower().Contains("credit") ? receiptDraft.FirstOrDefault()?.VoucherNo : receiptDraft.FirstOrDefault()?.InvoiceNo,
-                                receiptDraft.FirstOrDefault()?.PaymentRefNo
+                            if (receiptDraft.PaymentMethod.ToLower().Contains("credit"))
+                            {
+                                var payable = accountPayableRepository.Get(x => !string.IsNullOrEmpty(x.ReferenceNo) && x.AcctManagementId == receiptDraft.RefId).FirstOrDefault();
+                                return new HandleState((object)string.Format(
+                                "You can not cancel this receipt, because {0} - {1} - {2} have payment time later than this receipt. Please remove the lastest receipts first!",
+                                //receiptDraft.PaymentMethod.ToLower().Contains("credit") ? receiptDraft.VoucherNo : receiptDraft.InvoiceNo,
+                                payable?.BillingNo, receiptDraft.Type, receiptDraft.PaymentRefNo
                                 ));
+                            }
+                            else
+                            {
+                                var debitAR = debitMngtArRepository.Get(x => x.AcctManagementId.ToString() == receiptDraft.RefId && x.Hblid == receiptDraft.Hblid).FirstOrDefault();
+                                return new HandleState((object)string.Format(
+                                "You can not cancel this receipt, because {0} - {1} - {2} have payment time later than this receipt. Please remove the lastest receipts first!",
+                                debitAR?.RefNo, receiptDraft.Type, receiptDraft.PaymentRefNo
+                                ));
+                            }
                         }
                     }
                 }
