@@ -21,6 +21,8 @@ using StackExchange.Redis;
 using eFMS.API.Operation.Service.Models;
 using ITL.NetCore.Connection.Caching;
 using eFMS.API.Operation.Infrastructure.Common;
+using eFMS.API.Operation.DL.Models.Ecus;
+using eFMS.API.Operation.DL.Models;
 
 namespace eFMS.API.Operation.Infrastructure
 {
@@ -50,6 +52,7 @@ namespace eFMS.API.Operation.Infrastructure
             services.AddTransient<IOpsStageAssignedService, OpsStageAssignedService>();
             services.AddTransient<IEcusConnectionService, EcusConnectionService>();
             services.AddTransient<ICustomsDeclarationService, CustomsDeclarationService>();
+            services.AddTransient<ICacheServiceBase<CustomsDeclarationModel>, CacheServiceBase<CustomsDeclarationModel>>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

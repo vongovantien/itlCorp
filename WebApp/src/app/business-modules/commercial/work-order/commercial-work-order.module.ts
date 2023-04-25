@@ -29,7 +29,7 @@ const routing: Routes = [
                 path: '', component: CommercialWorkOrderComponent,
             },
             { path: 'new/:transactionType', component: CommercialCreateWorkOrderComponent, data: { name: 'New' } },
-            { path: ':id', component: CommercialWorkOrderDetailComponent, data: { name: 'New' } },
+            { path: ':id', component: CommercialWorkOrderDetailComponent, data: { name: 'Detail' } },
         ]
     }
 ];
