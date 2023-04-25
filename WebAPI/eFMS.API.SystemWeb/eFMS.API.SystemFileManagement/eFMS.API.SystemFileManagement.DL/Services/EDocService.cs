@@ -328,6 +328,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         public SysAttachFileTemplate GetAttTepmlateByJob(string Code, int docId, string transationType, string accountingType)
         {
             //var nameEn = _attachFileTemplateRepo.Get(x => x.Id == docId).FirstOrDefault()?.NameEn;
+            if (transationType == "TK")
+            {
+                return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.TransactionType == "CL" && x.AccountingType == accountingType).FirstOrDefault();
+            }
             return _attachFileTemplateRepo.Get(x => x.Code == Code && (x.AccountingType == "Settlement" || x.AccountingType == "ADV-Settlement") && x.TransactionType == transationType && x.AccountingType == accountingType).FirstOrDefault();
         }
         public async Task<List<EDocGroupByType>> GetEDocByJob(Guid jobID, string transactionType)
@@ -1185,12 +1189,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         var grpJobsAdv = advRquest.GroupBy(x => x.JobId).Select(x => x.Key).ToList();
                         foreach (var item in grpJobsAdv)
                         {
-                            if (item.Contains("LOG"))
+                            if (item.Contains("LOG") || item.Contains("TKI"))
                             {
                                 var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (opsJob != null)
                                 {
-                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "AD", HBLId = opsJob.Hblid });
+                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = item.Contains("TKI")?"TK": "CL", BillingNo = bilingNo, Code = "AD", HBLId = opsJob.Hblid });
                                 }
                             }
                             else
@@ -1209,12 +1213,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     var grpJobsSm = DC.CsShipmentSurcharge.Where(x => x.SettlementCode == bilingNo).GroupBy(x => new { x.JobNo }).Select(x => new { x.FirstOrDefault().JobNo, x.FirstOrDefault().Hblid });
                     foreach (var item in grpJobsSm)
                     {
-                        if (item.JobNo.Contains("LOG"))
+                        if (item.JobNo.Contains("LOG")|| item.JobNo.Contains("TKI"))
                         {
                             var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item.JobNo);
                             if (opsJob != null)
                             {
-                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SM", HBLId = null });
+                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = item.JobNo.Contains("TKI")?"TK": "CL", BillingNo = bilingNo, Code = "SM", HBLId = null });
                             }
                         }
                         else
@@ -1246,12 +1250,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         var grpJobsSOA = surchargeSoa.GroupBy(x => x.JobNo).Select(x => x.Key);
                         foreach (var item in grpJobsSOA)
                         {
-                            if (item.Contains("LOG"))
+                            if (item.Contains("LOG") || item.Contains("TKI"))
                             {
                                 var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (opsJob != null)
                                 {
-                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SOA" });
+                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = item.Contains("TKI")?"TK": "CL", BillingNo = bilingNo, Code = "SOA" });
                                 }
                             }
                             else
