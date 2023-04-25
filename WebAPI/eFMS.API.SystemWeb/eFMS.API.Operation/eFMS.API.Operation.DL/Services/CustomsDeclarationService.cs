@@ -125,28 +125,30 @@ namespace eFMS.API.Operation.DL.Services
                 {
                     // clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
                     // Loc xong set cache, case > 1 connect
-                    // cachedService.Set(clearanceEcus, TimeSpan.FromSeconds(30));
                     foreach (var item in connections)
                     {
                         var clearanceEcus = new List<DTOKHAIMD>();
                         clearanceEcus = ecusCconnectionService.GetDataEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
 
-                        if (clearanceEcus == null)
+                        if (clearanceEcus != null)
                         {
-                            rowsCount = 0;                            
-                            return returnList;
-                        }
-
-                        var clearencesNotExsitInFMS = clearanceEcus.Where(x => !checkExistEcusInEFMS(x.SOTK.ToString()));
-                        if (clearencesNotExsitInFMS.Count() > 0)
-                        {
-                            foreach (var d in clearencesNotExsitInFMS)
+                            var clearencesNotExsitInFMS = clearanceEcus.Where(x => !checkExistEcusInEFMS(x.SOTK.ToString()));
+                            if (clearencesNotExsitInFMS.Count() > 0)
                             {
-                                var newClearance = MapEcusClearanceToCustom(d, d.SOTK?.ToString().Trim());
-                                newClearance.Source = OperationConstants.FromEcus;
-                                returnList.Add(mapper.Map<CustomsDeclarationModel>(newClearance));
+                                foreach (var d in clearencesNotExsitInFMS)
+                                {
+                                    var newClearance = MapEcusClearanceToCustom(d, d.SOTK?.ToString().Trim());
+                                    newClearance.Source = OperationConstants.FromEcus;
+                                    returnList.Add(mapper.Map<CustomsDeclarationModel>(newClearance));
+                                }
                             }
+                            continue;
                         }
+                    }
+                    if (returnList == null || !returnList.Any())
+                    {
+                        rowsCount = 0;
+                        return returnList;
                     }
                     cachedService.Set(returnList, TimeSpan.FromSeconds(10));
                 }
