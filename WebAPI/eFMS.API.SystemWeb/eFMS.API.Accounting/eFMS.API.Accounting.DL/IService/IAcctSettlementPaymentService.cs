@@ -28,7 +28,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         AcctSettlementPaymentModel GetSettlementPaymentById(Guid idSettlement);
 
-        List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo);
+        List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo, int page = -1, int size = 5);
 
         List<AdvancePaymentMngt> GetAdvancePaymentMngts(string jobId, string mbl, string hbl, string requester);
 
@@ -113,6 +113,7 @@ namespace eFMS.API.Accounting.DL.IService
         Task<ResultHandle> AutoRateReplicateFromSettle(Guid settleId);
         string CheckValidFeesOnShipment(CreateUpdateSettlementModel model);
         bool CheckSettleHasAutoRateCharges(string settlementNo);
-        ResponsePagingModel<ShipmentChargeSettlement> GetSurchargePagingSettlementPayment(string settlementNo, int page, int size);
+        List<ShipmentChargeSettlement> GetSurchargePagingSettlementPayment(string settlementNo, int page, int size);
+        ResultHandle CheckConfirmPrepaidShipment(List<ShipmentChargeSettlement> ShipmentCharges);
     }
 }

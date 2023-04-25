@@ -130,5 +130,8 @@ export abstract class PopupBase extends AppPage {
         control.setValue(value != null ? value.trim() : value);
     }
 
+    isShowingPopup() {
+        return this.popup.isShown;
+    }
 
 }

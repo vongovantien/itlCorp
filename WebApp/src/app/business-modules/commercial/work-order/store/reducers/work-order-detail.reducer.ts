@@ -51,7 +51,7 @@ export const reducer = createReducer(
         ...state, listPrice: payload.data, isLoading: false
     })),
     on(WorkOrderActionTypes.AddPriceItemWorkOrderSuccess, (state: IWorkOrderDetailState, payload: { data: WorkOrderPriceModel }) => ({
-        ...state, listPrice: [...state.listPrice, payload.data]
+        ...state, listPrice: [...(state.listPrice || []), payload.data]
     })),
     on(WorkOrderActionTypes.SelectPriceItemWorkOrder, (state: IWorkOrderDetailState, payload: { index: number }) => {
         const newArrayPriceList = [...state.listPrice];

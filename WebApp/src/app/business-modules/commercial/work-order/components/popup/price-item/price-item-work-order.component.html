@@ -19,7 +19,7 @@
                             <label required>Co-loader</label>
                             <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                                 (remove)="partnerId.setValue(null)"
-                                [currentActiveItemId]="{field:'id', value: partnerId.value}"
+                                [currentActiveItemId]="{field:'id', value: partnerId.value, hardValue: selectedPartnerName}"
                                 [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                                 [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
                                 [disabled]="(isReadonly | async)">
@@ -56,7 +56,7 @@
                             <div class="col-lg-2">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!type.valid) }">
-                                    <label required>Type</label>
+                                    <label required>Fee Type</label>
                                     <ng-select [items]="types" formControlName="type" class="custom"
                                         placeholder="Please select" bindLabel="title"
                                         (change)="onSelectDataFormInfo($event, 'type')" bindValue="value"
@@ -200,7 +200,6 @@
                         </table>
                     </div>
                 </div>
-
                 <surcharge-list-work-order type="BUY" [transactionType]="transactionType" [(surcharges)]="buyings"
                     [submitted]="isSubmitted"></surcharge-list-work-order>
                 <surcharge-list-work-order type="SELL" [transactionType]="transactionType" [(surcharges)]="sellings"

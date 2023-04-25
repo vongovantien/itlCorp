@@ -286,12 +286,12 @@ namespace eFMS.API.System.Controllers
         public IActionResult Delete(int id)
         {
             var item = userLevelService.GetDetail(id);
-            //item.Active = false;
-            //item.UserModified = currentUser.UserID;
-            //item.InactiveOn = DateTime.Now;
-            //var hs = userLevelService.Update(item, x => x.Id == id);
-            var hs = userLevelService.Delete(x => x.Id == id);
-            var message = HandleError.GetMessage(hs, Crud.Delete);
+            item.Active = false;
+            item.UserModified = currentUser.UserID;
+            item.InactiveOn = DateTime.Now;
+            var hs = userLevelService.Update(item, x => x.Id == id);
+            //var hs = userLevelService.Delete(x => x.Id == id);
+            var message = HandleError.GetMessage(hs, Crud.Update);
 
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -300,7 +300,7 @@ namespace eFMS.API.System.Controllers
             }
             return Ok(result);
         }
-
+        
         /// <summary>
         /// Query user level
         /// </summary>
@@ -398,6 +398,7 @@ namespace eFMS.API.System.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             SysUserLevelModel modelDupdatelidate = null;
+            IActionResult updateStatus=null;
             var checkDupUser = users.GroupBy(x => x.UserId)
                                 .Where(t => t.Count() > 1)
                                 .Select(y => y.Key)
@@ -408,7 +409,12 @@ namespace eFMS.API.System.Controllers
             }
             foreach (var item in users)
             {
-                if (CheckExistUserLevelOnGroup(item))
+                if (CheckExistUserLevelOnGroup(item) && CheckExistUserLevelOnGroupStatus(item))
+                {
+                    updateStatus = ActiveInfoInGroup(item);
+                    break;
+                }
+                else if(CheckExistUserLevelOnGroup(item) && CheckExistUserLevelOnGroupStatus(item) == false)
                 {
                     modelDupdatelidate = item;
                     break;
@@ -417,6 +423,11 @@ namespace eFMS.API.System.Controllers
             if (modelDupdatelidate != null)
             {
                 return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_ITEM_EXISTED_USER_ON_USER_LEVEL, "group"].Value, Data = modelDupdatelidate });
+            }
+
+            if (updateStatus != null)
+            {
+                return Ok(new ResultHandle { Status = true, Message = stringLocalizer["Activated user in group"].Value, Data = updateStatus });
             }
             var hs = userLevelService.AddUser(users);
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -457,6 +468,24 @@ namespace eFMS.API.System.Controllers
                 }
             }
             return isDuplicate;
+        }
+
+        private bool CheckExistUserLevelOnGroupStatus(SysUserLevelModel model)
+        {
+            bool isInactive = false;
+            if (model.Id == 0)
+            {
+                if (userLevelService.Any(x => x.CompanyId == model.CompanyId
+                                            && x.OfficeId == model.OfficeId
+                                            && x.DepartmentId == model.DepartmentId
+                                            && x.UserId == model.UserId
+                                            && x.GroupId == model.GroupId
+                                            && (x.Active== false && x.Active!= model.Active)))
+                {
+                    isInactive = true;
+                }
+            }
+            return isInactive;
         }
 
         /// <summary>
@@ -506,6 +535,40 @@ namespace eFMS.API.System.Controllers
         {
             var results = userLevelService.GetUserActiveInfo();
             return Ok(results);
+        }
+
+        private IActionResult ActiveInfoInGroup(SysUserLevelModel model)
+        {
+            // var item = userLevelService.GetDetail(model.GroupId);
+            // item.Active = true;
+            HandleState hs = null;
+            var message = "";
+            try
+            {
+                var us = userLevelService.Get(x => x.OfficeId == model.OfficeId
+                                                    && x.GroupId == model.GroupId
+                                                    && x.UserId == model.UserId).ToList();
+
+                foreach (var item in us)
+                {
+                    item.Active = true;
+                    hs = userLevelService.Update(item, x => x.OfficeId == model.OfficeId
+                                                        && x.GroupId == model.GroupId
+                                                        && x.UserId == model.UserId);
+                    message = HandleError.GetMessage(hs, Crud.Update);
+                }
+
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                if (!hs.Success)
+                {
+                    return BadRequest(result);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An error occurred: {ex.Message}");
+            }
         }
     }
 }
