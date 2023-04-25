@@ -4831,6 +4831,11 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         hasPayments = hasPayments.Where(x => voucherNoList.Any(z => z.VoucherId == x.VoucherNo && z.Hblid == x.Hblid));
                     }
+                    if (invoiceNoList.Count <= 0 && voucherNoList.Count <= 0)
+                    {
+                        hasPayments = hasPayments.Where(x => false);
+                    }
+
                     return hasPayments;
                 }
             }
@@ -4855,13 +4860,17 @@ namespace eFMS.API.Accounting.DL.Services
                     IQueryable<AccAccountingPayment> hasPayments = acctPaymentRepository.Get(x => x.ReceiptId != receiptCurrent.Id
                                   && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH || x.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
                                   && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) < 0);
-                    if(invoiceNoList.Count > 0)
+                    if (invoiceNoList.Count > 0)
                     {
                         hasPayments = hasPayments.Where(x => invoiceNoList.Any(z => z.InvoiceNo == x.InvoiceNo && z.Hblid == x.Hblid));
                     }
                     if (voucherNoList.Count > 0)
                     {
                         hasPayments = hasPayments.Where(x => voucherNoList.Any(z => z.VoucherNo == x.VoucherNo && z.Hblid == x.Hblid));
+                    }
+                    if (invoiceNoList.Count <= 0 && voucherNoList.Count <= 0)
+                    {
+                        hasPayments = hasPayments.Where(x => false);
                     }
 
                     return hasPayments;
