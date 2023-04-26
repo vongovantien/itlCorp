@@ -1011,8 +1011,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var dhd = await CalculatorAgreement(agreementIds, partnerId);
                     }
                 }
-            }
-            new LogHelper("UpdateAgreementPartnersAsync", "Running on UpdateAgreementPartnersAsync");
+            }   
             return hs;
         }
 
@@ -1073,7 +1072,6 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
             }
-            new LogHelper("CalculatorAgreement", "Running on CalculatorAgreement");
             return hs;
         }
 
