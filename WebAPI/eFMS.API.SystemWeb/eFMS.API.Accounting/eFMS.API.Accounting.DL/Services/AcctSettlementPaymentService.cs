@@ -6573,7 +6573,7 @@ namespace eFMS.API.Accounting.DL.Services
                             return new ResultHandle() { Status = false, Message = messError };
                         }
                         var debitCodes = chargesHbl.Select(x => x.DebitNo).ToList();
-                        var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type == AccountingConstants.TYPE_SOA_DEBIT);
+                        var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type != AccountingConstants.ACCOUNTANT_TYPE_CREDIT && !(x.SyncStatus == AccountingConstants.STATUS_SYNCED && x.Status == AccountingConstants.STATUS_SOA_NEW));
                         var hasConfirm = debitNotes.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
                         if (!hasConfirm)
                         {
