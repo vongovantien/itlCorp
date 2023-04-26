@@ -573,11 +573,14 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
             for (const item of this.ReceiptGeneralCombineComponent.generalReceipts) {
                 if (!item.partnerId
                     || !item.paymentMethod
-                    || item.amountUsd === null
+                    || !item.officeId) {
+                    this._toastService.warning("Please fill in all required fields");
+                    return false;
+                }
+                if (item.amountUsd === null
                     || item.amountUsd < 0
                     || item.amountVnd === null
-                    || item.amountVnd < 0
-                    || !item.officeId) {
+                    || item.amountVnd < 0) {
                     this._toastService.warning("Paid amount must be less than or equal to the Unpaid amount");
                     return false;
                 }
