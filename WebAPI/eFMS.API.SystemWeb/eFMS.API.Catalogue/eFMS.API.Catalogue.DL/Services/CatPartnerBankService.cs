@@ -64,6 +64,29 @@ namespace eFMS.API.Catalogue.DL.Services
             return result;
         }
 
+        public async Task<string> CheckExistedPartnerBank(CatPartnerBankModel model)
+        {
+            var partner = await catPartnerRepository.Where(x => x.Id == model.PartnerId.ToString()).FirstOrDefaultAsync();
+            var existingBankAccounts = await DataContext.WhereAsync(x => x.PartnerId.ToString() == partner.Id);
+
+            if (model.Id != Guid.Empty)
+            {
+                var currentBankAccount = existingBankAccounts.FirstOrDefault(x => x.Id == model.Id);
+
+                if (currentBankAccount != null && model.BankAccountNo == currentBankAccount.BankAccountNo)
+                {
+                    return null;
+                }
+            }
+
+            if (existingBankAccounts.Any(account => account.BankAccountNo == model.BankAccountNo))
+            {
+                return "Bank account is existed";
+            }
+
+            return null;
+        }
+
         public async Task<CatPartnerBankModel> GetDetail(Guid Id)
         {
             var dataReturn = from partner in DataContext.Where(x => x.Id == Id)
@@ -82,6 +105,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                  BankCode = catBank.Code,
                                  Source = catBank.Source,
                                  ApproveStatus = partner.ApproveStatus,
+                                 BeneficiaryAddress = partner.BeneficiaryAddress,
                                  UserCreated = partner.UserCreated,
                                  UserModified = partner.UserModified,
                                  DatetimeCreated = partner.DatetimeCreated,
@@ -111,7 +135,41 @@ namespace eFMS.API.Catalogue.DL.Services
                                  BankName = catBank.BankNameEn,
                                  BankCode = catBank.Code,
                                  Source = catBank.Source,
+                                 Active = catBank.Active,
                                  ApproveStatus = partner.ApproveStatus,
+                                 BeneficiaryAddress = partner.BeneficiaryAddress,
+                                 UserCreated = partner.UserCreated,
+                                 UserModified = partner.UserModified,
+                                 DatetimeCreated = partner.DatetimeCreated,
+                                 DatetimeModified = partner.DatetimeModified,
+                                 UserCreatedName = sysUserRepository.First(x => x.Id == partner.UserCreated).Username,
+                                 UserModifiedName = sysUserRepository.First(x => x.Id == partner.UserModified).Username,
+                             };
+
+            return dataReturn;
+        }
+
+        public IQueryable<CatPartnerBankModel> GetPartnerBankApproved(Guid partnerId)
+        {
+            var dataReturn = from partner in DataContext.Where(x => x.PartnerId == partnerId && x.ApproveStatus == "Approved")
+                             join catBank in catBankRepository.Get() on partner.BankId equals catBank.Id
+                             orderby partner.DatetimeCreated descending
+                             select new CatPartnerBankModel
+                             {
+                                 Id = partner.Id,
+                                 PartnerId = partner.PartnerId,
+                                 BankAccountName = partner.BankAccountName,
+                                 BankAccountNo = partner.BankAccountNo,
+                                 BankAddress = partner.BankAddress,
+                                 SwiftCode = partner.SwiftCode,
+                                 Note = partner.Note,
+                                 BankId = partner.BankId,
+                                 BankName = catBank.BankNameEn,
+                                 BankCode = catBank.Code,
+                                 Source = catBank.Source,
+                                 Active = catBank.Active,
+                                 ApproveStatus = partner.ApproveStatus,
+                                 BeneficiaryAddress = partner.BeneficiaryAddress,
                                  UserCreated = partner.UserCreated,
                                  UserModified = partner.UserModified,
                                  DatetimeCreated = partner.DatetimeCreated,

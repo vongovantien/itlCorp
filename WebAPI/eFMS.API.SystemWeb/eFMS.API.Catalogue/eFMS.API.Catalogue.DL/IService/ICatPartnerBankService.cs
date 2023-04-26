@@ -16,6 +16,7 @@ namespace eFMS.API.Catalogue.DL.IService
         Task<HandleState> Update(CatPartnerBankModel model);
         Task<CatPartnerBankModel> GetDetail(Guid Id);
         IQueryable<CatPartnerBankModel> GetByPartner(Guid partnerId);
+        Task<string> CheckExistedPartnerBank(CatPartnerBankModel model);
         Task<HandleState> Delete(Guid Id);
         Task<HandleState> ReviseBankInformation(Guid bankId);
         Task<List<BankSyncModel>> GetListPartnerBankInfoToSync(List<Guid> partnerBankIds);

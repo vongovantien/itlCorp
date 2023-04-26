@@ -6,6 +6,7 @@ namespace eFMS.API.SystemFileManagement.DL.IService
     public interface IS3Service
     {
         Task<DeleteObjectResponse> DeleteObjectAsync(DeleteObjectRequest request);
+        Task<DeleteObjectsResponse> DeleteObjectsAsync(DeleteObjectsRequest request);
         Task<PutObjectResponse> PutObjectAsync(PutObjectRequest request);
         Task<GetObjectResponse> GetObjectAsync(GetObjectRequest request);
         Task<CopyObjectResponse> CopyObjectAsync(CopyObjectRequest request);

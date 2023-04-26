@@ -126,6 +126,15 @@ namespace eFMS.API.SystemFileManagement.Controllers
             return BadRequest(hs);
         }
 
+        [HttpDelete("DeleteFileFolder/{moduleName}/{folder}/{objectId}")]
+        public async Task<IActionResult> DeleteFileFolder(string moduleName, string folder, Guid objectId)
+        {
+            HandleState hs = await _aWSS3Service.DeleteFileFolder(moduleName, folder, objectId);
+            if (hs.Success)
+                return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
+            return BadRequest(hs);
+        }
+
         [HttpGet("GetAttachedFiles/{moduleName}/{folder}/{id}")]
         public async Task<IActionResult> GetFiles(string moduleName, string folder, Guid id, string child = null)
         {

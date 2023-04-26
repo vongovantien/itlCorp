@@ -3,12 +3,13 @@ import { ConfirmPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { Bank, Partner } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
-import { CatalogueRepo } from '@repositories';
+import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError, finalize, switchMap } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { FormBankCommercialCatalogueComponent } from 'src/app/business-modules/share-modules/components/form-bank-commercial-catalogue/form-bank-commercial-catalogue.component';
+import { FormBankCommercialCatalogueComponent } from 'src/app/business-modules/share-modules/components';
 @Component({
     selector: 'app-commercial-bank-list',
     templateUrl: './commercial-bank-list.component.html',
@@ -31,6 +32,7 @@ export class CommercialBankListComponent extends AppList {
         private _sortService: SortService,
         private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService,
+        private _systemFileManageRepo: SystemFileManageRepo
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -53,9 +55,13 @@ export class CommercialBankListComponent extends AppList {
     getPartnerBank(partnerId: string) {
         this.isLoading = true;
         this._catalogueRepo.getPartnerBank(partnerId)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this.isLoading = false;
-            })).subscribe(
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this.isLoading = false;
+                })
+            )
+            .subscribe(
                 (res: Bank[]) => {
                     this.partnerBanks = res || [];
                 }
@@ -84,28 +90,35 @@ export class CommercialBankListComponent extends AppList {
     }
 
 
-    onDeletePartnerBank(id: string) {
+    onDeletePartnerBank(partnerBankId: string) {
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             title: 'Confirm',
             body: 'Do you want to delete this bank account ?',
             labelConfirm: 'Ok'
-        }, () => { this.handleDeletePartnerBank(id) });
+        }, () => { this.handleDeletePartnerBank(partnerBankId) });
     }
 
 
     handleDeletePartnerBank(id: string) {
         this._catalogueRepo.deletePartnerBank(id)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
+            .pipe(
+                switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.getPartnerBank(this.partnerId);
+                        return this._systemFileManageRepo.deleteFileFolder("Catalogue", "PartnerBank", id)
+                            .pipe(
+                                catchError(this.catchError),
+                                finalize(() => this._progressRef.complete())
+                            )
                     } else {
                         this._toastService.error(res.message);
+                        return of(null);
                     }
-                }
-            );
+                }),
+                catchError(this.catchError),
+                finalize(() => this.getPartnerBank(this.partnerId))
+            )
+            .subscribe();
     }
 
     onRequestBank($event: any) {

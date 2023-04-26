@@ -111,6 +111,11 @@ namespace eFMS.API.Catalogue.Controllers
         public async Task<IActionResult> AddNew(CatPartnerBankModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            var messageError = await catPartnerBankService.CheckExistedPartnerBank(model);
+            if (!string.IsNullOrEmpty(messageError))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = messageError });
+            }
             var hs = await catPartnerBankService.AddNew(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -132,6 +137,11 @@ namespace eFMS.API.Catalogue.Controllers
         public async Task<IActionResult> Update(CatPartnerBankModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+            var messageError = await catPartnerBankService.CheckExistedPartnerBank(model);
+            if (!string.IsNullOrEmpty(messageError))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = messageError });
+            }
             var hs = await catPartnerBankService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
