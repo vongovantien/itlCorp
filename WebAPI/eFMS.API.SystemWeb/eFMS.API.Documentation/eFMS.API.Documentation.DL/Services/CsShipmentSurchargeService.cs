@@ -638,7 +638,7 @@ namespace eFMS.API.Documentation.DL.Services
                     item.TransactionType = GetTransactionType(item.JobNo);
                     if (item.Hblid != Guid.Empty)
                     {
-                        if (item.TransactionType != "CL")
+                        if (item.TransactionType != "CL"&& item.TransactionType != "TK")
                         {
                             CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
                             item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
@@ -674,7 +674,7 @@ namespace eFMS.API.Documentation.DL.Services
                     string _jobNo = string.Empty;
                     string _mblNo = string.Empty;
                     string _hblNo = string.Empty;
-                    if (item.TransactionType != "CL")
+                    if (item.TransactionType != "CL" && item.TransactionType != "TK")
                     {
                         var houseBill = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
                         _hblNo = houseBill?.Hwbno;
@@ -758,7 +758,7 @@ namespace eFMS.API.Documentation.DL.Services
                         surcharge.Hblno = _hblNo;
                         surcharge.DatetimeModified = DateTime.Now;
                         surcharge.UserModified = currentUser.UserID;
-                        if (surcharge.TransactionType == "CL")
+                        if (surcharge.TransactionType == "CL"|| surcharge.TransactionType == "TK")
                         {
                             //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
                             surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) && !string.IsNullOrEmpty(surcharge.SettlementCode) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);

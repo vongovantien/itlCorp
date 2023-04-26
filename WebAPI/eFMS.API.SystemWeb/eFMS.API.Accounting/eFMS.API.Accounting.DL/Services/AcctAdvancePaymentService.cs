@@ -810,7 +810,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private Guid GetJobId(string jobNo)
         {
-            if (jobNo.Contains("LOG"))
+            if (jobNo.Contains("LOG")|| jobNo.Contains("TKI"))
             {
                 return opsTransactionRepo.Get(x => x.JobNo == jobNo).FirstOrDefault().Id;
             }
