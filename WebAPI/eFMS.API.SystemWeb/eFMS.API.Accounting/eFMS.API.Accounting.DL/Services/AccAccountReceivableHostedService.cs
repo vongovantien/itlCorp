@@ -1011,7 +1011,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var dhd = await CalculatorAgreement(agreementIds, partnerId);
                     }
                 }
-            }
+            }   
             return hs;
         }
 
@@ -1072,7 +1072,6 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
             }
-            
             return hs;
         }
 

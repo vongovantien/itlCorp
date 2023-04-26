@@ -812,7 +812,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private Guid GetJobId(string jobNo)
         {
-            if (jobNo.Contains("LOG"))
+            if (jobNo.Contains("LOG")|| jobNo.Contains("TKI"))
             {
                 return opsTransactionRepo.Get(x => x.JobNo == jobNo).FirstOrDefault().Id;
             }
@@ -905,7 +905,7 @@ namespace eFMS.API.Accounting.DL.Services
             var ops = opsTransactionRepo.Get(x => x.Hblid == hblId).FirstOrDefault();
             if (ops != null)
             {
-                transactionType = ops?.TransactionType;
+                transactionType = ops.TransactionType;
             }
             else
             {
