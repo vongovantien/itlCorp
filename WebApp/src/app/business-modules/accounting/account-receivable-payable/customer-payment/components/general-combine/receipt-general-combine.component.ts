@@ -14,6 +14,7 @@ import { AppList } from 'src/app/app.list';
 import { AddGeneralCombineToReceipt, ReceiptCombineActionTypes, RemoveDebitCombine } from '../../store/actions';
 import { ICustomerPaymentState, ReceiptCombineExchangeState, ReceiptCombinePartnerState, ReceiptCombineSalemanState } from '../../store/reducers';
 import { CommonEnum } from '@enums';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'receipt-general-combine',
@@ -52,6 +53,7 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
         private readonly _systemRepo: SystemRepo,
         private readonly _actionStoreSubject: ActionsSubject,
         private readonly _accountingRepo: AccountingRepo,
+        private readonly _toastService: ToastrService
     ) {
         super();
     }
@@ -157,6 +159,10 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
         }
 
         const partner = this.partners.find(x => x.id === this.partnerId);
+        if(!partner){
+            this._toastService.warning('Parent partner doesn\'t have any contract information. Please check again!');
+            return;
+        }
         let newItem: GeneralCombineReceiptModel[] = [{
             id: SystemConstants.EMPTY_GUID,
             partnerId: partner.id,

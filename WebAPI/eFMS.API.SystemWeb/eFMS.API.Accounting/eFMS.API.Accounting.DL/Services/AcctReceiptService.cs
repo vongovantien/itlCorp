@@ -940,8 +940,8 @@ namespace eFMS.API.Accounting.DL.Services
                             else
                             {
                                 var debitInvoice = debitMngtArRepository.Get(x => item.RefIds.Contains(x.AcctManagementId.ToString()) && x.Hblid == item.Hblid).FirstOrDefault();
-                                item.BalanceVnd = debitInvoice.UnpaidAmountVnd;
-                                item.BalanceUsd = debitInvoice.UnpaidAmountUsd;
+                                item.BalanceVnd = debitInvoice?.UnpaidAmountVnd;
+                                item.BalanceUsd = debitInvoice?.UnpaidAmountUsd;
                                 if (item.RefCurrency == AccountingConstants.CURRENCY_LOCAL)
                                 {
                                     item.Balance = item.BalanceVnd;
@@ -2584,7 +2584,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             else
                             {
-                                var debitAR = debitMngtArRepository.Get(x => x.AcctManagementId.ToString() == query.RefId && x.Hblid == query.Hblid).FirstOrDefault();
+                                var debitAR = debitMngtArRepository.Get(x => x.AcctManagementId.ToString() == query.RefId && (query.Hblid == null || x.Hblid == query.Hblid)).FirstOrDefault();
                                 return new HandleState((object)string.Format(
                                     "You can not cancel this receipt, because {0} - {1} - {2} have payment time later than this receipt. Please cancel the lastest receipts first!",
                                         debitAR?.RefNo, query.Type, query.PaymentRefNo
@@ -2609,7 +2609,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             else
                             {
-                                var debitAR = debitMngtArRepository.Get(x => x.AcctManagementId.ToString() == receiptDraft.RefId && x.Hblid == receiptDraft.Hblid).FirstOrDefault();
+                                var debitAR = debitMngtArRepository.Get(x => x.AcctManagementId.ToString() == receiptDraft.RefId && (receiptDraft.Hblid == null || x.Hblid == receiptDraft.Hblid)).FirstOrDefault();
                                 return new HandleState((object)string.Format(
                                 "You can not cancel this receipt, because {0} - {1} - {2} have payment time later than this receipt. Please remove the lastest receipts first!",
                                 debitAR?.RefNo, receiptDraft.Type, receiptDraft.PaymentRefNo
@@ -4950,8 +4950,8 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return hs;
             }
-            var hblIds = payments.Select(x => x.Hblid).ToList();
-            var invoiceDebitArs = debitMngtArRepository.Get(x => hblIds.Contains(x.Hblid));
+            //var hblIds = payments.Select(x => x.Hblid).ToList();
+            //var invoiceDebitArs = debitMngtArRepository.Get(x => hblIds.Contains(x.Hblid));
             var accountingMng = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
             payments = payments.Where(x => x.Type == "DEBIT" || x.Type == "OBH").ToList();
             #region //DELETE
@@ -5272,8 +5272,8 @@ namespace eFMS.API.Accounting.DL.Services
                 var partnerInfo = partners.FirstOrDefault(x => x.Id == result.CustomerId);
                 result.CustomerName = partnerInfo?.ShortName;
                 result.ObhPartnerName = result.ObhpartnerId == null ? null : partners.FirstOrDefault(x => x.Id == result.ObhpartnerId.ToString())?.ShortName;
-                result.UserNameCreated = sysUserRepository.Where(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
-                result.UserNameModified = sysUserRepository.Where(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
+                //result.UserNameCreated = sysUserRepository.Where(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
+                //result.UserNameModified = sysUserRepository.Where(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
 
                 var contract = catContractRepository.Get(x => x.Active == true);
                 result.SalemanId = result.AgreementId == null ? string.Empty : contract.FirstOrDefault(x => x.Id == result.AgreementId)?.SaleManId;
@@ -5300,7 +5300,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var creditArs = creditMngtArRepository.Get(x => !string.IsNullOrEmpty(x.ReferenceNo));
 
                 IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH").OrderBy(x => x.DatetimeCreated);
-                var partnerInfos = catPartnerRepository.Get(x => x.Id == result.CustomerId || x.ParentId == result.CustomerId);
+                var partnerInfos = partners.Where(x => x.Id == result.CustomerId || x.ParentId == result.CustomerId);
 
                 if (listOBH.Count() > 0)
                 {
@@ -5344,13 +5344,13 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         if (!string.IsNullOrEmpty(item.PartnerId))
                         {
-                            var agnecy = partnerInfos.FirstOrDefault(x => x.Id == item.PartnerId);
-                            item.PartnerName = agnecy?.ShortName;
-                            item.TaxCode = agnecy?.AccountNo;
+                            var agency = partnerInfos.FirstOrDefault(x => x.Id == item.PartnerId);
+                            item.PartnerName = agency?.ShortName;
+                            item.TaxCode = agency?.AccountNo;
                         }
                         if (!string.IsNullOrEmpty(receipt.Arcbno) && receipt.PaymentMethod.ToLower().Contains("credit"))
                         {
-                            item.ReferenceNo = creditMngtArRepository.Get(x => x.Code == item.RefNo && x.Hblid == item.Hblid).FirstOrDefault()?.ReferenceNo;
+                            item.ReferenceNo = creditArs.Where(x => x.Code == item.RefNo && x.Hblid == item.Hblid).FirstOrDefault()?.ReferenceNo;
                         }
                     }
                     paymentReceipts.AddRange(items);
@@ -5437,12 +5437,13 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
                 result.Payments = paymentReceipts;
-                result.UserNameCreated = sysUserRepository.Where(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
-                result.UserNameModified = sysUserRepository.Where(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
+                var _users = sysUserRepository.Get(x => x.Active == true);
+                result.UserNameCreated = _users.Where(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
+                result.UserNameModified = _users.Where(x => x.Id == result.UserModified).FirstOrDefault()?.Username;
 
                 var contract = catContractRepository.Get(x => x.Active == true);
                 result.SalemanId = result.AgreementId == null ? string.Empty : contract.FirstOrDefault(x => x.Id == result.AgreementId)?.SaleManId;
-                result.SalemanName = result.SalemanId == null ? string.Empty : sysUserRepository.Where(x => x.Id == result.SalemanId).FirstOrDefault()?.Username;
+                result.SalemanName = result.SalemanId == null ? string.Empty : _users.Where(x => x.Id == result.SalemanId).FirstOrDefault()?.Username;
                 //result.ARCBContractId = contract.First(x => x.PartnerId == receipt.ArcbpartnerId && x.SaleManId == result.SalemanId)?.Id.ToString();
                 SysOffice receiptOffice = officeRepository.Get(x => x.Id == (result.OfficeId ?? Guid.Empty))?.FirstOrDefault();
                 result.OfficeName = receiptOffice.ShortName;
@@ -5536,18 +5537,18 @@ namespace eFMS.API.Accounting.DL.Services
                     result.SubRejectReceipt = receipt.SyncStatus != "Rejected" ? " - Rejected(" + totalRejectReceiptSync + ")" : string.Empty;
                 }
 
-                if (result.ReferenceId != null)
-                {
-                    AcctReceipt receiptRef = DataContext.Get(x => x.Id == result.ReferenceId)?.FirstOrDefault();
-                    if (receiptRef != null)
-                    {
-                        result.ReferenceNo = receiptRef.PaymentRefNo + "_" + receiptRef.Class;
-                    }
-                }
+                //if (result.ReferenceId != null)
+                //{
+                //    AcctReceipt receiptRef = DataContext.Get(x => x.Id == result.ReferenceId)?.FirstOrDefault();
+                //    if (receiptRef != null)
+                //    {
+                //        result.ReferenceNo = receiptRef.PaymentRefNo + "_" + receiptRef.Class;
+                //    }
+                //}
 
                 if (result.ObhpartnerId != null)
                 {
-                    CatPartner obhP = catPartnerRepository.Get(x => x.Id == result.ObhpartnerId.ToString())?.FirstOrDefault();
+                    CatPartner obhP = partners.Where(x => x.Id == result.ObhpartnerId.ToString())?.FirstOrDefault();
 
                     result.ObhPartnerName = obhP?.ShortName;
                 }
@@ -5635,7 +5636,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var paymentDB = acctPaymentRepository.Get(x => refIds.Contains(x.RefId));
                 var existedItem = (from item in receiptModel.Payments
                                    from pm in paymentDB
-                                   where item.RefIds.Contains(pm.RefId) && pm.Hblid == item.Hblid
+                                   where item.RefIds.Contains(pm.RefId) && (pm.Hblid == null || pm.Hblid == item.Hblid)
                                    join receipt in accReceipts on pm.ReceiptId equals receipt.Id
                                    select new
                                    {
