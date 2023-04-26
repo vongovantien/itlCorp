@@ -1697,7 +1697,7 @@ namespace eFMS.API.Accounting.DL.Services
                               DebitNo = sur.DebitNo,
                               DatetimeModified = sur.DatetimeModified,
                               CommodityGroupID = null,
-                              Service = opst?.TransactionType,
+                              Service = opst.TransactionType,
                               CDNote = null,
                               TypeCharge = charge.Type,
                               ExchangeDate = sur.ExchangeDate,

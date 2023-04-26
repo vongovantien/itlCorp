@@ -1078,7 +1078,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         });
 
         switch (serviceTypeId) {
-            case ChargeConstants.CL_CODE || ChargeConstants.TK_CODE:
+            case ChargeConstants.CL_CODE:
+            case ChargeConstants.TK_CODE:
                 shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
                     c = this.updatePayer(c, customerPayer);
                 });

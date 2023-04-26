@@ -327,12 +327,13 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !salemansId.value}">
+                <div class="form-group"
+                    [ngClass]="{'m-form__group has-danger':isSubmitted && (!salemansId.value || (salesmans?.length===0&&isJobCopy))}">
                     <label class="form-control-label" for="" required>
-                        Salesman
+                        Salesman {{isJobCopy}} {{salesmans?.length}}
                     </label>
                     <app-combo-grid-virtual-scroll
-                        [currentActiveItemId]="{field:'id',value: salemansId.value, hardValue: salesmanName}"
+                        [currentActiveItemId]="salesmans?.length===0&&isJobCopy? {hardValue:null }:{field:'id',value: salemansId.value, hardValue: salesmanName}"
                         (itemSelected)="onSelectDataFormInfo($event, 'salesman')"
                         [selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans" size="15"
                         [displayFields]="displayFieldSalesman" placeholder="Select salesman" [clearable]="false"

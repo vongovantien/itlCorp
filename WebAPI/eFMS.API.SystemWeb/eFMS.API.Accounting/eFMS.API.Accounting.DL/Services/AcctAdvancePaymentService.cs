@@ -903,7 +903,7 @@ namespace eFMS.API.Accounting.DL.Services
             var ops = opsTransactionRepo.Get(x => x.Hblid == hblId).FirstOrDefault();
             if (ops != null)
             {
-                transactionType = ops?.TransactionType;
+                transactionType = ops.TransactionType;
             }
             else
             {

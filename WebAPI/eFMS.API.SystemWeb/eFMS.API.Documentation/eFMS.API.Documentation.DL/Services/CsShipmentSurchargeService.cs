@@ -1529,15 +1529,15 @@ namespace eFMS.API.Documentation.DL.Services
                     //    item.IsValid = false;
 
                     //}
-                    if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno.Trim()) && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
-                    {
-                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST_OFFICE], item.Hblno, currentUser.OfficeCode);
-                        item.IsValid = false;
-                    }
                     if (!checkTranTypeImport(item.Hblno, transactionType, false))
                     {
                         item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE], item.Hblno, tranName);
                         //item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE], item.Hblno, transactionType);
+                        item.IsValid = false;
+                    }
+                    if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno.Trim()) && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
+                    {
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST_OFFICE], item.Hblno, currentUser.OfficeCode);
                         item.IsValid = false;
                     }
                 }
