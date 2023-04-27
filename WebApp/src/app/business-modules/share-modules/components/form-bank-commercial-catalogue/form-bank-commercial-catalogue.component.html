@@ -84,10 +84,16 @@
                         <div class="col-lg-6">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <div class="form-group">
+                                    <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': (isSubmitted || beneficiaryAddress.dirty)  && !beneficiaryAddress.valid}">
                                         <label required>Beneficiary Address</label>
                                         <input type="text" class="form-control" formControlName="beneficiaryAddress">
+                                        <div class="form-control-feedback"
+                                            *ngIf="isSubmitted && (beneficiaryAddress.errors | equalError: 'required') || (beneficiaryAddress.errors | equalError: 'required') && beneficiaryAddress.dirty">
+                                            Beneficiary Address is required
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>

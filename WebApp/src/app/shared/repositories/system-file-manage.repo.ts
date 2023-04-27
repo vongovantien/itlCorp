@@ -137,7 +137,13 @@ export class SystemFileManageRepo {
 
 
     GetProofOfDeliveryAttachedFiles(transactionType: string, jobId: string, hblId: string) {
-        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GetProofOfDeliveryAttachedFiles`, { transactionType:transactionType, jobId: jobId, hblId: hblId }).pipe(
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/EDoc/GetProofOfDeliveryAttachedFiles`, { transactionType: transactionType, jobId: jobId, hblId: hblId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteFileFolder(moduleName: string, folder: string, objectId: string,) {
+        return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DeleteFileFolder/${moduleName}/${folder}/${objectId}`).pipe(
             map((data: any) => data)
         );
     }

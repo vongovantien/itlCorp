@@ -11,8 +11,8 @@ import { FormValidators } from '@validators';
 import _cloneDeep from 'lodash-es/cloneDeep';
 import _merge from 'lodash-es/merge';
 import { ToastrService } from 'ngx-toastr';
-import { Observable } from 'rxjs';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { catchError, finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { IEDocUploadFile } from 'src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component';
 import { PopupBase } from 'src/app/popup.base';
 import { PartnerBank } from 'src/app/shared/models/catalogue/catPartnerBank.model';
@@ -42,7 +42,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     banks: Observable<Bank[]>;
     partnerId: string = '';
     partnerBankId: string = '';
-    bankId: any = null;
+    bankId: string = null;
     isUpdate: boolean = false;
     fileListUpload: any[] = [];
     fileListDetail: any[] = [];
@@ -96,7 +96,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     }
 
     getFormData() {
-        console.log(this.bankId)
         this.isSubmitted = true;
         if (this.formGroup.valid) {
             const formBody = this.formGroup.getRawValue();
@@ -134,6 +133,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
                     if (!!res) {
                         this.updateFormValue(res);
                         this.partnerBankId = res.id;
+                        this.bankId = res.bankId;
                     }
                 }
             );
@@ -159,40 +159,53 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     }
 
     onSubmitBankInfo() {
-        const mergeObj = this.getFormData();
-        console.log(mergeObj)
-        if (this.formGroup.valid) {
-            if (!this.isUpdate) {
-                this._catalogueRepo.addNewPartnerBank(mergeObj)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            if (res.status) {
-                                this._toastService.success(res.message);
-                                this.onRequest.emit(true);
-                                this.formGroup.reset();
-                                this.isSubmitted = false;
-                                this.hide();
-                            }
-                        }
-                    );
-            } else {
-                mergeObj.id = this.partnerBankId;
-                this._catalogueRepo.updatePartnerBank(mergeObj)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: CommonInterface.IResult) => {
-                            if (res.status) {
-                                this._toastService.success(res.message);
-                                this.onRequest.emit(true);
-                                this.formGroup.reset();
-                                this.isSubmitted = false;
-                                this.hide();
-                            }
-                        }
-                    );
-            }
+        this.isSubmitted = true
+        if (!this.formGroup.valid) {
+            return;
         }
+
+        const formData = this.getFormData();
+        const apiCall = this.isUpdate ? this._catalogueRepo.updatePartnerBank({ ...formData, id: this.partnerBankId }) : this._catalogueRepo.addNewPartnerBank(formData);
+        apiCall.pipe(catchError(this.catchError)).subscribe((res: CommonInterface.IResult) => {
+            if (res.status) {
+                this._toastService.success(res.message);
+                this.onRequest.emit(true);
+                this.formGroup.reset();
+                this.isSubmitted = false;
+                this.hide();
+            }
+        });
+    }
+
+    onSendBankInfoToAccountantSystem() {
+        if (!this.formGroup.valid) {
+            return;
+        }
+
+        this.isSubmitted = true;
+        const mergeObj = this.getFormData();
+        const action = mergeObj.approveStatus === CatalogueConstants.STATUS_APPROVAL.NEW ? 'ADD' : 'UPDATE';
+        mergeObj.id = this.partnerBankId;
+        this._catalogueRepo.updatePartnerBank(mergeObj).pipe(
+            catchError(this.catchError),
+            switchMap((res: CommonInterface.IResult) => {
+                if (res.status) {
+                    return this._catalogueRepo.syncBankInfoToAccountantSystem([{ Id: mergeObj.id, action }]);
+                } else {
+                    return of(res);
+                }
+            })
+        ).subscribe((res: any) => {
+            if (res.status) {
+                this._toastService.success(res.message);
+                this.onRequest.emit(true);
+                this.formGroup.reset();
+                this.isSubmitted = false;
+                this.hide();
+            } else {
+                this._toastService.error(res.message);
+            }
+        });
     }
 
     resetBankName() {
@@ -210,28 +223,6 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         })
 
         return url;
-    }
-
-    onSendBankInfoToAccountantSystem(): void {
-        this.isSubmitted = true;
-        const requestList = [
-            {
-                Id: this.bankDetail.id,
-                action: this.bankDetail.approveStatus === CatalogueConstants.STATUS_APPROVAL.NEW ? 'ADD' : 'UPDATE',
-            }
-        ];
-        this._catalogueRepo.syncBankInfoToAccountantSystem(requestList)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (res: any) => {
-                    if (!!res && res.status) {
-                        this._toastService.success(res.message);
-                        this.onRequest.emit(true);
-                        this.hide();
-                    } else {
-                        this._toastService.error(res.message);
-                    }
-                })
     }
 
     onReviseBankInfo(): void {
@@ -267,7 +258,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
 
     getBankInfoFiles(id: string) {
         this.isLoading = true;
-        this._systemFileManagementRepo.getFile('Category', 'PartnerBank', id).
+        this._systemFileManagementRepo.getFile('Catalogue', 'PartnerBank', id).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -293,7 +284,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         }
 
         this.fileListUpload.push(...Array.from(files));
-        this._systemFileManagementRepo.uploadFile('Category', 'PartnerBank', this.bankDetail.id, this.fileListUpload)
+        this._systemFileManagementRepo.uploadFile('Catalogue', 'PartnerBank', this.bankDetail.id, this.fileListUpload)
             .pipe(catchError(this.catchError))
             .subscribe((res: CommonInterface.IResult) => {
                 if (res.status) {

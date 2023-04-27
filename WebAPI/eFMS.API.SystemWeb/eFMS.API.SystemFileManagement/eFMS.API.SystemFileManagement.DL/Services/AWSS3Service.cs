@@ -8,6 +8,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -83,6 +84,40 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     var imageDetail = _sysImageDetailRepo.Delete(x => x.SysImageId == id);
                 }
                 return result;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.ToString());
+            }
+        }
+
+        public async Task<HandleState> DeleteFileFolder(string moduleName, string folderName, Guid objectId)
+        {
+            HandleState deleteResult = new HandleState();
+            try
+            {
+                var listRequest = new ListObjectsRequest
+                {
+                    BucketName = _bucketName,
+                    Prefix = $"{moduleName}/{folderName}/{objectId}"
+                };
+                var listObject = await _client.GetListObjectAsync(listRequest);
+                if (!listObject.S3Objects.Any()) return deleteResult;
+                var listFile = listObject.S3Objects.Select(x => x.Key).ToList();
+
+                var deleteRequest = new DeleteObjectsRequest
+                {
+                    BucketName = _bucketName,
+                    Objects = listFile.Select(key => new KeyVersion { Key = key }).ToList()
+                };
+                var deleteResponse = await _client.DeleteObjectsAsync(deleteRequest);
+
+                if (deleteResponse.HttpStatusCode == HttpStatusCode.OK)
+                {
+                    deleteResult = _sysImageRepo.Delete(x => x.ObjectId == objectId.ToString());
+                }
+
+                return deleteResult;
             }
             catch (Exception ex)
             {

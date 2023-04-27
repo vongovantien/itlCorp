@@ -27,6 +27,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             return await _client.DeleteObjectAsync(request);
         }
+        public async Task<DeleteObjectsResponse> DeleteObjectsAsync(DeleteObjectsRequest request)
+        {
+            return await _client.DeleteObjectsAsync(request);
+        }
 
         public async Task<PutObjectResponse> PutObjectAsync(PutObjectRequest request)
         {
