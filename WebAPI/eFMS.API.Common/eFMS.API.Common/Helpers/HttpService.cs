@@ -70,6 +70,32 @@ namespace eFMS.API.Common.Helpers
             return null;
         }
 
+        public async static Task<HttpResponseMessage> PostAPI(string url, object obj, string username, string password)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+                StringContent content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+
+                if (!string.IsNullOrEmpty(username))
+                {
+                    var authValue = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authValue);
+                }
+
+                HttpResponseMessage response = await client.PostAsync(url, content);
+                return response;
+            }
+            catch (Exception e)
+            {
+                new LogHelper("eFMS_HttpService_Log", e.ToString());
+            }
+            return null;
+        }
+
         public async static Task<HttpResponseMessage> GetApi(string url, string token)
         {
             try
