@@ -10,7 +10,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import * as fromStore from '../../store';
 import { ShareGoodsImportComponent } from '../goods-import/goods-import.component';
 import { Container } from '@models';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 
 @Component({
     selector: 'goods-list-popup',

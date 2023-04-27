@@ -1,4 +1,4 @@
-import range from 'lodash/range';
+import range from 'lodash-es/range';
 import { Injectable } from '@angular/core';
 @Injectable({ providedIn: 'root' })
 export class PagingService {

@@ -22,7 +22,7 @@ import { ICrystalReport } from '@interfaces';
 
 import { ShareSeaServiceFormSISeaExportComponent } from '../../../share-sea/components/form-si-sea-export/form-si-sea-export.component';
 
-import _groupBy from 'lodash/groupBy';
+import _groupBy from 'lodash-es/groupBy';
 import { catchError, finalize, takeUntil, take, pluck, concatMap, mergeMap } from 'rxjs/operators';
 import { forkJoin, of } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';

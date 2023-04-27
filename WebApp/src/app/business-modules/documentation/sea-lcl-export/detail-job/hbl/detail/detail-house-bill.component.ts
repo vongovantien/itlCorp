@@ -11,7 +11,7 @@ import { SeaLCLExportCreateHBLComponent } from '../create/create-house-bill.comp
 import * as fromShareBussiness from './../../../../../share-business/store';
 
 import { catchError, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { delayTime } from '@decorators';
 import { formatDate } from '@angular/common';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';

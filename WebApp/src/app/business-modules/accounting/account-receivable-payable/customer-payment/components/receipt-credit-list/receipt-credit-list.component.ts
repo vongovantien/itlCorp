@@ -7,7 +7,7 @@ import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptInvoiceModel } from "@models";
 import { takeUntil } from "rxjs/operators";
 import { RemoveCredit, AddDebitCreditToReceipt } from "../../store/actions";
-import _cloneDeep from 'lodash/cloneDeep'
+import _cloneDeep from 'lodash-es/cloneDeep'
 import { InjectViewContainerRefDirective } from "@directives";
 import { ConfirmPopupComponent } from "@common";
 import { AccountingConstants } from "@constants";

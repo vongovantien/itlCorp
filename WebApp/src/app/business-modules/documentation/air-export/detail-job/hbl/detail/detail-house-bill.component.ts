@@ -16,7 +16,7 @@ import { AirExportCreateHBLComponent } from '../create/create-house-bill.compone
 
 import { merge, of, throwError } from 'rxjs';
 import { catchError, takeUntil, skip, tap, switchMap, filter, concatMap, mergeMap } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { formatDate } from '@angular/common';
 import { getCurrentUserState } from '@store';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';

@@ -26,8 +26,8 @@ import { catchError, concatMap, map, switchMap, takeUntil, tap, mergeMap, finali
 import * as fromShareBussiness from './../../share-business/store';
 
 
-import _groupBy from 'lodash/groupBy';
-import isUUID from 'validator/lib/isUUID';
+import _groupBy from 'lodash-es/groupBy';
+import isUUID from 'validator/es/lib/isUUID';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';

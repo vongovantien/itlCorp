@@ -24,8 +24,8 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { ShareSeaServiceFormCreateHouseBillSeaImportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-import/form-create-hbl-sea-import.component';
 
 import { forkJoin, of } from 'rxjs';
-import isUUID from 'validator/lib/isUUID';
-import _groupBy from 'lodash/groupBy';
+import isUUID from 'validator/es/lib/isUUID';
+import _groupBy from 'lodash-es/groupBy';
 import { catchError, takeUntil, mergeMap, skip, switchMap } from 'rxjs/operators';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 import { InjectViewContainerRefDirective } from '@directives';

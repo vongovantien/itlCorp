@@ -7,7 +7,7 @@ import { InjectViewContainerRefDirective } from '@directives';
 import { Crystal } from '@models';
 import { Store } from '@ngrx/store';
 import { SystemFileManageRepo } from '@repositories';
-import _uniq from 'lodash/uniq';
+import _uniq from 'lodash-es/uniq';
 import { ToastrService } from 'ngx-toastr';
 import { combineLatest, of } from 'rxjs';
 import { catchError, concatMap, filter, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';

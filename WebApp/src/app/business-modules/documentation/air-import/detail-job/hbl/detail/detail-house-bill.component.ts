@@ -18,7 +18,7 @@ import { formatDate } from '@angular/common';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 import { catchError, concatMap, mergeMap, skip, switchMap, takeUntil } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 
 
 enum HBL_TAB {

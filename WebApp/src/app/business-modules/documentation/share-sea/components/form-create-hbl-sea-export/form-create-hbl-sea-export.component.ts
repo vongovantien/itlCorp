@@ -19,8 +19,8 @@ import { Observable, of } from 'rxjs';
 import { catchError, takeUntil, skip, finalize, tap, concatMap, startWith, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { DataService } from '@services';
 
-import _merge from 'lodash/merge';
-import _cloneDeep from 'lodash/cloneDeep';
+import _merge from 'lodash-es/merge';
+import _cloneDeep from 'lodash-es/cloneDeep';
 import { ToastrService } from 'ngx-toastr';
 import { getTransactionDetailCsTransactionState, getTransactionState } from './../../../../share-business/store';
 
@@ -35,7 +35,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
     @Input() isUpdate: boolean = false;
     @Input() set type(t: string) { this._type = t; }
-    @Input() jobId: string='';
+    @Input() jobId: string = '';
     get type() { return this._type; }
 
     private _type: string = ChargeConstants.SFE_CODE; // SLE | SFE
@@ -56,7 +56,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     country: AbstractControl;
     pol: AbstractControl;
     pod: AbstractControl;
-    finalPod:AbstractControl;
+    finalPod: AbstractControl;
     polDescription: AbstractControl;
     podDescription: AbstractControl;
     finalDestinationPlace: AbstractControl;
@@ -185,7 +185,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
     }
 
-    getShipmentType(){
+    getShipmentType() {
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(catchError(this.catchError),
                 distinctUntilChanged(),
@@ -421,7 +421,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             goodsDelivery: data.goodsDeliveryId,
             podDescription: !!data.podDescription ? data.podDescription : data.podName,
             polDescription: !!data.polDescription ? data.polDescription : data.polName,
-            finalDestinationPlace: !!data.finalDestinationPlace? data.finalDestinationPlace: data.finalPodName,
+            finalDestinationPlace: !!data.finalDestinationPlace ? data.finalDestinationPlace : data.finalPodName,
         };
 
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
