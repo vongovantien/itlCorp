@@ -1,5 +1,5 @@
 import { Directive, ElementRef, EventEmitter, HostListener, Injectable, Input, NgZone, Output, SimpleChanges } from '@angular/core';
-import { WindowRef } from './WindowRef';
+import { WindowRef } from './windowRef';
 const MAX_LOOKUP_RETRIES = 3;
 @Directive({
     selector: 'textarea[autoExpand]',
