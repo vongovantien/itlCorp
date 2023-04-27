@@ -13,7 +13,7 @@ import { CommonEnum } from '@enums';
 import { takeUntil, catchError, finalize, first, startWith } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ActivatedRoute } from '@angular/router';
 import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, GetCatalogueUnitAction, getCatalogueUnitState } from '@store';

@@ -15,7 +15,7 @@ import { getCurrentUserState, getMenuUserPermissionState, IAppState } from '@sto
 import { Store } from '@ngrx/store';
 import { getSOADetailState } from '../store/reducers';
 import { of } from 'rxjs';
-import groupBy from 'lodash/groupBy';
+import groupBy from 'lodash-es/groupBy';
 @Component({
     selector: 'app-statement-of-account-edit',
     templateUrl: './edit-soa.component.html',

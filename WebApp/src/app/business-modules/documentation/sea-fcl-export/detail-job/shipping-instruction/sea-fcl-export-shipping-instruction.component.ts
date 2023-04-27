@@ -22,7 +22,7 @@ import { ShareSeaServiceFormSISeaExportComponent } from '../../../share-sea/comp
 
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize, takeUntil, take, concatMap, pluck, mergeMap } from 'rxjs/operators';
-import _groupBy from 'lodash/groupBy';
+import _groupBy from 'lodash-es/groupBy';
 import { HttpResponse } from '@angular/common/http';
 
 @Component({

@@ -17,7 +17,7 @@ import { ShareSeaServiceFormCreateSeaImportComponent } from '../../share-sea/com
 import * as fromShareBussiness from './../../../share-business/store';
 
 import { catchError, takeUntil } from 'rxjs/operators';
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 
 import * as fromShareBusiness from '../../../share-business/store';
 @Component({

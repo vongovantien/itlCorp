@@ -18,7 +18,7 @@ import { ShareSeaServiceFormCreateSeaExportComponent } from '../../share-sea/com
 import { ShareSeaServiceShipmentGoodSummaryLCLComponent } from '../../share-sea/components/shipment-good-summary-lcl/shipment-good-summary-lcl.component';
 
 import { catchError } from 'rxjs/operators';
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 import * as fromShareBussiness from '../../../share-business/store';
 @Component({
     selector: 'app-create-job-lcl-export',

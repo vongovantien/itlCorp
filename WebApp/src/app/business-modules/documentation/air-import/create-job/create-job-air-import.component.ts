@@ -17,7 +17,7 @@ import { ShareAirServiceFormCreateComponent } from '../../share-air/components/f
 
 import * as fromShareBusiness from '../../../share-business/store';
 import { catchError } from 'rxjs/operators';
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 
 
 @Component({

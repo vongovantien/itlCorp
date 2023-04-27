@@ -13,7 +13,7 @@ import { AccountingManagementListChargeComponent } from '../../components/list-c
 import { IAccountingManagementState, InitPartner } from '../../store';
 
 import { catchError } from 'rxjs/operators';
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 import { AccountingConstants, RoutingConstants, SystemConstants } from '@constants';
 import { Router } from '@angular/router';
 

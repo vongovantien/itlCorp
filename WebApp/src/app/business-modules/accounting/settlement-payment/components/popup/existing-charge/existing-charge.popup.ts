@@ -5,7 +5,7 @@ import { SortService } from '@services';
 import { AccountingRepo, DocumentationRepo, CatalogueRepo, SystemRepo } from '@repositories';
 import { Partner, Surcharge } from '@models';
 import { ToastrService } from 'ngx-toastr';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { of } from 'rxjs';
 import { formatCurrency, formatDate } from '@angular/common';
@@ -49,7 +49,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
     selectedVatPartner: Partial<CommonInterface.IComboGridData> = {};
     selectedVatPartnerData: any;
-    listVatPartner: Partner[] =[];
+    listVatPartner: Partner[] = [];
 
     configShipment: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -167,7 +167,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         );
     }
 
-    getVatpartnerDataSource(){
+    getVatpartnerDataSource() {
         const customersFromService = this._catalogue.getCurrentCustomerSource();
         if (!!customersFromService.data.length) {
             this.listVatPartner = customersFromService.data;
@@ -359,7 +359,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             shipment.totalVATUSD = surcharges.reduce((net: number, charge: Surcharge) => net += charge.vatAmountUSD, 0);
             shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
             this.shipments = [...this.shipments, shipment];
-            this.shipments.map(item => item.advanceNoList = item.chargeSettlements.filter(x=>x.advanceNo !=null).map(x=> x.advanceNo).filter((value, index, self) => self.indexOf(value) === index));
+            this.shipments.map(item => item.advanceNoList = item.chargeSettlements.filter(x => x.advanceNo != null).map(x => x.advanceNo).filter((value, index, self) => self.indexOf(value) === index));
             this.total.totalUSDStr = formatCurrency(this.shipments[0].totalNetUSD + this.shipments[0].totalVATUSD, 'en', '') + ' = ' + formatCurrency(this.shipments[0].totalNetUSD, 'en', '') + ' + ' + formatCurrency(this.shipments[0].totalVATUSD, 'en', '');
             this.totalAmountVnd = this.formatNumberCurrency(this.shipments[0].totalVND) + ' = ' + this.formatNumberCurrency(this.shipments[0].totalNetVND) + ' + ' + this.formatNumberCurrency(this.shipments[0].totalVATVND);
             this.total.totalShipment = 1;
@@ -415,7 +415,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                     .map((charge: Surcharge) => {
                         let exchangeRate = !this.exchangeRateInput ? 1 : this.exchangeRateInput;
                         if (charge.currencyId === 'USD') {
-                            if(!!charge.kickBack && charge.kickBack === true){
+                            if (!!charge.kickBack && charge.kickBack === true) {
                                 exchangeRate = charge.finalExchangeRate;
                             }
                             charge.amountVnd = Math.round(charge.netAmount * exchangeRate);
@@ -459,7 +459,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             shipment.chargeSettlements.forEach(ele => {
                 if (ele[field] === null || ele[field] === "") {
                     ele[field] = value;
-                    if(field === 'invoiceNo'){
+                    if (field === 'invoiceNo') {
                         this.onChangeInvoiceNo(ele, value);
                     }
                 }
@@ -473,7 +473,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             const partner = this.getPartnerById(payeeId);
             chargeItem.vatPartnerId = partner.id;
             chargeItem.vatPartnerShortName = partner.shortName;
-        }else{
+        } else {
             chargeItem.vatPartnerId = null;
             chargeItem.vatPartnerShortName = null;
         }
@@ -508,11 +508,10 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         }
     }
 
-    getInvoiceAndVatPartner(){
+    getInvoiceAndVatPartner() {
         this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
-            shipment.chargeSettlements.forEach((charge: Surcharge)=>
-            {
-                if(!!charge.invoiceNo && !charge.vatPartnerId){
+            shipment.chargeSettlements.forEach((charge: Surcharge) => {
+                if (!!charge.invoiceNo && !charge.vatPartnerId) {
                     this.onChangeInvoiceNo(charge, charge.invoiceNo);
                 }
             })
@@ -546,7 +545,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         shipment.advanceNo = shipment.originAdvanceNo = advanceNoNew;
     }
 
-    clearAdvance(shipment: any){
+    clearAdvance(shipment: any) {
         // Set advance no = null when clear advance
         shipment.advanceNo = shipment.originAdvanceNo = null;
         shipment.chargeSettlements.forEach(element => {
@@ -747,7 +746,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             shipment.chargeSettlements.filter((charge: Surcharge) => charge.isSelected)
                 .map((surcharge: Surcharge) => this.selectedCharge.push(new Surcharge(surcharge)))
         );
-        console.log('Shipment',this.shipments);
+        console.log('Shipment', this.shipments);
 
 
         // if(this.shipments.every(x=>x.jobId.includes('LOG'))){
@@ -824,11 +823,11 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
     }
 
-    resetInvoiceDateAll(){
+    resetInvoiceDateAll() {
         this.invoiceDateAll.setValue(null);
     }
 
-    onResetInvoice(){
+    onResetInvoice() {
         this.confirmInvoice = false;
         this.invoiceNoAll = null;
         this.seriesNoAll = null;

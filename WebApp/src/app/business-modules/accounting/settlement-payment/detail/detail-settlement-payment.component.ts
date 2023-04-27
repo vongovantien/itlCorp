@@ -24,7 +24,7 @@ import { getCurrentUserState } from '@store';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, concatMap, finalize, pluck, takeUntil } from 'rxjs/operators';
 import { ShareBussinessAttachFileV2Component } from 'src/app/business-modules/share-business/components/edoc/files-attach-v2/files-attach-v2.component';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { LoadDetailSettlePayment, LoadDetailSettlePaymentFail, LoadDetailSettlePaymentSuccess } from '../components/store';
 @Component({
     selector: 'app-settlement-payment-detail',

@@ -3,7 +3,7 @@ import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
-import _uniqBy from 'lodash/uniqBy';
+import _uniqBy from 'lodash-es/uniqBy';
 import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';

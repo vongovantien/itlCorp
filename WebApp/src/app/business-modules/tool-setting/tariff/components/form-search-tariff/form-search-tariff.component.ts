@@ -6,7 +6,7 @@ import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { forkJoin } from 'rxjs';
-import _uniqBy from 'lodash/uniqBy';
+import _uniqBy from 'lodash-es/uniqBy';
 import { Partner } from 'src/app/shared/models';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { formatDate } from '@angular/common';

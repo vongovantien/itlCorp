@@ -14,7 +14,7 @@ import { environment } from 'src/environments/environment';
 import { GlobalState } from '../global-state';
 import { Employee, Bank, UserLevel } from '@models';
 import * as fromShare from '../business-modules/share-business/store';
-import UUID from 'validator/lib/isUUID';
+import UUID from 'validator/es/lib/isUUID';
 
 
 declare var $: any;

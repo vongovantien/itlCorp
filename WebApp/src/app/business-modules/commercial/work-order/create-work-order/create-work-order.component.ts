@@ -9,7 +9,7 @@ import { takeUntil } from 'rxjs/operators';
 import { CommercialFormCreateWorkOrderComponent } from '../components/form-create/form-create-work-order.component';
 import { InitPriceListWorkOrder, InitWorkOrder } from '../store/actions';
 import { IWorkOrderMngtState, WorkOrderListPricestate } from '../store/reducers';
-import _merge from 'lodash/merge'
+import _merge from 'lodash-es/merge'
 import { DocumentationRepo } from '@repositories';
 import { RoutingConstants, SystemConstants } from '@constants';
 

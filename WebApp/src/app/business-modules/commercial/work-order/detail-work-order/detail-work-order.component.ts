@@ -12,9 +12,9 @@ import {
     workOrderDetailCodeState,
     workOrderDetailTransactionTypeNameState
 } from '../store';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { WorkOrder, WorkOrderViewUpdateModel } from '@models';
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 import { formatDate } from '@angular/common';
 import { Observable } from 'rxjs';
 

@@ -19,7 +19,7 @@ import * as fromShareBussiness from './../../../share-business/store';
 import { ShareSeaServiceFormCreateSeaExportComponent } from '../../share-sea/components/form-create-sea-export/form-create-sea-export.component';
 
 import { catchError, takeUntil } from 'rxjs/operators';
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 
 import * as fromShareBusiness from '../../../share-business/store';
 @Component({

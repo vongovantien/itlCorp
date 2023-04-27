@@ -5,7 +5,7 @@ import { CommonEnum } from '@enums';
 import { Charge, Partner, WorkOrderSurchargeModel } from '@models';
 import { Store } from '@ngrx/store';
 import { CatalogueRepo } from '@repositories';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { Observable } from 'rxjs';
 import { finalize, shareReplay, switchMap, switchMapTo, takeUntil, tap } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';

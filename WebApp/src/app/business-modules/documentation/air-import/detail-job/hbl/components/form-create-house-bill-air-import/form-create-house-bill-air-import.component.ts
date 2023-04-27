@@ -15,8 +15,8 @@ import { InfoPopupComponent } from '@common';
 
 import { takeUntil, catchError, skip, tap, mergeMap, shareReplay, map, switchMap, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import _merge from 'lodash/merge';
-import cloneDeep from 'lodash/cloneDeep';
+import _merge from 'lodash-es/merge';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
 

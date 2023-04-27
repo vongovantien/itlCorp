@@ -24,7 +24,7 @@ import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-
 import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { BehaviorSubject, Observable, pipe } from 'rxjs';
 import { ShareDocumentTypeAttachComponent } from "src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component";
 import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState, getSettlementPaymentDetailTotalChargeState, LoadListNoGroupSurcharge } from '../store';

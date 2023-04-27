@@ -7,12 +7,12 @@ import { SortService } from 'src/app/shared/services';
 import { StatementOfAccountAddChargeComponent } from '../components/poup/add-charge/add-charge.popup';
 import { ToastrService } from 'ngx-toastr';
 import { SoaCharge, SOASearchCharge } from '@models';
-import _includes from 'lodash/includes';
-import _uniq from 'lodash/uniq';
+import _includes from 'lodash-es/includes';
+import _uniq from 'lodash-es/uniq';
 import { StatementOfAccountFormCreateComponent } from '../components/form-create-soa/form-create-soa.component';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants } from '@constants';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash-es/cloneDeep';
 
 @Component({
     selector: 'app-statement-of-account-new',
@@ -37,7 +37,7 @@ export class StatementOfAccountAddnewComponent extends AppList {
     isCollapsed: boolean = true;
     isCheckAllCharge: boolean = false;
 
-    dataCharge: any = null;  
+    dataCharge: any = null;
 
     constructor(
         private _sortService: SortService,
@@ -103,14 +103,14 @@ export class StatementOfAccountAddnewComponent extends AppList {
         }
     }
 
-    isValidSOA(){
+    isValidSOA() {
         if (!this.listCharges.length) {
             this._toastService.warning(`SOA Don't have any charges in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
             return false;
         }
 
-        if(this.dataSearch.type.toLowerCase() === 'debit' && !!this.dataSearchOld){
-            if(this.dataSearch.salemanId !== this.dataSearchOld.salemanId){
+        if (this.dataSearch.type.toLowerCase() === 'debit' && !!this.dataSearchOld) {
+            if (this.dataSearch.salemanId !== this.dataSearchOld.salemanId) {
                 this._toastService.warning(`The selected Saleman is different from shipment, Please recheck the Saleman! `, '', { positionClass: 'toast-bottom-right' });
                 return false;
             }

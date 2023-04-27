@@ -20,7 +20,7 @@ import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
 import { Observable } from 'rxjs';
 import { catchError, finalize, pluck, switchMap, takeUntil, tap } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { ISettlementPaymentState, LoadDetailSettlePayment, LoadDetailSettlePaymentSuccess, getListEdocState } from '../../settlement-payment/components/store';
 
 @Component({
