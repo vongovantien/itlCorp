@@ -271,20 +271,24 @@ namespace eFMS.API.Catalogue.Controllers
                         || responseUpdateModel.Success == "1")
                     {
                         var hs = await catPartnerBankService.UpdateByStatus(ids, "Processing");
-                        ResultHandle result = new ResultHandle { Status = true, Message = "Sync tài khoản ngân hàng thành công", Data = ids };
+                        ResultHandle result = new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_SUCCESS"].Value, Data = null };
                         return Ok(result);
                     }
                     else
                     {
+                        if (responseAddModel.Success == null || responseUpdateModel.Success == null)
+                        {
+                            return BadRequest(new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = null });
+                        }
                         ResultHandle result = new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = ids };
                         return BadRequest(result);
                     }
                 }
-                return BadRequest("Sync fail");
+                return BadRequest(new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = null });
             }
             catch (Exception)
             {
-                return BadRequest("Sync fail");
+                return BadRequest(new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = null });
             }
         }
     }
