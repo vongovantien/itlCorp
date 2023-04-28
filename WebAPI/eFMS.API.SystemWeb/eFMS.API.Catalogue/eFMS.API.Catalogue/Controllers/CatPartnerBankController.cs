@@ -272,11 +272,14 @@ namespace eFMS.API.Catalogue.Controllers
                 if (responseAddModel?.Success == "1" || responseUpdateModel?.Success == "1")
                 {
                     var hs = await catPartnerBankService.UpdateByStatus(ids, "Processing");
-                    ResultHandle result = new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_SUCCESS"].Value, Data = null };
-                    return Ok(result);
+                    return Ok(new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_SUCCESS"].Value, Data = null });
                 }
                 else
                 {
+                    if (responseAddModel?.Success == null && responseUpdateModel?.Success == null)
+                    {
+                        return BadRequest(new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = null });
+                    }
                     ResultHandle result = new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = ids };
                     return BadRequest(new ResultHandle { Status = true, Message = result.Message, Data = null });
                 }
