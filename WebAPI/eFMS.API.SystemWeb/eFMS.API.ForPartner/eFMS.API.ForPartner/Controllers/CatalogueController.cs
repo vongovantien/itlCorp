@@ -1,18 +1,16 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
-using eFMS.API.ForPartner.DL.Service;
 using eFMS.API.ForPartner.Infrastructure.Extensions;
 using eFMS.API.ForPartner.Infrastructure.Middlewares;
-using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace eFMS.API.ForPartner.Controllers
@@ -45,7 +43,8 @@ namespace eFMS.API.ForPartner.Controllers
         [Route("BankInfoSyncUpdateStatus")]
         public async Task<IActionResult> UpdateBankInfoSyncStatus(BankStatusUpdateModel model, [Required] string apiKey, [Required] string hash)
         {
-            var _startDateProgress = DateTime.Now;
+            var stopwatch = new Stopwatch();
+            stopwatch.Restart();
             if (!_catPartnerBankService.ValidateApiKey(apiKey))
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
@@ -64,13 +63,16 @@ namespace eFMS.API.ForPartner.Controllers
             string _message = hs.Success ? "Cập nhật thông tin ngân hàng thành công" : string.Format("{0}. Cập nhật thông tin ngân hàng thất bại", hs.Message.ToString());
             var result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
-            string _objectRequest = JsonConvert.SerializeObject(model);
-            var _endDateProgress = DateTime.Now;
-            #region -- Ghi Log --
-            string _funcLocal = "UpdateBankInfoSyncStatus";
-            string _major = "Cập nhật thông tin ngân hàng";
-            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
-            #endregion
+            Response.OnCompleted(async () =>
+            {
+                string _objectRequest = JsonConvert.SerializeObject(model);
+                var _endDateProgress = DateTime.Now;
+                #region -- Ghi Log --
+                string _funcLocal = "UpdateBankInfoSyncStatus";
+                string _major = "Cập nhật thông tin ngân hàng";
+                var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, DateTime.Now, DateTime.Now + stopwatch.Elapsed);
+                #endregion
+            });
 
             if (!hs.Success)
                 return BadRequest(result);

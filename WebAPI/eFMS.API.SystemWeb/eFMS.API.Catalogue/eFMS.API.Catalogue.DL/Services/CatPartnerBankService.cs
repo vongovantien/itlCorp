@@ -189,7 +189,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var existedItem = await DataContext.Where(x => x.Id == model.Id).FirstOrDefaultAsync();
                 if (existedItem == null)
                 {
-                    return new HandleState("Bank Account Not Found !!");
+                    return new HandleState(stringLocalizer["MSG_PARTNER_BANK_EXISTED"].Value);
                 }
                 model.DatetimeCreated = existedItem.DatetimeCreated;
                 model.DatetimeModified = DateTime.Now;
