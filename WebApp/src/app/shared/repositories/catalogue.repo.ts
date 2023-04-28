@@ -576,6 +576,21 @@ export class CatalogueRepo {
             })
         );
     }
+    getWardByDistrict(id: any) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatWard/getWardByDistrict`, { districtId: id }).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+    getWards() {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatWard/getAll`).pipe(
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
     
 
     getPlace(body?: any) {
@@ -648,6 +663,16 @@ export class CatalogueRepo {
 
     getEmailPartner(id: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerEmail/GetBy/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+    getAddressPartner(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatAddressPartner/GetAddressByPartner/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+    getDetailAddress(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatAddressPartner/GetDetailById/${id}`).pipe(
             map((data: any) => data)
         );
     }
@@ -1512,7 +1537,7 @@ export class CatalogueRepo {
 
     addAddress(data:any)
     {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatAddressPartner/Add`, data).pipe(
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatAddressPartner/add`, data).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -1520,7 +1545,7 @@ export class CatalogueRepo {
         );
     }
     updateAddress(data: any) {
-        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatAddressPartner/Update`, data).pipe(
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatAddressPartner/update`, data).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -1529,7 +1554,7 @@ export class CatalogueRepo {
     }
 
     deleteAddress(id: string) {
-        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatAddressPartner/${id}`).pipe(
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatAddressPartner/DeleteById/${id}`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

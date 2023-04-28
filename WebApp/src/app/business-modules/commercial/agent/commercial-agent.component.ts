@@ -20,6 +20,7 @@ import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { FormSearchExportComponent } from '../components/popup/form-search-export/form-search-export.popup';
 import { HttpResponse } from '@angular/common/http';
+import { ManagementAddressComponent } from '../components/management-address/management-commercial-address.component';
 
 
 @Component({
@@ -33,6 +34,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
     @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
     @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
     @ViewChild(FormSearchExportComponent) formSearchExportPopup: FormSearchExportComponent;
+    @ViewChild(ManagementAddressComponent) formManagementAddress: ManagementAddressComponent;
 
     menuSpecialPermission: Observable<any[]>;
 
@@ -46,6 +48,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
     headerSalemans: CommonInterface.IHeaderTable[];
     headerSearch: CommonInterface.IHeaderTable[];
+    selectedPartner: Partner;
 
     constructor(private _ngProgressService: NgProgress,
         private _catalogueRepo: CatalogueRepo,
@@ -381,6 +384,14 @@ export class CommercialAgentComponent extends AppList implements OnInit {
                     this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME))
                 }
             )
+    }
+    onSelectPartner(pn: Partner) {
+        this.selectedPartner = pn;
+    }
+
+    showManagementAddress(partner: any) {
+        this.formManagementAddress.setDefaultValue(partner);
+        this.formManagementAddress.show();
     }
 
 }

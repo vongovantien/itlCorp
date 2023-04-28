@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
@@ -25,6 +26,11 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
+        private readonly IContextBase<CatPartner> catPartnerRepository;
+        private readonly IContextBase<CatCountry> catCountryRepository;
+        private readonly IContextBase<CatCity> catCityRepository;
+        private readonly IContextBase<CatDistrict> catDistrictRepository;
+        private readonly IContextBase<CatWard> catWardRepository;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IMapper mapper;
 
@@ -32,12 +38,22 @@ namespace eFMS.API.Catalogue.DL.Services
             ICacheServiceBase<CatAddressPartner> cacheService,
             IMapper imapper,
             IContextBase<SysUser> sysUserRepo,
+            IContextBase<CatPartner> catPartnerRepo,
+            IContextBase<CatCountry> catCountryRepo,
+            IContextBase<CatCity> catCityRepo,
+            IContextBase<CatDistrict> catDistrictRepo,
+            IContextBase<CatWard> catWardRepo,
             IStringLocalizer<LanguageSub> localizer,
         ICurrentUser currUser) : base(repository, cacheService, imapper)
         {
             currentUser = currUser;
             sysUserRepository = sysUserRepo;
             stringLocalizer = localizer;
+            catPartnerRepository = catPartnerRepo;
+            catCountryRepository = catCountryRepo;
+            catDistrictRepository = catDistrictRepo;
+            catCityRepository = catCityRepo;
+            catWardRepository = catWardRepo;
             mapper = imapper;
         }
 
@@ -45,6 +61,11 @@ namespace eFMS.API.Catalogue.DL.Services
         public override HandleState Add(CatAddressPartnerModel entity)
         {
             var address = mapper.Map<CatAddressPartner>(entity);
+            var nameCountry = catCountryRepository.Get(x => x.Id == address.CountryId)?.FirstOrDefault()?.NameVn;
+            var nameCity = catCityRepository.Get(x => x.Id == address.CityId)?.FirstOrDefault()?.NameVn;
+            var nameDistrict = catDistrictRepository.Get(x => x.Id == address.DistrictId)?.FirstOrDefault()?.NameVn;
+            var nameWard = catWardRepository.Get(x => x.Id == address.WardId)?.FirstOrDefault()?.NameVn;
+            address.Location = address.StreetAddress + ", " + nameWard + ", " + nameDistrict + ", " + nameCity + ", " + nameCountry;
             address.Id = Guid.NewGuid();
             address.DatetimeCreated = address.DatetimeModified = DateTime.Now;
             address.Active = true;
@@ -68,10 +89,22 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.UserModified = currentUser.UserID;
                 entity.DatetimeModified = DateTime.Now;
                 entity.ShortNameAddress = model.ShortNameAddress;
+                entity.CountryId = model.CountryId;
+                entity.CityId = model.CityId;
+                entity.DistrictId = model.DistrictId;
+                entity.WardId = model.WardId;
                 entity.StreetAddress = model.StreetAddress;
                 entity.AddressType = model.AddressType;
-                entity.Location = model.Location;
+                entity.ContactPerson = model.ContactPerson;
+                entity.Tel = model.Tel;
                 entity.Active = model.Active;
+
+                var nameCountry = catCountryRepository.Get(x => x.Id == entity.CountryId)?.FirstOrDefault()?.NameVn;
+                var nameCity = catCityRepository.Get(x => x.Id == entity.CityId)?.FirstOrDefault()?.NameVn;
+                var nameDistrict = catDistrictRepository.Get(x => x.Id == entity.DistrictId)?.FirstOrDefault()?.NameVn;
+                var nameWard = catWardRepository.Get(x => x.Id == entity.WardId)?.FirstOrDefault()?.NameVn;
+                entity.Location = entity.StreetAddress + ", " + nameWard + ", " + nameDistrict + ", " + nameCity + ", " + nameCountry;
+
 
                 if (entity.Active == false)
                     entity.InactiveOn = DateTime.Now;
@@ -212,6 +245,11 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             ClearCache();
             CatAddressPartnerModel queryDetail = Get(x => x.Id == id).FirstOrDefault();
+            //get infor partner
+            var partner = catPartnerRepository.Get(x => x.Id.ToLower() == queryDetail.PartnerId.ToString().ToLower())?.FirstOrDefault();
+            queryDetail.AccountNo = partner?.AccountNo;
+            queryDetail.ShortName = partner?.ShortName;
+            queryDetail.TaxCode = partner?.TaxCode;
             // Get usercreate name
             if (queryDetail.UserCreated != null)
                 queryDetail.UserCreatedName = sysUserRepository.Get(x => x.Id == queryDetail.UserCreated)?.FirstOrDefault()?.Username;
@@ -223,97 +261,55 @@ namespace eFMS.API.Catalogue.DL.Services
 
         }
 
-        //    public List<CatBankImportModel> CheckValidImport(List<CatBankImportModel> list)
-        //    {
-        //        var banks = Get();
-        //        for (int i = 0; i < list.Count; i++)
-        //        {
-        //            var bankImport = list[i];
 
-        //            if (string.IsNullOrEmpty(bankImport.BankNameVn))
-        //            {
-        //                bankImport.BankName_VN_Error = stringLocalizer[CatalogueLanguageSub.MSG_BANK_NAME_VN_EMPTY];
-        //                bankImport.IsValid = false;
-        //            }
-        //            if (string.IsNullOrEmpty(bankImport.BankNameEn))
-        //            {
-        //                bankImport.BankName_EN_Error = stringLocalizer[CatalogueLanguageSub.MSG_BANK_NAME_EN_EMPTY];
-        //                bankImport.IsValid = false;
-        //            }
-        //            if (string.IsNullOrEmpty(bankImport.Code))
-        //            {
-        //                bankImport.CodeError = stringLocalizer[CatalogueLanguageSub.MSG_BANK_CODE_EMPTY];
-        //                bankImport.IsValid = false;
-        //            }
-        //            else
-        //            {
-        //                var check = banks.FirstOrDefault(x => x.Code.ToLower() == bankImport.Code.ToLower());
-        //                if (check != null)
-        //                {
-        //                    bankImport.CodeError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_CODE_EXISTED, bankImport.Code];
-        //                    bankImport.IsValid = false;
-        //                }
-        //                if (list.Count(x => x.Code?.ToLower() == bankImport.Code?.ToLower()) > 1)
-        //                {
-        //                    bankImport.CodeError = stringLocalizer[CatalogueLanguageSub.MSG_CHARGE_CODE_DUPLICATED, bankImport.Code];
-        //                    bankImport.IsValid = false;
-        //                }
-        //            }
-
-        //        }
-        //        return list;
-        //    }
-
-        //    public HandleState Import(List<CatBankImportModel> data)
-        //    {
-        //        try
-        //        {
-        //            foreach (var item in data)
-        //            {
-        //                var charge = new CatBank
-        //                {
-        //                    Id = Guid.NewGuid(),
-        //                    Code = item.Code,
-        //                    BankNameVn = item.BankNameVn,
-        //                    BankNameEn = item.BankNameEn,
-        //                    Active = item.Status.Trim().ToLower() == "active",
-        //                    DatetimeCreated = DateTime.Now,
-        //                    UserCreated = currentUser.UserID,
-        //                };
-        //                DataContext.Add(charge, false);
-        //            }
-        //            DataContext.SubmitChanges();
-        //            ClearCache();
-        //            Get();
-        //            return new HandleState();
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return new HandleState(ex.Message);
-        //        }
-        //    }
-
-        public async Task<IQueryable<CatAddressPartnerModel>> GetAddressByPartnerId(Guid id)
+        public IQueryable<CatAddressPartnerModel> GetAddressByPartnerId(Guid partnerId)
         {
-            var data = await DataContext.WhereAsync(x => x.PartnerId == id);
-            if (data.Count() == 0)
+            var data = DataContext.Get(x => x.PartnerId == partnerId);
+            if (data == null) return null;
+            var results = data.ProjectTo<CatAddressPartnerModel>(mapper.ConfigurationProvider).ToList();
+            results.ForEach(x =>
             {
-                return Enumerable.Empty<CatAddressPartnerModel>().AsQueryable();
-            }
-
-            var result = data.Select(x => new CatAddressPartnerModel
-            {
-                Id = x.Id,
-                UserCreated = x.UserCreated,
-                DatetimeCreated = x.DatetimeCreated,
-                UserModified = x.UserModified,
-                DatetimeModified = x.DatetimeModified,
-                Active = x.Active,
-                InactiveOn = x.InactiveOn,
+                var partner = catPartnerRepository.Get(y => y.Id.ToLower() == x.PartnerId.ToString().ToLower())?.FirstOrDefault();
+                x.ShortName = partner?.ShortName;
+                x.TaxCode = partner?.TaxCode;
+                x.AccountNo = partner?.AccountNo;
+                x.CountryName = catCountryRepository.Get(y => y.Id == x.CountryId).Select(t => t.NameEn).FirstOrDefault();
+                x.CityName = catCityRepository.Get(y => y.Id == x.CityId).Select(t => t.NameEn).FirstOrDefault();
+                x.DistrictName = catDistrictRepository.Get(y => y.Id == x.DistrictId).Select(t => t.NameEn).FirstOrDefault();
+                x.WardName = catWardRepository.Get(y => y.Id == x.WardId).Select(t => t.NameEn).FirstOrDefault();
             });
+            return results?.OrderByDescending(x => x.DatetimeModified).AsQueryable();
+            //if (data.Count() == 0)
+            //{
+            //    return Enumerable.Empty<CatAddressPartnerModel>().AsQueryable();
+            //}
+            //var partner = catPartnerRepository.Get(x => x.Id.ToLower() == partnerId.ToString().ToLower());
+            //var country = catCountryRepository.Get();
+            //var city = catCityRepository.Get();
+            //var district = catDistrictRepository.Get();
+            //var ward = catWardRepository.Get();
 
-            return result.AsQueryable();
+            //var result = (from address in data
+            //              join ctry in country on address.CountryId equals ctry.Id into ctryGrp
+            //              join ct in city on address.CityId equals ct.Id into ctGrp
+            //              join dt in district on address.DistrictId equals dt.Id into dtGrp
+            //              join w in ward on address.WardId equals w.Id into wGrp
+            //              from chgroup in ctryGrp.DefaultIfEmpty()
+            //              select new CatAddressPartnerModel
+            //{
+            //    Id = address.Id,
+            //    UserCreated = address.UserCreated,
+            //    DatetimeCreated = address.DatetimeCreated,
+            //    UserModified = address.UserModified,
+            //    DatetimeModified = address.DatetimeModified,
+            //    Active = address.Active,
+            //    InactiveOn = address.InactiveOn,
+            //    ShortName = 
+            //});
+
+            //return result?.OrderByDescending(x => x.DatetimeModified).AsQueryable();
         }
+
     }
 }
 

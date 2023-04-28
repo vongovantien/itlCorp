@@ -1,0 +1,59 @@
+<div class="modal fade form-contract-commercial-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center justify-content-between p-1">
+                    <h5 class="modal-title" style="margin-right:10px;">
+                        Address Management
+                    </h5>
+
+                    <button type="button" class="close" aria-label="Close" (click)="close()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form class="m-form m-form m-form--state" [formGroup]="formGroup">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && accountNo.invalid }">
+                                <label class="form-control-label">
+                                    Partner ID
+                                </label>
+                                <input type="text" class="form-control m-input" name="accountNo" autocomplete="nope"
+                                    formControlName="accountNo" disabled>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && shortName.invalid }">
+                                <label class="form-control-label">
+                                    Name ABBR <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input" disabled name="shortName"
+                                    autocomplete="nope" formControlName="shortName">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && taxCode.invalid }">
+                                <label class="form-control-label">
+                                    Taxcode
+                                </label>
+                                <input type="text" class="form-control m-input" disabled name="taxCode"
+                                    autocomplete="nope" formControlName="taxCode">
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+                <!-- <app-commercial-address-list></app-commercial-address-list> -->
+            </div>
+            <div class="modal-footer m--align-center">
+                <app-default-button [buttonSetting]="cancelButtonSetting" (click)="close()"></app-default-button>
+            </div>
+
+        </div>
+    </div>
+</div>

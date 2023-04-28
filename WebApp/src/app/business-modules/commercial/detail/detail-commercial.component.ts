@@ -20,6 +20,7 @@ import { CommercialBranchSubListComponent } from '../components/branch-sub/comme
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialBankListComponent } from '../components/bank/commercial-bank-list.component';
 import { formatDate } from '@angular/common';
+import { CommercialAddressListComponent } from '../components/address/commercial-address-list.component';
 
 @Component({
     selector: 'app-detail-commercial',
@@ -32,6 +33,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     @ViewChild(CommercialBranchSubListComponent) formBranchSubList: CommercialBranchSubListComponent;
     @ViewChild(CommercialBankListComponent) formBankList: CommercialBankListComponent
     @ViewChild(PayableComponent) payableComponent: PayableComponent;
+    @ViewChild(CommercialAddressListComponent) addressPartnerList: CommercialAddressListComponent;
 
     partnerId: string;
     partner: Partner;
@@ -93,6 +95,11 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     }
                     this.formBankList.partnerId = res.partnerId;
                     this.formBankList.getListBank(res.partnerId);
+
+                    this.addressPartnerList.partnerId = res.partnerId;
+                    this.addressPartnerList.getAddressPartner(res.partnerId);
+                    this.addressPartnerList.partner = res;
+
                     this.payableComponent.partnerId = res.partnerId;
                     this.payableComponent.getFileContract(res.partnerId);
                 } else {
@@ -117,6 +124,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     if (!!res) {
                         this.partner = res;
                         this.formBankList.partner = this.partner;
+                        this.addressPartnerList.partner = this.partner;
                         this.formCommercialComponent.active = this.partner.active;
                         this.formCreate.isBranchSub = this.isAddSubPartner;
                         this.setDataForm(this.partner);

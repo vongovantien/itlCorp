@@ -28,6 +28,7 @@ import { FormAddPartnerComponent } from '../components/form-add-partner/form-add
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { UserCreatePopupComponent } from '../components/user-create-popup/user-create-popup.component';
 import { formatDate } from '@angular/common';
+import { CommercialAddressListComponent } from 'src/app/business-modules/commercial/components/address/commercial-address-list.component';
 
 
 @Component({
@@ -52,6 +53,7 @@ export class PartnerDetailComponent extends AppList {
     @ViewChild(CommercialEmailListComponent) partnerEmailList: CommercialEmailListComponent;
     @ViewChild(UserCreatePopupComponent) userCreatePopup: UserCreatePopupComponent;
     @ViewChild(CommercialBankListComponent) partnerBankList: CommercialBankListComponent;
+    @ViewChild(CommercialAddressListComponent) addressPartnerList: CommercialAddressListComponent;
 
     public originRoute: string = null;
     contracts: Contract[] = [];
@@ -151,6 +153,10 @@ export class PartnerDetailComponent extends AppList {
         this.formPartnerComponent.isUpdate = !this.isAddSubPartner;
         this.partnerEmailList.getEmailPartner(this.partner.id);
         this.partnerEmailList.partnerId = this.partner.id;
+
+        this.addressPartnerList.getAddressPartner(this.partner.id);
+        this.addressPartnerList.partnerId = this.partner.id;
+        this.addressPartnerList.partner = this.partner;
         this._cd.detectChanges();
     }
 

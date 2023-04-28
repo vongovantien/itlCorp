@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -13,13 +14,13 @@ namespace eFMS.API.Catalogue.DL.IService
     public interface ICatAddressPartnerService : IRepositoryBaseCache<CatAddressPartner, CatAddressPartnerModel>
     {
         IQueryable<CatAddressPartnerModel> GetAll();
-        //IQueryable<CatAddressPartnerModel> Paging(CatBankCriteria criteria, int pageNumber, int pageSize, out int rowsCount);
+        //IQueryable<CatAddressPartnerModel> Paging(CatAddressPartnerCriteria criteria, int pageNumber, int pageSize, out int rowsCount);
         HandleState Update(CatAddressPartnerModel model);
         HandleState Delete(Guid id);
-        //IQueryable<CatAddressPartnerModel> Query(CatBankCriteria criteria);
+        //IQueryable<CatAddressPartnerModel> Query(CatAddressPartnerCriteria criteria);
         CatAddressPartnerModel GetDetail(Guid id);
         //List<CatAddressPartnerModel> CheckValidImport(List<CatAddressPartnerModel> list);
         //HandleState Import(List<CatAddressPartnerModel> data);
-        Task<IQueryable<CatAddressPartnerModel>> GetAddressByPartnerId(Guid id);
+        IQueryable<CatAddressPartnerModel> GetAddressByPartnerId(Guid id);
     }
 }

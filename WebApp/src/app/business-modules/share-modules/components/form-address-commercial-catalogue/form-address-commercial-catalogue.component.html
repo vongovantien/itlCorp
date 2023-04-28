@@ -1,0 +1,214 @@
+<div class="modal fade form-contract-commercial-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center justify-content-between p-1">
+                    <h5 class="modal-title" style="margin-right:10px;">
+                        Add New Address
+                    </h5>
+
+                    <button type="button" class="close" aria-label="Close" (click)="close()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form class="m-form m-form m-form--state" [formGroup]="formAddress">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && accountNo.invalid }">
+                                <label class="form-control-label">
+                                    Partner ID
+                                </label>
+                                <input type="text" class="form-control m-input" name="accountNo" autocomplete="nope"
+                                    formControlName="accountNo" disabled>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && shortName.invalid }">
+                                <label class="form-control-label">
+                                    Name ABBR <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input" disabled name="shortName"
+                                    autocomplete="nope" formControlName="shortName">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && taxCode.invalid }">
+                                <label class="form-control-label">
+                                    Taxcode
+                                </label>
+                                <input type="text" class="form-control m-input" disabled name="taxCode"
+                                    autocomplete="nope" formControlName="taxCode">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && shortNameAddress.invalid}">
+                                <label class="form-control-label">
+                                    Name Address ABBR <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input"
+                                    placeholder="Please enter Name Address ABBR" autocomplete="nope"
+                                    formControlName="shortNameAddress">
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && countryId.invalid}">
+                                <label class="form-control-label">
+                                    Country <span class="m--font-danger">(*)</span>
+                                </label>
+                                <ng-select [clearable]="true" [items]="countries" class="custom" bindLabel="text"
+                                    (change)="onChange($event, 'country')" placeholder="Select country"
+                                    formControlName="countryId">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && countryId.invalid">
+                                    Country is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && cityId.invalid }">
+                                <label class="form-control-label">
+                                    City <span class="m--font-danger">(*)</span>
+                                </label>
+                                <ng-select [clearable]="true" [items]="provinces" bindLabel="text" class="custom"
+                                    (change)="onChange($event, 'province')" placeholder="Select province"
+                                    formControlName="cityId">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && cityId.invalid">
+                                    Province is required
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && districtId.invalid }">
+                                <label class="form-control-label">
+                                    District <span class="m--font-danger">(*)</span>
+                                </label>
+                                <ng-select #chooseDistrict [clearable]="true" [items]="districts" bindLabel="text"
+                                    class="custom" placeholder="Select district"
+                                    (change)="onChange($event, 'district')" formControlName="districtId">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && districtId.invalid">
+                                    District is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted && wardId.invalid }">
+                                <label class="form-control-label">
+                                    Ward <span class="m--font-danger">(*)</span>
+                                </label>
+                                <ng-select [clearable]="true" [items]="wards" bindLabel="text" class="custom"
+                                    placeholder="Select Ward" formControlName="wardId">
+                                </ng-select>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && wardId.invalid">
+                                    Ward is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && streetAddress.invalid }">
+                                <label class="form-control-label">
+                                    Street Address <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input" formControlName="streetAddress"
+                                    placeholder="Please enter Street Address">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && streetAddress.invalid">
+                                    Street Address is required
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && addressType.invalid }">
+                                <label class="form-control-label">
+                                    Address Type <span class="m--font-danger">(*)</span>
+                                </label>
+                                <div class="pos-rel">
+                                    <ng-select [items]="listAddressType" (change)="selectedAddressType($event)"
+                                        class="custom" [clearable]="true" placeholder="Please select Address Type"
+                                        formControlName="addressType" [multiple]="true" placeholder="Please select">
+                                    </ng-select>
+                                </div>
+                                <div class="form-control-feedback" *ngIf="isSubmitted && addressType.invalid">
+                                    Address Type is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && contactPerson.invalid }">
+                                <label class="form-control-label">
+                                    Person Contract <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input"
+                                    placeholder="Please enter name Person Contract" autocomplete="nope"
+                                    formControlName="contactPerson">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && contactPerson.invalid">
+                                    Person Contract is required
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group"
+                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && tel.invalid }">
+                                <label class="form-control-label">
+                                    Phone number <span class="m--font-danger">(*)</span>
+                                </label>
+                                <input type="text" class="form-control m-input"
+                                    placeholder="Please enter name Phone number" autocomplete="nope"
+                                    formControlName="tel">
+                                <div class="form-control-feedback" *ngIf="isSubmitted && tel.invalid">
+                                    Phone number is required
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="isUpdate && !!addressDetail">
+                        <div class="col-6">
+                            <div class="m--align-left">
+                                Created: {{addressDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                                &nbsp;
+                                By <span class="text-success">{{addressDetail.userCreatedName}}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="m--align-left">
+                                Modified: {{addressDetail.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                                &nbsp;
+                                By <span class="text-success">{{addressDetail.userModifiedName}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand  m-btn--icon m-btn--uppercase m--margin-right-10" (click)="onSubmit()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span> Save </span>
+                    </span>
+                </button>
+                <app-default-button [buttonSetting]="cancelButtonSetting" (click)="close()"></app-default-button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,9 @@
 export class AddressPartner {
     id: string = "00000000-0000-0000-0000-000000000000";
     shortNameAddress: string = null;
+    accountNo: string = null;
+    shortName: string = null;
+    taxCode: string = null;
     addressType: string = null;
     userCreated: string = null;
     datetimeCreated: string = null;
@@ -10,14 +13,17 @@ export class AddressPartner {
     inactiveOn: string = null;
     userCreatedName: string = null;
     userModifiedName: string = null;
+    contactPerson: string = null;
+    tel: string = null;
 
     location: string = null;
     streetAddress: string = null;
-    codeCountry: string = null;
-    codeCity: string = null;
-    codeDistrict: string = null;
-    codeWard: string = null;
+    countryId: string = null;
+    cityId: string = null;
+    districtId: string = null;
+    wardId: string = null;
     partnerId: string = null;
+    index: number = null;
     
     constructor(data?: any) {
         const self = this;
