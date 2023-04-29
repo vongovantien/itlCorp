@@ -89,6 +89,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((partners: any[]) => {
                 this.listPartner = partners;
+                this._cd.markForCheck();
             });
     }
 
