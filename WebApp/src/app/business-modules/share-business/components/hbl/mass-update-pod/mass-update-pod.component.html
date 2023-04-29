@@ -1,72 +1,122 @@
 <div class="modal fade" role="dialog" bsModal #popup="bs-modal">
-    <div class="modal-dialog modal-md" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Mass Update POD</h5>
-                <button type="button" class="close" aria-label="Close"
-                    (click)="formGroup.reset(); hide(); isSubmitted = false">
+                <button type="button" class="close" aria-label="Close" (click)="onClosePopUp()">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form [formGroup]="formGroup">
-                    <div class="form">
-                        <div class="form-group"
-                            [ngClass]="{ 'm-form__group has-danger': isSubmitted && deliveryDate.value?.startDate===null}">
-                            <label required>Delivery Date</label>
-                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
-                                    placeholder="Please Select" readonly [singleDatePicker]="true"
-                                    formControlName="deliveryDate"
-                                    [allowRemove]="!!deliveryDate.value && !!deliveryDate.value?.startDate"
-                                    (remove)="resetDeliveryDate()" [alwaysShowCalendars]="true" [autoApply]="true" />
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
+                <div class="clearfix">
+                    <div class="float-right">
+                        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
+                            (click)="onShowDocumentAttach()">
+                            <span>
+                                <i class="la la-download"></i>
+                                <span>
+                                    Attach Files POD
                                 </span>
-                                <div class="form-control-feedback"
-                                    *ngIf="isSubmitted && deliveryDate.value?.startDate===null">
-                                    Delivery Date is Required
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                <div class="form">
+                    <div class="row">
+                        <div class="col-md-4 pr-0">
+                            <div class="form-group">
+                                <label>Delivery Person</label>
+                                <input type="text" class="form-control" autocomplete="nope"
+                                    placeholder="Delivery Person" [(ngModel)]="deliveryPersonAll">
+                            </div>
+                        </div>
+                        <div class="col-md-8 pr-0 " [formGroup]="formGroup">
+                            <div class="form-group">
+                                <label>Delivery Date</label>
+                                <div class="row">
+                                    <div class="col-lg-6 pr-0">
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                                formControlName="deliveryDateAll" placeholder="Please Select" readonly
+                                                [singleDatePicker]="true" [alwaysShowCalendars]="true"
+                                                [autoApply]="true" />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
+                                            </span>
+                                            <ng-container
+                                                *ngIf="!!deliveryDateAll.value && !!deliveryDateAll.value.startDate">
+                                                <span class=" m-input-icon_clear"
+                                                    (click)="resetFormControl(deliveryDateAll)"><i
+                                                        class="la la-times"></i></span>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <button class="btn btn-success btn-sm m-btn--pill m-btn--icon m-btn--icon-only"
+                                            (click)="onChangeAllValuePOD()"
+                                            title="Apply delivery person, delivery date">
+                                            <i class="la la-arrow-circle-down"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted && !deliveryPerson.valid }">
-                            <label required>Delivery Person</label>
-                            <input type="text" class="form-control" placeholder="Delivery Person"
-                                formControlName="deliveryPerson">
-                            <div class="form-control-feedback" *ngIf="isSubmitted && !deliveryPerson.valid">
-                                Delivery Person is required !
-                            </div>
-
-                        </div>
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': isSubmitted &&  !HAWBNo.valid }">
-                            <label required>HAWB No</label>
-                            <div class="pos-rel">
-                                <ng-select [items]="houseBillList" class="custom" [clearable]="true" bindLabel="hwbno"
-                                    formControlName="HAWBNo" [multiple]="true" (change)="selectedHAWBNo($event)">
-                                </ng-select>
-                            </div>
-                            <div class="form-control-feedback" *ngIf="isSubmitted && !HAWBNo.valid">
-                                HAWB No is required !
-                            </div>
-                        </div>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer m--align-center c-button-actions">
-                <ng-container>
-                    <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="updatePOD()">
-                    </app-default-button>
-                </ng-container>
+                </div>
+                <div>
+                    <table class="table table-brand">
+                        <thead app-table-header [headers]="headers"></thead>
+                        <tbody>
+                            <tr *ngFor="let hbl of houseBillList; let i = index; trackBy: trackByFn" class="abc">
+                                <td>
+                                    {{hbl.hwbno}}
+                                </td>
+                                <td>
+                                    <div class="form-group">
+                                        <input type="text" [(ngModel)]="hbl.deliveryPerson" class="form-control"
+                                            placeholder="Delivery Person">
+                                    </div>
+                                </td>
+                                <td class="transparent-calendar">
+                                    <div class="form-group">
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                                                placeholder="Please Select" readonly [singleDatePicker]="true"
+                                                [alwaysShowCalendars]="true" [autoApply]="true"
+                                                [(ngModel)]="hbl.deliveryDate" />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
+                                            </span>
+                                            <ng-container *ngIf="!!hbl.deliveryDate && !!hbl.deliveryDate.startDate">
+                                                <span class=" m-input-icon_clear" (click)="resetDeliveryDate(i)"><i
+                                                        class="la la-times"></i></span>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer m--align-center c-button-actions">
+                    <ng-container>
+                        <app-default-button [buttonSetting]="saveButtonSetting" (click)="updatePOD()">
+                        </app-default-button>
+                    </ng-container>
 
-                <app-default-button [buttonSetting]="cancelButtonSetting"
-                    (onClick)="isSubmitted = false; formGroup.reset(); hide()">
-                </app-default-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="onClosePopUp()">
+                    </app-default-button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    <document-type-attach [housebills]="houseBillList" [transactionType]="this.transactionType" [typeFrom]="'Shipment'" [isAttachFilePOD]="true" [jobId]="this.jobId">
+    </document-type-attach>
