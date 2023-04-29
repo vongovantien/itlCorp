@@ -2757,6 +2757,20 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
 
+                decimal vatAmount = 0;
+                decimal netAmount = 0;
+                // VAT amount
+                if (sur.Vatrate > 0)
+                {
+                    vatAmount = (sur.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(sur.VatAmountVnd ?? 0) : NumberHelper.RoundNumber(sur.VatAmountUsd ?? 0, 2));
+
+                }
+                else
+                {
+                    vatAmount = (sur.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(sur.Vatrate ?? 0) : NumberHelper.RoundNumber(sur.Vatrate ?? 0, 2));
+                }
+                // Net amount
+                netAmount = (sur.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(sur.AmountVnd ?? 0) : NumberHelper.RoundNumber(sur.AmountUsd ?? 0, 2));
                 var chg = new ChargeSOAResult()
                 {
                     ID = sur.Id,
@@ -2798,6 +2812,7 @@ namespace eFMS.API.Accounting.DL.Services
                     VATRate = sur.Vatrate,
                     VATAmountLocal = sur.VatAmountVnd,
                     VATAmountUSD = sur.VatAmountUsd,
+                    VATAmount = vatAmount,
                     PackageQty = _packageQty,
                     GrossWeight = _grossWeight,
                     ChargeWeight = _chargeWeight,
@@ -2813,11 +2828,13 @@ namespace eFMS.API.Accounting.DL.Services
                     FinalExchangeRate = sur.FinalExchangeRate,
                     PIC = null,
                     IsSynced = _isSynced,
-                    NetAmount = sur.NetAmount,
+                    NetAmount = netAmount,
+                    //NetAmount = sur.NetAmount,
                     AmountVND = sur.AmountVnd,
                     AmountUSD = sur.AmountUsd,
                     SeriesNo = sur.SeriesNo,
                     InvoiceDate = sur.InvoiceDate,
+                    
                     TaxCodeOBH = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH && !string.IsNullOrEmpty(sur.PaymentObjectId)) ? catPartnerRepo.Get(x => x.Id == sur.PaymentObjectId).Select(x => x.TaxCode).FirstOrDefault() : string.Empty,
                 };
                 result.Add(chg);
@@ -2840,7 +2857,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
 
-            var surCharges = csShipmentSurchargeRepo.Get(x => soa.Type == "Debit" ? x.Soano == soa.Soano : x.PaySoano == soa.Soano);
+            // var surCharges = csShipmentSurchargeRepo.Get(x => soa.Type == "Debit" ? x.Soano == soa.Soano : x.PaySoano == soa.Soano);
 
 
             List<ExportSOAOPS> lstSOAOPS = new List<ExportSOAOPS>();
@@ -2891,24 +2908,24 @@ namespace eFMS.API.Accounting.DL.Services
             opssoa.FromDate = soa.SoaformDate;
             opssoa.SoaNo = soa.Soano;
 
-            foreach (var item in opssoa.exportSOAOPs)
-            {
-                foreach (var it in item.Charges)
-                {
-                    // VAT amount
-                    if (it.VATRate > 0)
-                    {
-                        it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATAmountLocal ?? 0) : NumberHelper.RoundNumber(it.VATAmountUSD ?? 0, 2));
+            //foreach (var item in opssoa.exportSOAOPs)
+            //{
+            //    foreach (var it in item.Charges)
+            //    {
+            //        // VAT amount
+            //        if (it.VATRate > 0)
+            //        {
+            //            it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATAmountLocal ?? 0) : NumberHelper.RoundNumber(it.VATAmountUSD ?? 0, 2));
                         
-                    }
-                    else
-                    {
-                        it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATRate ?? 0) : NumberHelper.RoundNumber(it.VATRate ?? 0, 2));
-                    }
-                    // Net amount
-                    it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.AmountVND ?? 0) : NumberHelper.RoundNumber(it.AmountUSD ?? 0, 2));
-                }
-            }
+            //        }
+            //        else
+            //        {
+            //            it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATRate ?? 0) : NumberHelper.RoundNumber(it.VATRate ?? 0, 2));
+            //        }
+            //        // Net amount
+            //        it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.AmountVND ?? 0) : NumberHelper.RoundNumber(it.AmountUSD ?? 0, 2));
+            //    }
+            //}
 
             return opssoa;
         }
