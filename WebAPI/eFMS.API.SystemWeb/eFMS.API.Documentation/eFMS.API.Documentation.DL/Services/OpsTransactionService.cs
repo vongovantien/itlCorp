@@ -79,8 +79,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IContextBase<AccAccountingManagement> accMngtRepo;
         private readonly IOptions<ApiUrl> apiUrl;
-
         private readonly ICsStageAssignedService csStageAssignedService;
+        private readonly ICheckPointService checkPointService;
 
         public OpsTransactionService(IContextBase<OpsTransaction> repository,
             IMapper mapper,
@@ -121,7 +121,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransactionDetail> transactionDetail,
             IContextBase<AccAccountingManagement> accMngt,
             IOptions<ApiUrl> aUrl,
-            ICsStageAssignedService csStageAssigned
+            ICsStageAssignedService csStageAssigned,
+            ICheckPointService checkPoint
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -166,6 +167,7 @@ namespace eFMS.API.Documentation.DL.Services
             accMngtRepo = accMngt;
             apiUrl = aUrl;
             csStageAssignedService = csStageAssigned;
+            checkPointService = checkPoint;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -946,59 +948,15 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 // Check if customer existed
-                CatPartner customer = new CatPartner();
+                // CatPartner customer = new CatPartner();
+                var hsCheckPoint = checkPointService.ValidateCheckPointPartnerConvertClearance(model.AccountNo, model.PartnerTaxCode, out CatContract contract);
+                if(hsCheckPoint.Success == false)
+                {
+                    return hsCheckPoint;
+                }
                 CatContract customerContract = new CatContract();
-
-                if (model.AccountNo == null)
-                {
-                    customer = partnerRepository.Get(x => x.TaxCode == model.PartnerTaxCode)?.FirstOrDefault();
-                }
-                else
-                {
-                    customer = partnerRepository.Get(x => x.AccountNo == model.AccountNo)?.FirstOrDefault();
-                }
-                if (customer == null)
-                {
-                    var notFoundPartnerTaxCodeMessages = "Customer '" + (model.AccountNo ?? model.PartnerTaxCode) + "' Not found";
-                    return new HandleState(notFoundPartnerTaxCodeMessages);
-                }
-                if (customer.PartnerMode == "Internal")
-                {
-                    customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                    && x.SaleService.Contains("CL")
-                    && x.Active == true
-                    && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                }
-                else
-                {
-                    customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                       && x.SaleService.Contains("CL")
-                       && x.Active == true
-                       && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                    if (customerContract == null)
-                    {
-                        string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
-                        return new HandleState(errorContract);
-                    }
-                    string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
-                    if (customerContract.IsExpired == true)
-                    {
-                        string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
-                        return new HandleState(errorContract);
-                    }
-                    if (customerContract.IsOverDue == true)
-                    {
-                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
-                        return new HandleState(errorContract);
-                    }
-                    if (customerContract.IsOverLimit == true)
-                    {
-                        string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], model.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
-                        return new HandleState(errorContract);
-                    }
-                }
-
+                customerContract = contract;
+               
                 OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, model, customerContract);
                 opsTransaction.JobNo = CreateJobNoOps(null); //Generate JobNo [17/12/2020]
 
@@ -1219,61 +1177,13 @@ namespace eFMS.API.Documentation.DL.Services
                 int i = 0;
                 foreach (var item in list)
                 {
-                    // Check if customer existed
-                    var customer = new CatPartner();
+                    var hsCheckPoint = checkPointService.ValidateCheckPointPartnerConvertClearance(item.AccountNo, item.PartnerTaxCode, out CatContract contract);
+                    if (hsCheckPoint.Success == false)
+                    {
+                        return hsCheckPoint;
+                    }
                     CatContract customerContract = new CatContract();
-
-                    if (item.AccountNo == null)
-                    {
-                        customer = partnerRepository.Get(x => x.TaxCode == item.PartnerTaxCode)?.FirstOrDefault();
-                    }
-                    else
-                    {
-                        customer = partnerRepository.Get(x => x.AccountNo == item.AccountNo)?.FirstOrDefault();
-                    }
-                    if (customer == null)
-                    {
-                        var notFoundPartnerTaxCodeMessages = "Customer '" + (item.AccountNo ?? item.PartnerTaxCode) + "' Not found";
-                        return new HandleState(notFoundPartnerTaxCodeMessages);
-                    }
-
-                    if (customer.PartnerMode == "Internal")
-                    {
-                        customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                        && x.SaleService.Contains("CL")
-                        && x.Active == true
-                        && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-                    }
-                    else
-                    {
-                        customerContract = catContractRepository.Get(x => x.PartnerId == customer.ParentId
-                       && x.SaleService.Contains("CL")
-                       && x.Active == true
-                       && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
-
-                        if (customerContract == null)
-                        {
-                            string officeName = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
-                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
-                            return new HandleState(errorContract);
-                        }
-                        string SalesmanName = userRepository.Get(x => x.Id.ToString() == customerContract.SaleManId)?.FirstOrDefault()?.Username;
-                        if (customerContract.IsExpired == true)
-                        {
-                            string errorContract = String.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
-                            return new HandleState(errorContract);
-                        }
-                        if (customerContract.IsOverDue == true)
-                        {
-                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName);
-                            return new HandleState(errorContract);
-                        }
-                        if (customerContract.IsOverLimit == true)
-                        {
-                            string errorContract = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], item.AccountNo, customer.ShortName, customerContract.ContractType, SalesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
-                            return new HandleState(errorContract);
-                        }
-                    }
+                    customerContract = contract;
 
                     string existedMessage = CheckExist(null, item.Mblid, item.Hblid);
                     if (existedMessage != null)
