@@ -1,38 +1,40 @@
 :host ::ng-deep {
-  .table-summary{
-    .sticky-col {
-      position: -webkit-sticky;
-      position: sticky;
-      z-index: 1;
-      padding: 3px;
+    .table-summary {
+        .sticky-col {
+            position: -webkit-sticky;
+            position: sticky;
+            z-index: 1;
+            padding: 3px;
+        }
+        .first-col {
+            width: 135px;
+            min-width: 135px;
+            max-width: 135px;
+            left: -1px;
+            &.table-actions-col {
+                min-width: 135px;
+            }
+        }
+        .second-col {
+            width: 150px;
+            min-width: 150px;
+            max-width: 150px;
+            left: 134px;
+        }
+        .three-col {
+            width: 200px;
+            min-width: 200px;
+            max-width: 200px;
+            left: 284px;
+        }
+        .four-col {
+            width: 90px;
+            // min-width: 90px;
+            // max-width: 90px;
+            left: 484px;
+        }
     }
-    .first-col {
-      width: 90px;
-      min-width: 90px;
-      max-width: 90px;
-      left: -1px;
+    #debitAmountStyle {
+        color: #3966b6;
     }
-    .second-col {
-      width: 150px;
-      min-width: 150px;
-      max-width: 150px;
-      left: 80px;
-    }
-    .three-col {
-      width: 200px;
-      min-width: 200px;
-      max-width: 200px;
-      left: 225px;
-    }
-    .four-col {
-      width: 90px;
-      min-width: 90px;
-      max-width: 90px;
-      left: 420px;
-    }
-  }
-  #debitAmountStyle{
-    color: #3966b6;
-  }
 }
-
