@@ -6567,15 +6567,18 @@ namespace eFMS.API.Accounting.DL.Services
                     var chargesHbl = surcharges.Where(x => x.Hblid == hbl);
                     if (chargesHbl.Count() > 0)
                     {
-                        bool hasIssuedDebit = chargesHbl.All(x => !string.IsNullOrEmpty(x.DebitNo));
+                        bool hasIssuedDebit = chargesHbl.All(x => !string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano));
                         if (!hasIssuedDebit)
                         {
                             messError = stringLocalizer[AccountingLanguageSub.MSG_SETTLEMENT_HAD_SHIPMENT_PREPAID_NOT_ISSUED_DEBIT, chargesHbl.FirstOrDefault().JobNo];
                             return new ResultHandle() { Status = false, Message = messError };
                         }
                         var debitCodes = chargesHbl.Select(x => x.DebitNo).ToList();
+                        var soaNos = chargesHbl.Select(x => x.Soano).ToList();
+                        // Lấy data debit note và soa ngoại trừ phiếu đã sync có hđ <> prepaid trước đó
                         var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type != AccountingConstants.ACCOUNTANT_TYPE_CREDIT && !(x.SyncStatus == AccountingConstants.STATUS_SYNCED && x.Status == AccountingConstants.STATUS_SOA_NEW));
-                        var hasConfirm = debitNotes.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+                        var accSoas = acctSoaRepo.Get(x => soaNos.Contains(x.Soano) && x.Type != AccountingConstants.TYPE_SOA_CREDIT && !(x.SyncStatus == AccountingConstants.STATUS_SYNCED && x.Status == AccountingConstants.STATUS_SOA_NEW));
+                        var hasConfirm = debitNotes.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID) && accSoas.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
                         if (!hasConfirm)
                         {
                             messError = stringLocalizer[AccountingLanguageSub.MSG_SETTLEMENT_HAD_SHIPMENT_PREPAID_NOT_ISSUED_DEBIT, chargesHbl.FirstOrDefault().JobNo];
