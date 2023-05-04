@@ -102,7 +102,7 @@
                                 : accReceivableDetail.agreementCurrency }}
                             </span>
                             <span *ngIf="!!accReceivableDetail.isOverLimit" title="Contract is over credit limit">
-                                <i class="la la-exclamation la-lg text-danger"></i>
+                                <i class="la la-exclamation la-lg text-danger m-animate-blink"></i>
                             </span>
                         </div>
                     </div>
@@ -198,7 +198,8 @@
                         </h6>
                     </div>
                     <div class="col-lg-7">
-                        <div [ngClass]="accReceivableDetail.agreementType === 'Guarantee' ? null : 'text-danger'">
+                        <div [ngClass]="accReceivableDetail.agreementType === 'Guarantee' ? null : ( accReceivableDetail.expriedDay < 30 ? 'text-warning' 
+                            : accReceivableDetail.expriedDay < 0 ? 'text-danger' : 'text-success')">
                             {{ accReceivableDetail.agreementType === "Guarantee" ?
                             accReceivableDetail.creditTerm
                             : accReceivableDetail.expriedDay }}
@@ -274,13 +275,11 @@
 
                     </div>
                     <div class="col-lg-6">
-                        <span class="text-danger">{{ accReceivableDetail.over1To15Day |
+                        <span [ngClass]="!!accReceivableDetail.over1To15Day ? 'text-warning' : 'text-primary'">{{
+                            accReceivableDetail.over1To15Day |
                             number: '.0-3' }}</span>
                         <span *ngIf="accReceivableDetail.over1To15Day">
                             {{ accReceivableDetail.arCurrency }}
-                            <span *ngIf="!!accReceivableDetail.isOverDue" title="Contract have overdued">
-                                <i class="la la-exclamation-triangle la-lg text-warning"></i>
-                            </span>
                         </span>
                     </div>
                 </div>
@@ -296,6 +295,11 @@
                         <div>{{ accReceivableDetail.obhAmount | number: '.0-3'}}
                             <span *ngIf="accReceivableDetail.obhAmount">
                                 {{ accReceivableDetail.arCurrency }}
+                            </span>
+                            <span *ngIf="!!accReceivableDetail.isOverDueOBH"
+                                class="loader-container m--margin-top-10 m-animate-blink">
+                                <img src="assets/icons/overdue-obh.ico" style="vertical-align:text-bottom" width="25"
+                                    height="25" alt="Contract have overdue OBH">
                             </span>
                         </div>
                     </div>
@@ -323,15 +327,12 @@
                         <h6 class="font-weight-bold">Over 16-30 days:</h6>
                     </div>
                     <div class="col-lg-6">
-                        <span class="text-danger">{{ accReceivableDetail.over16To30Day
+                        <span [ngClass]="!!accReceivableDetail.over16To30Day ? 'text-warning' : 'text-primary'">{{
+                            accReceivableDetail.over16To30Day
                             | number: '.0-3'}}</span>
                         <span *ngIf="accReceivableDetail.over16To30Day">
                             {{ accReceivableDetail.arCurrency }}
-                            <span *ngIf="!!accReceivableDetail.isOverDue" title="Contract have overdued">
-                                <i class="la la-exclamation-triangle la-lg text-warning"></i>
-                            </span>
                         </span>
-
                     </div>
                 </div>
             </div>
@@ -382,7 +383,7 @@
                         <span *ngIf="accReceivableDetail.over30Day">
                             {{ accReceivableDetail.arCurrency }}
                             <span *ngIf="!!accReceivableDetail.isOverDue" title="Contract have overdued">
-                                <i class="la la-exclamation-triangle la-lg text-warning"></i>
+                                <i class="la la-exclamation-triangle la-lg text-warning m-animate-blink"></i>
                             </span>
                         </span>
 
