@@ -39,12 +39,9 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
             try
             {
                 new LogHelper("GenFileSyncSMBackgroundService", "STARTED at " + DateTime.Now);
-                await _busControl.ReceiveAsync<ExportDetailSettleModel>(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileQueue, async (models) =>
+                await _busControl.ReceiveAsync<ExportDetailSettleModel>(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileSyncQueue, async (models) =>
                 {
-                    new LogHelper("GenFileSyncSMBackgroundService", "STARTED at " + DateTime.Now + "\n " + JsonConvert.SerializeObject(models));
-
                     var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + models.SettlementId, models.AccessToken);
-                    new LogHelper("responseFromApi",  DateTime.Now + "\n " + JsonConvert.SerializeObject(responseFromApi));
                     var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
                     var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, models.Lang, "");
                     var file = new Helpers.FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
@@ -57,7 +54,6 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
                         Id = models.SettlementId,
                         UserCreated = dataObjects.Result.UserCreated
                     };
-                    new LogHelper("FileModel", DateTime.Now + "\n " + JsonConvert.SerializeObject(model.File.FileName));
                     await _busControl.SendAsync(RabbitExchange.EFMS_FileManagement, RabbitConstants.PostAttachFileTemplateToEDocQueue, model);
 
                 }, batchSize: 3, maxMessagesInFlight: 10);
