@@ -6552,18 +6552,18 @@ namespace eFMS.API.Accounting.DL.Services
                 var opsDetail = opsTransaction.Where(x => x.Hblid == hbl).FirstOrDefault();
                 var transDetail = transactionDetail.Where(x => x.Id == hbl).FirstOrDefault();
                 {
-                    var existPrepaid = (from partner in partners
-                                        join contract in contracts on partner.Id.ToLower() equals contract.PartnerId.ToLower()
-                                        where partner.Id == (opsDetail == null ? transDetail.CustomerId : opsDetail.CustomerId) && contract.SaleManId == (opsDetail == null ? transDetail.SaleManId : opsDetail.SalemanId)
-                                        && contract.SaleManId != salemanBOD
-                                        select new
-                                        {
-                                            contract.SaleManId
-                                        }).FirstOrDefault();
-                    if (existPrepaid == null)
-                    {
-                        continue;
-                    }
+                    //var existPrepaid = (from partner in partners
+                    //                    join contract in contracts on partner.Id.ToLower() equals contract.PartnerId.ToLower()
+                    //                    where partner.Id == (opsDetail == null ? transDetail.CustomerId : opsDetail.CustomerId) && contract.SaleManId == (opsDetail == null ? transDetail.SaleManId : opsDetail.SalemanId)
+                    //                    && contract.SaleManId != salemanBOD
+                    //                    select new
+                    //                    {
+                    //                        contract.SaleManId
+                    //                    }).FirstOrDefault();
+                    //if (existPrepaid == null)
+                    //{
+                    //    continue;
+                    //}
                     var chargesHbl = surcharges.Where(x => x.Hblid == hbl);
                     if (chargesHbl.Count() > 0)
                     {
