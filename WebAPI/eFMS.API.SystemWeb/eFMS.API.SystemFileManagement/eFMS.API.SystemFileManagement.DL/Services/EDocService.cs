@@ -515,7 +515,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             var result = new EDocGroupByType();
             var lstEdoc = new List<SysImageDetailModel>();
-            var data = _sysImageRepo.Get(x => x.Folder == transactionType && x.ObjectId == billingId.ToString());
+            //var data = _sysImageRepo.Get(x => x.Folder == transactionType && x.ObjectId == billingId.ToString());
             //var imageExist = _sysImageRepo.Count(x => x.Folder == transactionType && x.ObjectId == billingId.ToString())>0?_sysImageRepo.Get(x => x.Folder == transactionType && x.ObjectId == billingId.ToString()).ToList():new List<SysImage>(); // file goc co tren SM
             var imageExist = _sysImageRepo.Get(x => x.Folder == transactionType && x.ObjectId == billingId.ToString()).ToList(); // file goc co tren SM
             var lstEdocOT = new List<SysImageDetailModel>();
