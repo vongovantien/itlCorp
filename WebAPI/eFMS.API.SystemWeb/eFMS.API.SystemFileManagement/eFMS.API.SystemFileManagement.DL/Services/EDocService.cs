@@ -300,7 +300,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                     GroupId = currentUser.GroupId,
                                     Hblid = item.HBLId,
                                 };
-
+                                if(_opsTranRepo.Any(x=>x.Id==item.JobId))
+                                {
+                                    var imageDetailClone = imageDetail;
+                                    var mapRepToITL = MapToJobITL(imageDetailClone);
+                                    _sysImageDetailRepo.Add(mapRepToITL, false);
+                                }
                                 _sysImageDetailRepo.Add(imageDetail, false);
                             }
 
@@ -344,7 +349,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         Note = edoc.Note,
                                         GroupId = currentUser.GroupId,
                                     };
-
+                                    //if (_opsTranRepo.Any(x => x.Id == item.JobId))
+                                    //{
+                                    //    var imageDetailClone = imageDetail;
+                                    //    var mapRepToITL = MapToJobITL(imageDetailClone);
+                                    //    _sysImageDetailRepo.Add(mapRepToITL, false);
+                                    //}
                                     _sysImageDetailRepo.Add(imageDetail, false);
                                 }
                             }
