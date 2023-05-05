@@ -5,7 +5,7 @@
         public static string CalculatingReceivableDataPartnerQueue { get; } = "Accounting.CalculatingReceivableDataPartnerQueue";
         public static string CalculatingReceivableOverDuePaymentQueue { get; } = "Accounting.CalculatingOverDuePaymentQueue";
         public static string PostAttachFileTemplateToEDocQueue { get; } = "FileManagement.PostAttachFileTemplateToEDocQueue";
-        public static string GenFileQueue { get; } = "ReportData.GenFileSyncQueue";
+        public static string GenFileSyncQueue { get; } = "ReportData.GenFileSyncQueue";
     }
 
     public class RabbitExchange

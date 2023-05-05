@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.DL.Services
 {
-    public class EDocBackgroundService:BackgroundService
+    public class SyncFileTemplateBackgroundService:BackgroundService
     {
         private readonly IRabbitBus _busControl;
         public IServiceScopeFactory _services { get; }
-        public EDocBackgroundService(IRabbitBus busControl, IServiceScopeFactory service)
+        public SyncFileTemplateBackgroundService(IRabbitBus busControl, IServiceScopeFactory service)
         {
             _busControl = busControl;
             _services = service;

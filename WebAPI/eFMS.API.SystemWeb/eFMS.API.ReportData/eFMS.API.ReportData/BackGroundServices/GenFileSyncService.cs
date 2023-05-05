@@ -39,7 +39,7 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
             try
             {
                 new LogHelper("GenFileSyncSMBackgroundService", "STARTED at " + DateTime.Now);
-                await _busControl.ReceiveAsync<ExportDetailSettleModel>(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileQueue, async (models) =>
+                await _busControl.ReceiveAsync<ExportDetailSettleModel>(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileSyncQueue, async (models) =>
                 {
                     var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + models.SettlementId, models.AccessToken);
                     var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
