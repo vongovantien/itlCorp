@@ -478,16 +478,16 @@ namespace eFMS.API.Catalogue.DL.Services
 
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
-            if(entity.Arconfirmed == true && entity.Active == false)
+            if (entity.Arconfirmed == true && entity.Active == false)
             {
-                if((entity.TrialCreditLimited != currentContract.TrialCreditLimited) || (entity.TrialCreditDays != currentContract.TrialCreditDays) ||
-                    (entity.PaymentTerm != currentContract.PaymentTerm) || (entity.PaymentTermObh != currentContract.PaymentTermObh) || 
+                if ((entity.TrialCreditLimited != currentContract.TrialCreditLimited) || (entity.TrialCreditDays != currentContract.TrialCreditDays) ||
+                    (entity.PaymentTerm != currentContract.PaymentTerm) || (entity.PaymentTermObh != currentContract.PaymentTermObh) ||
                     (entity.CreditLimit != currentContract.CreditLimit) || (entity.TrialEffectDate != currentContract.TrialEffectDate) ||
                     (entity.TrialExpiredDate != currentContract.TrialExpiredDate) || (entity.CreditLimitRate != currentContract.CreditLimitRate) ||
                     (entity.BaseOn != currentContract.BaseOn))
                 {
                     entity.Arconfirmed = false;
-                }    
+                }
 
             }
             if (entity.ExpiredDate != null)
@@ -1173,7 +1173,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     if (item.ExpireDate.Value < item.EffectDate.Value)
                     {
-                        item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPERIED_DATE_NOT_VALID]);
+                        item.ExpiredtDateError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_EXPIRED_DATE_NOT_VALID]);
                         item.IsValid = false;
                     }
                 }
@@ -1258,7 +1258,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 else if (DataCamOfficeAR.Id.ToString().ToUpper().Equals(OfficeId.ToUpper()))
                 {
                     lstCCAR = null;
-                }    
+                }
                 else
                 {
                     var departmentHeadAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOfficeAR.Id).FirstOrDefault();
