@@ -3415,7 +3415,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  TotalAmountUsd = (sc.AmountUsd + sc.VatAmountUsd),
                                  ChargeWeight = trans.ChargeWeight,
                                  ChargeGroup = sc.ChargeGroup,
-                                 VatVoucher = string.IsNullOrEmpty(sc.InvoiceNo) ? sc.VoucherId : sc.InvoiceNo,
+                                 VatVoucher =  sc.VoucherId,
                                  PaymentStatus = acc.PaymentStatus,
                                  InvDueDay = acc.PaymentDueDate,
                                  VoucherIddate = sc.VoucherIddate,
@@ -3451,7 +3451,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 ChargeWeight = trans.ChargeWeight ?? ops.SumChargeWeight,
                                 TotalAmountUsd = (sc.AmountUsd + sc.VatAmountUsd),
                                 ChargeGroup = sc.ChargeGroup,
-                                VatVoucher = sc.VoucherId,
+                                VatVoucher = sc.InvoiceNo,
                                 InvDueDay = acc.PaymentDueDate,
                                 SoaNo = string.IsNullOrEmpty(sc.Soano) ? sc.PaySoano : sc.Soano,
                                 VoucherIddate = sc.VoucherIddate,
@@ -3530,7 +3530,7 @@ namespace eFMS.API.Documentation.DL.Services
                              TotalAmountUsd = soa.AmountUsd + soa.VatAmountUsd,
                              ChargeWeight = trans.ChargeWeight,
                              ChargeGroup = soa.ChargeGroup,
-                             VatVoucher = string.IsNullOrEmpty(soa.InvoiceNo) ? soa.VoucherId : soa.InvoiceNo,
+                             VatVoucher = (soa.Type == "Debit") ? soa.InvoiceNo : soa.VoucherId,
                              PaymentStatus = acc.PaymentStatus,
                              InvDueDay = acc.PaymentDueDate,
                              VoucherIddate = soa.VoucherIddate,
@@ -3568,7 +3568,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  TotalAmountUsd = sc.AmountUsd + sc.VatAmountUsd,
                                  ChargeWeight = trans.ChargeWeight,
                                  ChargeGroup = sc.ChargeGroup,
-                                 VatVoucher = string.IsNullOrEmpty(sc.InvoiceNo) ? sm.VoucherNo : sc.InvoiceNo,
+                                 VatVoucher = sc.Type == "Credit" ? sm.VoucherNo : sc.InvoiceNo,
                                  PaymentStatus = acc.PaymentStatus,
                                  InvDueDay = acc.PaymentDueDate,
                                  VoucherIddate = sc.VoucherIddate,
@@ -4326,7 +4326,6 @@ namespace eFMS.API.Documentation.DL.Services
             var res = dataTrans.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
 
             return res;
-
         }
 
 
