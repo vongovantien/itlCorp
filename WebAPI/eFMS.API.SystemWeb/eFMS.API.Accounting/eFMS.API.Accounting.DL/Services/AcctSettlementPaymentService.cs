@@ -6576,9 +6576,9 @@ namespace eFMS.API.Accounting.DL.Services
                         var debitCodes = chargesHbl.Select(x => x.DebitNo).ToList();
                         var soaNos = chargesHbl.Select(x => x.Soano).ToList();
                         // Lấy data debit note và soa ngoại trừ phiếu đã sync có hđ <> prepaid trước đó
-                        var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type != AccountingConstants.ACCOUNTANT_TYPE_CREDIT && !(x.SyncStatus == AccountingConstants.STATUS_SYNCED && x.Status == AccountingConstants.STATUS_SOA_NEW));
+                        var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type != AccountingConstants.ACCOUNTANT_TYPE_CREDIT && (x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID || x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID));
                         var accSoas = acctSoaRepo.Get(x => soaNos.Contains(x.Soano) && x.Type != AccountingConstants.TYPE_SOA_CREDIT && !(x.SyncStatus == AccountingConstants.STATUS_SYNCED && x.Status == AccountingConstants.STATUS_SOA_NEW));
-                        var hasConfirm = debitNotes.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID) && accSoas.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+                        var hasConfirm = debitNotes.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID) && accSoas.Any();
                         if (!hasConfirm)
                         {
                             messError = stringLocalizer[AccountingLanguageSub.MSG_SETTLEMENT_HAD_SHIPMENT_PREPAID_NOT_ISSUED_DEBIT, chargesHbl.FirstOrDefault().JobNo];
