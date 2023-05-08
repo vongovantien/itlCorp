@@ -133,6 +133,7 @@ export class JobManagementCreateJobComponent extends AppForm {
                                     mergeMap((res: LinkAirSeaModel) => {
                                         model.serviceNo = res?.jobNo;
                                         model.serviceHblId = res?.hblId;
+                                        model.transactionType = this.transactionType === 'TK' ? 'TK' : 'CL';
                                         return this._documentRepo.addOPSJob(model);
                                     }),
                                 )

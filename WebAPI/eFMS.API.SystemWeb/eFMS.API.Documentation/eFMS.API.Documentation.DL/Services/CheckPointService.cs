@@ -551,8 +551,13 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             if (contract.IsExpired == true)
                             {
+                                
+                                isValid = false;
+                            }
+                            else
+                            {
                                 // check shipment service date between contract effective date and expired date
-                                if (criteria.TransactionType == "CL"|| criteria.TransactionType == "TK")
+                                if (criteria.TransactionType == "CL" || criteria.TransactionType == "TK")
                                 {
                                     var shipment = opsTransactionRepository.First(x => x.Hblid == criteria.HblId);
                                     if (shipment != null)
@@ -583,8 +588,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         }
                                     }
                                 }
+                                isValid = true;
                             }
-                            else isValid = true;
                         }
                         else if (contract.IsExpired == true)
                         {

@@ -227,7 +227,7 @@
                                 (onChange)="updatePagingData($event)"></app-pagination>
                         </div>
                     </tab>
-                    <tab heading="List Link Fee" (selectTab)="onSelectTab('LINKFEE')">
+                    <tab *ngIf="transactionType!=='TK'" heading="List Link Fee" (selectTab)="onSelectTab('LINKFEE')">
                         <ng-container *ngIf="isSearchLinkFeea">
                             <app-job-mangement-link-fee></app-job-mangement-link-fee>
                         </ng-container>

@@ -182,7 +182,7 @@ export abstract class AppShareEDocBase extends AppList {
     getEDoc(transactionType: string) {
         if (this.typeFrom === 'Shipment') {
             if (this.jobId !== null && this.jobId !== '') {
-                this._systemFileRepo.getEDocByJob(this.jobId, this.transactionType)
+                this._systemFileRepo.getEDocByJob(this.jobId, 'CL')
                     .pipe(
                         catchError(this.catchError),
                     )

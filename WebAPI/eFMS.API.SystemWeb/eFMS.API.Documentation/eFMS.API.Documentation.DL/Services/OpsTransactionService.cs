@@ -1535,6 +1535,7 @@ namespace eFMS.API.Documentation.DL.Services
                 existedMblHbl = DataContext.Any(x => x.Hwbno == hblNo
                 && x.Mblno == mblNo
                 && x.CurrentStatus != TermData.Canceled
+                && x.TransactionType==model.TransactionType
                 );
             }
             else
@@ -1543,6 +1544,7 @@ namespace eFMS.API.Documentation.DL.Services
                 && x.CurrentStatus != TermData.Canceled
                 && x.Hwbno == model.Hwbno
                 && x.Mblno == model.Mblno
+                 && x.TransactionType == model.TransactionType
                 ).ToList();
                 if (duplicateHBLMBL.Count > 0)
                 {

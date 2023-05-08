@@ -139,8 +139,8 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
                             console.log(this.transactionType);
                             //his.transactionType = res.transactionType;
                             this.transactionType = res.opstransaction.jobNo.includes('LOG') ? 'CL' : 'TK';
-                            this.getDocumentType(this.transactionType);
-                            this.getEDoc(this.transactionType);
+                            this.getDocumentType('CL');
+                            this.getEDoc('CL');
                             this.jobNo = res.opstransaction?.jobNo;
                             this.isLocked = res.opstransaction?.isLocked;
                         }
