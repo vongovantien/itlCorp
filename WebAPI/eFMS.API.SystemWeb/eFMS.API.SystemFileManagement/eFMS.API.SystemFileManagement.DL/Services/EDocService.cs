@@ -147,10 +147,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         }
         private SysImageDetail MapToJobITL(SysImageDetail edoc)
         {
-            var isRep = _opsTranRepo.Any(x => x.ReplicatedId == edoc.JobId);
-            if (isRep)
+            var isRep = _opsTranRepo.Any(x => x.ReplicatedId == edoc.JobId && x.CurrentStatus != "Canceled");
+            var jobITL = _opsTranRepo.Where(x => x.ReplicatedId == edoc.JobId);
+            if (isRep && jobITL != null)
             {
-                var jobITL= _opsTranRepo.Where(x => x.ReplicatedId == edoc.JobId);
                 return new SysImageDetail()
                 {
                     BillingNo = edoc.BillingNo,
@@ -189,7 +189,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     List<SysImage> list = new List<SysImage>();
                     List<SysImageDetail> listDetail = new List<SysImageDetail>();
-                    List<SysImageDetail> listRepDetail = new List<SysImageDetail>();
 
                     string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(edoc.File.FileName)));
 
@@ -253,19 +252,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 Note = edoc.Note
                             };
                             listDetail.Add(sysImageDetail);
-                            listRepDetail.Add(sysImageDetail);
                             _sysImageDetailRepo.Add(sysImageDetail, false);
-                            var imageDetailClone = sysImageDetail;
-                            var mapRepToITL = MapToJobITL(imageDetailClone);
-                            if (mapRepToITL != null)
-                            {
-                                //listDetail.Add(mapRepToITL);
-                                _sysImageDetailRepo.Add(mapRepToITL, false);
-                                //_sysImageDetailRepo.SubmitChanges();
-                            }
                         }
                         else if (type == "Settlement")
                         {
+                            List<SysImageDetail> listRepDetail = new List<SysImageDetail>();
                             string bilingNo = string.Empty;
                             var models = new List<TransctionTypeJobModel>();
                             var tranType = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault()?.TransactionType;
@@ -1011,7 +1002,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             }
                             else
                             {
-                                if(_opsTranRepo.Any(x=>x.ReplicatedId==edoc.JobId))
+                                if(_opsTranRepo.Any(x=>x.ReplicatedId==edoc.JobId && x.CurrentStatus!= "Canceled"))
                                 {
                                     var itlJob=_opsTranRepo.Get(x=>x.ReplicatedId==edoc.JobId).FirstOrDefault();
                                     await _sysImageDetailRepo.DeleteAsync(x => x.SystemFileName == edoc.SystemFileName&&x.SysImageId==edoc.SysImageId&&x.JobId== itlJob.Id);
