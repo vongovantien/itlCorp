@@ -551,11 +551,6 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             if (contract.IsExpired == true)
                             {
-                                
-                                isValid = false;
-                            }
-                            else
-                            {
                                 // check shipment service date between contract effective date and expired date
                                 if (criteria.TransactionType == "CL" || criteria.TransactionType == "TK")
                                 {
