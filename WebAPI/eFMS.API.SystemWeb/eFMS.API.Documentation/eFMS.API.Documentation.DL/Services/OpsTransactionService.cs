@@ -1504,6 +1504,7 @@ namespace eFMS.API.Documentation.DL.Services
                 && x.Mblno == mblNo
                 && x.CurrentStatus != TermData.Canceled
                 && x.OfficeId == currentUser.OfficeID
+                && x.TransactionType==model.TransactionType
                 );
             }
             else
@@ -1513,6 +1514,7 @@ namespace eFMS.API.Documentation.DL.Services
                 && x.Hwbno == model.Hwbno
                 && x.Mblno == model.Mblno
                 && x.OfficeId == currentUser.OfficeID
+                && x.TransactionType == model.TransactionType
                 ).ToList();
                 if (duplicateHBLMBL.Count > 0)
                 {

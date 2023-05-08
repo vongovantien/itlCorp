@@ -21,7 +21,7 @@
             <div class="col-md-8">
                 <div class="m--align-right c-button-actions" *ngIf="!(isLocked | async)">
                     <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
-                        <ng-container *ngIf="allowLinkFee">
+                        <ng-container *ngIf="allowLinkFee && transactionType!=='TK'">
                             <button type="button" class="btn btn-success " (click)="getSaveLinkFee()">
                                 <i class="la la-plus"></i> Link Fee
                             </button>
@@ -77,7 +77,7 @@
                                     [ngClass]="charge.linkFee && allowLinkFee ? 'bg-green' : ''"
                                     *ngIf="(permissionShipments | async)?.allowUpdateCharge">
                                     <div class="table-actions" *ngIf="allowSaving">
-                                        <ng-container *ngIf="allowLinkFee && !charge.linkFee">
+                                        <ng-container *ngIf="allowLinkFee && !charge.linkFee && transactionType!=='TK'">
                                             <label class="m-checkbox">
                                                 <input type="checkbox" [(ngModel)]="charge.isSelected">
                                                 <span></span>

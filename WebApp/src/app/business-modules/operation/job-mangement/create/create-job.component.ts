@@ -133,6 +133,7 @@ export class JobManagementCreateJobComponent extends AppForm {
                                     mergeMap((res: LinkAirSeaModel) => {
                                         model.serviceNo = res?.jobNo;
                                         model.serviceHblId = res?.hblId;
+                                        model.transactionType = this.transactionType === 'TK' ? 'TK' : null;
                                         return this._documentRepo.addOPSJob(model);
                                     }),
                                 )
@@ -147,7 +148,7 @@ export class JobManagementCreateJobComponent extends AppForm {
                 partnerId: model.customerId,
                 salesmanId: model.salemanId,
                 hblId: SystemConstants.EMPTY_GUID,
-                transactionType: this.transactionType === 'TK' ? 'TK' : 'CL',
+                transactionType: this.transactionType === 'TK' ? 'TK' : null,
                 type: 1
             }).pipe(
                 switchMap(

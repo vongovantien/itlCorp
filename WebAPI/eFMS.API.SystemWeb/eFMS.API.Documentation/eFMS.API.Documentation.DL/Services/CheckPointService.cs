@@ -560,7 +560,7 @@ namespace eFMS.API.Documentation.DL.Services
                             if (contract.IsExpired == true)
                             {
                                 // check shipment service date between contract effective date and expired date
-                                if (criteria.TransactionType == "CL"|| criteria.TransactionType == "TK")
+                                if (criteria.TransactionType == "CL" || criteria.TransactionType == "TK")
                                 {
                                     var shipment = opsTransactionRepository.First(x => x.Hblid == criteria.HblId);
                                     if (shipment != null)
