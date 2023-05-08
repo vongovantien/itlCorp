@@ -6552,14 +6552,14 @@ namespace eFMS.API.Accounting.DL.Services
                 var opsDetail = opsTransaction.Where(x => x.Hblid == hbl).FirstOrDefault();
                 var transDetail = transactionDetail.Where(x => x.Id == hbl).FirstOrDefault();
                 {
-                    //var existPrepaid = (from partner in partners
-                    //                    join contract in contracts on partner.Id.ToLower() equals contract.PartnerId.ToLower()
-                    //                    where partner.Id == (opsDetail == null ? transDetail.CustomerId : opsDetail.CustomerId) && contract.SaleManId == (opsDetail == null ? transDetail.SaleManId : opsDetail.SalemanId)
-                    //                    && contract.SaleManId != salemanBOD
-                    //                    select new
-                    //                    {
-                    //                        contract.SaleManId
-                    //                    }).FirstOrDefault();
+                    var existPrepaid = (from partner in partners
+                                        join contract in contracts on partner.Id.ToLower() equals contract.PartnerId.ToLower()
+                                        where partner.Id == (opsDetail == null ? transDetail.CustomerId : opsDetail.CustomerId) && contract.SaleManId == (opsDetail == null ? transDetail.SaleManId : opsDetail.SalemanId)
+                                        && contract.SaleManId != salemanBOD
+                                        select new
+                                        {
+                                            contract.SaleManId
+                                        }).FirstOrDefault();
                     //if (existPrepaid == null)
                     //{
                     //    continue;
@@ -6568,7 +6568,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (chargesHbl.Count() > 0)
                     {
                         bool hasIssuedDebit = chargesHbl.All(x => !string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano));
-                        if (!hasIssuedDebit)
+                        if (!hasIssuedDebit && existPrepaid != null)
                         {
                             messError = stringLocalizer[AccountingLanguageSub.MSG_SETTLEMENT_HAD_SHIPMENT_PREPAID_NOT_ISSUED_DEBIT, chargesHbl.FirstOrDefault().JobNo];
                             return new ResultHandle() { Status = false, Message = messError };
