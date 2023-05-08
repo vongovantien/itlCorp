@@ -1420,6 +1420,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ReceiptMode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ReferenceId).HasColumnName("ReferenceID");
 
                 entity.Property(e => e.ReferenceNo)
@@ -1429,6 +1433,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Status)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SubArcbno)
+                    .HasColumnName("SubARCBNo")
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.SyncStatus).HasMaxLength(50);
 
