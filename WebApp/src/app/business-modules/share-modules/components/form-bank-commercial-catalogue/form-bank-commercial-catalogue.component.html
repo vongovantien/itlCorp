@@ -118,8 +118,8 @@
                             <label></label>
                             <label></label>
                             <div class="form-group">
-                                <input multiple style="display:none" type="file" #file
-                                    (change)="chooseFileUpload($event)">
+                                <input type="file" #file style="display:none" multiple
+                                    (change)="chooseFileUpload($event)" title="Upload files" />
                                 <button
                                     *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved'"
                                     style="margin-top:5px;" (click)="file.click()" type="button"

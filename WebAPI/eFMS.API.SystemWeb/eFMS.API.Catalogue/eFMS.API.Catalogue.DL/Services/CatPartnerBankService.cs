@@ -90,7 +90,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public async Task<CatPartnerBankModel> GetDetail(Guid Id)
         {
             var dataReturn = from partner in DataContext.Where(x => x.Id == Id)
-                             join catBank in catBankRepository.Get() on partner.BankId equals catBank.Id
+                             join catBank in catBankRepository.Get() on partner.BankId equals catBank.Id.ToString()
                              select new CatPartnerBankModel
                              {
                                  Id = partner.Id,
@@ -119,8 +119,8 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerBankModel> GetByPartner(Guid partnerId)
         {
-            var dataReturn = from partner in DataContext.Where(x => x.PartnerId == partnerId)
-                             join catBank in catBankRepository.Get() on partner.BankId equals catBank.Id
+            var dataReturn = from partner in DataContext.Where(x => x.PartnerId == partnerId.ToString())
+                             join catBank in catBankRepository.Get() on partner.BankId equals catBank.Id.ToString()
                              orderby partner.DatetimeCreated descending
                              select new CatPartnerBankModel
                              {
@@ -151,8 +151,8 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerBankModel> GetPartnerBankApproved(Guid partnerId)
         {
-            var dataReturn = from partner in DataContext.Where(x => x.PartnerId == partnerId && x.ApproveStatus == "Approved")
-                             join catBank in catBankRepository.Get() on partner.BankId equals catBank.Id
+            var dataReturn = from partner in DataContext.Where(x => x.PartnerId == partnerId.ToString() && x.ApproveStatus == "Approved")
+                             join catBank in catBankRepository.Get() on partner.BankId equals catBank.Id.ToString()
                              orderby partner.DatetimeCreated descending
                              select new CatPartnerBankModel
                              {
@@ -231,7 +231,7 @@ namespace eFMS.API.Catalogue.DL.Services
             foreach (var item in bankDetails)
             {
                 var partner = await catPartnerRepository.Get(x => x.Id == item.PartnerId.ToString()).FirstOrDefaultAsync();
-                var bank = await catBankRepository.Get(x => x.Id == item.BankId).FirstOrDefaultAsync();
+                var bank = await catBankRepository.Get(x => x.Id.ToString() == item.BankId).FirstOrDefaultAsync();
 
                 var lstbankDetail = new List<BankDetail>
                 {
@@ -280,6 +280,60 @@ namespace eFMS.API.Catalogue.DL.Services
 
             hs = DataContext.SubmitChanges();
             return hs;
+        }
+
+        public async Task<HandleState> ImportPartnerBank(List<CatPartnerBankImportModel> data)
+        {
+            try
+            {
+                foreach (var item in data)
+                {
+                    var catPartner = catPartnerRepository.First(x => x.AccountNo == item.CustomerCode.Trim())?.Id ?? null;
+                    var catBank = catBankRepository.First(x => x.Code == item.BankCode.Trim())?.Id.ToString() ?? null;
+                    var charge = new CatPartnerBank
+                    {
+                        Id = Guid.NewGuid(),
+                        PartnerId = catPartner,
+                        BankId = catBank,
+                        BankAccountName = item.BankAccountName,
+                        BankAccountNo = item.BankAccountNo,
+                        BankAddress = item.BankAddress,
+                        BeneficiaryAddress = item.BeneficiaryAddress,
+                        SwiftCode = item.SwiftCode,
+                        ApproveStatus = "Approved",
+                        DatetimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
+                        UserCreated = item.UserCreated,
+                        UserModified = item.UserModified,
+                        Active = true
+                    };
+                    DataContext.Add(charge, false);
+                }
+                DataContext.SubmitChanges();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public async Task<List<CatPartnerBankImportModel>> CheckValidImport(List<CatPartnerBankImportModel> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                var bankImport = list[i];
+
+                var partner = await catPartnerRepository.Where(x => x.AccountNo == bankImport.CustomerCode.ToString()).FirstOrDefaultAsync();
+                var existingBankAccounts = await DataContext.WhereAsync(x => x.PartnerId.ToString() == partner.Id);
+
+                if (existingBankAccounts.Any(account => account.BankAccountNo == bankImport.BankAccountNo))
+                {
+                    bankImport.ErrorMessage = "Bank account is existed";
+                    bankImport.IsValid = false;
+                }
+            }
+            return list;
         }
     }
 }

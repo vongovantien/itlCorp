@@ -277,9 +277,13 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     chooseFileUpload(event: any) {
         const files: FileList = event.target.files;
         const isFileSizeValid = Array.from(files).every(file => file.size / 1024 ** 2 < SystemConstants.MAX_FILE_SIZE);
-
+        const isFileTypeValid = Array.from(files).every(file => SystemConstants.ALLOWED_FILE_TYPES.includes(file.type));
         if (!isFileSizeValid) {
             this._toastService.warning(`Maximum file size is ${SystemConstants.MAX_FILE_SIZE}MB`);
+            return;
+        }
+        if (!isFileTypeValid) {
+            this._toastService.warning(`This file type is not valid. Please upload a pdf, doc, xlxs, or other valid file type`);
             return;
         }
 
@@ -288,7 +292,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
             .pipe(catchError(this.catchError))
             .subscribe((res: CommonInterface.IResult) => {
                 if (res.status) {
-                    this._toastService.success('File uploaded successfully!');
+                    this._toastService.success(res.message);
                     this.getBankInfoFiles(this.bankDetail.id);
                     this.fileListUpload = [];
                 }
