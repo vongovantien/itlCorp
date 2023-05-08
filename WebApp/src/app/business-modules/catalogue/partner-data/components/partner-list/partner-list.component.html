@@ -8,7 +8,8 @@
         <tbody>
             <ng-container *ngIf="!!partners.length">
                 <ng-container *ngFor="let partner of partners; let i = index; trackBy: trackByFn">
-                    <tr class="collapse-toggle-row">
+                    <tr class="collapse-toggle-row" 
+                    [contextMenu]="AddressContextMenu" (onTouch)="onSelectPartner(partner)">
                         <td class="table-actions-col">
                             <div class="table-actions" [style.width]="isCustomer ? '100px' : '70px'">
                                 <button type="button" *ngIf="isCustomer"
@@ -78,5 +79,15 @@
         </tbody>
     </table>
 </div>
+<app-context-menu #AddressContextMenu (clickOutside)="selectedPartner = null">
+    <div class="menu-context__item" position="rightTop" trigger="hover" >
+        <div class="d-flex justify-content-between ">
+            <div>
+                <span (click)="showManagementAddress(selectedPartner)">Address Management </span>
+            </div>
+        </div>
+    </div>
+</app-context-menu>
+<management-address-commercial></management-address-commercial>
 <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize" (onChange)="updatePagingData($event)">
 </app-pagination>

@@ -1,22 +1,25 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { AbstractControl, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Partner } from "@models";
 import { NgProgress } from "@ngx-progressbar/core";
 import { CatalogueRepo } from "@repositories";
 import { ToastrService } from "ngx-toastr";
 import { PopupBase } from "src/app/popup.base";
+import { CommercialAddressListComponent } from 'src/app/business-modules/commercial/components/address/commercial-address-list.component';
+
 @Component({
     selector: 'management-address-commercial',
     templateUrl: './management-commercial-address.component.html',
 })
 export class ManagementAddressComponent extends PopupBase implements OnInit {
+    @ViewChild(CommercialAddressListComponent) addressPartnerList: CommercialAddressListComponent;
     formGroup: FormGroup;
 
     accountNo: AbstractControl;
     shortName: AbstractControl;
     taxCode: AbstractControl;
 
-    partner: Partner;
+    partner: any;
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         protected _progressService: NgProgress,
@@ -36,6 +39,10 @@ export class ManagementAddressComponent extends PopupBase implements OnInit {
                 shortName: partner.shortName,
                 taxCode: partner.taxCode
             });
+            this.partner = partner;
+            this.addressPartnerList.getAddressPartner(this.partner.id);
+            this.addressPartnerList.partnerId = this.partner.id;
+            this.addressPartnerList.partner = this.partner;
         }
     }
     initForm() {
@@ -48,5 +55,8 @@ export class ManagementAddressComponent extends PopupBase implements OnInit {
         this.accountNo = this.formGroup.controls['accountNo'];
         this.shortName = this.formGroup.controls['shortName'];
         this.taxCode = this.formGroup.controls['taxCode'];
+    }
+    close() {
+        this.hide();
     }
 }

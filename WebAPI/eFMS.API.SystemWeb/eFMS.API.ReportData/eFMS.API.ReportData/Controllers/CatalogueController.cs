@@ -216,7 +216,7 @@ namespace eFMS.API.ReportData.Controllers
         {
             Helper helper = new Helper();
 
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatplaceUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.CatalogueAPI + Urls.Catelogue.ProvinceUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatProvince>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateProvinceExcelFile(dataObjects.Result);
@@ -235,7 +235,7 @@ namespace eFMS.API.ReportData.Controllers
         {
             Helper helper = new Helper();
 
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatplaceUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.CatalogueAPI + Urls.Catelogue.DistrictUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatDistrict>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateDistrictExcelFile(dataObjects.Result);
@@ -254,7 +254,7 @@ namespace eFMS.API.ReportData.Controllers
         {
             Helper helper = new Helper();
 
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatplaceUrl);
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catPlaceCriteria, aPis.CatalogueAPI + Urls.Catelogue.WardUrl);
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatTownWard>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
 
             var stream = helper.CreateTownWardExcelFile(dataObjects.Result);

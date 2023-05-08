@@ -156,6 +156,9 @@ export class FormAddressCommercialCatalogueComponent extends PopupBase implement
     onSubmit() {
         this.isSubmitted = true;
         this.selectedAddress.index = this.indexDetailAddress;
+        if (!this.formAddress.valid) {
+            return;
+        }
         this.assignValueModel();
         if (!this.isUpdate) {
             this._catalogueRepo.addAddress(this.selectedAddress)

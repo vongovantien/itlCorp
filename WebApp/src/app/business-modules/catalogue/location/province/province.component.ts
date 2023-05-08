@@ -30,7 +30,8 @@ export class AppProvinceComponent extends AppList implements OnInit {
             { fieldName: 'code', displayName: 'Code' },
             { fieldName: 'nameEn', displayName: 'English Name' },
             { fieldName: 'nameVn', displayName: 'Local Name' },
-            { fieldName: 'countryName', displayName: 'Country' }
+            { fieldName: 'countryName', displayName: 'Country' },
+            { fieldName: 'postalCode', displayName: 'Postal Code' }
 
         ],
         typeSearch: CommonEnum.TypeSearch.outtab
@@ -59,6 +60,7 @@ export class AppProvinceComponent extends AppList implements OnInit {
             { title: 'Name EN', field: 'nameEn', sortable: true },
             { title: 'Name Local', field: 'nameVn', sortable: true },
             { title: 'Country', field: 'countryName', sortable: true },
+            { title: 'Postal Code', field: 'postalCode', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
 

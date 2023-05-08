@@ -24,6 +24,7 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
     nameEn: AbstractControl;
     nameVn: AbstractControl;
     countryId: AbstractControl;
+    postalCode: AbstractControl;
     id: AbstractControl;
     active: AbstractControl;
 
@@ -59,6 +60,7 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
             countryId: ['', Validators.compose([
                 Validators.required
             ])],
+            postalCode: [],
             active: [true],
             id: [],
 
@@ -68,6 +70,7 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
         this.nameEn = this.formProvince.controls['nameEn'];
         this.nameVn = this.formProvince.controls['nameVn'];
         this.countryId = this.formProvince.controls['countryId'];
+        this.postalCode = this.formProvince.controls['postalCode'];
         this.active = this.formProvince.controls['active'];
         // this.id = this.formProvince.controls['id'];
     }
@@ -94,7 +97,8 @@ export class AddProvincePopupComponent extends PopupBase implements OnInit {
                 code: formData.code,
                 nameEn: formData.nameEn,
                 nameVn: formData.nameVn,
-                countryId: formData.countryId, // * 1 = VN 
+                countryId: formData.countryId,
+                postalCode: formData.postalCode,
                 active: !!this.isUpdate ? formData.active : true,
             };
             if (this.isUpdate) {

@@ -57,6 +57,9 @@
                                 <input type="text" class="form-control m-input"
                                     placeholder="Please enter Name Address ABBR" autocomplete="nope"
                                     formControlName="shortNameAddress">
+                                    <div class="form-control-feedback" *ngIf="isSubmitted && shortNameAddress.invalid">
+                                        Name Address ABBR is required
+                                    </div>
                             </div>
                         </div>
                         <div class="col-lg-4">

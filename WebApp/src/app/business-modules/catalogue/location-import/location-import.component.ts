@@ -166,14 +166,14 @@ export class LocationImportComponent extends AppList implements OnInit {
                 );
         } else {
             switch (this.type) {
-                case 'province':
+                case 'city':
                     fileName = "Province" + fileName;
                     break;
                 case 'district':
                     fileName = "District" + fileName;
                     placeType = CommonEnum.PlaceTypeEnum.District;
                     break;
-                case 'ward':
+                case 'town':
                     fileName = "Ward" + fileName;
                     placeType = CommonEnum.PlaceTypeEnum.Ward;
                     break;

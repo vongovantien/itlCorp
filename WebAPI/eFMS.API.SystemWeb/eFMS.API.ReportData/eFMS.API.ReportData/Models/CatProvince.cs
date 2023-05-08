@@ -11,6 +11,7 @@ namespace eFMS.API.ReportData.Models
         public string NameEn { get; set; }
         public string NameVn { get; set; }
         public string CountryName { get; set; }
+        public string PostalCode { get; set; }
         public bool? Active { get; set; }
     }
 }

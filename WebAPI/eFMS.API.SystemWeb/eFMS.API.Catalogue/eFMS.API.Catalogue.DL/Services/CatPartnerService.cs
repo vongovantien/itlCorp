@@ -1454,13 +1454,13 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 CatCity city = catCityRepository.Get(x => x.Id == queryDetail.ProvinceId)?.FirstOrDefault();
                 //CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
-                queryDetail.ProvinceName = city.NameEn;
+                queryDetail.ProvinceName = city?.NameEn;
             }
             if (queryDetail.ProvinceShippingId != null)
             {
                 CatCity city = catCityRepository.Get(x => x.Id == queryDetail.ProvinceShippingId)?.FirstOrDefault();
                 //CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
-                queryDetail.ProvinceShippingName = city.NameEn;
+                queryDetail.ProvinceShippingName = city?.NameEn;
             }
             // Get usercreate name
             if (queryDetail.UserCreated != null)

@@ -153,10 +153,7 @@ export class PartnerDetailComponent extends AppList {
         this.formPartnerComponent.isUpdate = !this.isAddSubPartner;
         this.partnerEmailList.getEmailPartner(this.partner.id);
         this.partnerEmailList.partnerId = this.partner.id;
-
-        this.addressPartnerList.getAddressPartner(this.partner.id);
-        this.addressPartnerList.partnerId = this.partner.id;
-        this.addressPartnerList.partner = this.partner;
+        
         this._cd.detectChanges();
     }
 
@@ -193,6 +190,11 @@ export class PartnerDetailComponent extends AppList {
                         this.partnerBankList.partnerId = this.partner.id;
                         this.partnerBankList.partner = this.partner;
                         this.partnerBankList.getListBank(this.partner.id);
+
+                        this.addressPartnerList.getAddressPartner(this.partner.id);
+                        this.addressPartnerList.partnerId = this.partner.id;
+                        this.addressPartnerList.partner = this.partner;
+
                         this.userCreatePopup.partnerId = this.partner.id;
                         this._store.select(getMenuUserPermissionState)
                             .pipe(takeUntil(this.ngUnsubscribe))
