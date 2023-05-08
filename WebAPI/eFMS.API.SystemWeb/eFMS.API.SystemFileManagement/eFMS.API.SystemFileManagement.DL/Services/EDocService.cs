@@ -146,7 +146,38 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             edocUploadMapModel.EDocFilesMap = lstDocMap;
             return edocUploadMapModel;
         }
-
+        private SysImageDetail MapToJobITL(SysImageDetail edoc)
+        {
+            var isRep = _opsTranRepo.Any(x => x.ReplicatedId == edoc.JobId && x.CurrentStatus != "Canceled");
+            var jobITL = _opsTranRepo.Where(x => x.ReplicatedId == edoc.JobId);
+            if (isRep && jobITL != null)
+            {
+                return new SysImageDetail()
+                {
+                    BillingNo = edoc.BillingNo,
+                    BillingType = edoc.BillingType,
+                    JobId = jobITL.FirstOrDefault().Id,
+                    Id = Guid.NewGuid(),
+                    DatetimeCreated = edoc.DatetimeCreated,
+                    DatetimeModified = edoc.DatetimeModified,
+                    DepartmentId = edoc.DepartmentId,
+                    DocumentTypeId = edoc.DocumentTypeId,
+                    ExpiredDate = edoc.ExpiredDate,
+                    GenEdocId = edoc.GenEdocId,
+                    GroupId = edoc.GroupId,
+                    Hblid = edoc.Hblid,
+                    Note = edoc.Note,
+                    OfficeId = edoc.OfficeId,
+                    Source = edoc.Source,
+                    SysImageId = edoc.SysImageId,
+                    SystemFileName = edoc.SystemFileName,
+                    UserCreated = edoc.UserCreated,
+                    UserFileName = edoc.UserFileName,
+                    UserModified = edoc.UserModified,
+                };
+            }
+            return null;
+        }
         public async Task<HandleState> PostEDocAsync(EDocUploadModel model, List<IFormFile> files, string type)
         {
             HandleState result = new HandleState();
@@ -230,12 +261,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 Source = model.FolderName,
                                 Note = edoc.Note
                             };
-
                             listDetail.Add(sysImageDetail);
                             _sysImageDetailRepo.Add(sysImageDetail, false);
                         }
                         else if (type == "Settlement")
                         {
+                            List<SysImageDetail> listRepDetail = new List<SysImageDetail>();
                             string bilingNo = string.Empty;
                             var models = new List<TransctionTypeJobModel>();
                             var tranType = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault()?.TransactionType;
@@ -270,7 +301,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                     GroupId = currentUser.GroupId,
                                     Hblid = item.HBLId,
                                 };
-
+                                if(_opsTranRepo.Any(x=>x.Id==item.JobId))
+                                {
+                                    var imageDetailClone = imageDetail;
+                                    var mapRepToITL = MapToJobITL(imageDetailClone);
+                                    _sysImageDetailRepo.Add(mapRepToITL, false);
+                                }
                                 _sysImageDetailRepo.Add(imageDetail, false);
                             }
 
@@ -314,7 +350,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                         Note = edoc.Note,
                                         GroupId = currentUser.GroupId,
                                     };
-
+                                    //if (_opsTranRepo.Any(x => x.Id == item.JobId))
+                                    //{
+                                    //    var imageDetailClone = imageDetail;
+                                    //    var mapRepToITL = MapToJobITL(imageDetailClone);
+                                    //    _sysImageDetailRepo.Add(mapRepToITL, false);
+                                    //}
                                     _sysImageDetailRepo.Add(imageDetail, false);
                                 }
                             }
@@ -977,6 +1018,11 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             }
                             else
                             {
+                                if(_opsTranRepo.Any(x=>x.ReplicatedId==edoc.JobId && x.CurrentStatus!= "Canceled"))
+                                {
+                                    var itlJob=_opsTranRepo.Get(x=>x.ReplicatedId==edoc.JobId).FirstOrDefault();
+                                    await _sysImageDetailRepo.DeleteAsync(x => x.SystemFileName == edoc.SystemFileName&&x.SysImageId==edoc.SysImageId&&x.JobId== itlJob.Id);
+                                }
                                 var image = _sysImageRepo.Get(x => x.Id == edoc.SysImageId).FirstOrDefault();
                                 var rsDelete = deleteFile(image.KeyS3);
                                 if (rsDelete != null)
