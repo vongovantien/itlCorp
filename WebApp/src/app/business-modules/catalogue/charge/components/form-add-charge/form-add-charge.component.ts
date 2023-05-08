@@ -110,7 +110,7 @@ export class FormAddChargeComponent extends AppForm {
             productDept: [],
             mode: [],
             creditCharge: [],
-            offices: [],
+            offices: [null, Validators.required],
 
         });
 
