@@ -553,19 +553,22 @@ namespace eFMS.API.Accounting.Controllers
                         {
                             return BadRequest(result);
                         }
-                        listAdd.ForEach(async x =>
-                        {
-                            var modelSuccess = new
+                        var listGenFile = new List<BravoSettlementModel>();
+                        listGenFile = listAdd.Count > 0 ? listAdd : listUpdate;
+                        listGenFile.ForEach(async x =>//lístAdd==0
                             {
-                                SettlementId = x.Stt,
-                                Lang = "EN",
-                                Action = "eDOC",
-                                AccessToken = Request.Headers["Authorization"].ToString()
-                            };
-                            new LogHelper("Push Rabbit SyncSettlementToAccountantSystem",  JsonConvert.SerializeObject(modelSuccess));
-                            await _busControl.SendAsync(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileSyncQueue, modelSuccess);
-                            //await HttpClientService.GetApi(_apiUrl.Value.Url + "/Export/api/v1/EN/AccountingReport/ExportDetailSettlementPayment?settlementId=" + x.Stt + "&action=Add", Request.Headers["Authorization"].ToString());
-                        });
+                                var modelSuccess = new
+                                {
+                                    SettlementId = x.Stt,
+                                    Lang = "EN",
+                                    Action = "eDOC",
+                                    AccessToken = Request.Headers["Authorization"].ToString()
+                                };
+                                new LogHelper("Push Rabbit SyncSettlementToAccountantSystem", JsonConvert.SerializeObject(modelSuccess));
+                                await _busControl.SendAsync(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileSyncQueue, modelSuccess);
+                                //await HttpClientService.GetApi(_apiUrl.Value.Url + "/Export/api/v1/EN/AccountingReport/ExportDetailSettlementPayment?settlementId=" + x.Stt + "&action=Add", Request.Headers["Authorization"].ToString());
+                            });
+
                         return Ok(result);
                     }
                     return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
