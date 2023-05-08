@@ -583,8 +583,8 @@ namespace eFMS.API.Documentation.DL.Services
                                         }
                                     }
                                 }
-                                isValid = true;
                             }
+                            else isValid = true;
                         }
                         else if (contract.IsExpired == true)
                         {
