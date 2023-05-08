@@ -1643,31 +1643,36 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 }
             );
     }
+
     detailLinkFee(selectedCs: CsShipmentSurcharge) {
-        if (!selectedCs)
-            this._toastService.error("Please Select Charge");
-        //this._spinner.show(this.spinnerpartner);
+        if (!selectedCs) {
+            return this._toastService.error("Please Select Charge");
+        }
         this._documentRepo.detailLinkFee(selectedCs.id)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
-                (result: any) => {
-                    if (result) {
-                        //this._spinner.hide(this.spinnerpartner);
-                        let strBody = "<div class=detail-linkfee > <b>Link from Job Ops:</b><a> " + result.jobNoOrg + "</a>"
-                            + "</br><b>Link to Job Service:</b><a> " + result.jobNoLink + "</a>"
-                            + "</br><b>Partner Name Selling :</b><a> " + result.partnerNameOrg + "</a>"
-                            + "</br><b>Partner Name Buying :</b><a> " + result.partnerNameLink + "</a>"
-                            + "</br><b>Linked At:</b><a> " + formatDate(new Date(result.datetimeCreated), 'dd/MM/yyyy hh:mm:ss', 'en') + "</a>"
-                            + "</br><b>Create By:</b><a> " + result.userCreatedName + "</a>"
-                            + "<div>"
-                        this.detailLinkFeePopup.title = "Information";
-                        this.detailLinkFeePopup.body = strBody;
-                        this.detailLinkFeePopup.show();
-                    } else {
-                        this._toastService.error("No Charge Link Fee");
-                    }
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe((result: any) => {
+                if (result) {
+                    const strBody = `
+                    <div class="detail-linkfee">
+                        <b>Link from Job Ops:</b><a> ${result.jobNoOrg}</a>
+                        </br><b>Link to Job Service:</b><a> ${result.jobNoLink}</a>
+                        </br><b>Partner Name Selling :</b><a> ${result.partnerNameOrg}</a>
+                        </br><b>Partner Name Buying :</b><a> ${result.partnerNameLink}</a>
+                        </br><b>Linked At:</b><a> ${formatDate(new Date(result.datetimeCreated), 'dd/MM/yyyy hh:mm:ss', 'en')}</a>
+                        </br><b>Create By:</b><a> ${result.userCreatedName}</a>
+                    </div>
+                `;
+                    this.detailLinkFeePopup.title = "Information";
+                    this.detailLinkFeePopup.body = strBody;
+                    this._cd.detectChanges();
+                    this.detailLinkFeePopup.show();
+                } else {
+                    this._toastService.error("No Charge Link Fee");
                 }
-            );
+            });
     }
 }
 
