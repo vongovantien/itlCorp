@@ -1177,7 +1177,7 @@ namespace eFMS.API.Accounting.DL.Services
                 IsExpired = s.FirstOrDefault().IsExpired,
                 IsOverLimit = s.FirstOrDefault().IsOverLimit,
                 IsOverDue = s.FirstOrDefault().IsOverDue,
-                IsOverDueOBH = s.FirstOrDefault().IsOverDue,
+                IsOverDueOBH = s.FirstOrDefault().IsOverDueOBH,
                 OverObh1to15Day = s.Sum(sum => sum.OverObh1to15Day),
                 OverObh16to30Day = s.Sum(sum => sum.OverObh16to30Day),
                 OverObh30Day = s.Sum(sum => sum.OverObh30Day),
