@@ -66,6 +66,7 @@ export class Contract {
     firstShipmentDate: any = null;
     paymentTermObh: string = null;
     isUpdateCreditTermInfo: boolean = false;
+    isOverDueObh: boolean = false;
 
 
     constructor(data?: any) {
