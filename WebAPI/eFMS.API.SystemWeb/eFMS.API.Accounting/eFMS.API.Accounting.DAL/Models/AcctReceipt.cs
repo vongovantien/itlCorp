@@ -49,5 +49,7 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? AgreementAdvanceAmountVnd { get; set; }
         public decimal? AgreementAdvanceAmountUsd { get; set; }
         public string Arcbno { get; set; }
+        public string SubArcbno { get; set; }
+        public string ReceiptMode { get; set; }
     }
 }

@@ -46,6 +46,7 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
     exchangeRate: number;
     partnerId: any;
     isContainDraft: boolean = false;
+    currentOffice: string = '';
 
     constructor(
         private readonly _store: Store<ICustomerPaymentState>,
@@ -73,6 +74,12 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
             this.headers.push({ title: 'Receipt No', field: '', required: true },
                 { title: 'Creator', field: '', required: true },
                 { title: 'Modified Time', field: '', required: true });
+        } else {
+            this._store.select(getCurrentUserState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe((user: SystemInterface.IClaimUser) => {
+                    this.currentOffice = user.officeId;
+                });
         }
 
         this._store.select(ReceiptCombineExchangeState)
@@ -167,7 +174,7 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
             id: SystemConstants.EMPTY_GUID,
             partnerId: partner.id,
             paymentMethod: null,
-            officeId: null,
+            officeId: this.currentOffice,
             amountUsd: null,
             amountVnd: null,
             obhPartnerId: null,
