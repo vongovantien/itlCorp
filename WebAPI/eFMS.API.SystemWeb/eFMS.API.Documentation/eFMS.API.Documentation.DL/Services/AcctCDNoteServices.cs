@@ -3618,7 +3618,7 @@ namespace eFMS.API.Documentation.DL.Services
                 ChargeGroup = se.FirstOrDefault().ChargeGroup,
                 VoucherIdre = string.Join(";", se.Select(x => x.VoucherIdre)),
                 scType = string.Join(";", se.Select(x => x.scType)),
-                VatVoucher = string.Join(";", se.Select(x => x.VatVoucher)),
+                VatVoucher = se.FirstOrDefault().VatVoucher,
                 InvDueDay = se.FirstOrDefault().InvDueDay,
                 SoaNo = se.FirstOrDefault().SoaNo,
                 PolId = se.FirstOrDefault().PolId,
@@ -4331,6 +4331,8 @@ namespace eFMS.API.Documentation.DL.Services
                 FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
                 DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
                 CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
+                // only get VoucherIdre for Note of OBH without Buy or sell
+                // Debit Note get Invoice No Credit Note: VoucherID
                 VatVoucher = rs.scType.Contains(DocumentConstants.CHARGE_OBH_TYPE) 
                              && (rs.scType.Contains(DocumentConstants.CHARGE_BUY_TYPE) 
                              || rs.scType.Contains(DocumentConstants.CHARGE_SELL_TYPE)) 
