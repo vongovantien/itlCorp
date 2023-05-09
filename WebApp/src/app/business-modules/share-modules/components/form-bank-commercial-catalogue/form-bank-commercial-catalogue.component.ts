@@ -323,7 +323,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
             );
     }
 
-    viewFileUpload(file: any) {
+    onViewFileUpload(file: any) {
         const selectedFile = Object.assign({}, file);
         this._systemFileManagementRepo.getFileEdoc(selectedFile.id).subscribe(
             (data) => {
