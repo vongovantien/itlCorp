@@ -288,12 +288,11 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 foreach (var item in data)
                 {
-                    var catPartner = catPartnerRepository.First(x => x.AccountNo == item.CustomerCode.Trim())?.Id ?? null;
                     var catBank = catBankRepository.First(x => x.Code == item.BankCode.Trim())?.Id.ToString() ?? null;
                     var charge = new CatPartnerBank
                     {
                         Id = Guid.NewGuid(),
-                        PartnerId = catPartner,
+                        PartnerId = item.PartnerId,
                         BankId = catBank,
                         BankAccountName = item.BankAccountName,
                         BankAccountNo = item.BankAccountNo,

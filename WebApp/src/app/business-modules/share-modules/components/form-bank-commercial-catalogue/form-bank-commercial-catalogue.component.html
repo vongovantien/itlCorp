@@ -114,37 +114,33 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <label></label>
-                            <label></label>
-                            <label></label>
                             <div class="form-group">
                                 <input type="file" #file style="display:none" multiple
-                                    (change)="chooseFileUpload($event)" title="Upload files" />
-                                <button
-                                    *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved'"
-                                    style="margin-top:5px;" (click)="file.click()" type="button"
-                                    class="btn btn-success  m-btn--icon m-btn--uppercase margin-right-10">
-                                    <span>
-                                        <i class="la la-plus"></i>
-                                        <span>
-                                            Update Files
-                                        </span>
-                                    </span>
-                                </button>
-                                <span class="text-primary">
-                                    {{ !!fileListUpload && !!fileListUpload[0]?.name ? fileListUpload[0]?.name : null}}
-                                </span>
-                                <br /><br />
+                                    (change)="chooseFileUpload($event)" title="Upload files"
+                                    [accept]="accepctFilesUpload" />
+                                <div class=" d-flex align-items-center text-truncate pb-3">
+                                    <button
+                                        *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved'"
+                                        style="margin-top:5px;" (click)="file.click()" type="button"
+                                        class="btn btn-success m-btn--icon m-btn--uppercase margin-right-10">
+                                        <span><i class="la la-plus"></i><span>Update Files</span></span>
+                                    </button>
+                                    &nbsp;
+                                    <span class="text-primary text-truncate">{{ !!fileListUpload &&
+                                        !!fileListUpload[0]?.name ?
+                                        fileListUpload[0]?.name : null }}</span>
+                                </div>
                                 <ng-container *ngIf="!isLoading && !!fileListDetail">
-                                    <li *ngFor="let file of fileListDetail"><a [href]="file.url" target="_blank"
-                                            [title]="file.name" download>{{file.name}}</a>
+                                    <p *ngFor="let file of fileListDetail" class="d-flex justify-content-start">
+                                        <a class='text-truncate' [href]="file.url" target="_blank" [title]="file.name"
+                                            download>{{
+                                            file.name}}</a>
                                         <span class="pointer text-center"
                                             *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved'">
-                                            <a title="Delete" (click)="onDeleteBankInfoFile(file)">
-                                                <i class="la la-times fa-lg text-danger"></i>
-                                            </a>
+                                            <a title="Delete" (click)="onDeleteBankInfoFile(file)"><i
+                                                    class="la la-times fa-lg text-danger"></i></a>
                                         </span>
-                                    </li>
+                                    </p>
                                 </ng-container>
                             </div>
                         </div>

@@ -242,7 +242,7 @@ namespace eFMS.API.Catalogue.Controllers
                     var bank = new CatPartnerBankImportModel
                     {
                         IsValid = true,
-                        CustomerCode = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                        PartnerId = worksheet.Cells[row, 1].Value?.ToString().Trim(),
                         BankCode = worksheet.Cells[row, 2].Value?.ToString().Trim(),
                         BankAccountNo = worksheet.Cells[row, 3].Value?.ToString().Trim(),
                         BankAccountName = worksheet.Cells[row, 4].Value?.ToString().Trim(),
