@@ -1631,7 +1631,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
     detailLinkFee(selectedCs: CsShipmentSurcharge) {
         if (!selectedCs) {
-            return this._toastService.error("Please Select Charge");
+            return this._toastService.warning("Please Select Charge");
         }
         this._documentRepo.detailLinkFee(selectedCs.id)
             .pipe(
