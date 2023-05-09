@@ -1079,7 +1079,9 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.BankAddress).HasMaxLength(200);
 
-                entity.Property(e => e.BankId).HasColumnName("BankID");
+                entity.Property(e => e.BankId)
+                    .HasColumnName("BankID")
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.BeneficiaryAddress).HasMaxLength(200);
 
@@ -1089,7 +1091,9 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
-                entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
+                entity.Property(e => e.PartnerId)
+                    .HasColumnName("PartnerID")
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.Source).HasMaxLength(50);
 
@@ -3257,9 +3261,7 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SyncStatus)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 

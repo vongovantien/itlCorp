@@ -157,4 +157,5 @@ export class SystemConstants {
     public static MAX_NUMBER_INT: number = 2147483647;
     public static MAX_NUMBER_DECIMAL: number = 99999999999999.9999;
     public static MAX_FILE_SIZE = 100;
+    public static ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
 }

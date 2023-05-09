@@ -20,6 +20,9 @@ using eFMS.API.Accounting.DL.IService;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using eFMS.API.Catalogue.DL.Models.Catalogue;
+using Microsoft.AspNetCore.Http;
+using OfficeOpenXml;
+using System.Globalization;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -189,6 +192,100 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uploadedFile"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("uploadFileImport")]
+        public async Task<IActionResult> UploadFileImport(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int colCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest();
+
+                List<CatPartnerBankImportModel> list = new List<CatPartnerBankImportModel>();
+                for (int row = 2; row <= rowCount; row++)
+                {
+                    bool isRowEmpty = true;
+                    for (int col = 1; col <= colCount; col++)
+                    {
+                        if (!string.IsNullOrWhiteSpace(worksheet.Cells[row, col].Value?.ToString()))
+                        {
+                            isRowEmpty = false;
+                            break;
+                        }
+                    }
+
+                    if (isRowEmpty)
+                    {
+                        continue;
+                    }
+                    DateTime? dateTimeCreated = null;
+                    DateTime? dateTimeModified = null;
+                    try
+                    {
+                        dateTimeCreated = DateTime.ParseExact(worksheet.Cells[row, 11].Value?.ToString().Trim(), "M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                        dateTimeModified = DateTime.ParseExact(worksheet.Cells[row, 12].Value?.ToString().Trim(), "M/d/yyyy h:mm:ss tt", CultureInfo.InvariantCulture);
+                    }
+                    catch (FormatException)
+                    {
+                        return BadRequest(new ResultHandle { Status = false, Message = "DateTime is not valid" });
+                    }
+                    var bank = new CatPartnerBankImportModel
+                    {
+                        IsValid = true,
+                        PartnerId = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                        BankCode = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                        BankAccountNo = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                        BankAccountName = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                        BankAddress = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                        BeneficiaryAddress = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                        SwiftCode = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                        Note = worksheet.Cells[row, 8].Value?.ToString().Trim(),
+                        UserCreated = worksheet.Cells[row, 9].Value?.ToString().Trim(),
+                        UserModified = worksheet.Cells[row, 10].Value?.ToString().Trim(),
+                        DatetimeCreated = dateTimeCreated,
+                        DatetimeModified = dateTimeModified
+
+                    };
+                    list.Add(bank);
+                }
+                var data = await catPartnerBankService.CheckValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle
+            {
+                Status = false,
+                Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value
+            });
+        }
+
+        /// <summary>
+        /// import list data into database
+        /// </summary>
+        /// <param name="data">list of data</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("import")]
+        [Authorize]
+        public async Task<IActionResult> Import([FromBody] List<CatPartnerBankImportModel> data)
+        {
+            var hs = await catPartnerBankService.ImportPartnerBank(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully!!!" };
+            if (hs.Success)
+                return Ok(result);
+            else
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Exception.Message });
         }
 
         /// <summary>

@@ -21,5 +21,7 @@ namespace eFMS.API.Catalogue.DL.IService
         Task<HandleState> ReviseBankInformation(Guid bankId);
         Task<List<BankSyncModel>> GetListPartnerBankInfoToSync(List<Guid> partnerBankIds);
         Task<HandleState> UpdateByStatus(List<Guid> ids, string status);
+        Task<List<CatPartnerBankImportModel>> CheckValidImport(List<CatPartnerBankImportModel> list);
+        Task<HandleState> ImportPartnerBank(List<CatPartnerBankImportModel> data);
     }
 }
