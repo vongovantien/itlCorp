@@ -1,25 +1,25 @@
-import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpResponse } from '@angular/common/http';
 
 import { AppForm } from '@app';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ChargeConstants } from '@constants';
 import { Crystal, EmailContent } from '@models';
-import { ReportPreviewComponent } from '@common';
+import { ReportPreviewComponent, SubHeaderComponent } from '@common';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { getTransactionLocked, TransactionGetDetailAction } from '@share-bussiness';
 
 
-import { combineLatest, forkJoin, of, from, Observable, timer, throwError } from 'rxjs';
-import { catchError, finalize, map, take, switchMap, mergeMap, delay, takeUntil, retryWhen, delayWhen, concatMap } from 'rxjs/operators';
+import { combineLatest, of, Observable, throwError } from 'rxjs';
+import { catchError, finalize, map, take, mergeMap, takeUntil, retryWhen, concatMap } from 'rxjs/operators';
 
 import { ShareBusinessAddAttachmentPopupComponent } from '../add-attachment/add-attachment.popup';
 import { environment } from 'src/environments/environment';
@@ -34,6 +34,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     @ViewChild(ShareBusinessAddAttachmentPopupComponent) attachmentPopup: ShareBusinessAddAttachmentPopupComponent;
     @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
 
     srcReportPDF: any = `${environment.HOST.EXPORT_CRYSTAL}`;
@@ -147,7 +148,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.serviceId = params.serviceId;
                    
                     if(params.name === "Send_Debit_Invoice"){
-                        this.name = "Send Debit Invoice"
+                        this.name = "Send Debit Invoice";
                     }
                     else{
                         this.name = params.name;
@@ -881,6 +882,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 break;
             default:
                 break;
+        }
+        if(this.isDbtInv){
+            this.headerComponent.resetBreadcrumb("Send Debit Invoice");
         }
     }
 
