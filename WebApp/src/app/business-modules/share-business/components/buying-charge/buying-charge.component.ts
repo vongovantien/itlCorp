@@ -1655,7 +1655,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     this._cd.detectChanges();
                     this.detailLinkFeePopup.show();
                 } else {
-                    this._toastService.error("No Charge Link Fee");
+                    this._toastService.warning("No Charge Link Fee");
                 }
             });
     }
