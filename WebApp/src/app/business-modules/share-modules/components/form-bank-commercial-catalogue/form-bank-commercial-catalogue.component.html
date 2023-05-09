@@ -132,9 +132,8 @@
                                 </div>
                                 <ng-container *ngIf="!isLoading && !!fileListDetail">
                                     <p *ngFor="let file of fileListDetail" class="d-flex justify-content-start">
-                                        <a class='text-truncate' [href]="file.url" target="_blank" [title]="file.name"
-                                            download>{{
-                                            file.name}}</a>
+                                        <a class='text-truncate pointer' [title]="file.name"
+                                            (click)="viewFileUpload(file)" download>{{file.name}}</a>
                                         <span class="pointer text-center"
                                             *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved'">
                                             <a title="Delete" (click)="onDeleteBankInfoFile(file)"><i
