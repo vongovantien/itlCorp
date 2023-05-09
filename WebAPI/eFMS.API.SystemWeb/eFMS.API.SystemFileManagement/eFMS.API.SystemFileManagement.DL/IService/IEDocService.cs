@@ -1,4 +1,5 @@
 ﻿using eFMS.API.SystemFileManagement.DL.Models;
+using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -25,5 +26,6 @@ namespace eFMS.API.SystemFileManagement.DL.IService
         Task<HandleState> GenEdocByBilling(string billingNo, string billingType);
         bool CheckAllowSettleEdocSendRequest(Guid settleId);
         Task<HandleState> UpdateEdocByAcc(EdocAccUpdateModel model);
+        Task<List<SysImageDetailModel>> GetProofOfDeliveryAttachedFiles(string transactionType, Guid jobId, Guid? hblId);
     }
 }

@@ -2,6 +2,7 @@
 using eFMS.API.Common.Globals;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
+using eFMS.API.SystemFileManagement.DL.Services;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
@@ -207,6 +208,13 @@ namespace eFMS.API.SystemFileManagement.Controllers
             if (hs.Success)
                 return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
             return BadRequest(hs);
+        }
+
+        [HttpGet("GetProofOfDeliveryAttachedFiles")]
+        public async Task<IActionResult> GetProofOfDeliveryAttachedFiles(string transactionType, Guid jobId, Guid? hblId)
+        {
+            var result = await _edocService.GetProofOfDeliveryAttachedFiles(transactionType, jobId, hblId);
+            return Ok(result);
         }
     }
 }
