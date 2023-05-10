@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -851,6 +853,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
 
                 entity.Property(e => e.SubColoader).HasMaxLength(800);
 
+
                 entity.Property(e => e.TransactionType)
                     .IsRequired()
                     .HasMaxLength(50)
@@ -1460,6 +1463,10 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1953,8 +1960,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.SyncStatus)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 
@@ -2213,6 +2218,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
 
                 entity.Property(e => e.ReplicatePrefix)
                     .HasMaxLength(50)

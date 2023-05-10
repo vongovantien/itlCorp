@@ -1529,16 +1529,24 @@ namespace eFMS.API.Documentation.DL.Services
                     //    item.IsValid = false;
 
                     //}
-                    if (!checkTranTypeImport(item.Hblno, transactionType, false))
+                    if (!opsTransaction.Any(x => x.Hwbno == item.Hblno))
                     {
-                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE], item.Hblno, tranName);
-                        //item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE], item.Hblno, transactionType);
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
                         item.IsValid = false;
                     }
-                    if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno.Trim()) && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
+                    else
                     {
-                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST_OFFICE], item.Hblno, currentUser.OfficeCode);
-                        item.IsValid = false;
+                        if (!checkTranTypeImport(item.Hblno, transactionType, false))
+                        {
+                            item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE], item.Hblno, tranName);
+                            //item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE], item.Hblno, transactionType);
+                            item.IsValid = false;
+                        }
+                        else if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno.Trim()) && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
+                        {
+                            item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST_OFFICE], item.Hblno, currentUser.OfficeCode);
+                            item.IsValid = false;
+                        }
                     }
                 }
                 if (string.IsNullOrEmpty(item.Mblno))
@@ -1553,23 +1561,23 @@ namespace eFMS.API.Documentation.DL.Services
                     //    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
                     //    item.IsValid = false;
                     //}
-                    if (!checkTranTypeImport(item.Mblno, transactionType, true))
+                    if (!opsTransaction.Any(x => x.Mblno == item.Mblno))
                     {
-                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBL_NOT_VALID_TRANSACTIONTYPE], item.Mblno, tranName);
-                        //item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE], item.Hblno, transactionType);
+                        //item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
                         item.IsValid = false;
                     }
-                    if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno.Trim()) && x.OfficeId == currentUser.OfficeID))
+                    else
                     {
-                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST_OFFICE], item.Mblno, currentUser.OfficeCode);
-                        item.IsValid = false;
-                    }
-                    else if (!string.IsNullOrEmpty(item.Hblno) && !string.IsNullOrEmpty(item.Mblno))
-                    {
-                        if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno))
+                        if (!checkTranTypeImport(item.Mblno, transactionType, true))
                         {
-                            //item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
-                            item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                            item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBL_NOT_VALID_TRANSACTIONTYPE], item.Mblno, tranName);
+                            //item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE], item.Hblno, transactionType);
+                            item.IsValid = false;
+                        }
+                        else if(!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno.Trim()) && x.OfficeId == currentUser.OfficeID))
+                        {
+                            item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST_OFFICE], item.Mblno, currentUser.OfficeCode);
                             item.IsValid = false;
                         }
                     }
@@ -1802,7 +1810,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         item.Hblid = currentOpsJob.Hblid;
                         item.JobNo = currentOpsJob.JobNo;
-                        item.TransactionType = transactionType=="TK"?"TK":"CL";
+                        item.TransactionType = transactionType == "TK" ? "TK" : "CL";
                         string jobNo = currentOpsJob.JobNo;
                         if (item.Type.ToLower() == "obh")
                         {
