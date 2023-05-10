@@ -3,7 +3,7 @@ import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
-import _uniqBy from 'lodash/uniqBy';
+import _uniqBy from 'lodash-es/uniqBy';
 import moment from 'moment';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -36,6 +36,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     @Input() docTypeId: number = 0;
     @Input() documentTypes: any[] = [];
     @Input() readonly: boolean = false;
+    @Input() isAttachFilePOD: boolean = false;
 
     lstEdocExist: any[] = [];
     headers: CommonInterface.IHeaderTable[] = [];
@@ -71,7 +72,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     ngOnInit(): void {
         this.getJobList();
-        this.transactionType = this.typeFrom;
+        this.transactionType = this.isAttachFilePOD === true ? this.transactionType: this.typeFrom;
         this.configJob = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'jobId', label: 'JobID' },
@@ -114,8 +115,10 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe((res) => {
                     if (res) {
-                        this.billingId = res.settlement.id;
-                        this.billingNo = res.settlement.settlementNo
+                        if (res?.settlement !== null && res?.settlement !== undefined) {
+                            this.billingId = res.settlement.id;
+                            this.billingNo = res.settlement.settlementNo
+                        }
                     }
                 })
         } else {
@@ -262,8 +265,16 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             }
             else if (!!docType) {
                 files[i].DocumentId = docType.id;
+                files[i].AccountingType = docType.accountingType;
                 files[i].docType = docType;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
+            }
+            else if (this.isAttachFilePOD === true) {
+                files[i].Code = "POD"
+                files[i].aliasName = "POD" + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
+                files[i].docType = "POD";
+                files[i].DocumentId = 0;
+                files[i].transactionType = this.transactionType
             }
             this.listFile.push(files[i]);
         }
@@ -298,11 +309,13 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     }
 
     onSelectDataFormInfo(event: any, index: number, type: string) {
+        console.log(event)
         switch (type) {
             case 'docType':
                 this.enablePayeeINV[index] = false;
                 this.listFile[index].Code = event.code;
                 this.listFile[index].DocumentId = event.id;
+                this.listFile[index].AccountingType = event.accountingType;
                 this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 this.listFile[index].docType = event.code;
                 if (event.code === 'INV' || event.code === 'OBH_INV') {
@@ -409,6 +422,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     AccountingType: x.AccountingType,
                 }));
             });
+
+
             this.EdocUploadFile = ({
                 ModuleName: this.typeFrom === 'Shipment' ? 'Document' : 'Accounting',
                 FolderName: this.typeFrom,

@@ -13,5 +13,6 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public string DateType { get; set; }
         public List<string> Service { get; set; }
         public List<string> Office { get; set; }
+        public bool IsCombineReceipt { get; set; }
     }
 }

@@ -20,7 +20,7 @@
                         [currentActiveItemId]="{ field: 'id', value: partnerId.value}"
                         [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
                         [displayFields]="displayFilesPartners" (remove)="resetFormControl(partnerId)"
-                        placeholder="Please select partner" [clearable]="false">
+                        placeholder="Please select partner" [clearable]="false" [disabled]="!!isCombineReceipt">
                     </app-combo-grid-virtual-scroll>
                 </div>
                 <div class="row">

@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import { AccountingRepo, DocumentationRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { getCurrentUserState, IAppState } from '@store';
-import _groupBy from 'lodash/groupBy';
+import _groupBy from 'lodash-es/groupBy';
 import { ToastrService } from 'ngx-toastr';
 import { concatMap, finalize, switchMap, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
@@ -346,7 +346,7 @@ export class ARPrePaidPaymentComponent extends AppList implements OnInit, ICryst
         const debitGroup = (_groupBy(cdList, 'jobId') || []);
 
         let results = [];
-        Object.entries(debitGroup).forEach((value, index) => {
+        Object.entries(debitGroup).forEach((value: any, index) => {
             const currentDebit = cdList.find(x => x.jobId === value[0]);
             const _total = value[1].reduce((acc, curr) => (acc += curr.totalAmount), 0);
             const itemGrps = {

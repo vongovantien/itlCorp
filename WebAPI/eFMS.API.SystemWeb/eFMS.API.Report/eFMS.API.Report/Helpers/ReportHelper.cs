@@ -1505,7 +1505,11 @@ namespace eFMS.API.Report.Helpers
                 "REFERENCE NO",
                 "P/M TERM",
                 "SHIPMENT NOTES",
-                "CREATED"
+                "CREATED",
+                "SALEMAN GROUP",
+                "SALEMAN DEPARTMENT",
+                "PIC GROUP",
+                "PIC DEPARTMENT",
             };
 
             List<string> subheadersTable = new List<string>()
@@ -1562,7 +1566,7 @@ namespace eFMS.API.Report.Helpers
 
             }
 
-            for (int i = 1; i < 59; i++)
+            for (int i = 1; i < 63; i++)
             {
                 if (i <= 27 || i >= 41)
                 {
@@ -1707,7 +1711,10 @@ namespace eFMS.API.Report.Helpers
                 workSheet.Cells[j + addressStartContent, 56].Value = item.PMTerm;
                 workSheet.Cells[j + addressStartContent, 57].Value = item.ShipmentNotes;
                 workSheet.Cells[j + addressStartContent, 58].Value = item.Created.HasValue ? item.Created.Value.ToString("dd/MM/yyyy") : "";
-
+                workSheet.Cells[j + addressStartContent, 59].Value = item.SaleInfo.GroupSaleMan;
+                workSheet.Cells[j + addressStartContent, 60].Value = item.SaleInfo.DeptSaleMan;
+                workSheet.Cells[j + addressStartContent, 61].Value = item.PICInfo.GroupPIC;
+                workSheet.Cells[j + addressStartContent, 62].Value = item.PICInfo.DeptPIC;
                 j++;
                 positionStart++;
             }
@@ -1819,9 +1826,9 @@ namespace eFMS.API.Report.Helpers
             workSheet.Column(9).Width = 20;
             workSheet.Column(17).Width = 20;
 
-            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 58].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 58].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 58].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 62].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 62].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 62].Style.Border.Top.Style = ExcelBorderStyle.Thin;
         }
 
         public Stream GenerateShipmentOverviewFCLExcell(IQueryable<GeneralExportShipmentOverviewFCLResult> overviews, GeneralReportCriteria criteria)

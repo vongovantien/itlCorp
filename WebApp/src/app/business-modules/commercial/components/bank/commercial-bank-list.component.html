@@ -4,7 +4,6 @@
         <div class="collapse show" id="data-partner">
             <div class="row m--margin-bottom-10">
                 <div class="col-lg-12 d-flex align-items-center justify-content-between">
-
                     <div class="form-group col-lg-4 p-1">
                         <div class="m-input-icon m-input-icon--right">
                             <input type="text" class="form-control m-input m-input--square" placeholder="Search"
@@ -33,14 +32,15 @@
                     <tbody>
                         <ng-container *ngIf="!!partnerBanks.length">
                             <tr
-                                *ngFor="let bank of partnerBanks | filter : keyword :['bankNameVn', 'bankAccountName','bankAccountNo'] ; let i = index;">
+                                *ngFor="let bank of partnerBanks | filter : keyword :['bankName', 'bankAccountName','bankAccountNo']">
                                 <td class="table-actions-col">
                                     <div class="table-actions">
                                         <app-permission-button *ngIf="!!partner && partner.permission?.allowUpdate"
-                                            type="detail" (onClick)="gotoDetailBank(bank.id, i)">
+                                            type="detail" (onClick)="gotoDetailPartnerBank(bank.id)">
                                         </app-permission-button>
-                                        <app-permission-button *ngIf="!!partner && partner.permission?.allowDelete"
-                                            type="delete" (onClick)="onDeleteBank(bank.id)">
+                                        <app-permission-button
+                                            *ngIf="!!partner && !!bank && partner.permission?.allowDelete && bank.approveStatus !== 'Approved' && bank.approveStatus !=='Processing'"
+                                            type="delete" (onClick)="onDeletePartnerBank(bank.id)">
                                         </app-permission-button>
                                     </div>
                                 </td>
@@ -48,10 +48,10 @@
                                 <td>{{bank.bankAccountName}}</td>
                                 <td>{{bank.bankAddress}}</td>
                                 <td>{{bank.swiftCode}}</td>
-                                <td>{{bank.bankNameEn}}</td>
-                                <td>{{bank.code}}</td>
+                                <td>{{bank.bankName}}</td>
+                                <td>{{bank.bankCode}}</td>
                                 <td>{{bank.source}}</td>
-                                <td class="d-inline-block text-truncate" style="max-width: 200px;">{{bank.note}}</td>
+                                <td class="d-inline-block text-truncate" style="max-width: 150px;">{{bank.note}}</td>
                             </tr>
                         </ng-container>
                         <tr app-table-none-record *ngIf=" !(isLoading) && !partnerBanks.length">

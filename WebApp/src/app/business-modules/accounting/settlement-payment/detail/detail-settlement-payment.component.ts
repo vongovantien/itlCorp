@@ -24,7 +24,7 @@ import { getCurrentUserState } from '@store';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, concatMap, finalize, pluck, takeUntil } from 'rxjs/operators';
 import { ShareBussinessAttachFileV2Component } from 'src/app/business-modules/share-business/components/edoc/files-attach-v2/files-attach-v2.component';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { LoadDetailSettlePayment, LoadDetailSettlePaymentFail, LoadDetailSettlePaymentSuccess } from '../components/store';
 @Component({
     selector: 'app-settlement-payment-detail',
@@ -47,6 +47,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     attachFiles: any[] = [];
     folderModuleName: string = 'Settlement';
     userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
+    advAmount: number = 0;
+    //isAttach: boolean = true;
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -261,6 +263,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         return true;
     }
 
+
     saveAndSendRequest() {
         if (!this.checkValidSettle()) {
             return;
@@ -271,6 +274,11 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             settlement: this.getBodySettlement(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
+
+        // if (!this.checkValidAttachEdoc(body.settlement.id)) {
+        //     this._toastService.error("Please check your Document Type !");
+        //     return;
+        // }
 
         let settlementResult: any = {};
         this._accoutingRepo.checkValidToSendRequestSettle(body)

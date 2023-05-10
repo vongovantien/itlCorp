@@ -98,6 +98,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                 files[i].AccountingType = docType.accountingType;
                 files[i].Code = docType.code;
                 files[i].DocumentId = docType.id;
+                files[i].AccountingType = docType.accountingType;
                 files[i].docType = docType.id;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             }
@@ -131,6 +132,7 @@ export class UserAttachFileManagementComponent extends AppList implements OnInit
                 if (!selectedDocType) { return; }
                 this.listFile[index].Code = selectedDocType.code;
                 this.listFile[index].DocumentId = selectedDocType.id;
+                this.listFile[index].AccountingType = selectedDocType.accountingType;
                 this.listFile[index].docType = selectedDocType.id;
                 this.listFile[index].AccountingType = selectedDocType.accountingType;
                 this.listFile[index].aliasName = selectedDocType.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))

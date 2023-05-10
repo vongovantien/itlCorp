@@ -1,107 +1,54 @@
 variables:
-  PROJECT_PATH: "$CI_PROJECT_DIR"
-  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/uat/eFMS-en"
-  APP_OUT_PATH_PROD_EN: "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-en"
-  APP_OUT_PATH_PROD_VI: "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-vi"
-
-image: node:12
+  FRONTEND_IMAGE_CURRENTVER: jackchuong/itl:efms-webapp-frontend-1.4.4
 
 stages:
-  - install
   - build
+  - deploy
 
-install_dependency:
-  stage: install
-  script:
-    - node --version
-    - echo "start job_build"
-    - cd WebApp
-    - npm install
-    - npm install -g @angular/cli
-  only:
-    - production
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - WebApp/node_modules
-      - WebApp/package-lock.json
-build_uat:
+build_image_frontend_final:
   stage: build
-  when: manual
+  image: docker:20.10.9
   script:
-    - cd WebApp
-    - npm run build:uat:en
-    - echo "end job_build"
+    - docker login -u $REGISTRY_USER -p $REGISTRY_PASS
+    - docker build -f dockerfile-frontend -t $FRONTEND_IMAGE_CURRENTVER ./WebApp
+    - docker push $FRONTEND_IMAGE_CURRENTVER
   only:
-    - feature-itl
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - WebApp/node_modules
-    policy: pull
-  artifacts:
-    name: "angular_build"
-    paths:
-      - $APP_OUTPUT_PATH
+    refs:
+      - feature-itl
+    changes:
+      - WebApp/**/*
+  when: manual
 
-build_test:
-  stage: build
-  when: manual
+deploy_k8s:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
   script:
-    - echo "start job_build"
-    - cd WebApp
-    - npm run build:test:en
-    - echo "end job_build"
+  #  - kubectl config get-contexts
+    - kubectl config use-context efms/eFMS-WebApp:efms-agent
+  #  - kubectl apply -f kubernetes-configs/manifest.yaml
+    - kubectl -n efms set image deployment.apps/efms-frontend efms-frontend=$FRONTEND_IMAGE_CURRENTVER
+    - kubectl -n efms annotate deployment.apps/efms-frontend kubernetes.io/change-cause="upgrade version to $FRONTEND_IMAGE_CURRENTVER"
   only:
-    - feature/dev
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - WebApp/node_modules
-    policy: pull
-  artifacts:
-    name: "angular_build"
-    paths:
-      - $APP_OUTPUT_PATH
+    refs:
+      - feature-itl
+    changes:
+      - WebApp/**/*
+  when: manual
 
-build_prod_en:
-  stage: build
-  when: manual
+rollback_k8s:
+  stage: deploy
+  image:
+    name: bitnami/kubectl:latest
+    entrypoint: [""]
   script:
-    - node --version
-    - echo "start job_build"
-    - cd WebApp
-    - npm run build:prod:en
-    - echo "end job_build"
+    - kubectl config use-context efms/eFMS-WebApp:efms-agent
+    - kubectl -n efms rollout history deployment.apps/efms-frontend    
+    - kubectl -n efms rollout undo deployment.apps/efms-frontend
   only:
-    - production
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - WebApp/node_modules
-    policy: pull
-  artifacts:
-    name: "angular_build_prod_en"
-    paths:
-      - $APP_OUT_PATH_PROD_EN
-
-build_prod_vi:
-  stage: build
+    refs:
+      - feature-itl
+    changes:
+      - WebApp/**/*
   when: manual
-  script:
-    - node --version
-    - echo "start job_build"
-    - cd WebApp
-    - npm run build:prod:vi
-    - echo "end job_build"
-  only:
-    - production
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - WebApp/node_modules
-    policy: pull
-  artifacts:
-    name: "angular_build_prod_vi"
-    paths:
-      - $APP_OUT_PATH_PROD_VI

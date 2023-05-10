@@ -38,7 +38,6 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly ICurrentUser currentUser;
         private readonly ICurrencyExchangeService currencyExchangeService;
-        private readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
         private readonly IContextBase<SysOffice> sysOfficeRepository;
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         private readonly IContextBase<CsTransactionDetail> csTransactionDetailRepository;
@@ -60,7 +59,6 @@ namespace eFMS.API.Accounting.DL.Services
              IContextBase<SysEmployee> sysEmployeeRepo,
              IContextBase<CsTransaction> csTransRepo,
              ICurrencyExchangeService exchangeService,
-             IContextBase<AcctCreditManagementAr> creditArRepo,
              IContextBase<SysOffice> sysOfficeRepo,
              IContextBase<OpsTransaction> opsTransactionRepo,
              IContextBase<CsTransactionDetail> csTransactionDetailRepo,
@@ -82,7 +80,6 @@ namespace eFMS.API.Accounting.DL.Services
             sysEmployeeRepository = sysEmployeeRepo;
             csTransactionRepository = csTransRepo;
             currencyExchangeService = exchangeService;
-            acctCreditManagementArRepository = creditArRepo;
             sysOfficeRepository = sysOfficeRepo;
             opsTransactionRepository = opsTransactionRepo;
             csTransactionDetailRepository = csTransactionDetailRepo;
@@ -4227,16 +4224,19 @@ namespace eFMS.API.Accounting.DL.Services
             // [CR:23/11/21] update get adv amount data with payment type and receipt method
             #region Get ADVANCE AMOUNT row
             List<string> methodsAdv = new List<string> {
-                AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE,
+                AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE, 
                 AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_BANK,
                 AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_CASH,
                 AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL,
+                // General payment receipt
+                AccountingConstants.COLLECT_OBH_AGENCY,
+                AccountingConstants.ADVANCE_AGENCY,
             };
             var receiptMethod = from rcpt in receiptData.Where(x => methodsAdv.Any(z => z == x.PaymentMethod) && (string.IsNullOrEmpty(criteria.PartnerId) || criteria.PartnerId == x.CustomerId))
                                 join payment in DataContext.Get(x => (string.IsNullOrEmpty(criteria.PartnerId) || criteria.PartnerId == x.PartnerId)) on rcpt.Id equals payment.ReceiptId
                                 select new
                                 {
-                                    PartnerId = payment.PartnerId,
+                                    PartnerId = string.IsNullOrEmpty(rcpt.Arcbno) ? payment.PartnerId: rcpt.CustomerId,
                                     payment.OfficeId,
                                     CusAdvanceAmountUsd = rcpt.CusAdvanceAmountUsd ?? 0,
                                     CusAdvanceAmountVnd = rcpt.CusAdvanceAmountVnd ?? 0,

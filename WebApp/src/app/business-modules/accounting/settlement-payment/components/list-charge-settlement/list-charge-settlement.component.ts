@@ -24,7 +24,7 @@ import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-
 import { SystemConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { getCurrentUserState } from '@store';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
 import { ShareDocumentTypeAttachComponent } from "src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component";
 import { ISettlementPaymentState, UpdateListNoGroupSurcharge, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState, getSettlementPaymentDetailTotalChargeState, LoadListNoGroupSurcharge } from '../store';
@@ -258,6 +258,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     onRequestSurcharge(surcharge: Surcharge[], isCopy?: boolean) {
+
         if (surcharge[0].isFromShipment) {
             this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
             this.surcharges = [...this.surcharges, ...surcharge];

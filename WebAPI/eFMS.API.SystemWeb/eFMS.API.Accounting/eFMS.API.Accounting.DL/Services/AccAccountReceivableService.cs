@@ -404,7 +404,10 @@ namespace eFMS.API.Accounting.DL.Services
                     IsOverDue = s.FirstOrDefault().contract.IsOverDue,
                     IsOverLimit = s.FirstOrDefault().contract.IsOverLimit,
                     IsExpired = s.FirstOrDefault().contract.IsExpired,
-
+                    OverObh1to15Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.OverObh1to15Day : 0).Sum(),
+                    OverObh16to30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.OverObh16to30Day : 0).Sum(),
+                    OverObh30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.OverObh30Day : 0).Sum(),
+                    IsOverDueOBH = s.First().contract.IsOverDueObh
                 });
 
             var data = from contract in groupByContract
@@ -464,7 +467,11 @@ namespace eFMS.API.Accounting.DL.Services
                            OfficeContract = contract.OfficeContract,
                            IsOverDue = contract.IsOverDue,
                            IsExpired = contract.IsExpired,
-                           IsOverLimit = contract.IsOverLimit
+                           IsOverLimit = contract.IsOverLimit,
+                           IsOverDueOBH = contract.IsOverDueOBH,
+                           OverObh1to15Day = contract.OverObh1to15Day,
+                           OverObh16to30Day = contract.OverObh16to30Day,
+                           OverObh30Day = contract.OverObh30Day,
                        };
             return data;
         }
@@ -921,6 +928,7 @@ namespace eFMS.API.Accounting.DL.Services
                         IsOverDue = s.First().IsOverDue,
                         ArOfficeIds = s.Select(x => x.OfficeId).Distinct().ToList(),
                         ArServices = s.Select(x => x.ArServiceCode).Distinct().ToList(),
+                        IsOverDueOBH = s.First().IsOverDueOBH
                     }).OrderByDescending(s => s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
@@ -1027,6 +1035,9 @@ namespace eFMS.API.Accounting.DL.Services
                     TotalObhUnPaidAmount = se.Select(sel => sel.ObhUnPaidAmount).Sum(),
                     TotalObhPaidAmount = se.Select(sel => sel.ObhPaidAmount).Sum(),
                     Services = se.Select(sel => sel.ArServiceCode).Distinct().ToList(),
+                    TotalOverObh1to15Day = se.Select(sel => sel.OverObh1to15Day).Sum(),
+                    TotalOverObh16to30Day = se.Select(sel => sel.OverObh16to30Day).Sum(),
+                    TotalOverObh30Day = se.Select(sel => sel.OverObh30Day).Sum(),
                     AccountReceivableGrpServices = se.Select(sel => new AccountReceivableServiceResult
                     {
                         OfficeId = Guid.Parse(sel.OfficeId),
@@ -1043,7 +1054,10 @@ namespace eFMS.API.Accounting.DL.Services
                         Currency = sel.ArCurrency,
                         ObhBillingAmount = sel.ObhBillingAmount,
                         ObhPaidAmount = sel.ObhPaidAmount,
-                        ObhUnPaidAmount = sel.ObhUnPaidAmount
+                        ObhUnPaidAmount = sel.ObhUnPaidAmount,
+                        OverObh1to15Day = sel.OverObh1to15Day,
+                        OverObh16to30Day = sel.OverObh16to30Day,
+                        OverObh30Day = sel.OverObh30Day                        
                     }).ToList()
                 });
             var offices = officeRepo.Get();
@@ -1067,7 +1081,10 @@ namespace eFMS.API.Accounting.DL.Services
                            TotalObhPaidAmount = ar.TotalObhPaidAmount,
                            TotalObhUnPaidAmount = ar.TotalObhUnPaidAmount,
                            AccountReceivableGrpServices = ar.AccountReceivableGrpServices,
-                           Services = ar.Services
+                           Services = ar.Services,
+                           TotalOverObh1to15Day = ar.TotalOverObh1to15Day,
+                           TotalOverObh16to30Day = ar.TotalOverObh16to30Day,
+                           TotalOverObh30Day = ar.TotalOverObh30Day
                        };
             return data.ToList();
         }
@@ -1160,6 +1177,10 @@ namespace eFMS.API.Accounting.DL.Services
                 IsExpired = s.FirstOrDefault().IsExpired,
                 IsOverLimit = s.FirstOrDefault().IsOverLimit,
                 IsOverDue = s.FirstOrDefault().IsOverDue,
+                IsOverDueOBH = s.FirstOrDefault().IsOverDueOBH,
+                OverObh1to15Day = s.Sum(sum => sum.OverObh1to15Day),
+                OverObh16to30Day = s.Sum(sum => sum.OverObh16to30Day),
+                OverObh30Day = s.Sum(sum => sum.OverObh30Day),
             }).FirstOrDefault();
             detail.AccountReceivableGrpOffices = GetARGroupOffice(arPartners);
             return detail;
@@ -1192,7 +1213,10 @@ namespace eFMS.API.Accounting.DL.Services
                     ObhBillingAmount = s.Select(se => se.ObhBilling).Sum(),
                     ObhPaidAmount = s.Select(se => se.ObhPaid).Sum(),
                     ObhUnPaidAmount = s.Select(se => se.ObhUnpaid).Sum(),
-                    ArSalesmanId = s.Key.SaleMan
+                    ArSalesmanId = s.Key.SaleMan,
+                    OverObh1to15Day = s.Select(se => se.OverObh1to15Day).Sum(),
+                    OverObh16to30Day = s.Select(se => se.OverObh16to30Day).Sum(),
+                    OverObh30Day = s.Select(se => se.OverObh30Day).Sum(),
                 });
             var users = userRepo.Get();
 
@@ -1225,7 +1249,10 @@ namespace eFMS.API.Accounting.DL.Services
                                            ObhPaidAmount = ar.ObhPaidAmount,
                                            ObhUnPaidAmount = ar.ObhUnPaidAmount,
                                            ArSalesmanId = ar.ArSalesmanId,
-                                           ArSalesmanName = u.Username
+                                           ArSalesmanName = u.Username,
+                                           OverObh1to15Day = ar.OverObh1to15Day,
+                                           OverObh16to30Day = ar.OverObh16to30Day,
+                                           OverObh30Day = ar.OverObh30Day
                                        };
 
             var detail = new AccountReceivableDetailResult();
@@ -1253,7 +1280,10 @@ namespace eFMS.API.Accounting.DL.Services
                 Over30Day = s.Sum(sum => sum.Over30Day),
                 ArCurrency = s.Select(se => se.ArCurrency).FirstOrDefault(),
                 ArSalesmanId = s.Key.ArSalesmanId,
-                ArSalesmanName = s.Select(x => x.ArSalesmanName).FirstOrDefault()
+                ArSalesmanName = s.Select(x => x.ArSalesmanName).FirstOrDefault(),
+                OverObh1to15Day = s.Sum(sum => sum.OverObh1to15Day),
+                OverObh16to30Day = s.Sum(sum => sum.OverObh16to30Day),
+                OverObh30Day = s.Sum(sum => sum.OverObh30Day)
             }).FirstOrDefault();
             detail.AccountReceivableGrpOffices = GetARGroupOffice(arPartners);
             return detail;
@@ -1296,17 +1326,34 @@ namespace eFMS.API.Accounting.DL.Services
             DebitAmountDetail debitAmountDetail = new DebitAmountDetail();
             var contract = contractPartnerRepo.Get(x => x.Id == criteria.AgreementId).FirstOrDefault();
             var partner = partnerRepo.Get(x => x.Id == criteria.PartnerId.ToString()).FirstOrDefault();
-            debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
+            if (criteria.AgreementId != null)
             {
-                ContractNo = contract.ContractNo,
-                EffectiveDate = contract.EffectiveDate,
-                ContracType = contract.ContractType,
-                ExpiredDate = contract.ExpiredDate,
-                PartnerCode = partner.TaxCode,
-                PartnerName = partner.ShortName,
-                Currency = contract.CurrencyId
-            };
-            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId(criteria.AgreementId, criteria.PartnerId, criteria.AgreementSalesmanId).ToList();
+                debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
+                {
+                    ContractNo = contract.ContractNo,
+                    EffectiveDate = contract.EffectiveDate,
+                    ContracType = contract.ContractType,
+                    ExpiredDate = contract.ExpiredDate,
+                    PartnerCode = partner.TaxCode,
+                    PartnerName = partner.ShortName,
+                    Currency = contract.CurrencyId
+                };
+            }
+            else
+            {
+                criteria.AgreementId = Guid.Empty;
+                debitAmountDetail.DebitAmountGeneralInfo = new DebitAmountGeneralInfo
+                {
+                    ContractNo = null,
+                    EffectiveDate = null,
+                    ContracType = null,
+                    ExpiredDate = null,
+                    PartnerCode = partner.TaxCode,
+                    PartnerName = partner.ShortName,
+                    Currency = null
+                };
+            }
+            debitAmountDetail.DebitAmountDetails = GetDebitAmountDetailbyPartnerId((Guid)criteria.AgreementId, criteria.PartnerId, criteria.AgreementSalesmanId).ToList();
             //debitAmountDetail.DebitAmountDetails.ForEach(x =>
             //{
             //    if (!checkingPaidLoop2(x.AcctManagementID)) debitAmountDetail.DebitAmountDetails.Remove(x);

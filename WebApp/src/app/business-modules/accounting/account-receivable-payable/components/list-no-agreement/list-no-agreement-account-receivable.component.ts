@@ -1,21 +1,21 @@
 import { Component, EventEmitter, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { AppList } from '@app';
-import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from '@services';
+import { catchError, finalize, map } from 'rxjs/operators';
 
+import { HttpResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { RoutingConstants, SystemConstants } from '@constants';
+import { ContextMenuDirective } from '@directives';
+import { TrialOfficialOtherModel } from '@models';
+import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo, ExportRepo } from '@repositories';
-import { Router } from '@angular/router';
-import { TrialOfficialOtherModel } from '@models';
-import { RoutingConstants, SystemConstants } from '@constants';
-import { getAccountReceivableListState, getAccountReceivableLoadingListState, IAccountReceivableState } from '../../account-receivable/store/reducers';
-import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
-import { HttpResponse } from '@angular/common/http';
+import { getAccountReceivableListState, getAccountReceivableLoadingListState, IAccountReceivableState } from '../../account-receivable/store/reducers';
 import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receivable-debit-detail-popup.component';
-import { ContextMenuDirective } from '@directives';
 
 @Component({
     selector: 'list-no-agreement-account-receivable',
@@ -143,5 +143,14 @@ export class AccountReceivableNoAgreementComponent extends AppList implements On
     onSelectPartner(part: TrialOfficialOtherModel) {
         this.selectedPartner = part;
         this.clearMenuContext(this.queryListMenuContext);
+    }
+
+    exportDebitAmount() {
+        this._exportRepo.exportDebitAmountDetailByContract(this.selectedPartner)
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, res.headers.get(SystemConstants.EFMS_FILE_NAME));
+                }
+            );
     }
 }

@@ -17,6 +17,7 @@ import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/comm
 import { PopupBase } from 'src/app/popup.base';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
+import { AccountingConstants } from '@constants';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -68,7 +69,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     paymentTerm: AbstractControl;
     firstShipmentDate: AbstractControl;
     creditLimitRate: AbstractControl;
-
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -193,14 +193,16 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.type = result.type;
         });
 
-        this.formGroup.get("effectiveDate").valueChanges
-            .pipe(
-                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
-                map((data: any) => data.startDate)
-            )
-            .subscribe((value: any) => {
-                this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
-            });
+        // this.formGroup.get("effectiveDate").valueChanges
+        //     .pipe(
+        //         distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+        //         map((data: any) => data.startDate)
+        //     )
+        //     .subscribe((value: any) => {
+        //         // this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
+        //         console.log(value);
+        //     });
+
         if (!!this.trialEffectDate.value) {
             this.formGroup.get("trialEffectDate").valueChanges
                 .pipe(
@@ -758,6 +760,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.contractTypeDetail = this.selectedContract.contractType;
 
         this.formatAutoExtendDays();
+        this.minDateExpired = this.createMoment(this.selectedContract?.effectiveDate);
     }
 
     assignValueToModel() {
@@ -771,7 +774,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.index = this.indexDetailContract;
         this.selectedContract.contractNo = this.formGroup.controls['contractNo'].value;
         this.selectedContract.effectiveDate = this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null;
-        this.selectedContract.expiredDate = !!this.expiredDate.value && !!this.expiredDate.value.startDate ? formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
+        this.selectedContract.expiredDate = this.expiredDate.value ? (this.expiredDate.value.startDate !== null ? formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null;
         this.selectedContract.contractType = !!this.contractType.value ? this.contractType.value : null;
         const services = this.saleService.value ? (this.saleService.value.length > 0 ? this.saleService.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
         this.selectedContract.saleService = services;
@@ -938,7 +941,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             });
         }
     }
-
     onUpdateEffectiveDate(value: { startDate: any; endDate: any }) {
         if (!!value.startDate && this.contractType.value === 'Trial') {
             this.expiredDate.setValue({

@@ -467,7 +467,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string UrlClone = string.Copy(ApiUrl.Value.Url);
 
             // info send to and cc
-            ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract, DataEnums.EMAIL_TYPE_ACTIVE_PARTNER);
+            ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract, DataEnums.EMAIL_TYPE_ACTIVE_CONTRACT);
 
             string url = string.Empty;
             string employeeIdSalemans = sysUserRepository.Get(x => x.Id == partner.SalesmanId).Select(t => t.EmployeeId).FirstOrDefault();
@@ -1175,7 +1175,6 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return null;
             }
-            IQueryable<CatPartnerViewModel> datas = null;
             IQueryable<CatPartnerViewModel> results = null;
             List<CatPartnerViewModel> partners = new List<CatPartnerViewModel>();
             if (size > 1)
@@ -1901,7 +1900,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public List<CatPartnerImportModel> CheckValidCustomerAgentImport(List<CatPartnerImportModel> list)
         {
-            var partners = Get().ToList();
+            var partners = DataContext.Get().ToList();
             var users = sysUserRepository.Get().ToList();
             var countries = countryService.Get().ToList();
             var provinces = placeService.Get(x => x.PlaceTypeId == PlaceTypeEx.GetPlaceType(CatPlaceTypeEnum.Province)).ToList();
@@ -1922,24 +1921,25 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
                 else
                 {
-                    string taxCode = item.TaxCode;
-                    string internalReferenceNo = !string.IsNullOrEmpty(item.InternalReferenceNo) ? item.InternalReferenceNo.Replace(" ", "") : string.Empty;
+                    string taxCode = item.TaxCode.Trim();
+                    string internalReferenceNo = !string.IsNullOrEmpty(item.InternalReferenceNo) ? item.InternalReferenceNo.Trim() : string.Empty;
 
-                    var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
-                    var unicodBytesCount = Encoding.UTF8.GetByteCount(taxCode);
-                    if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(taxCode))
-                    {
-                        item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_INVALID], item.TaxCode);
-                        item.IsValid = false;
-                    }
-                    else if (list.Count(x => x.TaxCode == taxCode) > 1)
+                    //var asciiBytesCount = Encoding.ASCII.GetByteCount(taxCode);
+                    //var unicodBytesCount = Encoding.UTF8.GetByteCount(taxCode);
+                    //if (asciiBytesCount != unicodBytesCount || !regexItem.IsMatch(taxCode))
+                    //{
+                    //    item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_INVALID], item.TaxCode);
+                    //    item.IsValid = false;
+                    //}
+                    //else 
+                    if (list.Count(x => x.TaxCode == taxCode) > 1)
                     {
                         item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_DUPLICATED]);
                         item.IsValid = false;
                     }
                     else
                     {
-                        if (partners.Any(x => x.TaxCode?.Replace(" ", "") == taxCode))
+                        if (partners.Any(x => x.TaxCode.Trim() == taxCode))
                         {
                             item.TaxCodeError = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_PARTNER_TAXCODE_EXISTED], item.TaxCode);
                             item.IsValid = false;
@@ -2248,8 +2248,52 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerViewModel2> GetMultiplePartnerGroup(PartnerMultiCriteria criteria)
         {
-            IQueryable<CatPartner> data;
+            IQueryable<CatPartnerViewModel2> data;
             List<string> grpCodes = new List<string>();
+            #region Delete Old
+            //Expression<Func<CatPartner, bool>> query = x => ((x.Active == criteria.Active || criteria.Active == null) && (string.IsNullOrEmpty(criteria.PartnerType) || x.PartnerType == criteria.PartnerType));
+            //Expression<Func<CatContract, bool>> queryContract = x => x.Active == true && (x.IsExpired == null || x.IsExpired == false);
+            //if (criteria.PartnerGroups != null)
+            //{
+            //    foreach (var grp in criteria.PartnerGroups)
+            //    {
+            //        string group = PlaceTypeEx.GetPartnerGroup(grp);
+            //        grpCodes.Add(group);
+            //    }
+            //    foreach (var group in grpCodes.Distinct())
+            //    {
+            //        if (query == null)
+            //        {
+            //            query = x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0;
+            //        }
+            //        else
+            //        {
+            //            query = query.Or(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
+            //        }
+            //    }
+            //    if (!string.IsNullOrEmpty(criteria.PartnerType))
+            //    {
+            //        query = query.And(x => x.PartnerType == criteria.PartnerType);
+            //    }
+
+            //    var partnerData = DataContext.Get(query);
+            //    if (!string.IsNullOrEmpty(criteria.Service))
+            //    {
+            //        queryContract = queryContract.And(x => IsMatchService(x.SaleService, criteria.Service));
+            //    }
+
+            //    if (!string.IsNullOrEmpty(criteria.Office))
+            //    {
+            //        queryContract = queryContract.And(x => IsMatchOffice(x.OfficeId, criteria.Office));
+            //    }
+
+            //    if (criteria.SalemanId != null)
+            //    {
+            //        queryContract = queryContract.And(x => x.SaleManId == criteria.SalemanId);
+            //    }
+            //}
+            #endregion
+
             if (criteria.PartnerGroups != null)
             {
                 foreach (var grp in criteria.PartnerGroups)
@@ -2257,79 +2301,78 @@ namespace eFMS.API.Catalogue.DL.Services
                     string group = PlaceTypeEx.GetPartnerGroup(grp);
                     grpCodes.Add(group);
                 }
-                Expression<Func<CatPartner, bool>> query = null;
-                foreach (var group in grpCodes.Distinct())
-                {
-                    if (query == null)
-                    {
-                        query = x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0;
-                    }
-                    else
-                    {
-                        query = query.Or(x => (x.PartnerGroup ?? "").IndexOf(group ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
-                    }
-                }
-                query = criteria.Active != null ? query.And(x => x.Active == criteria.Active) : query;
-                if (!string.IsNullOrEmpty(criteria.PartnerType))
-                {
-                    query = query.And(x => x.PartnerType == criteria.PartnerType);
-                }
+            }
+            CriteriaBuilder<CatPartner> criteriaPartner = new CriteriaBuilder<CatPartner>()
+            .Where(x => (x.Active == criteria.Active || criteria.Active == null) && (string.IsNullOrEmpty(criteria.PartnerType) || x.PartnerType == criteria.PartnerType));
 
-                data = DataContext.Get(query);
-                Expression<Func<CatContract, bool>> queryContract = x => x.Active == true && (x.IsExpired == null || x.IsExpired == false);
-                if (!string.IsNullOrEmpty(criteria.Service))
-                {
-                    queryContract = queryContract.And(x => IsMatchService(x.SaleService, criteria.Service));
-                }
-
-                if (!string.IsNullOrEmpty(criteria.Office))
-                {
-                    queryContract = queryContract.And(x => IsMatchOffice(x.OfficeId, criteria.Office));
-                }
-
-                if (criteria.SalemanId != null)
-                {
-                    queryContract = queryContract.And(x => x.SaleManId == criteria.SalemanId);
-                }
-
-                IQueryable<CatContract> contracts = contractRepository.Get(queryContract);
-                data = from p in data
-                       join c in contracts on p.Id equals c.PartnerId into pGrps
-                       from pgrp in pGrps.DefaultIfEmpty()
-                       select p;
-
+            CriteriaBuilder<CatContract> criteriaContract = new CriteriaBuilder<CatContract>()
+                .Where(x => x.Active == true && (x.IsExpired == null || x.IsExpired == false));
+            if (criteria.PartnerGroups != null)
+            {
+                criteriaPartner = criteriaPartner.Where(x => grpCodes.Count == 0 || grpCodes.Any(z => x.PartnerGroup.Contains(z)))
+                        .WhereIf(!string.IsNullOrEmpty(criteria.PartnerType), x => x.PartnerType == criteria.PartnerType);
+                criteriaContract = criteriaContract.WhereIf(!string.IsNullOrEmpty(criteria.Service), x => IsMatchService(x.SaleService, criteria.Service))
+                        .WhereIf(!string.IsNullOrEmpty(criteria.Office), x => IsMatchService(x.SaleService, criteria.Service))
+                        .WhereIf(!string.IsNullOrEmpty(criteria.SalemanId), x => x.SaleManId == criteria.SalemanId);
+            }
+            IQueryable<CatContract> contracts = criteriaContract.Apply(contractRepository.Get());
+            if (criteria.IsShowSaleman == true)
+            {
+                var partnerData = criteriaPartner.Apply(DataContext.Get());
+                var users = sysUserRepository.Get();
+                data = from p in partnerData
+                       join c in contracts on p.Id equals c.PartnerId
+                       join us in users on c.SaleManId equals us.Id
+                       select new CatPartnerViewModel2
+                       {
+                           Id = p.Id,
+                           PartnerGroup = p.PartnerGroup,
+                           PartnerNameVn = p.PartnerNameVn,
+                           PartnerNameEn = p.PartnerNameEn,
+                           ShortName = p.ShortName,
+                           TaxCode = p.TaxCode,
+                           SalePersonId = p.SalePersonId,
+                           Tel = p.Tel,
+                           AddressEn = p.AddressEn,
+                           Fax = p.Fax,
+                           CoLoaderCode = p.CoLoaderCode,
+                           RoundUpMethod = p.RoundUpMethod,
+                           ApplyDim = p.ApplyDim,
+                           AccountNo = p.AccountNo,
+                           PartnerType = p.PartnerType,
+                           TaxCodeAbbrName = p.AccountNo + " - " + p.ShortName,
+                           SalemanId = c.SaleManId,
+                           SalemanName = us.Username,
+                           ContractType = c.ContractType,
+                           ContractId = c.Id.ToString()
+                       };
             }
             else
             {
-                data = DataContext.Where(x => x.Active == criteria.Active || criteria.Active == null);
-                if (!string.IsNullOrEmpty(criteria.PartnerType))
-                {
-                    data = data.Where(x => x.PartnerType == criteria.PartnerType);
-                }
+                data = criteriaPartner.Apply(DataContext.Get())
+                    .Select(x => new CatPartnerViewModel2
+                    {
+                        Id = x.Id,
+                        PartnerGroup = x.PartnerGroup,
+                        PartnerNameVn = x.PartnerNameVn,
+                        PartnerNameEn = x.PartnerNameEn,
+                        ShortName = x.ShortName,
+                        TaxCode = x.TaxCode,
+                        SalePersonId = x.SalePersonId,
+                        Tel = x.Tel,
+                        AddressEn = x.AddressEn,
+                        Fax = x.Fax,
+                        CoLoaderCode = x.CoLoaderCode,
+                        RoundUpMethod = x.RoundUpMethod,
+                        ApplyDim = x.ApplyDim,
+                        AccountNo = x.AccountNo,
+                        PartnerType = x.PartnerType,
+                        TaxCodeAbbrName = x.AccountNo + " - " + x.ShortName
+                    });
             }
             if (data == null) return null;
-
-            data = data.GroupBy(x => x.Id).Select(x => x.FirstOrDefault());
-            var results = data.Select(x => new CatPartnerViewModel2
-            {
-                Id = x.Id,
-                PartnerGroup = x.PartnerGroup,
-                PartnerNameVn = x.PartnerNameVn,
-                PartnerNameEn = x.PartnerNameEn,
-                ShortName = x.ShortName,
-                TaxCode = x.TaxCode,
-                SalePersonId = x.SalePersonId,
-                Tel = x.Tel,
-                AddressEn = x.AddressEn,
-                Fax = x.Fax,
-                CoLoaderCode = x.CoLoaderCode,
-                RoundUpMethod = x.RoundUpMethod,
-                ApplyDim = x.ApplyDim,
-                AccountNo = x.AccountNo,
-                PartnerType = x.PartnerType,
-                TaxCodeAbbrName = x.AccountNo + " - " + x.ShortName
-            }).ToList();
-            return results.AsQueryable();
+            //var results = data.ToList();
+            return data;
         }
 
         private bool IsMatchService(string saleService, string serviceTerm)
@@ -2703,7 +2746,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     return item;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -2755,6 +2798,33 @@ namespace eFMS.API.Catalogue.DL.Services
 
             hs = await DataContext.AddAsync(newModel);
             return hs;
+        }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="salemanId"></param>
+        /// <returns></returns>
+        public List<CatPartnerViewModel2> GetParentPartnerSameSaleman(CatPartnerCriteria criteria)
+        {
+            string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
+            var partner = DataContext.Get(x => x.Id == criteria.Id).FirstOrDefault();
+            var partners = DataContext.Get(x => x.ParentId == partner.ParentId && (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase));
+            var contracts = contractRepository.Get(x => x.Active == true && x.SaleManId == criteria.Saleman);
+            var data = from pa in partners
+                       join ct in contracts on pa.ParentId equals ct.PartnerId
+                       select new CatPartnerViewModel2
+                       {
+                           Id = pa.Id,
+                           ShortName = pa.ShortName,
+                           TaxCode = pa.TaxCode,
+                           AccountNo = pa.AccountNo,
+                           ContractId = ct.Id.ToString(),
+                           SalemanId = ct.SaleManId,
+                           PartnerNameEn = pa.PartnerNameEn,
+                           PartnerNameVn = pa.PartnerNameVn
+                       };
+            return data.ToList();
         }
     }
 }

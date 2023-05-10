@@ -20,6 +20,7 @@ using StackExchange.Redis;
 using ITL.NetCore.Connection.Caching;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Catalogue.Infrastructure.Common;
+using eFMS.API.Accounting.DL.IService;
 
 namespace eFMS.API.Catalogue.Infrastructure
 {
@@ -125,7 +126,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             services.AddTransient<ICatPartnerEmailService, CatPartnerEmailService>();
             services.AddTransient<ICatBankService, CatBankService>();
             services.AddTransient<ICatStandardChargeService, CatStandardChargeService>();
-
+            services.AddTransient<ICatPartnerBankService, CatPartnerBankService>();
+            services.AddTransient<IActionFuncLogService, ActionFuncLogService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

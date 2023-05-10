@@ -8,7 +8,7 @@
                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                         name="daterange" placeholder="Select request date" [autoApply]="true"
                         formControlName="paymentDate" readonly calendar
-                        (datesUpdated)="onSelectDataFormInfo($event,'payment-date')" [attr.disabled]="isReadonly" />
+                        (datesUpdated)="onSelectDataFormInfo($event,'payment-date')" [attr.disabled]="isReadonly || isCombineReceipt" />
                 </div>
             </div>
         </div>
@@ -17,7 +17,7 @@
                 [ngClass]="{'m-form__group has-danger': (paymentMethod.errors | equalError: 'method_invalid')  }">
                 <label>Payment Method</label>
                 <ng-select [items]="paymentMethods" formControlName="paymentMethod" class="custom" name="method"
-                    [clearable]="false" [readonly]="isReadonly"
+                    [clearable]="false" [readonly]="isReadonly || isCombineReceipt"
                     (change)="onSelectDataFormInfo($event, 'payment-method')">
                 </ng-select>
             </div>
@@ -37,7 +37,7 @@
                         <label>Currency</label>
                         <ng-select formControlName="currencyId" class="custom" [items]="$currencyList | async"
                             bindLabel="id" bindValue="id" (change)="onSelectDataFormInfo($event,'currency')"
-                            [clearable]="false" [readonly]="isReadonly">
+                            [clearable]="false" [readonly]="isReadonly || isCombineReceipt">
                         </ng-select>
                     </div>
                 </div>
@@ -231,7 +231,7 @@
         </ng-container>
         <div class="col-lg-12 m--margin-top-20">
             <customer-payment-receipt-debit-list [isReadonly]="isReadonly" (onChangeDetailDebit)="updateTotalAmount($event)"></customer-payment-receipt-debit-list>
-            <customer-payment-receipt-credit-list [isReadonly]="isReadonly" *ngIf="false">
+            <customer-payment-receipt-credit-list [isReadonly]="isReadonly" *ngIf="isCombineReceipt">
             </customer-payment-receipt-credit-list>
         </div>
     </div>

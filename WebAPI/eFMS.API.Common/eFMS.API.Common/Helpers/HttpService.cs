@@ -23,7 +23,7 @@ namespace eFMS.API.Common.Helpers
 
                 if (!string.IsNullOrEmpty(token))
                 {
-                    token = token.Split()[1]; // remove bearer
+                    token = token.Split().Length > 1 ? token.Split()[1] : token; // remove bearer
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 }
 
@@ -58,6 +58,32 @@ namespace eFMS.API.Common.Helpers
                     {
                         client.DefaultRequestHeaders.Add(header.Key, header.Value);
                     }
+                }
+
+                HttpResponseMessage response = await client.PostAsync(url, content);
+                return response;
+            }
+            catch (Exception e)
+            {
+                new LogHelper("eFMS_HttpService_Log", e.ToString());
+            }
+            return null;
+        }
+
+        public async static Task<HttpResponseMessage> PostAPI(string url, object obj, string username, string password)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+                StringContent content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+
+                if (!string.IsNullOrEmpty(username))
+                {
+                    var authValue = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authValue);
                 }
 
                 HttpResponseMessage response = await client.PostAsync(url, content);

@@ -1,0 +1,102 @@
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: dockerhub-spc
+  namespace: efms
+spec:
+  provider: vault
+  secretObjects:
+    - data:
+        - key: .dockerconfigjson
+          objectName: dockerconfigjson
+      secretName: dockerhub
+      type: kubernetes.io/dockerconfigjson
+  parameters:
+    roleName: "efms-role"
+    vaultAddress: "http://vault:8200"
+    objects: |
+      - objectName: dockerconfigjson
+        secretPath: "common-use/data/dockerhub"
+        secretKey: jackchuong
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: efms-sa
+  namespace: efms
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: efms-frontend
+  namespace: efms
+  labels:
+    app: efms-frontend
+spec:
+  selector:
+    matchLabels:
+      app: efms-frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: efms-frontend
+    spec:
+      serviceAccountName: efms-sa
+      imagePullSecrets:
+        - name: dockerhub
+      containers:
+        - image: jackchuong/itl:efms-webapp-frontend-1.0.0
+          imagePullPolicy: Always
+          name: efms-frontend
+          volumeMounts:
+            - name: "dockerhub"
+              mountPath: "/mnt/dockerhubcred"
+      volumes:
+        - name: dockerhub
+          csi:
+            driver: "secrets-store.csi.k8s.io"
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "dockerhub-spc"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: efms-frontend-svc
+  namespace: efms
+spec:
+  selector:
+    app: efms-frontend
+  ports:
+    - name: efms-frontend
+      port: 80
+      protocol: TCP
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: efms-frontend-ingress
+  namespace: efms
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    #cert-manager.io/cluster-issuer: letsencrypt-production
+    #cert-manager.io/acme-challenge-type: http01
+    #nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  #tls:
+  #- hosts:
+  #    - test.api.eoms.itlvn.com
+  #  secretName: itlvn.com-tls
+  rules:
+    - host: kenny.itlvn.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: efms-frontend-svc
+                port:
+                  number: 80

@@ -4,14 +4,14 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 
-import { Shipment, CustomDeclaration } from '@models';
+import { Shipment, CustomDeclaration, Office } from '@models';
 import { SortService } from '@services';
-import { DocumentationRepo, ExportRepo, OperationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, OperationRepo, SystemRepo } from '@repositories';
 import { ConfirmPopupComponent, LoadingPopupComponent, Permission403PopupComponent, ReportPreviewComponent } from '@common';
 
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
-import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom, tap } from 'rxjs/operators';
 import { JobConstants, RoutingConstants, SystemConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
@@ -51,6 +51,7 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
     isSearchLinkFeea: boolean = false;
+
 
     constructor(
         private sortService: SortService,

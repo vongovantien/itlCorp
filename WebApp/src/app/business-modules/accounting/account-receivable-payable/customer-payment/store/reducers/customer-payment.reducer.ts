@@ -54,7 +54,8 @@ export const receiptManagementReducer = createReducer(
         ...state,
         isLoading: false,
         creditList: [...payload.invoices.filter(x => x.paymentType === 'CREDIT'), ...state.creditList],
-        debitList: [...payload.invoices.filter(x => x.paymentType === 'DEBIT' || x.paymentType === 'OBH' || x.paymentType === 'OTHER'), ...state.debitList]
+        debitList: [...payload.invoices.filter(x => x.paymentType === 'DEBIT' || x.paymentType === 'OBH' || x.paymentType === 'OTHER'
+                    || AccountingConstants.GENERAL_RECEIPT_PAYMENT_METHOD.some(item => item.id === x.paymentType)), ...state.debitList]
     })),
     on(ReceiptActions.RegistTypeReceipt, (state: IReceiptState, payload: any) => ({
         ...state,
@@ -64,7 +65,9 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.ResetInvoiceList, (state: IReceiptState) => ({ ...state, isLoading: true, creditList: [], debitList: [], agreement: {} })),
     on(ReceiptActions.InsertAdvance, (state: IReceiptState, payload: any) => ({
         ...state,
-        debitList: [...state.debitList, payload.data]
+        debitList: [...state.debitList, payload.data],
+        creditList: [...state.creditList, payload.data],
+        partnerId: null
     })),
     on(ReceiptActions.RemoveInvoice, (state: IReceiptState, payload: any) => ({
         ...state, debitList: [...state.debitList.slice(0, payload.index), ...state.debitList.slice(payload.index + 1)]
@@ -141,7 +144,7 @@ export const receiptManagementReducer = createReducer(
         ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 30 }
     })),
     on(ReceiptActions.LoadListCustomerPayment, (state: IReceiptState, payload: CommonInterface.IParamPaging) => ({
-        ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size }
+        ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size }, dataSearch: payload.dataSearch
     })),
     on(ReceiptActions.LoadListCustomerPaymentSuccess, (state: IReceiptState, payload: CommonInterface.IResponsePaging) => ({
         ...state, list: payload, isLoading: false, isLoaded: true

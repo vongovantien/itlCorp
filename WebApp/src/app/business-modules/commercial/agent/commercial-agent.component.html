@@ -81,13 +81,14 @@
                                     <td>{{agent.taxCode}}</td>
                                     <td> <span class="text-success">{{agent.userCreatedName}}</span> </td>
                                     <td>{{agent.datetimeModified | date:'dd/MM/yyyy' }}
-                                        <span [ngClass]="agent.active ? 'badge badge-success m--margin-left-5 m--margin-right-10' : 'badge badge-danger m--margin-left-5 m--margin-right-10'">
+                                        <span
+                                            [ngClass]="agent.active ? 'badge badge-success m--margin-left-5 m--margin-right-10' : 'badge badge-danger m--margin-left-5 m--margin-right-10'">
                                             {{agent.active ? 'Active' : 'Inactive'}}
                                         </span>
                                     </td>
                                     <!-- <td [ngClass]="agent.active ? 'text-success' : 'text-danger'">
                                         {{agent.active ? 'Active' : 'Inactive'}}</td>-->
-                                    <td>{{agent.addressVn}}</td> 
+                                    <td>{{agent.addressVn}}</td>
 
                                 </tr>
                                 <tr class="collapse-toggle-row" class="collapse-panel-row" app-table-collapse-row
@@ -109,11 +110,19 @@
                                                         <span *ngIf="!!sale.isExpired" title="Contract is expired">
                                                             <i class="la la-history la-lg"></i>
                                                         </span>
-                                                        <span *ngIf="!!sale.isOverLimit" title="Contract is over credit limit">
+                                                        <span *ngIf="!!sale.isOverLimit"
+                                                            title="Contract is over credit limit">
                                                             <i class="la la-exclamation la-lg text-danger"></i>
-                                                        </span> 
-                                                        <span *ngIf="!!sale.isOverDue && !sale.noDue" title="Contract have overdued">
-                                                            <i class="la la-exclamation-triangle la-lg text-warning"></i>
+                                                        </span>
+                                                        <span *ngIf="!!sale.isOverDue" title="Contract have overdued">
+                                                            <i
+                                                                class="la la-exclamation-triangle la-lg text-warning"></i>
+                                                        </span>
+                                                        <span *ngIf="!!sale.isOverDueObh"
+                                                            title="Contract have overdued OBH">
+                                                            <img src="assets/icons/overdue-obh.ico"
+                                                                style="vertical-align:text-bottom" width="25"
+                                                                height="25">
                                                         </span>
                                                     </td>
                                                     <td>
@@ -129,7 +138,8 @@
                                                     <td [ngClass]="sale.active ? 'text-success' : 'text-danger'">
                                                         {{sale.active ? 'Active' : 'Inactive'}}</td>
                                                     <td>
-                                                        <app-switch disabled [(ngModel)]="sale.arconfirmed" size="sm"></app-switch>
+                                                        <app-switch disabled [(ngModel)]="sale.arconfirmed"
+                                                            size="sm"></app-switch>
                                                     </td>
                                                     <td>
                                                         <span>{{sale.datetimeCreated | date: 'dd/MM/yyyy'}}</span>

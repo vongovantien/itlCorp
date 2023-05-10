@@ -10,11 +10,11 @@ import { LinkAirSeaModel, OpsTransaction } from "@models";
 import { DocumentationRepo } from "@repositories";
 import { JobManagementFormCreateComponent } from "../components/form-create/form-create-job.component";
 
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 import { of } from "rxjs";
 import { catchError, mergeMap, switchMap, takeUntil } from "rxjs/operators";
 import { ActionsSubject, Store } from "@ngrx/store";
-import _groupBy from 'lodash/groupBy';
+import _groupBy from 'lodash-es/groupBy';
 import * as fromShareBussiness from '../../../share-business/store'
 import { ShareBussinessContainerListPopupComponent } from '@share-bussiness';
 @Component({

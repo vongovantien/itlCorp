@@ -226,7 +226,7 @@ namespace eFMS.API.Documentation.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
                 }
             }
-            // validate checkpoint
+             // validate checkpoint
             var partnersNeedValidate = list.Where(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.IsRefundFee != true).ToList();
             if(partnersNeedValidate.Count() > 0)
             {
@@ -652,6 +652,7 @@ namespace eFMS.API.Documentation.Controllers
                         CurrencyId = worksheet.Cells[row, 10].Value?.ToString().Trim(),
                         VatPartnerId = worksheet.Cells[row,11].Value?.ToString().Trim(),
                         Vatrate = (decimal?)Vatrate,
+                        //TypeOfFee = worksheet.Cells[row, 12].Value?.ToString().Trim(),
                         //TotalAmount = (decimal?)TotalAmount,
                         ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
                         FinalExchangeRate = (decimal?)FinalExchangeRate, 

@@ -52,14 +52,14 @@ namespace eFMS.API.Common.Helpers
                     // Create a file to write to.   
                     using (StreamWriter sw = System.IO.File.CreateText(filepath))
                     {
-                        sw.WriteLine(logMessage);
+                        sw.WriteLine(DateTime.Now + " : " + logMessage);
                     }
                 }
                 else
                 {
                     using (StreamWriter sw = System.IO.File.AppendText(filepath))
                     {
-                        sw.WriteLine(logMessage);
+                        sw.WriteLine(DateTime.Now + " : " + logMessage);
                     }
                 }
             }

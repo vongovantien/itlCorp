@@ -33,7 +33,7 @@ import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-l
 
 import { takeUntil, switchMap, switchMapTo, take, filter } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { IAgreementReceipt } from '../form-create-receipt/form-create-receipt.component';
 @Component({
     selector: 'customer-payment-list-receipt',
@@ -48,7 +48,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     @Input() syncInfoTemplate?: TemplateRef<any>;
     @Input() isUpdate: boolean = false;
     @Output() onChangePaymentMethod: EventEmitter<any> = new EventEmitter<any>();
-    
+
     creditList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptCreditListState);
     debitList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptDebitListState);
 
@@ -95,6 +95,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     isSubmitted: boolean = false;
     isReadonly: boolean = null;  // * DONE | CANCEL
     exchangeRateValue: number = 1;
+    isCombineReceipt: boolean = false;
 
     headerReceiptReadonly: CommonInterface.IHeaderTable[] = [
         { title: 'Billing Ref No', field: 'invoiceNo' },
@@ -151,14 +152,14 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         // this.obhPartners = this._catalogueRepo.getListPartner(null, null, { active: true, partnerMode: 'Internal', notEqualInternalCode: this.currentUser });
         this.departments = this._systemRepo.getDepartment(null, null, { active: true, deptTypes: ['AR', 'ACCOUNTANT'] });
         this._store.select(ReceiptTypeState)
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (partnerGroup) => {
-                if (!!partnerGroup) {
-                    this.receiptType = partnerGroup;
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (partnerGroup) => {
+                    if (!!partnerGroup) {
+                        this.receiptType = partnerGroup;
+                    }
                 }
-            }
-        )
+            )
 
         this.initForm();
         this.listenCustomerInfoData();
@@ -252,7 +253,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 (data: string) => {
                     if (!!data) {
                         this.partnerId = data;
-                        
+
                     }
                 }
             );
@@ -603,7 +604,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             .subscribe((x: ReceiptInvoiceModel[]) => {
                 x.forEach((item: ReceiptInvoiceModel) => {
                     item.exchangeRateBilling = (!item.exchangeRateBilling || item.exchangeRateBilling === 0 ? this.exchangeRate.value : item.exchangeRateBilling);
-                } )
+                })
                 listInvoice = cloneDeep<ReceiptInvoiceModel[]>(x);
             });
         const body: IProcessClearInvoiceModel = {
@@ -665,7 +666,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 const _advanceUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
                 this.cusAdvanceAmountUsd.setValue(_advanceUsd);
 
-                if(this.receiptType.toUpperCase() === 'CUSTOMER'){
+                if (this.receiptType.toUpperCase() === 'CUSTOMER') {
                     const paidAmountUsd: number = +((+this.paidAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
                     this.paidAmountUsd.setValue(paidAmountUsd)
                 }
@@ -686,7 +687,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 const _advanceVnd: number = +((this.cusAdvanceAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
                 this.cusAdvanceAmountVnd.setValue(_advanceVnd);
 
-                if(this.receiptType.toUpperCase() === 'CUSTOMER'){
+                if (this.receiptType.toUpperCase() === 'CUSTOMER') {
                     const paidAmountVnd: number = +((this.paidAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
                     this.paidAmountVnd.setValue(paidAmountVnd);
                 }
@@ -719,9 +720,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                             totalPaidAmountUsd += element.paidAmountUsd;
                         }
                         if (!this.paidAmountVnd.value) {
-                            if(this.receiptType.toUpperCase() === 'CUSTOMER'){
+                            if (this.receiptType.toUpperCase() === 'CUSTOMER') {
                                 this.paidAmountVnd.setValue(totalPaidAmountVnd);
-                            }else{
+                            } else {
                                 this.finalPaidAmountVnd.setValue(totalPaidAmountVnd);
                             }
                         }
@@ -770,21 +771,21 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             }
             totalFinalPaidVnd = this.paidAmountVnd.value + (this.creditAmountVnd.value ?? 0);
             totalFinalPaidusd = this.paidAmountUsd.value + (this.creditAmountUsd.value ?? 0);
-    
+
             this.finalPaidAmountVnd.setValue(+totalFinalPaidVnd.toFixed(0));
             this.finalPaidAmountUsd.setValue(+totalFinalPaidusd.toFixed(2));
-        }else{
+        } else {
             if (!!isAsPaid) {
                 totalFinalPaidusd = (this.paidAmountUsd.value ?? 0) + (this.cusAdvanceAmountUsd.value ?? 0) + (this.creditAmountUsd.value ?? 0);
                 this.finalPaidAmountUsd.setValue(+totalFinalPaidusd);
                 return;
             }
             totalFinalPaidusd = this.paidAmountUsd.value + (this.creditAmountUsd.value ?? 0);
-    
+
             this.finalPaidAmountVnd.setValue(this.receiptDebitList.sumTotalObj.totalPaidVnd ?? 0);
             this.finalPaidAmountUsd.setValue(+totalFinalPaidusd.toFixed(2));
         }
-        
+
 
     }
 

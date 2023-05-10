@@ -1,16 +1,16 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { PopupBase } from '@app';
 import { ReceiptInvoiceModel } from '@models';
 import { AccountingRepo } from '@repositories';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, take, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
-import { GetInvoiceListSuccess, ResetInvoiceList, AddDebitCreditToReceipt } from '../../store/actions';
+import { GetInvoiceListSuccess, ResetInvoiceList, AddDebitCreditToReceipt, AddCreditCombineToReceipt, AddDebitCombineToReceipt, RegistCreditInvoiceListSuccess, RegistDebitInvoiceListSuccess, ResetCombineInvoiceList } from '../../store/actions';
 import { ToastrService } from 'ngx-toastr';
-import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState, ReceiptPartnerCurrentState } from '../../store/reducers';
+import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState, ReceiptPartnerCurrentState, IsReceiptCombineState, ReceiptCombinePartnerState, ReceiptCombineCreditListState, ReceiptCombineDeditListState, ReceiptCombineState } from '../../store/reducers';
 import { SortService } from '@services';
 import { AgencyReceiptModel } from 'src/app/shared/models/accouting/agency-receipt.model';
-import { combineLatest } from 'rxjs/internal/observable/combineLatest';
+import { combineLatest } from 'rxjs';
 
 @Component({
     selector: 'customer-agent-debit-popup',
@@ -19,7 +19,8 @@ import { combineLatest } from 'rxjs/internal/observable/combineLatest';
 
 export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase {
     @Output() onAddToReceipt: EventEmitter<any> = new EventEmitter<any>();
-
+    typeToGet: string = 'Debit';
+    
     type: string = null;
 
     listDebit: ReceiptInvoiceModel[] = [];
@@ -50,6 +51,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     isCheckAllAgent: boolean = false;
     TYPELIST: string = 'LIST';
     partnerId: string;
+    isCombineReceipt: boolean = false;
 
     sumTotalObj: ITotalObject = {
         totalDebitVnd: 0,
@@ -111,30 +113,67 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                 }
             })
 
-        this._store.select(ReceiptPartnerCurrentState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (id) => {
-                    this.sumTotalObj = this.resetTotalObj(this.sumTotalObj);
-                    this.sumTotalObjectPaymentReceipt = this.resetTotalObj(this.sumTotalObjectPaymentReceipt);
-                    this.partnerId = id;
+        this._store.select(IsReceiptCombineState)
+            .subscribe((data: boolean) => {
+                // Is Combine Receipt
+                if (!!data) {
+                    this.isCombineReceipt = data;
+                    this._store.select(ReceiptCombineState)
+                        .pipe(takeUntil(this.ngUnsubscribe))
+                        .subscribe(
+                            (data: any) => {
+                                this.typeToGet = data.listType;
+                                this.partnerId = data.refPartnerId;
+                            }
+                        )
+                    if (this.typeToGet?.toLowerCase() === 'credit') {
+                        this._store.select(ReceiptCombineCreditListState)
+                            .pipe(takeUntil(this.ngUnsubscribe))
+                            .subscribe(x => {
+                                this.currentPaymentReceiptCurrent.length = 0;
+                                this.currentPaymentReceiptCurrent.push(...x);
+                                if (!!this.currentPaymentReceiptCurrent.length) {
+                                    this.sumTotalObjectPaymentReceipt = this.calculateSumDataObject(this.currentPaymentReceiptCurrent);
+                                }
+                            })
+                    } else if (this.typeToGet?.toLowerCase() === 'debit') {
+                        this._store.select(ReceiptCombineDeditListState)
+                            .pipe(takeUntil(this.ngUnsubscribe))
+                            .subscribe(x => {
+                                this.currentPaymentReceiptCurrent.length = 0;
+                                this.currentPaymentReceiptCurrent.push(...x);
+                                if (!!this.currentPaymentReceiptCurrent.length) {
+                                    this.sumTotalObjectPaymentReceipt = this.calculateSumDataObject(this.currentPaymentReceiptCurrent);
+                                }
+                            })
+                    }
+                } else {
+                    // Is Not Combine Receipt
+                    this._store.select(ReceiptPartnerCurrentState)
+                        .pipe(takeUntil(this.ngUnsubscribe))
+                        .subscribe(
+                            (id) => {
+                                this.sumTotalObj = this.resetTotalObj(this.sumTotalObj);
+                                this.sumTotalObjectPaymentReceipt = this.resetTotalObj(this.sumTotalObjectPaymentReceipt);
+                                this.partnerId = id;
+                            }
+                        )
+                    combineLatest([
+                        this._store.select(ReceiptDebitListState),
+                        this._store.select(ReceiptCreditListState)])
+                        .pipe(takeUntil(this.ngUnsubscribe))
+                        .subscribe(x => {
+                            this.currentPaymentReceiptCurrent.length = 0;
+                            x.forEach((element: ReceiptInvoiceModel[]) => {
+                                this.currentPaymentReceiptCurrent.push(...element);
+                            });
+                            this.currentPaymentReceiptCurrent = this.currentPaymentReceiptCurrent.filter(x => x.paymentType !== 'OTHER');
+                            if (!!this.currentPaymentReceiptCurrent.length) {
+                                this.sumTotalObjectPaymentReceipt = this.calculateSumDataObject(this.currentPaymentReceiptCurrent);
+                            }
+                        })
                 }
-            )
-
-        combineLatest([
-            this._store.select(ReceiptDebitListState),
-            this._store.select(ReceiptCreditListState)])
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(x => {
-                this.currentPaymentReceiptCurrent.length = 0;
-                x.forEach((element: ReceiptInvoiceModel[]) => {
-                    this.currentPaymentReceiptCurrent.push(...element);
-                });
-                this.currentPaymentReceiptCurrent = this.currentPaymentReceiptCurrent.filter(x => x.paymentType !== 'OTHER');
-                if (!!this.currentPaymentReceiptCurrent.length) {
-                    this.sumTotalObjectPaymentReceipt = this.calculateSumDataObject(this.currentPaymentReceiptCurrent);
-                }
-            })
+            });
     }
 
     onChangeCheckAll(type: string) {
@@ -248,28 +287,79 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             }
 
         } else {
-            this._accountingRepo.getDataIssueAgencyPayment(body)
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (res: AgencyReceiptModel) => {
-                        if (!!res) {
-                            this.agencyDebitModel = res;
-                            const invoiceToCalculate: ReceiptInvoiceModel[] = [];
-                            this.agencyDebitModel.groupShipmentsAgency.forEach((element: IDataGroupShipmentAgency) => {
-                                element.isSelected = false;
-                                element.invoices.forEach(x => {
-                                    x.isSelected = false;
+            if (this.isCombineReceipt) {
+                body.isCombineReceipt = this.isCombineReceipt;
+                if(this.typeToGet.toLowerCase() === 'credit'){
+                    this._accountingRepo.getDataIssueCreditAgency(body)
+                    .pipe(catchError(this.catchError))
+                    .subscribe(
+                        (res: AgencyReceiptModel) => {
+                            if (!!res) {
+                                this.agencyDebitModel = res;
+                                const invoiceToCalculate: ReceiptInvoiceModel[] = [];
+                                this.agencyDebitModel.groupShipmentsAgency.forEach((element: IDataGroupShipmentAgency) => {
+                                    element.isSelected = false;
+                                    element.invoices.forEach(x => {
+                                        x.isSelected = false;
+                                    });
+                                    invoiceToCalculate.push(...element.invoices);
                                 });
-                                invoiceToCalculate.push(...element.invoices);
-                            });
-                            if (!!invoiceToCalculate.length) {
-                                this.sumTotalObj = this.calculateSumDataObject(invoiceToCalculate);
-                            }
+                                if (!!invoiceToCalculate.length) {
+                                    this.sumTotalObj = this.calculateSumDataObject(invoiceToCalculate);
+                                }
 
-                            this.filterList();
-                        }
-                    },
-                );
+                                this.filterList();
+                            }
+                        },
+                    );
+                }else{
+                    this._accountingRepo.getDataIssueAgencyPayment(body)
+                    .pipe(catchError(this.catchError))
+                    .subscribe(
+                        (res: AgencyReceiptModel) => {
+                            if (!!res) {
+                                this.agencyDebitModel = res;
+                                const invoiceToCalculate: ReceiptInvoiceModel[] = [];
+                                this.agencyDebitModel.groupShipmentsAgency.forEach((element: IDataGroupShipmentAgency) => {
+                                    element.isSelected = false;
+                                    element.invoices.forEach(x => {
+                                        x.isSelected = false;
+                                    });
+                                    invoiceToCalculate.push(...element.invoices);
+                                });
+                                if (!!invoiceToCalculate.length) {
+                                    this.sumTotalObj = this.calculateSumDataObject(invoiceToCalculate);
+                                }
+
+                                this.filterList();
+                            }
+                        },
+                    );
+                }
+            } else {
+                this._accountingRepo.getDataIssueAgencyPayment(body)
+                    .pipe(catchError(this.catchError))
+                    .subscribe(
+                        (res: AgencyReceiptModel) => {
+                            if (!!res) {
+                                this.agencyDebitModel = res;
+                                const invoiceToCalculate: ReceiptInvoiceModel[] = [];
+                                this.agencyDebitModel.groupShipmentsAgency.forEach((element: IDataGroupShipmentAgency) => {
+                                    element.isSelected = false;
+                                    element.invoices.forEach(x => {
+                                        x.isSelected = false;
+                                    });
+                                    invoiceToCalculate.push(...element.invoices);
+                                });
+                                if (!!invoiceToCalculate.length) {
+                                    this.sumTotalObj = this.calculateSumDataObject(invoiceToCalculate);
+                                }
+
+                                this.filterList();
+                            }
+                        },
+                    );
+            }
         }
     }
 
@@ -289,10 +379,10 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                             x.invoices.forEach(invoice => {
                                 for (let i = 0; i < result.length; i++) {
 
-                                    if (result[i].isSelected === true && invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl) {
+                                    if (result[i].isSelected === true && invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl && invoice.type === result[i].type) {
                                         invoice.isSelected = true;
                                     }
-                                    if ((invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl) || invoice.refNo === result[i].refNo) {
+                                    if ((invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl && invoice.type === result[i].type)) {
                                         const index = x.invoices.indexOf(invoice);
                                         x.invoices.splice(index, 1);
                                     }
@@ -333,10 +423,10 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                         this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
                             x.invoices.forEach(invoice => {
                                 result.forEach(t => {
-                                    if (t.isSelected === true && invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl) {
+                                    if (t.isSelected === true && invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl && invoice.type === t.type) {
                                         invoice.isSelected = true;
                                     }
-                                    if ((invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl)) {
+                                    if ((invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl && invoice.type === t.type)) {
                                         const index = x.invoices.indexOf(invoice);
                                         x.invoices.splice(index, 1);
                                     }
@@ -405,25 +495,44 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             return;
         }
 
-        if (((this.listDebitInvoice.length > 0 && this.listDebitInvoice[0].partnerId !== this.partnerId)
+        if (this.isCombineReceipt) {
+            this._store.select(ReceiptCombineState)
+                .pipe(take(1))
+                .subscribe((data: any) => {
+                    if (!!data) {
+                        if (data.listType.toLowerCase() === 'credit') {
+                            this._store.dispatch(RegistCreditInvoiceListSuccess({ creditInvoiceList: this.agencyDebitModel }));
+                            this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
+                            this._store.dispatch(AddCreditCombineToReceipt({ creditCombineList: datatoReceipt }));
+                        } else {
+                            this._store.dispatch(RegistDebitInvoiceListSuccess({ debitInvoiceList: this.agencyDebitModel }));
+                            this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
+                            this._store.dispatch(AddDebitCombineToReceipt({ debitCombineList: datatoReceipt }));
+                        }
+                        this.onAddToReceipt.emit(data.listType.toLowerCase());
+                    }
+                })
+        } else {
+            if (((this.listDebitInvoice.length > 0 && this.listDebitInvoice[0].partnerId !== this.partnerId)
             || (this.listCreditInvoice.length > 0 && this.listCreditInvoice[0].partnerId !== this.partnerId)
-        )) {
-            this._store.dispatch(ResetInvoiceList());
+            )) {
+                this._store.dispatch(ResetInvoiceList());
+            }
+
+            // * Set Default
+            datatoReceipt.forEach(element => {
+                element.paidAmountVnd = element.unpaidAmountVnd;
+                element.paidAmountUsd = element.unpaidAmountUsd;
+                element.totalPaidVnd = element.paidAmountVnd;
+                element.totalPaidUsd = element.paidAmountUsd;
+                element.creditNos = []
+                element.isValid = null;
+            });
+
+            this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
+            this._store.dispatch(AddDebitCreditToReceipt({ data: datatoReceipt }));
+            this.onAddToReceipt.emit(this.partnerId);
         }
-
-        // * Set Default
-        datatoReceipt.forEach(element => {
-            element.paidAmountVnd = element.unpaidAmountVnd;
-            element.paidAmountUsd = element.unpaidAmountUsd;
-            element.totalPaidVnd = element.paidAmountVnd;
-            element.totalPaidUsd = element.paidAmountUsd;
-            element.creditNos = []
-            element.isValid = null;
-        });
-
-        this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
-        this._store.dispatch(AddDebitCreditToReceipt({ data: datatoReceipt }));
-        this.onAddToReceipt.emit(this.partnerId);
         // this.hide();
     }
 
@@ -494,6 +603,11 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         }
 
         return totalObject;
+    }
+
+    close(){
+        console.log('closePopup');
+        this.hide();
     }
 }
 

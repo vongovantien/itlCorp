@@ -3403,6 +3403,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  IssuedDate = sc.DatetimeCreated,
                                  SettleNo = sc.SettlementCode,
                                  Type = cd.Type,
+                                 //scType = sc.Type,
                                  CodeNo = sc.CreditNo,
                                  HBLId = trans.Id,
                                  MBLNo = sc.Mblno,
@@ -3415,10 +3416,11 @@ namespace eFMS.API.Documentation.DL.Services
                                  TotalAmountUsd = (sc.AmountUsd + sc.VatAmountUsd),
                                  ChargeWeight = trans.ChargeWeight,
                                  ChargeGroup = sc.ChargeGroup,
-                                 VatVoucher = string.IsNullOrEmpty(sc.InvoiceNo) ? sc.VoucherId : sc.InvoiceNo,
+                                 VatVoucher =  sc.VoucherId,
                                  PaymentStatus = acc.PaymentStatus,
                                  InvDueDay = acc.PaymentDueDate,
                                  VoucherIddate = sc.VoucherIddate,
+                                 VoucherIdre = sc.VoucherIdre,
                                  IssuedStatus = cd.Status== "Issued Voucher" ? cd.Status : (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
                                  Status = (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null ? "Issued" : "New",
                              };
@@ -3441,6 +3443,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 JobNo = sc.JobNo,
                                 CodeNo = sc.DebitNo,
                                 Type = cd.Type,
+                                //scType = sc.Type,
                                 FlexID = cd.FlexId,
                                 MBLNo = sc.Mblno,
                                 POL = trans.PolDescription,
@@ -3451,7 +3454,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 ChargeWeight = trans.ChargeWeight ?? ops.SumChargeWeight,
                                 TotalAmountUsd = (sc.AmountUsd + sc.VatAmountUsd),
                                 ChargeGroup = sc.ChargeGroup,
-                                VatVoucher = sc.VoucherId,
+                                VatVoucher = sc.InvoiceNo,
+                                VoucherIdre = sc.VoucherIdre,
                                 InvDueDay = acc.PaymentDueDate,
                                 SoaNo = string.IsNullOrEmpty(sc.Soano) ? sc.PaySoano : sc.Soano,
                                 VoucherIddate = sc.VoucherIddate,
@@ -3479,7 +3483,9 @@ namespace eFMS.API.Documentation.DL.Services
                              PayerAcctManagementId = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.PayerAcctManagementId : sc.PayerAcctManagementId,
                              Customer = soa.Customer,
                              DatetimeCreated = soa.DatetimeCreated,
+                             scType = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.Type : sc.Type,
                              Type = soa.Type,
+                             voucherIdre = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.VoucherIdre : sc.VoucherIdre,
                              JobNo = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.JobNo : sc.JobNo,
                              Mblno = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.Mblno : sc.Mblno,
                              AmountUsd = (sc.Hblid == null || sc.Hblid == Guid.Empty) ? sc2.AmountUsd : sc.AmountUsd,
@@ -3520,6 +3526,7 @@ namespace eFMS.API.Documentation.DL.Services
                              SoaNo = soa.Soano,
                              IssuedDate = soa.DatetimeCreated,
                              Type = soa.Type,
+                             scType = soa.scType,
                              HBLId = soa.HblId,
                              MBLNo = soa.Mblno,
                              FlexID = string.IsNullOrEmpty(trans.FlexId) ? cd.FlexId : trans.FlexId,
@@ -3530,10 +3537,12 @@ namespace eFMS.API.Documentation.DL.Services
                              TotalAmountUsd = soa.AmountUsd + soa.VatAmountUsd,
                              ChargeWeight = trans.ChargeWeight,
                              ChargeGroup = soa.ChargeGroup,
-                             VatVoucher = string.IsNullOrEmpty(soa.InvoiceNo) ? soa.VoucherId : soa.InvoiceNo,
+                             //VoucherId = soa.voucherIdre,
+                             VatVoucher = (soa.Type == "Debit") ? soa.InvoiceNo : soa.VoucherId,
                              PaymentStatus = acc.PaymentStatus,
                              InvDueDay = acc.PaymentDueDate,
                              VoucherIddate = soa.VoucherIddate,
+                             VoucherIdre = soa.voucherIdre,
                              IssuedStatus = (!string.IsNullOrEmpty(soa.InvoiceNo) && soa.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(soa.VoucherId) && (soa.Type == DocumentConstants.CHARGE_OBH_TYPE ? soa.PayerAcctManagementId : soa.AcctManagementId) != null) ? "Issued Voucher" : "New",
                              Status = (soa.Type == DocumentConstants.CHARGE_OBH_TYPE ? soa.PayerAcctManagementId : soa.AcctManagementId) != null ? "Issued" : "New"
                          };
@@ -3557,6 +3566,7 @@ namespace eFMS.API.Documentation.DL.Services
                                  JobNo = sc.JobNo,
                                  IssuedDate = sc.DatetimeCreated,
                                  Type = sc.Type,
+                                 scType = sc.Type,
                                  CodeNo = sc.CreditNo,
                                  HBLId = sc.Hblid,
                                  MBLNo = sc.Mblno,
@@ -3568,8 +3578,9 @@ namespace eFMS.API.Documentation.DL.Services
                                  TotalAmountUsd = sc.AmountUsd + sc.VatAmountUsd,
                                  ChargeWeight = trans.ChargeWeight,
                                  ChargeGroup = sc.ChargeGroup,
-                                 VatVoucher = string.IsNullOrEmpty(sc.InvoiceNo) ? sm.VoucherNo : sc.InvoiceNo,
+                                 VatVoucher = sc.Type == "Credit" ? sm.VoucherNo : sc.InvoiceNo,
                                  PaymentStatus = acc.PaymentStatus,
+                                 VoucherIdre = sc.VoucherIdre,
                                  InvDueDay = acc.PaymentDueDate,
                                  VoucherIddate = sc.VoucherIddate,
                                  IssuedStatus = (!string.IsNullOrEmpty(sc.InvoiceNo) && sc.AcctManagementId != null) ? "Issued Invoice" : (!string.IsNullOrEmpty(sc.VoucherId) && (sc.Type == DocumentConstants.CHARGE_OBH_TYPE ? sc.PayerAcctManagementId : sc.AcctManagementId) != null) ? "Issued Voucher" : "New",
@@ -3605,6 +3616,8 @@ namespace eFMS.API.Documentation.DL.Services
                 VatAmountUsd = se.Sum(x => x.VatAmountUsd),
                 PaymentStatus = se.FirstOrDefault().PaymentStatus,
                 ChargeGroup = se.FirstOrDefault().ChargeGroup,
+                VoucherIdre = se.Any(x => !string.IsNullOrEmpty(x.VoucherIdre)) ? string.Join(";", se.Select(x => x.VoucherIdre)) : string.Empty,
+                scType = string.Join(";", se.Select(x => x.scType)),
                 VatVoucher = se.FirstOrDefault().VatVoucher,
                 InvDueDay = se.FirstOrDefault().InvDueDay,
                 SoaNo = se.FirstOrDefault().SoaNo,
@@ -4318,7 +4331,12 @@ namespace eFMS.API.Documentation.DL.Services
                 FreightAmount = (rs.ChargeGroup != null) ? (catchargeGroupRepository.Get().FirstOrDefault(x => x.Id == rs.ChargeGroup)?.Name.ToUpper() == "FREIGHT" ? rs?.TotalAmountUsd : null) : null,
                 DebitUsd = (rs.Type?.ToUpper() == "DEBIT" || rs.Type?.ToUpper() == "INVOICE") ? rs?.TotalAmountUsd : 0,
                 CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
-                VatVoucher = rs.VatVoucher,
+                // only get VoucherIdre for Note of OBH without Buy or sell
+                // Debit Note get Invoice No Credit Note: VoucherID
+                VatVoucher = rs.scType.Contains(DocumentConstants.CHARGE_OBH_TYPE) 
+                             && (rs.scType.Contains(DocumentConstants.CHARGE_BUY_TYPE) 
+                             || rs.scType.Contains(DocumentConstants.CHARGE_SELL_TYPE)) 
+                             || !rs.scType.Contains(DocumentConstants.CHARGE_OBH_TYPE) ? rs.VatVoucher: rs.VoucherIdre,
                 InvDueDay = rs?.InvDueDay,
                 SoaSmNo = string.IsNullOrEmpty(rs.SoaNo) ? rs.SettleNo : rs.SoaNo
             });
@@ -4326,7 +4344,6 @@ namespace eFMS.API.Documentation.DL.Services
             var res = dataTrans.OrderByDescending(o => o.JobNo).ToList<AccAccountingManagementAgencyResult>();
 
             return res;
-
         }
 
 

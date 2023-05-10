@@ -162,6 +162,7 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
             { title: 'Attach Person', field: 'userCreated', sortable: true },
         ];
+
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -270,7 +271,6 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             this.documentAttach.headers = this.headerAccAttach;
         }
         else {
-
             this.documentAttach.headers = this.headerAttach;
         }
         this.documentAttach.isUpdate = false;

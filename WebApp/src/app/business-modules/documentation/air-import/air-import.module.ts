@@ -13,6 +13,8 @@ import { AirImportCreateJobComponent } from './create-job/create-job-air-import.
 import { AirImportDetailJobComponent } from './detail-job/detail-job-air-import.component';
 import { DeactivateGuardService } from '@core';
 import { ShareAirServiceModule } from '../share-air/share-air-service.module';
+import { ChargeConstants } from '@constants';
+import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
 
 const routing: Routes = [
     {
@@ -37,6 +39,11 @@ const routing: Routes = [
                             name: "House Bill",
                         },
                     },
+                    {
+                        path: 'prealert', component: ShareBusinessReAlertComponent,
+                        data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.SCE_CODE },
+                    }
+                    
                 ]
             },
         ]

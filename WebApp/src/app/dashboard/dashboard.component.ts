@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
-import { Permission403PopupComponent } from '@common';
-import { ChargeConstants, RoutingConstants } from '@constants';
+import { InfoPopupComponent, Permission403PopupComponent } from '@common';
+import { ChargeConstants, RoutingConstants, SystemConstants } from '@constants';
 import { DocumentationRepo } from '@repositories';
-import { DataService, DestroyService } from '@services';
 import Highcharts from 'highcharts/highcharts';
 import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
@@ -11,6 +10,7 @@ import { AppPage } from '../app.base';
 import { Shipment } from '../shared/models/operation/shipment';
 // import { Chart } from 'angular-highcharts';
 import { ToastrService } from 'ngx-toastr';
+import { InjectViewContainerRefDirective } from '../shared/directives/inject-view-container-ref.directive';
 
 @Component({
     selector: 'app-dashboard',
@@ -21,6 +21,8 @@ import { ToastrService } from 'ngx-toastr';
 export class DashboardComponent extends AppPage implements OnInit {
 
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+
     isShow: boolean = false;
     shipments: any[] = [];
     term$ = new BehaviorSubject<string>('');
@@ -40,7 +42,7 @@ export class DashboardComponent extends AppPage implements OnInit {
         // this.selectedDate = Date.now();
         // this.selectedRange = { startDate: moment().startOf('month'), endDate: moment().endOf('month') };
     }
-    isSubmitted: Boolean = true;
+    isShowBackground: Boolean = true;
     ngOnInit() {
         this.initBasicData();
         // * Search autocomplete shipment.
@@ -213,29 +215,39 @@ export class DashboardComponent extends AppPage implements OnInit {
     }
 
     onChangeLoading(event) {
-        this.isSubmitted = event;
+        this.isShowBackground = event;
     }
 
     trackShipmentProgress(obj: any) {
         this.isLoading = true
         this._documentRepo.trackShipmentProgress(obj).pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (res: CommonInterface.IResult | any) => {
-                    if (!!res?.message) {
-                        this._toastService.warning(res.message);
-                        this.isSubmitted = true;
+                (res: CommonInterface.IResult) => {
+                    if (!!res && res.status) {
+                        this.shipmentTracking = res.data;
+                        if (!!res.data.trackInfos && res.data.trackInfos.length > 0) {
+                            this._toastService.success(res.message)
+                        }
+                        else {
+
+                            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                                title: 'No Tracking Data Found',
+                                body: `
+                                <span>No package tracking data found. Please try tracking again using the links provided below:</span>
+                                <ul class = 'list-unstyled'>
+                                    ${SystemConstants.TRACKING_URL.map((item, index) => `<li><a ${index === 0 && 'class="h5"'} href="${item.Url}"target="_blank" >${item.Name}</a></li>`).join('')}
+                                </ul>`,
+                                class: 'btn btn-brand'
+                            });
+                        }
+                        this.isShowBackground = false;
                     }
                     else {
-                        this.shipmentTracking = res;
-                        this.isSubmitted = false;
+                        this._toastService.warning(res.message);
+                        this.isShowBackground = true;
                     }
                     this.isLoading = false;
-
-                }, (error: any) => {
-                    console.log(error)
-                    this.isSubmitted = true;
-                    this.isLoading = false;
-                });
+                })
     }
 
     //https://www.npmjs.com/package/angular-highcharts

@@ -1,4 +1,10 @@
 export class SystemConstants {
+    public static readonly TRACKING_URL = [
+        {
+            Name: "www.track-trace.com",
+            Url: "https://www.track-trace.com/aircargo"
+        },
+    ];
 
     // Local Storage Key
     public static readonly CURRENT_CLIENT_LANGUAGE: string = 'CURRENT_CLIENT_LANGUAGE';
@@ -150,4 +156,5 @@ export class SystemConstants {
 
     public static MAX_NUMBER_INT: number = 2147483647;
     public static MAX_NUMBER_DECIMAL: number = 99999999999999.9999;
+    public static MAX_FILE_SIZE = 100;
 }

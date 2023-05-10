@@ -14,7 +14,7 @@ import { IAccountingManagementState, getAccountingManagementPartnerChargeState, 
 
 import { switchMap, takeUntil, withLatestFrom, map, filter, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 
 @Component({
     selector: 'list-charge-accounting-management',

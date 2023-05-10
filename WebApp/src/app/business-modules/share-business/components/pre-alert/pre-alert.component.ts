@@ -1,31 +1,31 @@
-import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router, Params, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpResponse } from '@angular/common/http';
 
 import { AppForm } from '@app';
 import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from '@repositories';
 import { IAppState } from '@store';
 import { ChargeConstants } from '@constants';
 import { Crystal, EmailContent } from '@models';
-import { ReportPreviewComponent } from '@common';
+import { ReportPreviewComponent, SubHeaderComponent } from '@common';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { getTransactionLocked, TransactionGetDetailAction } from '@share-bussiness';
 
 
-import { combineLatest, forkJoin, of, from, Observable, timer, throwError } from 'rxjs';
-import { catchError, finalize, map, take, switchMap, mergeMap, delay, takeUntil, retryWhen, delayWhen, concatMap } from 'rxjs/operators';
+import { combineLatest, of, Observable, throwError } from 'rxjs';
+import { catchError, finalize, map, take, mergeMap, takeUntil, retryWhen, concatMap } from 'rxjs/operators';
 
 import { ShareBusinessAddAttachmentPopupComponent } from '../add-attachment/add-attachment.popup';
 import { environment } from 'src/environments/environment';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { InjectViewContainerRefDirective } from '@directives';
-import { lowerCase } from 'lodash';
+import lowerCase  from 'lodash-es/lowerCase';
 @Component({
     selector: 'share-pre-alert',
     templateUrl: './pre-alert.component.html'
@@ -34,6 +34,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     @ViewChild(ShareBusinessAddAttachmentPopupComponent) attachmentPopup: ShareBusinessAddAttachmentPopupComponent;
     @ViewChild(ReportPreviewComponent) reportPopup: ReportPreviewComponent;
+    @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
 
     srcReportPDF: any = `${environment.HOST.EXPORT_CRYSTAL}`;
@@ -68,6 +69,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     isPOD: boolean = false; // Proof of delivery
     isSendHbl: boolean = false; // Send HBL (Sea Services)
     isSendHawb: boolean = false; // Send HAWB (Air Services)
+    isDbtInv: boolean = false; // Send Debit Note/Invoice (All Service)
     // Import
     isExitsArrivalNotice: boolean = false;
     isCheckedArrivalNotice: boolean = false;
@@ -123,7 +125,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         private _spinner: NgxSpinnerService,
         private _router: Router,
         private _cd: ChangeDetectorRef,
-        private _systemfileManageRepo: SystemFileManageRepo
+        private _systemfileManageRepo: SystemFileManageRepo,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -133,8 +135,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         this.subscription = combineLatest([
             this._activedRouter.params,
             this._activedRouter.data,
+            this._activedRouter.queryParams
         ]).pipe(
-            map(([params, qParams]) => ({ ...params, ...qParams })),
+            map(([params, qParams, namingParams]) => ({ ...params, ...qParams, ...namingParams })),
             take(1),
             takeUntil(this.ngUnsubscribe)
         ).subscribe(
@@ -143,7 +146,14 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.jobId = params.jobId;
                     this.hblId = !params.hblId || params.hblId === 'undefined' ? SystemConstants.EMPTY_GUID : params.hblId;
                     this.serviceId = params.serviceId;
-                    this.name = params.name;
+                   
+                    if(params.name === "Send_Debit_Invoice"){
+                        this.name = "Send Debit Invoice";
+                    }
+                    else{
+                        this.name = params.name;
+                    }
+
                     this.checkReportType();
 
                     this.hblRptName = (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE || this.serviceId === ChargeConstants.SCE_CODE) ? "HBL" : "HAWB";
@@ -187,6 +197,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 break;
             case "Send S.I":
                 this.isSI = true;
+                break;
+            case "Send Debit Invoice":
+                this.isDbtInv = true;
                 break;
         }
     }
@@ -247,14 +260,28 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.isCheckedDO = true;
                     this.isExitsDO = true;
                 }
+                else if(this.isDbtInv){
+                    this.checkExistDebitNote();
+                }
                 break;
             case ChargeConstants.AE_CODE: // Air Export
                 if (this.isPreAlert) {
                     this.checkExistManifestExport();
                 }
+                else if(this.isDbtInv){
+                    this.checkExistDebitNote();
+                }
                 break;
-            case ChargeConstants.SFI_CODE: // Sea FCL Import
+            case ChargeConstants.SFI_CODE:
+                if(this.isDbtInv){
+                    this.checkExistDebitNote();
+                } // Sea FCL Import
+                break;
             case ChargeConstants.SLI_CODE: // Sea LCL Import
+                if(this.isDbtInv){
+                    this.checkExistDebitNote();
+                }
+                break;
             case ChargeConstants.SCI_CODE: // Sea Consol Import
                 if (this.isArrivalNotice) {
                     this.isExitsArrivalNotice = true;
@@ -274,14 +301,27 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.isCheckedDO = true;
                     this.isExitsDO = true;
                 }
+                if(this.isDbtInv){
+                    this.checkExistDebitNote();
+                }
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
+                if(this.isDbtInv){
+                    this.checkExistDebitNote();
+                }
+                break;
             case ChargeConstants.SCE_CODE: // Sea Consol Export
+                if(this.isDbtInv){
+                    this.checkExistDebitNote();
+                }
+                break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
                 if (this.isPreAlert) {
                     this.checkExistManifestExport();
                 } else if (this.isSI) {
                     this.checkExistSIExport();
+                }else if(this.isDbtInv){
+                    this.checkExistDebitNote();
                 }
                 break;
             default:
@@ -361,6 +401,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     }
                     if (this.debitNos.length > 0) {
                         this.isExitsDebitNote = true;
+                        this.isCheckedDebitNote = true;
                     } else {
                         this.isExitsDebitNote = false;
                     }
@@ -432,6 +473,13 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         streamUploadReport.push(this._documentRepo.previewProofofDelivery(this.hawbDetails[0].id));
                     }
                 }
+                if (this.isDbtInv) {
+                    this.debitNos.forEach(element => {
+                        if (element.isCheckedDebitNote) {
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                        }
+                    });
+                }
                 break;
             case ChargeConstants.AE_CODE:
                 if (this.isPreAlert) {
@@ -456,9 +504,32 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         }
                     });
                 }
+                if (this.isDbtInv) {
+                    this.debitNos.forEach(element => {
+                        if (element.isCheckedDebitNote) {
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                        }
+                    });
+                }
                 break;
             case ChargeConstants.SFI_CODE:
+                if (this.isDbtInv) {
+                    this.debitNos.forEach(element => {
+                        if (element.isCheckedDebitNote) {
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                        }
+                    });
+                }
+                break;
             case ChargeConstants.SLI_CODE:
+                if (this.isDbtInv) {
+                    this.debitNos.forEach(element => {
+                        if (element.isCheckedDebitNote) {
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                        }
+                    });
+                }
+                break;
             case ChargeConstants.SCI_CODE:
                 if (this.isArrivalNotice) {
                     if (this.isExitsArrivalNotice && this.isCheckedArrivalNotice) {
@@ -483,9 +554,32 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         streamUploadReport.push(this._documentRepo.previewProofofDelivery(this.hawbDetails[0].id));
                     }
                 }
+                if (this.isDbtInv) {
+                    this.debitNos.forEach(element => {
+                        if (element.isCheckedDebitNote) {
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                        }
+                    });
+                }
                 break;
             case ChargeConstants.SFE_CODE:
+                if (this.isDbtInv) {
+                    this.debitNos.forEach(element => {
+                        if (element.isCheckedDebitNote) {
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                        }
+                    });
+                }
+                break;
             case ChargeConstants.SCE_CODE:
+                if (this.isDbtInv) {
+                    this.debitNos.forEach(element => {
+                        if (element.isCheckedDebitNote) {
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                        }
+                    });
+                }
+                break;
             case ChargeConstants.SLE_CODE:
                 if (this.isPreAlert) {
                     if (this.isCheckedManifest) {
@@ -515,6 +609,12 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.hawbDetails.forEach(ele => {
                         if (ele.isCheckedHawb) {
                             streamUploadReport.push(this._documentRepo.previewSeaHBLOfLanding(ele.id, 'ITL_FRAME'));
+                        }
+                    });
+                } else if (this.isDbtInv) {
+                    this.debitNos.forEach(element => {
+                        if (element.isCheckedDebitNote) {
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
                         }
                     });
                 }
@@ -666,6 +766,11 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     // }
 
     //#region Content Mail
+    getDebitInvMailContent(hblId: any[], jobId: string){
+        this.sendMailButtonName = "Debit Note & Credit Note";
+        this.getInfoMailDebitInv(hblId, jobId);
+    }
+
     getContentMail(serviceId: string, hblId: string, jobId: string) {
         switch (serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
@@ -678,13 +783,27 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 } else if (this.isSendHawb) {
                     this.sendMailButtonName = "Send HAWB";
                     this.getInfoMailHawbHBLAirService(hblId);
-                } else {
+                } else if (this.isDbtInv) {
+                    this.sendMailButtonName = "Send";
+                    this.getInfoMailDebitInv(this.hawbDetails.map(x => x.id), jobId);
+                }
+                else {
                     this.sendMailButtonName = "Send Arrival Notice";
                     this.getInfoMailHBLAirImport(hblId);
                 }
                 break;
             case ChargeConstants.SFI_CODE: // Sea Import
+                if(this.isDbtInv){
+                    this.sendMailButtonName="Send";
+                    this.getInfoMailDebitInv(this.hawbDetails.map(x => x.id), jobId);
+                }
+                break;
             case ChargeConstants.SLI_CODE:
+                if(this.isDbtInv){
+                    this.sendMailButtonName="Send";
+                    this.getInfoMailDebitInv(this.hawbDetails.map(x => x.id), jobId);
+                }
+                break;
             case ChargeConstants.SCI_CODE:
                 if (this.isDO) {
                     this.sendMailButtonName = "Send Delivery Order";
@@ -698,6 +817,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 } else if (this.isArrivalNotice) {
                     this.sendMailButtonName = "Send Arrival Notice";
                     this.getInfoMailHBLSeaImport(hblId, serviceId);
+                } else if(this.isDbtInv){
+                    this.sendMailButtonName="Send";
+                    this.getInfoMailDebitInv(this.hawbDetails.map(x => x.id), jobId);
                 }
                 break;
             case ChargeConstants.AE_CODE: // Air Export
@@ -707,12 +829,21 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 } else if (this.isSendHawb) {
                     this.sendMailButtonName = "Send HAWB";
                     this.getInfoMailHawbHBLAirService(hblId);
-                } else {
+                } else if(this.isDbtInv){
+                    this.sendMailButtonName="Send";
+                    this.getInfoMailDebitInv(this.hawbDetails.map(x => x.id), jobId);
+                }
+                else {
                     this.sendMailButtonName = "Send Pre Alert";
                     this.getInfoMailHBLAirExport(this.hawbDetails.map(x => x.id), jobId);
                 }
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
+                if(this.isDbtInv){
+                    this.sendMailButtonName="Send";
+                    this.getInfoMailDebitInv(this.hawbDetails.map(x => x.id), jobId);
+                }
+                break;
             case ChargeConstants.SCE_CODE:
                 if (this.isPreAlert) {
                     this.sendMailButtonName = "Send Pre Alert";
@@ -726,6 +857,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 } else if (this.isSI) {
                     this.sendMailButtonName = "Send S.I";
                     this.getInfoMailSISeaExport(jobId);
+                } else if(this.isDbtInv){
+                    this.sendMailButtonName="Send";
+                    this.getInfoMailDebitInv(this.hawbDetails.map(x => x.id), jobId);
                 }
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
@@ -741,10 +875,16 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 } else if (this.isSI) {
                     this.sendMailButtonName = "Send S.I";
                     this.getInfoMailSISeaExport(jobId);
+                } else if(this.isDbtInv){
+                    this.sendMailButtonName="Send";
+                    this.getInfoMailDebitInv(this.hawbDetails.map(x => x.id), jobId);
                 }
                 break;
             default:
                 break;
+        }
+        if(this.isDbtInv){
+            this.headerComponent.resetBreadcrumb("Send Debit Invoice");
         }
     }
 
@@ -860,6 +1000,26 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     });
                 },
             );
+    }
+
+    getInfoMailDebitInv(hblId: any[], jobId:string) {
+        this._progressRef.start();
+        this._documentRepo.getInfoMailDebitInv(hblId, jobId)
+        .pipe(
+            catchError(this.catchError),
+            finalize(() => {this._progressRef.complete(); })
+        )
+        .subscribe(
+            (res: EmailContent) => {
+                    this.formMail.setValue({
+                        from: res.from,
+                        to: res.to,
+                        cc: res.cc,
+                        subject: res.subject,
+                        body: res.body
+                    });
+                },
+        )
     }
     //#endregion Content Mail
 
@@ -1409,6 +1569,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         }
         if (this.isSendHbl || this.isSendHawb) {
             this.stageType = "SEND_HB"
+        }
+        if (this.isDbtInv){
+            this.stageType = "SEND_INV";
         }
         if (this.stageType.length !== 0) {
             this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId })

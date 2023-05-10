@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Accounting.DL.Models.Accounting
 {
@@ -22,6 +21,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string LocalBranchCode { get; set; }
         public string PaymentMethod { get; set; }
         public string Payee { get; set; }
+        public string BankAccountNo { get; set; }
         public decimal? SettleAmount { get; set; }
         public List<BravoSettlementRequestModel> Details { get; set; }
         public List<BravoAttachDoc> AtchDocInfo { get; set; }

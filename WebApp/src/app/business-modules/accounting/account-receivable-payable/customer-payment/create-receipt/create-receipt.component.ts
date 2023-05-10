@@ -224,7 +224,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
         sumPaidAmountUsd = +((+sumPaidAmountUsd).toFixed(2));
         sumPaidAmountVnd = +((+sumPaidAmountVnd).toFixed(0));
-        if (action == 2) {
+        if (action == 2 && !this.listInvoice.isCombineReceipt) {
             if ((receiptModel.currencyId === 'VND' && Math.abs(receiptModel.paidAmountVnd) > Math.abs(sumPaidAmountVnd)) || (receiptModel.currencyId !== 'VND' && Math.abs(receiptModel.paidAmountUsd) > Math.abs(sumPaidAmountUsd))) {
                 this._toastService.warning("Collect amount > Sum paid amount, please process clear");
                 return;
@@ -309,7 +309,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                     && (this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL
                         || this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.OBH_INTERNAL)
                 )) {
-                if (!this.listInvoice.obhpartnerId.value) {
+                if (!this.listInvoice.obhpartnerId.value && !this.listInvoice.isCombineReceipt) {
                     this.listInvoice.obhpartnerId.setErrors({ required: true });
                     valid = false;
                 } else {
@@ -339,8 +339,14 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                         this._store.dispatch(ResetInvoiceList());
                         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`]);
                         return;
+                    } else {
+                        if (!!res.message) {
+                            this._toastService.warning(res.message);
+                        } else {
+                            this._toastService.error("Create data fail, Please check again!");
+                        }
+                        return;
                     }
-                    this._toastService.error("Create data fail, Please check again!");
                 },
                 (res: HttpErrorResponse) => {
                     this.handleValidateReceiptResponse(res);

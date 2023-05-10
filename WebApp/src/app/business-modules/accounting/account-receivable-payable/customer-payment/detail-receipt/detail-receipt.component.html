@@ -55,7 +55,7 @@
 
                 <div class="c-button-actions text-center">
                     <ng-container
-                        *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
+                        *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced' && !receiptDetail?.arcbno">
                         <app-permission-button title="Save Draft" class="outline-primary" [icon]="'la la-sticky-note'"
                             (onClick)="submitClick('update')">
                         </app-permission-button>
@@ -66,7 +66,7 @@
                             (onClick)="confirmDoneReceipt()">
                         </app-permission-button>
                     </ng-container>
-                    <ng-container *ngIf="receiptDetail?.status === 'Done' && !!receiptDetail.isReceiptBankFee">
+                    <ng-container *ngIf="receiptDetail?.status === 'Done' && !!receiptDetail.isReceiptBankFee && !receiptDetail?.arcbno">
                         <app-permission-button type="add" title="Bank Fee/Other" class="primary" icon="la la-bank"
                             [dpToggle]="dropdownMenuBankFee" mode="dropdown">
                         </app-permission-button>

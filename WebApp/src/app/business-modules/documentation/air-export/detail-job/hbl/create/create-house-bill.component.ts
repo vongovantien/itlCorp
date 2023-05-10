@@ -24,9 +24,9 @@ import { CommonEnum } from '@enums';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirExportHBLFormCreateComponent } from '../components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
 
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 import { catchError, takeUntil, map, tap, mergeMap, switchMap } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { merge, of } from 'rxjs';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 import { InjectViewContainerRefDirective } from '@directives';

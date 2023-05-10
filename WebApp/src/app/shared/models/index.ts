@@ -27,6 +27,8 @@ export { ChargeGroup, Charge } from './catalogue/catCharge.model';
 export * from './catalogue/district.model';
 export * from './catalogue/catBank.model';
 export * from './catalogue/catStandardCharge.model';
+export { ContractPartner } from './catalogue/catContractPartner.model';
+export * from './catalogue/catPartnerBank.model';
 
 export { SoaCharge, SOA } from './accouting/soa.model';
 export * from './accouting/soa-search-charge';
@@ -49,6 +51,7 @@ export {
 } from './accouting/accounting-receivable.model';
 export * from './accouting/accounting-approve';
 export { ReceiptInvoiceModel, Receipt, ReceiptModel, ReceiptCreditDebitModel } from './accouting/receipt.model';
+export * from './accouting/receipt-combine.model';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';

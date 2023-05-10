@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 import { AppPage } from 'src/app/app.base';
+import { ShareDocumentTypeAttachComponent } from 'src/app/business-modules/share-business/components/edoc/document-type-attach/document-type-attach.component';
 import { ISettlementPaymentState, getListEdocState } from '../store';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
@@ -18,7 +19,7 @@ import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-
 export class SettlementShipmentItemComponent extends AppPage {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
     @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentAttachFilePopup: SettlementShipmentAttachFilePopupComponent;
-
+    @ViewChild(ShareDocumentTypeAttachComponent) documentAttach: ShareDocumentTypeAttachComponent;
     @Output() onCheck: EventEmitter<any> = new EventEmitter<any>();
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
     @Output() onPrintPlUSD: EventEmitter<any> = new EventEmitter<any>();

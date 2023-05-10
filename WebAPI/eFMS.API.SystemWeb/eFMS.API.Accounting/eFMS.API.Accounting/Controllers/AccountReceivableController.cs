@@ -243,5 +243,21 @@ namespace eFMS.API.Accounting.Controllers
             }
             return BadRequest(message);
         }
+
+        [HttpPut("TinhCongNo")]
+        public async Task<IActionResult> TinhCongNo(List<ObjectReceivableModel> models)
+        {
+            var hs = await accountReceivableService.CalculatorReceivableDebitAmountAsync(models);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            if (hs.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
+            return BadRequest(message);
+        }
+
+
     }
 }

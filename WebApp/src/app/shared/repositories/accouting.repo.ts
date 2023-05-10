@@ -818,6 +818,12 @@ export class AccountingRepo {
         );
     }
 
+    getDataIssueCreditAgency(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetDataIssueCreditAgency`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     cancelReceipt(id: string) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CancelReceipt/${id}`).pipe(
             map((data: any) => data)
@@ -859,8 +865,20 @@ export class AccountingRepo {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/SaveReceipt`, model, { saveAction: action });
     }
 
+    saveCombineReceipt(models: any, action: number) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/SaveCombineReceipt`, models, { saveAction: action });
+    }
+
+    checkDuplicateGeneralCombine(datas: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckDuplicateGeneralCombineReceipt`, datas);
+    }
+    
     getDetailReceipt(id: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetById/`, { id: id });
+    }
+
+    getByReceiptCombine(arcbNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetByReceiptCombine/`, { arcbNo: arcbNo });
     }
 
     rejectSoaCredit(model: any) {

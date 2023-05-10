@@ -42,5 +42,6 @@ namespace eFMS.API.Catalogue.DL.IService
         Task<CatPartnerModel> GetPartnerByTaxCode (string taxCode);
         Task<HandleState> AddPartnerFromUserData(Guid userId);
 
+        List<CatPartnerViewModel2> GetParentPartnerSameSaleman(CatPartnerCriteria criteria);
     }
 }

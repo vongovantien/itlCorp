@@ -7,7 +7,7 @@ import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptInvoiceModel } from "@models";
 import { takeUntil } from "rxjs/operators";
 import { RemoveCredit, AddDebitCreditToReceipt } from "../../store/actions";
-import _cloneDeep from 'lodash/cloneDeep'
+import _cloneDeep from 'lodash-es/cloneDeep'
 import { InjectViewContainerRefDirective } from "@directives";
 import { ConfirmPopupComponent } from "@common";
 import { AccountingConstants } from "@constants";
@@ -27,6 +27,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     creditList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptCreditListState);
 
     agencyHeaders: CommonInterface.IHeaderTable[] = [
+        { title: 'Partner', field: '', sortable: true, width: 50 },
         { title: 'RefNo', field: '' },
         { title: 'Net Off Invoice No', field: '' },
         { title: 'Acct Doc', field: '', },

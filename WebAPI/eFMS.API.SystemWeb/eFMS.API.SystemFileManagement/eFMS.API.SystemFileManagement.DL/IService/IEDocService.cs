@@ -1,4 +1,5 @@
 ﻿using eFMS.API.SystemFileManagement.DL.Models;
+using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -18,12 +19,13 @@ namespace eFMS.API.SystemFileManagement.DL.IService
         Task<HandleState> MappingeDocToShipment(Guid imageId, string billingId, string billingType);
         Task<HandleState> UpdateEDoc(SysImageDetailModel edocUpdate);
         Task<HandleState> PostFileAttacheDoc(FileUploadModel model);
-        Task<string> PostAttachFileTemplateToEDoc(FileUploadModel model);
+        Task<string> PostAttachFileTemplateToEDoc(FileUploadAttachTemplateModel model);
         Task<HandleState> AttachPreviewTemplate(List<EDocAttachPreviewTemplateUploadModel> models);
         Task<HandleState> OpenFile(Guid Id);
         Task<HandleState> CreateEDocZip(FileDowloadZipModel model);
         Task<HandleState> GenEdocByBilling(string billingNo, string billingType);
         bool CheckAllowSettleEdocSendRequest(Guid settleId);
         Task<HandleState> UpdateEdocByAcc(EdocAccUpdateModel model);
+        Task<List<SysImageDetailModel>> GetProofOfDeliveryAttachedFiles(string transactionType, Guid jobId, Guid? hblId);
     }
 }

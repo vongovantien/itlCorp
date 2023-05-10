@@ -20,6 +20,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using static eFMS.API.Documentation.DL.Common.Templates;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -644,7 +645,7 @@ namespace eFMS.API.Documentation.DL.Services
                             item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                             item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
                             // lưu cứng HBL Tránh bug.
-                            item.Hblno = hbl?.Hwbno;
+                            item.Hblno = hbl?.Hwbno;    
                             if (hbl != null)
                             {
                                 var masterBill = csTransactionRepository.Get(x => x.Id == hbl.JobId).FirstOrDefault();
@@ -663,7 +664,16 @@ namespace eFMS.API.Documentation.DL.Services
                             item.Mblno = hbl.Mblno;
                             item.Hblno = hbl.Hwbno;
                             //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
-                            item.ClearanceNo = !string.IsNullOrEmpty(item.ClearanceNo) && !string.IsNullOrEmpty(item.SettlementCode) ? item.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo);
+                            var existCle = DataContext.Where(x => x.JobNo == item.JobNo).FirstOrDefault() != null ? DataContext.Where(x => x.JobNo == item.JobNo).FirstOrDefault().ClearanceNo : null;
+                            if (existCle != null)
+                            {
+                                item.ClearanceNo = existCle;
+                            }
+                            else
+                            {
+                                item.ClearanceNo = !string.IsNullOrEmpty(item.ClearanceNo) && (!string.IsNullOrEmpty(item.SyncedFrom) || !string.IsNullOrEmpty(item.PaySyncedFrom)
+                                || item.AcctManagementId != null || item.PayerAcctManagementId != null || !string.IsNullOrEmpty(item.SettlementCode)) ? item.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo);
+                            }
                         }
                     }
 
@@ -760,8 +770,11 @@ namespace eFMS.API.Documentation.DL.Services
                         surcharge.UserModified = currentUser.UserID;
                         if (surcharge.TransactionType == "CL"|| surcharge.TransactionType == "TK")
                         {
-                            //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
-                            surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) && !string.IsNullOrEmpty(surcharge.SettlementCode) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
+                            //Cập nhật Clearance No cũ nhất cho phí(nếu có), nếu phí đã có Clearance No &Settlement thì không cập nhật[15563 - 29 / 03 / 2021]
+                            //surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) && (!string.IsNullOrEmpty(surcharge.SyncedFrom) || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
+                            //|| surcharge.AcctManagementId != null || surcharge.PayerAcctManagementId != null) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
+                            surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) || (!string.IsNullOrEmpty(surcharge.SyncedFrom) || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
+                           || surcharge.AcctManagementId != null || surcharge.PayerAcctManagementId != null || !string.IsNullOrEmpty(surcharge.SettlementCode)) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
                         }
 
                         surcharge.IsRefundFee = item.IsRefundFee;
@@ -2028,7 +2041,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         .Select(x => x.Id)
                                         .FirstOrDefault();
                     decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-
+                    //item.TypeOfFee = catChargeGroupRepository.Get(x => x.Name == item.TypeOfFee).FirstOrDefault().Id.ToString();
                     #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                     var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                     item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
@@ -2195,8 +2208,25 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private string GetCustomNoOldOfShipment(string jobNo)
         {
-            var LookupCustomDeclaration = customsDeclarationRepository.Get().ToLookup(x => x.JobNo);
-            var customNos = LookupCustomDeclaration[jobNo].OrderBy(o => o.DatetimeModified).FirstOrDefault()?.ClearanceNo;
+            var customNos = "";
+            var mainClaranceNo = customsDeclarationRepository.Get(x => x.JobNo == jobNo && x.ConvertTime != null).FirstOrDefault();
+            if (mainClaranceNo != null)
+            {
+                customNos = mainClaranceNo.ClearanceNo;
+            }
+            else
+            {
+                var customLastGrp = customsDeclarationRepository.Get(x => x.JobNo == jobNo).ToList();
+                if (customLastGrp.Count() > 0)
+                {
+                    var CustomLastOrder = customLastGrp.OrderBy(o => o.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
+                    if (CustomLastOrder.Count() > 1)
+                    {
+                        CustomLastOrder.OrderBy(x => x.DatetimeModified);
+                    }
+                    customNos = CustomLastOrder.FirstOrDefault().ClearanceNo;
+                }
+            }
             return customNos;
         }
 

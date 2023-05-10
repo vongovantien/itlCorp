@@ -4649,6 +4649,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             dataExport.InfoSettlement = GetInfoSettlementExport(settlementPayment);
             dataExport.ShipmentsSettlement = GetListShipmentSettlementExport(settlementPayment);
+            dataExport.UserCreated = currentUser.UserName;
             return dataExport;
         }
 
@@ -5140,7 +5141,7 @@ namespace eFMS.API.Accounting.DL.Services
                 Note = settlementPayment.Note,
                 IsDisplayLogo = isCommonOffice,
                 OfficeName = officeName,
-                ContactOffice = _contactOffice
+                ContactOffice = _contactOffice,
             };
             return infoSettlement;
         }
@@ -6533,7 +6534,7 @@ namespace eFMS.API.Accounting.DL.Services
         public ResultHandle CheckConfirmPrepaidShipment(List<ShipmentChargeSettlement> ShipmentCharges)
         {
             ResultHandle result = new ResultHandle() { Status = true };
-            var hblIds = ShipmentCharges.Select(x => x.Hblid).ToList();
+            var hblIds = ShipmentCharges.Select(x => x.Hblid).Distinct().ToList();
             var office = sysOfficeRepo.First(x => x.Id == currentUser.OfficeID);
             if (office.OfficeType == AccountingConstants.OFFICE_TYPE_OUTSOURCE)
             {
@@ -6559,22 +6560,31 @@ namespace eFMS.API.Accounting.DL.Services
                                         {
                                             contract.SaleManId
                                         }).FirstOrDefault();
-                    if (existPrepaid == null)
-                    {
-                        continue;
-                    }
+                    //if (existPrepaid == null)
+                    //{
+                    //    continue;
+                    //}
                     var chargesHbl = surcharges.Where(x => x.Hblid == hbl);
                     if (chargesHbl.Count() > 0)
                     {
-                        bool hasIssuedDebit = chargesHbl.All(x => !string.IsNullOrEmpty(x.DebitNo));
-                        if (!hasIssuedDebit)
+                        bool hasIssuedDebit = chargesHbl.All(x => !string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano));
+                        if (!hasIssuedDebit && existPrepaid != null)
                         {
                             messError = stringLocalizer[AccountingLanguageSub.MSG_SETTLEMENT_HAD_SHIPMENT_PREPAID_NOT_ISSUED_DEBIT, chargesHbl.FirstOrDefault().JobNo];
                             return new ResultHandle() { Status = false, Message = messError };
                         }
                         var debitCodes = chargesHbl.Select(x => x.DebitNo).ToList();
-                        var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type == AccountingConstants.TYPE_SOA_DEBIT);
-                        var hasConfirm = debitNotes.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+                        var soaNos = chargesHbl.Select(x => x.Soano).ToList();
+                        // Lấy data debit note và soa ngoại trừ phiếu đã sync có hđ <> prepaid trước đó
+                        var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type != AccountingConstants.ACCOUNTANT_TYPE_CREDIT && x.SyncStatus != AccountingConstants.STATUS_SYNCED);
+
+                        var hasConfirm = debitNotes.Where(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID || x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+                        if (existPrepaid != null)
+                        {
+                            var debitPrePaid = debitNotes.Where(x => x.Status != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID && x.Status != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).FirstOrDefault();
+                            var accSoas = acctSoaRepo.Get(x => soaNos.Contains(x.Soano) && x.Type != AccountingConstants.TYPE_SOA_CREDIT && x.SyncStatus != AccountingConstants.STATUS_SYNCED).FirstOrDefault();
+                            hasConfirm = hasConfirm && debitPrePaid == null && accSoas == null;
+                        }
                         if (!hasConfirm)
                         {
                             messError = stringLocalizer[AccountingLanguageSub.MSG_SETTLEMENT_HAD_SHIPMENT_PREPAID_NOT_ISSUED_DEBIT, chargesHbl.FirstOrDefault().JobNo];

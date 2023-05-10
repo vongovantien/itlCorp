@@ -19,7 +19,7 @@ const LIB = [
         BillingCustomDeclarationComponent,
         AddMoreModalComponent,
         SearchMultipleComponent,
-        AddNewModalComponent,
+        AddNewModalComponent
     ],
     exports: [],
     providers: [],

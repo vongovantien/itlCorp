@@ -16,7 +16,7 @@ import * as fromShareBussiness from '../../../share-business/store';
 import { combineLatest, of, Observable } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, concatMap } from 'rxjs/operators';
 
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { HttpErrorResponse } from '@angular/common/http';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';

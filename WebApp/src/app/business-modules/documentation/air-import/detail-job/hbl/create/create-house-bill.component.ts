@@ -15,8 +15,8 @@ import { AirImportHBLFormCreateComponent } from '../components/form-create-house
 import { ShareBusinessDeliveryOrderComponent, ShareBusinessImportHouseBillDetailComponent, ShareBusinessArrivalNoteAirComponent, getTransactionPermission, IShareBussinessState, TransactionGetDetailAction, getTransactionState, ITransactionState } from '@share-bussiness';
 
 import { forkJoin, merge, of } from 'rxjs';
-import _merge from 'lodash/merge';
-import isUUID from 'validator/lib/isUUID';
+import _merge from 'lodash-es/merge';
+import isUUID from 'validator/es/lib/isUUID';
 
 import { catchError, mergeMap, takeUntil, switchMap } from 'rxjs/operators';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
@@ -108,12 +108,12 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
         this._store.select(getTransactionState)
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (res: ITransactionState) => {
-                this.shipmentType = res.cstransaction.shipmentType;
-            }
-        );
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: ITransactionState) => {
+                    this.shipmentType = res.cstransaction.shipmentType;
+                }
+            );
         const formData = {
             customerId: form.customer,
             notifyPartyId: form.notifyId,

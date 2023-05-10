@@ -29,9 +29,10 @@ namespace eFMS.API.Operation.DL.IService
         int CheckDetailPermission(int id);
         CustomsDeclarationModel GetDetail(int id);
         List<CustomsDeclarationModel> GetListCustomNoAsignPIC();
-        bool CheckAllowUpdate(Guid? jobId);
+        bool CheckAllowUpdate(Guid? jobId, List<string> ClearanceNos);
         HandleState ImportClearancesOlaFromEcus();
         Task<HandleState> ReplicateCustomClearance(int Id);
+        Task<HandleState> AddNewCustomsDeclaration(CustomsDeclarationModel model);
         List<CustomsDeclarationModel> GetUserCustomClearance(CustomEcusCriteria ecusCustomCriteria, int page, int size, out int rowsCount);
     }
 }

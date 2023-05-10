@@ -1,0 +1,17 @@
+FROM node:14.20.1-alpine as dependencies
+ARG NG_CLI_ANALYTICS=false
+WORKDIR /WebApp
+COPY ./package*.json ./
+#RUN --mount=type=cache,target=./node_modules npm install
+RUN npm install
+
+From dependencies as build
+COPY ./ ./
+#RUN --mount=type=cache,target=./node_modules npm run build:uat
+RUN npm run build:uat:dc
+
+FROM nginx as frontendimage
+COPY ./build-helper/index.html /usr/share/nginx/html/index.html
+COPY --chown=nginx --from=build /WebApp/dist/en /usr/share/nginx/html/en
+COPY --chown=nginx --from=build /WebApp/dist/vi /usr/share/nginx/html/vi
+EXPOSE 80

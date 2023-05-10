@@ -12,7 +12,7 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { SeaFCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 
 import { catchError, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { ICrystalReport } from '@interfaces';
 import { formatDate } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';

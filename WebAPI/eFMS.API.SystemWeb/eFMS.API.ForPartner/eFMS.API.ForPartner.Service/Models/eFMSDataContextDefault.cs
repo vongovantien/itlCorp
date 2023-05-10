@@ -33,6 +33,7 @@ namespace eFMS.API.ForPartner.Service.Models
         public virtual DbSet<CatContract> CatContract { get; set; }
         public virtual DbSet<CatCurrencyExchange> CatCurrencyExchange { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
+        public virtual DbSet<CatPartnerBank> CatPartnerBank { get; set; }
         public virtual DbSet<CsShipmentSurcharge> CsShipmentSurcharge { get; set; }
         public virtual DbSet<SysActionFuncLog> SysActionFuncLog { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
@@ -53,7 +54,7 @@ namespace eFMS.API.ForPartner.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountPayable>(entity =>
             {
@@ -179,7 +180,7 @@ namespace eFMS.API.ForPartner.Service.Models
                     .ValueGeneratedNever();
 
                 entity.Property(e => e.AcctId)
-                    .HasMaxLength(30)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
@@ -590,6 +591,10 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.VoucherNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<AcctAdvancePayment>(entity =>
@@ -955,6 +960,10 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PaymentStatus)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ReferenceNo).HasMaxLength(100);
 
                 entity.Property(e => e.RemainUsd).HasColumnType("decimal(18, 4)");
@@ -1084,6 +1093,10 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.AgreementAdvanceAmountVnd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.AgreementId).HasColumnName("AgreementID");
+
+                entity.Property(e => e.Arcbno)
+                    .HasColumnName("ARCBNo")
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.Balance).HasColumnType("decimal(18, 4)");
 
@@ -1477,7 +1490,7 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
-                entity.Property(e => e.Offices).HasMaxLength(250);
+                entity.Property(e => e.Offices).HasMaxLength(500);
 
                 entity.Property(e => e.ProductDept)
                     .HasMaxLength(50)
@@ -1879,6 +1892,45 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.ZipCodeShipping)
                     .HasMaxLength(150)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<CatPartnerBank>(entity =>
+            {
+                entity.ToTable("catPartnerBank");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ApproveDescription).HasMaxLength(200);
+
+                entity.Property(e => e.ApproveStatus).HasMaxLength(50);
+
+                entity.Property(e => e.BankAccountName).HasMaxLength(200);
+
+                entity.Property(e => e.BankAccountNo).HasMaxLength(200);
+
+                entity.Property(e => e.BankAddress).HasMaxLength(200);
+
+                entity.Property(e => e.BankId).HasColumnName("BankID");
+
+                entity.Property(e => e.BeneficiaryAddress).HasMaxLength(200);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
+
+                entity.Property(e => e.Source).HasMaxLength(50);
+
+                entity.Property(e => e.SwiftCode).HasMaxLength(200);
+
+                entity.Property(e => e.UserCreated).HasMaxLength(50);
+
+                entity.Property(e => e.UserModified).HasMaxLength(50);
             });
 
             modelBuilder.Entity<CsShipmentSurcharge>(entity =>

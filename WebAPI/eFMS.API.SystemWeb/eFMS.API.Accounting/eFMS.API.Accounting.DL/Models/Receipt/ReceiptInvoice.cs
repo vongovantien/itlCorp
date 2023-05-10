@@ -19,6 +19,7 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public Guid? Hblid { get; set; }
         public List<string> CreditNos { get; set; }
         public bool? IsValid { get; set; }
+        public string ReferenceNo { get; set; }
     }
 
     public class ProcessClearInvoiceModel

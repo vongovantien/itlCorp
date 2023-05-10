@@ -13,7 +13,7 @@ import { combineLatest, of, Observable } from 'rxjs';
 import { switchMap, map, tap, skip, takeUntil, catchError, concatMap } from 'rxjs/operators';
 
 import * as fromShareBussiness from './../../../share-business/store';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { HttpErrorResponse } from '@angular/common/http';

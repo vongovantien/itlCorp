@@ -11,12 +11,11 @@ export class Bank {
     inactiveOn: string = '';
     userCreatedName: string = '';
     userModifiedName: string = '';
-
+    beneficiaryAddress: string = '';
+    approveStatus: string = '';
     swiftCode: string = '';
     bankAccountNo: string = '';
     bankAddress: string = '';
-    partnerId: string = '';
-    bankId: string = '';
     note: string = '';
     source: string = '';
     bankAccountName: string = '';

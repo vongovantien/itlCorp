@@ -1,4 +1,6 @@
-﻿using eFMS.API.ReportData.Infrastructure;
+﻿using eFMS.API.Infrastructure;
+using eFMS.API.ReportData.Infrastructure;
+using eFMS.API.ReportData.Service.BackGroundServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -46,7 +48,8 @@ namespace eFMS.API.ReportData
             services.AddSwagger();
             services.AddCustomAuthentication(Configuration);
             services.AddConfigureSetting(Configuration);
-        
+            services.AddHostedService<GenFileSyncService>();
+            services.SetUpRabbitMq(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

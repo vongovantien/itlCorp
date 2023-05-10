@@ -14,6 +14,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState ValidateCheckPointPartnerSurcharge(CheckPoint criteria);
         HandleState ValidateCheckPointMultiplePartnerSurcharge(CheckPointCriteria criteria);
         HandleState ValidateCheckPointPartnerSOA(string partnerId, AcctSoa soa);
+        HandleState ValidateCheckPointPartnerConvertClearance(string accountNo, string partnerTaxCode, out CatContract customerContract);
         bool ValidateCheckPointCashContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
         bool ValidateCheckPointOfficialTrialContractPartner(string partnerId, Guid HblId, string transactionType, string settlementCode, CHECK_POINT_TYPE checkPointType);
         List<CheckPointPartnerHBLDataGroup> GetPartnerForCheckPointInShipment(Guid Id, string transactionType);

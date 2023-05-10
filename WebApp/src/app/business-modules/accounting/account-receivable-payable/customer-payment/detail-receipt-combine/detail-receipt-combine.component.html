@@ -1,0 +1,18 @@
+<div class="customer-payment-combine-wrapper m-animate-fade-in">
+    <app-sub-header> </app-sub-header>
+
+    <div class="m-content">
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+                <form-create-receipt-combine [isUpdate]="true"
+                    (onSynceCombine)="onSynceCombineToAccountant($event)"></form-create-receipt-combine>
+                <receipt-general-combine (onSaveReceipt)="onSaveGeneralReceipt($event)"
+                    [isUpdate]="true"></receipt-general-combine>
+                <receipt-cd-combine #CreditPayment listType="credit" [isUpdate]="true"
+                    (onSaveReceipt)="onSaveReceipt($event)"></receipt-cd-combine>
+                <receipt-cd-combine #DebitPayment listType="debit" [isUpdate]="true"
+                    (onSaveReceipt)="onSaveReceipt($event)"></receipt-cd-combine>
+            </div>
+        </div>
+    </div>
+</div>

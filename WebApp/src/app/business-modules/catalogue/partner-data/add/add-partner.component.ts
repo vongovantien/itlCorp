@@ -18,7 +18,7 @@ import { FormContractCommercialPopupComponent } from 'src/app/business-modules/s
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 import { CommercialEmailListComponent } from 'src/app/business-modules/commercial/components/email/commercial-email-list.component';
 import { formatDate } from '@angular/common';
 

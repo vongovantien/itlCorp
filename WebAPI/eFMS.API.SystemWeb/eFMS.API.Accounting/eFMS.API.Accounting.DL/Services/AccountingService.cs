@@ -67,7 +67,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         private readonly IAcctSettlementPaymentService settlementPaymentService;
-   
+        private readonly IContextBase<AccAccountPayable> accountPayableRepository;
+
         #endregion --Dependencies--
 
         readonly IQueryable<SysUser> users;
@@ -123,6 +124,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<CsTransaction> csTransactionRepo,
             IContextBase<OpsTransaction> opsTransactionRepo,
+            IContextBase<AccAccountPayable> accountPayableRepo,
             IMapper mapper) : base(repository, mapper)
         {
             AdvanceRepository = AdvanceRepo;
@@ -166,6 +168,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysEmailTemplateRepository = sysEmailTemplateRepo;
             csTransactionRepository = csTransactionRepo;
             opsTransactionRepository = opsTransactionRepo;
+            accountPayableRepository = accountPayableRepo;
             // ---
 
             users = UserRepository.Get();
@@ -204,7 +207,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                              ExchangeRate = GetExchangeRate(ad.RequestDate, ad.AdvanceCurrency),
                                                              DueDate = ad.PaymentTerm,
                                                              PaymentMethod = ad.PaymentMethod == "Bank" ? "Bank Transfer" : ad.PaymentMethod,
-                                                             
+
                                                          };
                 List<BravoAdvanceModel> data = queryAdv.ToList();
                 foreach (var item in data)
@@ -370,7 +373,7 @@ namespace eFMS.API.Accounting.DL.Services
                             item.Payee = settle.Payee;
                             item.CurrencyCode = settle.SettlementCurrency;
                             item.SettleAmount = settle.Amount;
-
+                            item.BankAccountNo = settle.BankAccountNo;
                             // Ds Surcharge của settlement.
                             //IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.SettlementCode == item.ReferenceNo);
                             var surcharges = GetShipmentSurchargesData(item.ReferenceNo, "SETTLEMENT").AsQueryable();
@@ -760,7 +763,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     charges.Add(charge);
 
-                    if(string.IsNullOrEmpty(hblId))
+                    if (string.IsNullOrEmpty(hblId))
                     {
                         hblId = surcharge.Hblid.ToString();
                     }
@@ -864,7 +867,7 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
                         // tính net amount và vat amount theo phí
-                        if (currencyId == AccountingConstants.CURRENCY_LOCAL) 
+                        if (currencyId == AccountingConstants.CURRENCY_LOCAL)
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
                             _taxMoney = surcharge.VatAmountVnd ?? 0;
@@ -919,7 +922,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.IsRefund = 0;
 
                         charges.Add(charge);
-                        if(string.IsNullOrEmpty(hblId))
+                        if (string.IsNullOrEmpty(hblId))
                         {
                             hblId = surcharge.Hblid.ToString();
                         }
@@ -1213,7 +1216,7 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal _netAmount = 0;
                         decimal _taxMoney = 0;
                         // tính net amount và vat amount theo phí
-                        
+
                         if (currencyId == AccountingConstants.CURRENCY_LOCAL)
                         {
                             _netAmount = surcharge.AmountVnd ?? 0;
@@ -1526,7 +1529,7 @@ namespace eFMS.API.Accounting.DL.Services
                     data = invalidSVouchers;
                     return new HandleState("Danh sách voucher không hợp lệ");
                 }
-                
+
                 {
                     try
                     {
@@ -1778,7 +1781,7 @@ namespace eFMS.API.Accounting.DL.Services
             return customerName;
         }
 
-        private string  GetLinkCdNote(string cdNoteNo, Guid jobId, string currency)
+        private string GetLinkCdNote(string cdNoteNo, Guid jobId, string currency)
         {
             string _link = string.Empty;
             if (cdNoteNo.Contains("CL"))
@@ -2666,7 +2669,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             if ((catagory == "SOA_DEBIT" || catagory == "CDNOTE_DEBIT" || catagory == "CDNOTE_INVOICE") && emailReceiveDebit?.FirstOrDefault() != null)
             {
-                emails =emailReceiveDebit?.FirstOrDefault().EmailInfo.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+                emails = emailReceiveDebit?.FirstOrDefault().EmailInfo.Split(';').Where(x => x.ToString() != string.Empty).ToList();
             }
             if ((catagory == "SOA_CREDIT" || catagory == "CDNOTE_CREDIT") && emailReceiveCredit?.FirstOrDefault() != null)
             {
@@ -2783,7 +2786,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var smUserNotify = sysUserNotifyRepository.SubmitChanges();
                     trans.Commit();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     trans.Rollback();
                 }
@@ -2804,7 +2807,7 @@ namespace eFMS.API.Accounting.DL.Services
             receiptSyncs = new List<AcctReceiptSyncModel>();
             if (ids == null || ids.Count() == 0) return data;
 
-            IQueryable<AcctReceipt> receipts = receiptRepository.Get(x => ids.Contains(x.Id));
+            IQueryable<AcctReceipt> receipts = receiptRepository.Get(x => ids.Contains(x.Id) && x.SyncStatus != AccountingConstants.STATUS_SYNCED);
 
             foreach (var receipt in receipts)
             {
@@ -2812,6 +2815,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 IQueryable<AccAccountingPayment> paymentsDebit = payments.Where(x => x.PaymentType != "CREDIT" && x.PaymentAmount != 0); // trường hợp treo OBH (paymentAmount = 0)
                 IQueryable<AccAccountingPayment> paymentNetOff = payments.Where(x => (x.NetOffVnd != null && x.NetOffVnd != 0) || (x.NetOffUsd != null && x.NetOffUsd != 0));
+                IQueryable<AccAccountingPayment> paymentsCredit = payments.Where(x => x.PaymentType == "CREDIT" && x.PaymentAmount != 0);
                 if (receipt.Type == "Agent" && receipt.Class == AccountingConstants.RECEIPT_CLASS_NET_OFF)
                 {
                     PaymentModel paymentModelNetOff = GenerateReceiptSyncModel("NETOFF", receipt, paymentNetOff, out AcctReceiptSyncModel receiptSyncNetOff);
@@ -2849,6 +2853,13 @@ namespace eFMS.API.Accounting.DL.Services
                             receiptSyncs.Add(receiptSyncNetOff);
                             data.Add(paymentModelNetOff);
                         }
+
+                        if(paymentsCredit.Count() > 0)
+                        {
+                            PaymentModel paymentModelClearCredit = GenerateReceiptSyncModel("CREDIT", receipt, paymentsCredit, out AcctReceiptSyncModel receiptSyncCredit);
+                            receiptSyncs.Add(receiptSyncCredit);
+                            data.Add(paymentModelClearCredit);
+                        }
                     }
                 }
             }
@@ -2878,7 +2889,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                  CustomerCode = partner.AccountNo,
                                                  CustomerName = partner.PartnerNameVn,
                                                  Description0 = GeneratePaymentReceiptDescription(receipt, type),
-                                                 PaymentMethod = GetPaymentMethodReceipt(receipt, type), // 16473
+                                                 PaymentMethod = !string.IsNullOrEmpty(receipt.Arcbno) ? receipt.PaymentMethod : GetPaymentMethodReceipt(receipt, type), // 16473
                                                  DataType = "PAYMENT",
                                                  LocalBranchCode = grpobh.InternalCode
                                              };
@@ -2891,7 +2902,7 @@ namespace eFMS.API.Accounting.DL.Services
                 List<PaymentDetailModel> details = new List<PaymentDetailModel>();
 
                 string obhAccountNo = string.Empty;
-                if(receiptItem.ObhpartnerId != Guid.Empty && receiptItem.ObhpartnerId != null)
+                if (receiptItem.ObhpartnerId != Guid.Empty && receiptItem.ObhpartnerId != null)
                 {
                     CatPartner partnerOBH = PartnerRepository.Get(x => x.Id == receiptItem.ObhpartnerId.ToString())?.FirstOrDefault();
                     if (partnerOBH != null)
@@ -2899,7 +2910,7 @@ namespace eFMS.API.Accounting.DL.Services
                         obhAccountNo = partnerOBH.AccountNo;
                     }
                 }
-                else if(receiptItem.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE
+                else if (receiptItem.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE
                     || type == "CLEAR_ADV")
                 {
                     obhAccountNo = result.CustomerCode;
@@ -2918,10 +2929,10 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    BankAccountNo = receiptItem.BankAccountNo,
                                                                    ObhPartnerCode = obhAccountNo,
                                                                    Description = receiptItem.Type == "Agent" ? ("Cấn trừ " + payment.BillingRefNo) : GeneratePaymentReceiptDescription(payment, type),
-                                                                   ChargeType = GetChargeTypeReceiptPayment(receiptItem, payment, type),
+                                                                   ChargeType = !string.IsNullOrEmpty(receiptItem.Arcbno) ? payment.Type : GetChargeTypeReceiptPayment(receiptItem, payment, type),
                                                                    DebitAccount = GetPaymentReceiptAccount(receiptItem, payment.Type, invoicegrp.AccountNo, type),
                                                                    NganhCode = "FWD",
-                                                                   Stt_Cd_Htt = type == "COLL_ADV" ? string.Empty : invoicegrp.ReferenceNo
+                                                                   Stt_Cd_Htt = type == "COLL_ADV" ? string.Empty : GetReferenceNoReceipt(invoicegrp, type)
                                                                };
                 if (queryPayments != null)
                 {
@@ -3137,7 +3148,7 @@ namespace eFMS.API.Accounting.DL.Services
             string account = invoiceAccountNo;
             if (type == "COLL_ADV")
             {
-                if(receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                if (receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
                     account = "13114";
                 }
@@ -3185,7 +3196,7 @@ namespace eFMS.API.Accounting.DL.Services
                         return receipt.PaymentRefNo + "CR";
                     }
                 case "COLL_ADV":
-                    return receipt.PaymentRefNo + "_AD"; 
+                    return receipt.PaymentRefNo + "_AD";
                 default:
                     return receipt.PaymentRefNo;
             }
@@ -3194,7 +3205,7 @@ namespace eFMS.API.Accounting.DL.Services
         private string GeneratePaymentReceiptDescription(AcctReceipt receipt, string type)
         {
             string _des = "Thu công nợ khách hàng";
-            if (type == "NETOFF")
+            if (type == "NETOFF" || type == "CREDIT")
             {
                 if(receipt.Type == "Agent")
                 {
@@ -3202,7 +3213,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 return "Công Nợ Cấn Trừ";
             }
-           
+
             if (type == "COLL_ADV")
             {
                 if (string.IsNullOrEmpty(receipt.Description))
@@ -3223,11 +3234,11 @@ namespace eFMS.API.Accounting.DL.Services
         private string GeneratePaymentReceiptDescription(AccAccountingPayment payment, string type)
         {
             string _description = string.Empty;
-            if (type == "NETOFF")
+            if (type == "NETOFF" || type == "CREDIT")
             {
                 return "Công Nợ Cấn Trừ";
             }
-            if(type == "COLL_ADV")
+            if (type == "COLL_ADV")
             {
                 return "Công Nợ thu ứng trước";
             }
@@ -3313,7 +3324,14 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 if (key == "amount")
                 {
-                    _paidAmount = payment.PaymentAmountVnd;
+                    if (receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        _paidAmount = payment.PaymentAmountVnd;
+                    }
+                    else
+                    {
+                        _paidAmount = payment.PaymentAmountUsd;
+                    }
                 }
             }
 
@@ -3379,6 +3397,26 @@ namespace eFMS.API.Accounting.DL.Services
 
             return chargeType;
         }
+
+        /// <summary>
+        /// Get reference no of debit/credit combine
+        /// </summary>
+        /// <param name="invoice"></param>
+        /// <param name="_type"></param>
+        /// <returns></returns>
+        private string GetReferenceNoReceipt(AccAccountingManagement invoice, string _type)
+        {
+            if (_type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
+            {
+                var payables = accountPayableRepository.Get(x => x.VoucherNo == invoice.VoucherId && x.AcctManagementId.Contains(invoice.Id.ToString())).FirstOrDefault();
+                return payables?.ReferenceNo;
+            }
+            else
+            {
+                return invoice?.ReferenceNo;
+            }
+        }
+
         /// <summary>
         /// Add or Update Receipt Sync
         /// </summary>
@@ -3517,7 +3555,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             var debit = cdNoteRepository.Get(x => x.Code == item)?.FirstOrDefault();
                             if (debit == null) continue;
-                            if(debit?.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
+                            if (debit?.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
                             {
                                 messageError = stringLocalizer[AccountingLanguageSub.MSG_SOA_DEBIT_PREPAID_NOT_BE_CONFIRMED];
                                 break;
@@ -3577,7 +3615,7 @@ namespace eFMS.API.Accounting.DL.Services
             //        });
             //    }
             //}
-            
+
             string queryParamUrlAttachFile = string.Format(@"/en/#/home/tool/file-management/user-attach-file?module={0}&folder={1}&objectId={2}&billingNo={3}", "Accounting", folder, objectId, billingNo);
             results.Add(new BravoAttachDoc
             {

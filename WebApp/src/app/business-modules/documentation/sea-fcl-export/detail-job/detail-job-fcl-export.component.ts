@@ -12,7 +12,7 @@ import { tap, map, switchMap, catchError, takeUntil, skip, concatMap } from 'rxj
 
 import * as fromShareBussiness from './../../../share-business/store';
 
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { ICanComponentDeactivate } from '@core';
 import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';

@@ -10,6 +10,7 @@ import { ICrystalReport } from '@interfaces';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { IAppState, getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
+import groupBy from 'lodash-es/groupBy';
 import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';

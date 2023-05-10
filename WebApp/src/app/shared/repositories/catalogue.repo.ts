@@ -162,17 +162,18 @@ export class CatalogueRepo {
     }
 
     getPartnerByGroups(groups: number[], active: boolean = true, service: string = null, office: string = null, salemanId: string = null): any {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`,
-            {
-                partnerGroups: groups,
-                active: active,
-                service: service,
-                office: office,
-                salemanId: salemanId
-            }, null, { "hideSpinner": "true" });
+        return this.getPartnerGroupsWithCriteria({ partnerGroups: groups, active: active, service: service, office: office, salemanId: salemanId });
+        // return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`,
+        //     {
+        //         partnerGroups: groups,
+        //         active: active,
+        //         service: service,
+        //         office: office,
+        //         salemanId: salemanId
+        //     }, null, { "hideSpinner": "true" });
     }
 
-    getPartnerGroupsWithCriteria(data: any){
+    getPartnerGroupsWithCriteria(data: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`, data, null, { "hideSpinner": "true" }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
@@ -239,6 +240,15 @@ export class CatalogueRepo {
                 })
             );
         }
+    }
+
+    getACRefPartnerWithSaleman(partnerId: string, salemanId: string, partnerGroup: number) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetParentPartnerSameSaleman`, { id: partnerId, saleman: salemanId, partnerGroup: partnerGroup }, null).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
     }
 
     getListCharge(page?: number, size?: number, body: any = {}) {
@@ -1435,5 +1445,57 @@ export class CatalogueRepo {
                 return res;
             })
         );
+    }
+
+    getPartnerBank(partnerId: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerBank/GetByPartner`, { partnerId: partnerId }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    getDetailPartnerBank(id: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerBank/GetDetail`, { id: id }).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    addNewPartnerBank(data: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerBank/AddNew`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    updatePartnerBank(data: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerBank/Update`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    deletePartnerBank(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartnerBank/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+
+    reviseBankInformation(bankId: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerBank/ReviseBankInformation`, null, { bankId: bankId});
+    }
+
+    syncBankInfoToAccountantSystem(requestList: any[]) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerBank/SyncBankInfoToAccountantSystem`, requestList);
     }
 }
