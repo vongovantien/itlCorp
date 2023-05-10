@@ -719,13 +719,13 @@ namespace eFMS.API.Documentation.DL.Services
             return emailContent;
         }
 
-        public EmailContentModel GetInfoMailDebitInvoice(Guid hblId, Guid jobId)
+        public EmailContentModel GetInfoMailDebitInvoice(List<string> hblId, Guid jobId)
         {
             var shipmentInfo = DataContext.First(x => x.Id == jobId);
             if (shipmentInfo == null) return null;
 
-            var _housebills = detailRepository.Get(x => hblId.Equals(x.Id));
-            var hwbNos = string.Join(" - ", _housebills.Select(x => x.Hwbno).Distinct());
+            var _housebills = detailRepository.Get(x => hblId.Contains(x.Id.ToString()));
+            var hwbNos = string.Join(" - ", _housebills.Select(x => x.Hwbno).DefaultIfEmpty());
             var mawb = !string.IsNullOrEmpty(shipmentInfo.Mawb) ? shipmentInfo.Mawb : string.Join(";", _housebills.Select(x => x.Mawb).Distinct());
 
             // Email PIC
@@ -764,14 +764,13 @@ namespace eFMS.API.Documentation.DL.Services
                 _body = _body.Replace("{{FlightVesNo}}", _hbl?.FlightNo);
                 _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _hbl.GrossWeight));
                 _body = _body.Replace("{{CW}}", string.Format("{0:n2}", _hbl.ChargeWeight));
-                _body = _body.Replace("{{HAWB}}", _hbl.Hwbno);
                 _body = _body.Replace("{{UserName}}", _consignee?.PartnerNameEn);
                 _body = _body.Replace("{{Routing}}", _hbl?.Route);
                 _subject = _subject.Replace("{{pic}}", picEmail);
 
                 numOrder += 1;
             }
-
+            _body = _body.Replace("{{HAWB}}", hwbNos);
             _body = _body.Replace("{{Hwbno}}", hwbNos);
             _body = _body.Replace("{{MAWB}}", mawb);
             _body = _body.Replace("{{Routing}}", shipmentInfo.Route);

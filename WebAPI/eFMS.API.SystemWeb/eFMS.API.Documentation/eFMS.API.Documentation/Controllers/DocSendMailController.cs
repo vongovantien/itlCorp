@@ -248,11 +248,11 @@ namespace eFMS.API.Documentation.Controllers
         /// </summary>
         /// <param name="hblId"></param>
         /// <returns></returns>
-        [HttpGet("GetInfoMailDebitInvoice")]
+        [HttpPost("GetInfoMailDebitInvoice")]
         [Authorize]
-        public IActionResult GetInfoMailDebitInvoice(Guid hblId, Guid jobId)
+        public IActionResult GetInfoMailDebitInvoice([FromBody] List<string> hblIds, Guid jobId)
         {
-            var data = sendMailService.GetInfoMailDebitInvoice(hblId, jobId);
+            var data = sendMailService.GetInfoMailDebitInvoice(hblIds, jobId);
             return Ok(data);
         }
     }

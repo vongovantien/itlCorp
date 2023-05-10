@@ -25,7 +25,7 @@ namespace eFMS.API.Documentation.DL.IService
         EmailContentModel GetMailDOHBLSeaImport(Guid jobId, string serviceId);
         EmailContentModel GetInfoMailHBLPreAlerSeaExport(Guid? hblId, string serviceId);
         EmailContentModel GetInfoMailPreAlerSeaExport(List<Guid?> hblIds, Guid? jobId, string serviceId);
-        EmailContentModel GetInfoMailDebitInvoice(Guid hblId, Guid jobId);
+        EmailContentModel GetInfoMailDebitInvoice(List<string> hblIds, Guid jobId);
         bool SendMailContractCashWithOutstandingDebit();
         List<sp_GetShipmentDataWithOutstandingDebit> GetDataOustandingDebit(string salemanId);
     }
