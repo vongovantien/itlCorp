@@ -6533,7 +6533,7 @@ namespace eFMS.API.Accounting.DL.Services
         public ResultHandle CheckConfirmPrepaidShipment(List<ShipmentChargeSettlement> ShipmentCharges)
         {
             ResultHandle result = new ResultHandle() { Status = true };
-            var hblIds = ShipmentCharges.Select(x => x.Hblid).ToList();
+            var hblIds = ShipmentCharges.Select(x => x.Hblid).Distinct().ToList();
             var office = sysOfficeRepo.First(x => x.Id == currentUser.OfficeID);
             if (office.OfficeType == AccountingConstants.OFFICE_TYPE_OUTSOURCE)
             {
@@ -6575,14 +6575,14 @@ namespace eFMS.API.Accounting.DL.Services
                         var debitCodes = chargesHbl.Select(x => x.DebitNo).ToList();
                         var soaNos = chargesHbl.Select(x => x.Soano).ToList();
                         // Lấy data debit note và soa ngoại trừ phiếu đã sync có hđ <> prepaid trước đó
-                        var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type != AccountingConstants.ACCOUNTANT_TYPE_CREDIT &&
-                        ((x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID || x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID) || !(x.SyncStatus == AccountingConstants.STATUS_SYNCED && x.Status == AccountingConstants.STATUS_SOA_NEW)));
+                        var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type != AccountingConstants.ACCOUNTANT_TYPE_CREDIT && x.SyncStatus != AccountingConstants.STATUS_SYNCED);
 
-                        var hasConfirm = debitNotes.All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+                        var hasConfirm = debitNotes.Where(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID || x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
                         if (existPrepaid != null)
                         {
-                            var accSoas = acctSoaRepo.Get(x => soaNos.Contains(x.Soano) && x.Type != AccountingConstants.TYPE_SOA_CREDIT && !(x.SyncStatus == AccountingConstants.STATUS_SYNCED && x.Status == AccountingConstants.STATUS_SOA_NEW)).FirstOrDefault();
-                            hasConfirm = hasConfirm && accSoas == null;
+                            var debitPrePaid = debitNotes.Where(x => x.Status != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID && x.Status != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).FirstOrDefault();
+                            var accSoas = acctSoaRepo.Get(x => soaNos.Contains(x.Soano) && x.Type != AccountingConstants.TYPE_SOA_CREDIT && x.SyncStatus != AccountingConstants.STATUS_SYNCED).FirstOrDefault();
+                            hasConfirm = hasConfirm && debitPrePaid == null && accSoas == null;
                         }
                         if (!hasConfirm)
                         {
