@@ -230,13 +230,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         if (type == "Shipment")
                         {
                             var attachTemplate = new SysAttachFileTemplate();
-                            if (edoc.Code == "POD" && !string.IsNullOrEmpty(edoc.TransactionType))
+                            if (edoc.Code == "POD"&& _attachFileTemplateRepo.Any(x => x.Code == "POD" && x.TransactionType == edoc.TransactionType))
                             {
                                 attachTemplate = _attachFileTemplateRepo.Get(x => x.Code == "POD" && x.TransactionType == edoc.TransactionType).FirstOrDefault();
                             }
                             else
                             {
-                                attachTemplate = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault();
+                                var opsTranType = _opsTranRepo.Get(x => x.Id == edoc.JobId).FirstOrDefault().TransactionType == null ? "CL" : "TK";
+                                attachTemplate = _attachFileTemplateRepo.Get(x => x.Code == edoc.Code&&x.TransactionType== opsTranType).FirstOrDefault();
                             }
 
                             var sysImageDetail = new SysImageDetail
@@ -2180,7 +2181,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         private Guid getJobId(string jobNo, string trantype)
         {
-            if (trantype == "CL")
+            if (trantype == "CL"|| trantype == "TK")
             {
                 var ops = _opsTranRepo.Get(x => x.JobNo == jobNo);
                 return ops.FirstOrDefault().Id;

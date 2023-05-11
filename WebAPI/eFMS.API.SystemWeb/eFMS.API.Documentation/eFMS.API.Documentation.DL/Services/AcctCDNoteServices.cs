@@ -353,7 +353,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var chargeFirst = model.listShipmentSurcharge.First();
                     var _customerId = string.Empty;
                     var _salesmanId = string.Empty;
-                    if (chargeFirst.TransactionType == "CL")
+                    if (chargeFirst.TransactionType == "CL"||chargeFirst.TransactionType=="TK")
                     {
                         // kiểm tra prepaid trên shipment trước
                         var opsJob = opstransRepository.First(x => x.Hblid == chargeFirst.Hblid);
