@@ -166,7 +166,7 @@
                                         [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.chargeId || (charge.duplicateCharge && charge.duplicateInvoice))}">
                                         <div class="list-master-charge">
                                             <app-combo-grid-virtual-scroll
-                                                [currentActiveItemId]="{field:'id', value:charge.chargeId}"
+                                                [currentActiveItemId]="{field:'id', value:charge.chargeId, hardValue: charge.chargeNameEn}"
                                                 (itemSelected)="onSelectDataFormInfo($event, 'charge', charge)"
                                                 [selectedDisplayFields]="configComboGridCharge.selectedDisplayFields"
                                                 [dataSources]="listCharges"
