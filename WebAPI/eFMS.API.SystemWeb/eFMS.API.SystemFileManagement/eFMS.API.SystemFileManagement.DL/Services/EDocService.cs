@@ -44,6 +44,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private IContextBase<AcctSoa> _soaRepo;
         private IContextBase<SysUser> _userRepo;
         private IContextBase<CsShipmentSurcharge> _surRepo;
+        private IContextBase<SysOffice> _officeRepo;
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)_sysImageDetailRepo.DC;
         private readonly Dictionary<string, string> PreviewTemplateCodeMappingAttachTemplateCode = new Dictionary<string, string>();
         public EDocService(IContextBase<SysImage> SysImageRepo,
@@ -59,6 +60,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             IContextBase<SysUser> userRepo,
             IContextBase<AcctSoa> soaRepo,
              IContextBase<CsShipmentSurcharge> surRepo,
+             IContextBase<SysOffice> officeRepo,
         IContextBase<CsTransactionDetail> tranDeRepo)
         {
             this.currentUser = currentUser;
@@ -77,6 +79,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             _userRepo = userRepo;
             _soaRepo = soaRepo;
             _surRepo = surRepo;
+            _officeRepo = officeRepo;
             PreviewTemplateCodeMappingAttachTemplateCode.Add("HBL", "HBL");
             PreviewTemplateCodeMappingAttachTemplateCode.Add("MBL", "MBL");
             PreviewTemplateCodeMappingAttachTemplateCode.Add("DEBIT", "INV");
@@ -552,7 +555,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             //var currentOffice = currentUser.OfficeCode;
             var edosExisted = new List<IGrouping<Guid?,SysImageDetail>>();
-            if(currentUser.OfficeCode == "ITLHM")
+            if(_officeRepo.Any(x=>x.Id==currentUser.OfficeID&&x.OfficeType== "OutSource"))
             {
                 var edocList = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo);
                 var edocData = new List<SysImageDetail>();
@@ -1291,7 +1294,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     var grpJobsSm = DC.CsShipmentSurcharge.Where(x => x.SettlementCode == bilingNo).GroupBy(x => new { x.JobNo }).Select(x => new { x.FirstOrDefault().JobNo, x.FirstOrDefault().Hblid });
                     foreach (var item in grpJobsSm)
                     {
-                        if (item.JobNo.Contains("LOG")|| item.JobNo.Contains("RLOG")|| item.JobNo.Contains("TKI"))
+                        if (item.JobNo.Contains("LOG")|| item.JobNo.Contains("TKI"))
                         {
                             var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item.JobNo);
                             if (opsJob != null)
