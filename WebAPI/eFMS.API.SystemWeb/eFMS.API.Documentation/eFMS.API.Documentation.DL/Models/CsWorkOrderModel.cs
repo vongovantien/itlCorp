@@ -30,6 +30,7 @@ namespace eFMS.API.Documentation.DL.Models
         public bool Active { get; set; }
         public string Status { get; set; }
         public string Source { get; set; }
+        public string UserCreated { get; set; }
     }
 
     public class CsWorkOrderViewUpdateModel: CsWorkOrderModel

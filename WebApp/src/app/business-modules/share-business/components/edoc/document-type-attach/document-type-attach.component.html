@@ -1,5 +1,5 @@
 <div class="modal fade" role="dialog" bsModal #popup="bs-modal">
-    <div class="modal-dialog c-modal-fullscreen" role="document">
+    <div class="modal-dialog c-modal-fullscreen modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Attachments Files</h5>
@@ -30,7 +30,7 @@
                 <list-file-attach *ngIf="jobOnSettle" [typeFrom]="typeFrom" [jobNo]="jobNo" [jobOnSettle]="jobOnSettle"
                     [transactionType]="transactionType" [billingId]="billingId" [readonly]="readonly"
                     [isEdocByAcc]="isEdocByAcc" [jobId]="jobId" [lstEdocExist]="lstEdocExist"></list-file-attach>
-                <div class="row">
+                <div class="row" *ngIf="!readonly">
                     <div class="col-md-12">
                         <table class="table table-brand table-editable table-fixed-err">
                             <thead app-table-header [headers]="headers">
@@ -59,7 +59,8 @@
                                                         disabled>
                                                 </div>
                                             </td>
-                                            <td *ngIf="typeFrom==='Settlement'||typeFrom==='Shipment'">
+                                            <td
+                                                *ngIf="(typeFrom==='Settlement'||typeFrom==='Shipment') && !isAttachFilePOD; else attachPODFile">
                                                 <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!file.DocumentId||file
                                                         .DocumentId===null)) }" [title]="file.docTitle">
                                                     <div class="list-master">
@@ -74,6 +75,12 @@
                                                     </div>
                                                 </div>
                                             </td>
+                                            <ng-template #attachPODFile>
+                                                <td class="form-group">
+                                                    <input type="text" class="form-control" value="POD" disabled>
+                                                </td>
+                                            </ng-template>
+
                                             <td *ngIf="typeFrom==='SOA'">
                                                 <div class="form-group">
                                                     <input class="form-control" [disabled]="true" type="text"
@@ -141,7 +148,7 @@
                                                     </div>
                                                 </td>
                                             </ng-container>
-                                            <td class="disabled" *ngIf="typeFrom==='Shipment'||jobOnSettle">
+                                            <td class="disabled" *ngIf="(typeFrom==='Shipment'||jobOnSettle) && !isAttachFilePOD">
                                                 <div class="form-group ">
                                                     <input type="text" class="form-control " [ngModel]="jobNo" disabled>
                                                 </div>
@@ -177,7 +184,8 @@
                                             </td>
                                         </tr>
                                     </ng-container>
-                                    <tr app-table-none-record [colspan]="headers.length  + 1" *ngIf="!listFile.length">
+                                    <tr app-table-none-record [colspan]="headers.length  + 1"
+                                        *ngIf="!listFile.length && !readonly">
                                     </tr>
                                 </tbody>
                             </ng-container>
@@ -185,7 +193,7 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer m--align-center c-button-actions">
+            <div *ngIf="!readonly" class="modal-footer m--align-center c-button-actions">
                 <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="uploadEDoc()">
                 </app-default-button>
                 <app-default-button [buttonSetting]="cancelButtonSetting"

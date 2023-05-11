@@ -244,4 +244,8 @@ export class StatementOfAccountSearchComponent extends AppForm {
     resetPersonalHandle() {
         this.currentUser = null;
     }
+    resetPartnerInfo() {
+        // Reset to default value
+        this.selectedPartner.value = 'All';
+    }
 }

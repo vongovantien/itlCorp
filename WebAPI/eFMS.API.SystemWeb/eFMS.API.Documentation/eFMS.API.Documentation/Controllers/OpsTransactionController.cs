@@ -563,5 +563,19 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        // API check existed job
+        [HttpPost("CheckExistedJob")]
+        [Authorize]
+        public IActionResult CheckExistedJob(OpsTransactionModel model)
+        {
+
+            var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
+            if (existedMessage != null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
+            }
+            return Ok(new ResultHandle { Status = true, Message = null });
+        }
     }
 }

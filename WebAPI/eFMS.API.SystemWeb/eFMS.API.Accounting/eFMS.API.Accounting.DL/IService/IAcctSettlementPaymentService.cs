@@ -114,5 +114,6 @@ namespace eFMS.API.Accounting.DL.IService
         string CheckValidFeesOnShipment(CreateUpdateSettlementModel model);
         bool CheckSettleHasAutoRateCharges(string settlementNo);
         List<ShipmentChargeSettlement> GetSurchargePagingSettlementPayment(string settlementNo, int page, int size);
+        ResultHandle CheckConfirmPrepaidShipment(List<ShipmentChargeSettlement> ShipmentCharges);
     }
 }

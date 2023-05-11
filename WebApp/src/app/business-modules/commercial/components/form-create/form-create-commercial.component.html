@@ -120,7 +120,7 @@
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true" name="daterange" [autoApply]="true"
-                                formControlName="dateId" readonly 
+                                formControlName="dateId" readonly
                                 [attr.disabled]="this.isActive === true ? 'disabled' : null">
                             <ng-container *ngIf="dateId?.value?.startDate !== null && this.isActive === false">
                                 <span class=" m-input-icon_clear" (click)="resetFormControl(dateId)"><i class="la la-times"></i></span>

@@ -78,9 +78,10 @@ export class CommercialWorkOrderDetailComponent extends CommercialCreateWorkOrde
                     this.isActive = this.workOrderDetail.active || false;
                     this.prices = this.workOrderDetail.listPrice;
                     this.transactionType = this.workOrderDetail.transactionType;
-                    this.updateFormWorkOrder(this.workOrderDetail);
 
+                    this.updateFormWorkOrder(this.workOrderDetail);
                     this._store.dispatch(LoadDetailWorkOrderSuccess(res));
+                    this.formWorkOrder.getListSalesman(this.workOrderDetail.partnerId, this.transactionType);
                 }
             );
     }
@@ -94,6 +95,7 @@ export class CommercialWorkOrderDetailComponent extends CommercialCreateWorkOrde
             podDescription: res.podDescription,
         };
         this.formWorkOrder.form.patchValue(Object.assign(_merge(res, formData)));
+        this.formWorkOrder.salesmanName = res.salesmanName;
     }
 
     onToggleActive($event) {
