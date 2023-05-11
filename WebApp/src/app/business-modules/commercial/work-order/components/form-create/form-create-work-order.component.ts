@@ -60,8 +60,8 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
 
     // transit: AbstractControl;
 
-    partners: Observable<Partner[]>;
-    agents: Observable<Customer[]>;
+    partners: Partner[] = [];
+    agents: Customer[] = [];
     ports: Observable<PortIndex[]>;
     salesmans: User[] = [];
     incoterms: Observable<Incoterm[]>
@@ -69,8 +69,11 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
     paymentMethods = JobConstants.COMMON_DATA.FREIGHTTERMS;
     shipmentTypes: string[] = JobConstants.COMMON_DATA.SHIPMENTTYPES;
 
-    partnerName: string;
-    salesmanName: string;
+    partnerName: string = '';
+    agentName: string = '';
+    consigneeName: string = '';
+    shipperName: string = '';
+    salesmanName: string = '';
 
     displayFieldsPartner = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldsPort = JobConstants.CONFIG.COMBOGRID_PORT;
@@ -78,22 +81,12 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
     isLoadingPort: Observable<boolean>;
     isLoadingPartner: boolean;
     isLoadingUser: boolean = false;
-    isLoadingAgent: Observable<boolean>;
+    isLoadingAgent: boolean = false;
+    isloadingShipper: boolean = false;
+    isLoadingConsignee: boolean = false;
 
     ngOnInit(): void {
-        this.isLoadingPartner = true;
-        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL)
-            .pipe(
-                shareReplay(),
-                finalize(() => this.isLoadingPartner = false)
-            );
-
-        this._store.dispatch(new GetCatalogueAgentAction());
-        this.agents = this._store.select(getCatalogueAgentState);
-        this.isLoadingAgent = this._store.select(getCatalogueAgentLoadingState);
-
         this.initForm();
-
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -180,16 +173,74 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
             )
     }
 
+    loadPartner(type: string) {
+        if (!!this.partners.length) return;
+        switch (type) {
+            case 'partner':
+                this.isLoadingPartner = true;
+                break;
+            case 'consignee':
+                this.isLoadingConsignee = true;
+                break;
+            case 'shipper':
+                this.isloadingShipper = true;
+                break;
+            default:
+                break;
+        }
+        this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL)
+            .pipe(
+                finalize(() => {
+                    switch (type) {
+                        case 'partner':
+                            this.isLoadingPartner = false;
+                            break;
+                        case 'consignee':
+                            this.isLoadingConsignee = false;
+                            break;
+                        case 'shipper':
+                            this.isloadingShipper = false;
+                            break;
+                        default:
+                            break;
+                    }
+                })
+            ).subscribe(
+                (partners) => {
+                    this.partners = partners;
+                    console.log(this.partners);
+                }
+            )
+    }
+
+    loadAgent() {
+        if (!!this.agents.length) return;
+        this.isLoadingAgent = true;
+        this._store.dispatch(new GetCatalogueAgentAction());
+        this._store.select(getCatalogueAgentState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                finalize(() => this.isLoadingAgent = false)
+            ).subscribe(
+                (agents) => {
+                    this.agents = agents;
+                }
+            )
+    }
+
     onSelectDataFormInfo(data: any, key: string) {
         this.form.controls[key].setValue(data.id);
         switch (key) {
             case 'shipperId':
+                this.shipperName = data.shortName;
                 this.shipperDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 break;
             case 'consigneeId':
+                this.consigneeName = data.shortName;
                 this.consigneeDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 break;
             case 'agentId':
+                this.agentName = data.shortName;
                 this.agentDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 break;
             case 'pol':

@@ -52,12 +52,24 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
         }
     ];
 
+    quantityTypes: CommonInterface.ICommonTitleValue[] = [
+        {
+            title: 'FLAT', value: 'FLAT',
+        },
+        {
+            title: 'RANGE', value: 'RANGE'
+        },
+        {
+            title: 'ULD', value: 'ULD'
+        }
+    ];
+
     form: FormGroup;
     partnerId: AbstractControl;
     unitId: AbstractControl;
     fromValue: AbstractControl;
     toValue: AbstractControl;
-    quantityRange: AbstractControl;
+    quantityType: AbstractControl;
     type: AbstractControl;
 
     displayFieldsPartner = JobConstants.CONFIG.COMBOGRID_PARTNER;
@@ -142,8 +154,10 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
                         this.form.patchValue({
                             partnerId: res.partnerId,
                             unitId: res.unitId,
-                            quantityRange: { from: res.quantityFromRange, to: res.quantityToRange },
-                            type: res.type
+                            quantityType: res.quantityType,
+                            type: res.type,
+                            fromValue: res.quantityFromValue,
+                            toValue: res.quantityToValue,
                         });
 
                         this.frieghtCharges.length = 0;
@@ -209,15 +223,15 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
         this.form = this._fb.group({
             partnerId: [null, Validators.required],
             unitId: [null, Validators.required],
-            quantityRange: [null, Validators.required],
-            fromValue: [{ value: null, disabled: true }],
-            toValue: [{ value: null, disabled: true }],
+            quantityType: [null, Validators.required],
+            fromValue: [null],
+            toValue: [null],
             type: [null, Validators.required]
         });
 
         this.partnerId = this.form.controls['partnerId'];
         this.unitId = this.form.controls['unitId'];
-        this.quantityRange = this.form.controls['quantityRange'];
+        this.quantityType = this.form.controls['quantityType'];
         this.fromValue = this.form.controls['fromValue'];[]
         this.toValue = this.form.controls['toValue'];
         this.type = this.form.controls['type'];
@@ -265,8 +279,9 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
             partnerId: formValue.partnerId,
             partnerName: this.selectedPartnerName,
             unitId: formValue.unitId,
-            quantityFromRange: formValue.quantityRange?.from,
-            quantityToRange: formValue.quantityRange?.to,
+            quantityType: formValue.quantityType,
+            // quantityFromRange: formValue.quantity?.from,
+            // quantityToRange: formValue.quantity?.to,
             surcharges: [...this.buyings, ...this.sellings],
             chargeIdBuying: freightCharge.chargeIdbuying,
             chargeIdSelling: freightCharge.chargeIdSelling,
@@ -302,7 +317,7 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
     }
 
     compareNgSelectQuantityRange(item: CommonInterface.ICommonTitleValue, selectedItem: any): boolean {
-        return item.value.from === selectedItem.from && item.value.to === selectedItem.to;
+        return item.value === selectedItem.value && item.value === selectedItem.value;
     }
 
     hidePriceItemPopup() {

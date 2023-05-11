@@ -83,8 +83,8 @@ export class CommercialPriceListWorkOrderComponent extends AppList implements On
                                 return;
                             }
                             const isDuplicate = currentPrices.some((price) => price.partnerId === priceUpdate.partnerId
-                                && price.quantityFromRange == priceUpdate.quantityFromRange
-                                && price.quantityToRange == priceUpdate.quantityToRange
+                                && price.quantityFromValue == priceUpdate.quantityFromValue
+                                && price.quantityToValue == priceUpdate.quantityToValue
                             );
                             if (!isDuplicate) {
                                 this._store.dispatch(AddPriceItemWorkOrderSuccess({ data: priceUpdate }));
@@ -95,8 +95,8 @@ export class CommercialPriceListWorkOrderComponent extends AppList implements On
                         case WorkOrderActionTypes.UPDATE_PRICE_ITEM:
                             const isDuplicateUpdate = currentPrices.some((price) => price.id !== priceUpdate.id
                                 && price.partnerId === priceUpdate.partnerId
-                                && price.quantityFromRange == priceUpdate.quantityFromRange
-                                && price.quantityToRange == priceUpdate.quantityToRange
+                                && price.quantityFromValue == priceUpdate.quantityFromValue
+                                && price.quantityToValue == priceUpdate.quantityToValue
                             );
                             if (!isDuplicateUpdate) {
                                 this._store.dispatch(UpdatePriceItemWorkOrderSuccess({ data: priceUpdate }));

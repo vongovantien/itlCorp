@@ -30,12 +30,11 @@
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!quantityRange.valid) }">
-                                    <label required>Quantity Range</label>
-                                    <ng-select [items]="quantityRanges" formControlName="quantityRange" class="custom"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!quantityType.valid) }">
+                                    <label required>Quantity Type</label>
+                                    <ng-select [items]="quantityTypes" formControlName="quantityType" class="custom"
                                         placeholder="Please select" bindLabel="title" bindValue="value"
-                                        [clearable]="false" [compareWith]="compareNgSelectQuantityRange"
-                                        [readonly]="(isReadonly | async)">
+                                        [clearable]="false" [readonly]="(isReadonly | async)">
                                     </ng-select>
                                 </div>
                             </div>

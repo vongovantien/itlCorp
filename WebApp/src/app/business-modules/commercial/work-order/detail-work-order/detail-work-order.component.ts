@@ -96,6 +96,10 @@ export class CommercialWorkOrderDetailComponent extends CommercialCreateWorkOrde
         };
         this.formWorkOrder.form.patchValue(Object.assign(_merge(res, formData)));
         this.formWorkOrder.salesmanName = res.salesmanName;
+        this.formWorkOrder.partnerName = res.partnerName;
+        this.formWorkOrder.agentName = res.agentName;
+        this.formWorkOrder.shipperName = res.shipperName;
+        this.formWorkOrder.consigneeName = res.consigneeName;
     }
 
     onToggleActive($event) {

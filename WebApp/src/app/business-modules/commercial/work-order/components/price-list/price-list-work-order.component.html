@@ -44,7 +44,8 @@
                                 </td>
                                 <td class="text-primary">{{item.partnerName}}</td>
                                 <td>
-                                    {{ [item.quantityFromRange, item.quantityToRange] | quantityRange }}
+                                    <span class="font-weight-bold">{{item.quantityType}}</span>
+                                    {{ [item.quantityFromValue, item.quantityToValue] | quantityRange }}
                                 </td>
                                 <td>{{item.unitCode}}</td>
                                 <td>

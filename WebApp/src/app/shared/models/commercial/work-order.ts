@@ -68,8 +68,9 @@ export class WorkOrderPrice {
     notes: string = null;
     currencyIdBuying: string = 'VND';
     currencyIdSelling: string = 'VND';
-    quantityFromRange: number = null;
-    quantityToRange: number = null;
+    quantityType: string = null;
+    // quantityFromRange: number = null;
+    // quantityToRange: number = null;
     quantityFromValue: number = null;
     quantityToValue: number = null;
     unitId: string = null;
