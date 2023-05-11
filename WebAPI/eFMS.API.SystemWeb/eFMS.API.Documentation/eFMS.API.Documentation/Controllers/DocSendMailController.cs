@@ -250,10 +250,17 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpGet("GetInfoMailDebitInvoice")]
         [Authorize]
-        public IActionResult GetInfoMailDebitInvoice(Guid hblId, Guid jobId)
+        public IActionResult GetInfoMailDebitInvoice(string cdNo)
         {
-            var data = sendMailService.GetInfoMailDebitInvoice(hblId, jobId);
-            return Ok(data);
+            try
+            {
+                var data = sendMailService.GetInfoMailDebitInvoice(cdNo);
+                return Ok(data);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

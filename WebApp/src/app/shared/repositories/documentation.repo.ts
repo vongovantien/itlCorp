@@ -1342,8 +1342,8 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-    getInfoMailDebitInv(hblId: any, jobId: string){
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/getInfoMailDebitInvoice`, { hblId: hblId, jobId: jobId }).pipe(
+    getInfoMailDebitInv(cdNo: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/getInfoMailDebitInvoice`, {cdNo: cdNo}).pipe(
             map((data: any) => data)
         );
     }

@@ -719,14 +719,23 @@ namespace eFMS.API.Documentation.DL.Services
             return emailContent;
         }
 
-        public EmailContentModel GetInfoMailDebitInvoice(Guid hblId, Guid jobId)
+        public EmailContentModel GetInfoMailDebitInvoice(string cdNo)
         {
-            var shipmentInfo = DataContext.First(x => x.Id == jobId);
-            if (shipmentInfo == null) return null;
-
-            var _housebills = detailRepository.Get(x => hblId.Equals(x.Id));
-            var hwbNos = string.Join(" - ", _housebills.Select(x => x.Hwbno).Distinct());
-            var mawb = !string.IsNullOrEmpty(shipmentInfo.Mawb) ? shipmentInfo.Mawb : string.Join(";", _housebills.Select(x => x.Mawb).Distinct());
+            if (string.IsNullOrEmpty(cdNo)){
+                throw new ArgumentException("Not able to find Cd Note");
+            }
+            var cdNoteInfo = acctCdnoteRepo.Get(x => x.Code == cdNo).FirstOrDefault();
+            var charges = new List<CsShipmentSurcharge>();
+            
+            charges = suchargeRepo.Get(x => x.CreditNo == cdNo || x.DebitNo == cdNo).ToList();
+            
+            var shipmentInfo = DataContext.First(x => x.Id == cdNoteInfo.JobId);
+            
+            var hblIds = charges.Select(x => x.Hblid).ToList();
+            
+            var _housebills = detailRepository.Get(x => hblIds.Contains(x.Id));
+            var hwbNos = string.Join(" - ", charges.Select(x => x.Hblno).DefaultIfEmpty());
+            var mawb = charges.Select(x => x.Mblno).FirstOrDefault();
 
             // Email PIC
             var _picId = !string.IsNullOrEmpty(shipmentInfo.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == shipmentInfo.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
@@ -737,13 +746,14 @@ namespace eFMS.API.Documentation.DL.Services
             var managerMail = sysEmployeeRepo.Get(x => x.Id == managerId).FirstOrDefault()?.Email;
 
             // Get template
+            // Subject part
             var template = sysEmailTemplateRepo.Get(x => x.Code == "DEBIT-INVOICE-REALERT").FirstOrDefault();
             var _subject = template.Subject;
             _subject = _subject.Replace("{{MAWB}}", string.IsNullOrEmpty(shipmentInfo.Mawb) ? string.Empty : shipmentInfo.Mawb);
             _subject = _subject.Replace("{{Hwbno}}", string.IsNullOrEmpty(hwbNos) ? string.Empty : ("/ " + hwbNos));
             _subject = _subject.Replace("{{shipmentAgentName}}", shipmentAgentName);
             _subject = _subject.Replace("{{HAWB}}", hwbNos);
-
+            // body part
             var _body = template.Body;
             _body = _body.Replace("{{MAWB}}", shipmentInfo.Mawb);
             var transportMode = shipmentInfo.TransactionType[0].ToString() == "S" ? "Vessel" : "Flight";
@@ -755,8 +765,6 @@ namespace eFMS.API.Documentation.DL.Services
             var contenEmail = string.Empty;
             foreach (var _hbl in _housebills)
             {
-                //var _content = template.Content;
-                var _shipper = catPartnerRepo.Get(x => x.Id == _hbl.ShipperId).FirstOrDefault();
                 var _consignee = catPartnerRepo.Get(x => x.Id == _hbl.ConsigneeId).FirstOrDefault();
 
                 _body = _body.Replace("{{Hwbno}}", _hbl.Hwbno);
@@ -764,21 +772,20 @@ namespace eFMS.API.Documentation.DL.Services
                 _body = _body.Replace("{{FlightVesNo}}", _hbl?.FlightNo);
                 _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _hbl.GrossWeight));
                 _body = _body.Replace("{{CW}}", string.Format("{0:n2}", _hbl.ChargeWeight));
-                _body = _body.Replace("{{HAWB}}", _hbl.Hwbno);
                 _body = _body.Replace("{{UserName}}", _consignee?.PartnerNameEn);
                 _body = _body.Replace("{{Routing}}", _hbl?.Route);
                 _subject = _subject.Replace("{{pic}}", picEmail);
 
                 numOrder += 1;
             }
-
+            _body = _body.Replace("{{HAWB}}", hwbNos);
             _body = _body.Replace("{{Hwbno}}", hwbNos);
             _body = _body.Replace("{{MAWB}}", mawb);
             _body = _body.Replace("{{Routing}}", shipmentInfo.Route);
             _body = _body.Replace("{{pic}}", picEmail);
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == shipmentInfo.GroupId).FirstOrDefault();
-            
+
             _body = _body.Replace("{{emailGroupOfPic}}", groupUser?.Email);
             // Get email from of person in charge
             var partnerInfo = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.Email; //Email to
@@ -792,7 +799,7 @@ namespace eFMS.API.Documentation.DL.Services
             var mailFrom = string.IsNullOrEmpty(picEmail) ? "Info FMS" : picEmail;
             emailContent.From = mailFrom;
             emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo;
-            emailContent.Cc = managerMail; 
+            emailContent.Cc = managerMail;
             emailContent.Subject = _subject;
             emailContent.Body = _body;
             emailContent.AttachFiles = new List<string>();
