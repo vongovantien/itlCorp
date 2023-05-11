@@ -793,7 +793,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.getInfoMailHawbHBLAirService(hblId);
                 } else if (this.isDbtInv) {
                     this.sendMailButtonName = "Send";
-                    this.getInfoMailDebitInv(jobId);
+                    this.getInfoMailDebitInv(this.cdNoteNo);;
                 }
                 else {
                     this.sendMailButtonName = "Send Arrival Notice";
@@ -803,13 +803,13 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             case ChargeConstants.SFI_CODE: // Sea Import
                 if(this.isDbtInv){
                     this.sendMailButtonName="Send";
-                    this.getInfoMailDebitInv(jobId);
+                    this.getInfoMailDebitInv(this.cdNoteNo);;
                 }
                 break;
             case ChargeConstants.SLI_CODE:
                 if(this.isDbtInv){
                     this.sendMailButtonName="Send";
-                    this.getInfoMailDebitInv(jobId);
+                    this.getInfoMailDebitInv(this.cdNoteNo);;
                 }
                 break;
             case ChargeConstants.SCI_CODE:
@@ -827,7 +827,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.getInfoMailHBLSeaImport(hblId, serviceId);
                 } else if(this.isDbtInv){
                     this.sendMailButtonName="Send";
-                    this.getInfoMailDebitInv(jobId);
+                    this.getInfoMailDebitInv(this.cdNoteNo);;
                 }
                 break;
             case ChargeConstants.AE_CODE: // Air Export
@@ -839,7 +839,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.getInfoMailHawbHBLAirService(hblId);
                 } else if(this.isDbtInv){
                     this.sendMailButtonName="Send";
-                    this.getInfoMailDebitInv(jobId);
+                    this.getInfoMailDebitInv(this.cdNoteNo);;
                 }
                 else {
                     this.sendMailButtonName = "Send Pre Alert";
@@ -849,7 +849,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             case ChargeConstants.SFE_CODE: // Sea FCL Export
                 if(this.isDbtInv){
                     this.sendMailButtonName="Send";
-                    this.getInfoMailDebitInv(jobId);
+                    this.getInfoMailDebitInv(this.cdNoteNo);;
                 }
                 break;
             case ChargeConstants.SCE_CODE:
@@ -867,7 +867,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.getInfoMailSISeaExport(jobId);
                 } else if(this.isDbtInv){
                     this.sendMailButtonName="Send";
-                    this.getInfoMailDebitInv(jobId);
+                    this.getInfoMailDebitInv(this.cdNoteNo);;
                 }
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
@@ -885,7 +885,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.getInfoMailSISeaExport(jobId);
                 } else if(this.isDbtInv){
                     this.sendMailButtonName="Send";
-                    this.getInfoMailDebitInv(jobId);
+                    this.getInfoMailDebitInv(this.cdNoteNo);;
                 }
                 break;
             default:
@@ -1010,9 +1010,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             );
     }
 
-    getInfoMailDebitInv(jobId:string) {
+    getInfoMailDebitInv(cdNoteNo:string) {
         this._progressRef.start();
-        this._documentRepo.getInfoMailDebitInv(this.lstHblId, jobId)
+        this._documentRepo.getInfoMailDebitInv(cdNoteNo)
         .pipe(
             catchError(this.catchError),
             finalize(() => {this._progressRef.complete(); })
@@ -1579,7 +1579,16 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             this.stageType = "SEND_HB"
         }
         if (this.isDbtInv){
-            this.lstStage = ["SEND_INV", "S_INV"];
+            this.lstStage = ["SEND_AN", "S_INV"];
+            console.log(this.lstHblId);
+            this.lstStage.forEach(el => {
+                this.lstHblId.forEach(_hbl => {
+                    this._documentRepo.assignStageByEventType({ stageType: el, jobId, hblId: _hbl })
+                    .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                    .subscribe();
+                })
+            })
+            
         }
         if (this.stageType.length !== 0 && !this.isDbtInv) {
             this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId })
@@ -1589,16 +1598,18 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     getDetailCdNote(jobId: string, cdNote: string) {
+        
         this._documentRepo.getDetailsCDNote(jobId, cdNote)
             .pipe(
                 catchError(this.catchError),
             ).subscribe(
                 (dataCdNote: any) => {
                     this.CdNoteDetail = dataCdNote;
-                    this.lstHblId = this.CdNoteDetail.listSurcharges.map(x=> x.hblid);
+                    this.lstHblId = this.CdNoteDetail.listSurcharges.map(x => x.hblid);
                 },
             );
-        }
+
+    }
 }
 
 interface IShipmentAttachFile {

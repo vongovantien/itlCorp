@@ -491,7 +491,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends DetailCDNoteBase i
                     if (res.status) {
                         switch (type) {
                             case 'DebitNote/Invoice':
-                                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice' } });
+                                this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice',  cdNoteNo: this.CdNoteDetail.cdNote.code } });
                                 break;
                         }
                     }

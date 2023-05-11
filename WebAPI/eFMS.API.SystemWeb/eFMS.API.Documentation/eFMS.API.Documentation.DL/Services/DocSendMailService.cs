@@ -719,12 +719,20 @@ namespace eFMS.API.Documentation.DL.Services
             return emailContent;
         }
 
-        public EmailContentModel GetInfoMailDebitInvoice(List<string> hblId, Guid jobId)
+        public EmailContentModel GetInfoMailDebitInvoice(string cdNo)
         {
-            var shipmentInfo = DataContext.First(x => x.Id == jobId);
-            if (shipmentInfo == null) return null;
-
-            var _housebills = detailRepository.Get(x => hblId.Contains(x.Id.ToString()));
+            var cdNoteInfo = acctCdnoteRepo.Get(x => x.Code == cdNo).FirstOrDefault();
+            var charges = new List<CsShipmentSurcharge>();
+            
+            charges = suchargeRepo.Get(x => x.CreditNo == cdNo || x.DebitNo == cdNo).ToList();
+            
+            var shipmentInfo = DataContext.First(x => x.Id == cdNoteInfo.JobId);
+            List<Guid> hblIds = new List<Guid>();
+            foreach (var item in charges)
+            {
+                hblIds.Add(item.Hblid);
+            }
+            var _housebills = detailRepository.Get(x => hblIds.Contains(x.Id));
             var hwbNos = string.Join(" - ", _housebills.Select(x => x.Hwbno).DefaultIfEmpty());
             var mawb = !string.IsNullOrEmpty(shipmentInfo.Mawb) ? shipmentInfo.Mawb : string.Join(";", _housebills.Select(x => x.Mawb).Distinct());
 
@@ -777,7 +785,7 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{pic}}", picEmail);
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == shipmentInfo.GroupId).FirstOrDefault();
-            
+
             _body = _body.Replace("{{emailGroupOfPic}}", groupUser?.Email);
             // Get email from of person in charge
             var partnerInfo = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.Email; //Email to
@@ -791,7 +799,7 @@ namespace eFMS.API.Documentation.DL.Services
             var mailFrom = string.IsNullOrEmpty(picEmail) ? "Info FMS" : picEmail;
             emailContent.From = mailFrom;
             emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo;
-            emailContent.Cc = managerMail; 
+            emailContent.Cc = managerMail;
             emailContent.Subject = _subject;
             emailContent.Body = _body;
             emailContent.AttachFiles = new List<string>();
