@@ -733,8 +733,8 @@ namespace eFMS.API.Documentation.DL.Services
                 hblIds.Add(item.Hblid);
             }
             var _housebills = detailRepository.Get(x => hblIds.Contains(x.Id));
-            var hwbNos = string.Join(" - ", _housebills.Select(x => x.Hwbno).DefaultIfEmpty());
-            var mawb = !string.IsNullOrEmpty(shipmentInfo.Mawb) ? shipmentInfo.Mawb : string.Join(";", _housebills.Select(x => x.Mawb).Distinct());
+            var hwbNos = string.Join(" - ", charges.Select(x => x.Hblno).DefaultIfEmpty());
+            var mawb = charges[0].Mblno;
 
             // Email PIC
             var _picId = !string.IsNullOrEmpty(shipmentInfo.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == shipmentInfo.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
@@ -745,13 +745,14 @@ namespace eFMS.API.Documentation.DL.Services
             var managerMail = sysEmployeeRepo.Get(x => x.Id == managerId).FirstOrDefault()?.Email;
 
             // Get template
+            // Subject part
             var template = sysEmailTemplateRepo.Get(x => x.Code == "DEBIT-INVOICE-REALERT").FirstOrDefault();
             var _subject = template.Subject;
             _subject = _subject.Replace("{{MAWB}}", string.IsNullOrEmpty(shipmentInfo.Mawb) ? string.Empty : shipmentInfo.Mawb);
             _subject = _subject.Replace("{{Hwbno}}", string.IsNullOrEmpty(hwbNos) ? string.Empty : ("/ " + hwbNos));
             _subject = _subject.Replace("{{shipmentAgentName}}", shipmentAgentName);
             _subject = _subject.Replace("{{HAWB}}", hwbNos);
-
+            // body part
             var _body = template.Body;
             _body = _body.Replace("{{MAWB}}", shipmentInfo.Mawb);
             var transportMode = shipmentInfo.TransactionType[0].ToString() == "S" ? "Vessel" : "Flight";
@@ -763,8 +764,6 @@ namespace eFMS.API.Documentation.DL.Services
             var contenEmail = string.Empty;
             foreach (var _hbl in _housebills)
             {
-                //var _content = template.Content;
-                var _shipper = catPartnerRepo.Get(x => x.Id == _hbl.ShipperId).FirstOrDefault();
                 var _consignee = catPartnerRepo.Get(x => x.Id == _hbl.ConsigneeId).FirstOrDefault();
 
                 _body = _body.Replace("{{Hwbno}}", _hbl.Hwbno);
