@@ -562,7 +562,8 @@ namespace eFMS.API.Accounting.DL.Services
                 ReasonReject = s.FirstOrDefault().ReasonReject,
                 PayeeName = s.FirstOrDefault().PayeeName,
                 DepartmentName = s.FirstOrDefault().DepartmentName,
-                AdvanceFor = s.FirstOrDefault().AdvanceFor
+                AdvanceFor = s.FirstOrDefault().AdvanceFor,
+                DueDate = s.FirstOrDefault().DueDate
             });
 
             return data;
