@@ -252,8 +252,15 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult GetInfoMailDebitInvoice(string cdNo)
         {
-            var data = sendMailService.GetInfoMailDebitInvoice(cdNo);
-            return Ok(data);
+            try
+            {
+                var data = sendMailService.GetInfoMailDebitInvoice(cdNo);
+                return Ok(data);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

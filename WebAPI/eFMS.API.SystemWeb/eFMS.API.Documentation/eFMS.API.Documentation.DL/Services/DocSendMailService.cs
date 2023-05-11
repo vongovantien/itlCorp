@@ -721,20 +721,21 @@ namespace eFMS.API.Documentation.DL.Services
 
         public EmailContentModel GetInfoMailDebitInvoice(string cdNo)
         {
+            if (string.IsNullOrEmpty(cdNo)){
+                throw new ArgumentException("Not able to find Cd Note");
+            }
             var cdNoteInfo = acctCdnoteRepo.Get(x => x.Code == cdNo).FirstOrDefault();
             var charges = new List<CsShipmentSurcharge>();
             
             charges = suchargeRepo.Get(x => x.CreditNo == cdNo || x.DebitNo == cdNo).ToList();
             
             var shipmentInfo = DataContext.First(x => x.Id == cdNoteInfo.JobId);
-            List<Guid> hblIds = new List<Guid>();
-            foreach (var item in charges)
-            {
-                hblIds.Add(item.Hblid);
-            }
+            
+            var hblIds = charges.Select(x => x.Hblid).ToList();
+            
             var _housebills = detailRepository.Get(x => hblIds.Contains(x.Id));
             var hwbNos = string.Join(" - ", charges.Select(x => x.Hblno).DefaultIfEmpty());
-            var mawb = charges[0].Mblno;
+            var mawb = charges.Select(x => x.Mblno).FirstOrDefault();
 
             // Email PIC
             var _picId = !string.IsNullOrEmpty(shipmentInfo.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == shipmentInfo.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
