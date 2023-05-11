@@ -1579,7 +1579,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             this.stageType = "SEND_HB"
         }
         if (this.isDbtInv){
-            this.lstStage = ["SEND_AN", "S_INV"];
+            this.lstStage = ["SEND_AN", "SEND_INV"];
             console.log(this.lstHblId);
             this.lstStage.forEach(el => {
                 this.lstHblId.forEach(_hbl => {
