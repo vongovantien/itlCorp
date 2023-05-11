@@ -629,7 +629,8 @@ namespace eFMS.API.Documentation.DL.Services
                         || !string.IsNullOrEmpty(x.SettlementCode)
                         || !string.IsNullOrEmpty(x.SyncedFrom)
                         || !string.IsNullOrEmpty(x.PaySyncedFrom)
-                        || !string.IsNullOrEmpty(x.LinkChargeId))
+                        || !string.IsNullOrEmpty(x.LinkChargeId)
+                        || x.LinkFee == true)
                         );
             if (query.Any() || accAdvanceRequestRepository.Any(x => x.JobId == detail.JobNo))
             {
