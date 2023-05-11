@@ -177,6 +177,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             }
             return null;
         }
+
         public async Task<HandleState> PostEDocAsync(EDocUploadModel model, List<IFormFile> files, string type)
         {
             HandleState result = new HandleState();
@@ -189,6 +190,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     List<SysImage> list = new List<SysImage>();
                     List<SysImageDetail> listDetail = new List<SysImageDetail>();
+                    List<SysImageDetail> listRepDetail = new List<SysImageDetail>();
 
                     string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(edoc.File.FileName)));
 
@@ -252,11 +254,19 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 Note = edoc.Note
                             };
                             listDetail.Add(sysImageDetail);
+                            listRepDetail.Add(sysImageDetail);
                             _sysImageDetailRepo.Add(sysImageDetail, false);
+                            var imageDetailClone = sysImageDetail;
+                            var mapRepToITL = MapToJobITL(imageDetailClone);
+                            if (mapRepToITL != null)
+                            {
+                                //listDetail.Add(mapRepToITL);
+                                _sysImageDetailRepo.Add(mapRepToITL, false);
+                                //_sysImageDetailRepo.SubmitChanges();
+                            }
                         }
                         else if (type == "Settlement")
                         {
-                            List<SysImageDetail> listRepDetail = new List<SysImageDetail>();
                             string bilingNo = string.Empty;
                             var models = new List<TransctionTypeJobModel>();
                             var tranType = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault()?.TransactionType;
@@ -538,6 +548,62 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return result;
         }
 
+        private List<SysImageDetailModel> getEDocSM(AcctSettlementPayment settle,string transactionType)
+        {
+            //var currentOffice = currentUser.OfficeCode;
+            var edosExisted = new List<IGrouping<Guid?,SysImageDetail>>();
+            if(currentUser.OfficeCode == "ITLHM")
+            {
+                var edocList = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo);
+                var edocData = new List<SysImageDetail>();
+                edocList.ToList().ForEach(item =>
+                {
+                    if (_opsTranRepo.Any(x => x.Id == item.JobId && x.JobNo.Contains("R")))
+                    {
+                        edocData.Add(item);
+                    }
+                });
+                edosExisted = edocData.OrderBy(x => x.DatetimeCreated).GroupBy(x => x.SysImageId).ToList();
+            }
+            else
+            {
+                edosExisted = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo).OrderBy(x => x.DatetimeCreated).GroupBy(x => x.SysImageId).ToList();
+            }
+            var result = new List<SysImageDetailModel>();
+            foreach (var x in edosExisted)
+            {
+                var image = _sysImageRepo.Get(z => z.Id == x.FirstOrDefault().SysImageId).FirstOrDefault();
+                var jobDetail = GetJobDetail(x.FirstOrDefault().JobId, x.FirstOrDefault().Hblid, x.FirstOrDefault().DocumentTypeId);
+                var countItem = x.GroupBy(z => z.JobId).Count();
+                var edoc = new SysImageDetailModel()
+                {
+                    Id = x.FirstOrDefault().Id,
+                    BillingNo = settle.SettlementNo,
+                    SystemFileName = x.FirstOrDefault().SystemFileName,
+                    ImageUrl = image == null ? null : image.Url,
+                    DatetimeCreated = x.FirstOrDefault().DatetimeCreated,
+                    BillingType = transactionType,
+                    DatetimeModified = x.FirstOrDefault().DatetimeModified,
+                    DepartmentId = currentUser.DepartmentId,
+                    DocumentTypeId = x?.FirstOrDefault().DocumentTypeId,
+                    Source = SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT,
+                    SysImageId = image.Id,
+                    UserCreated = x.FirstOrDefault().UserCreated,
+                    UserFileName = x.FirstOrDefault().UserFileName,
+                    UserModified = x.FirstOrDefault().UserModified,
+                    Note = x.FirstOrDefault().Note,
+                    HBLNo = countItem > 1 ? null : jobDetail.HBLNo,
+                    JobNo = countItem > 1 ? null : jobDetail.JobNo,
+                    Hblid = countItem > 1 ? Guid.Empty : jobDetail.HBLId,
+                    JobId = countItem > 1 ? Guid.Empty : jobDetail.JobId,
+                    DocumentTypeName = _attachFileTemplateRepo.Get(y => y.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().NameEn,
+                    TransactionType = jobDetail?.TransactionType
+                };
+                result.Add(edoc);
+            }
+            return result;
+        }
+
         public EDocGroupByType GetEDocByAccountant(Guid billingId, string transactionType)
         {
             var result = new EDocGroupByType();
@@ -595,38 +661,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     };
                     lstEdocOT.Add(edoc);
                 });
-                var edosExisted = _sysImageDetailRepo.Get(x => x.BillingNo == settle.SettlementNo).OrderBy(x => x.DatetimeCreated).GroupBy(x => x.SysImageId).ToList();
-                foreach (var x in edosExisted)
-                {
-                    var image = _sysImageRepo.Get(z => z.Id == x.FirstOrDefault().SysImageId).FirstOrDefault();
-                    var jobDetail = GetJobDetail(x.FirstOrDefault().JobId, x.FirstOrDefault().Hblid, x.FirstOrDefault().DocumentTypeId);
-                    var countItem = x.GroupBy(z => z.JobId).Count();
-                    var edoc = new SysImageDetailModel()
-                    {
-                        Id = x.FirstOrDefault().Id,
-                        BillingNo = settle.SettlementNo,
-                        SystemFileName = x.FirstOrDefault().SystemFileName,
-                        ImageUrl = image == null ? null : image.Url,
-                        DatetimeCreated = x.FirstOrDefault().DatetimeCreated,
-                        BillingType = transactionType,
-                        DatetimeModified = x.FirstOrDefault().DatetimeModified,
-                        DepartmentId = currentUser.DepartmentId,
-                        DocumentTypeId = x?.FirstOrDefault().DocumentTypeId,
-                        Source = SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_SETTLEMENT,
-                        SysImageId = image.Id,
-                        UserCreated = x.FirstOrDefault().UserCreated,
-                        UserFileName = x.FirstOrDefault().UserFileName,
-                        UserModified = x.FirstOrDefault().UserModified,
-                        Note = x.FirstOrDefault().Note,
-                        HBLNo = countItem > 1 ? null : jobDetail.HBLNo,
-                        JobNo = countItem > 1 ? null : jobDetail.JobNo,
-                        Hblid = countItem > 1 ? Guid.Empty : jobDetail.HBLId,
-                        JobId = countItem > 1 ? Guid.Empty : jobDetail.JobId,
-                        DocumentTypeName = _attachFileTemplateRepo.Get(y => y.Id == x.FirstOrDefault().DocumentTypeId).FirstOrDefault().NameEn,
-                        TransactionType = jobDetail?.TransactionType
-                    };
-                    lstEdoc.Add(edoc);
-                }
+                lstEdoc = getEDocSM(settle,transactionType);
                 //result.EDocs = lstEdoc.GroupBy(x => x.DocumentTypeId).ToList().Select(x => x.FirstOrDefault()).OrderBy(x => x.DatetimeCreated).ToList();
                 var lstEdocModel = new List<SysImageDetailModel>();
                 var edocLst = lstEdoc.OrderBy(x => x.DatetimeCreated).GroupBy(x => x.SysImageId).ToList();
@@ -1256,7 +1291,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     var grpJobsSm = DC.CsShipmentSurcharge.Where(x => x.SettlementCode == bilingNo).GroupBy(x => new { x.JobNo }).Select(x => new { x.FirstOrDefault().JobNo, x.FirstOrDefault().Hblid });
                     foreach (var item in grpJobsSm)
                     {
-                        if (item.JobNo.Contains("LOG"))
+                        if (item.JobNo.Contains("LOG")|| item.JobNo.Contains("RLOG")|| item.JobNo.Contains("TKI"))
                         {
                             var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item.JobNo);
                             if (opsJob != null)
