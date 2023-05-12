@@ -6,8 +6,8 @@ namespace eFMS.API.ForPartner.Service.Models
     public partial class CatPartnerBank
     {
         public Guid Id { get; set; }
-        public Guid? BankId { get; set; }
-        public Guid? PartnerId { get; set; }
+        public string BankId { get; set; }
+        public string PartnerId { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

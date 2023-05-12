@@ -173,7 +173,7 @@
                     </span>
                 </button>
                 <button
-                    *ngIf="!!bankDetail && bankDetail.approveStatus !== 'Processing' && bankDetail.approveStatus !== 'Approved'"
+                    *ngIf="bankDetail?.approveStatus !== 'Processing' && bankDetail?.approveStatus !== 'Approved'"
                     class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
                     (click)="onSendBankInfoToAccountantSystem()">
                     <span>

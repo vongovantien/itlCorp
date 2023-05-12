@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Catalogue.DL.Models.Catalogue;
@@ -10,6 +11,7 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +27,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<CatPartner> catPartnerRepository;
         private readonly IContextBase<SysImage> sysImageRepository;
+        private readonly IOptions<ApiServiceUrl> _serviceUrl;
         public CatPartnerBankService(IContextBase<CatPartnerBank> repository,
             IMapper mapper,
             IContextBase<SysUser> sysUserRepo,
@@ -32,7 +35,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IStringLocalizer<LanguageSub> localizer,
             ICurrentUser currUser,
             IContextBase<CatPartner> catPartnerRepo,
-            IContextBase<SysImage> sysImageRepo) : base(repository, mapper)
+            IContextBase<SysImage> sysImageRepo, IOptions<ApiServiceUrl> serviceUrl) : base(repository, mapper)
         {
             currentUser = currUser;
             sysUserRepository = sysUserRepo;
@@ -40,6 +43,7 @@ namespace eFMS.API.Catalogue.DL.Services
             catBankRepository = catBankRepo;
             catPartnerRepository = catPartnerRepo;
             sysImageRepository = sysImageRepo;
+            _serviceUrl = serviceUrl;
         }
 
         #region CRUD
@@ -47,7 +51,6 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var result = new HandleState();
             var newItem = mapper.Map<CatPartnerBank>(entity);
-            newItem.Id = Guid.NewGuid();
             newItem.DatetimeCreated = newItem.DatetimeModified = DateTime.Now;
             newItem.UserCreated = newItem.UserModified = currentUser.UserID;
             newItem.Active = true;
@@ -149,38 +152,6 @@ namespace eFMS.API.Catalogue.DL.Services
             return dataReturn;
         }
 
-        public IQueryable<CatPartnerBankModel> GetPartnerBankApproved(Guid partnerId)
-        {
-            var dataReturn = from partner in DataContext.Where(x => x.PartnerId == partnerId.ToString() && x.ApproveStatus == "Approved")
-                             join catBank in catBankRepository.Get() on partner.BankId equals catBank.Id.ToString()
-                             orderby partner.DatetimeCreated descending
-                             select new CatPartnerBankModel
-                             {
-                                 Id = partner.Id,
-                                 PartnerId = partner.PartnerId,
-                                 BankAccountName = partner.BankAccountName,
-                                 BankAccountNo = partner.BankAccountNo,
-                                 BankAddress = partner.BankAddress,
-                                 SwiftCode = partner.SwiftCode,
-                                 Note = partner.Note,
-                                 BankId = partner.BankId,
-                                 BankName = catBank.BankNameEn,
-                                 BankCode = catBank.Code,
-                                 Source = catBank.Source,
-                                 Active = catBank.Active,
-                                 ApproveStatus = partner.ApproveStatus,
-                                 BeneficiaryAddress = partner.BeneficiaryAddress,
-                                 UserCreated = partner.UserCreated,
-                                 UserModified = partner.UserModified,
-                                 DatetimeCreated = partner.DatetimeCreated,
-                                 DatetimeModified = partner.DatetimeModified,
-                                 UserCreatedName = sysUserRepository.First(x => x.Id == partner.UserCreated).Username,
-                                 UserModifiedName = sysUserRepository.First(x => x.Id == partner.UserModified).Username,
-                             };
-
-            return dataReturn;
-        }
-
         public async Task<HandleState> Update(CatPartnerBankModel model)
         {
             var result = new HandleState();
@@ -245,12 +216,13 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 };
 
+                var test = _serviceUrl.Value.ApiUrlFileSystem.ToString();
                 var lstAttachedFile = await sysImageRepository.Get(x => x.ObjectId == item.Id.ToString())
                 .Select(x => new AttachedDocument
                 {
                     AttachDocDate = x.DateTimeCreated,
                     AttachDocName = x.Name,
-                    AttachDocPath = x.Url,
+                    AttachDocPath = _serviceUrl.Value.ApiUrlFileSystem.ToString() + "/api/v1/en-Us/AWSS3/DownloadFile/" + x.KeyS3,
                     AttachDocRowId = x.Id,
                 }).ToListAsync();
 
@@ -328,11 +300,43 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 if (existingBankAccounts.Any(account => account.BankAccountNo == bankImport.BankAccountNo))
                 {
-                    bankImport.ErrorMessage = "Bank account is existed";
+                    bankImport.ErrorMessage = stringLocalizer["MSG_PARTNER_BANK_EXISTED"].Value;
                     bankImport.IsValid = false;
                 }
             }
             return list;
+        }
+
+        public IQueryable<CatPartnerBankModel> GetApprovedBanksByPartner(Guid partnerId)
+        {
+            var dataReturn = from partner in DataContext.Where(x => x.PartnerId == partnerId.ToString() && x.ApproveStatus == "Approved")
+                             join catBank in catBankRepository.Get() on partner.BankId equals catBank.Id.ToString()
+                             orderby partner.DatetimeCreated descending
+                             select new CatPartnerBankModel
+                             {
+                                 Id = partner.Id,
+                                 PartnerId = partner.PartnerId,
+                                 BankAccountName = partner.BankAccountName,
+                                 BankAccountNo = partner.BankAccountNo,
+                                 BankAddress = partner.BankAddress,
+                                 SwiftCode = partner.SwiftCode,
+                                 Note = partner.Note,
+                                 BankId = partner.BankId,
+                                 BankName = catBank.BankNameEn,
+                                 BankCode = catBank.Code,
+                                 Source = catBank.Source,
+                                 Active = catBank.Active,
+                                 ApproveStatus = partner.ApproveStatus,
+                                 BeneficiaryAddress = partner.BeneficiaryAddress,
+                                 UserCreated = partner.UserCreated,
+                                 UserModified = partner.UserModified,
+                                 DatetimeCreated = partner.DatetimeCreated,
+                                 DatetimeModified = partner.DatetimeModified,
+                                 UserCreatedName = sysUserRepository.First(x => x.Id == partner.UserCreated).Username,
+                                 UserModifiedName = sysUserRepository.First(x => x.Id == partner.UserModified).Username,
+                             };
+
+            return dataReturn;
         }
     }
 }

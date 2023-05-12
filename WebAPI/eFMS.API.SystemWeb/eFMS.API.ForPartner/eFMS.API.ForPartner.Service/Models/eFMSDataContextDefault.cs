@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace eFMS.API.ForPartner.Service.Models
 {
@@ -1904,7 +1902,9 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.BankAddress).HasMaxLength(200);
 
-                entity.Property(e => e.BankId).HasColumnName("BankID");
+                entity.Property(e => e.BankId)
+                    .HasColumnName("BankID")
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.BeneficiaryAddress).HasMaxLength(200);
 
@@ -1914,7 +1914,9 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
-                entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
+                entity.Property(e => e.PartnerId)
+                    .HasColumnName("PartnerID")
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.Source).HasMaxLength(50);
 
