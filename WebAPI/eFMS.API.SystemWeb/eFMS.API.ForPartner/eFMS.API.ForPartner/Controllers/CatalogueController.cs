@@ -46,6 +46,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <returns></returns>
         [HttpPut]
         [APIKeyAuth]
+        [ValidateModel]
         [Route("BankInfoSyncUpdateStatus")]
         public async Task<IActionResult> UpdateBankInfoSyncStatus(BankStatusUpdateModel model, [Required] string apiKey, [Required] string hash)
         {
