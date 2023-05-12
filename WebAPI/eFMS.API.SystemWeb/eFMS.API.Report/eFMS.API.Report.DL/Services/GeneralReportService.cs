@@ -260,7 +260,7 @@ namespace eFMS.API.Report.DL.Services
                 new SqlParameter(){ ParameterName = "@carrierId", Value = criteria.CarrierId },
                 new SqlParameter(){ ParameterName = "@agentId", Value = criteria.AgentId },
                 new SqlParameter(){ ParameterName = "@pol", Value = criteria.Pol },
-                new SqlParameter(){ ParameterName = "@pod", Value = criteria.Pod }
+                new SqlParameter(){ ParameterName = "@pod", Value = criteria.Pod },
             };
             //var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDataGeneralReport>(parameters);
             var list = DC.ExecuteProcedure<sp_GetDataGeneralReport>(parameters);

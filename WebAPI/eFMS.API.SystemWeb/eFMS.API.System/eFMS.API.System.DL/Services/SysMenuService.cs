@@ -105,20 +105,30 @@ namespace eFMS.API.System.DL.Services
                     .Where(p => p.MenuId.Contains("doc") || p.MenuId.Contains("ops"));
 
                 bool hasOpsService = permissionDetails.Any(x => x.MenuId.Contains("ops"));
+                bool hasOpsTrucking = permissionDetails.Any(x => x.MenuId.Contains("opsTruckingInland"));
 
                 List<string> menuIds = (permissionDetails.Where(x => x.MenuId.Contains("doc"))).Select(x => x.MenuId).ToList();
                 if(hasOpsService)
                 {
                     menuIds.Insert(0,"ops");
                 }
+                if (hasOpsTrucking)
+                {
+                    menuIds.Insert(0, "opsTrucking");
+                }
 
-                if(menuIds.Count() > 0)
+                if (menuIds.Count() > 0)
                 {
                     foreach (string menuId in menuIds)
                     {
                         if(menuId == "ops")
                         {
                             results.Add(CustomData.Services.FirstOrDefault(x => x.Value == "CL"));
+                            continue;
+                        }
+                        if (menuId == "opsTrucking")
+                        {
+                            results.Add(CustomData.Services.FirstOrDefault(x => x.Value == "TK"));
                             continue;
                         }
                         SysMenu menuDetail = DataContext.Get(x => x.Id == menuId)?.FirstOrDefault();
