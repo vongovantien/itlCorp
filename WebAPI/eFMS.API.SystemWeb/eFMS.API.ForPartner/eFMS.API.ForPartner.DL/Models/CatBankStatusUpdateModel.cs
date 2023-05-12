@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using eFMS.API.ForPartner.DL.Anotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace eFMS.API.ForPartner.DL.Models
 {
@@ -7,7 +8,10 @@ namespace eFMS.API.ForPartner.DL.Models
         [Required(ErrorMessage = "EF_ANNOTATIONS_REQUIRED")]
         public string BankAccountno { get; set; }
         [Required(ErrorMessage = "EF_ANNOTATIONS_REQUIRED")]
-        [RegularExpression("Approved|Rejected", ErrorMessage = "EF_ANNOTATIONS_NOT_VALID")]
+        [StringContainAttribute(AllowableValues = new string[] {
+            "Approved",
+            "Rejected",
+        })]
         public string ApproveStatus { get; set; }
         [Required(ErrorMessage = "EF_ANNOTATIONS_REQUIRED")]
         public string Description { get; set; }
