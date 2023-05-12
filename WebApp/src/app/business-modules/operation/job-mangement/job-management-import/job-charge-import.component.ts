@@ -1,15 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { forkJoin } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { AppPage } from 'src/app/app.base';
+import { InfoPopupComponent } from 'src/app/shared/common/popup';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { DocumentationRepo } from 'src/app/shared/repositories';
 import { PagingService } from 'src/app/shared/services/paging-service';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { AppPage } from 'src/app/app.base';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { ToastrService } from 'ngx-toastr';
-import { catchError, takeUntil } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
 @Component({

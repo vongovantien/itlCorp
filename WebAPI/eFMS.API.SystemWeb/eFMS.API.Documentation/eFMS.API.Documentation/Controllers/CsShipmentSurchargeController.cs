@@ -652,6 +652,7 @@ namespace eFMS.API.Documentation.Controllers
                         CurrencyId = worksheet.Cells[row, 10].Value?.ToString().Trim(),
                         VatPartnerId = worksheet.Cells[row,11].Value?.ToString().Trim(),
                         Vatrate = (decimal?)Vatrate,
+                        TypeOfFee = worksheet.Cells[row, 12].Value?.ToString().Trim(),
                         //TotalAmount = (decimal?)TotalAmount,
                         ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
                         FinalExchangeRate = (decimal?)FinalExchangeRate, 

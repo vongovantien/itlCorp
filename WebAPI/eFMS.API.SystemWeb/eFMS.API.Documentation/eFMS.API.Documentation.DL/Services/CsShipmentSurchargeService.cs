@@ -2028,7 +2028,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         .Select(x => x.Id)
                                         .FirstOrDefault();
                     decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-
+                    item.TypeOfFee = catChargeGroupRepository.Get(x => x.Name == item.TypeOfFee).FirstOrDefault().Id.ToString();
                     #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                     var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                     item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
