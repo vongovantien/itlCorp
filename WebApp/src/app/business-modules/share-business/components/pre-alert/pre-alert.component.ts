@@ -269,7 +269,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.isExitsDO = true;
                 }
                 else if(this.isDbtInv){
-                    this.checkExistDebitNote();
+                    this.checkExistDebitNoteSendInv();
                 }
                 break;
             case ChargeConstants.AE_CODE: // Air Export
@@ -277,17 +277,17 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.checkExistManifestExport();
                 }
                 else if(this.isDbtInv){
-                    this.checkExistDebitNote();
+                    this.checkExistDebitNoteSendInv();
                 }
                 break;
             case ChargeConstants.SFI_CODE:
                 if(this.isDbtInv){
-                    this.checkExistDebitNote();
+                    this.checkExistDebitNoteSendInv();
                 } // Sea FCL Import
                 break;
             case ChargeConstants.SLI_CODE: // Sea LCL Import
                 if(this.isDbtInv){
-                    this.checkExistDebitNote();
+                    this.checkExistDebitNoteSendInv();
                 }
                 break;
             case ChargeConstants.SCI_CODE: // Sea Consol Import
@@ -310,17 +310,17 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     this.isExitsDO = true;
                 }
                 if(this.isDbtInv){
-                    this.checkExistDebitNote();
+                    this.checkExistDebitNoteSendInv();
                 }
                 break;
             case ChargeConstants.SFE_CODE: // Sea FCL Export
                 if(this.isDbtInv){
-                    this.checkExistDebitNote();
+                    this.checkExistDebitNoteSendInv();
                 }
                 break;
             case ChargeConstants.SCE_CODE: // Sea Consol Export
                 if(this.isDbtInv){
-                    this.checkExistDebitNote();
+                    this.checkExistDebitNoteSendInv();
                 }
                 break;
             case ChargeConstants.SLE_CODE: // Sea LCL Export
@@ -329,13 +329,15 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 } else if (this.isSI) {
                     this.checkExistSIExport();
                 }else if(this.isDbtInv){
-                    this.checkExistDebitNote();
+                    this.checkExistDebitNoteSendInv();
                 }
                 break;
             default:
                 break;
         }
-        this.checkExistDebitNote();
+        if(!this.isDbtInv){
+            this.checkExistDebitNote();
+        }
     }
 
     checkExistSIExport() {
@@ -394,6 +396,30 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     checkExistDebitNote() {
         this._documentRepo.getListCDNoteWithHbl(this.hblId, this.jobId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { })
+            )
+            .subscribe(
+                (res: any) => {
+                    if (res) {
+                        if (this.serviceId === 'AE' || this.serviceId === 'SFE' || this.serviceId === 'SLE' || this.serviceId === 'SCE') {
+                            this.debitNos = res.map(v => ({ ...v, isCheckedDebitNote: false }));
+                        } else {
+                            this.debitNos = res.filter(x => lowerCase(x.type) !== 'credit').map(v => ({ ...v, isCheckedDebitNote: false }));
+                        }
+                    }
+                    if (this.debitNos.length > 0) {
+                        this.isExitsDebitNote = true;
+                        this.isCheckedDebitNote = true;
+                    } else {
+                        this.isExitsDebitNote = false;
+                    }
+                });
+    }
+
+    checkExistDebitNoteSendInv() {
+        this._documentRepo.getListCDNoteWithCDNoteNo(this.cdNoteNo)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -1579,8 +1605,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             this.stageType = "SEND_HB"
         }
         if (this.isDbtInv){
-            this.lstStage = ["SEND_AN", "SEND_INV"];
-            console.log(this.lstHblId);
+            this.lstStage = (this.attachedFile.length > 0) ? ["SEND_AN", "SEND_INV"]: ["SEND_INV"];
             this.lstStage.forEach(el => {
                 this.lstHblId.forEach(_hbl => {
                     this._documentRepo.assignStageByEventType({ stageType: el, jobId, hblId: _hbl })
