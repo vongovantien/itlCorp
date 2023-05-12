@@ -214,7 +214,7 @@ namespace eFMS.API.Documentation.DL.Services
             return valid;
         }
 
-        private bool ValidateCheckPointPrepaidContractChangePartnerOrSalesman(Guid HblId, string partnerId, string transactionType)
+        private bool ValidateCheckPointPrepaidContractChangePartnerOrSalesman(Guid HblId)
         {
             bool valid = true;
             var surcharges = csSurchargeRepository.Get(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.Hblid == HblId);
@@ -385,7 +385,7 @@ namespace eFMS.API.Documentation.DL.Services
                         if (currentPartner != criteria.PartnerId || currentSaleman != criteria.SalesmanId)
                         {
                             // không cho đổi customer nếu đang là prepaid nếu đã issue debit/ inv
-                            isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId, currentPartner, criteria.TransactionType);
+                            isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId);
                             if (!isValid)
                             {
                                 return new HandleState((object)string.Format(@"Contract of {0} is Prepaid has issued debit/invoice. Cannot change to another customer or salesman",
@@ -406,7 +406,7 @@ namespace eFMS.API.Documentation.DL.Services
                             partner = catPartnerRepository.First(x => x.Id == currentPartner);
                             if (contractNext.ContractType == "Prepaid")
                             {
-                                isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId, currentPartner, criteria.TransactionType);
+                                isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId);
                                 if (!isValid)
                                 {
                                     return new HandleState((object)string.Format(@"Cannot change to Prepaid Contract with HBL has issued debit/invoice",
