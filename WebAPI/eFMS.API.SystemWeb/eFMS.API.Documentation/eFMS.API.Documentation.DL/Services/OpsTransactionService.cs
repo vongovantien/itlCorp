@@ -734,7 +734,10 @@ namespace eFMS.API.Documentation.DL.Services
             var queryDefault = ExpressionQueryDefault(criteria);
             var data = DataContext.Get(queryDefault);
             var queryPermission = QueryByPermission(criteria.RangeSearch);
-            queryPermission = QuerySearchLinkJob(queryPermission, criteria);
+            if (criteria.TransactionType == null)
+            {
+                queryPermission = QuerySearchLinkJob(queryPermission, criteria);
+            }
             data = data.Where(queryPermission);
 
             if (data == null) return null;
