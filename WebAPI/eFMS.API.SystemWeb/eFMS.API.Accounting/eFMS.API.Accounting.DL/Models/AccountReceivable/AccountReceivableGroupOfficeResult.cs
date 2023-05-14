@@ -23,5 +23,8 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? TotalObhUnPaidAmount { get; set; }
         public List<AccountReceivableServiceResult> AccountReceivableGrpServices { get; set; }
         public List<string> Services { get; set; }
+        public decimal? TotalOverObh1to15Day { get; set; }
+        public decimal? TotalOverObh16to30Day { get; set; }
+        public decimal? TotalOverObh30Day { get; set; }
     }
 }
