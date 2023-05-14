@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { PagingService } from '@services';
 
 import { catchError, finalize } from 'rxjs/operators';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { SystemConstants } from '@constants';
 
 @Component({

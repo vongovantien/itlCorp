@@ -1,5 +1,5 @@
-import orderBy from 'lodash/orderBy';
-import deburr from 'lodash/deburr';
+import orderBy from 'lodash-es/orderBy';
+import deburr from 'lodash-es/deburr';
 import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })

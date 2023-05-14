@@ -4,7 +4,7 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { PopupBase } from "src/app/popup.base";
 import { OperationRepo } from "src/app/shared/repositories";
 
-import _includes from "lodash/includes";
+import _includes from "lodash-es/includes";
 import { NgxSpinnerService } from "ngx-spinner";
 import { ToastrService } from "ngx-toastr";
 import { catchError, finalize, takeUntil } from "rxjs/operators";

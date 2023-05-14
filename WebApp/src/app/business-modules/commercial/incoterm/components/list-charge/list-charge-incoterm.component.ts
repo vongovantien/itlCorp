@@ -9,7 +9,7 @@ import { SortService } from '@services';
 
 import { map, takeUntil, shareReplay, tap, switchMap, distinctUntilChanged } from 'rxjs/operators';
 
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { forkJoin, Observable } from 'rxjs';
 
 

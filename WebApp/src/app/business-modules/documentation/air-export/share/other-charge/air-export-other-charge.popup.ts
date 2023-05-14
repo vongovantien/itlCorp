@@ -5,7 +5,7 @@ import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { getOtherChargeState, getTransactionLocked } from '@share-bussiness';
 import { skip, takeUntil } from 'rxjs/operators';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 
 @Component({
     selector: 'air-export-other-charge-popup',

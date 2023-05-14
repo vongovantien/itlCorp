@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { DataService } from '@services';
 import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, GetCatalogueUnitAction, getCatalogueUnitState, IAppState } from '@store';
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { ToastrService } from 'ngx-toastr';
 import { Observable, of } from 'rxjs';
 import { catchError, shareReplay, switchMap } from 'rxjs/operators';
@@ -48,7 +48,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
   initShipments: OperationInteface.IShipment[];
   listCurrency: Observable<Currency[]>;
   listChargeGroup: Observable<ChargeGroup[]>;
-  
+
   currency: string = 'VND';
   isUpdate: boolean = false;
   isSubmitted: boolean = false;
@@ -73,7 +73,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
   ngOnInit() {
   }
 
-  ngAfterViewInit(){
+  ngAfterViewInit() {
     this.headers = [
       { title: 'Shipment info', field: '', sortable: true, width: 330 },
       { title: 'Discription', field: 'chargeNameEn', sortable: true, width: 250 },

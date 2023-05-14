@@ -6,7 +6,7 @@ import { InfoPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { AppList } from 'src/app/app.list';
 
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { finalize, catchError } from 'rxjs/operators';
 import { SystemConstants } from '@constants';
 

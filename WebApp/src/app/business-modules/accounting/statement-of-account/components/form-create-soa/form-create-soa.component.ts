@@ -5,16 +5,16 @@ import { SystemConstants } from 'src/constants/system.const';
 import { catchError, takeUntil, take, skip } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { formatDate } from '@angular/common';
-import _includes from 'lodash/includes';
-import _uniq from 'lodash/uniq';
+import _includes from 'lodash-es/includes';
+import _uniq from 'lodash-es/uniq';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { DataService, SortService } from 'src/app/shared/services';
 import { ToastrService } from 'ngx-toastr';
 import { ShareModulesInputShipmentPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { Store } from '@ngrx/store';
 import { IAppState, getMenuUserPermissionState } from '@store';
-import { cloneDeep } from 'lodash';
-import _uniqBy from 'lodash/uniqBy';
+import cloneDeep from 'lodash-es/cloneDeep';
+import _uniqBy from 'lodash-es/uniqBy';
 
 @Component({
     selector: 'soa-form-create',
@@ -111,7 +111,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         this.getCharge();
         this.getService();
         this.getCommondity();
- 
+
     }
 
     getUserLevel() {
@@ -177,7 +177,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
 
         this._sysRepo.getEmployeeByUserId('ad78fc30-5316-46e5-bc9d-7e207efafbec').pipe()
             .subscribe((data: any) => {
-                if(data){
+                if (data) {
                     this.itlBOD = [{ id: 'ad78fc30-5316-46e5-bc9d-7e207efafbec', value: data.employeeNameEn }];
                 }
             })
@@ -380,7 +380,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     this.updateDataSearch('serviceTypeId', this.selectedService.toString().replace(/(?:,)/g, ';'));
                     this.updateDataSearch('strServices', this.selectedService.toString());
 
-                    if(this.agreementsInfo.filter(x => x.saleManId === this.selectedSaleman.id).length > 1){
+                    if (this.agreementsInfo.filter(x => x.saleManId === this.selectedSaleman.id).length > 1) {
                         this.getSelectedCurrencyForm();
                     }
                 }
@@ -404,12 +404,12 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 break;
             case 'saleman':
                 this.selectedSaleman = {};
-                if(!!data){
+                if (!!data) {
                     this.selectedSaleman = cloneDeep({ id: data.id, value: data.value });
                     this.getSelectedCurrencyForm();
                     this.salemanDisplay = this.selectedSaleman.value;
                     this.updateDataSearch('salemanId', this.selectedSaleman.id);
-                } else{
+                } else {
                     this.salemanDisplay = null;
                     this.updateDataSearch('salemanId', null);
                 }
@@ -451,15 +451,15 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         }
     }
 
-    isValidSearch(){
+    isValidSearch() {
         if (this.isApplied && !this.selectedRangeDate.startDate || !this.selectedPartner.value) {
             return false;
         }
-        if(this.selectedType === this.types[0].value){
-            if(!this.salemanDisplay){
+        if (this.selectedType === this.types[0].value) {
+            if (!this.salemanDisplay) {
                 return false;
             }
-            if(this.selectedStaffType === this.staffTypes[1].value && (!this.selectedUser.some((item: any) => item.id === this.selectedSaleman.id))){
+            if (this.selectedStaffType === this.staffTypes[1].value && (!this.selectedUser.some((item: any) => item.id === this.selectedSaleman.id))) {
                 this._toastService.warning("Selection Staff Saleman and Saleman must be the same.")
                 return false;
             }
@@ -600,8 +600,8 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
         }
     }
 
-    getInfoAgreement(){
-        if(this.selectedType === this.types[0].value && !!this.selectedPartner.value){
+    getInfoAgreement() {
+        if (this.selectedType === this.types[0].value && !!this.selectedPartner.value) {
             this.saleMans = [];
             this._catalogueRepo.getAgreement(
                 {
@@ -610,23 +610,23 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                     (agreements: any[]) => {
                         if (!!agreements && !!agreements.length) {
                             this.agreementsInfo = agreements;
-                            this.saleMans = [...agreements.map(x => ({id: x.saleManId, value: x.saleManName})), ...this.itlBOD];
+                            this.saleMans = [...agreements.map(x => ({ id: x.saleManId, value: x.saleManName })), ...this.itlBOD];
                             this.saleMans = _uniqBy(this.saleMans, 'id');
-                        }else{
+                        } else {
                             this.saleMans = this.itlBOD;
                             this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0].id;
                         }
                         this.updateDataSearch('currency', this.selectedCurrency);
-                        if(this.saleMans.length > 0){
+                        if (this.saleMans.length > 0) {
                             this.onSelectDataFormInfo(this.saleMans[0], 'saleman');
                         }
-                        else{
+                        else {
                             this.onSelectDataFormInfo(null, 'saleman');
                         }
                     }
                 );
         }
-        else{
+        else {
             this.onSelectDataFormInfo(null, 'saleman');
         }
     }

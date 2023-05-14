@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
 import { RoutingConstants } from '@constants';
 
 import { catchError } from 'rxjs/operators';
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 
 @Component({
     selector: 'app-sea-lcl-export-booking-note-create',
