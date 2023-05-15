@@ -45,6 +45,7 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
     receiptDebitGroups: any[] = [];
     formCreateMapValue: any = {};
     conbineType: string = '';
+    orgArcbNo: string = '';
 
     constructor(protected readonly _store: Store<IAppState>,
         protected readonly _accountingRepo: AccountingRepo,
@@ -73,14 +74,15 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                 if (!!data) {
                     if (data.type === 'existing') {
                         this.conbineType = data.type;
-                        this._accountingRepo.getByReceiptCombine(data.arcbno)
+                        this._accountingRepo.getByReceiptCombine(data.arcbno, data.type)
                             .pipe(
                                 takeUntil(this.ngUnsubscribe)
                             )
                             .subscribe(
                                 (res: any) => {
                                     if (!!res) {
-                                         this.updateDetailForm(res[0]);
+                                        this.orgArcbNo = res[0].arcbno;
+                                        this.updateDetailForm(res[0]);
                                     }
                                 });
                     }
@@ -99,18 +101,19 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
           paymentRefNo: data.paymentRefNo,
           exchangeRate: data.exchangeRate,
           currency: data.currencyId,
-          combineNo: data.arcbno
+          combineNo: data.subArcbno
         };
     
         this.CreateReceiptCombineComponent.form.patchValue(this.utility.mergeObject({ ...data }, formMapping));
         this.CreateReceiptCombineComponent.form.get('paymentDate').disable();
-        this.CreditPaymentReceiptCDCombineComponent.arcbno = data.arcbno;
-        this.DebitPaymentReceiptCDCombineComponent.arcbno = data.arcbno;
+        this.CreditPaymentReceiptCDCombineComponent.arcbno = data.subArcbno;
+        this.DebitPaymentReceiptCDCombineComponent.arcbno = data.subArcbno;
         this._store.dispatch(UpdateExchangeRateReceiptCombine({ exchangeRate: data.exchangeRate }));
         // this.CreateReceiptCombineComponent.partnerName = data[0].customerName;
     
         this.CreateReceiptCombineComponent.partnerId.setValue(data.customerId);
         this.CreateReceiptCombineComponent.partnerName = data.customerName + ' - ' + data.salemanName;
+        this.CreateReceiptCombineComponent.arcbNo = data.arcbno;
         this._store.dispatch(SelectPartnerReceiptCombine({
           id: data.customerId,
           shortName: data.customerName,
@@ -377,11 +380,12 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                     this._toastService.success(res.message);
                     this._store.dispatch(ResetCombineInvoiceList());
                     this._store.dispatch(ResetInvoiceList());
+                    const newArcbNo = !this.CreateReceiptCombineComponent.arcbNo ? res.data[0].subArcbno : this.CreateReceiptCombineComponent.arcbNo;
                     if(!this.formCreateMapValue.arcbno || this.conbineType === 'existing'){
-                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${res.data[0].arcbno}`]);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${newArcbNo}`]);
                         return EMPTY;
                     }
-                    return this._accountingRepo.getByReceiptCombine(res.data[0].arcbno);
+                    return this._accountingRepo.getByReceiptCombine(newArcbNo);
                 }else{
                     this._toastService.warning(res.message);
                 }
@@ -395,7 +399,7 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                         return;
                     }
                     this.updateDetailForm(res[0]);
-                    this.CreateReceiptCombineComponent.isContainDraft = res.some(x => x.status === 'Done' && x?.syncStatus !== 'Synced');
+                    this.CreateReceiptCombineComponent.isAllDone = res.every(x => x.status === 'Done' && x?.syncStatus !== 'Synced');
                     this.updateGeneralReceipt(res);
                     this.updateCreditDebitCombineReceipt(res);
                 },
@@ -418,7 +422,8 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
             model.currencyId = this.formCreateMapValue.currencyId;
             model.paymentMethod = model.class = item.paymentMethod;
             model.paymentDate = this.formCreateMapValue.paymentDate;
-            model.arcbno = this.CreateReceiptCombineComponent.combineNo.value;
+            model.arcbno = this.CreateReceiptCombineComponent.arcbNo;
+            model.subArcbno = !!this.orgArcbNo ? this.CreateReceiptCombineComponent.combineNo.value : model.subArcbno;
             model.creditAmountUsd = model.finalPaidAmountUsd = item.cdCombineList.reduce((acc, curr) => (acc += curr.paidAmountUsd), 0);
             model.creditAmountVnd = model.finalPaidAmountVnd = item.cdCombineList.reduce((acc, curr) => (acc += curr.paidAmountVnd), 0);
             model.description = item.description;
@@ -455,7 +460,8 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
             model.creditAmountUsd = model.finalPaidAmountUsd = item.cdCombineList.reduce((acc, curr) => (acc += curr.paidAmountUsd), 0);
             model.creditAmountVnd = model.finalPaidAmountVnd = item.cdCombineList.reduce((acc, curr) => (acc += curr.paidAmountVnd), 0);
             model.description = item.description;
-            model.arcbno = this.CreateReceiptCombineComponent.combineNo.value;
+            model.arcbno = this.CreateReceiptCombineComponent.arcbNo;
+            model.subArcbno = !!this.orgArcbNo ? this.CreateReceiptCombineComponent.combineNo.value : model.subArcbno;
             model.agreementId = this.formCreateMapValue.contractId;
             model.exchangeRate = this.formCreateMapValue.exchangeRate;
             item.cdCombineList.forEach((x: any) => {
@@ -478,7 +484,8 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
         this._store.select(ReceiptCombineAgreementState)
         .subscribe((res: any) => {
             this.formCreateMapValue = {
-                arcbno: this.CreateReceiptCombineComponent.combineNo.value,
+                arcbno: this.CreateReceiptCombineComponent.arcbNo,
+                subArcbno: this.CreateReceiptCombineComponent.combineNo.value,
                 customerId: dataForm.partnerId,
                 paymentDate: !!dataForm.paymentDate.startDate ? formatDate(dataForm.paymentDate.startDate, 'yyyy-MM-dd', 'en') : null,
                 exchangeRate: !!dataForm.exchangeRate ? dataForm.exchangeRate : 1,
@@ -501,15 +508,15 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
             item.customerId = this.formCreateMapValue.customerId;
             item.paymentDate = !this.formCreateMapValue.paymentDate ? null : this.formCreateMapValue.paymentDate;
             item.agreementId = this.formCreateMapValue.contractId;
-            item.arcbno = this.CreateReceiptCombineComponent.combineNo.value;
+            item.arcbno = this.CreateReceiptCombineComponent.arcbNo;
             item.exchangeRate = this.formCreateMapValue.exchangeRate;
             item.payments = [];
             generals.forEach((payment: any) => {
                 payment.payments.partnerId = payment.partnerId;
                 payment.payments.type = payment.paymentMethod;
                 payment.payments.paymentType = 'OTHER';
-                payment.payments.paidAmountUsd = payment.amountUsd;
-                payment.payments.paidAmountVnd = payment.amountVnd;
+                payment.payments.paidAmountUsd = payment.payments.paidAmount = payment.payments.finalPaidAmount = payment.payments.finalPaidAmountUsd = payment.amountUsd;
+                payment.payments.paidAmountVnd = payment.payments.finalPaidAmountVnd = payment.amountVnd;
                 payment.payments.obhpartnerId = payment.obhpartnerId;
                 payment.payments.officeId = payment.officeId;
                 payment.payments.notes = payment.notes;
@@ -531,10 +538,11 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                     item.paymentDate = !this.formCreateMapValue.paymentDate ? null : this.formCreateMapValue.paymentDate;
                     item.paidAmount = item.paidAmountUsd = item.finalPaidAmount = item.finalPaidAmountUsd = element.amountUsd;//this.ReceiptGeneralCombineComponent.generalReceipts.reduce((acc, curr) => (acc += curr.amountUsd), 0);
                     item.paidAmountVnd = item.finalPaidAmountVnd = element.amountVnd;//this.ReceiptGeneralCombineComponent.generalReceipts.reduce((acc, curr) => (acc += curr.amountVnd), 0);
-                    item.obhpartnerId = element.obhPartnerId;
+                    item.obhpartnerId = element.obhpartnerId;
                     // item.description = element.notes;
                     item.agreementId = this.formCreateMapValue.contractId;//element.agreementId;
-                    item.arcbno = this.CreateReceiptCombineComponent.combineNo.value;
+                    item.arcbno = !!this.orgArcbNo ? this.orgArcbNo : this.CreateReceiptCombineComponent.arcbNo;
+                    item.subArcbno = !!this.orgArcbNo ? this.CreateReceiptCombineComponent.combineNo.value : item.subArcbno;
                     item.exchangeRate = this.formCreateMapValue.exchangeRate;
 
                     if (!element?.payments) {
@@ -588,7 +596,7 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
 
             if (!!this.ReceiptGeneralCombineComponent.generalReceipts?.length) {
                 this.ReceiptGeneralCombineComponent.generalReceipts.forEach((obj) => {
-                    if (this.ReceiptGeneralCombineComponent.generalReceipts.filter(item => item.partnerId === obj.partnerId && item.paymentMethod === obj.paymentMethod && item.obhPartnerId === obj.obhPartnerId && item.officeId === obj.officeId).length > 1) {
+                    if (this.ReceiptGeneralCombineComponent.generalReceipts.filter(item => item.partnerId === obj.partnerId && item.paymentMethod === obj.paymentMethod && item.obhpartnerId === obj.obhpartnerId && item.officeId === obj.officeId).length > 1) {
                         obj.duplicate = true;
                     } else {
                         obj.duplicate = false;
@@ -596,6 +604,10 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                 });
                 if (this.ReceiptGeneralCombineComponent.generalReceipts.some(item => item.duplicate)) {
                     this._toastService.warning("Duplicate general detail, Please check it again!");
+                    return false;
+                }
+
+                if(this.ReceiptGeneralCombineComponent.generalReceipts.some(item => item.duplicateOffice)){
                     return false;
                 }
             }

@@ -118,9 +118,9 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpGet("GetByReceiptCombine")]
         [Authorize]
-        public IActionResult GetByReceiptCombine(string arcbNo)
+        public IActionResult GetByReceiptCombine(string arcbNo, string getType)
         {
-            var detail = acctReceiptService.GetByReceiptCombine(arcbNo);
+            var detail = acctReceiptService.GetByReceiptCombine(arcbNo, getType);
             return Ok(detail);
         }
 

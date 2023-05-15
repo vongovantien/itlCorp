@@ -69,17 +69,21 @@ export class AccountingConstants {
         OTHER_FEE: 'Other Fee',
         EXTRA: 'COLL - Extra',
         OTHER: 'Other',
+        //General combine
         COLLECT_OBH_AGENCY: 'Collect OBH Agency',
         PAY_OBH_AGENCY: 'Pay OBH Agency' ,
-        COLLECTED_AMOUNT: 'Collected Amount',
+        COLLECTED_AMOUNT: 'Collected Amount Agency',
         ADVANCE_AGENCY: 'Advance Agency',
         BANK_FEE_AGENCY: 'Bank Fee Agency',
         RECEIVE_FROM_PAY_OBH: 'Receive From Pay OBH',
         RECEIVE_FROM_COLLECT_OBH: 'Receive From Collect OBH',
-        CLEAR_CREDIT_FROM_OBH: 'Clear Credit From OBH',
-        CLEAR_CREDIT_FROM_PAID_AMT: 'Clear Credit From Paid AMT',
-        CLEAR_DEBIT_FROM_OBH: 'Clear Debit From OBH',
-        CLEAR_DEBIT_FROM_PAID_AMT: 'Clear Debit From Paid AMT',
+        PAID_AMOUNT_AGENCY: 'Paid Amount Agency',
+        //Credit combine
+        // CLEAR_CREDIT_FROM_OBH: 'Clear Credit From OBH',
+        CLEAR_CREDIT_AGENCY: 'Clear Credit Agency',
+        //Debit combine
+        // CLEAR_DEBIT_FROM_OBH: 'Clear Debit From OBH',
+        CLEAR_DEBIT_AGENCY: 'Clear Debit Agency',
     }
 
     public static RECEIPT_ADVANCE_TYPE = {
@@ -108,21 +112,22 @@ export class AccountingConstants {
         // { id: 'Bank Fee Agency', text: 'Bank Fee Agency' },
         // { id: 'Receive From Pay OBH', text: 'Receive From Pay OBH' },
         // { id: 'Receive From Collect OBH', text: 'Receive From Collect OBH' },
+        { id: 'Paid Amount Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.PAID_AMOUNT_AGENCY },
         { id: 'Collect OBH Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.COLLECT_OBH_AGENCY },
         { id: 'Pay OBH Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.PAY_OBH_AGENCY },
-        { id: 'Collected Amount', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.COLLECTED_AMOUNT },
+        { id: 'Collected Amount Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.COLLECTED_AMOUNT },
         { id: 'Advance Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.ADVANCE_AGENCY },
         { id: 'Bank Fee Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.BANK_FEE_AGENCY },
         { id: 'Receive From Pay OBH', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_PAY_OBH },
         { id: 'Receive From Collect OBH', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_COLLECT_OBH },
     ];
     public static CREDIT_COMBINE_RECEIPT_PAYMENT_METHOD: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
-        { id: 'Clear Credit From OBH', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_CREDIT_FROM_OBH },
-        { id: 'Clear Credit From Paid AMT', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_CREDIT_FROM_PAID_AMT }
+        // { id: 'Clear Credit From OBH', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_CREDIT_FROM_OBH },
+        { id: 'Clear Credit Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_CREDIT_AGENCY }
     ];
     public static DEBIT_COMBINE_RECEIPT_PAYMENT_METHOD: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
-        { id: 'Clear Debit From OBH', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_DEBIT_FROM_OBH },
-        { id: 'Clear Debit From Paid AMT', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_DEBIT_FROM_PAID_AMT }
+        // { id: 'Clear Debit From OBH', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_DEBIT_FROM_OBH },
+        { id: 'Clear Debit Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_DEBIT_AGENCY }
     ];
     public static MAX_NUMBER_INT: number = 2147483647;
     public static MAX_NUMBER_DECIMAL: number = 99999999999999.9999;

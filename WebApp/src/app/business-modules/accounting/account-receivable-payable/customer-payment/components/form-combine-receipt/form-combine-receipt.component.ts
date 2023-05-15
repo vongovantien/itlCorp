@@ -35,6 +35,8 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
     currency: AbstractControl;
     combineNo: AbstractControl;
 
+    arcbNo: string = null;
+
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = <CommonInterface.IComboGridDisplayField[]>[
         { field: 'accountNo', label: 'Partner Code' },
         { field: 'shortName', label: 'Name ABBR' },
@@ -48,7 +50,7 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
     partnerName: string;
     isSubmitted: boolean = false;
     selectedPartner: any = {};
-    isContainDraft: boolean = false;
+    isAllDone: boolean = false;
 
     typeCombine: COMBINE_TYPE = 'NEW';
 

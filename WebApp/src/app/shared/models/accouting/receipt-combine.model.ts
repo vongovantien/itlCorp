@@ -8,10 +8,11 @@ export class GeneralCombineReceiptModel {
     paymentMethod?: string;
     amountVnd?: number;
     amountUsd?: number;
-    obhPartnerId?: string;
+    obhpartnerId?: string;
     officeId?: string;
     notes?: string;
     duplicate?: boolean = false;
+    duplicateOffice?: boolean = false;
     receiptNo?: string;
     userCreated?: string;
     datetimeModified?: Date;

@@ -11,7 +11,7 @@ import { RoutingConstants, AccountingConstants, SystemConstants } from "@constan
 
 import { catchError, map, take, takeUntil, withLatestFrom } from "rxjs/operators";
 import { formatDate } from "@angular/common";
-import { IAppState } from "@store";
+import { IAppState, getMenuUserSpecialPermissionState } from "@store";
 import { Store } from "@ngrx/store";
 import { LoadListCustomerPayment, ResetInvoiceList, RegistTypeReceipt, ResetCombineInvoiceList, SearchListCustomerPayment } from "./store/actions";
 import { InjectViewContainerRefDirective, ContextMenuDirective } from "@directives";
@@ -78,7 +78,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         { title: 'Paid Date', field: 'paymentDate', sortable: true },
         { title: 'Customer Name', field: 'customerName', sortable: true },
         { title: 'Collect Amount', field: '', sortable: true },
-        { title: 'AR Combine No', field: 'arcbno', sortable: true },
+        { title: 'AR Combine No', field: 'subArcbno', sortable: true },
         { title: 'Description', field: 'description', sortable: true },
         { title: 'Receipt Type', field: '', sortable: true },
         { title: 'Payment Method', field: 'paymentMethod', sortable: true },
@@ -107,6 +107,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
     ngOnInit() {
         this.headers = this.headersCustomer;
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.select(customerPaymentReceipSearchState)
         .pipe(take(1))
         .subscribe(

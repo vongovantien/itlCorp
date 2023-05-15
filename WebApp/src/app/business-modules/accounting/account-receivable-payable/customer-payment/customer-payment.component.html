@@ -121,11 +121,11 @@
                                                     </td>
                                                     <td *ngIf="_receiptType === 'Agent'">
                                                         <div *ngIf="cps?.arcbno">
-                                                            <ng-container *ngIf="cps.status != 'Cancel'; else CancelARCB">
-                                                                <a href="javascript:void(0)" (click)="goToARCBDetail(cps.arcbno)">{{cps.arcbno}}</a>
+                                                            <ng-container *ngIf="cps.status != 'Cancel' && ((menuSpecialPermission | async | specialPermission:'ViewReceiptCombine') || cps.arcbno !== cps.subArcbno); else CancelARCB">
+                                                                <a href="javascript:void(0)" (click)="goToARCBDetail(cps.subArcbno)">{{cps.subArcbno}}</a>
                                                             </ng-container>
                                                             <ng-template #CancelARCB>
-                                                                <a class="text-muted pointer">{{cps.arcbno}}
+                                                                <a class="text-muted pointer">{{cps.subArcbno}}
                                                                 </a>
                                                             </ng-template>
                                                         </div>
@@ -249,19 +249,34 @@
                     {{selectedReceipt?.paymentRefNo}}</span></span>
         </div>
     </ng-container>
-    <ng-container *ngIf="_receiptType === 'Agent' && !!selectedReceipt?.arcbno">
-        <div class="menu-context__item" (click)="goToARCBDetail(selectedReceipt?.arcbno)" *ngIf="selectedReceipt?.status !== 'Cancel'">
-            <span>
-                <i class="la la-pencil-square text-primary"></i>
-                <span>View & Edit Receipt Combine</span>
-            </span>
-        </div>
-        <div class="menu-context__item" (click)="goToExistingARCB(selectedReceipt?.arcbno)">
-            <span>
-                <i class="la la-plus text-primary"></i>
-                <span>Add To Existing Combine</span>
-            </span>
-        </div>
+    <ng-container *ngIf="_receiptType === 'Agent' && !!selectedReceipt?.subArcbno">
+        <ng-container
+            *ngIf="(selectedReceipt?.arcbno === selectedReceipt?.subArcbno) && (menuSpecialPermission | async | specialPermission:'ViewReceiptCombine')">
+            <div class="menu-context__item" (click)="goToARCBDetail(selectedReceipt?.subArcbno)"
+                *ngIf="selectedReceipt?.status !== 'Cancel'">
+                <span>
+                    <i class="la la-pencil-square text-primary"></i>
+                    <span>View & Edit Receipt Combine</span>
+                </span>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="selectedReceipt?.arcbno !== selectedReceipt?.subArcbno">
+            <div class="menu-context__item" (click)="goToARCBDetail(selectedReceipt?.subArcbno)">
+                <span>
+                    <i class="la la-plus text-primary"></i>
+                    <span>View Office Combine</span>
+                </span>
+            </div>
+        </ng-container>
+        <ng-container
+            *ngIf="(selectedReceipt?.arcbno !== selectedReceipt?.subArcbno) || (menuSpecialPermission | async | specialPermission:'ViewReceiptCombine')">
+            <div class="menu-context__item" (click)="goToExistingARCB(selectedReceipt?.subArcbno)">
+                <span>
+                    <i class="la la-plus text-primary"></i>
+                    <span>Add To Existing Combine</span>
+                </span>
+            </div>
+        </ng-container>
     </ng-container>
     <!-- <div class="menu-context__item">
         <span><i class="la la-print"></i><span>Print...</span></span>

@@ -126,6 +126,8 @@ export class Receipt {
     exchangeRate: number = 0;
     officeId: string = null;
     arcbno: string = null;
+    subArcbno: string = null;
+    receiptMode: string = null;
 
     constructor(object?: any) {
         const self = this;

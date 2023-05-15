@@ -55,7 +55,7 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
               return;
             }
             this.updateDetailForm(res[0]);
-            this.CreateReceiptCombineComponent.isContainDraft = res.some(x => x.status === 'Done' && x?.syncStatus !== 'Synced');
+            this.CreateReceiptCombineComponent.isAllDone = res.every(x => x.status === 'Done' && x?.syncStatus !== 'Synced');
             this.updateGeneralReceipt(res);
             this.updateCreditDebitCombineReceipt(res);
           }
@@ -74,7 +74,7 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
               return;
             }
             this.updateDetailForm(res[0]);
-            this.CreateReceiptCombineComponent.isContainDraft = res.some(x => x.status === 'Done' && x?.syncStatus !== 'Synced');
+            this.CreateReceiptCombineComponent.isAllDone = res.every(x => x.status === 'Done' && x?.syncStatus !== 'Synced');
             this.updateGeneralReceipt(res);
             this.updateCreditDebitCombineReceipt(res);
           } else {
@@ -139,6 +139,8 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
                       description: currentDebit.description,
                       status: currentDebit.status,
                       syncStatus: currentDebit.syncStatus,
+                      arcbno: currentDebit.arcbno,
+                      subArcbno: currentDebit.subArcbno,
                       cdCombineList: [],
                       sumTotal: {}
                     }
@@ -214,6 +216,8 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
                       description: currentDebit.description,
                       status: currentDebit.status,
                       syncStatus: currentDebit.syncStatus,
+                      arcbno: currentDebit.arcbno,
+                      subArcbno: currentDebit.subArcbno,
                       cdCombineList: [],
                       sumTotal: {}
                     }
@@ -264,6 +268,11 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
         receiptSyncIds.push(receiptSyncId);
       });
 
+    let creditAmount = generalReceipts.filter((x: any) => !!x.status && x.status.toLowerCase() === 'done' && x?.syncStatus !== 'Synced' && x.receiptMode === 'Credit')
+      .reduce((acc, curr) => { return acc + curr.finalPaidAmount }, 0);
+    let debitAmount = generalReceipts.filter((x: any) => !!x.status && x.status.toLowerCase() === 'done' && x?.syncStatus !== 'Synced' && x.receiptMode === 'Debit')
+      .reduce((acc, curr) => { return acc + curr.finalPaidAmount }, 0);
+
     this.DebitPaymentReceiptCDCombineComponent.receiptDebitGroups
       .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done'  && x?.syncStatus !== 'Synced')
       .forEach((item: IReceiptCombineGroup) => {
@@ -271,6 +280,7 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
           id: item.id,
           action: item.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
         };
+        debitAmount += item.finalPaidAmount;
         receiptSyncIds.push(receiptSyncId);
       });
 
@@ -281,10 +291,16 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
           id: item.id,
           action: item.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
         };
+        creditAmount += item.finalPaidAmount;
         receiptSyncIds.push(receiptSyncId);
       });
     if (!receiptSyncIds.length) {
       this._toastService.warning("Please done receipt before sync data to accountant, Please check it again!");
+      return;
+    }
+
+    if(creditAmount != debitAmount){
+      this._toastService.error("Final Credit Amount and Final Debit Amount of combined receipts not balance, Please check it again!");
       return;
     }
 
@@ -322,7 +338,7 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
         this._toastService.success(res.message);
         this._store.dispatch(ResetCombineInvoiceList());
         this._store.dispatch(ResetInvoiceList());
-        this.getDetailReceiptCombine(selectedCPs.arcbno);
+        this.getDetailReceiptCombine(selectedCPs.subArcbno);
       });
   }
 

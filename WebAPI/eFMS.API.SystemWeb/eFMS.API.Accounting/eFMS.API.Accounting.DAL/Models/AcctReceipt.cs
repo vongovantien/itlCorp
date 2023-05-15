@@ -51,5 +51,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string Arcbno { get; set; }
         public string SubArcbno { get; set; }
         public string ReceiptMode { get; set; }
+        public bool? IsBalanceReceipt { get; set; }
     }
 }

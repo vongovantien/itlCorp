@@ -38,7 +38,7 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model);
         HandleState UpdateAccountingDebitAR(List<ReceiptInvoiceModel> payments, Guid receiptId, SaveAction saveAction);
         HandleState SaveCombineReceipt(List<AcctReceiptModel> receiptModels, SaveAction saveAction);
-        List<AcctReceiptModel> GetByReceiptCombine(string _arcbNo);
+        List<AcctReceiptModel> GetByReceiptCombine(string _arcbNo, string _getType);
         HandleState CheckExitedCombineReceipt(List<AcctReceiptModel> receiptModels);
         HandleState UpdateCreditARCombine(List<AcctReceiptModel> receiptModels, SaveAction saveAction);
         HandleState AddPaymentsCreditCombine(List<AcctReceiptModel> receiptModels, SaveAction saveAction);

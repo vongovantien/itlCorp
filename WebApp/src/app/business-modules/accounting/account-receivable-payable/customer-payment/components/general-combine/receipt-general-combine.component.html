@@ -114,15 +114,15 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !!item.duplicate}">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && !!item.duplicate) || !!item.duplicateOffice}">
                                             <ng-container *ngIf="!item.status else ObhPartner">
                                                 <div class="list-master-unit">
                                                     <app-combo-grid-virtual-scroll #comboGridOffice
-                                                        [currentActiveItemId]="{field:'id', value:item.obhPartnerId}"
+                                                        [currentActiveItemId]="{field:'id', value:item.obhpartnerId}"
                                                         (itemSelected)="onSelectDataTableInfo($event.id, item, 'obhPartnerId')"
                                                         [selectedDisplayFields]="['shortName']" [dataSources]="obhPartners"
                                                         [displayFields]="[{ field: 'accountNo', label: 'Partner Code' },{ field: 'shortName', label: 'Name ABBR' }]"
-                                                        [height]="150" placeholder="Please Select" (remove)="item.obhPartnerId = null"
+                                                        [height]="150" placeholder="Please Select" (remove)="item.obhpartnerId = null"
                                                         [disabled]="!!item.readonly">
                                                     </app-combo-grid-virtual-scroll>
                                                 </div>
@@ -136,7 +136,7 @@
                                     </td>
                                     <td>
                                         <div class="form-group"
-                                            [ngClass]="{'m-form__group has-danger': isSubmitted  && (!item.officeId || !!item.duplicate)}">
+                                            [ngClass]="{'m-form__group has-danger': (isSubmitted  && (!item.officeId || !!item.duplicate)) || !!item.duplicateOffice }">
                                             <ng-container *ngIf="!item.status else Office">
                                                 <select class="form-control" [(ngModel)]="item.officeId" placeholder="Office handle"
                                                     (ngModelChange)="onSelectDataTableInfo($event, item, 'officeId')">
@@ -191,6 +191,11 @@
                                                     Cancel</span>
                                             </div>
                                         </ng-template>
+                                    </td>
+                                    <td *ngIf="!!item.receiptNo">
+                                        <div class="form-group ">
+                                            {{item.subArcbno}}
+                                        </div>
                                     </td>
                                     <td *ngIf="!!item.receiptNo">
                                         <div class="form-group ">

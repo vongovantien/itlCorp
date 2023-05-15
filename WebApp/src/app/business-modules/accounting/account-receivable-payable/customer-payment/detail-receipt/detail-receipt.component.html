@@ -19,7 +19,7 @@
                     <div>
                         <div class="c-button-actions">
                             <ng-container
-                                *ngIf="receiptDetail?.status === 'Done' && receiptDetail?.syncStatus !== 'Synced'">
+                                *ngIf="receiptDetail?.status === 'Done' && receiptDetail?.syncStatus !== 'Synced' && !receiptDetail?.arcbno">
                                 <app-permission-button title="Sync to Accountant" type="sync" class="info"
                                     icon="la la-cloud-upload" (onClick)="confirmSync()">
                                 </app-permission-button>

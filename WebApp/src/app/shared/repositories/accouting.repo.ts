@@ -882,8 +882,8 @@ export class AccountingRepo {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetById/`, { id: id });
     }
 
-    getByReceiptCombine(arcbNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetByReceiptCombine/`, { arcbNo: arcbNo });
+    getByReceiptCombine(arcbNo: string, type: string = null) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetByReceiptCombine/`, { arcbNo: arcbNo, getType: type });
     }
 
     rejectSoaCredit(model: any) {

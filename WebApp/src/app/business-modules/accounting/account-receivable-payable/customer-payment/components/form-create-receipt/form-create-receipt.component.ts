@@ -261,11 +261,11 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         this.isShowGetDebit = false;
     }
 
-    goToReceiptCombine() {
+    goToReceiptCombine(arcbNo: string) {
         if (!this.receipt.arcbno) {
             return;
         }
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${this.receipt.arcbno}`]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${arcbNo}`]);
 
     }
 }
