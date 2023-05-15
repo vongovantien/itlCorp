@@ -6545,7 +6545,10 @@ namespace eFMS.API.Accounting.DL.Services
             var partners = catPartnerRepo.Get(x => x.Active == true);
             var contracts = contractRepository.Get(x => x.Active == true && x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PREPAID && (x.IsExpired == false || x.IsExpired == null));
             string salemanBOD = sysUserRepo.Get(x => x.Username == AccountingConstants.ITL_BOD)?.FirstOrDefault()?.Id;
+
             var surcharges = csShipmentSurchargeRepo.Get(x => x.Type != AccountingConstants.TYPE_CHARGE_BUY && hblIds.Contains(x.Hblid));
+            var cdnoteRepo = acctCdnoteRepo.Get(x => x.Type != AccountingConstants.ACCOUNTANT_TYPE_CREDIT && x.SyncStatus != AccountingConstants.STATUS_SYNCED);
+            var soaRepo = acctSoaRepo.Get(x => x.Type != AccountingConstants.TYPE_SOA_CREDIT && x.SyncStatus != AccountingConstants.STATUS_SYNCED);
             string messError = string.Empty;
             foreach (var hbl in hblIds)
             {
@@ -6560,15 +6563,11 @@ namespace eFMS.API.Accounting.DL.Services
                                         {
                                             contract.SaleManId
                                         }).FirstOrDefault();
-                    //if (existPrepaid == null)
-                    //{
-                    //    continue;
-                    //}
                     var chargesHbl = surcharges.Where(x => x.Hblid == hbl);
                     if (chargesHbl.Count() > 0)
                     {
                         bool hasIssuedDebit = chargesHbl.All(x => !string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.Soano));
-                        if (!hasIssuedDebit && existPrepaid != null)
+                        if (!hasIssuedDebit && existPrepaid != null) // Check charges had issued debit note with shipment have prepaid contract
                         {
                             messError = stringLocalizer[AccountingLanguageSub.MSG_SETTLEMENT_HAD_SHIPMENT_PREPAID_NOT_ISSUED_DEBIT, chargesHbl.FirstOrDefault().JobNo];
                             return new ResultHandle() { Status = false, Message = messError };
@@ -6576,15 +6575,16 @@ namespace eFMS.API.Accounting.DL.Services
                         var debitCodes = chargesHbl.Select(x => x.DebitNo).ToList();
                         var soaNos = chargesHbl.Select(x => x.Soano).ToList();
                         // Lấy data debit note và soa ngoại trừ phiếu đã sync có hđ <> prepaid trước đó
-                        var debitNotes = acctCdnoteRepo.Get(x => debitCodes.Contains(x.Code) && x.Type != AccountingConstants.ACCOUNTANT_TYPE_CREDIT && x.SyncStatus != AccountingConstants.STATUS_SYNCED);
-
+                        var debitNotes = cdnoteRepo.Where(x => debitCodes.Contains(x.Code));
                         var hasConfirm = debitNotes.Where(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID || x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).All(x => x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
                         if (existPrepaid != null)
                         {
                             var debitPrePaid = debitNotes.Where(x => x.Status != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID && x.Status != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).FirstOrDefault();
-                            var accSoas = acctSoaRepo.Get(x => soaNos.Contains(x.Soano) && x.Type != AccountingConstants.TYPE_SOA_CREDIT && x.SyncStatus != AccountingConstants.STATUS_SYNCED).FirstOrDefault();
+                            var accSoas = soaRepo.Where(x => soaNos.Contains(x.Soano)).FirstOrDefault();
                             hasConfirm = hasConfirm && debitPrePaid == null && accSoas == null;
                         }
+                        // Check all debit prepaid had confirmed
+                        // Except case debit note or soa debit had synced with other contract
                         if (!hasConfirm)
                         {
                             messError = stringLocalizer[AccountingLanguageSub.MSG_SETTLEMENT_HAD_SHIPMENT_PREPAID_NOT_ISSUED_DEBIT, chargesHbl.FirstOrDefault().JobNo];
