@@ -255,20 +255,20 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                                 this.mapBankCode(res[0].code);
                             }
                         }
-                        else {
-                            this.bankAccount = [];
-                            this.setBankInfoForPayee(this.selectedPayee);
-                        }
+                        // else {
+                        //     this.bankAccount = [];
+                        //     this.setBankInfoForPayee(this.selectedPayee);
+                        // }
                     })
         }
     }
 
-    setBankInfoForPayee(payee: Partner) {
-        this.bankAccountNo.setValue(payee.bankAccountNo);
-        this.bankAccountName.setValue(payee.bankAccountName);
-        this.bankName.setValue(payee.bankName);
-        this.mapBankCode(payee.bankCode);
-    }
+    // setBankInfoForPayee(payee: Partner) {
+    //     this.bankAccountNo.setValue(payee.bankAccountNo);
+    //     this.bankAccountName.setValue(payee.bankAccountName);
+    //     this.bankName.setValue(payee.bankName);
+    //     this.mapBankCode(payee.bankCode);
+    // }
 
     onSelectDataBankInfo(data: any, type: string) {
         if (data) {

@@ -1495,6 +1495,6 @@ export class CatalogueRepo {
     }
 
     getApprovedBanksByPartner(partnerId: string){
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerBank/GetApprovedBanksByPartner`, null, {partnerId: partnerId});
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerBank/GetApprovedBanksByPartner`, {partnerId: partnerId});
     }
 }
