@@ -17,7 +17,6 @@ import { workOrderDetailIsReadOnlyState } from '../../store';
 @Component({
     selector: 'form-create-work-order',
     templateUrl: './form-create-work-order.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CommercialFormCreateWorkOrderComponent extends AppForm implements OnInit {
     @ViewChild('combogridSalesman') combogrid: ComboGridVirtualScrollComponent;
@@ -174,7 +173,7 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
     }
 
     loadPartner(type: string) {
-        if (!!this.partners.length) return;
+        if (!!this.partners?.length) return;
         switch (type) {
             case 'partner':
                 this.isLoadingPartner = true;
@@ -207,7 +206,7 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
                 })
             ).subscribe(
                 (partners) => {
-                    this.partners = partners;
+                    this.partners = [...partners];
                     console.log(this.partners);
                 }
             )

@@ -224,8 +224,8 @@ export class CommercialPriceItemWorkOrderPopupComponent extends PopupBase implem
             partnerId: [null, Validators.required],
             unitId: [null, Validators.required],
             quantityType: [null, Validators.required],
-            fromValue: [null],
-            toValue: [null],
+            fromValue: [null, Validators.required, Validators.min(0), Validators.max(999999)],
+            toValue: [null, Validators.required, Validators.min(0), Validators.max(999999)],
             type: [null, Validators.required]
         });
 
