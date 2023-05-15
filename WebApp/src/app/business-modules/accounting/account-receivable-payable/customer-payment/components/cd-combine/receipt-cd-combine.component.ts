@@ -9,6 +9,7 @@ import { AgencyReceiptModel } from 'src/app/shared/models/accouting/agency-recei
 import { GetInvoiceListSuccess, RegistDebitListTypeReceipt, RegistGetDebitType, RemoveDebitCombine } from '../../store/actions';
 import { ICustomerPaymentState, ReceiptCombineCreditInvoiceState, ReceiptCombineDebitInvoiceState, ReceiptCombineDeditListState, ReceiptCombineExchangeState, ReceiptCombineLoadingState, ReceiptCombinePartnerState, ReceiptCombineState } from '../../store/reducers';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
+import { AccountingConstants } from '@constants';
 
 @Component({
     selector: 'receipt-cd-combine',
@@ -24,12 +25,10 @@ export class ARCustomerPaymentReceiptCDCombineComponent extends AppList implemen
     cdCombineList: ICDCombine[] = [];
     headersCredit: CommonInterface.IHeaderTable[];
     paymentMethodsCredit: CommonInterface.ICommonTitleValue[] = [
-        { title: 'Clear Credit From OBH', value: 'Clear Credit From OBH' },
-        { title: 'Clear Credit From Paid AMT', value: 'Clear Credit From Paid AMT' }
+        { title: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_CREDIT_AGENCY, value: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_CREDIT_AGENCY }
     ];
     paymentMethodsDebit: CommonInterface.ICommonTitleValue[] = [
-        { title: 'Clear Debit From OBH', value: 'Clear Debit From OBH' },
-        { title: 'Clear Debit From Paid AMT', value: 'Clear Debit From Paid AMT' }
+        { title: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_DEBIT_AGENCY, value: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_DEBIT_AGENCY }
     ];
 
     exchangeRate = this._store.select(ReceiptCombineExchangeState);

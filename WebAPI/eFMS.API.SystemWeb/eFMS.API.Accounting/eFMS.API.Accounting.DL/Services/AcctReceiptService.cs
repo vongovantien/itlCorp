@@ -61,6 +61,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AccAccountPayable> accountPayableRepository;
         private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepository;
         private readonly IContextBase<AccAccountPayablePayment> payablePaymentRepository;
+        private readonly IContextBase<SysGroup> groupRepository;
 
         public AcctReceiptService(
             IContextBase<AcctReceipt> repository,
@@ -90,7 +91,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctDebitManagementAr> debitMngtArRepo,
             IContextBase<AccAccountPayable> accountPayableRepo,
             IContextBase<AcctSettlementPayment> settlementPaymentRepo,
-            IContextBase<AccAccountPayablePayment> payablePaymentRepo
+            IContextBase<AccAccountPayablePayment> payablePaymentRepo,
+            IContextBase<SysGroup> groupRepo
             ) : base(repository, mapper)
         {
             currentUser = curUser;
@@ -118,6 +120,7 @@ namespace eFMS.API.Accounting.DL.Services
             accountPayableRepository = accountPayableRepo;
             settlementPaymentRepository = settlementPaymentRepo;
             payablePaymentRepository = payablePaymentRepo;
+            groupRepository = groupRepo;
         }
 
         private IQueryable<AcctReceipt> GetQueryBy(AcctReceiptCriteria criteria)
@@ -425,7 +428,7 @@ namespace eFMS.API.Accounting.DL.Services
             switch (receipt.PaymentMethod)
             {
                 case "Bank Transfer":
-                case "Collected Amount":
+                case "Collected Amount Agency":
                     string prefix = string.Empty;
 
                     switch (officeCode)
@@ -495,16 +498,17 @@ namespace eFMS.API.Accounting.DL.Services
                 case "Other Fee":
                 case "COLL - Extra":
                 case "OBH - Internal":
+                case "Paid Amount Agency":
                 case "Collect OBH Agency":
                 case "Pay OBH Agency":
                 case "Advance Agency":
                 case "Bank Fee Agency":
                 case "Receive From Pay OBH":
                 case "Receive From Collect OBH":
-                case "Clear Credit From OBH":
-                case "Clear Credit From Paid AMT":
-                case "Clear Debit From OBH":
-                case "Clear Debit From Paid AMT":
+                //case "Clear Credit From OBH":
+                case "Clear Credit Agency":
+                //case "Clear Debit From OBH":
+                case "Clear Debit Agency":
                     string prefix3 = string.Empty;
 
                     switch (officeCode)
@@ -538,7 +542,7 @@ namespace eFMS.API.Accounting.DL.Services
         private string GenerateCombineReceiptNo()
         {
             string receiptNo = "ARCB";
-            var combineDatas = DataContext.Get(x => x.DatetimeCreated.Value.Year == DateTime.Now.Year && x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Day == DateTime.Now.Day && !string.IsNullOrEmpty(x.Arcbno));
+            var combineDatas = DataContext.Get(x => x.DatetimeCreated.Value.Year == DateTime.Now.Year && x.DatetimeCreated.Value.Month == DateTime.Now.Month && x.DatetimeCreated.Value.Day == DateTime.Now.Day && !string.IsNullOrEmpty(x.Arcbno) && x.Arcbno.Contains(receiptNo));
             string formatNum = "0000";
             receiptNo += DateTime.Now.ToString("yyMMdd");
             if (combineDatas != null && combineDatas.Count() > 0)
@@ -556,9 +560,24 @@ namespace eFMS.API.Accounting.DL.Services
 
         private string GenerateReceiptNoWithPrefix(string prefix, AcctReceiptModel receipt)
         {
-            if(string.IsNullOrEmpty(prefix))
+            if (string.IsNullOrEmpty(prefix))
             {
-                return "PT" + DateTime.Now.ToString("YY") + "00001";
+                string patternPT = @"^(" + "PT" + DateTime.Now.ToString("yy") + ")";
+                patternPT += @"\d{5}";
+                Regex regexPT = new Regex(patternPT);
+                var ptReceipts = DataContext.Get(x => !string.IsNullOrEmpty(x.PaymentRefNo) && regexPT.IsMatch(x.PaymentRefNo)).OrderByDescending(x => x.PaymentRefNo).ToList();
+                if (ptReceipts != null && ptReceipts.Count > 0)
+                {
+                    string lastReceiptNo = ptReceipts.FirstOrDefault().PaymentRefNo;
+                    string lastReceiptNoNumber = lastReceiptNo.Substring(4, 5);
+                    int lastReceiptNoNumberInt = int.Parse(lastReceiptNoNumber);
+                    string newReceiptNoNumber = (lastReceiptNoNumberInt + 1).ToString("00000");
+                    return "PT" + DateTime.Now.ToString("yy") + newReceiptNoNumber;
+                }
+                else
+                {
+                    return "PT" + DateTime.Now.ToString("yy") + "00001";
+                }
             }
             string receiptNo = prefix; // default
 
@@ -2344,6 +2363,8 @@ namespace eFMS.API.Accounting.DL.Services
                             AcctReceipt receipt = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
 
                             receiptModel.Arcbno = receipt.Arcbno;
+                            receiptModel.SubArcbno = receipt.SubArcbno;
+                            receiptModel.ReceiptMode = receipt.ReceiptMode;
                             receiptModel.UserCreated = receipt.UserCreated;
                             receiptModel.DatetimeCreated = receipt.DatetimeCreated;
                             receiptModel.GroupId = receipt.GroupId;
@@ -2414,6 +2435,15 @@ namespace eFMS.API.Accounting.DL.Services
                                     throw new Exception("Có lỗi khi update cấn trừ hóa đơn" + hs.Message?.ToString());
                                 }
 
+                                if (receipt.Arcbno == receipt.SubArcbno && Common.CustomData.PaymentMethodGeneral.Any(c => c.Value == receipt.PaymentMethod))
+                                {
+                                    GenerateSubGeneralCombine(new List<AcctReceipt>() { receiptCurrent }, receipt.Arcbno);
+                                }
+
+                                if (!string.IsNullOrEmpty(receiptCurrent.Arcbno))
+                                {
+                                    UpdateBalanceReceipt(receiptCurrent.SubArcbno);
+                                }
 
                                 if (receiptModel.AgreementId != null)
                                 {
@@ -2540,10 +2570,8 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
                 else if (receiptCurrent.Class == AccountingConstants.RECEIPT_CLASS_CLEAR_DEBIT ||
-                    receiptCurrent.Class == AccountingConstants.CLEAR_DEBIT_FROM_OBH ||
-                    receiptCurrent.Class == AccountingConstants.CLEAR_DEBIT_FROM_PAID_AMT ||
-                    receiptCurrent.Class == AccountingConstants.CLEAR_CREDIT_FROM_OBH ||
-                    receiptCurrent.Class == AccountingConstants.CLEAR_CREDIT_FROM_PAID_AMT)
+                    receiptCurrent.Class == AccountingConstants.CLEAR_CREDIT_AGENCY ||
+                    receiptCurrent.Class == AccountingConstants.CLEAR_DEBIT_AGENCY)
                 {
                     // kiểm tra hóa đơn phát sinh payment # với payment trong receipt current.
                     List<string> receiptCurrentPaymentInvoiceList = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo).ToList();
@@ -5261,10 +5289,10 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="_arcbNo"></param>
         /// <returns></returns>
-        public List<AcctReceiptModel> GetByReceiptCombine(string _arcbNo)
+        public List<AcctReceiptModel> GetByReceiptCombine(string _arcbNo, string _getType)
         {
-            var receipts = DataContext.Get(x => x.Arcbno == _arcbNo && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
-            if (receipts == null || receipts.Count() == 0)
+            var _orgArcbNo = DataContext.Get(x => x.SubArcbno == _arcbNo && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL).FirstOrDefault()?.Arcbno;
+            if (string.IsNullOrEmpty(_orgArcbNo))
             {
                 var receiptTemp = DataContext.Get(x => x.Arcbno == _arcbNo).FirstOrDefault();
                 AcctReceiptModel result = mapper.Map<AcctReceiptModel>(receiptTemp);
@@ -5283,6 +5311,22 @@ namespace eFMS.API.Accounting.DL.Services
 
                 return new List<AcctReceiptModel>() { result };
             }
+
+            var receipts = DataContext.Get(x => x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL).ToList();
+            if (_arcbNo == _orgArcbNo)
+            {
+                receipts = receipts.Where(x => x.Arcbno == _orgArcbNo).ToList();
+            }
+            else
+            {
+                receipts = receipts.Where(x => x.SubArcbno == _arcbNo).ToList();
+            }
+
+            if(!string.IsNullOrEmpty(_getType) && _getType == "existing")
+            {
+                receipts = new List<AcctReceipt> { receipts.FirstOrDefault() };
+            }
+
             var resultData = new List<AcctReceiptModel>();
             foreach (var receipt in receipts)
             {
@@ -5336,7 +5380,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         GetPaymentStatusAgent(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList(), s.FirstOrDefault().Hblid),
                         ExchangeRateBilling = s.FirstOrDefault().ExchangeRateBilling,
                         PartnerId = s.FirstOrDefault()?.PartnerId?.ToString(),
-                        Negative = s.FirstOrDefault()?.Negative,
+                        //Negative = s.FirstOrDefault()?.Negative,
                         PaymentType = s.FirstOrDefault().PaymentType
                     }).ToList();
 
@@ -5421,9 +5465,9 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.PartnerName = partnerInfo?.ShortName;
                         payment.Negative = acctPayment.Negative;
                         payment.PaymentType = acctPayment.PaymentType;
-                        payment.NetOff = acctPayment.NetOff;
-                        payment.NetOffUsd = acctPayment.NetOffUsd;
-                        payment.NetOffVnd = acctPayment.NetOffVnd;
+                        //payment.NetOff = acctPayment.NetOff;
+                        //payment.NetOffUsd = acctPayment.NetOffUsd;
+                        //payment.NetOffVnd = acctPayment.NetOffVnd;
                         payment.RefCurrency = acctPayment.RefCurrency;
                         payment.ReferenceNo = acctPayment.Type == "CREDIT" ? creditArs.FirstOrDefault(x => x.Code == acctPayment.BillingRefNo && x.Hblid == acctPayment.Hblid)?.ReferenceNo : _ReferenceNo;
 
@@ -5444,7 +5488,6 @@ namespace eFMS.API.Accounting.DL.Services
                 var contract = catContractRepository.Get(x => x.Active == true);
                 result.SalemanId = result.AgreementId == null ? string.Empty : contract.FirstOrDefault(x => x.Id == result.AgreementId)?.SaleManId;
                 result.SalemanName = result.SalemanId == null ? string.Empty : _users.Where(x => x.Id == result.SalemanId).FirstOrDefault()?.Username;
-                //result.ARCBContractId = contract.First(x => x.PartnerId == receipt.ArcbpartnerId && x.SaleManId == result.SalemanId)?.Id.ToString();
                 SysOffice receiptOffice = officeRepository.Get(x => x.Id == (result.OfficeId ?? Guid.Empty))?.FirstOrDefault();
                 result.OfficeName = receiptOffice.ShortName;
                 //result.ReceiptInternalOfficeCode = receiptOffice.InternalCode;
@@ -5691,7 +5734,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
-                var _arcbNo = GenerateCombineReceiptNo();
+
+                var _arcbNo = $"{Guid.NewGuid().ToString().Substring(0, 8)}";
                 foreach (var item in receiptModels)
                 {
                     item.Arcbno = _arcbNo;
@@ -5722,6 +5766,10 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
                 var hs = DataContext.SubmitChanges();
+                if (hs.Success)
+                {
+                    receiptModels = UpdateArcbNoReceipt(receiptModels, _arcbNo);
+                }
                 return hs;
             }
             catch (Exception ex)
@@ -5764,6 +5812,7 @@ namespace eFMS.API.Accounting.DL.Services
                     model.FinalPaidAmountUsd = item.Sum(x => x.FinalPaidAmountUsd ?? 0);
                     model.FinalPaidAmountVnd = item.Sum(x => x.FinalPaidAmountVnd ?? 0);
                     model.Class = model.PaymentMethod; // Class = Payment Method
+                    model.ReceiptMode = GetReceiptMode(model.PaymentMethod);
 
                     CatPartner partner = catPartnerRepository.Get(x => x.Id == model.CustomerId)?.FirstOrDefault();
                     if (partner != null)
@@ -5830,6 +5879,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 model.PaymentRefNo = GenerateReceiptNoV2(model, _officeCode);
                             }
                             model.Class = model.PaymentMethod; // Class = Payment Method
+                            model.ReceiptMode = GetReceiptMode(model.PaymentMethod);
 
                             //if(model.Type == "CREDIT") 
                             //{
@@ -5858,7 +5908,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 HandleState hsPayment = AddPayments(model.Payments, receipt);
                                 if (!hsPayment.Success)
                                 {
-                                    new LogHelper("eFMS_AR_SaveDraftGeneralPayment_LOG", hsPayment.Message?.ToString());
+                                    new LogHelper("eFMS_AR_AddDraftDebitCombine_LOG", hsPayment.Message?.ToString());
                                     trans.Rollback();
                                 }
                             }
@@ -5877,6 +5927,8 @@ namespace eFMS.API.Accounting.DL.Services
                             receiptCurrent.OfficeId = model.OfficeId;
                             receiptCurrent.Description = model.Description;
                             receiptCurrent.Class = model.PaymentMethod; // Class = Payment Method
+                            receiptCurrent.ReceiptMode = GetReceiptMode(model.PaymentMethod);
+
                             receiptCurrent.PaidAmount = model.PaidAmountUsd;
                             receiptCurrent.FinalPaidAmount = model.FinalPaidAmountUsd;
                             model.PaidAmount = model.PaidAmountUsd = model.FinalPaidAmountUsd;
@@ -6030,12 +6082,12 @@ namespace eFMS.API.Accounting.DL.Services
                                 receiptCurrent.PaymentMethod = receiptModel.FirstOrDefault().PaymentMethod;
                                 receiptCurrent.OfficeId = receiptModel.FirstOrDefault().OfficeId;
                                 receiptCurrent.Description = receiptModel.FirstOrDefault().Description;
-                                receiptCurrent.PaidAmount = receiptModel.Sum(x => x.PaidAmountUsd ?? 0);
-                                receiptCurrent.PaidAmountUsd = receiptModel.Sum(x => x.PaidAmountUsd ?? 0);
-                                receiptCurrent.PaidAmountVnd = receiptModel.Sum(x => x.PaidAmountVnd ?? 0);
-                                receiptCurrent.FinalPaidAmount = receiptModel.Sum(x => x.FinalPaidAmountUsd ?? 0);
-                                receiptCurrent.FinalPaidAmountUsd = receiptModel.Sum(x => x.FinalPaidAmountUsd ?? 0);
-                                receiptCurrent.FinalPaidAmountVnd = receiptModel.Sum(x => x.FinalPaidAmountVnd ?? 0);
+                                receiptCurrent.PaidAmount = receiptModel.Sum(x => x.Payments.FirstOrDefault().PaidAmount ?? 0);
+                                receiptCurrent.PaidAmountUsd = receiptModel.Sum(x => x.Payments.FirstOrDefault().PaidAmountUsd ?? 0);
+                                receiptCurrent.PaidAmountVnd = receiptModel.Sum(x => x.Payments.FirstOrDefault().PaidAmountVnd ?? 0);
+                                receiptCurrent.FinalPaidAmount = receiptModel.Sum(x => x.Payments.FirstOrDefault().PaidAmount ?? 0);
+                                receiptCurrent.FinalPaidAmountUsd = receiptModel.Sum(x => x.Payments.FirstOrDefault().PaidAmountUsd ?? 0);
+                                receiptCurrent.FinalPaidAmountVnd = receiptModel.Sum(x => x.Payments.FirstOrDefault().PaidAmountVnd ?? 0);
 
                                 //CatPartner partner = catPartnerRepository.Get(x => x.Id == receiptModel.CustomerId)?.FirstOrDefault();
                                 //if (partner != null)
@@ -6110,9 +6162,11 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var _arcbNo = receiptModels.Where(x => !string.IsNullOrEmpty(x.Arcbno)).FirstOrDefault()?.Arcbno;
+                bool isAddNew = false;
                 if (string.IsNullOrEmpty(_arcbNo))
                 {
-                    _arcbNo = GenerateCombineReceiptNo();
+                    isAddNew = true;
+                    _arcbNo = $"{Guid.NewGuid().ToString().Substring(0, 8)}";
                 }
                 foreach (var item in receiptModels)
                 {
@@ -6156,6 +6210,13 @@ namespace eFMS.API.Accounting.DL.Services
                         return hsDebit;
                     }
                 }
+
+                if (isAddNew)
+                {
+                    receiptModels = UpdateArcbNoReceipt(receiptModels, _arcbNo);
+                }
+                UpdateBalanceReceipt(_arcbNo);
+
                 return new HandleState();
             }
             catch (Exception ex)
@@ -6163,6 +6224,29 @@ namespace eFMS.API.Accounting.DL.Services
                 new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
                 return new HandleState((object)ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Update ArcbNo Receipt
+        /// </summary>
+        /// <param name="_arcbNo"></param>
+        /// <returns></returns>
+        private List<AcctReceiptModel> UpdateArcbNoReceipt(List<AcctReceiptModel> receiptModels, string _arcbNo)
+        {
+            var _arcbNoRandom = _arcbNo;
+            var receiptCombineAdd = DataContext.Get(x => x.Arcbno == _arcbNoRandom);
+            _arcbNo = GenerateCombineReceiptNo();
+            foreach(var item in receiptModels)
+            {
+                item.Arcbno = item.SubArcbno = _arcbNo;
+            }
+            foreach (var item in receiptCombineAdd)
+            {
+                item.Arcbno = item.SubArcbno = _arcbNo;
+                DataContext.Update(item, x => x.Id == item.Id, false);
+            }
+            var hsUpdReceipt = DataContext.SubmitChanges();
+            return receiptModels;
         }
 
         /// <summary>
@@ -6176,6 +6260,7 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var receiptGrp = receiptModels.GroupBy(x => new { x.OfficeId, x.PaymentMethod, x.ObhpartnerId, x.Id });
+                List<AcctReceipt> generateCombines = new List<AcctReceipt>();
                 foreach (var receiptModel in receiptGrp)
                 {
                     var existedReceipt = receiptModel.Where(x => x.Id != Guid.Empty && x.Status == AccountingConstants.RECEIPT_STATUS_DRAFT);
@@ -6192,6 +6277,7 @@ namespace eFMS.API.Accounting.DL.Services
                         receipt.UserModified = currentUser.UserID;
                         receipt.DatetimeModified = DateTime.Now;
                         receipt.Class = receiptModel.Key.PaymentMethod; // Class = Payment Method
+                        receipt.ReceiptMode = GetReceiptMode(receiptModel.Key.PaymentMethod);
 
                         receipt.Status = AccountingConstants.RECEIPT_STATUS_DONE;
                         receipt.PaidAmount = existedReceipt.Sum(x => x.PaidAmountUsd ?? 0);
@@ -6204,6 +6290,7 @@ namespace eFMS.API.Accounting.DL.Services
                         hs = DataContext.Update(receipt, x => x.Id == receipt.Id);
                         if (hs.Success)
                         {
+                            generateCombines.Add(receipt);
                             var payments = new List<ReceiptInvoiceModel>();
                             foreach (var data in receiptModel.Select(z => z))
                             {
@@ -6263,6 +6350,7 @@ namespace eFMS.API.Accounting.DL.Services
                         model.FinalPaidAmountUsd = receiptModel.Sum(x => x.FinalPaidAmountUsd ?? 0);
                         model.FinalPaidAmountVnd = receiptModel.Sum(x => x.FinalPaidAmountVnd ?? 0);
                         model.Class = model.PaymentMethod; // Class = Payment Method
+                        model.ReceiptMode = GetReceiptMode(model.PaymentMethod);
 
                         CatPartner partner = catPartnerRepository.Get(x => x.Id == model.CustomerId)?.FirstOrDefault();
                         if (partner != null)
@@ -6275,6 +6363,7 @@ namespace eFMS.API.Accounting.DL.Services
                         HandleState hs = DataContext.Add(receipt);
                         if (hs.Success)
                         {
+                            generateCombines.Add(receipt);
                             var payments = new List<ReceiptInvoiceModel>();
                             foreach (var data in receiptModel.Select(z => z))
                             {
@@ -6302,11 +6391,150 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
                 var hsResult = DataContext.SubmitChanges();
+                if (hsResult.Success)
+                {
+                    generateCombines = generateCombines.Where(x => x.Arcbno == x.SubArcbno).ToList();
+                    if (generateCombines.Count > 0) // Gen new general sub combine
+                    {
+                        GenerateSubGeneralCombine(generateCombines, _arcbNo);
+                    }
+                }
                 return hsResult;
             }
             catch (Exception ex)
             {
-                new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
+                new LogHelper("eFMS_AR_SaveDoneGeneralCombine_LOG", ex.ToString());
+                return new HandleState((object)ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Auto generate new general combine
+        /// </summary>
+        /// <param name="generateCombines"></param>
+        /// <param name="_arcbNo"></param>
+        /// <returns></returns>
+        private HandleState GenerateSubGeneralCombine(List<AcctReceipt> generateCombines, string _arcbNo)
+        {
+            var receiptGrp = generateCombines.Where(x => x.ObhpartnerId != null && (x.PaymentMethod == AccountingConstants.COLLECT_OBH_AGENCY || x.PaymentMethod == AccountingConstants.PAY_OBH_AGENCY))
+                .GroupBy(x => new { x.Id, x.PaymentMethod, x.ObhpartnerId, x.OfficeId });
+            try
+            {
+                foreach (var receiptModel in receiptGrp)
+                {
+
+                    var obhPartnerData = catPartnerRepository.Get(x => x.Id == receiptModel.Key.ObhpartnerId.ToString() && !string.IsNullOrEmpty(x.InternalCode)).FirstOrDefault();
+                    if (obhPartnerData == null)
+                    {
+                        return new HandleState();
+                    }
+                    var officeMapping = officeRepository.Get(x => x.InternalCode == obhPartnerData.InternalCode).FirstOrDefault();
+                    if (officeMapping == null)
+                    {
+                        return new HandleState();
+                    }
+
+                    var receipt = mapper.Map<AcctReceiptModel>(receiptModel.Select(x => x).FirstOrDefault());
+                    receipt.Id = Guid.NewGuid();
+                    receipt.Status = AccountingConstants.RECEIPT_STATUS_DRAFT;
+
+                    receipt.UserCreated = receipt.UserModified = currentUser.UserID;
+                    receipt.DatetimeCreated = receipt.DatetimeModified = DateTime.Now;
+                    receipt.CompanyId = currentUser.CompanyID;
+                    receipt.OfficeId = officeMapping.Id;
+                    var departmentAR = departmentRepository.Get(x => x.BranchId == officeMapping.Id && x.DeptType == "AR" && x.Active == true).FirstOrDefault();
+                    if (departmentAR != null)
+                    {
+                        receipt.DepartmentId = departmentAR.Id;
+                        var groupAR = groupRepository.Get(x => x.DepartmentId == departmentAR.Id && x.Active == true).FirstOrDefault();
+                        if (groupAR != null)
+                        {
+                            receipt.GroupId = groupAR.Id;
+                        }
+                    }
+
+                    receipt.Arcbno = _arcbNo;
+                    receipt.SubArcbno = string.Format("{0}-{1}", _arcbNo, officeMapping.Code);
+
+                    var _officeCode = officeRepository.Get(x => x.Id == receipt.OfficeId).FirstOrDefault()?.Code;
+
+                    if (receipt.PaymentMethod == AccountingConstants.COLLECT_OBH_AGENCY)
+                    {
+                        receipt.PaymentMethod = AccountingConstants.PAY_OBH_AGENCY;
+                    }
+                    else
+                    {
+                        receipt.PaymentMethod = AccountingConstants.COLLECT_OBH_AGENCY;
+                    }
+                    {
+                        receipt.PaymentRefNo = GenerateReceiptNoV2(mapper.Map<AcctReceiptModel>(receipt), _officeCode);
+                    }
+                    receipt.Class = receipt.PaymentMethod; // Class = Payment Method
+                    receipt.ReceiptMode = GetReceiptMode(receipt.PaymentMethod);
+                    receipt.ObhpartnerId = null;
+
+                    CatPartner partner = catPartnerRepository.Get(x => x.Id == receipt.CustomerId)?.FirstOrDefault();
+                    if (partner != null)
+                    {
+                        receipt.Type = partner.PartnerType == "Agent" ? "Agent" : "Customer";
+                    }
+
+                    //AcctReceipt receipt = mapper.Map<AcctReceipt>(model);
+
+                    HandleState hs = DataContext.Add(receipt);
+                    if (hs.Success)
+                    {
+                        var payments = new List<ReceiptInvoiceModel>();
+                        var receiptIds = receiptModel.Select(x => x.Id).ToList();
+                        var paymentReceipt = acctPaymentRepository.Get(x => receiptIds.Contains(x.ReceiptId ?? Guid.Empty));
+                        foreach (var item in paymentReceipt)
+                        {
+                            var _payment = new AccAccountingPayment();
+                            _payment = mapper.Map<AccAccountingPayment>(item);
+                            _payment.Id = Guid.NewGuid();
+                            _payment.ReceiptId = receipt.Id;
+                            _payment.BillingRefNo = GenerateAdvNo();
+                            _payment.PaymentNo = receipt.PaymentRefNo;
+                            _payment.Type = receipt.PaymentMethod;
+                            _payment.PaymentMethod = receipt.PaymentMethod; //Payment Method Phiếu thu
+                            _payment.Note = string.Empty;
+                            _payment.DeptInvoiceId = receipt.DepartmentId;
+                            _payment.OfficeInvoiceId = receipt.OfficeId;
+                            _payment.CompanyInvoiceId = receipt.CompanyId;
+                            _payment.UserCreated = _payment.UserModified = receipt.UserCreated;
+                            _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
+                            _payment.GroupId = receipt.GroupId;
+                            _payment.DepartmentId = receipt.DepartmentId;
+                            _payment.OfficeId = receipt.OfficeId;
+                            _payment.CompanyId = receipt.CompanyId;
+                            acctPaymentRepository.Add(_payment, false);
+                        }
+                        var hsPayment = acctPaymentRepository.SubmitChanges();
+                        if (!hsPayment.Success)
+                        {
+                            new LogHelper("eFMS_AR_SaveDoneGeneralPayment_LOG", hsPayment.Message?.ToString() + " - Data: " + JsonConvert.SerializeObject(receipt));
+                        }
+
+                        //if (receipt.AgreementId != null && (receipt.PaymentMethod == AccountingConstants.COLLECT_OBH_AGENCY || receipt.PaymentMethod == AccountingConstants.ADVANCE_AGENCY))
+                        //{
+                        //    HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receipt, SaveAction.SAVEDONE, out decimal advUsd, out decimal advVnd);
+
+                        //    if (!hsUpdateCusAdvOfAgreement.Success)
+                        //    {
+                        //        throw new Exception("Có lỗi khi update thông tin hợp đồng" + hsUpdateCusAdvOfAgreement.Message?.ToString());
+                        //    }
+                        //    receipt.AgreementAdvanceAmountVnd = advVnd;
+                        //    receipt.AgreementAdvanceAmountUsd = advUsd;
+                        //    hs = DataContext.Update(receipt, x => x.Id == receipt.Id);
+                        //}
+                    }
+
+                }
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                new LogHelper("eFMS_AR_GenerateSubGeneralCombine_LOG", ex.ToString());
                 return new HandleState((object)ex.Message);
             }
         }
@@ -6346,6 +6574,7 @@ namespace eFMS.API.Accounting.DL.Services
                         receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
                         receiptModel.PaidAmount = receiptModel.PaidAmountUsd = receiptModel.FinalPaidAmountUsd;
                         receiptModel.PaidAmountVnd = receiptModel.FinalPaidAmountVnd;
+                        receiptModel.ReceiptMode = GetReceiptMode(receiptModel.PaymentMethod);
 
                         AcctReceipt receiptData = mapper.Map<AcctReceipt>(receiptModel);
                         var listInvoice = receiptModel.Payments
@@ -6425,6 +6654,7 @@ namespace eFMS.API.Accounting.DL.Services
                         receiptModel.UserModified = currentUser.UserID;
                         receiptModel.DatetimeModified = DateTime.Now;
                         receiptModel.Class = receiptModel.PaymentMethod;
+                        receiptModel.ReceiptMode = GetReceiptMode(receiptModel.PaymentMethod);
 
                         receiptModel.Status = AccountingConstants.RECEIPT_STATUS_DONE;
                         receiptModel.DatetimeModified = DateTime.Now;
@@ -6515,6 +6745,56 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
+        /// <summary>
+        /// Update Balance Receipt
+        /// </summary>
+        /// <param name="_arcbNo"></param>
+        /// <returns></returns>
+        private HandleState UpdateBalanceReceipt(string _arcbNo)
+        {
+            var receipts = DataContext.Get(x => x.Arcbno == _arcbNo && x.Status == AccountingConstants.RECEIPT_STATUS_DONE);
+            var combineGrp = receipts.GroupBy(x => x.SubArcbno);
+            foreach (var grp in combineGrp)
+            {
+                var receiptGrp = receipts.Where(x => x.SubArcbno == grp.Key);
+                var sumCreditReceipts = receiptGrp.Where(x => x.ReceiptMode == "Credit").Sum(x => x.FinalPaidAmount ?? 0);
+                var sumDebitReceipts = receiptGrp.Where(x => x.ReceiptMode == "Debit").Sum(x => x.FinalPaidAmount ?? 0);
+                var _isBanlance = sumCreditReceipts == sumDebitReceipts;
+                foreach (var item in receiptGrp)
+                {
+                    item.IsBalanceReceipt = _isBanlance;
+                    DataContext.Update(item, x => x.Id == item.Id, false);
+                }
+            }
+            var hs = DataContext.SubmitChanges();
+            return hs;
+        }
+
+        /// <summary>
+        /// Get receipt mode
+        /// </summary>
+        /// <param name="paymentMethod"></param>
+        /// <returns></returns>
+        private string GetReceiptMode(string paymentMethod)
+        {
+            string _mode = string.Empty;
+            switch (paymentMethod)
+            {
+                case "Advance Agency":
+                case "Clear Dedit Agency":
+                case "Collect OBH Agency":
+                case "Paid Amount Agency":
+                    _mode = "Debit";
+                    break;
+                case "Bank Fee Agency":
+                case "Clear Credit Agency":
+                case "Collected Amount Agency":
+                case "Pay OBH Agency":
+                    _mode = "Credit";
+                    break;
+            }
+            return _mode;
+        }
         #endregion
     }
 }

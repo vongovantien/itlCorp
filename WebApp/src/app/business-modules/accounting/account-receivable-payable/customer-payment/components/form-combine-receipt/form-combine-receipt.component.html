@@ -5,7 +5,7 @@
             Create {{typeCombine === 'EXISTING' ? 'Existing Combine' : 'Combine'}} Receipt
         </h3>
         <div class="c-button-actions">
-            <ng-container *ngIf="isContainDraft">
+            <ng-container *ngIf="isAllDone">
                 <app-permission-button title="Sync to Accountant" type="sync" class="info" icon="la la-cloud-upload"
                     (onClick)="confirmSync()">
                 </app-permission-button>

@@ -72,6 +72,7 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
 
         if (this.isUpdate) {
             this.headers.push({ title: 'Receipt No', field: '', required: true },
+                { title: 'Combine No', field: '' },
                 { title: 'Creator', field: '', required: true },
                 { title: 'Modified Time', field: '', required: true });
         } else {
@@ -177,7 +178,7 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
             officeId: this.currentOffice,
             amountUsd: null,
             amountVnd: null,
-            obhPartnerId: null,
+            obhpartnerId: null,
             duplicate: false,
             isModified: true,
             agreementId: partner.contractId,
@@ -197,6 +198,27 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
             case 'partnerId':
                 generalReceiptItem.partnerId = data.id;
                 // generalReceiptItem.agreementId = data.contractId;
+                break;
+            case 'obhPartnerId':
+                generalReceiptItem.duplicateOffice = false;
+                generalReceiptItem.obhpartnerId = data;
+                if(!!generalReceiptItem.officeId){
+                    const office : any = this.offices.find(x => x.id === generalReceiptItem.officeId);
+                    if (!!office && this.obhPartners.filter(item => item.id === data).some(x => x.internalCode === office.internalCode)) {
+                        generalReceiptItem.duplicateOffice = true;
+                        this._toastService.warning('Internal office OBH partner is not allowed to be the same as Office Branch');
+                    }
+                }
+                break;
+            case 'officeId':
+                generalReceiptItem.duplicateOffice = false;
+                if(!!generalReceiptItem.obhpartnerId){
+                    const office : any = this.offices.find(x => x.id === generalReceiptItem.officeId);
+                    if(!!office && this.obhPartners.filter(item => item.id === generalReceiptItem.obhpartnerId).some(x => x.internalCode === office.internalCode)){
+                        generalReceiptItem.duplicateOffice = true;
+                        this._toastService.warning('Internal office OBH partner is not allowed to be the same as Office Branch');
+                    }
+                }
                 break;
             default:
                 generalReceiptItem[key] = data;

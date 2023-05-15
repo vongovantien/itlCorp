@@ -1,24 +1,24 @@
 <div class="customer-payment-combine-wrapper m-animate-fade-in">
     <app-sub-header> </app-sub-header>
 
-<div class="m-content">
-    <div class="m-portlet">
-        <div class="m-portlet__body">
-            <form-create-receipt-combine [isUpdate]="false"></form-create-receipt-combine>
-            <receipt-general-combine></receipt-general-combine>
-            <receipt-cd-combine #CreditPayment listType="credit"></receipt-cd-combine>
-            <receipt-cd-combine #DebitPayment listType="debit"></receipt-cd-combine>
-            <div class="c-button-actions text-center">
-                <app-permission-button title="Save Draft" class="outline-primary" [icon]="'la la-sticky-note'"
-                    (onClick)="submitClick('draft')">
-                </app-permission-button>
-                <app-permission-button type="save" title="Done" class="outline-success"
-                    (onClick)="confirmDoneReceipt()">
-                </app-permission-button>
+    <div class="m-content">
+        <div class="m-portlet">
+            <div class="m-portlet__body">
+                <form-create-receipt-combine [isUpdate]="false"></form-create-receipt-combine>
+                <receipt-general-combine></receipt-general-combine>
+                <receipt-cd-combine #CreditPayment listType="credit"></receipt-cd-combine>
+                <receipt-cd-combine #DebitPayment listType="debit"></receipt-cd-combine>
+                <div class="c-button-actions text-center">
+                    <app-permission-button title="Save Draft" class="outline-primary" [icon]="'la la-sticky-note'"
+                        (onClick)="submitClick('draft')">
+                    </app-permission-button>
+                    <app-permission-button type="save" title="Done" class="outline-success"
+                        (onClick)="confirmDoneReceipt()">
+                    </app-permission-button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </div>
 
 <ng-template inject></ng-template>
