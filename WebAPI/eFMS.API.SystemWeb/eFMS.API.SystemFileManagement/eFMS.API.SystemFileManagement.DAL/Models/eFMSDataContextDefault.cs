@@ -1959,7 +1959,7 @@ namespace eFMS.API.SystemFileManagement.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SyncStatus)
+                entity.Property(e => e.SyncStatus);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 
