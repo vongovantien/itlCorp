@@ -713,6 +713,13 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     sendMail() {
+        if(this.isArrivalNotice){
+            this.debitNos.forEach(el=>{
+                if(!!el.isCheckedDebitNote){
+                    this.getDetailCdNote(this.jobId, el.code)
+                }
+            })
+        }
         console.log("after 5s send");
 
         this.attachFileUpload();
@@ -1594,6 +1601,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         }
         if (this.isArrivalNotice) {
             this.stageType = "SEND_AN"
+            this.getDetailCdNote
         }
         if (this.isDO) {
             this.stageType = "SEND_DO"
@@ -1604,26 +1612,37 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         if (this.isSendHbl || this.isSendHawb) {
             this.stageType = "SEND_HB"
         }
-        if (this.isDbtInv){
-            this.lstStage = (this.attachedFile.length > 0) ? ["SEND_AN", "SEND_INV"]: ["SEND_INV"];
-            this.lstStage.forEach(el => {
-                this.lstHblId.forEach(_hbl => {
-                    this._documentRepo.assignStageByEventType({ stageType: el, jobId, hblId: _hbl })
+        if (this.isDbtInv) {
+            this.stageType = "SEND_INV";
+            this.lstHblId.forEach(_hbl => {
+                this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId: _hbl })
                     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                     .subscribe();
-                })
             })
-            
         }
         if (this.stageType.length !== 0 && !this.isDbtInv) {
-            this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId })
-                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                .subscribe();
+            if (this.attachedFile.length > 0 && this.stageType == "SEND_AN") {
+                this.lstStage = ["SEND_AN", "SEND_INV"]
+                this.lstHblId.forEach(_hbl=>{
+                    console.log(_hbl);
+                    this.lstStage.forEach(el => {
+                        this._documentRepo.assignStageByEventType({ stageType: el, jobId, hblId:_hbl })
+                            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                            .subscribe();
+                    })
+                })
+            }
+            else{
+                if (this.stageType.length !== 0 && !this.isDbtInv) {
+                    this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId })
+                        .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                        .subscribe();
+                }
+            }
         }
     }
 
     getDetailCdNote(jobId: string, cdNote: string) {
-        
         this._documentRepo.getDetailsCDNote(jobId, cdNote)
             .pipe(
                 catchError(this.catchError),

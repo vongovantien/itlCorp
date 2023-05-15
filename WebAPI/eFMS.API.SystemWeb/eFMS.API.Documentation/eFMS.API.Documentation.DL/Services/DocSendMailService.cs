@@ -750,6 +750,7 @@ namespace eFMS.API.Documentation.DL.Services
             #endregion
             var _picId = !string.IsNullOrEmpty(shipmentInfo.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == shipmentInfo.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+            var picName = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.EmployeeNameEn; //Email from
             var toEmail = catContractRepo.Get(x => x.PartnerId == cdNoteInfo.PartnerId && x.Active == true).FirstOrDefault()?.EmailAddress;
             if (string.IsNullOrEmpty(toEmail)) {
                 toEmail = catPartnerRepo.Get(x => x.Id == cdNoteInfo.PartnerId).FirstOrDefault()?.BillingEmail 
@@ -802,7 +803,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             string _hblInfosresult = _hblInfos.ToString();
-            _subject = _subject.Replace("{{pic}}", picEmail);
+            _subject = _subject.Replace("{{pic}}", picName);
             _body = _body.Replace("{{HBLDetailsField}}", _hblInfos.ToString());
             _body = _body.Replace("{{Routing}}", routesString);
             _body = _body.Replace("{{HAWB}}", hwbNos);
