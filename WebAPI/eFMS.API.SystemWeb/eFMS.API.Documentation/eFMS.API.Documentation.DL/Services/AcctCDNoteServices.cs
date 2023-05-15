@@ -4460,5 +4460,18 @@ namespace eFMS.API.Documentation.DL.Services
             var results = mapper.Map<List<AcctCdnoteModel>>(data);
             return results;
         }
+
+        /// <summary>
+        /// Get CDNote With CDNoteNo
+        /// </summary>
+        /// <param name="CDNoteNo"></param>
+        /// <returns></returns>
+        public List<AcctCdnoteModel> GetCDNoteWithCDNoteNo(string CDNoteNo)
+        {
+            var data = DataContext.Get(x => CDNoteNo == x.Code).ToList();
+
+            var results = mapper.Map<List<AcctCdnoteModel>>(data);
+            return results;
+        }
     }
 }

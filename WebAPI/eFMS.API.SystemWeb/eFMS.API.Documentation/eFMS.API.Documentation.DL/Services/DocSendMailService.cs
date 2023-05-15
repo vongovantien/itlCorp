@@ -46,6 +46,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysGroup> sysGroupRepo;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         private readonly IContextBase<SysUserLevel> sysUserLevelRepo;
+        private readonly IContextBase<CatContract> catContractRepo;
+        private readonly IContextBase<CatPartnerEmail> catPartnerEmailRepo;
         public DocSendMailService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -65,6 +67,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctCdnote> acctCdnote,
             IContextBase<SysGroup> sysGroup,
             IContextBase<SysUserLevel> sysUserLevel,
+            IContextBase<CatContract> catContract,
+            IContextBase<CatPartnerEmail> catPartnerEmail,
             IOptions<ApiServiceUrl> serviceUrl) : base(repository, mapper)
         {
             currentUser = user;
@@ -85,6 +89,8 @@ namespace eFMS.API.Documentation.DL.Services
             acctCdnoteRepo = acctCdnote;
             sysGroupRepo = sysGroup;
             sysUserLevelRepo = sysUserLevel;
+            catContractRepo = catContract;
+            catPartnerEmailRepo = catPartnerEmail;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -737,11 +743,29 @@ namespace eFMS.API.Documentation.DL.Services
             var hwbNos = string.Join(" - ", charges.Select(x => x.Hblno).DefaultIfEmpty());
             var mawb = charges.Select(x => x.Mblno).FirstOrDefault();
 
-            // Email PIC
+            // Email To
+            #region Descripe
+            // Get theo thu tu: Email tren hd => Billing Email ngoai Detail Partner
+            // => Email ngoai Detail Partner => Email tab email
+            #endregion
             var _picId = !string.IsNullOrEmpty(shipmentInfo.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == shipmentInfo.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+            var toEmail = catContractRepo.Get(x => x.PartnerId == cdNoteInfo.PartnerId && x.Active == true).FirstOrDefault()?.EmailAddress;
+            if (string.IsNullOrEmpty(toEmail)) {
+                toEmail = catPartnerRepo.Get(x => x.Id == cdNoteInfo.PartnerId).FirstOrDefault()?.BillingEmail 
+                            ?? catPartnerRepo.Get(x => x.Id == cdNoteInfo.PartnerId).FirstOrDefault()?.Email;
+            }
+            if (string.IsNullOrEmpty(toEmail))
+            { 
+                toEmail = catPartnerEmailRepo.Get(x=>x.PartnerId==cdNoteInfo.PartnerId && x.OfficeId==cdNoteInfo.OfficeId 
+                                                    && x.Type == "Billing").FirstOrDefault()?.Email;
+            }
+
+                // Email cc to department manager
             var shipmentAgentName = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.PartnerNameEn; // Agent on shipment
-            var managerId = sysUserLevelRepo.Get(x => x.GroupId == shipmentInfo.GroupId && x.Position == "Manager-Leader").FirstOrDefault()?.UserId;
+            var picUserId = sysUserRepo.Get(x => x.EmployeeId == _picId).FirstOrDefault()?.Id;
+            var departmentId = sysUserLevelRepo.Get(x => x.UserId==picUserId).FirstOrDefault()?.DepartmentId;
+            var managerId = sysUserLevelRepo.Get(x => x.GroupId == 11 && x.DepartmentId== departmentId && x.Position == "Manager-Leader").FirstOrDefault()?.UserId;
             managerId = sysUserRepo.Get(x => x.Id == managerId).FirstOrDefault()?.EmployeeId;
             var managerMail = sysEmployeeRepo.Get(x => x.Id == managerId).FirstOrDefault()?.Email;
 
@@ -763,6 +787,10 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{ATA}}", (shipmentInfo.Ata != null) ? shipmentInfo.Ata.Value.ToString("dd MMM, yyyy") : string.Empty);
             var numOrder = 1;
             var contenEmail = string.Empty;
+
+            var distinctRoutes = _housebills.Select(h => h.Route).Distinct();
+            string routesString = string.Join("; ", distinctRoutes);
+
             foreach (var _hbl in _housebills)
             {
                 var _consignee = catPartnerRepo.Get(x => x.Id == _hbl.ConsigneeId).FirstOrDefault();
@@ -773,11 +801,12 @@ namespace eFMS.API.Documentation.DL.Services
                 _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _hbl.GrossWeight));
                 _body = _body.Replace("{{CW}}", string.Format("{0:n2}", _hbl.ChargeWeight));
                 _body = _body.Replace("{{UserName}}", _consignee?.PartnerNameEn);
-                _body = _body.Replace("{{Routing}}", _hbl?.Route);
                 _subject = _subject.Replace("{{pic}}", picEmail);
 
                 numOrder += 1;
             }
+
+            _body = _body.Replace("{{Routing}}", routesString);
             _body = _body.Replace("{{HAWB}}", hwbNos);
             _body = _body.Replace("{{Hwbno}}", hwbNos);
             _body = _body.Replace("{{MAWB}}", mawb);
@@ -799,7 +828,7 @@ namespace eFMS.API.Documentation.DL.Services
             var mailFrom = string.IsNullOrEmpty(picEmail) ? "Info FMS" : picEmail;
             emailContent.From = mailFrom;
             emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo;
-            emailContent.Cc = managerMail;
+            emailContent.Cc = toEmail;
             emailContent.Subject = _subject;
             emailContent.Body = _body;
             emailContent.AttachFiles = new List<string>();

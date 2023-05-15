@@ -135,6 +135,15 @@ namespace eFMS.API.Documentation.Controllers
             return cdNoteServices.GetCDNoteWithHbl(hblId, jobId);
         }
 
+
+        [HttpGet]
+        [Route("GetCDNoteWithCDNoteNo")]
+        [Authorize]
+        public List<AcctCdnoteModel> GetCDNoteWithCDNoteNo(string CDNoteNo)
+        {
+            return cdNoteServices.GetCDNoteWithCDNoteNo(CDNoteNo);
+        }
+
         [HttpGet]
         [Route("GetDetails")]
         public AcctCDNoteDetailsModel Get(Guid jobId, string cdNo)
