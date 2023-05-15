@@ -23,5 +23,6 @@ namespace eFMS.API.Catalogue.DL.IService
         Task<HandleState> UpdateByStatus(List<Guid> ids, string status);
         Task<List<CatPartnerBankImportModel>> CheckValidImport(List<CatPartnerBankImportModel> list);
         Task<HandleState> ImportPartnerBank(List<CatPartnerBankImportModel> data);
+        IQueryable<CatPartnerBankModel> GetApprovedBanksByPartner(Guid partnerId);
     }
 }

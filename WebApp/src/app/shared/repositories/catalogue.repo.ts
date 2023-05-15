@@ -1415,11 +1415,6 @@ export class CatalogueRepo {
 
     }
 
-    getListBankByPartnerById(id: string) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/GetBankByPartnerId/${id}`);
-
-    }
-
     getDetailBankById(id: string) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/GetDetailById/${id}`);
 
@@ -1497,5 +1492,9 @@ export class CatalogueRepo {
 
     syncBankInfoToAccountantSystem(requestList: any[]) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerBank/SyncBankInfoToAccountantSystem`, requestList);
+    }
+
+    getApprovedBanksByPartner(partnerId: string){
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerBank/GetApprovedBanksByPartners`, null, {partnerId: partnerId});
     }
 }

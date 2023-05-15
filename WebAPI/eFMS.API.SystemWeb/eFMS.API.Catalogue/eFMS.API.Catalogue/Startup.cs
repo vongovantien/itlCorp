@@ -51,6 +51,7 @@ namespace eFMS.API.Catalogue
             services.Configure<ApiServiceUrl>(option =>
             {
                 option.ApiUrlAccounting = Configuration.GetSection("ApiUrlAccounting").Value;
+                option.ApiUrlFileSystem = Configuration.GetSection("ApiUrlFileSystem").Value;
             });
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,

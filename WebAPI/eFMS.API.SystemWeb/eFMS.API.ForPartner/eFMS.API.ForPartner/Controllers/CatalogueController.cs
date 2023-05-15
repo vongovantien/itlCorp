@@ -4,7 +4,10 @@ using eFMS.API.ForPartner.DL.Common;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
 using eFMS.API.ForPartner.Infrastructure.Extensions;
+using eFMS.API.ForPartner.Infrastructure.Filters;
 using eFMS.API.ForPartner.Infrastructure.Middlewares;
+using eFMS.API.ForPartner.Service.Models;
+using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
@@ -27,11 +30,13 @@ namespace eFMS.API.ForPartner.Controllers
         private readonly ICatPartnerBankService _catPartnerBankService;
         private readonly IStringLocalizer _stringLocalizer;
         private readonly IActionFuncLogService actionFuncLogService;
-        public CatalogueController(ICatPartnerBankService catPartnerBankService, IStringLocalizer<LanguageSub> stringLocalizer, IActionFuncLogService actionFuncLog)
+        private readonly IContextBase<CatPartner> catPartnerRepository;
+        public CatalogueController(ICatPartnerBankService catPartnerBankService, IStringLocalizer<LanguageSub> stringLocalizer, IActionFuncLogService actionFuncLog, IContextBase<CatPartner> catPartnerRepo)
         {
             _catPartnerBankService = catPartnerBankService;
             _stringLocalizer = stringLocalizer;
             actionFuncLogService = actionFuncLog;
+            catPartnerRepository = catPartnerRepo;
         }
 
         /// <summary>
@@ -40,9 +45,12 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPut]
+        [APIKeyAuth]
+        [ValidateModel]
         [Route("BankInfoSyncUpdateStatus")]
         public async Task<IActionResult> UpdateBankInfoSyncStatus(BankStatusUpdateModel model, [Required] string apiKey, [Required] string hash)
         {
+            if (!ModelState.IsValid) return BadRequest();
             var stopwatch = new Stopwatch();
             stopwatch.Restart();
             if (!_catPartnerBankService.ValidateApiKey(apiKey))
@@ -53,14 +61,14 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
-            var fieldRequire = GetFieldRequireForUpdatePartnerBank(model);
-            if (!string.IsNullOrEmpty(fieldRequire))
+            if (!catPartnerRepository.Any(x => x.AccountNo == model.PartnerCode))
             {
-                ResultHandle _result = new ResultHandle { Status = false, Message = string.Format(@"Trường {0} không có dữ liệu. Vui lòng kiểm tra lại!", fieldRequire), Data = model };
+                ResultHandle _result = new ResultHandle { Status = false, Message = "Thông tin partner không tồn tại.", Data = model };
                 return BadRequest(_result);
             }
+
             var hs = await _catPartnerBankService.UpdatePartnerBankInfoSyncStatus(model);
-            string _message = hs.Success ? "Cập nhật thông tin ngân hàng thành công" : string.Format("{0}. Cập nhật thông tin ngân hàng thất bại", hs.Message.ToString());
+            string _message = hs.Success ? "Cập nhật thông tin ngân hàng thành công." : string.Format("{0}. Cập nhật thông tin ngân hàng thất bại.", hs.Message.ToString());
             var result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
             Response.OnCompleted(async () =>
@@ -78,17 +86,5 @@ namespace eFMS.API.ForPartner.Controllers
                 return BadRequest(result);
             return Ok(result);
         }
-
-        private string GetFieldRequireForUpdatePartnerBank(BankStatusUpdateModel model)
-        {
-            string message = string.Empty;
-            if (string.IsNullOrEmpty(model.PartnerCode))
-            {
-                message += "PartnerCode";
-            }
-
-            return message;
-        }
-
     }
 }

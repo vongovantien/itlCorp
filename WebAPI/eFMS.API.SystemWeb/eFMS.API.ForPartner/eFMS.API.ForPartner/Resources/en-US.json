@@ -2,5 +2,9 @@
   "MSG_DATA_NOT_FOUND": "Data not found",
   "MSG_INSERT_SUCCESS": "New data added",
   "MSG_UPDATE_SUCCESS": "Data update success",
-  "MSG_DELETE_SUCCESS": "Data delete success"
+  "MSG_DELETE_SUCCESS": "Data delete success",
+
+  "MSG_BANK_NOT_EXISTED": "Dữ liệu [{0}] không tồn tại",
+  "EF_ANNOTATIONS_REQUIRED": "Trường [{0}] bắt buộc",
+  "EF_ANNOTATIONS_NOT_VALID": "Trường [{0}] không hơp lệ"
 }

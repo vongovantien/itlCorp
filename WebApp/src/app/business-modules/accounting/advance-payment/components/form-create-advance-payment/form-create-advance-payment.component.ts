@@ -241,7 +241,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
     getBankAccountPayee(isSetBank: Boolean) {
         if (!!this.payee.value && this.paymentMethod.value !== 'Cash') {
-            this._catalogueRepo.getListBankByPartnerById(this.payee.value)
+            this._catalogueRepo.getApprovedBanksByPartner(this.payee.value)
                 .pipe(catchError(this.catchError), finalize(() => {
                     this.isLoading = false;
                 })).subscribe(

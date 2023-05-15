@@ -116,8 +116,8 @@
                                                         <ng-template #dblock>
                                                             <span class="d-block" style="width:30px"></span>
                                                         </ng-template>
-                                                        <ng-container *ngIf="advancePayment.statusApproval === 'Done' 
-                                                            && !advancePayment.voucherNo 
+                                                        <ng-container *ngIf="advancePayment.statusApproval === 'Done'
+                                                            && !advancePayment.voucherNo
                                                             && advancePayment.syncStatus !== 'Synced' ;else dblock">
                                                             <label class="m-checkbox">
                                                                 <input type="checkbox" name=""
@@ -170,6 +170,7 @@
                                                 </td>
                                                 <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{advancePayment.dueDate | date: 'dd/MM/yyyy'}}</td>
+                                                {{advancePayment | json}}
                                                 <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
                                                 <td [ngSwitch]="advancePayment.statusApprovalName">
@@ -338,7 +339,7 @@
 
     </div>
     <ng-container title="Deny" *ngIf="menuSpecialPermission | async | specialPermission:'DenyAdvance'">
-        <ng-container *ngIf="selectedAdv?.statusApproval === 'Done' && selectedAdv?.syncStatus !== 'Synced' && !selectedAdv.voucherNo 
+        <ng-container *ngIf="selectedAdv?.statusApproval === 'Done' && selectedAdv?.syncStatus !== 'Synced' && !selectedAdv.voucherNo
     ">
             <hr />
             <div class="menu-context__item text-danger" (click)="denyAdvItem()">

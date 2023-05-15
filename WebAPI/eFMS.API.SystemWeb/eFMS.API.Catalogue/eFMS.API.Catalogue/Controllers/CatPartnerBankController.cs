@@ -23,6 +23,7 @@ using eFMS.API.Catalogue.DL.Models.Catalogue;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 using System.Globalization;
+using eFMS.API.Catalogue.DL.Common;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -40,6 +41,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IOptions<ESBUrl> _webUrl;
+        private readonly IOptions<ApiServiceUrl> _serviceUrl;
         private readonly IActionFuncLogService actionFuncLogService;
         private readonly BravoLoginModel loginInfo;
         /// <summary>
@@ -50,7 +52,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="currUser">inject interface ICurrentUser</param>
         /// <param name="hostingEnvironment">inject interface IHostingEnvironment</param>
         public CatPartnerBankController(IStringLocalizer<LanguageSub> localizer, ICatPartnerBankService service,
-            ICurrentUser currUser, IHostingEnvironment hostingEnvironment, IActionFuncLogService actionFuncLog, IOptions<ESBUrl> webUrl)
+            ICurrentUser currUser, IHostingEnvironment hostingEnvironment, IActionFuncLogService actionFuncLog, IOptions<ESBUrl> webUrl, IOptions<ApiServiceUrl> serviceUrl)
         {
             stringLocalizer = localizer;
             catPartnerBankService = service;
@@ -58,6 +60,7 @@ namespace eFMS.API.Catalogue.Controllers
             _hostingEnvironment = hostingEnvironment;
             actionFuncLogService = actionFuncLog;
             _webUrl = webUrl;
+            _serviceUrl = serviceUrl;
             loginInfo = new BravoLoginModel
             {
                 UserName = "bravo",
@@ -119,9 +122,10 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = messageError });
             }
+            model.Id = Guid.NewGuid();
             var hs = await catPartnerBankService.AddNew(model);
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model.Id };
             if (!hs.Success)
             {
                 return BadRequest(result);
@@ -385,6 +389,19 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 return BadRequest(new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = null });
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="partnerId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetApprovedBanksByPartner")]
+        public IActionResult GetApprovedBanksByPartner(Guid partnerId)
+        {
+            var data = catPartnerBankService.GetApprovedBanksByPartner(partnerId);
+            return Ok(data);
         }
     }
 }

@@ -178,24 +178,25 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
     }
 
     onSendBankInfoToAccountantSystem() {
+        this.isSubmitted = true;
         if (!this.formGroup.valid) {
             return;
         }
 
-        this.isSubmitted = true;
-        const mergeObj = this.getFormData();
-        const action = mergeObj.approveStatus === CatalogueConstants.STATUS_APPROVAL.NEW ? 'ADD' : 'UPDATE';
-        mergeObj.id = this.partnerBankId;
-        this._catalogueRepo.updatePartnerBank(mergeObj).pipe(
+        const formData = this.getFormData();
+        const apiCall = this.isUpdate
+            ? this._catalogueRepo.updatePartnerBank({ ...formData, id: this.partnerBankId })
+            : this._catalogueRepo.addNewPartnerBank(formData);
+
+        apiCall.pipe(
             catchError(this.catchError),
             switchMap((res: CommonInterface.IResult) => {
-                if (res.status) {
-                    return this._catalogueRepo.syncBankInfoToAccountantSystem([{ Id: mergeObj.id, action }]);
-                } else {
-                    return of(res);
-                }
+                const action = this.isUpdate && formData.approveStatus !== CatalogueConstants.STATUS_APPROVAL.NEW ? 'UPDATE' : 'ADD';
+                const id = this.isUpdate ? this.partnerBankId : res.data;
+                console.log(id)
+                return this._catalogueRepo.syncBankInfoToAccountantSystem([{ Id: id, action }]);
             })
-        ).subscribe((res: any) => {
+        ).subscribe((res: CommonInterface.IResult) => {
             if (res.status) {
                 this._toastService.success(res.message);
                 this.onRequest.emit(true);
@@ -276,6 +277,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
 
     chooseFileUpload(event: any) {
         const files: FileList = event.target.files;
+
         const isFileSizeValid = Array.from(files).every(file => file.size / 1024 ** 2 < SystemConstants.MAX_FILE_SIZE);
         if (!isFileSizeValid) {
             this._toastService.warning(`Maximum file size is ${SystemConstants.MAX_FILE_SIZE}MB`);
@@ -327,8 +329,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
         const selectedFile = Object.assign({}, file);
         this._systemFileManagementRepo.getFileEdoc(selectedFile.id).subscribe(
             (data) => {
-                const extension = file.name.split('.').pop();
-                this.downLoadFile(data, SystemConstants.FILE_EXCEL, file.name + '.' + extension);
+                this.downLoadFile(data, SystemConstants.FILE_EXCEL, file.name);
             }
         )
     }
