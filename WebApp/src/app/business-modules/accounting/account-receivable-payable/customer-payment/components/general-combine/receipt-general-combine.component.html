@@ -19,14 +19,14 @@
                 <div class="table-wrapper table-editable m--margin-top-20" style="max-height:500px">
                     <table class="table table-brand dataTable-edit">
                         <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                            <th class="m--w-90 first table-actions-col">
+                            <th class="m--w-90 first table-actions-col" *ngIf="isContainDraft">
                     
                             </th>
                         </thead>
                         <tbody class="tbody-group">
                             <ng-container *ngIf="!!generalReceipts.length">
                                 <tr *ngFor="let item of generalReceipts; let i = index; trackBy: trackByFn">
-                                    <td class="table-actions-col">
+                                    <td class="table-actions-col" *ngIf="isContainDraft">
                                         <div class="table-actions">
                                             <ng-container *ngIf="!isUpdate; else saveDraft">
                                                 <button (click)="duplicateGeneralItem(i)"
@@ -93,7 +93,7 @@
                                     <td>
                                         <div class="form-group "
                                             [ngClass]="{'m-form__group has-danger': isSubmitted && (item.amountUsd < 0 || item.amountUsd === null)}">
-                                            <ng-container *ngIf="!item.readonly else AmoutUsdTpl ">
+                                            <ng-container *ngIf="item?.status !== 'Done' else AmoutUsdTpl ">
                                                 <input type="number" class="form-control" [(ngModel)]="item.amountUsd" name="amountUsd"
                                                     autoFormatCurrency [disabled]="isReadonly"
                                                     (ngModelChange)="onSelectDataTableInfo($event, item,'amountUsd')">
