@@ -17,6 +17,7 @@ export class GeneralCombineReceiptModel {
     userCreated?: string;
     datetimeModified?: Date;
     isModified: boolean;
+    subArcbno: string;
 }
 
 export interface ICDCombine {

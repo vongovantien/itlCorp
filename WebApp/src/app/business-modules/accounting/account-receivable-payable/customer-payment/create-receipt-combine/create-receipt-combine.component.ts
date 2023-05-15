@@ -380,7 +380,7 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                     this._toastService.success(res.message);
                     this._store.dispatch(ResetCombineInvoiceList());
                     this._store.dispatch(ResetInvoiceList());
-                    const newArcbNo = !this.CreateReceiptCombineComponent.arcbNo ? res.data[0].subArcbno : this.CreateReceiptCombineComponent.arcbNo;
+                    const newArcbNo = !this.CreateReceiptCombineComponent.combineNo?.value ? res.data[0].subArcbno : this.CreateReceiptCombineComponent.combineNo?.value;
                     if(!this.formCreateMapValue.arcbno || this.conbineType === 'existing'){
                         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${newArcbNo}`]);
                         return EMPTY;
@@ -388,6 +388,7 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
                     return this._accountingRepo.getByReceiptCombine(newArcbNo);
                 }else{
                     this._toastService.warning(res.message);
+                    return EMPTY;
                 }
                 of(res);
             }),
@@ -596,7 +597,7 @@ export class ARCustomerPaymentCreateReciptCombineComponent  extends AppForm impl
 
             if (!!this.ReceiptGeneralCombineComponent.generalReceipts?.length) {
                 this.ReceiptGeneralCombineComponent.generalReceipts.forEach((obj) => {
-                    if (this.ReceiptGeneralCombineComponent.generalReceipts.filter(item => item.partnerId === obj.partnerId && item.paymentMethod === obj.paymentMethod && item.obhpartnerId === obj.obhpartnerId && item.officeId === obj.officeId).length > 1) {
+                    if (this.ReceiptGeneralCombineComponent.generalReceipts.filter(item => item.partnerId === obj.partnerId && item.paymentMethod === obj.paymentMethod && item.obhpartnerId === obj.obhpartnerId && item.officeId === obj.officeId && item.subArcbno === obj.subArcbno).length > 1) {
                         obj.duplicate = true;
                     } else {
                         obj.duplicate = false;

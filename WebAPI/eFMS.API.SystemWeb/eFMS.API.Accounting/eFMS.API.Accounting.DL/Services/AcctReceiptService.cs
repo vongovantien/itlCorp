@@ -5463,7 +5463,7 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.ExchangeRateBilling = acctPayment.ExchangeRateBilling;
                         payment.PartnerId = acctPayment?.PartnerId?.ToString();
                         payment.PartnerName = partnerInfo?.ShortName;
-                        payment.Negative = acctPayment.Negative;
+                        //payment.Negative = acctPayment.Negative;
                         payment.PaymentType = acctPayment.PaymentType;
                         //payment.NetOff = acctPayment.NetOff;
                         //payment.NetOffUsd = acctPayment.NetOffUsd;
@@ -5511,65 +5511,65 @@ namespace eFMS.API.Accounting.DL.Services
                                 && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).Select(x => x.Id.ToString()).ToList();
 
                                 item.RefIds = ids;
-                                decimal totalBalanceOBH = 0;
-                                decimal totalBalanceOBHVnd = 0;
-                                decimal totalBalanceOBHUsd = 0;
+                                //decimal totalBalanceOBH = 0;
+                                //decimal totalBalanceOBHVnd = 0;
+                                //decimal totalBalanceOBHUsd = 0;
 
-                                foreach (var i in ids)
-                                {
-                                    AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == i)?.FirstOrDefault();
-                                    totalBalanceOBHVnd = invoice.UnpaidAmountVnd ?? 0;
-                                    totalBalanceOBHUsd = invoice.UnpaidAmountUsd ?? 0;
-                                    if (item.RefCurrency == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        totalBalanceOBH = totalBalanceOBHVnd;
-                                    }
-                                    else
-                                    {
-                                        totalBalanceOBH = totalBalanceOBHUsd;
-                                    }
-                                }
+                                //foreach (var i in ids)
+                                //{
+                                //    AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == i)?.FirstOrDefault();
+                                //    totalBalanceOBHVnd = invoice.UnpaidAmountVnd ?? 0;
+                                //    totalBalanceOBHUsd = invoice.UnpaidAmountUsd ?? 0;
+                                //    if (item.RefCurrency == AccountingConstants.CURRENCY_LOCAL)
+                                //    {
+                                //        totalBalanceOBH = totalBalanceOBHVnd;
+                                //    }
+                                //    else
+                                //    {
+                                //        totalBalanceOBH = totalBalanceOBHUsd;
+                                //    }
+                                //}
 
-                                item.Balance = totalBalanceOBH;
-                                item.BalanceVnd = totalBalanceOBHVnd;
-                                item.BalanceUsd = totalBalanceOBHUsd;
+                                //item.Balance = totalBalanceOBH;
+                                //item.BalanceVnd = totalBalanceOBHVnd;
+                                //item.BalanceUsd = totalBalanceOBHUsd;
                             }
                         }
 
-                        if (debitPaidAprt.Count() > 0)
-                        {
-                            foreach (var item in debitPaidAprt)
-                            {
-                                if (receipt.Type == "Customer")
-                                {
-                                    AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == item.RefIds.FirstOrDefault())?.FirstOrDefault();
-                                    item.BalanceVnd = invoice.UnpaidAmountVnd;
-                                    item.BalanceUsd = invoice.UnpaidAmountUsd;
-                                    if (item.RefCurrency == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        item.Balance = item.BalanceVnd;
-                                    }
-                                    else
-                                    {
-                                        item.Balance = item.BalanceUsd;
-                                    }
-                                }
-                                else
-                                {
-                                    var debitInvoice = debitMngtArRepository.Get(x => item.RefIds.Contains(x.AcctManagementId.ToString()) && x.Hblid == item.Hblid).FirstOrDefault();
-                                    item.BalanceVnd = debitInvoice.UnpaidAmountVnd;
-                                    item.BalanceUsd = debitInvoice.UnpaidAmountUsd;
-                                    if (item.RefCurrency == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        item.Balance = item.BalanceVnd;
-                                    }
-                                    else
-                                    {
-                                        item.Balance = item.BalanceUsd;
-                                    }
-                                }
-                            }
-                        }
+                        //if (debitPaidAprt.Count() > 0)
+                        //{
+                        //    foreach (var item in debitPaidAprt)
+                        //    {
+                        //        if (receipt.Type == "Customer")
+                        //        {
+                        //            AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == item.RefIds.FirstOrDefault())?.FirstOrDefault();
+                        //            item.BalanceVnd = invoice.UnpaidAmountVnd;
+                        //            item.BalanceUsd = invoice.UnpaidAmountUsd;
+                        //            if (item.RefCurrency == AccountingConstants.CURRENCY_LOCAL)
+                        //            {
+                        //                item.Balance = item.BalanceVnd;
+                        //            }
+                        //            else
+                        //            {
+                        //                item.Balance = item.BalanceUsd;
+                        //            }
+                        //        }
+                        //        else
+                        //        {
+                        //            var debitInvoice = debitMngtArRepository.Get(x => item.RefIds.Contains(x.AcctManagementId.ToString()) && x.Hblid == item.Hblid).FirstOrDefault();
+                        //            item.BalanceVnd = debitInvoice.UnpaidAmountVnd;
+                        //            item.BalanceUsd = debitInvoice.UnpaidAmountUsd;
+                        //            if (item.RefCurrency == AccountingConstants.CURRENCY_LOCAL)
+                        //            {
+                        //                item.Balance = item.BalanceVnd;
+                        //            }
+                        //            else
+                        //            {
+                        //                item.Balance = item.BalanceUsd;
+                        //            }
+                        //        }
+                        //    }
+                        //}
                     }
                 }
 
@@ -5598,6 +5598,10 @@ namespace eFMS.API.Accounting.DL.Services
 
                 resultData.Add(result);
             }
+            if(resultData.Count > 0)
+            {
+                resultData = resultData.OrderByDescending(x => x.DatetimeCreated).OrderBy(x => x.SubArcbno).ToList();
+            }
             return resultData;
         }
 
@@ -5610,14 +5614,15 @@ namespace eFMS.API.Accounting.DL.Services
         {
             {
                 var result = new HandleState();
-                if(!receiptModels.Any(x=>x.Id == Guid.Empty))
+                if (!receiptModels.Any(x => x.Id == Guid.Empty))
                 {
                     return result;
                 }
                 var generalCombines = receiptModels.Where(x => Common.CustomData.PaymentMethodGeneral.Any(c => c.Value == x.PaymentMethod)).ToList();
+                var subArcbNos = generalCombines.Select(x => x.SubArcbno).ToList();
                 if (generalCombines.Count > 0)
                 {
-                    var existedGeneralCombine = DataContext.Get(x => x.Arcbno == generalCombines[0].Arcbno && x.CustomerId == generalCombines[0].CustomerId && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL).ToList();
+                    var existedGeneralCombine = DataContext.Get(x => x.Arcbno == generalCombines[0].Arcbno && subArcbNos.Contains(x.SubArcbno) && x.CustomerId == generalCombines[0].CustomerId && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL).ToList();
                     if (existedGeneralCombine != null && existedGeneralCombine.Count > 0)
                     {
                         var receiptIds = existedGeneralCombine.Select(x => x.Id.ToString()).ToList();

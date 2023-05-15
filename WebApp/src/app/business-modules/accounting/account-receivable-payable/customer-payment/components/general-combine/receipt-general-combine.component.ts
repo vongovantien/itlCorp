@@ -184,7 +184,8 @@ export class ARCustomerPaymentReceiptGeneralCombineComponent extends AppList imp
             agreementId: partner.contractId,
             receiptNo: null,
             userCreated: null,
-            datetimeModified: null
+            datetimeModified: null,
+            subArcbno: null,
         }];
         this._store.dispatch(AddGeneralCombineToReceipt({ generalCombineList: newItem }));
     }
