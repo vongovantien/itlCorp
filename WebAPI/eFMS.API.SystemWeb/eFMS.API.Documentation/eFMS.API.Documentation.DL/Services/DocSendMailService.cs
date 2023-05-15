@@ -771,7 +771,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             // Get template
             // Subject part
-            var template = sysEmailTemplateRepo.Get(x => x.Code == "DEBIT-INVOICE-REALERT").FirstOrDefault();
+            var template = sysEmailTemplateRepo.Get(x => x.Code == "DEBIT-INVOICE-PREALERT").FirstOrDefault();
             var _subject = template.Subject;
             _subject = _subject.Replace("{{MAWB}}", string.IsNullOrEmpty(shipmentInfo.Mawb) ? string.Empty : shipmentInfo.Mawb);
             _subject = _subject.Replace("{{Hwbno}}", string.IsNullOrEmpty(hwbNos) ? string.Empty : ("/ " + hwbNos));
@@ -781,7 +781,7 @@ namespace eFMS.API.Documentation.DL.Services
             var _body = template.Body;
             _body = _body.Replace("{{MAWB}}", shipmentInfo.Mawb);
             var transportMode = shipmentInfo.TransactionType[0].ToString() == "S" ? "Vessel" : "Flight";
-            _body = _body.Replace("{{transportMode}}", "Flight");
+            _body = _body.Replace("{{transportMode}}", transportMode);
             _body = _body.Replace("{{Flight}}", shipmentInfo.FlightVesselName);
             _body = _body.Replace("{{ETD}}", (shipmentInfo.Etd != null) ? shipmentInfo.Etd.Value.ToString("dd MMM, yyyy") : string.Empty);
             _body = _body.Replace("{{ATA}}", (shipmentInfo.Ata != null) ? shipmentInfo.Ata.Value.ToString("dd MMM, yyyy") : string.Empty);
@@ -790,22 +790,20 @@ namespace eFMS.API.Documentation.DL.Services
 
             var distinctRoutes = _housebills.Select(h => h.Route).Distinct();
             string routesString = string.Join("; ", distinctRoutes);
+            var _hblInfos = new StringBuilder();
 
             foreach (var _hbl in _housebills)
             {
                 var _consignee = catPartnerRepo.Get(x => x.Id == _hbl.ConsigneeId).FirstOrDefault();
-
-                _body = _body.Replace("{{Hwbno}}", _hbl.Hwbno);
-                _body = _body.Replace("{{QTy}}", _hbl.PackageQty?.ToString());
+                _hblInfos.Append($"<p>- HAWB: {_hbl.Hwbno}<br>- Quantity: {_hbl.PackageQty} / G.W: {string.Format("{0:n2}", _hbl.GrossWeight)} KGS<br>- Routing: {_hbl.Route}</p>");
                 _body = _body.Replace("{{FlightVesNo}}", _hbl?.FlightNo);
-                _body = _body.Replace("{{GW}}", string.Format("{0:n2}", _hbl.GrossWeight));
-                _body = _body.Replace("{{CW}}", string.Format("{0:n2}", _hbl.ChargeWeight));
                 _body = _body.Replace("{{UserName}}", _consignee?.PartnerNameEn);
-                _subject = _subject.Replace("{{pic}}", picEmail);
-
                 numOrder += 1;
             }
 
+            string _hblInfosresult = _hblInfos.ToString();
+            _subject = _subject.Replace("{{pic}}", picEmail);
+            _body = _body.Replace("{{HBLDetailsField}}", _hblInfos.ToString());
             _body = _body.Replace("{{Routing}}", routesString);
             _body = _body.Replace("{{HAWB}}", hwbNos);
             _body = _body.Replace("{{Hwbno}}", hwbNos);
