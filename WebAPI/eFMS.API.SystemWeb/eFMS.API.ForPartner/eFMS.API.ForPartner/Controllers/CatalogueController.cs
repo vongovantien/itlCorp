@@ -61,11 +61,6 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
-            if (!catPartnerRepository.Any(x => x.AccountNo == model.PartnerCode))
-            {
-                ResultHandle _result = new ResultHandle { Status = false, Message = "Thông tin partner không tồn tại.", Data = model };
-                return BadRequest(_result);
-            }
 
             var hs = await _catPartnerBankService.UpdatePartnerBankInfoSyncStatus(model);
             string _message = hs.Success ? "Cập nhật thông tin ngân hàng thành công." : string.Format("{0}. Cập nhật thông tin ngân hàng thất bại.", hs.Message.ToString());
