@@ -740,7 +740,7 @@ namespace eFMS.API.Documentation.DL.Services
             var hblIds = charges.Select(x => x.Hblid).ToList();
             
             var _housebills = detailRepository.Get(x => hblIds.Contains(x.Id));
-            var hwbNos = string.Join(" - ", charges.Select(x => x.Hblno).DefaultIfEmpty());
+            var hwbNos = string.Join(" , ", charges.Select(x => x.Hblno).Distinct());
             var mawb = charges.Select(x => x.Mblno).FirstOrDefault();
 
             // Email To
@@ -810,7 +810,6 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{HAWB}}", hwbNos);
             _body = _body.Replace("{{Hwbno}}", hwbNos);
             _body = _body.Replace("{{MAWB}}", mawb);
-            _body = _body.Replace("{{Routing}}", shipmentInfo.Route);
             _body = _body.Replace("{{pic}}", picEmail);
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == shipmentInfo.GroupId).FirstOrDefault();
@@ -827,8 +826,8 @@ namespace eFMS.API.Documentation.DL.Services
             var emailContent = new EmailContentModel();
             var mailFrom = string.IsNullOrEmpty(picEmail) ? "Info FMS" : picEmail;
             emailContent.From = mailFrom;
-            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo;
-            emailContent.Cc = toEmail;
+            emailContent.To = toEmail;
+            emailContent.Cc = managerMail;
             emailContent.Subject = _subject;
             emailContent.Body = _body;
             emailContent.AttachFiles = new List<string>();
