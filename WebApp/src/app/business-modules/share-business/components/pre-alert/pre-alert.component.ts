@@ -419,7 +419,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     checkExistDebitNoteSendInv() {
-        this._documentRepo.getListCDNoteWithCDNoteNo(this.cdNoteNo)
+        this._documentRepo.getListCDNoteWithPartnerIdFromCDNoteNo(this.cdNoteNo)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -428,7 +428,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 (res: any) => {
                     if (res) {
                         if (this.serviceId === 'AE' || this.serviceId === 'SFE' || this.serviceId === 'SLE' || this.serviceId === 'SCE') {
-                            this.debitNos = res.map(v => ({ ...v, isCheckedDebitNote: false }));
+                            // this.debitNos = res.map(v => ({ ...v, isCheckedDebitNote: true }));
+                            this.debitNos = res.map(v => (v.code === this.cdNoteNo) ? { ...v, isCheckedDebitNote: true } : { ...v, isCheckedDebitNote: false });
+
                         } else {
                             this.debitNos = res.filter(x => lowerCase(x.type) !== 'credit').map(v => ({ ...v, isCheckedDebitNote: false }));
                         }

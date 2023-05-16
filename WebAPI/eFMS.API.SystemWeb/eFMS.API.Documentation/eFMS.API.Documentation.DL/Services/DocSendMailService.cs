@@ -48,6 +48,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysUserLevel> sysUserLevelRepo;
         private readonly IContextBase<CatContract> catContractRepo;
         private readonly IContextBase<CatPartnerEmail> catPartnerEmailRepo;
+        private readonly IContextBase<CsDimensionDetail> csDimensionDetailRepo;
         public DocSendMailService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -69,6 +70,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUserLevel> sysUserLevel,
             IContextBase<CatContract> catContract,
             IContextBase<CatPartnerEmail> catPartnerEmail,
+            IContextBase<CsDimensionDetail> csDimensionDetail,
             IOptions<ApiServiceUrl> serviceUrl) : base(repository, mapper)
         {
             currentUser = user;
@@ -91,6 +93,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysUserLevelRepo = sysUserLevel;
             catContractRepo = catContract;
             catPartnerEmailRepo = catPartnerEmail;
+            csDimensionDetailRepo = csDimensionDetail;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -738,7 +741,7 @@ namespace eFMS.API.Documentation.DL.Services
             var shipmentInfo = DataContext.First(x => x.Id == cdNoteInfo.JobId);
             
             var hblIds = charges.Select(x => x.Hblid).ToList();
-            
+            var hblPackage = csDimensionDetailRepo.Get(x => hblIds.Contains((Guid)x.Hblid)).ToList();
             var _housebills = detailRepository.Get(x => hblIds.Contains(x.Id));
             var hwbNos = string.Join(" , ", charges.Select(x => x.Hblno).Distinct());
             var mawb = charges.Select(x => x.Mblno).FirstOrDefault();
@@ -783,10 +786,10 @@ namespace eFMS.API.Documentation.DL.Services
             _body = _body.Replace("{{MAWB}}", shipmentInfo.Mawb);
             var transportMode = shipmentInfo.TransactionType[0].ToString() == "S" ? "Vessel" : "Flight";
             _body = _body.Replace("{{transportMode}}", transportMode);
-            _body = _body.Replace("{{Flight}}", shipmentInfo.FlightVesselName);
+            _body = _body.Replace("{{FlightVesNo}}", shipmentInfo.FlightVesselName);
             _body = _body.Replace("{{ETD}}", (shipmentInfo.Etd != null) ? shipmentInfo.Etd.Value.ToString("dd MMM, yyyy") : string.Empty);
             _body = _body.Replace("{{ATA}}", (shipmentInfo.Ata != null) ? shipmentInfo.Ata.Value.ToString("dd MMM, yyyy") : string.Empty);
-            var numOrder = 1;
+            
             var contenEmail = string.Empty;
 
             var distinctRoutes = _housebills.Select(h => h.Route).Distinct();
@@ -796,10 +799,9 @@ namespace eFMS.API.Documentation.DL.Services
             foreach (var _hbl in _housebills)
             {
                 var _consignee = catPartnerRepo.Get(x => x.Id == _hbl.ConsigneeId).FirstOrDefault();
-                _hblInfos.Append($"<p>- HAWB: {_hbl.Hwbno}<br>- Quantity: {_hbl.PackageQty} / G.W: {string.Format("{0:n2}", _hbl.GrossWeight)} KGS<br>- Routing: {_hbl.Route}</p>");
+                _hblInfos.Append($"<p>- HAWB: {_hbl.Hwbno}<br>- Quantity: {Convert.ToInt32(csDimensionDetailRepo.Get(x => (Guid)x.Hblid==_hbl.Id).FirstOrDefault()?.Package)} PCS/ G.W: {string.Format("{0:n2}", _hbl.GrossWeight)} KGS<br>- Routing: {_hbl.Route}</p>");
                 _body = _body.Replace("{{FlightVesNo}}", _hbl?.FlightNo);
                 _body = _body.Replace("{{UserName}}", _consignee?.PartnerNameEn);
-                numOrder += 1;
             }
 
             string _hblInfosresult = _hblInfos.ToString();

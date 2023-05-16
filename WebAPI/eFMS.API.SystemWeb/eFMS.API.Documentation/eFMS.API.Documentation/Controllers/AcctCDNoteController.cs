@@ -137,11 +137,11 @@ namespace eFMS.API.Documentation.Controllers
 
 
         [HttpGet]
-        [Route("GetCDNoteWithCDNoteNo")]
+        [Route("getListCDNoteWithPartnerIdFromCDNoteNo")]
         [Authorize]
-        public List<AcctCdnoteModel> GetCDNoteWithCDNoteNo(string CDNoteNo)
+        public List<AcctCdnoteModel> GetListCDNoteWithPartnerIdFromCDNoteNo(string CDNoteNo)
         {
-            return cdNoteServices.GetCDNoteWithCDNoteNo(CDNoteNo);
+            return cdNoteServices.GetListCDNoteWithPartnerIdFromCDNoteNo(CDNoteNo);
         }
 
         [HttpGet]

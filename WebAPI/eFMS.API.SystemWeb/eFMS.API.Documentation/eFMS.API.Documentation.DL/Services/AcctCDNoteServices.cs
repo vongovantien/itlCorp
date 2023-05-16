@@ -4449,10 +4449,13 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="CDNoteNo"></param>
         /// <returns></returns>
-        public List<AcctCdnoteModel> GetCDNoteWithCDNoteNo(string CDNoteNo)
+        public List<AcctCdnoteModel> GetListCDNoteWithPartnerIdFromCDNoteNo(string CDNoteNo)
         {
             var data = DataContext.Get(x => CDNoteNo == x.Code).ToList();
 
+            //Update get all debitnote with partner ID
+            var partnerId = data.FirstOrDefault().PartnerId;
+            data = DataContext.Get(x => partnerId == x.PartnerId && x.Type!="Credit").ToList();
             var results = mapper.Map<List<AcctCdnoteModel>>(data);
             return results;
         }

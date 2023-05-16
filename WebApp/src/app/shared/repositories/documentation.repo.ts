@@ -342,8 +342,8 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/GetCDNoteWithHbl`, { hblId: hblId, jobId: jobId });
     }
 
-    getListCDNoteWithCDNoteNo(CDNoteNo: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/GetCDNoteWithCDNoteNo`, { CDNoteNo: CDNoteNo });
+    getListCDNoteWithPartnerIdFromCDNoteNo(CDNoteNo: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/getListCDNoteWithPartnerIdFromCDNoteNo`, { CDNoteNo: CDNoteNo });
     }
 
     checkCdNoteAllowToDelete(id: string) {

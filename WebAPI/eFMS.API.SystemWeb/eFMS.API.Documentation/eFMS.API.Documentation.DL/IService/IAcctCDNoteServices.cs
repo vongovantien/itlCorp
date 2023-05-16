@@ -33,6 +33,6 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewCombineBilling(List<CombineBillingCriteria> criteria);
         List<AccAccountingManagementResult> GetDataAcctMngtDebCretInvExport(CDNoteCriteria criteria);
         List<AccAccountingManagementAgencyResult> GetDataAcctMngtAgencyExport(CDNoteCriteria criteria);
-        List<AcctCdnoteModel> GetCDNoteWithCDNoteNo(string cDNoteNo);
+        List<AcctCdnoteModel> GetListCDNoteWithPartnerIdFromCDNoteNo(string cDNoteNo);
     }
 }
