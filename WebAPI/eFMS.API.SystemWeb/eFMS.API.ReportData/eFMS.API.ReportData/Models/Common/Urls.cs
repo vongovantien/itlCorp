@@ -92,7 +92,7 @@
 
             public const string GetDataExporDebCretInvUrl = "/Documentation/api/v1/en-US/AcctCDNote/GetDataAcctMngtDebCretInvExport";
 
-            public const string GetDataExportAgencyInvUrl = "/Documentation/api/v1/en-US/AcctCDNote/GetDataAcctMngtAgencyExport";
+            public const string GetDataExportAgencyInvUrl = "/api/v1/en-US/AcctCDNote/GetDataAcctMngtAgencyExport";
 
             public const string GetDataOustandingDebitUrl = "/Documentation/api/v1/en-US/DocSendMail/GetDataOustandingDebit?salemanId=";
             public const string GetOPSTransactionUrl = "/Documentation/api/v1/en-US/OpsTransaction/Query";
