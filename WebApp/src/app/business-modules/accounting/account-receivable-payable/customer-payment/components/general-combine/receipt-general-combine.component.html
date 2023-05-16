@@ -19,14 +19,14 @@
                 <div class="table-wrapper table-editable m--margin-top-20" style="max-height:500px">
                     <table class="table table-brand dataTable-edit">
                         <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                            <th class="m--w-90 first table-actions-col" *ngIf="isContainDraft">
+                            <th class="m--w-90 first table-actions-col" *ngIf="!isUpdate || isContainDraft">
                     
                             </th>
                         </thead>
                         <tbody class="tbody-group">
                             <ng-container *ngIf="!!generalReceipts.length">
                                 <tr *ngFor="let item of generalReceipts; let i = index; trackBy: trackByFn">
-                                    <td class="table-actions-col" *ngIf="isContainDraft">
+                                    <td class="table-actions-col" *ngIf="!isUpdate || isContainDraft">
                                         <div class="table-actions">
                                             <ng-container *ngIf="!isUpdate; else saveDraft">
                                                 <button (click)="duplicateGeneralItem(i)"
