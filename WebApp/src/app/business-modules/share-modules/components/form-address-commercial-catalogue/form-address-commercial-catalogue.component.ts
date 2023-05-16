@@ -7,7 +7,9 @@ import { ToastrService } from 'ngx-toastr';
 import { catchError, finalize } from 'rxjs/operators';
 import { PopupBase } from 'src/app/popup.base';
 import _merge from 'lodash/merge';
-import { pipe } from 'rxjs';
+import { Observable, pipe } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { GetCatalogueAddressAction, getCatalogueAddressState } from '@store';
 
 @Component({
     selector: 'popup-form-address-commercial-catalogue',
@@ -46,18 +48,21 @@ export class FormAddressCommercialCatalogueComponent extends PopupBase implement
     indexDetailAddress: number = null;
     addressDetail: any = null;
     listAddressType: any[] = ['All', 'Delivery', 'Pickup', 'Shipping', 'Billing'];
+    addresses: Observable<AddressPartner[]>;
 
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         protected _progressService: NgProgress,
-        private _toastService: ToastrService) {
+        private _toastService: ToastrService,
+        private _store: Store<any>) {
         super();
         this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
         this.initForm();
-        console.log(this.partner);
+        this._store.dispatch(new GetCatalogueAddressAction());
+        this.addresses = this._store.select(getCatalogueAddressState);
     }
     setDefaultValue(partner: any) {
         if (!!partner) {

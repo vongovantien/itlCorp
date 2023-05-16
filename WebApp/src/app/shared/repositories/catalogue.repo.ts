@@ -591,7 +591,43 @@ export class CatalogueRepo {
         );
     }
 
-    
+    getAllCities(body: any = { active: true }) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCity/query`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    getListDistrict(page?: number, size?: number, body: any = {}) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatDistrict/paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
+        } else {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatDistrict/query`, body).pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
+        }
+    }
+    // getAllDistricts(body: any = { active: true }) {
+    //     return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatDistrict/query`, body).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
+    // getAllWards(body: any = { active: true }) {
+    //     return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatWard/query`, body).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
+
+
 
     getPlace(body?: any) {
         if (!!body) {
@@ -966,17 +1002,17 @@ export class CatalogueRepo {
             })
         );
     }
-    pagingDistrict(page: number, size: number, body: any = {}) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatDistrict/paging`, body, {
-            page: '' + page,
-            size: '' + size
-        }).pipe(
-            catchError((error) => throwError(error)),
-            map((res: any) => {
-                return res;
-            })
-        );
-    }
+    // pagingDistrict(page: number, size: number, body: any = {}) {
+    //     return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatDistrict/paging`, body, {
+    //         page: '' + page,
+    //         size: '' + size
+    //     }).pipe(
+    //         catchError((error) => throwError(error)),
+    //         map((res: any) => {
+    //             return res;
+    //         })
+    //     );
+    // }
     pagingWard(page: number, size: number, body: any = {}) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatWard/paging`, body, {
             page: '' + page,
@@ -988,12 +1024,71 @@ export class CatalogueRepo {
             })
         );
     }
-
-    getCountry(body: any = { active: true }) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCountry/Query`, body).pipe(
-            map((data: any) => data)
-        );
+    getAllWards(page?: number, size?: number, body: any = {}) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatWard/paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
+        } else {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatWard/query`, body).pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
+        }
     }
+
+    getCountry(page?: number, size?: number, body: any = {}) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
+        } else {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCountry/Query`, body).pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
+        }
+    }
+    getAllProvince(page?: number, size?: number, body: any = {}) {
+        if (!!page && !!size) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCity/paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
+        } else {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCity/query`, body).pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
+        }
+    }
+    //     return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatCountry/Query`, body).pipe(
+    //         map((data: any) => data)
+    //     );
+    // }
 
     getDetailCountry(id: number) {
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatCountry/getById/` + id)
@@ -1534,9 +1629,12 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
-
-    addAddress(data:any)
-    {
+    getAddress(body: any = { active: true }) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatAddressPartner/getAll`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    addAddress(data: any) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatAddressPartner/add`, data).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {

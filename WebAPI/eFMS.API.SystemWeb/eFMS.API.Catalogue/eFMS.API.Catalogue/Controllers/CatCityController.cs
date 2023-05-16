@@ -207,30 +207,30 @@ namespace eFMS.API.Catalogue.Controllers
                 int rowCount = worksheet.Dimension.Rows;
                 int ColCount = worksheet.Dimension.Columns;
                 if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
-                if (worksheet.Cells[1, 1].Value?.ToString() != "Province Code")
-                {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'City Code' " });
-                }
-                if (worksheet.Cells[1, 2].Value?.ToString() != "English Name")
-                {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'English Name' " });
-                }
-                if (worksheet.Cells[1, 3].Value?.ToString() != "Local Name")
-                {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Local Name' " });
-                }
-                if (worksheet.Cells[1, 4].Value?.ToString() != "Country Code")
-                {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Country' " });
-                }
-                if (worksheet.Cells[1, 5].Value?.ToString() != "Postal Code")
-                {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Country' " });
-                }
-                if (worksheet.Cells[1, 6].Value?.ToString() != "Inactive")
-                {
-                    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Inactive' " });
-                }
+                //if (worksheet.Cells[1, 1].Value?.ToString() != "Province Code")
+                //{
+                //    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'City Code' " });
+                //}
+                //if (worksheet.Cells[1, 2].Value?.ToString() != "English Name")
+                //{
+                //    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'English Name' " });
+                //}
+                //if (worksheet.Cells[1, 3].Value?.ToString() != "Local Name")
+                //{
+                //    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Local Name' " });
+                //}
+                //if (worksheet.Cells[1, 4].Value?.ToString() != "Country Code")
+                //{
+                //    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Country' " });
+                //}
+                //if (worksheet.Cells[1, 5].Value?.ToString() != "Postal Code")
+                //{
+                //    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Country' " });
+                //}
+                //if (worksheet.Cells[1, 6].Value?.ToString() != "Inactive")
+                //{
+                //    return BadRequest(new ResultHandle { Status = false, Message = "Column 1 must have header is 'Inactive' " });
+                //}
                 List<CatCityModel> list = new List<CatCityModel>();
                 for (int row = 2; row <= rowCount; row++)
                 {

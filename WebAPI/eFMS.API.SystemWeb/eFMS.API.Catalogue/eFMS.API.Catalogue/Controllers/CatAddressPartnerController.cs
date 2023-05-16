@@ -52,7 +52,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// get the list of all address
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Route("getAll")]
         public IActionResult Get()
         {

@@ -17,6 +17,9 @@ import { AppCountryComponent } from './country/country.component';
 import { AppProvinceComponent } from './province/province.component';
 import { AppDistrictComponent } from './district/district.component';
 import { AppWardComponent } from './ward/ward.component';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { reducers, locationEffect } from './store';
 
 const routing: Routes = [
     {
@@ -39,7 +42,9 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         ModalModule.forRoot(),
         TabsModule.forRoot(),
-        PaginationModule.forRoot()
+        PaginationModule.forRoot(),
+        StoreModule.forFeature('locations', reducers),
+        EffectsModule.forFeature(locationEffect),
     ],
     exports: [],
     declarations: [
