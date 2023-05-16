@@ -335,8 +335,8 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                 fromDate: !!this.date.value?.startDate ? formatDate(this.date.value.startDate, 'yyyy-MM-dd', 'en') : null,
                 toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,
                 dateType: this.dateType.value,
-                service: this.service.value[0] === 'All' ? this.mapMultipleValueId(this.services) : this.service.value,
-                office: this.office.value[0] === 'All' ? this.mapMultipleValueId(this.offices) : this.office.value,
+                service: this.service.value[0] === 'All' || !this.service.value.length ? this.mapMultipleValueId(this.services) : this.service.value,
+                office: this.office.value[0] === 'All' || !this.office.value?.length ? this.mapMultipleValueId(this.offices) : this.office.value,
             };
             this.poupParentComponent.onApply(body);
         }
