@@ -2734,7 +2734,15 @@ namespace eFMS.API.Documentation.DL.Services
             surcharge.ChargeId = chargeBuy.DebitCharge ?? Guid.Empty;
 
             surcharge.Quantity = chargeBuy.ServiceDate.Value < datetimeCR ? 1 : chargeBuy.Quantity;
-            surcharge.Vatrate = chargeBuy.ServiceDate.Value < datetimeCR ? 8 : 10; // [CR:18726] update 8 -> 10% from 1/1/2023
+            // [CR:19414 Calculate Vatrate selling]
+            if (chargeBuy.ReplicateAutorateVAT != null && chargeBuy.ReplicateAutorateVAT != 0)
+            {
+                surcharge.Vatrate = chargeBuy.ReplicateAutorateVAT ?? 0;
+            }
+            else
+            {
+                surcharge.Vatrate = chargeBuy.ServiceDate.Value < datetimeCR ? 8 : 10; // [CR:18726] update 8 -> 10% from 1/1/2023
+            }
 
             surcharge.Soano = null;
             surcharge.PaySoano = null;

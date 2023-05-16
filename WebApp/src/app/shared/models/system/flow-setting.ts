@@ -24,6 +24,7 @@ export class FlowSetting {
     approvalSettlement: boolean = false;
     alertAtd: boolean = false;
     overPaymentTermOBH: boolean = false;
+    replicateAutorateVat: number = null;
 
     constructor(data?: any) {
         const self = this;

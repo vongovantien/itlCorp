@@ -255,6 +255,13 @@
                                 [(ngModel)]="replicateOffice.replicatePrefix">
                         </div>
                     </div>
+                    <div class="col-lg-2">
+                        <div class="form-group">
+                            <label for="">Replicate Autorate VAT</label>
+                            <input type="number" class="form-control" [(ngModel)]="replicateOffice.replicateAutorateVat"
+                                placeholder="%" [attr.disabled]="!replicateOffice.replicateOfficeId ? true : null">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
