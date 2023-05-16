@@ -3398,6 +3398,7 @@ namespace eFMS.API.Documentation.DL.Services
                              from acc in accGrps.DefaultIfEmpty()
                              where partner.PartnerType == "Agent" && !string.IsNullOrEmpty(acc.VoucherId) && string.IsNullOrEmpty(sc.PaySoano)
                              || ((sc.SyncedFrom == "SETTLEMENT" || sc.PaySyncedFrom == "SETTLEMENT") && string.IsNullOrEmpty(sc.PaySoano) && string.IsNullOrEmpty(sc.CreditNo))
+                             && (!string.IsNullOrEmpty(sc.PaySyncedFrom) && !string.IsNullOrEmpty(sc.VoucherIdre))
                              select new InvoiceListModel
                              {
                                  JobNo = sc.JobNo,
@@ -3540,6 +3541,7 @@ namespace eFMS.API.Documentation.DL.Services
                              TotalAmountUsd = soa.AmountUsd + soa.VatAmountUsd,
                              ChargeWeight = trans.ChargeWeight,
                              ChargeGroup = soa.ChargeGroup,
+                             InvoiceNo = soa.InvoiceNo,
                              //VoucherId = soa.voucherIdre,
                              VatVoucher = (soa.Type == "Debit") ? soa.InvoiceNo : soa.VoucherId,
                              PaymentStatus = acc.PaymentStatus,
@@ -3619,6 +3621,7 @@ namespace eFMS.API.Documentation.DL.Services
                 VatAmountUsd = se.Sum(x => x.VatAmountUsd),
                 PaymentStatus = se.FirstOrDefault().PaymentStatus,
                 ChargeGroup = se.FirstOrDefault().ChargeGroup,
+                InvoiceNo =  se.Any(x => !string.IsNullOrEmpty(x.InvoiceNo)) ? string.Join(";", se.Select(x => x.InvoiceNo).Distinct()) : string.Empty,
                 VoucherIdre = se.Any(x => !string.IsNullOrEmpty(x.VoucherIdre)) ? string.Join(";", se.Select(x => x.VoucherIdre).Distinct()) : string.Empty,
                 scType = string.Join(";", se.Select(x => x.scType)),
                 VatVoucher = se.FirstOrDefault().VatVoucher,
@@ -4336,10 +4339,13 @@ namespace eFMS.API.Documentation.DL.Services
                 CreditUsd = (rs.Type?.ToUpper() == "CREDIT" || rs.Type?.ToUpper() == "BUY") ? rs?.TotalAmountUsd : 0,
                 // only get VoucherIdre for Note of OBH without Buy or sell
                 // Debit Note get Invoice No Credit Note: VoucherID
-                VatVoucher = rs.scType.Contains(DocumentConstants.CHARGE_OBH_TYPE) 
-                             && (rs.scType.Contains(DocumentConstants.CHARGE_BUY_TYPE) 
-                             || rs.scType.Contains(DocumentConstants.CHARGE_SELL_TYPE)) 
-                             || !rs.scType.Contains(DocumentConstants.CHARGE_OBH_TYPE) ? rs.VatVoucher: rs.VoucherIdre,
+                // Cot VatNo/VoucherID: case OBH -- Payee (CreditNo, PaySyncFrom, PaySoa) -> VoucheIdre 
+                // case OBH -- OBH partner (Dbit, SyncedFrom,SoaNo) -> VoucherID
+
+                VatVoucher = (rs.scType.Contains(DocumentConstants.CHARGE_OBH_TYPE) 
+                             && (rs.scType.Contains(DocumentConstants.CHARGE_BUY_TYPE) || rs.scType.Contains(DocumentConstants.CHARGE_SELL_TYPE)))
+                             || !rs.scType.Contains(DocumentConstants.CHARGE_OBH_TYPE)
+                             ? rs.VatVoucher: (rs.scType.Contains(DocumentConstants.CHARGE_OBH_TYPE) && rs.Type?.ToUpper() == "DEBIT") ? rs.InvoiceNo: rs.VoucherIdre,
                 InvDueDay = rs?.InvDueDay,
                 SoaSmNo = string.IsNullOrEmpty(rs.SoaNo) ? rs.SettleNo : rs.SoaNo
             });
