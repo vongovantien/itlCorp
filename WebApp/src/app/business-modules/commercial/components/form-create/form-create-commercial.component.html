@@ -53,8 +53,7 @@
                                     [attr.disabled]="active || isBranchSubCurrent || this.isBranchSub ? 'disabled' : null"
                                     (blur)="getInforCompanyByTaxCode(this.taxCode.value)">
                                 <div class="form-control-feedback"
-                                    *ngIf="(isSubmitted &&
-                                ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength')))||((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
+                                    *ngIf="isSubmitted && ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
                                     Tax Code include 8 - 14 characters!
                                 </div>
                                 <div class="form-control-feedback"
@@ -73,7 +72,8 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger':(isSubmitted || internalReferenceNo.dirty) && !internalReferenceNo.valid}">
                                 <label>Internal Reference</label>
-                                <input #focusInput type="text" class="form-control" formControlName="internalReferenceNo">
+                                <input #focusInput type="text" class="form-control"
+                                    formControlName="internalReferenceNo">
                                 <div class="form-control-feedback" *ngIf="isSubmitted &&
                                 ((internalReferenceNo.errors | equalError: 'maxlength' )|| (internalReferenceNo.errors | equalError: 'minlength'))
                                 ">
@@ -101,10 +101,11 @@
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': isSubmitted && identityNo.invalid }">
+                    <div class="form-group"
+                        [ngClass]="{ 'm-form__group has-danger': isSubmitted && identityNo.invalid }">
                         <label>Identity No</label>
                         <input type="text" class="form-control" formControlName="identityNo"
-                        [attr.disabled]="this.isActive === true ? 'disabled' : null">
+                            [attr.disabled]="this.isActive === true ? 'disabled' : null">
                         <div [ngClass]="'text-danger'"
                             *ngIf="(isSubmitted && ((identityNo.errors | equalError:'maxlength') || (identityNo.errors | equalError:'minlength'))) ">
                             Identity No include 8 - 15 characters!
@@ -119,11 +120,12 @@
                         <label>ID Date</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true" name="daterange" [autoApply]="true"
-                                formControlName="dateId" readonly
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                                name="daterange" [autoApply]="true" formControlName="dateId" readonly
                                 [attr.disabled]="this.isActive === true ? 'disabled' : null">
                             <ng-container *ngIf="dateId?.value?.startDate !== null && this.isActive === false">
-                                <span class=" m-input-icon_clear" (click)="resetFormControl(dateId)"><i class="la la-times"></i></span>
+                                <span class=" m-input-icon_clear" (click)="resetFormControl(dateId)"><i
+                                        class="la la-times"></i></span>
                             </ng-container>
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
@@ -137,7 +139,7 @@
                     <div class="form-group">
                         <label>ID Place</label>
                         <input type="text" class="form-control" formControlName="placeId"
-                        [attr.disabled]="this.isActive === true ? 'disabled' : null">
+                            [attr.disabled]="this.isActive === true ? 'disabled' : null">
                     </div>
                 </div>
             </div>
