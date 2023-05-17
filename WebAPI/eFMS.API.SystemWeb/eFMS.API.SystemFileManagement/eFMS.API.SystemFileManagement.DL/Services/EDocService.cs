@@ -11,6 +11,7 @@ using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver.Linq;
@@ -2435,6 +2436,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             });
             
             var hs = await _sysImageDetailRepo.DeleteAsync(e=> listEdoc.Contains(e.Id));
+            //_sysImageDetailRepo.SubmitChanges();
             return hs.Success;
         }
 
@@ -2447,12 +2449,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             if (delEdoc)
             {
                 var billingId=getBillingId(model.BillingType,model.BillingNo);
-                var imageIds = _sysImageRepo.Get(x => billingId.Contains(x.ObjectId)).Select(x=>x.Id);
-                imageIds.ToList().ForEach(async  x =>
+                var imageIds = _sysImageRepo.Get(x => billingId==x.ObjectId).Select(x=>x.Id);
+                imageIds.ToList().ForEach( x =>
                 {
                     if (!_sysImageDetailRepo.Any(z => x == z.SysImageId))
                     {
-                        await _sysImageRepo.DeleteAsync(g => g.Id == x);
+                        _sysImageRepo.DeleteAsync(g => g.Id == x);
                     }
                 });
             }
