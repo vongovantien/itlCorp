@@ -11,8 +11,6 @@ using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,34 +37,32 @@ namespace eFMS.API.ForPartner.DL.Service
 
         public async Task<HandleState> UpdatePartnerBankInfoSyncStatus(BankStatusUpdateModel model)
         {
-            try
+            var hs = new HandleState();
+            var partner = await catPartnerRepository.Get(x => x.AccountNo == model.PartnerCode).FirstOrDefaultAsync();
+            if (partner == null)
             {
-                var hs = new HandleState();
-                var errorsMessage = new List<string>();
-                var partner = await catPartnerRepository.Get(x => x.AccountNo == model.PartnerCode).FirstOrDefaultAsync();
-                var listBank = await DataContext.WhereAsync(x => x.PartnerId.ToString() == partner.Id);
-                foreach (var item in model.BankInfo)
-                {
-                    if (listBank.Any(x => x.BankAccountNo == item.BankAccountno))
-                    {
-                        var updateItem = listBank.FirstOrDefault(x => x.BankAccountNo == item.BankAccountno);
-                        updateItem.ApproveDescription = item.Description;
-                        updateItem.ApproveStatus = item.ApproveStatus;
-                        hs = await DataContext.UpdateAsync(updateItem, x => x.Id == updateItem.Id);
-                    }
-                    else
-                    {
-                        errorsMessage.Add(item.BankAccountno);
-                    }
-                }
-                hs = new HandleState(false, (object)$"{string.Join(", ", errorsMessage)} không tồn tại trong hệ thống");
-                return hs;
+                return new HandleState(false, (object)"Thông tin partner không tồn tại");
             }
-            catch (Exception)
-            {
 
-                throw;
+            var listBank = await DataContext.GetAsync(x => x.PartnerId == partner.Id);
+            var errorsMessage = model.BankInfo
+                .Where(item => !listBank.Any(bank => bank.BankAccountNo == item.BankAccountno))
+                .Select(item => item.BankAccountno);
+
+            if (errorsMessage.Any())
+            {
+                return new HandleState(false, (object)$"{string.Join(", ", errorsMessage)} không tồn tại trong hệ thống");
             }
+
+            foreach (var item in model.BankInfo)
+            {
+                var bank = listBank.FirstOrDefault(x => x.BankAccountNo == item.BankAccountno);
+                bank.ApproveDescription = item.Description;
+                bank.ApproveStatus = item.ApproveStatus;
+                hs = DataContext.Update(bank, x => x.Id == bank.Id, false);
+            }
+            hs = DataContext.SubmitChanges();
+            return hs;
         }
 
         public bool ValidateApiKey(string apiKey)
