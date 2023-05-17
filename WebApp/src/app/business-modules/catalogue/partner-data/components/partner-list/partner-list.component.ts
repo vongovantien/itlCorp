@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemRepo } from '@repositories';
@@ -8,6 +8,8 @@ import { Partner, Company, Office } from '@models';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { IPartnerDataState, getPartnerDataSearchParamsState, getPartnerDataListState, LoadListPartner, getPartnerDataListPagingState, getPartnerDataListLoadingState } from '../../store';
 import { Store } from '@ngrx/store';
+import { ManagementAddressComponent } from 'src/app/business-modules/commercial/components/management-address/management-commercial-address.component';
+
 
 
 @Component({
@@ -15,6 +17,8 @@ import { Store } from '@ngrx/store';
     templateUrl: './partner-list.component.html'
 })
 export class PartnerListComponent extends AppList implements OnInit {
+    @ViewChild(ManagementAddressComponent) formManagementAddress: ManagementAddressComponent;
+
     // @Input() type = 0;
     @Input() criteria: any = {};
     @Input() isSearching: boolean = false;
@@ -30,6 +34,7 @@ export class PartnerListComponent extends AppList implements OnInit {
 
     isSearch: boolean = false;
     dataSearchs: any = [];
+    selectedPartner: any;
 
     constructor(private _ngProgressService: NgProgress,
         private _catalogueRepo: CatalogueRepo,
@@ -256,5 +261,13 @@ export class PartnerListComponent extends AppList implements OnInit {
 
     showConfirmDelete(item) {
         this.deleteConfirm.emit(item);
+    }
+    onSelectPartner(partner: Partner) {
+        this.selectedPartner = partner;
+    }
+
+    showManagementAddress(partner: any) {
+        this.formManagementAddress.setDefaultValue(partner);
+        this.formManagementAddress.show();
     }
 }

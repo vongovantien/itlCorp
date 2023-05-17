@@ -175,7 +175,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
                     (res) => {
-                        this.provinces = this.utility.prepareNg2SelectData(res || [], 'id', 'name_VN');
+                        this.provinces = this.utility.prepareNg2SelectData(res || [], 'id', 'nameVn');
                     }
                 );
         } else {
@@ -183,7 +183,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
                     (res) => {
-                        this.provinces = this.utility.prepareNg2SelectData(res || [], 'id', 'name_VN');
+                        this.provinces = this.utility.prepareNg2SelectData(res || [], 'id', 'nameVn');
                     }
                 );
         }
@@ -194,7 +194,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
                     (res) => {
-                        this.districts = this.utility.prepareNg2SelectData(res || [], 'id', 'name_VN');
+                        this.districts = this.utility.prepareNg2SelectData(res || [], 'id', 'nameVn');
                     }
                 );
         } else {
@@ -202,7 +202,7 @@ export class FormWarehouseComponent extends PopupBase implements OnInit {
                 .pipe(catchError(this.catchError), finalize(() => { }))
                 .subscribe(
                     (res) => {
-                        this.districts = this.utility.prepareNg2SelectData(res || [], 'id', 'name_VN');
+                        this.districts = this.utility.prepareNg2SelectData(res || [], 'id', 'nameVn');
                     }
                 );
         }

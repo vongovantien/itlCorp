@@ -154,6 +154,30 @@
         public static readonly string MSG_COUNTRY_CODE_DUPLICATE = "MSG_COUNTRY_CODE_DUPLICATE";
         #endregion
 
+        #region city
+        public static readonly string MSG_CITY_NAME_EN_EMPTY = "MSG_CITY_NAME_EN_EMPTY";
+        public static readonly string MSG_CITY_NAME_LOCAL_EMPTY = "MSG_CITY_NAME_LOCAL_EMPTY";
+        public static readonly string MSG_CITY_CODE_EMPTY = "MSG_CITY_CODE_EMPTY";
+        public static readonly string MSG_CITY_EXISTED = "MSG_CITY_EXISTED";
+        public static readonly string MSG_CITY_CODE_DUPLICATE = "MSG_CITY_CODE_DUPLICATE";
+        #endregion
+
+        #region district
+        public static readonly string MSG_DISTRICT_NAME_EN_EMPTY = "MSG_DISTRICT_NAME_EN_EMPTY";
+        public static readonly string MSG_DISTRICT_NAME_LOCAL_EMPTY = "MSG_DISTRICT_NAME_LOCAL_EMPTY";
+        public static readonly string MSG_DISTRICT_CODE_EMPTY = "MSG_DISTRICT_CODE_EMPTY";
+        public static readonly string MSG_DISTRICT_EXISTED = "MSG_DISTRICT_EXISTED";
+        public static readonly string MSG_DISTRICT_CODE_DUPLICATE = "MSG_DISTRICT_CODE_DUPLICATE";
+        #endregion
+
+        #region ward
+        public static readonly string MSG_WARD_NAME_EN_EMPTY = "MSG_WARD_NAME_EN_EMPTY";
+        public static readonly string MSG_WARD_NAME_LOCAL_EMPTY = "MSG_WARD_NAME_LOCAL_EMPTY";
+        public static readonly string MSG_WARD_CODE_EMPTY = "MSG_WARD_CODE_EMPTY";
+        public static readonly string MSG_WARD_EXISTED = "MSG_WARD_EXISTED";
+        public static readonly string MSG_WARD_CODE_DUPLICATE = "MSG_WARD_CODE_DUPLICATE";
+        #endregion
+
         #region Stage
         public static readonly string MSG_STAGE_NAME_EN_EMPTY = "MSG_STAGE_NAME_EN_EMPTY";
         public static readonly string MSG_STAGE_CODE_EMPTY = "MSG_STAGE_CODE_EMPTY";

@@ -58,6 +58,12 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatBank, CatBankModel>();
             CreateMap<CatStandardCharge, CatStandardChargeModel>();
             CreateMap<CatPartnerBank, CatPartnerBankModel>().ReverseMap();
+            CreateMap<CatCity, CatCityModel>();
+            CreateMap<CatAddressPartner, CatAddressPartnerModel>();
+            CreateMap<CatDistrict, CatDistrictModel>();
+            CreateMap<CatWard, CatWardModel>();
+
+
 
         }
     }

@@ -442,7 +442,7 @@ export class FormAddPartnerComponent extends AppForm {
                 this.getShippingProvinces(data.id, !!this.provinceShippingId.value ? this.provinceShippingId.value : null);
                 break;
             case 'shippping-city':
-                this.shippingProvinceName = data.name_EN;
+                this.shippingProvinceName = data.nameEn;
                 this.provinceShippingId.setValue(data.id);
                 break;
             case 'billing-country':

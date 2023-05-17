@@ -47,6 +47,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysOffice> officeRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<CatCountry> catCountryRepository;
+        private readonly IContextBase<CatCity> catCityRepository;
         private readonly IContextBase<SysImage> sysImageRepository;
         private readonly IContextBase<CsTransactionDetail> transactionDetailRepository;
         private readonly IContextBase<CatDepartment> catDepartmentRepository;
@@ -70,6 +71,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CatContract> contractRepo, IOptions<WebUrl> url,
             IContextBase<SysOffice> officeRepo,
             IContextBase<CatCountry> catCountryRepo,
+            IContextBase<CatCity> catCityRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
             IContextBase<SysImage> sysImageRepo,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
@@ -92,6 +94,7 @@ namespace eFMS.API.Catalogue.DL.Services
             officeRepository = officeRepo;
             sysEmployeeRepository = sysEmployeeRepo;
             catCountryRepository = catCountryRepo;
+            catCityRepository = catCityRepo;
             sysImageRepository = sysImageRepo;
             transactionDetailRepository = transactionDetailRepo;
             catDepartmentRepository = catDepartmentRepo;
@@ -1448,13 +1451,15 @@ namespace eFMS.API.Catalogue.DL.Services
 
             if (queryDetail.ProvinceId != null)
             {
-                CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
-                queryDetail.ProvinceName = province.NameEn;
+                CatCity city = catCityRepository.Get(x => x.Id == queryDetail.ProvinceId)?.FirstOrDefault();
+                //CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
+                queryDetail.ProvinceName = city?.NameEn;
             }
             if (queryDetail.ProvinceShippingId != null)
             {
-                CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
-                queryDetail.ProvinceShippingName = province.NameEn;
+                CatCity city = catCityRepository.Get(x => x.Id == queryDetail.ProvinceShippingId)?.FirstOrDefault();
+                //CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
+                queryDetail.ProvinceShippingName = city?.NameEn;
             }
             // Get usercreate name
             if (queryDetail.UserCreated != null)

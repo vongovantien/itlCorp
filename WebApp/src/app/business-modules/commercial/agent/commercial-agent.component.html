@@ -54,7 +54,8 @@
                     <tbody>
                         <ng-container *ngIf="!!agents.length">
                             <ng-container *ngFor="let agent of agents; let i = index; trackBy: trackByFn">
-                                <tr class="collapse-toggle-row">
+                                <tr class="collapse-toggle-row"
+                                [contextMenu]="AddressContextMenu" (onTouch)="onSelectPartner(agent)">
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <button type="button" (click)="showSaleman(agent.id)"
@@ -164,11 +165,19 @@
         </div>
     </div>
 </div>
-
+<app-context-menu #AddressContextMenu (clickOutside)="selectedPartner = null">
+    <div class="menu-context__item" position="rightTop" trigger="hover" >
+        <div class="d-flex justify-content-between ">
+            <div>
+                <span (click)="showManagementAddress(selectedPartner)">Address Management </span>
+            </div>
+        </div>
+    </div>
+</app-context-menu>
 <confirm-popup body="You want to delete this agent ?" (onSubmit)="onDelete()"></confirm-popup>
-
 <permission-403-popup></permission-403-popup>
 <popup-form-contract-commercial-catalogue (onRequest)="onRequestContract($event)">
 </popup-form-contract-commercial-catalogue>
 
+<management-address-commercial></management-address-commercial>
 <form-search-export-popup></form-search-export-popup>

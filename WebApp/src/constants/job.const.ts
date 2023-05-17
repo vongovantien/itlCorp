@@ -76,7 +76,7 @@ export class JobConstants {
         ],
         COMBOGRID_CITY_PROVINCE: <CommonInterface.IComboGridDisplayField[]>[
             { field: 'code', label: 'City Code' },
-            { field: 'name_EN', label: 'Name En' },
+            { field: 'nameEn', label: 'Name En' },
         ]
     };
 

@@ -1,8 +1,8 @@
 export class ProviceModel {
     id: string;
     code: string;
-    name_EN: string;
-    name_VN: string;
+    nameEn: string;
+    nameVn: string;
     areaID: string;
     countryID: number;
     countryNameVN: string;
@@ -14,4 +14,13 @@ export class ProviceModel {
     datetimeModified?: Date;
     active?: boolean;
     inactiveOn?: Date;
+
+    constructor(data?: any) {
+        const self = this;
+        for (const key in data) {
+            if (self.hasOwnProperty(key)) {
+                self[key] = data[key];
+            }
+        }
+    }
 }

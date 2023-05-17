@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
@@ -9,7 +9,10 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 import { SortService } from 'src/app/shared/services';
 import { AddWardPopupComponent } from './add-ward/add-ward.component';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { SearchOptionsComponent } from '@common';
+import { getLocationWardState, getWardDataSearch, ICatLocationState, LoadListWardLocation, SearchListWard } from '../store';
+import { Store } from '@ngrx/store';
 
 
 
@@ -22,6 +25,8 @@ export class AppWardComponent extends AppList implements OnInit {
 
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(AddWardPopupComponent) wardPopup: AddWardPopupComponent;
+    @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
+
 
     wards: any[] = [];
     selectedWard: any;
@@ -42,14 +47,16 @@ export class AppWardComponent extends AppList implements OnInit {
         private _ngProgressService: NgProgress,
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _store: Store<ICatLocationState>,
+        private _cd: ChangeDetectorRef
 
     ) {
         super();
 
         this._progressRef = this._ngProgressService.ref();
         this.requestSearch = this.searchWard;
-        this.requestList = this.getWards;
+        this.requestList = this.requestListWard;
         this.requestSort = this.sortWard;
     }
 
@@ -64,28 +71,66 @@ export class AppWardComponent extends AppList implements OnInit {
             { title: 'Country', field: 'countryName', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
-
+        this._store.select(getWardDataSearch)
+            .pipe(
+                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe),
+                map((dataSearch) => ({ dataSearch: dataSearch }))
+            ).subscribe(
+                (res: any) => {
+                    if (!!res && !!Object.keys(res?.dataSearch).length) {
+                        this.dataSearch = res.dataSearch;
+                    }
+                },
+            );
         this.getWards();
+        this.requestListWard();
     }
-
+    ngAfterViewInit() {
+        if (Object.keys(this.dataSearch).length > 0) {
+            this.searchOptionsComponent.searchObject.searchString = this.dataSearch.keyword;
+            this._cd.detectChanges();
+        }
+    }
     searchWard(event: CommonInterface.ISearchOption) {
         this.dataSearch = { placeType: CommonEnum.PlaceTypeEnum.Ward };
         this.dataSearch[event.field] = event.searchString;
+        this.dataSearch.keyword = event.searchString;
+        this._store.dispatch(SearchListWard({ payload: this.dataSearch }));
+        this.requestListWard();
         this.getWards();
     }
-
+    requestListWard() {
+        this._store.dispatch(LoadListWardLocation({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
     getWards() {
-        this.isLoading = true;
-        this._progressRef.start();
-        this._catalogueRepo.pagingPlace(this.page, this.pageSize, this.dataSearch)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this.isLoading = false;
-                this._progressRef.complete();
-            }))
-            .subscribe(
-                (res: CommonInterface.IResponsePaging) => {
+        // this.isLoading = true;
+        // this._progressRef.start();
+        // this._catalogueRepo.pagingWard(this.page, this.pageSize, this.dataSearch)
+        //     .pipe(catchError(this.catchError), finalize(() => {
+        //         this.isLoading = false;
+        //         this._progressRef.complete();
+        //     }))
+        //     .subscribe(
+        //         (res: CommonInterface.IResponsePaging) => {
+        //             this.wards = res.data || [];
+        //             this.totalItems = res.totalItems;
+        //         }
+        //     );
+        this._store.select(getLocationWardState)
+            .pipe(
+                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe),
+                map((data: CommonInterface.IResponsePaging | any) => {
+                    return {
+                        data: data.data,
+                        totalItems: data.totalItems,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
                     this.wards = res.data || [];
-                    this.totalItems = res.totalItems;
+                    this.totalItems = res.totalItems || 0;
                 }
             );
     }
@@ -96,6 +141,8 @@ export class AppWardComponent extends AppList implements OnInit {
 
     resetSearch() {
         this.dataSearch = { placeType: CommonEnum.PlaceTypeEnum.Ward };
+        this.requestListWard()
+        this._store.dispatch(SearchListWard({ payload: {} }));
         this.getWards();
     }
 
@@ -127,7 +174,7 @@ export class AppWardComponent extends AppList implements OnInit {
         this.confirmDeletePopup.hide();
 
         this._progressRef.start();
-        this._catalogueRepo.deletePlace(this.selectedWard.id)
+        this._catalogueRepo.deleteWard(this.selectedWard.id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
