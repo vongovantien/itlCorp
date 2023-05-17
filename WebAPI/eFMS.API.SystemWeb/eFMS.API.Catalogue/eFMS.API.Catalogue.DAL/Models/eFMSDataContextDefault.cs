@@ -33,6 +33,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CatIncoterm> CatIncoterm { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
         public virtual DbSet<CatPartnerBank> CatPartnerBank { get; set; }
+        public virtual DbSet<CatPartnerBank> CatPartnerBank { get; set; }
         public virtual DbSet<CatPartnerCharge> CatPartnerCharge { get; set; }
         public virtual DbSet<CatPartnerEmail> CatPartnerEmail { get; set; }
         public virtual DbSet<CatPartnerGroup> CatPartnerGroup { get; set; }
@@ -52,6 +53,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<CustomsDeclaration> CustomsDeclaration { get; set; }
         public virtual DbSet<OpsStageAssigned> OpsStageAssigned { get; set; }
         public virtual DbSet<OpsTransaction> OpsTransaction { get; set; }
+        public virtual DbSet<SysActionFuncLog> SysActionFuncLog { get; set; }
         public virtual DbSet<SysActionFuncLog> SysActionFuncLog { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
         public virtual DbSet<SysEmailSetting> SysEmailSetting { get; set; }
@@ -577,6 +579,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.IsOverDueObh).HasColumnName("IsOverDueOBH");
 
+                entity.Property(e => e.IsOverDueObh).HasColumnName("IsOverDueOBH");
+
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
                     .IsUnicode(false);
@@ -1026,6 +1030,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("SysMappingID")
                     .HasMaxLength(200);
 
+                entity.Property(e => e.SysMappingId)
+                    .HasColumnName("SysMappingID")
+                    .HasMaxLength(200);
+
                 entity.Property(e => e.TaxCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -1094,6 +1102,45 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.PartnerId)
                     .HasColumnName("PartnerID")
                     .HasMaxLength(50);
+
+                entity.Property(e => e.Source).HasMaxLength(50);
+
+                entity.Property(e => e.SwiftCode).HasMaxLength(200);
+
+                entity.Property(e => e.UserCreated).HasMaxLength(50);
+
+                entity.Property(e => e.UserModified).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<CatPartnerBank>(entity =>
+            {
+                entity.ToTable("catPartnerBank");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.ApproveDescription).HasMaxLength(200);
+
+                entity.Property(e => e.ApproveStatus).HasMaxLength(50);
+
+                entity.Property(e => e.BankAccountName).HasMaxLength(200);
+
+                entity.Property(e => e.BankAccountNo).HasMaxLength(200);
+
+                entity.Property(e => e.BankAddress).HasMaxLength(200);
+
+                entity.Property(e => e.BankId).HasColumnName("BankID");
+
+                entity.Property(e => e.BeneficiaryAddress).HasMaxLength(200);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
 
                 entity.Property(e => e.Source).HasMaxLength(50);
 
@@ -1292,6 +1339,8 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.WardId).HasColumnName("WardID");
 
                 entity.Property(e => e.WardId).HasColumnName("WardID");
 
@@ -2101,6 +2150,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.SubColoader).HasMaxLength(800);
+
+                entity.Property(e => e.TrackingStatus).HasMaxLength(50);
 
                 entity.Property(e => e.TrackingStatus).HasMaxLength(50);
 
@@ -2919,6 +2970,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2932,6 +2987,45 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
+            });
+
+            modelBuilder.Entity<SysActionFuncLog>(entity =>
+            {
+                entity.ToTable("sysActionFuncLog");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.EndDateProgress).HasColumnType("datetime");
+
+                entity.Property(e => e.FuncLocal)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FuncPartner)
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Major).HasMaxLength(100);
+
+                entity.Property(e => e.ObjectRequest).HasColumnType("ntext");
+
+                entity.Property(e => e.ObjectResponse).HasColumnType("ntext");
+
+                entity.Property(e => e.StartDateProgress).HasColumnType("datetime");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysActionFuncLog>(entity =>
@@ -3262,6 +3356,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.SyncStatus).HasMaxLength(50);
+
+                entity.Property(e => e.SyncStatus)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 

@@ -5,11 +5,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { Company, Customer, Office, User } from '@models';
+import { Company, Customer, Office, Partner, User } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemFileManageRepo, SystemRepo } from '@repositories';
-import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, getCurrentUserState, getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { GetCatalogueCurrencyAction, IAppState, getCatalogueCurrencyState, getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { catchError, distinctUntilChanged, finalize, map, takeUntil } from 'rxjs/operators';
@@ -76,7 +76,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
 
     partnerId: string = null;
-
+    detailPartner: Partner;
     users: any[] = [];
     companies: Company[] = [];
     contracts: Contract[] = [];
@@ -161,6 +161,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+
         this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
             if (!!res) {
                 this.currentUser = res;
@@ -211,6 +212,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 });
 
         }
+        console.log(this.partnerId)
     }
 
     initForm() {
@@ -222,7 +224,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             contractNo: [null, Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
             expiredDate: [null, Validators.compose([
-                Validators.required, 
+                Validators.required,
                 this.checkExpiredDate
             ])],
             contractType: [null, Validators.required],
@@ -863,7 +865,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 (res: boolean) => {
                     if (res === true) {
                         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
-                            body: 'There are Other Agreement that same service, If Agreement is actived, Those Agreement will be Inactive. Are You Sure Active this agreement ?',
+                            body: 'There are Other Agreement that same service, If Agreement is activated, Those Agreement will be Inactive. Are You Sure Active this agreement ?',
                             label: 'OK'
                         }, () => {
                             this.processActiveInActiveContract(id);
@@ -894,26 +896,42 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     processActiveInActiveContract(id: string, bodyCredit?: any) {
         this._progressRef.start();
         this._catalogueRepo.activeInactiveContract(id, this.partnerId, bodyCredit)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this._progressRef.complete();
-            }))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this.selectedContract.active = !this.selectedContract.active;
                         this.statusContract = this.selectedContract.active;
-                        let message = '';
-                        if (!this.selectedContract.active) {
-                            message = 'Inactive success !!';
-                        } else {
-                            message = 'Active success !!';
-                            this.selectedContract.partnerStatus = true;
-                        }
+                        const message = this.selectedContract.active ? 'Active success !!' : 'Inactive success !!';
+                        // if (this.selectedContract.active) {
+                        //     this.selectedContract.partnerStatus = true;
+                        //     console.log(this.detailPartner)
+                        //     const action = !!this.detailPartner.sysMappingID ? 'UPDATE' : 'ADD';
+                        //     this.syncPartnerToAccountantSystem([{ Id: this.partnerId, action }]);
+                        // }
+                        console.log(this.detailPartner)
                         this._toastService.success(message);
                         this.onRequest.emit(this.selectedContract);
                     } else {
                         this._toastService.error(res.message);
                     }
+                }
+            );
+    }
+
+    syncPartnerToAccountantSystem(partnerSyncIds: any[]) {
+        this._catalogueRepo.syncPartnerToAccountantSystem(partnerSyncIds)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    const messageType = res.status ? 'success' : 'warning';
+                    this._toastService[messageType](res.message);
                 }
             );
     }

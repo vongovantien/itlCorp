@@ -169,7 +169,8 @@ export class PartnerDetailComponent extends AppList {
                         this.allowUpdate = this.partner.permission.allowUpdate;
                         this.formPartnerComponent.isAddBranchSub = this.isAddSubPartner;
                         this.formPartnerComponent.groups = this.partner.partnerGroup;
-                        // console.log("res: ", res);
+                        this.formContractPopup.detailPartner = this.partner;
+                        console.log(this.partner)
                         this.formPartnerComponent.setFormData(this.partner);
                         if (this.isAddSubPartner) {
                             this.formPartnerComponent.getACRefName(this.partner.id);
@@ -512,18 +513,24 @@ export class PartnerDetailComponent extends AppList {
                 },
             );
     }
-    onSave(body: any) {
 
+    onSave(body: any) {
         this._progressRef.start();
         if (!this.isAddSubPartner) {
             this._catalogueRepo.updatePartner(body.id, body)
-                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                .subscribe(
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
+                ).subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this.formPartnerComponent.activePartner = this.partner.active;
                             this.formPartnerComponent.bankName.setValue(this.formPartnerComponent.bankName.value?.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
                             this.getParentCustomers();
+                            if (body.active === true) {
+                                const partnerSyncIds: any[] = [{ id: body.id, action: !!body.SysMappingID ? 'UPDATE' : 'ADD' }];
+                                this.syncPartnerToAccountantSystem(partnerSyncIds);
+                            }
                             this._toastService.success(res.message);
                         } else {
                             this._toastService.warning(res.message);
@@ -545,6 +552,23 @@ export class PartnerDetailComponent extends AppList {
                     }, err => {
                     });
         }
+    }
+
+    syncPartnerToAccountantSystem(partnerSyncIds: string[]) {
+        this._catalogueRepo.syncPartnerToAccountantSystem(partnerSyncIds)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe((res: CommonInterface.IResult) => {
+                const { status, message } = res;
+
+                if (status) {
+                    this._toastService.success(message);
+                } else {
+                    this._toastService.warning(message);
+                }
+            });
     }
 
     sortBySaleMan(sortData: CommonInterface.ISortData): void {

@@ -31,6 +31,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using eFMS.API.Catalogue.DL.Models.CataloguePartner;
+using Microsoft.EntityFrameworkCore;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -58,6 +60,8 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICacheServiceBase<CatPartner> cache;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
+        private readonly IContextBase<CatBank> catBankRepository;
+        IContextBase<CatPartnerBank> catPartnerBankRepository;
         SysUser salemanBOD;
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -80,6 +84,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<SysEmailSetting> sysEmailSettingRepo,
+            IContextBase<CatPartnerBank> catPartnerBankRepo,
+            IContextBase<CatBank> catBankRepo,
             IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -103,6 +109,8 @@ namespace eFMS.API.Catalogue.DL.Services
             cache = cacheService;
             sysEmailTemplateRepository = sysEmailTemplateRepo;
             sysEmailSettingRepository = sysEmailSettingRepo;
+            catBankRepository = catBankRepo;
+            catPartnerBankRepository = catPartnerBankRepo;
 
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -165,6 +173,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             if (hsContract.Success)
                             {
                                 if (partner.IsRequestApproval == true)
+                                if (partner.IsRequestApproval == true)
                                 {
                                     foreach (var item in entity.Contracts)
                                     {
@@ -178,6 +187,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                         SendMailRequestApproval(entity);
                                     }
                                 }
+
 
                             }
 
@@ -356,8 +366,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     lstCCAR = null;
                 }
                 else if (DataCamOfficeAR.Id.ToString().ToUpper().Equals(OfficeId.ToUpper()))
+                else if (DataCamOfficeAR.Id.ToString().ToUpper().Equals(OfficeId.ToUpper()))
                 {
                     lstCCAR = null;
+                }
                 }
                 else
                 {
@@ -542,6 +554,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 lstTo = listEmailViewModel.ListAccountant;
                 if (listEmailViewModel.ListCCAccountant != null)
+                if (listEmailViewModel.ListCCAccountant != null)
                 {
                     lstCc.AddRange(listEmailViewModel.ListCCAccountant);
                 }
@@ -549,6 +562,7 @@ namespace eFMS.API.Catalogue.DL.Services
             else
             {
                 lstTo = listEmailViewModel.ListAR;
+                if (listEmailViewModel.ListCCAR != null)
                 if (listEmailViewModel.ListCCAR != null)
                 {
                     lstCc.AddRange(listEmailViewModel.ListCCAR);
@@ -976,6 +990,32 @@ namespace eFMS.API.Catalogue.DL.Services
                              Office = GetContractOfficeName(c.OfficeId),
                              PartnerType = p.PartnerType
                          };
+                         join p in DataContext.Get() on c.PartnerId equals p.Id
+                         join user1 in sysUSer on c.SaleManId equals user1.Id into grpUs1
+                         from g1 in grpUs1.DefaultIfEmpty()
+                         join user2 in sysUSer on c.UserCreated equals user2.Id into grpUs2
+                         from g2 in grpUs2.DefaultIfEmpty()
+                         where p.PartnerType == criteria.PartnerType
+                         select new QueryExportAgreementInfo
+                         {
+                             Active = c.Active,
+                             AgreementNo = c.ContractNo,
+                             AgreementType = c.ContractType,
+                             ARComfirm = c.Arconfirmed,
+                             CreditLimit = c.ContractType == DataEnums.CONTRACT_TRIAL ? c.TrialCreditLimited : c.CreditLimit,
+                             Currency = c.CurrencyId,
+                             EffectiveDate = c.EffectiveDate,
+                             ExpiredDate = c.ExpiredDate,
+                             PartnerCode = p.TaxCode,
+                             PartnerNameEn = p.PartnerNameEn,
+                             PartnerNameVn = p.PartnerNameVn,
+                             PaymentTerm = c.PaymentTerm,
+                             SaleManName = g1.Username,
+                             UserCreatedName = g2.Username,
+                             Service = Common.CommonData.GetServicesName(c.SaleService),
+                             Office = GetContractOfficeName(c.OfficeId),
+                             PartnerType = p.PartnerType
+                         };
 
             }
             if (string.IsNullOrEmpty(criteria.PartnerType))
@@ -1006,11 +1046,37 @@ namespace eFMS.API.Catalogue.DL.Services
                              Office = GetContractOfficeName(c.OfficeId),
                              PartnerType = p.PartnerType
                          };
+                         join p in DataContext.Get() on c.PartnerId equals p.Id
+                         join user1 in sysUSer on c.SaleManId equals user1.Id into grpUs1
+                         from g1 in grpUs1.DefaultIfEmpty()
+                         join user2 in sysUSer on c.UserCreated equals user2.Id into grpUs2
+                         from g2 in grpUs2.DefaultIfEmpty()
+                         select new QueryExportAgreementInfo
+                         {
+                             Active = c.Active,
+                             AgreementNo = c.ContractNo,
+                             AgreementType = c.ContractType,
+                             ARComfirm = c.Arconfirmed,
+                             CreditLimit = c.ContractType == DataEnums.CONTRACT_TRIAL ? c.TrialCreditLimited : c.CreditLimit,
+                             Currency = c.CurrencyId,
+                             EffectiveDate = c.EffectiveDate,
+                             ExpiredDate = c.ExpiredDate,
+                             PartnerCode = p.TaxCode,
+                             PartnerNameEn = p.PartnerNameEn,
+                             PartnerNameVn = p.PartnerNameVn,
+                             PaymentTerm = c.PaymentTerm,
+                             SaleManName = g1.Username,
+                             UserCreatedName = g2.Username,
+                             Service = Common.CommonData.GetServicesName(c.SaleService),
+                             Office = GetContractOfficeName(c.OfficeId),
+                             PartnerType = p.PartnerType
+                         };
 
             }
             return result;
         }
 
+        public IQueryable<QueryExportAgreementInfo> MappingQueryAgreementInfo(IQueryable<CatPartner> queryPartner, bool? AgreeActive, string partnerType)
         public IQueryable<QueryExportAgreementInfo> MappingQueryAgreementInfo(IQueryable<CatPartner> queryPartner, bool? AgreeActive, string partnerType)
         {
             var contract = contractRepository.Get();
@@ -1225,6 +1291,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return new HandleState();
         }
 
+
         public HandleState CheckDeletePermission(string id)
         {
             var detail = DataContext.Get(x => x.Id == id).FirstOrDefault();
@@ -1398,6 +1465,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 BankName = x.partner.BankName,
                 Note = x.partner.Note,
                 OfficeName = x.ShortName
+                OfficeName = x.ShortName
             });
             return results;
         }
@@ -1450,12 +1518,12 @@ namespace eFMS.API.Catalogue.DL.Services
             if (queryDetail.ProvinceId != null)
             {
                 CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
-                queryDetail.ProvinceName = province.NameEn;
+                queryDetail.ProvinceName = province?.NameEn;
             }
             if (queryDetail.ProvinceShippingId != null)
             {
                 CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
-                queryDetail.ProvinceShippingName = province.NameEn;
+                queryDetail.ProvinceShippingName = province?.NameEn;
             }
             // Get usercreate name
             if (queryDetail.UserCreated != null)
@@ -2171,7 +2239,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     var _office = officeRepository.Get(x => x.Id.ToString() == officeId)?.FirstOrDefault();
                     if (_office != null)
+                    if (_office != null)
                     {
+                        officeName += _office.ShortName + "; ";
                         officeName += _office.ShortName + "; ";
                     }
                 }
@@ -2383,6 +2453,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
             Expression<Func<CatPartner, bool>> query = q => true;
             if (criteria.Active != null)
+            if (criteria.Active != null)
             {
                 query = query.And(x => x.Active == criteria.Active);
             }
@@ -2505,6 +2576,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return hs;
         }
 
+
         public List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType, string officeId = null)
         {
             List<SysUserViewModel> salemans = new List<SysUserViewModel>();
@@ -2518,7 +2590,10 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 var office = officeRepository.Get(x => x.Id.ToString() == officeId)?.FirstOrDefault();
                 if (office != null && office.OfficeType == "OutSource")
+                if (office != null && office.OfficeType == "OutSource")
                 {
+                    salemans.Add(new SysUserViewModel
+                    {
                     salemans.Add(new SysUserViewModel
                     {
                         Active = true,
@@ -2531,10 +2606,14 @@ namespace eFMS.API.Catalogue.DL.Services
                     return salemans;
                 }
                 else
+                }
+                else
                 {
                     var contracts = contractRepository.Get(contractExp);
                     salemans = GetSysUserViewModelByContract(contracts);
                 }
+            }
+            else
             }
             else
             {
@@ -2551,6 +2630,8 @@ namespace eFMS.API.Catalogue.DL.Services
                     });
 
                     return salemans;
+                }
+                else
                 }
                 else
                 {
@@ -2596,12 +2677,15 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<CatPartnerForKeyinCharge> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria)
         {
 
+
             IQueryable<CatPartner> dataAgents = Enumerable.Empty<CatPartner>().AsQueryable();
             IQueryable<CatPartner> dataCustomers = Enumerable.Empty<CatPartner>().AsQueryable();
             IQueryable<CatPartnerForKeyinCharge> queryAgentForKeyIn = Enumerable.Empty<CatPartnerForKeyinCharge>().AsQueryable();
             IQueryable<CatPartnerForKeyinCharge> queryInternalForKeyIn = Enumerable.Empty<CatPartnerForKeyinCharge>().AsQueryable();
 
             Expression<Func<CatPartner, bool>> queryAgent = x => x.Active == true && x.PartnerType == DataEnums.PARTNER_TYPE_AGENT;
+            Expression<Func<CatPartner, bool>> queryCustomer = x => x.Active == true
+            && x.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER
             Expression<Func<CatPartner, bool>> queryCustomer = x => x.Active == true
             && x.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER
             && x.PartnerMode != DataEnums.PARTNER_MODE_INTERNAL;
@@ -2657,6 +2741,18 @@ namespace eFMS.API.Catalogue.DL.Services
                                              AccountNo = p.AccountNo,
                                              PartnerType = p.PartnerType,
                                          };
+                                         join c in contractCustomers on p.Id equals c.PartnerId
+                                         select new CatPartnerForKeyinCharge
+                                         {
+                                             Id = p.Id,
+                                             PartnerGroup = p.PartnerGroup,
+                                             PartnerNameVn = p.PartnerNameVn,
+                                             PartnerNameEn = p.PartnerNameEn,
+                                             ShortName = p.ShortName,
+                                             TaxCode = p.TaxCode,
+                                             AccountNo = p.AccountNo,
+                                             PartnerType = p.PartnerType,
+                                         };
             var partnersInternal = DataContext.Get(x => x.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER && x.PartnerMode == DataEnums.PARTNER_MODE_INTERNAL);
             queryInternalForKeyIn = from p in partnersInternal
                                     select new CatPartnerForKeyinCharge
@@ -2685,6 +2781,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     client.BaseAddress = new Uri(baseUrl);
                     client.DefaultRequestHeaders.Clear();
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
 
                     HttpResponseMessage res = await client.GetAsync(baseUrl);
                     var item = new CatPartnerModel();
@@ -2755,6 +2852,60 @@ namespace eFMS.API.Catalogue.DL.Services
 
             hs = await DataContext.AddAsync(newModel);
             return hs;
+        }
+    }
+
+        public async Task<List<PartnerSyncModel>> GetListPartnerToSync(List<string> Ids)
+        {
+            var dataReturn = new List<PartnerSyncModel>();
+            if (Ids == null || !Ids.Any()) return dataReturn;
+            var partners = await DataContext.GetAsync(x => Ids.Contains(x.Id));
+            foreach (var partner in partners)
+            {
+                var partnerSync = new PartnerSyncModel();
+                partnerSync.Code = partner.AccountNo;
+                partnerSync.Name = partner.PartnerNameVn;
+                partnerSync.CustomerType = partner.PartnerGroup.Trim() == "STAFF;PERSONAL" ? "1" : (partner.PartnerMode.Trim() == "External" ? "2" : "3");
+                partnerSync.Address = partner.AddressShippingVn;
+                partnerSync.BillingAddress = partner.AddressVn;
+                partnerSync.TaxRegNo = partner.TaxCode;
+                partnerSync.Tel = partner.Tel;
+                partnerSync.Email = partner.Email;
+                partnerSync.IdCardNo = partner.IdentityNo;
+                partnerSync.IdCardDate = partner.DateId.ToString();
+                partnerSync.IdCardPlace = partner.PlaceId;
+
+                var partnerBankAccounts = await catPartnerBankRepository.GetAsync(x => x.PartnerId.ToString() == partner.Id && x.ApproveStatus == "New");
+                var bankAccounts = new List<PartnerBankAccountSyncModel>();
+                var attachedBankFiles = new List<PartnerAttachDocSyncModel>();
+                foreach (var partnerBank in partnerBankAccounts)
+                {
+                    var bankDetail = await catBankRepository.Where(x => x.Id == partnerBank.BankId).FirstOrDefaultAsync();
+                    bankAccounts.Add(new PartnerBankAccountSyncModel()
+                    {
+                        BankCode = bankDetail.Code,
+                        BankAccountNo = partnerBank.BankAccountName,
+                        BankName = bankDetail.BankNameEn,
+                        SwiftCode = partnerBank.SwiftCode,
+                        Address = partnerBank.BankAddress
+                    });
+
+                    var attachedFiles = sysImageRepository.Get(x => x.ObjectId == partner.Id).Select(x => new PartnerAttachDocSyncModel
+                    {
+                        AttachDocRowId = x.Id.ToString(),
+                        AttachDocDate = x.DateTimeCreated.ToString(),
+                        AttachDocName = x.Name,
+                        AttachDocPath = x.Url
+                    });
+                    attachedBankFiles.AddRange(attachedFiles);
+                }
+
+                partnerSync.Details = bankAccounts;
+                partnerSync.AtchDocInfo = attachedBankFiles;
+                dataReturn.Add(partnerSync);
+            }
+
+            return dataReturn;
         }
     }
 }

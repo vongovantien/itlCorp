@@ -1,7 +1,15 @@
-﻿using AutoMapper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using AutoMapper;
+using eFMS.API.Accounting.DL.IService;
+using eFMS.API.Accounting.DL.Models.Accounting;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Models.CataloguePartner;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.Infrastructure.Middlewares;
 using eFMS.API.Catalogue.Models;
@@ -15,6 +23,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
@@ -37,6 +47,9 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatPartnerService catPartnerService;
         private readonly IMapper mapper;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IOptions<ESBUrl> _webUrl;
+        private readonly BravoLoginModel loginInfo;
+        private readonly IActionFuncLogService actionFuncLogService;
 
         /// <summary>
         /// constructor
@@ -48,12 +61,21 @@ namespace eFMS.API.Catalogue.Controllers
         public CatPartnerController(IStringLocalizer<LanguageSub> localizer,
             ICatPartnerService service,
             IMapper iMapper,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IOptions<ESBUrl> webUrl,
+              IActionFuncLogService actionFuncLog)
         {
             stringLocalizer = localizer;
             catPartnerService = service;
             mapper = iMapper;
             _hostingEnvironment = hostingEnvironment;
+            _webUrl = webUrl;
+            actionFuncLogService = actionFuncLog;
+            loginInfo = new BravoLoginModel
+            {
+                UserName = "bravo",
+                Password = "br@vopro"
+            };
         }
 
         /// <summary>
@@ -670,6 +692,114 @@ namespace eFMS.API.Catalogue.Controllers
                 return Ok(result);
             }
             return Ok(hs);
+        }
+
+        [HttpPut("SyncPartnerToAccountantSystem")]
+        [Authorize]
+        public async Task<IActionResult> GetListPartnerToSync(List<RequestStringListModel> request)
+        {
+            var _startDateProgress = DateTime.Now;
+            if (!ModelState.IsValid) return BadRequest();
+
+            try
+            {
+                // 1. Login
+                HttpResponseMessage responseFromApi = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api/Login", loginInfo, null);
+                BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
+                if (loginResponse?.Success != "1")
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = null });
+                }
+                // 2. Get Data To Sync.
+                List<string> ids = request.Select(x => x.Id).ToList();
+
+                List<string> idsAdd = request.Where(x => x.Action == ACTION.ADD).Select(x => x.Id).ToList();
+                List<string> idsUpdate = request.Where(x => x.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
+
+                List<PartnerSyncModel> listAdd = (idsAdd.Count > 0) ? await catPartnerService.GetListPartnerToSync(idsAdd) : new List<PartnerSyncModel>();
+                List<PartnerSyncModel> listUpdate = (idsUpdate.Count > 0) ? await catPartnerService.GetListPartnerToSync(idsUpdate) : new List<PartnerSyncModel>();
+
+                HttpResponseMessage resAdd = new HttpResponseMessage();
+                HttpResponseMessage resUpdate = new HttpResponseMessage();
+                BravoResponseModel responseAddModel = new BravoResponseModel();
+                BravoResponseModel responseUpdateModel = new BravoResponseModel();
+
+                // 3. Call Bravo to SYNC.
+                if (listAdd.Count > 0)
+                {
+                    resAdd = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSCustomerSyncAdd", listAdd, loginResponse.TokenKey);
+                    responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+
+                    #region -- Ghi Log --
+                    var modelLog = new SysActionFuncLogModel
+                    {
+                        Id = Guid.NewGuid(),
+                        FuncLocal = "GetListPartnerToSync",
+                        FuncPartner = "EFMSCustomerSyncAdd",
+                        ObjectRequest = JsonConvert.SerializeObject(listAdd),
+                        ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
+                        Major = "Đồng bộ đối tượng",
+                        StartDateProgress = _startDateProgress,
+                        EndDateProgress = DateTime.Now
+                    };
+                    var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+                    #endregion
+                }
+
+                if (listUpdate.Count > 0)
+                {
+                    resUpdate = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSCustomerSyncUpdate", listUpdate, loginResponse.TokenKey);
+                    responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
+
+                    #region -- Ghi Log --
+                    var modelLog = new SysActionFuncLogModel
+                    {
+                        Id = Guid.NewGuid(),
+                        FuncLocal = "GetListPartnerToSync",
+                        FuncPartner = "EFMSCustomerSyncUpdate",
+                        ObjectRequest = JsonConvert.SerializeObject(listAdd),
+                        ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
+                        Major = "Đồng bộ đối tượng",
+                        StartDateProgress = _startDateProgress,
+                        EndDateProgress = DateTime.Now
+                    };
+                    var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+                    #endregion
+                }
+                //update partner status
+                if (responseAddModel.Success == "1")
+                {
+                    var idsItemAdd = request.Where(x => x.Action == ACTION.ADD).Select(x => x.Id).ToList();
+                    var listUpdated = await catPartnerService.GetAsync(x => idsItemAdd.Contains(x.Id));
+
+                    foreach (var item in listUpdated)
+                    {
+                        item.SysMappingId = item.AccountNo;
+                        var hs = catPartnerService.Update(item);
+                        hs = catPartnerService.SubmitChanges();
+                    }
+                }
+                // 4. Update STATUS
+                if (responseAddModel?.Success == "1"
+                    || responseUpdateModel?.Success == "1")
+                {
+                    ResultHandle result = new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_SUCCESS"].Value, Data = ids };
+                    return Ok(result);
+                }
+                else
+                {
+                    if (responseAddModel?.Success == null && responseUpdateModel?.Success == null)
+                    {
+                        return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = null });
+                    }
+                    return BadRequest(new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = ids });
+                }
+
+            }
+            catch (Exception)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = null });
+            }
         }
     }
 }

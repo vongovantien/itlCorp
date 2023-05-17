@@ -1,10 +1,12 @@
 ﻿using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Models.CataloguePartner;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Models;
 using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using System;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +43,7 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatPartnerForKeyinCharge> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria);
         Task<CatPartnerModel> GetPartnerByTaxCode (string taxCode);
         Task<HandleState> AddPartnerFromUserData(Guid userId);
+        Task<List<PartnerSyncModel>> GetListPartnerToSync(List<string> Ids);
 
     }
 }

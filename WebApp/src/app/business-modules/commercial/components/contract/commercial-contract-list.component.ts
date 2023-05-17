@@ -275,9 +275,9 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${this.partnerId}/contract/${this.selectedContract.id}`]);
     }
 
-    getListContract(partneId: string) {
+    getListContract(partnerId: string) {
         this.isLoading = true;
-        this._catalogueRepo.getListContract(partneId, false)
+        this._catalogueRepo.getListContract(partnerId, false)
             .pipe(
                 finalize(() => this.isLoading = false)
             )
