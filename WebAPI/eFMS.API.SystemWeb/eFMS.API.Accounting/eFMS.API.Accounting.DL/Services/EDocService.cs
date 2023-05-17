@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
@@ -20,6 +21,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CsTransaction> _csTran;
         readonly IContextBase<AcctSettlementPayment> _settle;
         readonly IContextBase<CsShipmentSurcharge> _surcharge;
+        readonly IContextBase<SysOffice> _office;
+        readonly ICurrentUser _currentUser;
         public EDocService(
             IContextBase<SysImageDetail> repository, 
             IContextBase<AcctAdvanceRequest> advRequest,
@@ -27,7 +30,9 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CsTransaction> csTran,
             IContextBase<AcctSettlementPayment> settle,
             IContextBase<CsShipmentSurcharge> surcharge,
-            IMapper mapper
+            IContextBase<SysOffice> office,
+            ICurrentUser currentUser,
+        IMapper mapper
             ) : base(repository, mapper)
         {
             _advRequest= advRequest;
@@ -35,6 +40,26 @@ namespace eFMS.API.Accounting.DL.Services
             _csTran= csTran;
             _settle= settle;
             _surcharge= surcharge;
+            _office= office;
+            _currentUser = currentUser;
+        }
+
+        public List<Guid?> getListRep(List<Guid?> lstJobId)
+        {
+            var fromRep = _office.Any(x => x.Id == _currentUser.OfficeID && x.OfficeType == "OutSource");
+            if(fromRep)
+            {
+                var result = new List<Guid?>();
+                lstJobId.ForEach(x =>
+                {
+                    if (_opsTran.Any(z => z.ReplicatedId == x))
+                    {
+                        result.Add(x);
+                    }
+                });
+                return result;
+            }
+            return lstJobId;
         }
 
         public EdocAccUpdateModel MapAdvanceRequest(string AdvNo)
@@ -49,7 +74,7 @@ namespace eFMS.API.Accounting.DL.Services
                 BillingNo = AdvNo,
                 BillingType = "Advance",
                 ListAdd = lstAdd,
-                ListDel = lstDel,
+                ListDel = getListRep(lstDel),
             };
             return edocModel;
         }
@@ -66,7 +91,7 @@ namespace eFMS.API.Accounting.DL.Services
                 BillingNo = settleNo,
                 BillingType = "Settlement",
                 ListAdd = lstAdd,
-                ListDel = lstDel,
+                ListDel = getListRep(lstDel),
             };
             return edocModel;
         }
@@ -83,7 +108,7 @@ namespace eFMS.API.Accounting.DL.Services
                 BillingNo = soaNo,
                 BillingType = "SOA",
                 ListAdd = lstAdd,
-                ListDel = lstDel,
+                ListDel = getListRep(lstDel),
             };
             return edocModel;
         }
@@ -93,7 +118,7 @@ namespace eFMS.API.Accounting.DL.Services
             var result = new List<Guid?>();
             jobNos.ForEach(jobNo =>
             {
-                if (jobNo.Contains("LOG"))
+                if (jobNo.Contains("LOG")|| jobNo.Contains("TKI"))
                 {
                     var opsId = _opsTran.Get(x => x.JobNo == jobNo).FirstOrDefault().Id;
                     result.Add(opsId);

@@ -72,7 +72,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     ngOnInit(): void {
         this.getJobList();
-        this.transactionType = this.isAttachFilePOD === true ? this.transactionType: this.typeFrom;
+        this.transactionType = this.isAttachFilePOD === true ? this.transactionType : this.typeFrom;
         this.configJob = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'jobId', label: 'JobID' },
@@ -115,10 +115,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe((res) => {
                     if (res) {
-                        if (res?.settlement !== null && res?.settlement !== undefined) {
-                            this.billingId = res.settlement.id;
-                            this.billingNo = res.settlement.settlementNo
-                        }
+                        this.billingId = res.settlement?.id;
+                        this.billingNo = res.settlement?.settlementNo
                     }
                 })
         } else {
@@ -158,7 +156,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            _uniqBy(data, 'hbl').forEach(element => {
+                            var listJob = data.filter(x => x.id !== SystemConstants.EMPTY_GUID);
+                            _uniqBy(listJob, 'hbl').forEach(element => {
                                 let item = ({
                                     jobId: element.jobId,
                                     id: element.shipmentId,
@@ -171,7 +170,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             }
                             );
 
-                            _uniqBy(data, 'payer').forEach(element => {
+                            _uniqBy(listJob, 'payer').forEach(element => {
                                 let item = ({
                                     payer: element.payer,
                                 })
@@ -179,7 +178,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             }
                             );
                             this.configPayee.dataSource = this.payeeDataSource;
-                            _uniqBy(data, 'invoiceNo').forEach(element => {
+                            _uniqBy(listJob, 'invoiceNo').forEach(element => {
                                 if (element.invoiceNo !== '') {
                                     let item = ({
                                         invoiceNo: element.invoiceNo,
@@ -452,6 +451,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             if (res.status) {
                                 this._toastService.success("Upload file successfully!");
                                 this.resetForm();
+                                this.hide();
+                                //this._store.dispatch(LoadListEDocSettle({ transactionType: this.transactionType, billingId: this.billingId }));
+                                this.onSearchEdoc.emit(this.transactionType);
                                 this.isSubmitted = false;
                             }
                         }
