@@ -10,6 +10,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver.Linq;
@@ -20,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using static eFMS.API.Common.Helpers.FileHelper;
 using static System.Net.Mime.MediaTypeNames;
@@ -150,15 +152,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         }
         private SysImageDetail MapToJobITL(SysImageDetail edoc)
         {
-            var isRep = _opsTranRepo.Any(x => x.ReplicatedId == edoc.JobId && x.CurrentStatus != "Canceled");
-            var jobITL = _opsTranRepo.Where(x => x.ReplicatedId == edoc.JobId);
-            if (isRep && jobITL != null)
+            //var isRep = _opsTranRepo.Any(x => x.ReplicatedId == edoc.JobId && x.CurrentStatus != "Canceled");
+            var jobITL = _opsTranRepo.Where(x => x.ReplicatedId == edoc.JobId).FirstOrDefault();
+            if (jobITL != null)
             {
                 return new SysImageDetail()
                 {
                     BillingNo = edoc.BillingNo,
                     BillingType = edoc.BillingType,
-                    JobId = jobITL.FirstOrDefault().Id,
+                    JobId = jobITL.Id,
                     Id = Guid.NewGuid(),
                     DatetimeCreated = edoc.DatetimeCreated,
                     DatetimeModified = edoc.DatetimeModified,
@@ -260,13 +262,19 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             listRepDetail.Add(sysImageDetail);
                             _sysImageDetailRepo.Add(sysImageDetail, false);
                             var imageDetailClone = sysImageDetail;
-                            var mapRepToITL = MapToJobITL(imageDetailClone);
-                            if (mapRepToITL != null)
+                            if (_opsTranRepo.Any(x => x.Id == edoc.JobId && x.CurrentStatus != "Canceled"))
                             {
-                                //listDetail.Add(mapRepToITL);
-                                _sysImageDetailRepo.Add(mapRepToITL, false);
-                                //_sysImageDetailRepo.SubmitChanges();
+                                var imageDetailClone1 = sysImageDetail;
+                                var mapRepToITL1 = MapToJobITL(imageDetailClone1);
+                                _sysImageDetailRepo.Add(mapRepToITL1, false);
                             }
+                            //var mapRepToITL = MapToJobITL(imageDetailClone);
+                            //if (mapRepToITL != null)
+                            //{
+                            //    //listDetail.Add(mapRepToITL);
+                            //    _sysImageDetailRepo.Add(mapRepToITL, false);
+                            //    //_sysImageDetailRepo.SubmitChanges();
+                            //}
                         }
                         else if (type == "Settlement")
                         {
@@ -304,13 +312,13 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                     GroupId = currentUser.GroupId,
                                     Hblid = item.HBLId,
                                 };
-                                if(_opsTranRepo.Any(x=>x.Id==item.JobId))
+                                _sysImageDetailRepo.Add(imageDetail, false);
+                                if (_opsTranRepo.Any(x => x.Id == item.JobId && x.CurrentStatus != "Canceled"))
                                 {
                                     var imageDetailClone = imageDetail;
                                     var mapRepToITL = MapToJobITL(imageDetailClone);
                                     _sysImageDetailRepo.Add(mapRepToITL, false);
                                 }
-                                _sysImageDetailRepo.Add(imageDetail, false);
                             }
 
                         }
@@ -1167,6 +1175,17 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     edoc.DocumentTypeId = GetDocTypeIdByJob(edocUpdate.TransactionType, (int)edocUpdate.DocumentTypeId, edocUpdate.AccountingType);
                     edoc.JobId = edocUpdate.JobId;
                     var hs = await _sysImageDetailRepo.UpdateAsync(edoc, x => x.Id == edoc.Id, false);
+                    if (_opsTranRepo.Any(x => edocUpdate.JobId == x.ReplicatedId))
+                    {
+                        var ops = await _opsTranRepo.GetAsync(x => x.ReplicatedId == edocUpdate.JobId);
+                        var edocRep = await _sysImageDetailRepo.GetAsync(x => x.JobId == ops.FirstOrDefault().Id && x.SysImageId == edoc.SysImageId);
+                        var edocClone = edocRep.FirstOrDefault();
+                        edocClone.SystemFileName = edoc.SystemFileName;
+                        edocClone.Note = edoc.Note;
+                        edocClone.DocumentTypeId = edoc.DocumentTypeId;
+                        _sysImageDetailRepo.Update(edocClone, x => x.Id == edocClone.Id, true);
+                        //_sysImageDetailRepo.SubmitChanges();
+                    }
                 }
                 if (edoc == null)
                 {
@@ -2228,10 +2247,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             return true;
         }
 
-        private SysAttachFileTemplate GetDocType(string transactionType, string billingType)
-        {
-            return _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType && x.AccountingType == billingType).FirstOrDefault();
-        }
+        //private SysAttachFileTemplate GetDocType(string transactionType, string billingType)
+        //{
+        //    return _attachFileTemplateRepo.Get(x => x.TransactionType == transactionType && x.AccountingType == billingType).FirstOrDefault();
+        //}
 
         private List<Guid?> FilterEdocForJob(string billingNo)
         {
@@ -2239,7 +2258,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             var imageForJob = _sysImageDetailRepo.Get(x => x.BillingNo == billingNo).GroupBy(x => x.SysImageId);
             imageForJob.ToList().ForEach(x =>
             {
-                if (x.Count() > 1)
+                if (x.Count() > 0)
                 {
                     result.Add(x.FirstOrDefault().SysImageId);
                 }
@@ -2251,70 +2270,171 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             var imgIds = FilterEdocForJob(billingNo);
             var images = new List<Guid>();
+            var billingId= getBillingId(billingType, billingNo);
+            switch (billingType)
+            {
+                case "Settlement":
+                    images = _sysImageRepo.Get(x => x.ObjectId == billingId && imgIds.Contains(x.Id)).Select(x=>x.Id).ToList();
+                    break;
+                case "Advance":
+                    images = _sysImageRepo.Get(x => x.ObjectId == billingId && imgIds.Contains(x.Id)).Select(x => x.Id).ToList();
+                    break;
+                case "SOA":
+                    images = _sysImageRepo.Get(x => x.ObjectId == billingId && imgIds.Contains(x.Id)).Select(x => x.Id).ToList();
+                    break;
+                default: return null;
+            }
+            var result = _sysImageDetailRepo.Get(x=> images.Contains((Guid)x.SysImageId)).GroupBy(x => x.SysImageId).Select(x => x.FirstOrDefault()).ToList();
+            return _sysImageDetailRepo.Get(x => images.Contains((Guid)x.SysImageId)).GroupBy(x => x.SysImageId).Select(x => x.FirstOrDefault()).ToList();
+        }
+
+        private string getBillingId(string billingType, string billingNo)
+        {
             switch (billingType)
             {
                 case "Settlement":
                     var settlId = _setleRepo.Get(x => x.SettlementNo == billingNo).FirstOrDefault().Id;
-                    images = _sysImageRepo.Get(x => x.ObjectId == settlId.ToString() && imgIds.Contains(x.Id)).Select(x=>x.Id).ToList();
-                    break;
+                    return settlId.ToString();
                 case "Advance":
                     var advId = _advRepo.Get(x => x.AdvanceNo == billingNo).FirstOrDefault().Id;
-                    images = _sysImageRepo.Get(x => x.ObjectId == advId.ToString() && imgIds.Contains(x.Id)).Select(x => x.Id).ToList();
-                    break;
+                    return advId.ToString();
                 case "SOA":
                     var soaId = _soaRepo.Get(x => x.Soano == billingNo).FirstOrDefault().Id;
-                    images = _sysImageRepo.Get(x => x.ObjectId == soaId.ToString() && imgIds.Contains(x.Id)).Select(x => x.Id).ToList();
-                    break;
-                default: return null;
+                    return soaId.ToString();
+                default: return Guid.Empty.ToString();
             }
-            return _sysImageDetailRepo.Get(x => images.Contains((Guid)x.SysImageId)).GroupBy(x => x.SysImageId).Select(x => x.FirstOrDefault()).ToList();
         }
+
+        private async Task<bool> InsertEdocfromAcc(EdocAccUpdateModel model, bool fromRep)
+        {
+            var listEdoc=new List<SysImageDetail>();
+            var listImage = GetListImageByAcc(model.BillingType, model.BillingNo);
+            var groupListImage=new List<List<SysImageDetail>>();
+            if (fromRep)
+            {
+                groupListImage = listImage.GroupBy(x => x.SysImageId).Select(x => x.Count() > 2 ? x.ToList() : null).ToList();
+            }
+            else
+            {
+                groupListImage = listImage.GroupBy(x => x.SysImageId).Select(x => x.Count() > 1 ? x.ToList() : null).ToList();
+            }
+            var listImageResult=new List<SysImageDetail>();
+            if (groupListImage.Count > 0)
+            {
+                groupListImage.ForEach(x =>
+                {
+                    listImageResult.AddRange(x);
+                });
+                if (listImageResult.Count > 0)
+                {
+                    listImageResult.ForEach(img =>
+                    {
+                        model.ListAdd.ForEach(x =>
+                        {
+                            var edoc = new SysImageDetail()
+                            {
+                                Id = Guid.NewGuid(),
+                                BillingNo = model.BillingNo,
+                                BillingType = model.BillingType,
+                                DatetimeCreated = DateTime.Now,
+                                DocumentTypeId = img.DocumentTypeId,
+                                JobId = x,
+                                Source = model.BillingType,
+                                SystemFileName = img.SystemFileName,
+                                SysImageId = img.SysImageId,
+                                UserCreated = img.UserCreated,
+                                UserFileName = img.UserFileName,
+                            };
+                            listEdoc.Add(edoc);
+                            if (fromRep)
+                            {
+                                var itlId = _opsTranRepo.Get(g => g.ReplicatedId == x).FirstOrDefault();
+                                if (itlId != null)
+                                {
+                                    //var edocClone = new SysImageDetail();
+                                    var edocClone = new SysImageDetail
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        BillingNo = model.BillingNo,
+                                        BillingType = model.BillingType,
+                                        DatetimeCreated = DateTime.Now,
+                                        DocumentTypeId = img.DocumentTypeId,
+                                        JobId = itlId.Id,
+                                        Source = model.BillingType,
+                                        SystemFileName = img.SystemFileName,
+                                        SysImageId = img.SysImageId,
+                                        UserCreated = img.UserCreated,
+                                        UserFileName = img.UserFileName,
+                                    };
+                                    listEdoc.Add(edocClone);
+                                }
+                            }
+                        });
+                    });
+                }
+            };
+            var hs = await _sysImageDetailRepo.AddAsync(listEdoc);
+            return hs.Success;
+        }
+
+        private async Task<bool> RemoveEdocfromAcc(EdocAccUpdateModel model,bool fromRep)
+        {
+            var billingId= getBillingId(model.BillingType, model.BillingNo);
+            var listEdoc = new List<Guid>();
+            var lstImgUpdate = new List<Guid>();
+            var listImage = await _sysImageDetailRepo.GetAsync(x => x.BillingNo == model.BillingNo && model.ListDel.Contains((Guid)x.JobId));
+            listImage.ForEach(img =>
+            {
+                model.ListDel.ForEach(x =>
+                {
+                   if(img.JobId==x) 
+                   {
+                        listEdoc.Add(img.Id);
+                        if (fromRep)
+                        {
+
+                            var itlId = _opsTranRepo.Get(g => g.ReplicatedId == img.JobId).FirstOrDefault();
+                            if (itlId != null)
+                            {
+                                var edocId = _sysImageDetailRepo.Get(z =>z.JobId == itlId.Id&&z.BillingNo==model.BillingNo&&z.SysImageId==img.SysImageId).FirstOrDefault().Id;
+                                listEdoc.Add(edocId);
+                            }
+                        }
+                    }
+                });
+
+            });
+            
+            var hs = await _sysImageDetailRepo.DeleteAsync(e=> listEdoc.Contains(e.Id));
+            return hs.Success;
+        }
+
 
         public async Task<HandleState> UpdateEdocByAcc(EdocAccUpdateModel model)
         {
-            var hsDel = new HandleState();
-            var result=  new HandleState(true,"Update EDoc Success");
-            if (hsDel.Success)
+            var fromRep = await _officeRepo.AnyAsync(x => x.Id == currentUser.OfficeID && x.OfficeType == "OutSource");
+            var result = new HandleState(true,"Update Edoc Success");
+            var delEdoc=await RemoveEdocfromAcc(model,fromRep);
+            if (delEdoc)
             {
-                var listEdoc = new List<SysImageDetail>();
-                var listImage = GetListImageByAcc(model.BillingType, model.BillingNo);
-                listImage.ForEach(img =>
+                var billingId=getBillingId(model.BillingType,model.BillingNo);
+                var imageIds = _sysImageRepo.Get(x => billingId.Contains(x.ObjectId)).Select(x=>x.Id);
+                imageIds.ToList().ForEach(async  x =>
                 {
-                    model.ListAdd.ForEach(x =>
+                    if (!_sysImageDetailRepo.Any(z => x == z.SysImageId))
                     {
-                        var edoc = new SysImageDetail()
-                        {
-                            Id = Guid.NewGuid(),
-                            BillingNo = model.BillingNo,
-                            BillingType = model.BillingType,
-                            DatetimeCreated = DateTime.Now,
-                            DocumentTypeId = img.DocumentTypeId,
-                            JobId = x,
-                            Source = model.BillingType,
-                            SystemFileName = img.SystemFileName,
-                            SysImageId = img.SysImageId,
-                            UserCreated = img.UserCreated,
-                            UserFileName = img.UserFileName,
-                        };
-                        listEdoc.Add(edoc);
-                    });
+                        await _sysImageRepo.DeleteAsync(g => g.Id == x);
+                    }
                 });
-                result = await _sysImageDetailRepo.AddAsync(listEdoc);
-                if (!result.Success)
-                {
-                    result = new HandleState("Add Edoc Wrrong");
-                }
-                else
-                {
-                    if (model.ListDel.Count == 0)
-                    {
-                        hsDel = new HandleState(true, "Don't have Edoc to Delete");
-                    }
-                    else
-                    {
-                        hsDel = await _sysImageDetailRepo.DeleteAsync(x => x.BillingNo == model.BillingNo && model.ListDel.Contains((Guid)x.JobId));
-                    }
-                }
+            }
+            var addEdoc = await InsertEdocfromAcc(model,fromRep);
+            if(!addEdoc)
+            {
+                result = new HandleState("Add Edoc Wrrong");
+            }
+            if(!delEdoc)
+            {
+                result = new HandleState("Delete Edoc Wrrong");
             }
             return result;
         }
