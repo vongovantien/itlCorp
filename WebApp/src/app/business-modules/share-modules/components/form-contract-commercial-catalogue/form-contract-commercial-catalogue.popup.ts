@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
@@ -27,13 +27,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     formGroup: FormGroup;
     partners: Observable<Customer[]>;
-
     isUpdate: boolean = false;
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(SalesmanCreditLimitPopupComponent) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
     @ViewChild(PartnerRejectPopupComponent) popupRejectPartner: PartnerRejectPopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmChangeAgreementTypePopup: ConfirmPopupComponent;
-
+    @Input() detailPartner: any;
     openOnPartner: boolean = false;
 
     isRequiredContractNo: boolean = false;
@@ -76,7 +75,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
 
     partnerId: string = null;
-    detailPartner: Partner;
     users: any[] = [];
     companies: Company[] = [];
     contracts: Contract[] = [];
@@ -161,7 +159,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-
+        console.log(this.detailPartner)
         this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
             if (!!res) {
                 this.currentUser = res;
@@ -912,7 +910,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         //     const action = !!this.detailPartner.sysMappingID ? 'UPDATE' : 'ADD';
                         //     this.syncPartnerToAccountantSystem([{ Id: this.partnerId, action }]);
                         // }
-                        console.log(this.detailPartner)
                         this._toastService.success(message);
                         this.onRequest.emit(this.selectedContract);
                     } else {

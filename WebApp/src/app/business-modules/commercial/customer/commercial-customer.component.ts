@@ -20,8 +20,8 @@ import { Observable } from 'rxjs';
 import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 import { FormSearchExportComponent } from '../components/popup/form-search-export/form-search-export.popup';
-import { getCustomerListState, getCustomerLoadingState, getCustomerSearchParamsState, ICustomerState } from './store';
-import { LoadListCustomer, SearchList } from './store/actions/customer.action';
+import { ICustomerState, getCustomerListState, getCustomerLoadingState, getCustomerSearchParamsState } from './store';
+import { LoadListCustomer, SearchList, getDetailCustomerSuccess } from './store/actions/customer.action';
 
 
 @Component({

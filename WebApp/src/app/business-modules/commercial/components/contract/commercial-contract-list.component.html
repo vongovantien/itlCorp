@@ -98,7 +98,7 @@
 
 <confirm-popup body="You want to delete this contract ?" (onSubmit)="onDelete()"></confirm-popup>
 
-<popup-form-contract-commercial-catalogue (onRequest)="onRequestContract($event)">
+<popup-form-contract-commercial-catalogue  [detailPartner]="detailPartner" (onRequest)="onRequestContract($event)">
 </popup-form-contract-commercial-catalogue>
 
 <popup-form-update-email-contract (onRequest)="onHandleRequest($event)"></popup-form-update-email-contract>

@@ -89,11 +89,11 @@
                         [ngClass]="{ 'm-form__group has-danger': (isSubmitted || taxCode.dirty) && (taxCode.invalid|| (taxCode.errors | equalError:'maxlength' || taxCode.errors | equalError:'minlength')) }">
                         <label class="form-control-label" for="">Tax Code<span class="m--font-danger">(*)</span>
                         </label>
-                        <input [attr.disabled]="active.value || isBranchSub || this.isAddBranchSub ?  'disabled' : null"
-                            type="text" min="0" class="form-control m-input m-input--square"
-                            title="Tax code must be number" placeholder="Please enter Tax Code" autocomplete="nope"
-                            formControlName="taxCode" [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }"
-                            required (blur)="getInforCompanyByTaxCode(this.taxCode.value)">
+                        <input [attr.disabled]="active.value || isBranchSub || this.isAddBranchSub ?  'disabled' : null" type="text" min="0"
+                            class="form-control m-input m-input--square" title="Tax code must be number"
+                            placeholder="Please enter Tax Code" autocomplete="nope" formControlName="taxCode"
+                            [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }" required
+                            (blur)="getInforCompanyByTaxCode(this.taxCode.value)">
                         <div class="form-control-feedback"
                             *ngIf="(isSubmitted &&
                             ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength')))||((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
@@ -161,8 +161,7 @@
             </div>
             <div class="row">
                 <div class="col-lg-4">
-                    <div class="form-group"
-                        [ngClass]="{ 'm-form__group has-danger': isSubmitted && partnerGroup.invalid }">
+                    <div class="form-group" [ngClass]="{ 'm-form__group has-danger': isSubmitted && partnerGroup.invalid }">
                         <label class="form-control-label" for="">
                             Category <span class="m--font-danger">(*)</span>
                         </label>
@@ -175,11 +174,10 @@
                             Category is required
                         </div>
                     </div>
-                    <div class="form-group"
-                        [ngClass]="{ 'm-form__group has-danger': isSubmitted && identityNo.invalid }">
+                    <div class="form-group"  [ngClass]="{ 'm-form__group has-danger': isSubmitted && identityNo.invalid }">
                         <label>Identity No</label>
                         <input type="text" class="form-control" formControlName="identityNo"
-                            [attr.disabled]="this.active.value === true ? 'disabled' : null">
+                        [attr.disabled]="this.active.value === true ? 'disabled' : null">
                         <div [ngClass]="'text-danger'"
                             *ngIf="(isSubmitted && ((identityNo.errors | equalError:'maxlength') || (identityNo.errors | equalError:'minlength')))">
                             Identity No include 8 - 15 characters!
@@ -201,26 +199,23 @@
                         <label>ID Date</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                name="daterange" [autoApply]="true" formControlName="dateId" readonly
+                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true" name="daterange"
+                                [autoApply]="true" formControlName="dateId" readonly
                                 [attr.disabled]="this.active.value === true ? 'disabled' : null">
                             <span class="m-input-icon__icon m-input-icon__icon--right">
                                 <span>
                                     <i class="la la-calendar"></i>
                                 </span>
                             </span>
-                            <ng-container
-                                *ngIf="!!dateId.value && !!dateId.value.startDate && this.active.value === false">
-                                <span class=" m-input-icon_clear" (click)="resetFormControl(dateId)"><i
-                                        class="la la-times"></i></span>
+                            <ng-container *ngIf="!!dateId.value && !!dateId.value.startDate && this.active.value === false">
+                                <span class=" m-input-icon_clear"  (click)="resetFormControl(dateId)"><i class="la la-times"></i></span>
                             </ng-container>
-                        </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>ID Place</label>
                         <input type="text" class="form-control" formControlName="placeId"
-                            [attr.disabled]="this.active.value === true ? 'disabled' : null">
+                        [attr.disabled]="this.active.value === true ? 'disabled' : null">
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -403,8 +398,8 @@
                                 <label class="form-control-label">
                                     Zipcode
                                 </label>
-                                <input type="text" class="form-control m-input m-input--square"
-                                    placeholder="" autocomplete=" nope" name="zipCode" formControlName="zipCode">
+                                <input type="text" class="form-control m-input m-input--square" placeholder=""
+                                    maxlength="20" autocomplete="nope" name="zipCode" formControlName="zipCode">
                             </div>
                         </div>
                         <div class="col-lg-4">

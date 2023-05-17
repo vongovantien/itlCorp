@@ -12,6 +12,7 @@ export const commercialState = createFeatureSelector<ICustomerState>('customer')
 export const getCustomerSearchParamsState = createSelector(commercialState, (state: ICustomerState) => state && state.com && state.com.dataSearch);
 export const getCustomerListState = createSelector(commercialState, (state: ICustomerState) => state.com?.customers);
 export const getCustomerLoadingState = createSelector(commercialState, (state: ICustomerState) => state.com?.isLoading);
+export const getDetailCustomerState = createSelector(commercialState, (state: ICustomerState) => state.com?.customer);
 
 export const reducers: ActionReducerMap<ICustomerState> = {
     com: reducer

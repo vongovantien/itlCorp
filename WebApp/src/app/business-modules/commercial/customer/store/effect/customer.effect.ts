@@ -26,4 +26,16 @@ export class CustomerEffect {
                     )
             )
         ));
+    getCustomerEffect$: Observable<Action> = createEffect(() => this.actions$
+        .pipe(
+            ofType(CustomerActionTypes.LOAD_LIST),
+            switchMap(
+                (param: CommonInterface.IParamPaging) => this._catalogueRepo.getListPartner(param.page, param.size, param.dataSearch)
+                    .pipe(
+                        catchError(() => EMPTY),
+                        map((data: CommonInterface.IResponsePaging) => LoadListCustomerSuccess(data)),
+
+                    )
+            )
+        ));
 }
