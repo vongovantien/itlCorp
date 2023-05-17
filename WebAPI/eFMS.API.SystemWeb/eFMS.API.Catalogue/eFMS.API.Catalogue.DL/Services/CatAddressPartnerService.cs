@@ -126,7 +126,6 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         public HandleState Delete(Guid id)
         {
-            //ChangeTrackerHelper.currentUser = currentUser.UserID;
             var hs = DataContext.Delete(x => x.Id == id);
             if (hs.Success == true)
             {
@@ -136,104 +135,6 @@ namespace eFMS.API.Catalogue.DL.Services
             return hs;
         }
         #endregion
-
-
-        //    public IQueryable<CatAddressPartnerModel> Paging(CatBankCriteria criteria, int pageNumber, int pageSize, out int rowsCount)
-        //    {
-        //        IQueryable<CatAddressPartnerModel> results = QueryPaging(criteria);
-        //        if (results == null)
-        //        {
-        //            rowsCount = 0;
-        //            return null;
-        //        }
-
-        //        rowsCount = results.Select(x => x.Id).Count();
-        //        if (rowsCount == 0)
-        //            return null;
-
-        //        if (pageSize > 1)
-        //        {
-        //            if (pageNumber < 1) { pageNumber = 1; }
-        //            results = results.OrderByDescending(x => x.DatetimeModified).Skip((pageNumber - 1) * pageSize).Take(pageSize).AsQueryable();
-        //        }
-        //        return results;
-        //    }
-
-        //    private IQueryable<CatAddressPartnerModel> QueryPaging(CatAddressPartnerCriteria criteria)
-        //    {
-        //        //var sysUsers = sysUserRepository.Get();
-        //        //var sysBanks = GetAll();
-        //        //var query = (from bank in sysBanks
-        //        //             join user in sysUsers on bank.UserCreated equals user.Id into userCreate
-        //        //             join user2 in sysUsers on bank.UserModified equals user2.Id into userModifi
-        //        //             from modifi in userModifi.DefaultIfEmpty()
-        //        //             from create in userCreate.DefaultIfEmpty()
-        //        //             select new { bank, create, modifi }
-        //        //    );
-
-        //        //if (criteria.ShortNameAddress != null)
-        //        //    query = query.Where(x => (x.bank.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1);
-        //        //else if (criteria.BankNameVn != null)
-        //        //    query = query.Where(x => (x.bank.BankNameVn ?? "").IndexOf(criteria.BankNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
-        //        //else if (criteria.BankNameEn != null)
-        //        //    query = query.Where(x => (x.bank.BankNameEn ?? "").IndexOf(criteria.BankNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
-        //        //else if (criteria.Active != null)
-        //        //{
-        //        //    query = query.Where(x => x.bank.Active == criteria.Active);
-        //        //}
-        //        //else
-        //        //{
-        //        //    query = query.Where(x => (x.bank.Code.ToString() ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-        //        //                       || (x.bank.BankNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-        //        //                       || (x.bank.BankNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
-        //        //}
-
-        //        //var res = query.Select(x => new CatAddressPartnerModel
-        //        //{
-        //        //    Id = x.bank.Id,
-        //        //    Code = x.bank.Code,
-        //        //    BankNameEn = x.bank.BankNameEn,
-        //        //    BankNameVn = x.bank.BankNameVn,
-        //        //    UserCreated = x.bank.UserCreated,
-        //        //    DatetimeCreated = x.bank.DatetimeCreated,
-        //        //    UserModified = x.bank.UserModified,
-        //        //    DatetimeModified = x.bank.DatetimeModified,
-        //        //    Active = x.bank.Active,
-        //        //    InactiveOn = x.bank.InactiveOn,
-        //        //    UserCreatedName = x.create.Username,
-        //        //    UserModifiedName = x.modifi.Username
-        //        //});
-
-        //        //return res;
-        //    }
-
-        //    public IQueryable<CatAddressPartnerModel> Query(CatAddressPartnerCriteria criteria)
-        //    {
-        //        return GetBy(criteria);
-        //    }
-
-        //    private IQueryable<CatAddressPartnerModel> GetBy(CatAddressPartnerCriteria criteria)
-        //    {
-        //        ClearCache();
-        //        Expression<Func<CatAddressPartnerModel, bool>> query;
-        //        if (criteria.Code != null)
-        //            query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1);
-        //        else if (criteria.BankNameVn != null)
-        //            query = (x => (x.BankNameVn ?? "").IndexOf(criteria.BankNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
-        //        else if (criteria.BankNameEn != null)
-        //            query = (x => (x.BankNameEn ?? "").IndexOf(criteria.BankNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
-        //        else if (criteria.Active != null)
-        //        {
-        //            query = (x => x.Active == criteria.Active);
-        //        }
-        //        else
-        //        {
-        //            query = (x => (x.Code.ToString() ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-        //                               || (x.BankNameVn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
-        //                               || (x.BankNameEn ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1);
-        //        }
-        //        return Get(query);
-        //    }
 
         public IQueryable<CatAddressPartnerModel> GetAll()
         {
@@ -279,35 +180,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 x.WardName = catWardRepository.Get(y => y.Id == x.WardId).Select(t => t.NameEn).FirstOrDefault();
             });
             return results?.OrderByDescending(x => x.DatetimeModified).AsQueryable();
-            //if (data.Count() == 0)
-            //{
-            //    return Enumerable.Empty<CatAddressPartnerModel>().AsQueryable();
-            //}
-            //var partner = catPartnerRepository.Get(x => x.Id.ToLower() == partnerId.ToString().ToLower());
-            //var country = catCountryRepository.Get();
-            //var city = catCityRepository.Get();
-            //var district = catDistrictRepository.Get();
-            //var ward = catWardRepository.Get();
-
-            //var result = (from address in data
-            //              join ctry in country on address.CountryId equals ctry.Id into ctryGrp
-            //              join ct in city on address.CityId equals ct.Id into ctGrp
-            //              join dt in district on address.DistrictId equals dt.Id into dtGrp
-            //              join w in ward on address.WardId equals w.Id into wGrp
-            //              from chgroup in ctryGrp.DefaultIfEmpty()
-            //              select new CatAddressPartnerModel
-            //{
-            //    Id = address.Id,
-            //    UserCreated = address.UserCreated,
-            //    DatetimeCreated = address.DatetimeCreated,
-            //    UserModified = address.UserModified,
-            //    DatetimeModified = address.DatetimeModified,
-            //    Active = address.Active,
-            //    InactiveOn = address.InactiveOn,
-            //    ShortName = 
-            //});
-
-            //return result?.OrderByDescending(x => x.DatetimeModified).AsQueryable();
         }
 
     }
