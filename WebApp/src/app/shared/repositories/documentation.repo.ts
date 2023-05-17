@@ -342,8 +342,14 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/GetCDNoteWithHbl`, { hblId: hblId, jobId: jobId });
     }
 
-    getListCDNoteWithPartnerIdFromCDNoteNo(CDNoteNo: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/getListCDNoteWithPartnerIdFromCDNoteNo`, { CDNoteNo: CDNoteNo });
+    getListCDNoteWithPartnerId(body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/Query`, body)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
     }
 
     checkCdNoteAllowToDelete(id: string) {

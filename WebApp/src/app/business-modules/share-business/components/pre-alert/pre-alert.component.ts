@@ -81,6 +81,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     isExitsDebitNote: boolean = false;
     isCheckedDebitNote: boolean = false;
+    isDefaultDebitNote: boolean = false;
 
     isExitsPOD: boolean = false;
     isCheckedPOD: boolean = false;
@@ -112,6 +113,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     stageType: string = '';
     cdNoteNo: string = '';
     CdNoteDetail: any = null;
+    partnerId: any = null;
     lstStage: any[]= [];
     signImgUrl: string = '';
 
@@ -156,12 +158,13 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     if(params.name === "Send_Debit_Invoice"){
                         this.cdNoteNo = params.cdNoteNo;
                         this.name = "Send Debit Invoice";
+                        this.partnerId = params.partnerId;
                         this.getDetailCdNote(this.jobId, this.cdNoteNo);
                     }
                     else{
                         this.name = params.name;
                     }
-
+                    console.log(this.partnerId);
                     this.checkReportType();
 
                     this.hblRptName = (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE || this.serviceId === ChargeConstants.SCE_CODE) ? "HBL" : "HAWB";
@@ -419,7 +422,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     checkExistDebitNoteSendInv() {
-        this._documentRepo.getListCDNoteWithPartnerIdFromCDNoteNo(this.cdNoteNo)
+        this._documentRepo.getListCDNoteWithPartnerId({partnerId: this.partnerId})
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -429,7 +432,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     if (res) {
                         if (this.serviceId === 'AE' || this.serviceId === 'SFE' || this.serviceId === 'SLE' || this.serviceId === 'SCE') {
                             // this.debitNos = res.map(v => ({ ...v, isCheckedDebitNote: true }));
-                            this.debitNos = res.map(v => (v.code === this.cdNoteNo) ? { ...v, isCheckedDebitNote: true } : { ...v, isCheckedDebitNote: false });
+                            this.debitNos = res.filter(x => lowerCase(x.type) !== 'credit').map(v => (v.code === this.cdNoteNo) ? { ...v, isCheckedDebitNote: true, isDefaultDebitNote: true } : { ...v, isCheckedDebitNote: false });
 
                         } else {
                             this.debitNos = res.filter(x => lowerCase(x.type) !== 'credit').map(v => ({ ...v, isCheckedDebitNote: false }));
@@ -1603,7 +1606,6 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         }
         if (this.isArrivalNotice) {
             this.stageType = "SEND_AN"
-            this.getDetailCdNote
         }
         if (this.isDO) {
             this.stageType = "SEND_DO"

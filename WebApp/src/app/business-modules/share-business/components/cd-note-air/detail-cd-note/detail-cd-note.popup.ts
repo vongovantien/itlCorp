@@ -446,7 +446,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends DetailCDNoteBas
 
     sendMail(type: string) {
         if (!!this.CdNoteDetail.syncStatus) {
-            this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code } });
+            this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code, partnerId: this.CdNoteDetail.partnerId } });
         }
         else {
             this._documentationRepo.validateCheckPointContractPartner({
@@ -468,7 +468,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends DetailCDNoteBas
                         if (res.status) {
                             switch (type) {
                                 case 'DebitNote/Invoice':
-                                    this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code } });
+                                    this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code, partnerId: this.CdNoteDetail.partnerId } });
                                     break;
                             }
                         }
