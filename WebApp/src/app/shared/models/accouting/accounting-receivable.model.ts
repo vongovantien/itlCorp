@@ -127,6 +127,8 @@ export class AccReceivableDetailModel {
     isOverLimit: boolean = false;
     isOverDue: boolean = false;
     arSalesmanName: string = null;
+    isOverDueOBH: boolean = false;
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
@@ -154,6 +156,9 @@ export class AccReceivableOfficesDetailModel {
     totalObhPaidAmount: number = 0;
     totalObhUnPaidAmount: number = 0;
     services: string[] = [];
+    totalOverObh1to15Day: number = 0;
+    totalOverObh16to30Day: number = 0;
+    totalOverObh30Day: number = 0;
 
     constructor(data?: any) {
         const self = this;

@@ -7,7 +7,7 @@ import { Company } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { getMenuUserPermissionState, getMenuUserSpecialPermissionState, IAppState } from '@store';
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 import { ToastrService } from 'ngx-toastr';
 import { combineLatest, forkJoin, Observable } from 'rxjs';
 import { catchError, finalize, map, takeUntil } from "rxjs/operators";

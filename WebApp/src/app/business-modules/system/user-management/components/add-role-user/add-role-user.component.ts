@@ -3,7 +3,7 @@ import { Company, Office, PermissionSample } from '@models';
 import { SystemRepo } from '@repositories';
 import { finalize, catchError, switchMap, tap } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { ConfirmPopupComponent } from '@common';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';

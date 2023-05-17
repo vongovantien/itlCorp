@@ -10,7 +10,7 @@ import { skip, takeUntil, catchError } from 'rxjs/operators';
 
 import { DocumentationRepo } from '@repositories';
 import { ConfirmPopupComponent } from '@common';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
 import { CommonEnum } from '@enums';
 import { getDimensionVolumesState, getTransactionLocked, IShareBussinessState } from '@share-bussiness';

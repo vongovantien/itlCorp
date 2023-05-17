@@ -8,7 +8,7 @@ import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { ShareBussinessGoodsListPopupComponent } from '../goods-list/goods-list.popup';
 import { Unit, HouseBill } from 'src/app/shared/models';
 
-import _groupBy from 'lodash/groupBy';
+import _groupBy from 'lodash-es/groupBy';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 
@@ -123,14 +123,14 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (!this.description && this.containers.length>0) {
+        if (!this.description && this.containers.length > 0) {
             this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
 
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
 
-        if (!this.commodities && this.containers.length>0) {
+        if (!this.commodities && this.containers.length > 0) {
             this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
@@ -156,7 +156,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
             }
         }
         // * Container
-        if (this.containers.length>0) {
+        if (this.containers.length > 0) {
             this.containerDetail = '';
             this.containerDescription = '';
             if (this.type === 'export') {

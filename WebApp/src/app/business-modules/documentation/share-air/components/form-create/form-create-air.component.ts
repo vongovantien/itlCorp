@@ -19,8 +19,8 @@ import {
     InitDimensionAction,
     IShareBussinessState
 } from '@share-bussiness';
-import cloneDeep from 'lodash/cloneDeep';
-import _merge from 'lodash/merge';
+import cloneDeep from 'lodash-es/cloneDeep';
+import _merge from 'lodash-es/merge';
 import { Observable } from 'rxjs';
 import { catchError, distinctUntilChanged, shareReplay, skip, takeUntil } from 'rxjs/operators';
 import { SystemConstants } from 'src/constants/system.const';

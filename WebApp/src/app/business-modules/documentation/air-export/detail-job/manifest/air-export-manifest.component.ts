@@ -18,7 +18,7 @@ import { ShareBusinessAddHblToManifestComponent } from 'src/app/business-modules
 import { CommonEnum } from '@enums';
 import { getTransactionLocked, getTransactionPermission, TransactionGetDetailAction } from '@share-bussiness';
 
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ICrystalReport } from '@interfaces';

@@ -984,6 +984,8 @@ namespace eFMS.API.Documentation.DL.Services
                           CompanyId = detail.CompanyId,
                           TransactionType = tran.TransactionType,
                           PackageTypeName = catUnit.Code,
+                          DeliveryDate = detail.DeliveryDate,
+                          DeliveryPerson = detail.DeliveryPerson,
                       };
             if (res.Select(x => x.Id).Count() == 0) return null;
             var results = res.OrderByDescending(o => o.DatetimeModified).ToList();
@@ -1018,6 +1020,8 @@ namespace eFMS.API.Documentation.DL.Services
                           SaleManId = detail.SaleManId,
                           CustomerId = detail.CustomerId,
                           CustomerName = cus.ShortName,
+                          DeliveryPerson = detail.DeliveryPerson,
+                          DeliveryDate = detail.DeliveryDate,
                       };
             return res;
         }

@@ -204,14 +204,19 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{ 'm-form__group has-danger': isSubmitted &&  !offices.valid  }">
                                 <label class="form-control-label">
-                                    Offices
+                                    Offices <span class="m--font-danger">(*)</span>
                                 </label>
                                 <ng-select [items]="listOffices | async" class="custom" placeholder="All"
                                     formControlName="offices" [multiple]="true" class="custom" bindLabel="code"
-                                    bindValue="id">
+                                    bindValue="id" placeholder="Please Select Offices">
                                 </ng-select>
+                                <div class="form-control-feedback"
+                                    *ngIf="isSubmitted && !offices.valid">
+                                    Offices is required !
+                                </div>
                             </div>
                         </div>
 

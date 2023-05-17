@@ -16,11 +16,11 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ShareAirExportOtherChargePopupComponent, IDataOtherCharge } from '../../share/other-charge/air-export-other-charge.popup';
 import { JobConstants, RoutingConstants, SystemConstants } from '@constants';
 
-import _merge from 'lodash/merge';
-import _cloneDeep from 'lodash/cloneDeep';
+import _merge from 'lodash-es/merge';
+import _cloneDeep from 'lodash-es/cloneDeep';
 import { Observable, of, merge } from 'rxjs';
 import { map, takeUntil, catchError, finalize, switchMap, concatMap, distinctUntilChanged, mergeMap } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { ShareAirServiceDIMVolumePopupComponent } from '../../../share-air/components/dim/dim-volume.popup';
 import { HttpResponse, HttpResponseBase } from '@angular/common/http';
 import { ICrystalReport } from '@interfaces';
@@ -481,7 +481,7 @@ export class AirExportMAWBFormComponent extends AppForm implements OnInit, ICrys
                             this.wtorValpayment.setValue(this.wts[0]);
                         }
                     }
-                    
+
                     console.log(this.wtorValpayment.value);
                 }
             });

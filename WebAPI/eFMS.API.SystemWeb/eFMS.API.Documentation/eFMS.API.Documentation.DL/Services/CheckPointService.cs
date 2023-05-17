@@ -9,6 +9,7 @@ using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -184,7 +185,7 @@ namespace eFMS.API.Documentation.DL.Services
                     valid = false;
                 }
             }
-           
+
             return valid;
         }
 
@@ -298,7 +299,9 @@ namespace eFMS.API.Documentation.DL.Services
             if (criteria.Data.Count == 0) return result;
             foreach (var partner in criteria.Data)
             {
-                CheckPoint checkPoint = new CheckPoint { PartnerId = partner.PartnerId,
+                CheckPoint checkPoint = new CheckPoint
+                {
+                    PartnerId = partner.PartnerId,
                     HblId = partner.HblId ?? Guid.Empty,
                     TransactionType = criteria.TransactionType,
                     type = partner.Type == DocumentConstants.CHARGE_OBH_TYPE ? CHECK_POINT_TYPE.SURCHARGE_OBH : CHECK_POINT_TYPE.SURCHARGE,
@@ -335,7 +338,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                if(checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
                 {
                     var hasRefund = csSurchargeRepository.Any(x => x.Hblid == criteria.HblId
                        && x.Type != DocumentConstants.CHARGE_BUY_TYPE
@@ -346,7 +349,7 @@ namespace eFMS.API.Documentation.DL.Services
                         return result;
                     }
                 }
-                
+
                 if (checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                 {
                     if (criteria.TransactionType == "CL")
@@ -374,13 +377,13 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         contractCurrent = GetContractByPartnerId(criteria.PartnerId, criteria.SalesmanId);
                         partner = catPartnerRepository.First(x => x.Id == currentPartner);
-                        if(contractCurrent == null)
+                        if (contractCurrent == null)
                         {
                             return new HandleState((object)string.Format(@"{0} doesn't have any agreement please you check again", partner?.ShortName));
                         }
                     }
 
-                    if(contractCurrent.ContractType == "Prepaid") // check hợp đồng hiện tại trước khi đổi sales, đổi customer
+                    if (contractCurrent.ContractType == "Prepaid") // check hợp đồng hiện tại trước khi đổi sales, đổi customer
                     {
                         if (currentPartner != criteria.PartnerId || currentSaleman != criteria.SalesmanId)
                         {
@@ -395,10 +398,11 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         currentSaleman = criteria.SalesmanId;
                         currentPartner = criteria.PartnerId;
-                    } else
+                    }
+                    else
                     {
-                        
-                        if(currentPartner != criteria.PartnerId || currentSaleman != criteria.SalesmanId)
+
+                        if (currentPartner != criteria.PartnerId || currentSaleman != criteria.SalesmanId)
                         {
                             currentSaleman = criteria.SalesmanId;
                             currentPartner = criteria.PartnerId;
@@ -420,7 +424,8 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                     }
-                } else
+                }
+                else
                 {
                     if (criteria.TransactionType == "CL")
                     {
@@ -457,13 +462,15 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             isValid = true;
                             break;
-                        } else if (contract.IsOverDue == true)
+                        }
+                        else if (contract.IsOverDue == true)
                         {
                             isValid = false;
                             errorCode = 2;
-                        } else if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdueOBH"))
+                        }
+                        else if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdueOBH"))
                         {
-                            if(checkPointType == CHECK_POINT_TYPE.SURCHARGE_OBH || checkPointType == 0)
+                            if (checkPointType == CHECK_POINT_TYPE.SURCHARGE_OBH || checkPointType == 0)
                             {
                                 if (contract.IsOverDueObh == true)
                                 {
@@ -474,7 +481,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 {
                                     isValid = true;
                                 }
-                            } else
+                            }
+                            else
                             {
                                 isValid = true;
                             }
@@ -491,7 +499,7 @@ namespace eFMS.API.Documentation.DL.Services
                         isValid = true;
                         break;
                     }
-                    if(checkPointType == CHECK_POINT_TYPE.SURCHARGE_OBH || checkPointType == 0)
+                    if (checkPointType == CHECK_POINT_TYPE.SURCHARGE_OBH || checkPointType == 0)
                     {
                         if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdueOBH"))
                         {
@@ -603,7 +611,8 @@ namespace eFMS.API.Documentation.DL.Services
                     if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL || checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                     {
                         isValid = ValidateCheckPointPrepaidContractPartner(criteria.HblId, criteria.PartnerId, criteria.TransactionType);
-                    } else
+                    }
+                    else
                     {
                         isValid = true;
                     }
@@ -684,7 +693,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                contract = contractRepository.Get(x => x.PartnerId == partnerId 
+                contract = contractRepository.Get(x => x.PartnerId == partnerId
                 && x.Active == true
                 && x.OfficeId.ToLower().Contains(currentUser.OfficeID.ToString().ToLower())
                 && x.SaleManId == saleman)?.FirstOrDefault();
@@ -787,8 +796,9 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (surcharges.Count() > 0)
             {
-                partners = surcharges.GroupBy(x => new { x.PaymentObjectId, x.Type }).Select(x => 
-                new CheckPointPartnerHBLDataGroup { 
+                partners = surcharges.GroupBy(x => new { x.PaymentObjectId, x.Type }).Select(x =>
+                new CheckPointPartnerHBLDataGroup
+                {
                     PartnerId = x.Key.PaymentObjectId,
                     HblId = x.FirstOrDefault().Hblid,
                     Type = x.Key.Type
@@ -815,7 +825,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             return partners;
         }
-       
+
         public bool AllowCheckNoProfitShipment(string jobNo, bool? isCheked)
         {
             if (isCheked == true)
@@ -849,14 +859,14 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
-       
+
         public bool AllowCheckNoProfitShipmentDuplicate(string jobNo, bool? isCheked, bool isReplicate, out string shipmentInvalid)
         {
             shipmentInvalid = string.Empty;
             if (isCheked == true)
             {
-                var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.IsFromShipment == true  && x.JobNo == jobNo);
-                if(surcharges.Count() <= 0)
+                var surcharges = csSurchargeRepository.Get(x => x.Type != "OBH" && x.IsFromShipment == true && x.JobNo == jobNo);
+                if (surcharges.Count() <= 0)
                 {
                     return true;
                 }
@@ -917,7 +927,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
-      
+
         public bool AllowUnCheckNoProfitShipment(string jobNo, bool? isCheked)
         {
             if (isCheked == false)
@@ -929,7 +939,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 var transaction = surcharges.Select(x => x.TransactionType).FirstOrDefault();
                 var shipmentNoProfit = false;
-                if(transaction == "CL")
+                if (transaction == "CL")
                 {
                     shipmentNoProfit = opsTransactionRepository.Get(x => x.JobNo == jobNo).FirstOrDefault()?.NoProfit ?? false;
                 }
@@ -970,6 +980,110 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             return true;
+        }
+
+        public HandleState ValidateCheckPointPartnerConvertClearance(string accountNo, string partnerTaxCode, out CatContract customerContract)
+        {
+            CatPartner customer = new CatPartner();
+            customerContract = new CatContract();
+
+            if (accountNo == null)
+            {
+                customer = catPartnerRepository.Get(x => x.TaxCode == partnerTaxCode)?.FirstOrDefault();
+            }
+            else
+            {
+                customer = catPartnerRepository.Get(x => x.AccountNo == accountNo)?.FirstOrDefault();
+            }
+            if (customer == null)
+            {
+                var notFoundPartnerTaxCodeMessages = "Customer '" + (accountNo ?? partnerTaxCode) + "' Not found";
+                return new HandleState(notFoundPartnerTaxCodeMessages);
+            }
+            if (customer.PartnerMode == "Internal")
+            {
+                customerContract = contractRepository.Get(x => x.PartnerId == customer.ParentId
+                && x.SaleService.Contains("CL")
+                && x.Active == true
+                && x.OfficeId.Contains(currentUser.OfficeID.ToString()))?.FirstOrDefault();
+
+                return new HandleState();
+            }
+            var contracts = contractRepository.Get(x => x.PartnerId == customer.ParentId
+                   && x.SaleService.Contains("CL")
+                   && x.Active == true
+                   && x.OfficeId.Contains(currentUser.OfficeID.ToString())).ToList();
+            if(contracts.Count > 1)
+            {
+                // Ưu tiên hợp đồng không dính check point.
+                var contractPassAllCheckPoint = contracts.FirstOrDefault(x => (x.IsExpired == null || x.IsExpired == false)
+                && (x.IsOverLimit == null || x.IsOverLimit == false)
+                && (x.IsOverDue == null || x.IsOverDue == false)
+                );
+                if (contractPassAllCheckPoint != null)
+                {
+                    customerContract = contractPassAllCheckPoint;
+                    return new HandleState();
+                }  else
+                {
+                    customerContract = contracts.FirstOrDefault();
+                }
+            } else
+            {
+                customerContract = contracts.FirstOrDefault();
+            }
+          
+            int error = -1;
+
+            if (customerContract == null)
+            {
+                error = 0;
+            }
+
+            else if (customerContract.IsExpired == true && IsSettingFlowApplyContract(customerContract.ContractType, currentUser.OfficeID, customer.PartnerType, "expired"))
+            {
+                error = 1;
+            }
+            else if (customerContract.IsOverDue == true && IsSettingFlowApplyContract(customerContract.ContractType, currentUser.OfficeID, customer.PartnerType, "overdue"))
+            {
+                error = 2;
+            }
+            else if (customerContract.IsOverLimit == true && IsSettingFlowApplyContract(customerContract.ContractType, currentUser.OfficeID, customer.PartnerType, "credit"))
+            {
+                error = 3;
+            }
+
+            if (error > -1)
+            {
+                string errorMes = string.Empty;
+                string salesmanId = string.Empty;
+                string salesmanName = string.Empty;
+                if (error != 0) { 
+                    salesmanId = customerContract.SaleManId;
+                    salesmanName = sysUserRepository.Get(x => x.Id.ToString() == salesmanId)?.FirstOrDefault()?.Username;
+                }
+                switch (error)
+                {
+                    case 0:
+                        string officeName = sysOfficeRepository.Get(x => x.Id == currentUser.OfficeID).Select(o => o.ShortName).FirstOrDefault();
+                        errorMes = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_CONTRACT_NULL], customer.ShortName, officeName);
+                        break;
+                    case 1:
+                        errorMes = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_EXPIRED], accountNo, customer.ShortName, customerContract.ContractType, salesmanName);
+                        break;
+                    case 2:
+                        errorMes = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERDUE], accountNo, customer.ShortName, customerContract.ContractType, salesmanName);
+                        break;
+                    case 3:
+                        errorMes = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CLEARANCE_IS_OVERLIMIT], accountNo, customer.ShortName, customerContract.ContractType, salesmanName, Math.Round((decimal)customerContract.CreditRate, 2, MidpointRounding.ToEven));
+                        break;
+                    default:
+                        break;
+                }
+                return new HandleState(errorMes);
+            }
+
+            return new HandleState();
         }
     }
 }

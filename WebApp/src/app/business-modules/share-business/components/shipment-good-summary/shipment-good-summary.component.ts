@@ -7,8 +7,8 @@ import { Container } from 'src/app/shared/models/document/container.model';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { ShareBussinessContainerListPopupComponent } from '../container-list/container-list.popup';
 
-import _uniqBy from 'lodash/uniqBy';
-import _groupBy from 'lodash/groupBy';
+import _uniqBy from 'lodash-es/uniqBy';
+import _groupBy from 'lodash-es/groupBy';
 import { takeUntil, skip } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
@@ -47,7 +47,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         protected _actionStoreSubject: ActionsSubject,
         protected _store: Store<fromStore.IContainerState>,
         protected _activedRoute: ActivatedRoute
-        
+
     ) {
         super();
     }
@@ -126,14 +126,14 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
 
     updateData(containers: Container[] | any) {
         // * Description, Commondity.
-        if (!this.description && this.containers.length>0) {
+        if (!this.description && this.containers.length > 0) {
             this.description = '';
             this.description = (containers || []).filter((c: Container) => Boolean(c.description)).reduce((acc: string, curr: Container) => acc += curr.description + "\n", '');
         }
 
         const comoditiesName: string[] = containers.map((c: Container) => c.commodityName);
 
-        if (!this.commodities && this.containers.length>0) {
+        if (!this.commodities && this.containers.length > 0) {
             this.commodities = '';
             this.commodities = comoditiesName
                 .filter((item: string, index: number) => Boolean(item) && comoditiesName.indexOf(item) === index)
@@ -152,7 +152,7 @@ export class ShareBussinessShipmentGoodSummaryComponent extends AppForm {
         this.totalCBM = +this.totalCBM.toFixed(3);
 
         // * Container, Package.
-        if (this.containers.length>0) {
+        if (this.containers.length > 0) {
             this.containerDetail = '';
         }
         const contObject: any[] = (containers || []).map((container: Container | any) => ({
