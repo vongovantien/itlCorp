@@ -2565,7 +2565,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
         #endregion -- PREVIEW CD NOTE --
 
-        private IQueryable<AcctCdnote> Query(CDNoteCriteria criteria)
+        public IQueryable<AcctCdnote> Query(CDNoteCriteria criteria)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.accManagement);
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);

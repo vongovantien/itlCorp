@@ -14,6 +14,7 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface IAcctCDNoteServices : IRepositoryBase<AcctCdnote, AcctCdnoteModel>
     {
+        IQueryable<AcctCdnote> Query(CDNoteCriteria criteria);
         HandleState AddNewCDNote(AcctCdnoteModel model);
         HandleState UpdateCDNote(AcctCdnoteModel model);
         HandleState DeleteCDNote(Guid idCDNote);

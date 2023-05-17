@@ -345,6 +345,19 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// Query CD Note by criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("Query")]
+        [Authorize]
+        public IActionResult Query(CDNoteCriteria criteria)
+        {
+            var result = cdNoteServices.Query(criteria);
+            return Ok(result);
+        }
+
+        /// <summary>
         /// get invoice - cd note
         /// </summary>
         /// <param name="criteria"></param>
