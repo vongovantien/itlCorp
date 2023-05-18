@@ -19,7 +19,7 @@ import { ShareSeaServiceFormCreateSeaImportComponent } from '../../share-sea/com
 
 import { catchError, takeUntil } from 'rxjs/operators';
 import * as fromShareBussiness from './../../../share-business/store';
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 
 @Component({
     selector: 'app-create-job-fcl-import',

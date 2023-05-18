@@ -25,7 +25,7 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 
 import { catchError, takeUntil, mergeMap, skip, switchMap } from 'rxjs/operators';
 import { forkJoin, of } from 'rxjs';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 import { InjectViewContainerRefDirective } from '@directives';
 

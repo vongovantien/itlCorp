@@ -26,7 +26,7 @@ import { ShareBusinessAddAttachmentPopupComponent } from '../add-attachment/add-
 import { environment } from 'src/environments/environment';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { InjectViewContainerRefDirective } from '@directives';
-import { lowerCase } from 'lodash';
+import lowerCase  from 'lodash-es/lowerCase';
 @Component({
     selector: 'share-pre-alert',
     templateUrl: './pre-alert.component.html'

@@ -7,7 +7,7 @@ import { AccAccountingManagementModel, Partner, ChartOfAccounts } from '@models'
 import { RoutingConstants, AccountingConstants } from '@constants';
 import { tap, switchMap, catchError } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { AppForm } from '@app';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { CommonEnum } from '@enums';

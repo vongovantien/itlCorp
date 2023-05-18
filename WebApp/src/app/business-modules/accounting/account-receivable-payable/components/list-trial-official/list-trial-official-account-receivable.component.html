@@ -53,7 +53,7 @@
                                                 [ngStyle]="{'background-color': (selectedPartner?.taxCode === item.taxCode 
                                                 && selectedPartner.agreementSalesmanId === item.agreementSalesmanId
                                                 && selectedPartner.agreementId === item.agreementId) ? '#dfdfdf' : '#fff'}">
-                                                <div class="table-actions" style="width: 70px">
+                                                <div class="table-actions" style="width: 170px">
                                                     <app-permission-button type="detail"
                                                         (click)="viewDetail(item.agreementId)">
                                                     </app-permission-button>
@@ -62,6 +62,12 @@
                                                     </span>
                                                     <span *ngIf="!!item.isOverDue" title="Contract have overdued">
                                                         <i class="la la-exclamation-triangle la-lg text-warning"></i>
+                                                    </span>
+                                                    <span *ngIf="!!item.isOverDueOBH"
+                                                        title="Contract have overdued OBH">
+                                                        <img src="assets/icons/overdue-obh.ico"
+                                                            style="vertical-align:text-bottom" width="25" height="25"
+                                                            alt="Contract have overdue OBH">
                                                     </span>
                                                     <span *ngIf="!!item.isOverLimit"
                                                         title="Contract is over credit limit">
@@ -129,28 +135,24 @@
                                             </td>
                                             <!-- <td>{{ item.obhAmount | negativeNumber: '.0-3'}}</td> -->
                                             <td class="text-right">
-                                                <span [ngClass]="'text-danger'">
-                                                    <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item, null, 'Over1To15')">
-                                                        {{ item.over1To15Day | negativeNumber: '.0-3' }}
-                                                    </a>
-                                                </span>
+                                                <a href="javascript:void(0)"
+                                                    [ngClass]="!!item.over1To15Day ? 'text-warning' : ''"
+                                                    (click)="showDebitDetail(item, null, 'Over1To15')">
+                                                    {{ item.over1To15Day | negativeNumber: '.0-3' }}
+                                                </a>
                                             </td>
                                             <td class="text-right">
-                                                <span [ngClass]="'text-danger'">
-                                                    <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item, null, 'Over15To30')">
-                                                        {{ item.over16To30Day | negativeNumber: '.0-3' }}
-                                                    </a>
-                                                </span>
+                                                <a href="javascript:void(0)"
+                                                    [ngClass]="!!item.over16To30Day ? 'text-warning' : ''"
+                                                    (click)="showDebitDetail(item, null, 'Over15To30')">
+                                                    {{ item.over16To30Day | negativeNumber: '.0-3' }}
+                                                </a>
                                             </td>
                                             <td class="text-right">
-                                                <span [ngClass]="'text-danger'">
-                                                    <a href="javascript:void(0)"
-                                                        (click)="showDebitDetail(item, null, 'Over30')">
-                                                        {{ item.over30Day | negativeNumber: '.0-3' }}
-                                                    </a>
-                                                </span>
+                                                <a href="javascript:void(0)" class="text-danger"
+                                                    (click)="showDebitDetail(item, null, 'Over30')">
+                                                    {{ item.over30Day | negativeNumber: '.0-3' }}
+                                                </a>
                                             </td>
                                             <td class="text-center">{{ item.agreementCurrency }}</td>
                                             <td class="text-right text-primary">

@@ -11,8 +11,8 @@ import { RoutingConstants, SystemConstants } from '@constants';
 
 import { map, tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
 import { of, combineLatest } from 'rxjs';
-import isUUID from 'validator/lib/isUUID';
-import _merge from 'lodash/merge';
+import isUUID from 'validator/es/lib/isUUID';
+import _merge from 'lodash-es/merge';
 
 @Component({
     selector: 'app-sea-lcl-export-booking-note-detail',

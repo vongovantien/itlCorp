@@ -231,8 +231,7 @@
                             <ng-container *ngIf="
                             soa.type==='Debit'
                             &&soa.syncStatus !== 'Synced'
-                            &&soa.currency === 'VND'
-                            &&soa.groupShipments.length > 0">
+                            &&soa.currency === 'VND'">
                                 <button class="btn btn-success m-btn--icon m-btn--uppercase"
                                     (click)="adjustDebitValue()" title="">
                                     <span>

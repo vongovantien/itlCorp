@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
 import { catchError, concatMap, finalize, pluck, takeUntil } from 'rxjs/operators';
 import { CombineBilling } from 'src/app/shared/models/accouting/combine-billing.model';
-import { isUUID } from 'validator';
+import isUUID from 'validator/es/lib/isUUID';
 import { CombineBillingListComponent } from '../components/combine-billing-list/combine-billing-list.component';
 import { FormGetBillingListComponent } from '../components/form-get-billing-list/form-get-billing-list.component';
 import { delayTime } from '@decorators';
@@ -256,7 +256,7 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
       )
       .subscribe(
         (response: HttpResponse<any>) => {
-          if (response!=null) {
+          if (response != null) {
             this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
           } else {
             this._toastService.warning('No data found');
