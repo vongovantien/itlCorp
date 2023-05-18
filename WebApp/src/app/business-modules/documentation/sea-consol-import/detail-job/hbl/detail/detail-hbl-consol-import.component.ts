@@ -13,7 +13,7 @@ import { SeaConsolImportCreateHBLComponent } from '../create/create-hbl-consol-i
 import * as fromShareBussiness from './../../../../../share-business/store';
 
 import { catchError, takeUntil, skip, switchMap } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { formatDate } from '@angular/common';
 import { InfoPopupComponent } from '@common';
 import { HttpErrorResponse } from '@angular/common/http';

@@ -15,9 +15,9 @@ import { AccountingConstants, RoutingConstants } from '@constants';
 import { AccountingManagementFormCreateVoucherComponent } from '../../components/form-create-voucher/form-create-voucher.component';
 import { AccountingManagementListChargeComponent } from '../../components/list-charge/list-charge-accouting-management.component';
 
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 import { catchError } from 'rxjs/operators';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 
 @Component({
     selector: 'app-accounting-create-voucher',

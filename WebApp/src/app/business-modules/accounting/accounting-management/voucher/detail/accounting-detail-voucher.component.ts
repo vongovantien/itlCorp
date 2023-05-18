@@ -16,10 +16,10 @@ import { IAccountingManagementState, UpdateChargeList } from '../../store';
 import { AccountingManagementCreateVoucherComponent } from '../create/accounting-create-voucher.component';
 
 import { Observable, of } from 'rxjs';
-import { isUUID } from 'validator';
-import _merge from 'lodash/merge';
+import isUUID from 'validator/es/lib/isUUID';
+import _merge from 'lodash-es/merge';
 import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 @Component({
     selector: 'app-accounting-detail-voucher',
     templateUrl: './accounting-detail-voucher.component.html',

@@ -12,7 +12,7 @@ import { SystemConstants } from '@constants';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { Observable, forkJoin, of } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 

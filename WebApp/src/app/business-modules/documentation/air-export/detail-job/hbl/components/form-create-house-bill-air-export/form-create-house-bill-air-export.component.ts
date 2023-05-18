@@ -20,8 +20,8 @@ import { FormValidators } from '@validators';
 import { ShareAirExportOtherChargePopupComponent } from '../../../../share/other-charge/air-export-other-charge.popup';
 
 import { InjectViewContainerRefDirective } from '@directives';
-import _cloneDeep from 'lodash/cloneDeep';
-import _merge from 'lodash/merge';
+import _cloneDeep from 'lodash-es/cloneDeep';
+import _merge from 'lodash-es/merge';
 import { ToastrService } from 'ngx-toastr';
 import { forkJoin, Observable } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, map, mergeMap, shareReplay, skip, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';

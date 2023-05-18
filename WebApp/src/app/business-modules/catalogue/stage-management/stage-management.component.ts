@@ -1,8 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
 import { StageModel } from 'src/app/shared/models/catalogue/stage.model';
 import { SortService } from 'src/app/shared/services/sort.service';
-import _findIndex from 'lodash/findIndex';
-import _map from 'lodash/map';
+import _findIndex from 'lodash-es/findIndex';
+import _map from 'lodash-es/map';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { StageManagementAddPopupComponent } from './components/form-create/form-create-stage-management.popup';
 import { ToastrService } from 'ngx-toastr';
@@ -44,7 +44,7 @@ export class StageManagementComponent extends AppList {
         private _toastService: ToastrService,
         private _catalogueRepo: CatalogueRepo,
         private _ngProgessSerice: NgProgress,
-        private _exportRepo: ExportRepo, ) {
+        private _exportRepo: ExportRepo,) {
         super();
         this._progressRef = this._ngProgessSerice.ref();
         this.requestList = this.getStages;

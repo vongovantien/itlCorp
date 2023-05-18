@@ -68,6 +68,8 @@ namespace eFMS.API.Documentation.DL.Services
             myDict.Add("Sea LCL Import", "SLI");
             myDict.Add("Sea Export", "SCE");
             myDict.Add("Sea Import", "SCI");
+            myDict.Add("Sea Consol Export", "SCE");
+            myDict.Add("Sea Consol Import", "SCI");
             myDict.Add("Custom Logistic", "CL");
 
             var rules = _csRuleLinkFeeRepository.Get(x => x.Status == true);

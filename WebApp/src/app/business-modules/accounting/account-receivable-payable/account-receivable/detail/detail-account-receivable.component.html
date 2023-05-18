@@ -61,6 +61,12 @@
 
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
+                                                    <span *ngIf="!!item.totalOverObh1to15Day"
+                                                        class="loader-container m--margin-top-10 m-animate-blink">
+                                                        <img src="assets/icons/overdue-obh.ico"
+                                                            style="vertical-align:text-bottom" width="25" height="25"
+                                                            alt="Contract have overdue OBH">
+                                                    </span>
                                                     <a href="javascript:void(0)"
                                                         (click)="showDebitDetail(item, null, null, null, 'Over1To15')">
                                                         {{ item.totalOver1To15Day | number: '.0-3' }}
@@ -72,6 +78,12 @@
                                             </td>
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
+                                                    <span *ngIf="!!item.totalOverObh16to30Day"
+                                                        class="loader-container m--margin-top-10 m-animate-blink">
+                                                        <img src="assets/icons/overdue-obh.ico"
+                                                            style="vertical-align:text-bottom" width="25" height="25"
+                                                            alt="Contract have overdue OBH">
+                                                    </span>
                                                     <a href="javascript:void(0)"
                                                         (click)="showDebitDetail(item, null, null, null, 'Over15To30')">
                                                         {{ item.totalOver15To30Day | number: '.0-3' }}
@@ -82,8 +94,21 @@
                                                 </a>
                                             </td>
                                             <td class="text-right">
-                                                <span [ngClass]="'text-danger'">
+                                                <span>
+                                                    <ng-container *ngIf="!!item.totalOver30Day"
+                                                        title="Contract have overdued">
+                                                        <i
+                                                            class="la la-exclamation-triangle la-lg text-warning m-animate-blink">
+                                                        </i>
+                                                    </ng-container>
+                                                    <span *ngIf="!!item.totalOverObh30Day"
+                                                        class="loader-container m--margin-top-10 m-animate-blink">
+                                                        <img src="assets/icons/overdue-obh.ico"
+                                                            style="vertical-align:text-bottom" width="25" height="25"
+                                                            alt="Contract have overdue OBH">
+                                                    </span>
                                                     <a href="javascript:void(0)"
+                                                        [class.text-danger]="!!item.totalOver30Day"
                                                         (click)="showDebitDetail(item, null, null, null,'Over30')">
                                                         {{ item.totalOver30Day | number: '.0-3' }}
                                                     </a>
@@ -104,7 +129,8 @@
                                                     <tr
                                                         *ngFor="let element of item.accountReceivableGrpServices; let j = index; trackBy: trackByFn">
                                                         <td>
-                                                            <ng-container *ngIf="agreementId&&menuSpecialPermission | async | specialPermission:'ReCalculateARSummary'">
+                                                            <ng-container
+                                                                *ngIf="agreementId&&menuSpecialPermission | async | specialPermission:'ReCalculateARSummary'">
                                                                 <button title="Calculate Accounts Receivable Payable"
                                                                     (click)="onClickCalculateService(element,item)"
                                                                     class="btn btn-primary btn-sm m-btn--pill m-btn--icon m-btn--icon-only">
@@ -112,13 +138,14 @@
                                                                 </button>
                                                             </ng-container>
 
-                                                            <ng-container *ngIf="partnerId && menuSpecialPermission | async | specialPermission:'ReCalARSumNoContract'">
-                                                            <button title="Calculate Accounts Receivable Payable"
-                                                                (click)="onClickCalculateService(element,item)"
-                                                                class="btn btn-primary btn-sm m-btn--pill m-btn--icon m-btn--icon-only">
-                                                                <i class="la la-calculator"></i>
-                                                            </button>
-                                                        </ng-container>
+                                                            <ng-container
+                                                                *ngIf="partnerId && menuSpecialPermission | async | specialPermission:'ReCalARSumNoContract'">
+                                                                <button title="Calculate Accounts Receivable Payable"
+                                                                    (click)="onClickCalculateService(element,item)"
+                                                                    class="btn btn-primary btn-sm m-btn--pill m-btn--icon m-btn--icon-only">
+                                                                    <i class="la la-calculator"></i>
+                                                                </button>
+                                                            </ng-container>
                                                         </td>
                                                         <td>{{ element.serviceName }}
                                                         </td>

@@ -6,7 +6,7 @@ import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { OperationRepo, DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
-import _map from 'lodash/map';
+import _map from 'lodash-es/map';
 import { Router } from '@angular/router';
 import { IAppState, getMenuUserPermissionState, getCurrentUserState } from '@store';
 import { Store } from '@ngrx/store';

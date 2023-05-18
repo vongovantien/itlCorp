@@ -10,7 +10,7 @@ import { User, UserLevel } from "@models";
 import { AppList } from "src/app/app.list";
 
 import { catchError, finalize, takeUntil } from "rxjs/operators";
-import cloneDeep from "lodash/cloneDeep";
+import cloneDeep from "lodash-es/cloneDeep";
 import { IShareSystemState, getShareSystemUserLevelState, SystemLoadUserLevelAction } from "../../store";
 import { RoutingConstants } from "@constants";
 

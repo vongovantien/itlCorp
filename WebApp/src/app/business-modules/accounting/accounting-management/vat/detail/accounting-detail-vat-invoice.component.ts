@@ -15,8 +15,8 @@ import { AccountingManagementCreateVATInvoiceComponent } from '../create/account
 
 import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
-import isUUID from 'validator/lib/isUUID';
-import _merge from 'lodash/merge';
+import isUUID from 'validator/es/lib/isUUID';
+import _merge from 'lodash-es/merge';
 
 @Component({
     selector: 'app-accounting-detail-vat-invoice',

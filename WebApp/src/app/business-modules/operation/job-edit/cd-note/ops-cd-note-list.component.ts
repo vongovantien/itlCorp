@@ -11,7 +11,7 @@ import { OpsCdNoteDetailPopupComponent } from '../components/popup/ops-cd-note-d
 import { ToastrService } from 'ngx-toastr';
 import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/ops-cd-note-add.popup';
 import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
-import _uniq from 'lodash/uniq';
+import _uniq from 'lodash-es/uniq';
 import { ReportPreviewComponent } from '@common';
 import { Crystal } from '@models';
 import { InjectViewContainerRefDirective } from '@directives';

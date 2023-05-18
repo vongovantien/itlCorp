@@ -19,7 +19,7 @@ import {
 
 
 import { catchError } from 'rxjs/operators';
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 import { ShareAirServiceFormCreateComponent } from '../../share-air/components/form-create/form-create-air.component';
 @Component({
     selector: 'app-create-job-air-export',
