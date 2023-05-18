@@ -34,8 +34,9 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<AccAccountReceivable> DataContext;
+        private readonly IContextBase<AcctCdnote> acctCdnoteRepo;
         IMapper mapper;
-
+        readonly string eFMSystemUser = string.Empty;
         public AccAccountReceivableHostedService(IContextBase<AccAccountReceivable> repository, 
             IMapper _mapper,
             ICurrencyExchangeService currencyExchange,
@@ -45,7 +46,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CsTransaction> transaction,
             IContextBase<CsTransactionDetail> transactionDetail,
             IContextBase<OpsTransaction> ops,
-            IContextBase<CsShipmentSurcharge> surcharge
+            IContextBase<CsShipmentSurcharge> surcharge,
+            IContextBase<AcctCdnote> acctCdnote
             )
         {
             DataContext = repository;
@@ -58,6 +60,11 @@ namespace eFMS.API.Accounting.DL.Services
             opsRepo = ops;
             surchargeRepo = surcharge;
             currencyExchangeService = currencyExchange;
+            acctCdnoteRepo = acctCdnote;
+
+
+            eFMSystemUser = userRepo.Get(x => x.Username == "eFMS.System")?.FirstOrDefault()?.Id;
+
         }
 
         public async Task<HandleState> CalculatorReceivableDebitAmountAsync(List<ObjectReceivableModel> models)
@@ -1145,6 +1152,41 @@ namespace eFMS.API.Accounting.DL.Services
                             receivables != null ? JsonConvert.SerializeObject(receivables) : "[]");
             string logName = string.Format("InsertOrUpdateReceivable_{0}_eFMS_LOG", (status ? "Success" : "Fail"));
             new LogHelper(logName, logMessage);
+        }
+
+        public void CalculatetorReceivableOverDuePrepaidAsync()
+        {
+            var debitPrepaidUnpaid =  acctCdnoteRepo.Get(x => x.Type != "CREDIT" && x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID).ToList();
+            if(debitPrepaidUnpaid.Count > 0)
+            {
+                // check if debitPrepaidUnpaid's created date > current date within 3 days.
+                var debitOverDue = debitPrepaidUnpaid.Where(x => x.DatetimeCreated.Value.Date.AddDays(3) < DateTime.Now.Date).ToList();
+                var grp = debitOverDue.GroupBy(x => new { x.PartnerId, x.SalemanId })
+                    .Select(x => new { x.Key.PartnerId, x.Key.SalemanId })
+                    .ToList();
+                if (grp.Count > 0)
+                {
+                    foreach (var debit in grp)
+                    {
+                        var contractsPrepaid =  contractPartnerRepo.Get(x => x.SaleManId == debit.SalemanId 
+                        && x.PartnerId == debit.PartnerId 
+                        && x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PREPAID).ToList();
+                       
+                        if (contractsPrepaid.Count > 0)
+                        {
+                            foreach (var item in contractsPrepaid)
+                            {
+                                item.IsOverDuePrepaid = true;
+                                item.DatetimeModified = DateTime.Now;
+                                item.UserModified = eFMSystemUser;
+                                var hsUpdateContractPrepaid =  contractPartnerRepo.Update(item, x => x.Id == item.Id);
+                            }
+                            string logMessage = JsonConvert.SerializeObject(contractsPrepaid.Select(x => new { x.PartnerId, x.SaleManId }).ToList());
+                            new LogHelper("CalculatetorReceivableOverDuePrepaidAsync", logMessage);
+                        }
+                    }
+                }
+            }
         }
     }
 }

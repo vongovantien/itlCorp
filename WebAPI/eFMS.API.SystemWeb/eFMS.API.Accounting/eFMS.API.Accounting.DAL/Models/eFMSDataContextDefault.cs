@@ -343,7 +343,7 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("OverOBH1To15Day")
                     .HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.OverObh30Day)
+                entity.Property(e => e.OverObh30day)
                     .HasColumnName("OverOBH30Day")
                     .HasColumnType("decimal(18, 4)");
 
@@ -1749,7 +1749,7 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
-                entity.Property(e => e.Offices).HasMaxLength(250);
+                entity.Property(e => e.Offices).HasMaxLength(500);
 
                 entity.Property(e => e.ProductDept)
                     .HasMaxLength(50)
@@ -4424,9 +4424,7 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SyncStatus)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 
