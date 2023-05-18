@@ -2649,21 +2649,6 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
-            if (string.IsNullOrEmpty(criteria.ReferenceNos)
-                && string.IsNullOrEmpty(criteria.PartnerId)
-                && criteria.IssuedDate == null
-                && string.IsNullOrEmpty(criteria.CreatorId)
-                && string.IsNullOrEmpty(criteria.Type)
-                && string.IsNullOrEmpty(criteria.Status)
-                && criteria.FromExportDate == null
-                && criteria.ToExportDate == null
-                )
-            {
-                var maxDate = await DataContext.Get().MaxAsync(x => x.DatetimeCreated) ?? DateTime.Now;
-                var minDate = maxDate.AddMonths(-1); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
-                query = query.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
-            }
-
             var results = DataContext.Get(query);
             return results;
         }
