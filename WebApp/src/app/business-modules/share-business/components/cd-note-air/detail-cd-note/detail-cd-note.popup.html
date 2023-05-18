@@ -13,7 +13,7 @@
                 </button>
                 
                 <div class="modal-actions c-button-actions">
-                    <button class="btn btn-info m-btn--icon" type="button" (click)="sendMail('DebitNote/Invoice')">
+                    <button class="btn btn-info m-btn--icon" type="button" *ngIf="CdNoteDetail.cdNote.type === 'DEBIT'||CdNoteDetail.cdNote.type === 'INVOICE'" (click)="sendMail('DebitNote/Invoice')">
                         <span>
                             <i class="la la-envelope"></i>
                             <span title="Send Debit Note/Invoice">Send Email</span>

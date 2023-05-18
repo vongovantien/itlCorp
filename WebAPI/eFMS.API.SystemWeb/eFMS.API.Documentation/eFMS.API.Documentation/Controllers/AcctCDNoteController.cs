@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 
@@ -133,15 +134,6 @@ namespace eFMS.API.Documentation.Controllers
         public List<AcctCdnoteModel> GetCDNoteWithHbl(Guid? hblId, Guid? jobId)
         {
             return cdNoteServices.GetCDNoteWithHbl(hblId, jobId);
-        }
-
-
-        [HttpGet]
-        [Route("GetCDNoteWithCDNoteNo")]
-        [Authorize]
-        public List<AcctCdnoteModel> GetCDNoteWithCDNoteNo(string CDNoteNo)
-        {
-            return cdNoteServices.GetCDNoteWithCDNoteNo(CDNoteNo);
         }
 
         [HttpGet]
@@ -342,6 +334,28 @@ namespace eFMS.API.Documentation.Controllers
         {
             var result = cdNoteServices.PreviewCombineBilling(criteria);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Query CD Note by criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("Query")]
+        [Authorize]
+        public async Task<IActionResult> QueryAsync(CDNoteCriteria criteria)
+        {
+            var result = await cdNoteServices.QueryAsync(criteria);
+            if (result == null)
+            {
+                // Handle empty result set
+                return NotFound(); // or any other appropriate response indicating no data found
+            }
+            else
+            {
+                // Handle non-empty result set
+                return Ok(result);
+            }
         }
 
         /// <summary>

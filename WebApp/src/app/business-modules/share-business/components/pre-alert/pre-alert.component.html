@@ -381,7 +381,7 @@
                             <ng-container *ngIf="isExitsDebitNote else NotDebitNote">
                                 <ng-container *ngFor="let debitNo of debitNos">
                                     <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px">
-                                        <input type="checkbox" [(ngModel)]="debitNo.isCheckedDebitNote" (change)="onChangeCheckBox()">
+                                        <input type="checkbox" *ngIf="!!debitNo.isDefaultDebitNote" disabled="true" [(ngModel)]="debitNo.isCheckedDebitNote" (change)="onChangeCheckBox()">
                                         <span></span>
                                     </label>
                                     <span>
