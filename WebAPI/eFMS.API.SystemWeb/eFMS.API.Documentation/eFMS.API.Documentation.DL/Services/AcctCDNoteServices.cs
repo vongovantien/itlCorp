@@ -2627,7 +2627,8 @@ namespace eFMS.API.Documentation.DL.Services
         {
             Expression<Func<AcctCdnote, bool>> query = x => (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
                                             && (x.UserCreated == criteria.CreatorId || string.IsNullOrEmpty(criteria.CreatorId))
-                                            && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type));
+                                            && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type)
+                                            && (x.JobId == criteria.JobId || Guid.Empty==criteria.JobId));
 
             if (criteria.FromExportDate != null && criteria.ToExportDate != null)
                 query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromExportDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToExportDate.Value.Date);
