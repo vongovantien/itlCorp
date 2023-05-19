@@ -754,18 +754,29 @@ namespace eFMS.API.Documentation.DL.Services
             var _picId = !string.IsNullOrEmpty(shipmentInfo.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == shipmentInfo.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
             var picName = sysUserRepo.Get(x => x.EmployeeId == _picId).FirstOrDefault()?.Username; //Email from
-            var toEmail = catContractRepo.Get(x => x.PartnerId == cdNoteInfo.PartnerId && x.Active == true).FirstOrDefault()?.EmailAddress;
-            if (string.IsNullOrEmpty(toEmail)) {
-                toEmail = catPartnerRepo.Get(x => x.Id == cdNoteInfo.PartnerId).FirstOrDefault()?.BillingEmail 
-                            ?? catPartnerRepo.Get(x => x.Id == cdNoteInfo.PartnerId).FirstOrDefault()?.Email;
-            }
+            var toEmail = catContractRepo.Get(x => x.PartnerId == cdNoteInfo.PartnerId && x.SaleManId== cdNoteInfo.SalemanId && x.Active == true).FirstOrDefault()?.EmailAddress;
             if (string.IsNullOrEmpty(toEmail))
-            { 
-                toEmail = catPartnerEmailRepo.Get(x=>x.PartnerId==cdNoteInfo.PartnerId && x.OfficeId==cdNoteInfo.OfficeId 
+            {
+                toEmail = catPartnerRepo.Get(x => x.Id == cdNoteInfo.PartnerId).FirstOrDefault().BillingEmail;
+                if (string.IsNullOrEmpty(toEmail))
+                {
+                    toEmail = catPartnerRepo.Get(x => x.Id == cdNoteInfo.PartnerId).FirstOrDefault().Email;
+                }
+            }
+            // Lay mail info trong tab email
+            if (string.IsNullOrEmpty(toEmail))
+            {
+                toEmail = catPartnerEmailRepo.Get(x => x.PartnerId == cdNoteInfo.PartnerId && x.OfficeId == cdNoteInfo.OfficeId
                                                     && x.Type == "Billing").FirstOrDefault()?.Email;
             }
+            // case all above cannot find mail check for inactive contract
+            if (string.IsNullOrEmpty(toEmail))
+            {
+                toEmail = catContractRepo.Get(x => x.PartnerId == cdNoteInfo.PartnerId && x.SaleManId == cdNoteInfo.SalemanId && x.Active == false).FirstOrDefault()?.EmailAddress;
 
-                // Email cc to department manager
+            }
+
+            // Email cc to department manager
             var shipmentAgentName = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.PartnerNameEn; // Agent on shipment
             var picUserId = sysUserRepo.Get(x => x.EmployeeId == _picId).FirstOrDefault()?.Id;
             var departmentId = sysUserLevelRepo.Get(x => x.UserId==picUserId).FirstOrDefault()?.DepartmentId;
