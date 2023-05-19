@@ -573,6 +573,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.FirstShipmentDate).HasColumnType("datetime");
 
+                entity.Property(e => e.IsOverDueObh).HasColumnName("IsOverDueOBH");
+
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
                     .IsUnicode(false);
@@ -2049,6 +2051,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.SubColoader).HasMaxLength(800);
 
+                entity.Property(e => e.TrackingStatus).HasMaxLength(50);
+
                 entity.Property(e => e.TransactionType)
                     .IsRequired()
                     .HasMaxLength(50)
@@ -3162,6 +3166,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("ObjectID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 

@@ -407,7 +407,8 @@ namespace eFMS.API.Accounting.DL.Services
                     OverObh1to15Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.OverObh1to15Day : 0).Sum(),
                     OverObh16to30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.OverObh16to30Day : 0).Sum(),
                     OverObh30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.OverObh30day : 0).Sum(),
-                    IsOverDueOBH = s.First().contract.IsOverDueObh
+                    IsOverDueOBH = s.First().contract.IsOverDueObh,
+                    IsOverDuePrepaid = s.First().contract.IsOverDuePrepaid
                 });
 
             var data = from contract in groupByContract
@@ -472,6 +473,8 @@ namespace eFMS.API.Accounting.DL.Services
                            OverObh1to15Day = contract.OverObh1to15Day,
                            OverObh16to30Day = contract.OverObh16to30Day,
                            OverObh30Day = contract.OverObh30Day,
+                           IsOverDuePrepaid = contract.IsOverDuePrepaid
+                           
                        };
             return data;
         }
@@ -928,7 +931,8 @@ namespace eFMS.API.Accounting.DL.Services
                         IsOverDue = s.First().IsOverDue,
                         ArOfficeIds = s.Select(x => x.OfficeId).Distinct().ToList(),
                         ArServices = s.Select(x => x.ArServiceCode).Distinct().ToList(),
-                        IsOverDueOBH = s.First().IsOverDueOBH
+                        IsOverDueOBH = s.First().IsOverDueOBH,
+                        IsOverDuePrepaid = s.First().IsOverDuePrepaid
                     }).OrderByDescending(s => s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
@@ -1181,6 +1185,7 @@ namespace eFMS.API.Accounting.DL.Services
                 OverObh1to15Day = s.Sum(sum => sum.OverObh1to15Day),
                 OverObh16to30Day = s.Sum(sum => sum.OverObh16to30Day),
                 OverObh30Day = s.Sum(sum => sum.OverObh30Day),
+                IsOverDuePrepaid = s.FirstOrDefault().IsOverDuePrepaid,
             }).FirstOrDefault();
             detail.AccountReceivableGrpOffices = GetARGroupOffice(arPartners);
             return detail;

@@ -60,7 +60,8 @@
                                                     <span *ngIf="!!item.isExpired" title="Contract is expired">
                                                         <i class="la la-history la-lg"></i>
                                                     </span>
-                                                    <span *ngIf="!!item.isOverDue" title="Contract have overdued">
+                                                    <span *ngIf="!!item.isOverDue || !!item.isOverDuePrepaid"
+                                                        title="Contract have overdued">
                                                         <i class="la la-exclamation-triangle la-lg text-warning"></i>
                                                     </span>
                                                     <span *ngIf="!!item.isOverDueOBH"
@@ -161,6 +162,11 @@
                                                         {{item.saleDebitAmount | negativeNumber:'.0-3'}}
                                                     </ng-container>
                                                     <ng-container *ngSwitchDefault>
+                                                        <span *ngIf="!!item.isOverDuePrepaid"
+                                                            title="Contract have overdued">
+                                                            <i
+                                                                class="la la-exclamation-triangle la-lg text-warning"></i>
+                                                        </span>
                                                         {{item.debitAmount | negativeNumber:'.0-3'}}
                                                     </ng-container>
                                                 </ng-container>
