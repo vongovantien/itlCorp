@@ -164,7 +164,6 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     else{
                         this.name = params.name;
                     }
-                    console.log(this.partnerId);
                     this.checkReportType();
 
                     this.hblRptName = (this.serviceId === ChargeConstants.SFE_CODE || this.serviceId === ChargeConstants.SLE_CODE || this.serviceId === ChargeConstants.SCE_CODE) ? "HBL" : "HAWB";
@@ -422,7 +421,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     checkExistDebitNoteSendInv() {
-        this._documentRepo.getListCDNoteWithPartnerId({partnerId: this.partnerId})
+        this._documentRepo.getListCDNoteWithPartnerId({ jobId: this.jobId, partnerId: this.partnerId})
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -1625,16 +1624,25 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             })
         }
         if (this.stageType.length !== 0 && !this.isDbtInv) {
+            console.log(this.attachedFile);
             if (this.attachedFile.length > 0 && this.stageType == "SEND_AN") {
-                this.lstStage = ["SEND_AN", "SEND_INV"]
-                this.lstHblId.forEach(_hbl=>{
-                    console.log(_hbl);
-                    this.lstStage.forEach(el => {
-                        this._documentRepo.assignStageByEventType({ stageType: el, jobId, hblId:_hbl })
+                if(this.lstHblId.length > 0){
+                    this.lstStage = ["SEND_AN", "SEND_INV"]
+                    this.lstHblId.forEach(_hbl=>{
+                        this.lstStage.forEach(el => {
+                            this._documentRepo.assignStageByEventType({ stageType: el, jobId, hblId:_hbl })
+                                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                                .subscribe();
+                        })
+                    })
+                }
+                else{
+                    if (this.stageType.length !== 0 && this.isArrivalNotice) {
+                        this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId })
                             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                             .subscribe();
-                    })
-                })
+                    }
+                }
             }
             else{
                 if (this.stageType.length !== 0 && !this.isDbtInv) {

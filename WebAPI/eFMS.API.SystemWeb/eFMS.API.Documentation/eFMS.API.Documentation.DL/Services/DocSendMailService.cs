@@ -753,7 +753,7 @@ namespace eFMS.API.Documentation.DL.Services
             #endregion
             var _picId = !string.IsNullOrEmpty(shipmentInfo.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == shipmentInfo.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
-            var picName = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.EmployeeNameEn; //Email from
+            var picName = sysUserRepo.Get(x => x.EmployeeId == _picId).FirstOrDefault()?.Username; //Email from
             var toEmail = catContractRepo.Get(x => x.PartnerId == cdNoteInfo.PartnerId && x.Active == true).FirstOrDefault()?.EmailAddress;
             if (string.IsNullOrEmpty(toEmail)) {
                 toEmail = catPartnerRepo.Get(x => x.Id == cdNoteInfo.PartnerId).FirstOrDefault()?.BillingEmail 
