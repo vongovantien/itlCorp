@@ -2207,7 +2207,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ShippingMark).HasMaxLength(250);
 
                 entity.Property(e => e.Taxcll)
                     .HasColumnName("TAXCLL")
