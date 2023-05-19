@@ -61,7 +61,7 @@ namespace eFMS.API.Accounting.DL.Services
             var occurenceTime = parsedExp.GetNextOccurrence(DateTimeOffset.Now, TimeZoneInfo.Local);
 
             var delay = occurenceTime.GetValueOrDefault() - currentTime;
-            new LogHelper(string.Format("ScopedAlertHostedService"), "Delay " + delay + "\n");
+            new LogHelper(string.Format("PrepaidOverDueBackgroundService"), "Delay " + delay + "\n");
 
             await Task.Delay(delay);
         }

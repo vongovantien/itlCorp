@@ -67,7 +67,7 @@ export class Contract {
     paymentTermObh: string = null;
     isUpdateCreditTermInfo: boolean = false;
     isOverDueObh: boolean = false;
-
+    isOverDuePrepaid: boolean = false;
 
     constructor(data?: any) {
         const self = this;

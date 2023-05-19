@@ -2243,8 +2243,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ShippingMark).HasMaxLength(250);
-
                 entity.Property(e => e.Taxcll)
                     .HasColumnName("TAXCLL")
                     .IsUnicode(false);
@@ -3935,11 +3933,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
 
-                entity.Property(e => e.QuantityFromRange).HasColumnType("decimal(18, 4)");
-
                 entity.Property(e => e.QuantityFromValue).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.QuantityToRange).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.QuantityToValue).HasColumnType("decimal(18, 4)");
 
@@ -4797,9 +4791,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SyncStatus)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 

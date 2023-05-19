@@ -207,6 +207,7 @@ namespace eFMS.API.Accounting.DL.Services
             HandleState result = new HandleState();
             if (model.Count > 0)
             {
+                var cdNoteData = new List<AcctCdnote>();
                 foreach (var item in model)
                 {
                     var cd = DataContext.Get(x => x.Id == item.Id)?.FirstOrDefault();
@@ -219,8 +220,59 @@ namespace eFMS.API.Accounting.DL.Services
                     cd.UserModified = currentUser.UserID;
 
                     var d = await DataContext.UpdateAsync(cd, x => x.Id == cd.Id, false);
+                    if (d.Success)
+                    {
+                        cdNoteData.Add(cd);
+                    }
                 }
                 result = DataContext.SubmitChanges();
+                if(result.Success && cdNoteData.Count > 0)
+                {
+                    var partnerIds = cdNoteData.Select(x => x.PartnerId).ToList();                 
+                    var contractToResetOverDuePrepaid = DC.CatContract.Where(x => partnerIds.Contains(x.PartnerId) && x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PREPAID).ToList();
+                    if(contractToResetOverDuePrepaid.Count > 0)
+                    {
+                        foreach (var c in contractToResetOverDuePrepaid)
+                        {
+                            c.IsOverDuePrepaid = false;
+                            c.DatetimeModified = DateTime.Now;
+                            c.UserModified = currentUser.UserID;
+                            DC.CatContract.Update(c);
+                            DC.SaveChanges();
+                        }
+                    }
+
+                var debitPrepaidUnpaid = DataContext.Get(x => x.Type != "CREDIT"
+                     && x.Status == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID
+                     && partnerIds.Contains(x.PartnerId)
+                 ).ToList();
+                    if (debitPrepaidUnpaid.Count > 0)
+                    {
+                        var debitOverDue = debitPrepaidUnpaid.Where(x => x.DatetimeCreated.Value.Date.AddDays(3) < DateTime.Now.Date).ToList();
+                        var grp = debitOverDue.GroupBy(x => new { x.PartnerId, x.SalemanId })
+                            .Select(x => new { x.Key.PartnerId, x.Key.SalemanId })
+                            .ToList();
+                        foreach (var debit in grp)
+                        {
+                            var contractsPrepaid = DC.CatContract.Where(x => x.SaleManId == debit.SalemanId
+                            && x.PartnerId == debit.PartnerId
+                            && x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PREPAID).ToList();
+
+                            if (contractsPrepaid.Count > 0)
+                            {
+                                foreach (var item in contractsPrepaid)
+                                {
+                                    item.IsOverDuePrepaid = true;
+                                    item.DatetimeModified = DateTime.Now;
+                                    item.UserModified = currentUser.UserID;
+                                    DC.CatContract.Update(item);
+                                    DC.SaveChanges();
+                                }
+                            }
+                        }
+                    }
+                   
+                }
             }
             return result;
         }
