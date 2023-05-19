@@ -48,6 +48,10 @@ const routing: Routes = [
                 path: 'manifest', component: SeaFclImportManifestComponent,
                 data: { name: "Manifest", },
             },
+            {
+                path: 'prealert', component: ShareBusinessReAlertComponent,
+                data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.SFI_CODE },
+            },
         ]
     },
 ];
