@@ -47,6 +47,7 @@
              <param name="size"></param>
              <returns></returns>
         </member>
+        <!-- Badly formed XML comment ignored for member "M:eFMS.API.Operation.Controllers.CustomsDeclarationController.GetUserCustomClearance(eFMS.API.Operation.DL.Models.Criteria.CustomEcusCriteria,System.Int32,System.Int32)" -->
         <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.Paging(eFMS.API.Operation.DL.Models.Criteria.CustomsDeclarationCriteria,System.Int32,System.Int32)">
             <summary>
             get and paging the list of custom declarations by conditions
