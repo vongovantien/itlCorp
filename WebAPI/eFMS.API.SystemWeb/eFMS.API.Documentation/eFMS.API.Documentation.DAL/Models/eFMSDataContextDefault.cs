@@ -4180,7 +4180,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Hblno)
                     .HasColumnName("HBLNo")
-                    .HasMaxLength(20);
+                    .HasMaxLength(200);
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
