@@ -50,8 +50,7 @@
                                         Taxcode field was required!
                                     </div>
                                     <div class="form-control-feedback"
-                                        *ngIf="(isSubmitted &&
-                                    ((taxcode.errors | equalError:'maxlength') || (taxcode.errors | equalError:'minlength')))||((taxcode.errors | equalError:'maxlength') || (taxcode.errors | equalError:'minlength'))">
+                                        *ngIf="isSubmitted && ((taxcode.errors | equalError:'maxlength') || (taxcode.errors | equalError:'minlength'))">
                                         Tax Code include 8 - 14 characters!
                                     </div>
                                     <div class="form-control-feedback"
@@ -109,7 +108,7 @@
                                     <input type="number" class="form-control m-input m-input--square"
                                         formControlName="margin" placeholder="Please enter Margin">
 
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && 
+                                    <div class="form-control-feedback" *ngIf="isSubmitted &&
                                         ((margin.errors | equalError:'max') || (margin.errors | equalError:'min'))">
                                         Margin must be from 0 to 100 %
                                     </div>
