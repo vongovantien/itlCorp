@@ -190,7 +190,7 @@ export class SettlementFormCreateComponent extends AppForm {
     getBeneficiaryInfo() {
         if (!!this.payee.value) {
             if (this.paymentMethod.value !== this.methods[0]) {
-                this.getBankAccountPayee(true);
+                this.getBankAccountPayee();
             } else {
                 this.resetBankInfo();
             }
@@ -244,7 +244,7 @@ export class SettlementFormCreateComponent extends AppForm {
         }
     }
 
-    getBankAccountPayee(isSetBank: Boolean) {
+    getBankAccountPayee() {
         if (!!this.payee.value && this.paymentMethod.value.value !== 'Cash') {
             this._catalogueRepo.getApprovedBanksByPartner(this.payee.value)
                 .pipe(catchError(this.catchError), finalize(() => {
@@ -253,23 +253,12 @@ export class SettlementFormCreateComponent extends AppForm {
                     (res: any[]) => {
                         if (!!res && res.length > 0) {
                             this.bankAccount = res;
-                            if (isSetBank === true) {
-                                this.bankAccountNo.setValue(res[0].bankAccountNo);
-                                this.bankNameDescription.setValue(res[0].bankNameEn);
-                                this.bankName.setValue(res[0].bankNameEn);
-                                this.beneficiaryName.setValue(res[0].bankAccountName)
-                                this.mapBankCode(res[0].code);
-                            }
+                            this.bankAccountNo.setValue(res[0].bankAccountNo);
+                            this.bankNameDescription.setValue(res[0].bankName);
+                            this.bankName.setValue(res[0].bankName);
+                            this.beneficiaryName.setValue(res[0].bankAccountName)
+                            this.mapBankCode(res[0].bankCode);
                         }
-                        // else {
-                        //     this.bankAccount = [];
-                        //     const beneficiary = this.getPartnerById(this.payee.value);
-                        //     if (!!beneficiary) {
-                        //         this.beneficiaryName.setValue(beneficiary.bankAccountName);
-                        //         this.bankAccountNo.setValue(beneficiary.bankAccountNo);
-                        //         this.setBankInfo(beneficiary);
-                        //     }
-                        // }
                     });
         }
     }
