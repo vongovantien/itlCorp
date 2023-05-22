@@ -47,6 +47,7 @@ export class CommercialBankListComponent extends AppList {
             { title: 'Swift Code', field: '', sortable: false },
             { title: 'Bank Name', field: '', sortable: false },
             { title: 'Bank Code', field: '', sortable: false },
+            { title: 'Approved Status', field: '', sortable: true },
             { title: 'Source', field: '', sortable: false },
             { title: 'Note', field: '', sortable: false },
         ];
@@ -124,7 +125,6 @@ export class CommercialBankListComponent extends AppList {
     onRequestBank($event: any) {
         const data = $event;
         if (data === true) {
-            this.formUpdateBankPopup.hide();
             this.getPartnerBank(this.partnerId);
         }
     }

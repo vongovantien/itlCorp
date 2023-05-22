@@ -170,7 +170,6 @@
                                                 </td>
                                                 <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{advancePayment.dueDate | date: 'dd/MM/yyyy'}}</td>
-                                                {{advancePayment | json}}
                                                 <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
                                                 <td [ngSwitch]="advancePayment.statusApprovalName">

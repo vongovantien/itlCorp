@@ -240,6 +240,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
                             this._toastService.success(res.message);
                             this.bankDetail.approveStatus = CatalogueConstants.STATUS_APPROVAL.REVISE;
                             this.approveStatus.setValue(CatalogueConstants.STATUS_APPROVAL.REVISE);
+                            this.onRequest.emit(true);
                         }
                         else {
                             this._toastService.error(res.message);
