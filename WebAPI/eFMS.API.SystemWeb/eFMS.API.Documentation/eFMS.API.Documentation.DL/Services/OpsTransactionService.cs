@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -372,21 +373,27 @@ namespace eFMS.API.Documentation.DL.Services
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                          && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
+                                                         && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-")
+                                                         && x.TransactionType == null
+                                                         )
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: HAN -> H [15202]
                     break;
                 case "ITLDAD":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
+                                                        && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                         && x.TransactionType == null
+                                                        )
                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
                     break;
                 case "ITLCAM":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-"))
+                                                        && x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-")
+                                                         && x.TransactionType == null
+                                                        )
                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
                     break;
                 default:
@@ -395,7 +402,9 @@ namespace eFMS.API.Documentation.DL.Services
                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                      && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
                                                      && !x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-")
-                                                     && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
+                                                     && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-")
+                                                      && x.TransactionType == null
+                                                     )
                                                      .OrderByDescending(x => x.JobNo).FirstOrDefault();
                     break;
             }
