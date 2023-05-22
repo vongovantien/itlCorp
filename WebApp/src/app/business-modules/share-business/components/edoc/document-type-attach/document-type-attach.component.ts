@@ -59,6 +59,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     payFilled: boolean = true;
     jobOnSettle: boolean = false;
     isEdocByAcc: boolean = false;
+    PODTypeId: number = 0;
 
     constructor(
         private _toastService: ToastrService,
@@ -72,7 +73,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     ngOnInit(): void {
         this.getJobList();
-        this.transactionType = this.isAttachFilePOD === true ? this.transactionType: this.typeFrom;
+        this.transactionType = this.isAttachFilePOD === true ? this.transactionType : this.typeFrom;
         this.configJob = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'jobId', label: 'JobID' },
@@ -301,6 +302,10 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 (res: any[]) => {
                     this.documentTypes = res;
                     this.configDocType.dataSource = res;
+                    if (this.isAttachFilePOD) {
+                        console.log(res);
+                        this.PODTypeId = res.filter(x => x.code === 'POD')[0].id;
+                    }
                 },
             );
     }
@@ -414,7 +419,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     Note: x.note !== undefined ? x.note : '',
                     BillingId: this.billingId !== '' ? this.billingId : SystemConstants.EMPTY_GUID,
                     Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
-                    DocumentId: x.DocumentId,
+                    DocumentId: this.isAttachFilePOD ? this.PODTypeId : x.DocumentId,
                     AccountingType: x.AccountingType,
                 }));
             });
