@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -62,6 +63,11 @@ namespace eFMS.API.Accounting.DL.Services
             return lstJobId;
         }
 
+        //public async Task<bool> HaveEDoc(string billinftype,string billingNo)
+        //{
+        //    return await DataContext.AnyAsync(x => x.BillingType == billinftype && x.BillingNo == billingNo);
+        //}
+
         public EdocAccUpdateModel MapAdvanceRequest(string AdvNo)
         {
             var lstCurrADV = _advRequest.Get(x => x.AdvanceNo == AdvNo).GroupBy(x => x.JobId).Select(x => x.FirstOrDefault().JobId).ToList();
@@ -74,7 +80,7 @@ namespace eFMS.API.Accounting.DL.Services
                 BillingNo = AdvNo,
                 BillingType = "Advance",
                 ListAdd = lstAdd,
-                ListDel = getListRep(lstDel),
+                ListDel = lstDel,
             };
             return edocModel;
         }
@@ -108,7 +114,7 @@ namespace eFMS.API.Accounting.DL.Services
                 BillingNo = soaNo,
                 BillingType = "SOA",
                 ListAdd = lstAdd,
-                ListDel = getListRep(lstDel),
+                ListDel = lstDel,
             };
             return edocModel;
         }

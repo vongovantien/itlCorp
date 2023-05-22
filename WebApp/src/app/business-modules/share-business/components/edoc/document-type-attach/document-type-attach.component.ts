@@ -201,14 +201,15 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            _uniqBy(data, 'hbl').forEach(element => {
+                            console.log(data);
+                            var listJob = data.filter(x => x.id !== SystemConstants.EMPTY_GUID);
+                            _uniqBy(listJob, 'hbl').forEach(element => {
                                 let item = ({
                                     jobId: element.jobId,
                                     id: element.shipmentId,
                                     customNo: element.customNo,
                                     hbl: element.hbl,
                                     mbl: element.mbl
-
                                 })
                                 this.jobDataSource.push(item);
                             }
