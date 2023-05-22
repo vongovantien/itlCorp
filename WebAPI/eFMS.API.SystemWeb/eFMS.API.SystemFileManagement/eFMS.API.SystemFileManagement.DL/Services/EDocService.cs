@@ -10,6 +10,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver.Linq;
@@ -361,6 +362,39 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return (new HandleState(false, ex.Message));
                 throw ex;
             }
+        }
+
+        private SysImageDetail MapToJobITL(SysImageDetail edoc)
+        {
+            var isRep = _opsTranRepo.Any(x => x.ReplicatedId == edoc.JobId && x.CurrentStatus != "Canceled");
+            var jobITL = _opsTranRepo.Where(x => x.ReplicatedId == edoc.JobId);
+            if (isRep && jobITL != null)
+            {
+                return new SysImageDetail()
+                {
+                    BillingNo = edoc.BillingNo,
+                    BillingType = edoc.BillingType,
+                    JobId = jobITL.FirstOrDefault().Id,
+                    Id = Guid.NewGuid(),
+                    DatetimeCreated = edoc.DatetimeCreated,
+                    DatetimeModified = edoc.DatetimeModified,
+                    DepartmentId = edoc.DepartmentId,
+                    DocumentTypeId = edoc.DocumentTypeId,
+                    ExpiredDate = edoc.ExpiredDate,
+                    GenEdocId = edoc.GenEdocId,
+                    GroupId = edoc.GroupId,
+                    Hblid = edoc.Hblid,
+                    Note = edoc.Note,
+                    OfficeId = edoc.OfficeId,
+                    Source = edoc.Source,
+                    SysImageId = edoc.SysImageId,
+                    SystemFileName = edoc.SystemFileName,
+                    UserCreated = edoc.UserCreated,
+                    UserFileName = edoc.UserFileName,
+                    UserModified = edoc.UserModified,
+                };
+            }
+            return null;
         }
 
         public SysAttachFileTemplate GetAttTepmlateByJob(string Code, int docId, string transationType, string accountingType)
@@ -2239,6 +2273,20 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 }
             });
             return result;
+        }
+
+        private string getBillingId(string billingType, string billingNo)
+        {
+            switch (billingType)
+            {
+                case "Settlement":
+                    return _setleRepo.Get(x => x.SettlementNo == billingNo).FirstOrDefault().Id.ToString();
+                case "Advance":
+                    return _advRepo.Get(x => x.AdvanceNo == billingNo).FirstOrDefault().Id.ToString();
+                case "SOA":
+                    return _soaRepo.Get(x => x.Soano == billingNo).FirstOrDefault().Id;
+                default: return null;
+            }
         }
 
         private List<SysImageDetail> GetListImageByAcc(string billingType, string billingNo)
