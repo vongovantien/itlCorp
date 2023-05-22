@@ -58,7 +58,7 @@
                             </span>
                         </span>
                     </button>
-                    <button *ngIf="transactionType==='TK', else closeOPS" type="button"
+                    <button *ngIf="transactionType==='TK', else closeCL" type="button"
                         class="btn  m-btn--icon m-btn--uppercase" routerLink="/home/operation/trucking-inland">
                         <span>
                             <i class="la la-ban"></i>
@@ -67,9 +67,9 @@
                             </span>
                         </span>
                     </button>
-                    <ng-template #closeOPS>
-                        <button *ngIf="transactionType==='TK', else closeOPS" type="button"
-                            class="btn  m-btn--icon m-btn--uppercase" routerLink="/home/operation/job-management">
+                    <ng-template #closeCL>
+                        <button #closeCL type="button" class="btn  m-btn--icon m-btn--uppercase"
+                            routerLink="/home/operation/job-management">
                             <span>
                                 <i class="la la-ban"></i>
                                 <span>

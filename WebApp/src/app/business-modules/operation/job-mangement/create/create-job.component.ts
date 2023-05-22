@@ -191,8 +191,9 @@ export class JobManagementCreateJobComponent extends AppForm {
         if (this.transactionType === 'TK') {
             this._router.navigate([RoutingConstants.LOGISTICS.TRUCKING_INLAND]);
         }
-
-        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
+        else {
+            this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
+        }
     }
 
     subscriptionSaveContainerChange() {
