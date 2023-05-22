@@ -2416,7 +2416,16 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             var fromRep = await _officeRepo.AnyAsync(x => x.Id == currentUser.OfficeID && x.OfficeType == "OutSource");
             var result = new HandleState(true,"Update Edoc Success");
-            var delEdoc=await RemoveEdocfromAcc(model,fromRep);
+            bool delEdoc;
+            if (model.BillingType == "Settlement")
+            {
+                delEdoc = await RemoveEdocfromAcc(model, fromRep);
+            }
+            else
+            {
+                delEdoc = await RemoveEdocfromAcc(model, false);
+            }
+            
             if (delEdoc)
             {
                 var billingId=getBillingId(model.BillingType,model.BillingNo);
