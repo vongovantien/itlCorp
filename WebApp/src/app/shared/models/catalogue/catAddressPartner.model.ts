@@ -15,6 +15,10 @@ export class AddressPartner {
     userModifiedName: string = null;
     contactPerson: string = null;
     tel: string = null;
+    countryName: string = null;
+    cityName: string = null;
+    districtName: string = null;
+    wardName: string = null;
 
     location: string = null;
     streetAddress: string = null;
