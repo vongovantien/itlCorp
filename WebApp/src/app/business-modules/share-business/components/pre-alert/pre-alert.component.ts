@@ -1624,24 +1624,18 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             })
         }
         if (this.stageType.length !== 0 && !this.isDbtInv) {
-            console.log(this.attachedFile);
             if (this.attachedFile.length > 0 && this.stageType == "SEND_AN") {
+                this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId: this.hblId })
+                                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                                .subscribe();
+
                 if(this.lstHblId.length > 0){
-                    this.lstStage = ["SEND_AN", "SEND_INV"]
+                    this.stageType = "SEND_INV";
                     this.lstHblId.forEach(_hbl=>{
-                        this.lstStage.forEach(el => {
-                            this._documentRepo.assignStageByEventType({ stageType: el, jobId, hblId:_hbl })
+                            this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId:_hbl })
                                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                                 .subscribe();
                         })
-                    })
-                }
-                else{
-                    if (this.stageType.length !== 0 && this.isArrivalNotice) {
-                        this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId })
-                            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                            .subscribe();
-                    }
                 }
             }
             else{
@@ -1661,7 +1655,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             ).subscribe(
                 (dataCdNote: any) => {
                     this.CdNoteDetail = dataCdNote;
-                    this.lstHblId = this.CdNoteDetail.listSurcharges.map(x => x.hblid);
+                    this.lstHblId= this.lstHblId.concat(this.CdNoteDetail.listSurcharges.map(x => x.hblid));
                 },
             );
 
