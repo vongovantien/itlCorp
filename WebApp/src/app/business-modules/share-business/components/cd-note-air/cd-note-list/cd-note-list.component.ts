@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from 'src/app/shared/services';
 import { combineLatest, of } from 'rxjs';
-import _uniq from 'lodash/uniq';
+import _uniq from 'lodash-es/uniq';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
 import { ShareBussinessCdNoteAddAirPopupComponent } from '../add-cd-note/add-cd-note.popup';
 import { ShareBussinessCdNoteDetailAirPopupComponent } from '../detail-cd-note/detail-cd-note.popup';

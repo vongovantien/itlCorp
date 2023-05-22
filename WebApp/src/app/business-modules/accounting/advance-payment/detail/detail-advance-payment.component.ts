@@ -24,7 +24,7 @@ import { IAppState } from "@store";
 import { combineLatest, EMPTY } from "rxjs";
 import { catchError, concatMap, map } from "rxjs/operators";
 import { ShareBussinessAttachFileV2Component } from "src/app/business-modules/share-business/components/edoc/files-attach-v2/files-attach-v2.component";
-import isUUID from "validator/lib/isUUID";
+import isUUID from "validator/es/lib/isUUID";
 import { ListAdvancePaymentCarrierComponent } from "../components/list-advance-payment-carrier/list-advance-payment-carrier.component";
 
 @Component({

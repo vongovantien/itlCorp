@@ -27,8 +27,8 @@ import { catchError, takeUntil, mergeMap, switchMap } from 'rxjs/operators';
 import { forkJoin, of } from 'rxjs';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
-import isUUID from 'validator/lib/isUUID';
-import groupBy from 'lodash/groupBy';
+import isUUID from 'validator/es/lib/isUUID';
+import groupBy from 'lodash-es/groupBy';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 import { InjectViewContainerRefDirective } from '@directives';
 
@@ -301,12 +301,12 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     onsubmitData() {
         this._store.select(getTransactionState)
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (res: ITransactionState) => {
-                this.shipmentType = res.cstransaction.shipmentType;
-            }
-        );
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: ITransactionState) => {
+                    this.shipmentType = res.cstransaction.shipmentType;
+                }
+            );
         const body = {
             id: SystemConstants.EMPTY_GUID,
             jobId: this.jobId,

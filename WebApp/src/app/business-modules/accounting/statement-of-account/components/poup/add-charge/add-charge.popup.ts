@@ -3,8 +3,8 @@ import { PopupBase } from 'src/app/popup.base';
 import { AccountingRepo } from 'src/app/shared/repositories';
 import { SOASearchCharge, Charge } from 'src/app/shared/models';
 
-import _includes from 'lodash/includes';
-import _uniq from 'lodash/uniq';
+import _includes from 'lodash-es/includes';
+import _uniq from 'lodash-es/uniq';
 import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { SortService } from 'src/app/shared/services';

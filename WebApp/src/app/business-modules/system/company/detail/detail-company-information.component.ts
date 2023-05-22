@@ -13,7 +13,7 @@ import { IShareSystemState, SystemLoadUserLevelAction } from '../../store';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 
 import { forkJoin } from 'rxjs';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { SortService } from '@services';
 import { RoutingConstants } from '@constants';
 
@@ -33,7 +33,7 @@ export class CompanyInformationDetailComponent extends AppList {
         active: true,
         kbExchangeRate: null,
     };
-    
+
     companyId: string = '';
     company: Company;
 
@@ -112,7 +112,7 @@ export class CompanyInformationDetailComponent extends AppList {
 
         this.formAddCompany.formGroup.patchValue(this.formData);
         this.formAddCompany.active.setValue(this.formAddCompany.types.filter(i => i.value === company.active)[0]);
-        
+
     }
 
     getDetailCompany() {

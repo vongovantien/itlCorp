@@ -845,19 +845,15 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public async Task<HandleState> UpdateMultipleProofOfDelivery(ProofOfDeliveryModel model)
+        public async Task<HandleState> UpdateMultipleProofOfDelivery(List<ProofOfDeliveryModel> listModel)
         {
             var listHBL = new List<CsTransactionDetail>();
 
-            foreach (var hblId in model.HouseBills)
+            foreach (var hbl in listModel)
             {
-                var detailTransaction = detailTransactionRepository.First(x => x.Id == hblId);
-                if (detailTransaction == null) return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND].Value);
-                detailTransaction.ReferenceNoProof = model.ReferenceNo;
-                detailTransaction.DeliveryDate = model.DeliveryDate;
-                detailTransaction.DeliveryPerson = model.DeliveryPerson;
-                detailTransaction.DeliveryPerson = model.DeliveryPerson;
-                detailTransaction.Note = model.Note;
+                var detailTransaction = detailTransactionRepository.First(x => x.Id == hbl.HblId);
+                detailTransaction.DeliveryDate = hbl.DeliveryDate;
+                detailTransaction.DeliveryPerson = hbl.DeliveryPerson;
                 listHBL.Add(detailTransaction);
             }
 

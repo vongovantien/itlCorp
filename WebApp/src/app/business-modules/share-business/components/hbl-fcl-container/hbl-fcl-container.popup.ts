@@ -12,7 +12,7 @@ import { DeleteContainerAction, SaveContainerAction, getHBLContainersState, ICon
 import { PopupBase } from 'src/app/popup.base';
 import { SystemConstants } from 'src/constants/system.const';
 
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 import { ShareContainerImportComponent } from '../container-import/container-import.component';

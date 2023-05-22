@@ -16,7 +16,7 @@ import {
     WorkOrderListPricestate
 } from '../../store';
 import { CommercialPriceItemWorkOrderPopupComponent } from '../popup/price-item/price-item-work-order.component';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
 import { SystemConstants } from '@constants';

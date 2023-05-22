@@ -8,8 +8,8 @@ import { IncotermUpdateModel, Incoterm } from '@models';
 
 import { CommercialCreateIncotermComponent } from '../create/create-incoterm-commercial.component';
 
-import UUID from 'validator/lib/isUUID';
-import _merge from 'lodash/merge';
+import UUID from 'validator/es/lib/isUUID';
+import _merge from 'lodash-es/merge';
 import { of } from 'rxjs';
 import { takeUntil, map, switchMap, tap, catchError } from 'rxjs/operators';
 

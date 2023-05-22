@@ -13,7 +13,7 @@ import { CatalogueRepo, DocumentationRepo, ExportRepo, SystemFileManageRepo } fr
 import { ICrystalReport } from "@interfaces";
 
 import { takeUntil, catchError, map, switchMap, concatMap, mergeMap } from "rxjs/operators";
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { delayTime } from "@decorators";
 import { combineLatest, of } from 'rxjs';
 import { RoutingConstants, SystemConstants } from '@constants';
@@ -438,7 +438,6 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
     showMassUpdatePOD() {
         if (!!this.houseBills) {
             this.massUpdatePODComponent.show();
-            console.log(this.houseBills);
         }
     }
 
