@@ -19,23 +19,16 @@ namespace eFMS.API.Accounting.DL.Services
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            try
+            while (!stoppingToken.IsCancellationRequested)
             {
-                while (!stoppingToken.IsCancellationRequested)
+                await WaitForNextSchedule("* * * * *"); // At 1:00am every day.
+                new LogHelper("PrepaidOverDueBackgroundService", "RUNNING at " + DateTime.Now);
+                using (var scope = _services.CreateScope())
                 {
-                    await WaitForNextSchedule("0 1 * * *"); // At 1:00am every day.
-                    new LogHelper("PrepaidOverDueBackgroundService", "RUNNING at " + DateTime.Now);
-                    using (var scope = _services.CreateScope())
-                    {
-                        var scopedService = scope.ServiceProvider.GetRequiredService<IAccAccountReceivableHostedService>();
-                        scopedService.CalculatetorReceivableOverDuePrepaidAsync();
-                    }
+                    var scopedService = scope.ServiceProvider.GetRequiredService<IAccAccountReceivableHostedService>();
+                    scopedService.CalculatetorReceivableOverDuePrepaidAsync();
+                    new LogHelper("PrepaidOverDueBackgroundService", "EXCUTED at " + DateTime.Now);
                 }
-            }
-            catch (Exception ex)
-            {
-                new LogHelper("PrepaidOverDueBackgroundService", " ERROR at " + DateTime.Now + " " + ex.ToString() + " ");
-                throw;
             }
         }
 
