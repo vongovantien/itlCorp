@@ -987,6 +987,13 @@
             <param name="salemanId"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailDebitInvoice(System.String)">
+            <summary>
+            Get Mail Info Proof Of Delivery HBL Air Export- Air Import
+            </summary>
+            <param name="hblId"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.OpsTransactionController">
             <summary>
             A base class for an MVC controller without view support.
