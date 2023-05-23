@@ -20,7 +20,7 @@ import { getTransactionLocked, TransactionGetDetailAction } from '@share-bussine
 
 
 import { combineLatest, of, Observable, throwError } from 'rxjs';
-import { catchError, finalize, map, take, mergeMap, takeUntil, retryWhen, concatMap, skip } from 'rxjs/operators';
+import { catchError, finalize, map, take, mergeMap, takeUntil, retryWhen, concatMap, skip, switchMap } from 'rxjs/operators';
 
 import { ShareBusinessAddAttachmentPopupComponent } from '../add-attachment/add-attachment.popup';
 import { environment } from 'src/environments/environment';
@@ -406,7 +406,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     checkExistDebitNoteSendInv() {
-        this._documentRepo.getListCDNoteWithPartnerId({ jobId: this.jobId, partnerId: this.partnerId})
+        this._documentRepo.getListCDNoteWithPartnerId({ jobId: this.jobId, partnerId: this.partnerId })
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { })
@@ -984,12 +984,12 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     getInfoMailDebitInv(cdNoteNo:string) {
         this._progressRef.start();
         this._documentRepo.getInfoMailDebitInv(cdNoteNo)
-        .pipe(
-            catchError(this.catchError),
+            .pipe(
+                catchError(this.catchError),
             finalize(() => {this._progressRef.complete(); })
-        )
-        .subscribe(
-            (res: EmailContent) => {
+            )
+            .subscribe(
+                (res: EmailContent) => {
                     this.formMail.setValue({
                         from: res.from,
                         to: res.to,
@@ -1558,18 +1558,19 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         }
         if (this.stageType.length !== 0 && !this.isDbtInv) {
             if (this.attachedFile.length > 0 && this.stageType == "SEND_AN") {
-                this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId: this.hblId })
-                    .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                    .subscribe();
-
+                let stream: Observable<any> = null;
                 if (this.lstHblId.length > 0) {
-                    const body = this.assignMultipleStageSendInv(this.lstHblId);
-                    // case co tick chon send debit hoac invoice thi stage gen => s_inv
-                    this._documentRepo.addMultipleStageToJob(this.jobId, body)
-                        .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                        .subscribe();
-
+                    stream = this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId: this.hblId })
+                        .pipe(
+                            switchMap(() => {
+                                const body = this.assignMultipleStageSendInv(this.lstHblId);
+                                return this._documentRepo.addMultipleStageToJob(this.jobId, body);
+                            }))
+                } else {
+                    stream = this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId: this.hblId })
                 }
+                if (!stream) return;
+                stream.subscribe();
             }
             else {
                 if (this.stageType.length !== 0 && !this.isDbtInv) {
@@ -1597,8 +1598,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     assignMultipleStageSendInv(lstHblId) {
         this.isSubmitted = true;
         const stageCode = OPEXConstants.S_INV_CODE;
-        let Obj_body = lstHblId.map((value) =>({  hblId: value,  code: stageCode,  jobId:this.jobId,  type:"System" }) );
-        // console.log(Obj_body)
+        let Obj_body = lstHblId.map((value) => ({ hblId: value, code: stageCode, jobId: this.jobId, type: "System" }));
         return Obj_body
     }
 
