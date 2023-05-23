@@ -21,11 +21,13 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsTransaction> csTransRepository;
         private readonly IContextBase<CsTransactionDetail> csTransDetailRepository;
         private readonly IStageService stageService;
+        private readonly IContextBase<CatStage> catStageRepo;
 
         public CsStageAssignedService(
             ICurrentUser user,
             IContextBase<CsTransaction> csTransRepo,
             IContextBase<CsTransactionDetail> csTransDetailRepo,
+            IContextBase<CatStage> catStageRepository,
             IContextBase<OpsStageAssigned> repository,
             IMapper mapper,
             IStageService catstageService
@@ -35,6 +37,7 @@ namespace eFMS.API.Documentation.DL.Services
             csTransRepository = csTransRepo;
             csTransDetailRepository = csTransDetailRepo;
             stageService = catstageService;
+            catStageRepo = catStageRepository;
         }
 
         public async Task<HandleState> AddNewStageAssigned(CsStageAssignedModel model)
@@ -85,9 +88,10 @@ namespace eFMS.API.Documentation.DL.Services
                 var assignedItem = mapper.Map<OpsStageAssigned>(stage);
                 assignedItem.Id = Guid.NewGuid();
                 assignedItem.Hblno = hbl;
-                if (stage.StageId.ToString() == "37" && stage.Type!="User")
+                if (!string.IsNullOrEmpty(stage.Code) && stage.Code.ToString() == DocumentConstants.SEND_INV_CODE && stage.Type!="User")
                 {
                     assignedItem.Status = TermData.Done;
+                    assignedItem.StageId = catStageRepo.Get(x=>x.Code==stage.Code).FirstOrDefault().Id;
                     assignedItem.MainPersonInCharge = stage.RealPersonInCharge = currentUser.UserID;
                     assignedItem.Deadline = DateTime.Now;
                     assignedItem.Type = DocumentConstants.FROM_SYSTEM;

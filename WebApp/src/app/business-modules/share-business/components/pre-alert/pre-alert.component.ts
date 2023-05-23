@@ -1595,9 +1595,9 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     assignMultipleStageSendInv(lstHblId) {
         this.isSubmitted = true;
-        const stageId = OPEXConstants.S_INV_CODE;
+        const stageCode = OPEXConstants.S_INV_CODE;
         let Obj_body = lstHblId.map((value) => { let data = { 
-                            hblId: value, stageId, 
+                            hblId: value, code: stageCode, 
                             jobId:this.jobId, 
                             type:"System" }; 
                             return data;
