@@ -14,12 +14,13 @@ import { AppList } from 'src/app/app.list';
 
 import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { IAgentState, getAgentSearchParamsState, SearchListAgent, getAgentDataListState, LoadListAgent, getAgentPagingState, getAgentLoadingState } from './store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { FormSearchExportComponent } from '../components/popup/form-search-export/form-search-export.popup';
 import { HttpResponse } from '@angular/common/http';
+import { IAgentState } from '../store/reducers/agent.reducer';
+import { LoadListAgent, SearchListAgent, getAgentDataListState, getAgentLoadingState, getAgentPagingState, getAgentSearchParamsState } from '../store';
 
 
 @Component({

@@ -904,12 +904,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         this.selectedContract.active = !this.selectedContract.active;
                         this.statusContract = this.selectedContract.active;
                         const message = this.selectedContract.active ? 'Active success !!' : 'Inactive success !!';
-                        // if (this.selectedContract.active) {
-                        //     this.selectedContract.partnerStatus = true;
-                        //     console.log(this.detailPartner)
-                        //     const action = !!this.detailPartner.sysMappingID ? 'UPDATE' : 'ADD';
-                        //     this.syncPartnerToAccountantSystem([{ Id: this.partnerId, action }]);
-                        // }
+                        if (this.selectedContract.active) {
+                            this.selectedContract.partnerStatus = true;
+                            const action = !!this.detailPartner.sysMappingId ? 'UPDATE' : 'ADD';
+                            this.syncPartnerToAccountantSystem([{ Id: this.partnerId, action }]);
+                        }
                         this._toastService.success(message);
                         this.onRequest.emit(this.selectedContract);
                     } else {

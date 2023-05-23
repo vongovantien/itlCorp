@@ -2807,7 +2807,10 @@ namespace eFMS.API.Catalogue.DL.Services
                     });
                     attachedBankFiles.AddRange(attachedFiles);
                 }
-
+                if (bankAccounts.Count() <= 0)
+                {
+                    bankAccounts.Add(new PartnerBankAccountSyncModel());
+                }
                 partnerSync.Details = bankAccounts;
                 partnerSync.AtchDocInfo = attachedBankFiles;
                 dataReturn.Add(partnerSync);

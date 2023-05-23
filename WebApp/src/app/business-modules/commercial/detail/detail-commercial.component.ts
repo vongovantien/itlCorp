@@ -129,7 +129,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                             this.formCreate.acRefCustomers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, true, this.partner.id);
                             this.formCreate.getACRefName(this.partner.parentId);
                         }
-                        //this.formContractComponent.detailPartner = res;
                         this.formCreate.getShippingProvinces(res.countryShippingId);
                         this.formCreate.getBillingProvinces(res.countryId);
                         this.payableComponent.getGeneralPayable(this.partner.id, this.partner.currency === null ? "VND" : this.partner.currency);
