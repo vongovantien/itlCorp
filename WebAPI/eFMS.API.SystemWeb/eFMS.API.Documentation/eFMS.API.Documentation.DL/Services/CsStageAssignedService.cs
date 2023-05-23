@@ -56,7 +56,7 @@ namespace eFMS.API.Documentation.DL.Services
             var currentJob = await csTransRepository.Get(x => x.Id == criteria.JobId).FirstOrDefaultAsync();
             var hbl = await csTransDetailRepository.Get(x => x.Id == criteria.HblId).FirstOrDefaultAsync();
             var stage = await stageService.GetStageByType(criteria.StageType);
-            var orderNumber = DataContext.Where(x => x.JobId == criteria.JobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
+            var orderNumber = await DataContext.Where(x => x.JobId == criteria.JobId).Select(x => x.OrderNumberProcessed).MaxAsync() ?? 0;
 
             CsStageAssignedModel newItem = new CsStageAssignedModel();
 
@@ -79,7 +79,7 @@ namespace eFMS.API.Documentation.DL.Services
         public async Task<HandleState> AddMultipleStageAssigned(Guid jobId, List<CsStageAssignedModel> listStageAssigned)
         {
             var result = new HandleState();
-            var orderNumber = DataContext.Where(x => x.JobId == jobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
+            var orderNumber = await DataContext.Where(x => x.JobId == jobId).Select(x => x.OrderNumberProcessed).MaxAsync() ?? 0;
 
             foreach (var stage in listStageAssigned)
             {
