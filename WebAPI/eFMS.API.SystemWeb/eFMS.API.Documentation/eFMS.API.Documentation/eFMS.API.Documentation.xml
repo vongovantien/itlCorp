@@ -124,6 +124,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.QueryAsync(eFMS.API.Documentation.DL.Models.Criteria.CDNoteCriteria)">
+            <summary>
+            Query CD Note by criteria
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.GetDataAcctMngtDebCretInvExport(eFMS.API.Documentation.DL.Models.Criteria.CDNoteCriteria)">
             <summary>
             get invoice - cd note
@@ -985,6 +992,13 @@
             Get detail shipment oustanding debit for saleman
             </summary>
             <param name="salemanId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.DocSendMailController.GetInfoMailDebitInvoice(System.String)">
+            <summary>
+            Get Mail Info Proof Of Delivery HBL Air Export- Air Import
+            </summary>
+            <param name="hblId"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Documentation.Controllers.OpsTransactionController">

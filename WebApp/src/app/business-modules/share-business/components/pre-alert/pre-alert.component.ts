@@ -666,7 +666,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     sendMail() {
         this.lstHblId = [];
-        if (this.isArrivalNotice) {
+        if (this.isArrivalNotice || this.isDbtInv) {
             this.debitNos.forEach(el => {
                 if (!!el.isCheckedDebitNote) {
                     this.getDetailCdNote(this.jobId, el.code)
@@ -1551,7 +1551,8 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         }
         if (this.isDbtInv) {
             this.stageType = "SEND_INV";
-            this._documentRepo.assignStageByEventType({ stageType: this.stageType, jobId, hblId: this.lstHblId })
+            const body = this.assignMultipleStageSendInv(this.lstHblId);
+            this._documentRepo.addMultipleStageToJob(this.jobId, body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
                 .subscribe();
         }
@@ -1596,12 +1597,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     assignMultipleStageSendInv(lstHblId) {
         this.isSubmitted = true;
         const stageCode = OPEXConstants.S_INV_CODE;
-        let Obj_body = lstHblId.map((value) => { let data = { 
-                            hblId: value, code: stageCode, 
-                            jobId:this.jobId, 
-                            type:"System" }; 
-                            return data;
-                        });
+        let Obj_body = lstHblId.map((value) =>({  hblId: value,  code: stageCode,  jobId:this.jobId,  type:"System" }) );
         // console.log(Obj_body)
         return Obj_body
     }
