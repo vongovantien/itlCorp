@@ -124,13 +124,6 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.QueryAsync(eFMS.API.Documentation.DL.Models.Criteria.CDNoteCriteria)">
-            <summary>
-            Query CD Note by criteria
-            </summary>
-            <param name="criteria"></param>
-            <returns></returns>
-        </member>
         <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.GetDataAcctMngtDebCretInvExport(eFMS.API.Documentation.DL.Models.Criteria.CDNoteCriteria)">
             <summary>
             get invoice - cd note
