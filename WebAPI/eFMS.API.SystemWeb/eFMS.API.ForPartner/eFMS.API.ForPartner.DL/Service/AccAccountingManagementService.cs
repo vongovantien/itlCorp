@@ -700,19 +700,17 @@ namespace eFMS.API.ForPartner.DL.Service
                             return new HandleState((object)"Không tìm thấy hóa đơn");
                         }
 
-                        // Find and Delete Inoice Temp with same debit/soa
+                        // Find another SELL/OBH and Delete Inoice Temp with same debit/soa
                         IQueryable<CsShipmentSurcharge> surchargeHadSynced = null;
                         if (charge.SyncedFrom == ForPartnerConstants.SYNCED_FROM_CDNOTE)
                         {
                             surchargeHadSynced = surchargeRepo.Get(x => x.DebitNo == charge.DebitNo
-                            && x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_CDNOTE
-                            && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                            && x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_CDNOTE);
                         }
                         else if (charge.SyncedFrom == ForPartnerConstants.SYNCED_FROM_SOA)
                         {
                             surchargeHadSynced = surchargeRepo.Get(x => x.Soano == charge.Soano
-                           && x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_SOA
-                           && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                           && x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_SOA);
                         }
 
                         if (surchargeHadSynced != null && surchargeHadSynced.Count() > 0)
@@ -795,7 +793,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         }
                         else
                         {
-                            charges = surchargeRepo.Get(x => IdsInvoiceTemps.Contains(x.AcctManagementId ?? Guid.Empty) && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                            charges = surchargeRepo.Get(x => IdsInvoiceTemps.Contains(x.AcctManagementId ?? Guid.Empty));
                         }
 
                         if (charges != null)
