@@ -89,6 +89,9 @@ export class CommercialAddressListComponent extends AppList {
         this.formUpdateAddressPopup.id = this.id;
         this.formUpdateAddressPopup.partnerId = this.partnerId;
         this.formUpdateAddressPopup.indexDetailAddress = index;
+        this.formUpdateAddressPopup.getProvinces(address.countryId);
+        this.formUpdateAddressPopup.getDistricts(address.cityId);
+        this.formUpdateAddressPopup.getWards(address.districtId);
         if (!!this.formUpdateAddressPopup.partnerId) {
             this._catalogueRepo.getDetailAddress(address.id)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))

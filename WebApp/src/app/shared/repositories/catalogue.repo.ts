@@ -580,7 +580,7 @@ export class CatalogueRepo {
     //     );
     // }
      getDistrictsByProvince(id: any) {
-        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatDistrict/getDistrictByCity`, { provinceId: id }).pipe(
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatDistrict/getDistrictByCity`, { cityId: id }).pipe(
             map((res: any) => {
                 return res;
             })

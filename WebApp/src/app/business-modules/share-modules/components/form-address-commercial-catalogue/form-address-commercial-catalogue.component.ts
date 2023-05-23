@@ -10,6 +10,7 @@ import _merge from 'lodash/merge';
 import { Observable, pipe } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { GetCatalogueAddressAction, getCatalogueAddressState } from '@store';
+import { SystemConstants } from '@constants';
 
 @Component({
     selector: 'popup-form-address-commercial-catalogue',
@@ -86,7 +87,10 @@ export class FormAddressCommercialCatalogueComponent extends PopupBase implement
             streetAddress: [null, Validators.required],
             addressType: [null, Validators.required],
             contactPerson: [null, Validators.required],
-            tel: [null, Validators.required]
+            tel: [null, Validators.compose([
+                Validators.required,
+                Validators.pattern(SystemConstants.CPATTERN.NUMBER),
+            ])],
         });
 
         this.accountNo = this.formAddress.controls['accountNo'];
@@ -232,7 +236,7 @@ export class FormAddressCommercialCatalogueComponent extends PopupBase implement
             case 'country':
                 this.cityId.setValue(null);
                 this.districtId.setValue(null);
-                // this.districts = [];
+                this.wardId.setValue(null);
                 if (!!event) {
                     this.getProvinces(event.id);
                 } else {
@@ -241,6 +245,7 @@ export class FormAddressCommercialCatalogueComponent extends PopupBase implement
                 break;
             case 'province':
                 this.districtId.setValue(null);
+                this.wardId.setValue(null);
                 if (!!event) {
                     this.getDistricts(event.id);
                 } else {
