@@ -85,6 +85,13 @@ namespace eFMS.API.Documentation.DL.Services
                 var assignedItem = mapper.Map<OpsStageAssigned>(stage);
                 assignedItem.Id = Guid.NewGuid();
                 assignedItem.Hblno = hbl;
+                if (stage.StageId.ToString() == "37" && stage.Type!="User")
+                {
+                    assignedItem.Status = TermData.Done;
+                    assignedItem.MainPersonInCharge = stage.RealPersonInCharge = currentUser.UserID;
+                    assignedItem.Deadline = DateTime.Now;
+                    assignedItem.Type = DocumentConstants.FROM_SYSTEM;
+                }
                 assignedItem.DatetimeModified = assignedItem.DatetimeCreated = DateTime.Now;
                 assignedItem.OrderNumberProcessed = orderNumber;
 
