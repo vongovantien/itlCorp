@@ -803,16 +803,8 @@ namespace eFMS.API.Documentation.DL.Services
             var picInfo = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault();
             // Email to: agent/customer + consignee
             var toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == true).FirstOrDefault()?.EmailAddress;
-            var mailTo = string.Empty;
-            var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerEmail))
-            {
-                partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
-            mailTo += partnerEmail;
             var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
-            mailTo += ";" + emailConsignee;
-            
+            toEmailOnContract += ";" + emailConsignee;
 
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
@@ -829,7 +821,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             emailContent.From = mailFrom; //email PIC của lô hàng
-            emailContent.To = string.IsNullOrEmpty(toEmailOnContract) ? mailTo : toEmailOnContract; //Email của Customer/Agent
+            emailContent.To = string.IsNullOrEmpty(toEmailOnContract) ? string.Empty : toEmailOnContract; //Email của Customer/Agent
             emailContent.Cc = groupUser?.Email; // Group Mail của pic trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
