@@ -2138,14 +2138,15 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 userInfo = userlevelRepository.Get(x => x.UserId == currentUser.UserID).FirstOrDefault();
             }
-            var companyUser = sysCompanyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
+            //var companyUser = sysCompanyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
             var officeUser = sysOfficeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();
-
+            var officeTransaction = sysOfficeRepo.First(x => x.Id == data.OfficeId);
 
             var parameter = new AirImptAuthorisedLetterReportParameter
             {
                 MAWB = data.Mawb?.ToUpper(),
-                CompanyName = language == "EN" ? companyUser?.BunameEn : companyUser?.BunameVn, // Company Name Vn of user
+                //CompanyName = language == "EN" ? companyUser?.BunameEn : companyUser?.BunameVn, // Company Name Vn of user
+                CompanyName = officeTransaction?.BranchNameVn,
                 CompanyAddress1 = language == "EN" ? officeUser?.AddressEn : officeUser?.AddressVn, // Office Address Vn of user
                 CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty), //Tel & Fax of Office user
                 Website = officeUser?.Taxcode, //(Sửa lại thành MST)
