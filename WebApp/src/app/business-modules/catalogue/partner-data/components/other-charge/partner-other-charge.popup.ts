@@ -11,7 +11,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { PopupBase } from 'src/app/popup.base';
 
 import { Observable } from 'rxjs';
-import cloneDeep from 'lodash/cloneDeep';
+import cloneDeep from 'lodash-es/cloneDeep';
 import { finalize, catchError } from 'rxjs/operators';
 import { ChargeConstants } from 'src/constants/charge.const';
 import { SortService } from '@services';

@@ -6,7 +6,7 @@ import { catchError, concatMap, finalize, map, mergeMap, switchMap, takeUntil } 
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import _uniq from 'lodash/uniq';
+import _uniq from 'lodash-es/uniq';
 import { combineLatest, of } from 'rxjs';
 import { ReportPreviewComponent } from 'src/app/shared/common/report-preview/report-preview.component';
 import { TransactionTypeEnum } from 'src/app/shared/enums';
@@ -382,18 +382,18 @@ export class ShareBussinessCdNoteListComponent extends AppList {
         if (this.transactionType === TransactionTypeEnum.AirExport || this.transactionType === TransactionTypeEnum.AirImport) {
             this._documentationRepo.previewAirCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
                 .pipe(
-            ).subscribe(
-                (res: any) => {
-                    if (res !== false) {
-                        if (res?.dataSource?.length > 0) {
-                            this.dataReport = res;
-                            this.renderAndShowReport(typeCdNote, jobId);
-                        } else {
-                            this._toastService.warning('There is no data to display preview');
+                ).subscribe(
+                    (res: any) => {
+                        if (res !== false) {
+                            if (res?.dataSource?.length > 0) {
+                                this.dataReport = res;
+                                this.renderAndShowReport(typeCdNote, jobId);
+                            } else {
+                                this._toastService.warning('There is no data to display preview');
+                            }
                         }
-                    }
-                },
-            );
+                    },
+                );
         } else {
             this._documentationRepo.previewSIFCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: currency })
                 .pipe(catchError(this.catchError))

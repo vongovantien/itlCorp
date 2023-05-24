@@ -533,6 +533,7 @@ namespace eFMS.API.Documentation.DL.Services
                             || !string.IsNullOrEmpty(surcharge.SyncedFrom)
                             || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
                             || surcharge.AcctManagementId != null
+                            || surcharge.LinkFee == true
                          select detail);
             var data = DataContext.Get(x => x.Id == jobId).FirstOrDefault();
 

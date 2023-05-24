@@ -17,7 +17,7 @@ import * as fromShareBussiness from './../../../share-business/store';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { HttpErrorResponse } from '@angular/common/http';
 
 

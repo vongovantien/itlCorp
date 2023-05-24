@@ -13,7 +13,7 @@ import { CreateHouseBillComponent } from '../create/create-house-bill.component'
 import { ShareBussinessShipmentGoodSummaryComponent } from '@share-bussiness';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { catchError, takeUntil, skip, switchMap } from 'rxjs/operators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { HttpErrorResponse } from '@angular/common/http';

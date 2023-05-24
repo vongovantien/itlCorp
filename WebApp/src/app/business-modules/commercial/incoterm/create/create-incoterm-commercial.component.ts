@@ -13,7 +13,7 @@ import { CommercialListChargeIncotermComponent } from '../components/list-charge
 
 import { catchError } from 'rxjs/operators';
 
-import _merge from 'lodash/merge';
+import _merge from 'lodash-es/merge';
 import { RoutingConstants } from '@constants';
 
 @Component({

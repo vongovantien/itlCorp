@@ -22,8 +22,8 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { ShareSeaServiceFormCreateHouseBillSeaExportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-export/form-create-hbl-sea-export.component';
 
 import { catchError, takeUntil, tap, switchMap } from 'rxjs/operators';
-import isUUID from 'validator/lib/isUUID';
-import groupBy from 'lodash/groupBy';
+import isUUID from 'validator/es/lib/isUUID';
+import groupBy from 'lodash-es/groupBy';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 import { InjectViewContainerRefDirective } from '@directives';
 import { of } from 'rxjs';
@@ -151,12 +151,12 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     getDataForm() {
         const form: any = this.formCreateHBLComponent.formCreate.getRawValue();
         this._store.select(getTransactionState)
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (res: ITransactionState) => {
-                this.shipmentType = res.cstransaction.shipmentType;
-            }
-        );
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: ITransactionState) => {
+                    this.shipmentType = res.cstransaction.shipmentType;
+                }
+            );
         const formData = {
             id: SystemConstants.EMPTY_GUID,
             jobId: this.jobId,

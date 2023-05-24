@@ -15,7 +15,7 @@ import { catchError, concatMap, map, switchMap, takeUntil, tap } from 'rxjs/oper
 import { HttpErrorResponse } from '@angular/common/http';
 import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import * as fromShareBussiness from '../../../share-business/store';
 
 

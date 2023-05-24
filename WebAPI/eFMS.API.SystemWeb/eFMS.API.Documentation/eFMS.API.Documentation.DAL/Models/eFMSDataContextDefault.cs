@@ -1,6 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -2207,7 +2205,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ShippingMark).HasMaxLength(250);
 
                 entity.Property(e => e.Taxcll)
                     .HasColumnName("TAXCLL")
@@ -4150,7 +4147,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Hblno)
                     .HasColumnName("HBLNo")
-                    .HasMaxLength(20);
+                    .HasMaxLength(200);
 
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 

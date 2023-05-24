@@ -15,7 +15,7 @@ import * as fromShareBussiness from './../../../share-business/store';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
-import isUUID from 'validator/lib/isUUID';
+import isUUID from 'validator/es/lib/isUUID';
 import { CsTransaction } from '@models';
 import { ICanComponentDeactivate } from '@core';
 import { RoutingConstants } from '@constants';

@@ -59,9 +59,13 @@
                                     </span>
                                     <span *ngIf="!!item.isOverLimit" title="Contract is over credit limit">
                                         <i class="la la-exclamation la-lg text-danger"></i>
-                                    </span> 
-                                    <span *ngIf="!!item.isOverDue && !item.noDue" title="Contract have overdued">
+                                    </span>
+                                    <span *ngIf="!!item.isOverDue" title="Contract have overdued">
                                         <i class="la la-exclamation-triangle la-lg text-warning"></i>
+                                    </span>
+                                    <span *ngIf="!!item.isOverDueObh" title="Contract have overdued OBH">
+                                        <img src="assets/icons/overdue-obh.ico" style="vertical-align:text-bottom"
+                                            width="25" height="25">
                                     </span>
                                 </td>
                                 <td>{{item.saleServiceName}}</td>
