@@ -7,6 +7,7 @@ using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,6 +15,7 @@ namespace eFMS.API.Documentation.DL.IService
 {
     public interface IAcctCDNoteServices : IRepositoryBase<AcctCdnote, AcctCdnoteModel>
     {
+        Task<IQueryable<AcctCdnote>> QueryAsync(CDNoteCriteria criteria);
         HandleState AddNewCDNote(AcctCdnoteModel model);
         HandleState UpdateCDNote(AcctCdnoteModel model);
         HandleState DeleteCDNote(Guid idCDNote);

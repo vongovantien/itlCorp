@@ -11,7 +11,14 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closePopup()">
                     <span aria-hidden="true">&times;</span>
                 </button>
+                
                 <div class="modal-actions c-button-actions">
+                    <button class="btn btn-info m-btn--icon" type="button" *ngIf="CdNoteDetail.cdNote.type === 'DEBIT'||CdNoteDetail.cdNote.type === 'INVOICE'" (click)="sendMail('DebitNote/Invoice')">
+                        <span>
+                            <i class="la la-envelope"></i>
+                            <span title="Send Debit Note/Invoice">Send Email</span>
+                        </span>
+                    </button>
                     <div class="dropdown m-dropdown m-dropdown--inline">
                         <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown">
                             <i class="la la-print"></i>Preview<span class="caret"></span>

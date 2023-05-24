@@ -10,7 +10,7 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public string CreatorId { get; set; }
         public string Type { get; set; }
         public string Status { get; set; }
-
+        public Guid JobId { get; set; }
         public DateTime? FromExportDate { get; set; }
         public DateTime? ToExportDate { get; set; }
         public DateTime? FromAccountingDate { get; set; }

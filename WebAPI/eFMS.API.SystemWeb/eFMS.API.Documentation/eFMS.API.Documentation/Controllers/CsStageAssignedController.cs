@@ -53,7 +53,9 @@ namespace eFMS.API.Documentation.Controllers
             foreach (var item in listItem)
             {
                 item.Status = TermData.InSchedule;
-                item.Type = DocumentConstants.FROM_USER;
+                if(string.IsNullOrEmpty(item.Type)) {
+                    item.Type = DocumentConstants.FROM_USER;
+                }
                 item.RealPersonInCharge = item.MainPersonInCharge;
                 item.UserCreated = item.UserModified = currentUser.UserID;
             }

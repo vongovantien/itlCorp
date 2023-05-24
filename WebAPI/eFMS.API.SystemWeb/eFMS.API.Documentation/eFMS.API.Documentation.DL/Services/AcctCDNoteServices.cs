@@ -18,6 +18,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -27,6 +28,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -2614,6 +2616,38 @@ namespace eFMS.API.Documentation.DL.Services
                 var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
                 var minDate = maxDate.AddMonths(-1); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
                 query = query.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
+            }
+
+            var results = DataContext.Get(query);
+            return results;
+        }
+
+
+        public async Task<IQueryable<AcctCdnote>> QueryAsync(CDNoteCriteria criteria)
+        {
+            Expression<Func<AcctCdnote, bool>> query = x => (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
+                                            && (x.UserCreated == criteria.CreatorId || string.IsNullOrEmpty(criteria.CreatorId))
+                                            && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type)
+                                            && (x.JobId == criteria.JobId || Guid.Empty==criteria.JobId));
+
+            if (criteria.FromExportDate != null && criteria.ToExportDate != null)
+                query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromExportDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToExportDate.Value.Date);
+
+
+            if (!string.IsNullOrEmpty(criteria.ReferenceNos))
+            {
+                IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
+                var surchargesCdNote = await surchargeRepository.GetAsync(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno));
+                var surchargesCdNoteRes = surchargesCdNote.Select(s => s.DebitNo ?? s.CreditNo).ToList();
+                
+                if (surchargesCdNoteRes.Count > 0)
+                {
+                    query = query.And(x => refNos.Any(a => a == x.Code) || surchargesCdNoteRes.Any(a => a == x.Code));
+                }
+                else
+                {
+                    query = query.And(x => refNos.Any(a => a == x.Code));
+                }
             }
 
             var results = DataContext.Get(query);
