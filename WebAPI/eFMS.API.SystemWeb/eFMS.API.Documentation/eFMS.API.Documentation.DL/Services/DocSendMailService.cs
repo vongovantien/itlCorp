@@ -802,7 +802,7 @@ namespace eFMS.API.Documentation.DL.Services
             var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
             var picInfo = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault();
             // Email to: agent/customer + consignee
-            var toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == true).FirstOrDefault()?.EmailAddress;
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
             var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
             toEmailOnContract += ";" + emailConsignee;
 
