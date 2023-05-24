@@ -1523,7 +1523,6 @@ namespace eFMS.API.Documentation.DL.Services
                 && x.Mblno == mblNo
                 && x.CurrentStatus != TermData.Canceled
                 && x.OfficeId == currentUser.OfficeID
-                && x.TransactionType==model.TransactionType
                 );
             }
             else
