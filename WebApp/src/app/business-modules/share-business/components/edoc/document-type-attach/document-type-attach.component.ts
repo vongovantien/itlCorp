@@ -59,6 +59,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
     payFilled: boolean = true;
     jobOnSettle: boolean = false;
     isEdocByAcc: boolean = false;
+    PODTypeId: number = 0;
 
     constructor(
         private _toastService: ToastrService,
@@ -72,7 +73,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
 
     ngOnInit(): void {
         this.getJobList();
-        this.transactionType = this.isAttachFilePOD === true ? this.transactionType: this.typeFrom;
+        this.transactionType = this.isAttachFilePOD === true ? this.transactionType : this.typeFrom;
         this.configJob = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'jobId', label: 'JobID' },
@@ -115,8 +116,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe((res) => {
                     if (res) {
-                        this.billingId = res.settlement.id;
-                        this.billingNo = res.settlement.settlementNo
+                        this.billingId = res.settlement?.id;
+                        this.billingNo = res.settlement?.settlementNo
                     }
                 })
         } else {
@@ -156,7 +157,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            _uniqBy(data, 'hbl').forEach(element => {
+                            var listJob = data.filter(x => x.id !== SystemConstants.EMPTY_GUID);
+                            _uniqBy(listJob, 'hbl').forEach(element => {
                                 let item = ({
                                     jobId: element.jobId,
                                     id: element.shipmentId,
@@ -200,7 +202,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 .subscribe(
                     (data) => {
                         if (!!data) {
-                            _uniqBy(data, 'hbl').forEach(element => {
+                            var listJob = data.filter(x => x.id !== SystemConstants.EMPTY_GUID);
+                            _uniqBy(listJob, 'hbl').forEach(element => {
                                 let item = ({
                                     jobId: element.jobId,
                                     id: element.shipmentId,
@@ -301,6 +304,9 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 (res: any[]) => {
                     this.documentTypes = res;
                     this.configDocType.dataSource = res;
+                    if (this.isAttachFilePOD) {
+                        this.PODTypeId = res.filter(x => x.code === 'POD')[0].id;
+                    }
                 },
             );
     }
@@ -414,7 +420,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     Note: x.note !== undefined ? x.note : '',
                     BillingId: this.billingId !== '' ? this.billingId : SystemConstants.EMPTY_GUID,
                     Id: x.id !== undefined ? x.id : SystemConstants.EMPTY_GUID,
-                    DocumentId: x.DocumentId,
+                    DocumentId: this.isAttachFilePOD ? this.PODTypeId : x.DocumentId,
                     AccountingType: x.AccountingType,
                 }));
             });
@@ -448,6 +454,8 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             if (res.status) {
                                 this._toastService.success("Upload file successfully!");
                                 this.resetForm();
+                                this.hide();
+                                this.onSearchEdoc.emit(this.transactionType);
                                 this.isSubmitted = false;
                             }
                         }
