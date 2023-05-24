@@ -210,23 +210,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var emailContent = new EmailContentModel();
             // Email to: agent/customer
-            var toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == true).FirstOrDefault()?.EmailAddress;
-            //if (string.IsNullOrEmpty(toEmailOnContract))
-            //{
-            //    // case active cannot find mail check for inactive contract
-            //    if (string.IsNullOrEmpty(toEmailOnContract))
-            //    {
-            //        toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == false).FirstOrDefault()?.EmailAddress;
-            //    }
-            //}
-            if (string.IsNullOrEmpty(toEmailOnContract)) // Lay theo tt Partner
-            {
-                toEmailOnContract = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-                if (string.IsNullOrEmpty(toEmailOnContract))
-                {
-                    toEmailOnContract = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-                }
-            }
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
 
             var mailFrom = "Info FMS";
             var signImg = string.Empty;
@@ -307,23 +291,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var emailContent = new EmailContentModel();
             // Email to: agent/customer
-            var toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == true).FirstOrDefault()?.EmailAddress;
-            //if (string.IsNullOrEmpty(toEmailOnContract))
-            //{
-            //    // case active cannot find mail check for inactive contract
-            //    if (string.IsNullOrEmpty(toEmailOnContract))
-            //    {
-            //        toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == false).FirstOrDefault()?.EmailAddress;
-            //    }
-            //}
-            if (string.IsNullOrEmpty(toEmailOnContract)) // Lay theo tt Partner
-            {
-                toEmailOnContract = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-                if (string.IsNullOrEmpty(toEmailOnContract))
-                {
-                    toEmailOnContract = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-                }
-            }
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
 
             var mailFrom = "Info FMS";
             if (!string.IsNullOrEmpty(picEmail))
@@ -403,23 +371,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var emailContent = new EmailContentModel();
             // Email to: agent/customer
-            var toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == true).FirstOrDefault()?.EmailAddress;
-            //if (string.IsNullOrEmpty(toEmailOnContract))
-            //{
-            //    // case active cannot find mail check for inactive contract
-            //    if (string.IsNullOrEmpty(toEmailOnContract))
-            //    {
-            //        toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == false).FirstOrDefault()?.EmailAddress;
-            //    }
-            //}
-            if (string.IsNullOrEmpty(toEmailOnContract)) // Lay theo tt Partner
-            {
-                toEmailOnContract = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-                if (string.IsNullOrEmpty(toEmailOnContract))
-                {
-                    toEmailOnContract = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-                }
-            }
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
 
             var mailFrom = "Info FMS";
             if (!string.IsNullOrEmpty(picEmail))
@@ -626,23 +578,7 @@ namespace eFMS.API.Documentation.DL.Services
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == shipmentInfo.GroupId).FirstOrDefault();
             // Get email from contract
-            var toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == true).FirstOrDefault()?.EmailAddress;
-            //if (string.IsNullOrEmpty(toEmailOnContract))
-            //{
-            //    // case active cannot find mail check for inactive contract
-            //    if (string.IsNullOrEmpty(toEmailOnContract))
-            //    {
-            //        toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == false).FirstOrDefault()?.EmailAddress;
-            //    }
-            //}
-            if (string.IsNullOrEmpty(toEmailOnContract)) // Lay theo tt Partner
-            {
-                toEmailOnContract = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-                if (string.IsNullOrEmpty(toEmailOnContract))
-                {
-                    toEmailOnContract = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.Email;
-                }
-            }
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, shipmentInfo);
             
             var emailContent = new EmailContentModel();
             var mailFrom = string.IsNullOrEmpty(picEmail) ? "Info FMS" : picEmail;
@@ -961,23 +897,11 @@ namespace eFMS.API.Documentation.DL.Services
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
 
             // Email to: agent/customer + consignee
-            var toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == true).FirstOrDefault()?.EmailAddress;
-            //if (string.IsNullOrEmpty(toEmailOnContract))
-            //{
-            //    // case active cannot find mail check for inactive contract
-            //    if (string.IsNullOrEmpty(toEmailOnContract))
-            //    {
-            //        toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == false).FirstOrDefault()?.EmailAddress;
-            //    }
-            //}
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
             var mailTo = string.Empty;
             var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
             if (string.IsNullOrEmpty(toEmailOnContract))
             {
-                if (string.IsNullOrEmpty(partnerEmail))
-                {
-                    partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-                }
                 mailTo += partnerEmail;
                 var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
                 mailTo += ";" + emailConsignee;
@@ -1065,24 +989,11 @@ namespace eFMS.API.Documentation.DL.Services
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
 
             // Email to: agent/customer + consignee
-            var toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == true).FirstOrDefault()?.EmailAddress;
-            //if (string.IsNullOrEmpty(toEmailOnContract))
-            //{
-            //    // case active cannot find mail check for inactive contract
-            //    if (string.IsNullOrEmpty(toEmailOnContract))
-            //    {
-            //        toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == false).FirstOrDefault()?.EmailAddress;
-            //    }
-            //}
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
             var mailTo = string.Empty;
-            var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to when email field contract is null
             if (string.IsNullOrEmpty(toEmailOnContract))
             {
-                if (string.IsNullOrEmpty(partnerEmail))
-                {
-                    partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-                }
-                mailTo += partnerEmail;
+                mailTo += toEmailOnContract;
                 var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
                 mailTo += ";" + emailConsignee;
             }
@@ -1411,24 +1322,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             // Email to: agent/customer
-            var toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == true).FirstOrDefault()?.EmailAddress;
-            //if (string.IsNullOrEmpty(toEmailOnContract))
-            //{
-            //    // case active cannot find mail check for inactive contract
-            //    if (string.IsNullOrEmpty(toEmailOnContract))
-            //    {
-            //        toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _housebill.CustomerId && x.SaleManId == _housebill.SaleManId && x.Active == false).FirstOrDefault()?.EmailAddress;
-            //    }
-            //}
-            if (string.IsNullOrEmpty(toEmailOnContract)) // Lay theo tt Partner
-            {
-                toEmailOnContract = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-                if (string.IsNullOrEmpty(toEmailOnContract))
-                {
-                    toEmailOnContract = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-                }
-            }
-
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
             var emailContent = new EmailContentModel();
             emailContent.From = mailFrom;
             emailContent.To = string.IsNullOrEmpty(toEmailOnContract) ? string.Empty : toEmailOnContract; //Email của Customer/Agent
@@ -1762,6 +1656,27 @@ namespace eFMS.API.Documentation.DL.Services
 
             var resquest = await HttpClientService.GetByteArrayFromFile(urlExport + "/api/v1/en-US/Documentation/ExportShipmentOutstandingDebit?salemanId=" + salemanId, null);
             return resquest;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="CsTransactionDetail _Hbl, CsTransaction _ShipmentInfo"></param>
+        /// <returns></returns>
+        private string GetToPartnerEmailOnContract(CsTransactionDetail _Hbl, CsTransaction _ShipmentInfo)
+        {
+            var toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _Hbl.CustomerId && x.SaleManId == _Hbl.SaleManId && x.Active == true).FirstOrDefault()?.EmailAddress;
+            
+            if (string.IsNullOrEmpty(toEmailOnContract)) // Lay theo tt Partner
+            {
+                toEmailOnContract = catPartnerRepo.Get(x => x.Id == _Hbl.CustomerId).FirstOrDefault()?.Email; //Email to
+                if (string.IsNullOrEmpty(toEmailOnContract))
+                {
+                    toEmailOnContract = catPartnerRepo.Get(x => x.Id == _ShipmentInfo.AgentId).FirstOrDefault()?.Email;
+                }
+            }
+            return toEmailOnContract;
         }
     }
 }
