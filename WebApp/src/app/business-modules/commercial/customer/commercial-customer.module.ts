@@ -11,7 +11,7 @@ import { CommercialDetailComponent } from '../detail/detail-commercial.component
 import { ShareCommercialModule } from '../share-commercial.module';
 import { CommercialCustomerComponent } from './commercial-customer.component';
 import { reducers } from '../store';
-import { commercialEffect } from '../store/effect';
+import { commercialEffect } from '../store/effects';
 
 const routing: Routes = [
     {

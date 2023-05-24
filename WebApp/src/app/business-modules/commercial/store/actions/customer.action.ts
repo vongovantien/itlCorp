@@ -6,7 +6,7 @@ export enum CustomerActionTypes {
     LOAD_LIST_SUCCESS = '[CustomerAction] Load List Success]',
 };
 
-export const SearchList = createAction(CustomerActionTypes.SEARCH_LIST, props<{ payload: any }>());
+export const SearchListCustomer = createAction(CustomerActionTypes.SEARCH_LIST, props<{ payload: any }>());
 export const LoadListCustomer = createAction(CustomerActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());
 export const LoadListCustomerSuccess = createAction(CustomerActionTypes.LOAD_LIST_SUCCESS, props<CommonInterface.IResponsePaging>());
 

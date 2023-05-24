@@ -19,7 +19,7 @@ export const initialState: ICustomerState = {
 
 const reducer = createReducer(
     initialState,
-    on(Types.SearchList, (state: ICustomerState, data: any) => ({
+    on(Types.SearchListCustomer, (state: ICustomerState, data: any) => ({
         ...state, dataSearch: { ...data.payload }
     })),
     on(

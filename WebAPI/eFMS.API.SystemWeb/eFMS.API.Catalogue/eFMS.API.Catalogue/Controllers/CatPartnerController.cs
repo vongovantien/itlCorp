@@ -17,7 +17,6 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
-using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -26,11 +25,6 @@ using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OfficeOpenXml;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.Controllers
 {
@@ -682,7 +676,7 @@ namespace eFMS.API.Catalogue.Controllers
         [HttpPost]
         [Route("AddPartnerFromUserData")]
         [Authorize]
-        public async Task<IActionResult> AddPartnerFromUserData( Guid userId)
+        public async Task<IActionResult> AddPartnerFromUserData(Guid userId)
         {
             var hs = await catPartnerService.AddPartnerFromUserData(userId);
             if (hs.Success)
@@ -767,7 +761,7 @@ namespace eFMS.API.Catalogue.Controllers
                     #endregion
                 }
                 //update partner status
-                if (responseAddModel.Success == "1")
+                if (responseAddModel.Success == "1" || responseAddModel.Success == "2")
                 {
                     var idsItemAdd = request.Where(x => x.Action == ACTION.ADD).Select(x => x.Id).ToList();
                     var listUpdated = await catPartnerService.GetAsync(x => idsItemAdd.Contains(x.Id));

@@ -17,6 +17,7 @@ import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/comm
 import { PopupBase } from 'src/app/popup.base';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
+import { getDetailPartnerDataState } from 'src/app/business-modules/commercial/store';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -32,7 +33,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     @ViewChild(SalesmanCreditLimitPopupComponent) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
     @ViewChild(PartnerRejectPopupComponent) popupRejectPartner: PartnerRejectPopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmChangeAgreementTypePopup: ConfirmPopupComponent;
-    @Input() detailPartner: any;
+    detailPartner: any;
     openOnPartner: boolean = false;
 
     isRequiredContractNo: boolean = false;
@@ -159,7 +160,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-        console.log(this.detailPartner)
+        this._store.select(getDetailPartnerDataState).subscribe(res => this.detailPartner = res)
         this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
             if (!!res) {
                 this.currentUser = res;
@@ -208,14 +209,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 .subscribe((value: any) => {
                     this.minDateExpiredTrial = this.createMoment(value); // * Update MinDate -> ExpiredDate.
                 });
-
         }
-        console.log(this.partnerId)
     }
 
     initForm() {
         this.formGroup = this._fb.group({
-            // salesmanId: [null, Validators.required],
             companyId: [null, Validators.required],
             partnerId: [null],
             officeId: [null, Validators.required],
@@ -516,7 +514,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         if (this.formGroup.valid) {
             const objCheckContract = !!this.contractNo.value && this.contracts.length >= 1 ? this.contracts.filter(x => x.contractNo === this.contractNo.value && x.contractType === "Official").length > 1 : null;
             if (objCheckContract) {
-                //this.contractNo.setValue(null);
                 this.isDuplicateContract = true;
                 this._toastService.error('Contract no has been existed!');
                 return;
@@ -905,6 +902,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         this.statusContract = this.selectedContract.active;
                         const message = this.selectedContract.active ? 'Active success !!' : 'Inactive success !!';
                         if (this.selectedContract.active) {
+                            console.log(this.detailPartner)
                             this.selectedContract.partnerStatus = true;
                             const action = !!this.detailPartner.sysMappingId ? 'UPDATE' : 'ADD';
                             this.syncPartnerToAccountantSystem([{ Id: this.partnerId, action }]);

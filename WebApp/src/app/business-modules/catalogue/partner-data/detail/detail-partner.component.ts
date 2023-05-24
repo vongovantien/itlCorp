@@ -28,6 +28,7 @@ import { FormAddPartnerComponent } from '../components/form-add-partner/form-add
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { UserCreatePopupComponent } from '../components/user-create-popup/user-create-popup.component';
 import { formatDate } from '@angular/common';
+import { getDetailPartnerSuccess } from 'src/app/business-modules/commercial/store';
 
 
 @Component({
@@ -102,7 +103,7 @@ export class PartnerDetailComponent extends AppList {
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _cd: ChangeDetectorRef,
-        private _store: Store<IAppState>
+        private _store: Store<any>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -154,7 +155,7 @@ export class PartnerDetailComponent extends AppList {
         this._cd.detectChanges();
     }
 
-    getParnerDetails() {
+    getPartnerDetail() {
         this._progressRef.start();
         this._catalogueRepo.getDetailPartner(this.partner.id)
             .pipe(
@@ -170,7 +171,6 @@ export class PartnerDetailComponent extends AppList {
                         this.formPartnerComponent.isAddBranchSub = this.isAddSubPartner;
                         this.formPartnerComponent.groups = this.partner.partnerGroup;
                         this.formContractPopup.detailPartner = this.partner;
-                        console.log(this.partner)
                         this.formPartnerComponent.setFormData(this.partner);
                         if (this.isAddSubPartner) {
                             this.formPartnerComponent.getACRefName(this.partner.id);
@@ -189,6 +189,7 @@ export class PartnerDetailComponent extends AppList {
                         this.partnerBankList.partner = this.partner;
                         this.partnerBankList.getPartnerBank(this.partner.id);
                         this.userCreatePopup.partnerId = this.partner.id;
+                        this._store.dispatch(getDetailPartnerSuccess({payload: res}))
                         this._store.select(getMenuUserPermissionState)
                             .pipe(takeUntil(this.ngUnsubscribe))
                             .subscribe(x => {
@@ -295,14 +296,11 @@ export class PartnerDetailComponent extends AppList {
                     this.formPartnerComponent.countries = this.utility.prepareNg2SelectData(countries || [], 'id', 'name');
                     this.formPartnerComponent.billingProvinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'name_VN');
                     this.formPartnerComponent.shippingProvinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'name_VN');
-                    // this.formPartnerComponent.parentCustomers = this.utility.prepareNg2SelectData(customers || [], 'id', 'partnerNameVn');
                     this.formPartnerComponent.parentCustomers = customers;
                     this.formPartnerComponent.partnerGroups = this.utility.prepareNg2SelectData(partnerGroups || [], 'id', 'id');
                     this.getPartnerGroupActive(this.partnerType);
                     this.formPartnerComponent.workPlaces = workPlaces.map(x => ({ "text": x.code + ' - ' + x.branchNameEn, "id": x.id }));
-                    this.getParnerDetails();
-
-
+                    this.getPartnerDetail();
                     // * Update other charge.
                     this.formPartnerComponent.otherChargePopup.initCharges = partnerCharge || [];
                     this.formPartnerComponent.otherChargePopup.charges = partnerCharge || [];
@@ -530,6 +528,8 @@ export class PartnerDetailComponent extends AppList {
                             if (body.active === true) {
                                 const partnerSyncIds: any[] = [{ id: body.id, action: !!body.SysMappingID ? 'UPDATE' : 'ADD' }];
                                 this.syncPartnerToAccountantSystem(partnerSyncIds);
+                                this.partner.sysMappingID = this.partner.accountNo;
+                                this._store.dispatch(getDetailPartnerSuccess({ payload: this.partner }))
                             }
                             this._toastService.success(res.message);
                         } else {
@@ -685,8 +685,6 @@ export class PartnerDetailComponent extends AppList {
                     }
                 }
             );
-
-
     }
 
     onRequestApproval() {
@@ -704,8 +702,6 @@ export class PartnerDetailComponent extends AppList {
                     }
                 }
             );
-
-
     }
 
     gotoList() {

@@ -61,6 +61,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
         private readonly IContextBase<CatPartnerBank> catPartnerBankRepository;
         private readonly IContextBase<CatBank> catBankRepository;
+        private readonly IOptions<ApiServiceUrl> _serviceUrl;
         SysUser salemanBOD;
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -84,7 +85,9 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<SysEmailSetting> sysEmailSettingRepo,
             IOptions<ApiUrl> apiurl,
-            IContextBase<CatPartnerBank> catPartnerBankRepo, IContextBase<CatBank> catBankRepo) : base(repository, cacheService, mapper)
+            IContextBase<CatPartnerBank> catPartnerBankRepo,
+            IContextBase<CatBank> catBankRepo,
+            IOptions<ApiServiceUrl> serviceUrl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -109,6 +112,7 @@ namespace eFMS.API.Catalogue.DL.Services
             sysEmailSettingRepository = sysEmailSettingRepo;
             catPartnerBankRepository = catPartnerBankRepo;
             catBankRepository = catBankRepo;
+            _serviceUrl = serviceUrl;
 
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -1456,12 +1460,12 @@ namespace eFMS.API.Catalogue.DL.Services
             if (queryDetail.ProvinceId != null)
             {
                 CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
-                queryDetail.ProvinceName = province.NameEn;
+                queryDetail.ProvinceName = province?.NameEn;
             }
             if (queryDetail.ProvinceShippingId != null)
             {
                 CatPlaceModel province = placeService.Get(x => x.Id == queryDetail.ProvinceShippingId && x.PlaceTypeId == GetTypeFromData.GetPlaceType(CatPlaceTypeEnum.Province))?.FirstOrDefault();
-                queryDetail.ProvinceShippingName = province.NameEn;
+                queryDetail.ProvinceShippingName = province?.NameEn;
             }
             // Get usercreate name
             if (queryDetail.UserCreated != null)
@@ -2780,7 +2784,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 partnerSync.Tel = partner.Tel;
                 partnerSync.Email = partner.Email;
                 partnerSync.IdCardNo = partner.IdentityNo;
-                partnerSync.IdCardDate = partner.DateId.ToString();
+                partnerSync.IdCardDate = partner.DateId;
                 partnerSync.IdCardPlace = partner.PlaceId;
 
                 var partnerBankAccounts = await catPartnerBankRepository.GetAsync(x => x.PartnerId.ToString() == partner.Id && x.ApproveStatus == "New");
@@ -2798,12 +2802,12 @@ namespace eFMS.API.Catalogue.DL.Services
                         Address = partnerBank.BankAddress
                     });
 
-                    var attachedFiles = sysImageRepository.Get(x => x.ObjectId == partner.Id).Select(x => new PartnerAttachDocSyncModel
+                    var attachedFiles = sysImageRepository.Get(x => x.ObjectId == partnerBank.Id.ToString()).Select(x => new PartnerAttachDocSyncModel
                     {
                         AttachDocRowId = x.Id.ToString(),
-                        AttachDocDate = x.DateTimeCreated.ToString(),
+                        AttachDocDate = x.DateTimeCreated,
                         AttachDocName = x.Name,
-                        AttachDocPath = x.Url
+                        AttachDocPath = _serviceUrl.Value.ApiUrlFileSystem.ToString() + "/api/v1/en-Us/AWSS3/DownloadFile/" + x.KeyS3
                     });
                     attachedBankFiles.AddRange(attachedFiles);
                 }

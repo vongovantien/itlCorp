@@ -264,7 +264,6 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
     ngAfterViewInit() {
         if (Object.keys(this.dataSearchs).length > 0) {
-            console.log(this.dataSearchs);
 
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
             const type = this.dataSearchs.type === "userCreated" ? "userCreatedName" : this.dataSearchs.type;

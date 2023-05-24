@@ -18,13 +18,14 @@ import { RoutingConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
-import { SearchList, IPartnerDataState, getPartnerDataSearchParamsState } from './store';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 import { FormSearchExportComponent } from '../../commercial/components/popup/form-search-export/form-search-export.popup';
 import { HttpResponse } from '@angular/common/http';
+import { SearchListPartner, getPartnerDataSearchParamsState } from '../../commercial/store';
+import { IPartnerDataState } from '../../commercial/store/reducers/partner.reducer';
 type PARTNERDATA_TAB = 'allTab' | 'Customer' | 'Agent' | 'Carrier' | 'Consginee' | 'Shipper';
 
 
@@ -184,7 +185,7 @@ export class PartnerComponent extends AppList implements OnInit {
             partnerGroup: this.criteria.partnerGroup
         };
         this.page = 1;
-        this._store.dispatch(SearchList({ payload: searchData }));
+        this._store.dispatch(SearchListPartner({ payload: searchData }));
 
         this.allPartnerComponent.requestList();
     }
@@ -213,7 +214,7 @@ export class PartnerComponent extends AppList implements OnInit {
             this.criteria.partnerGroup = PartnerGroupEnum.ALL;
         }
 
-        this._store.dispatch(SearchList({ payload: { activetab: tabName } }));
+        this._store.dispatch(SearchListPartner({ payload: { activetab: tabName } }));
     }
 
     ngAfterViewInit() {

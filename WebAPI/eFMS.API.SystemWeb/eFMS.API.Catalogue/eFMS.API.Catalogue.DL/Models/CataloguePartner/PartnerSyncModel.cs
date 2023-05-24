@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Catalogue.DL.Models.CataloguePartner
 {
@@ -16,7 +15,7 @@ namespace eFMS.API.Catalogue.DL.Models.CataloguePartner
     public class PartnerAttachDocSyncModel
     {
         public string AttachDocRowId { get; set; }
-        public string AttachDocDate { get; set; }
+        public DateTime? AttachDocDate { get; set; }
         public string AttachDocName { get; set; }
         public string AttachDocPath { get; set; }
     }
@@ -32,7 +31,7 @@ namespace eFMS.API.Catalogue.DL.Models.CataloguePartner
         public string Tel { get; set; }
         public string Email { get; set; }
         public string IdCardNo { get; set; }
-        public string IdCardDate { get; set; }
+        public DateTime? IdCardDate { get; set; }
         public string IdCardPlace { get; set; }
         public List<PartnerBankAccountSyncModel> Details { get; set; }
         public List<PartnerAttachDocSyncModel> AtchDocInfo { get; set; }
