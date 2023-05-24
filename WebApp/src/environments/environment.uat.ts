@@ -8,7 +8,7 @@ export const environment = {
         WEB_URL: "uat-api-efms.itlvn.com",
         ACCOUNTING: "uat-api-efms.itlvn.com/Accounting",
         DOCUMENTATION: "uat-api-efms.itlvn.com/Documentation",
-        CATALOGUE: "localhost:44341",
+        CATALOGUE: "uat-api-efms.itlvn.com/Catalogue",
         OPERATION: "uat-api-efms.itlvn.com/Operation",
         SYSTEM: "uat-api-efms.itlvn.com/System",
         REPORT: "https://uat-api-efms.itlvn.com/ReportPreview/Default.aspx",
