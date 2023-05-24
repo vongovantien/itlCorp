@@ -459,11 +459,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var emailContent = new EmailContentModel();
             // Email to: agent/customer
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerInfo))
-            {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
+            var toEmail = GetToPartnerEmailOnContract(_housebill, _shipment);
 
             var mailFrom = "Info FMS";
             if (!string.IsNullOrEmpty(picEmail))
@@ -475,7 +471,7 @@ namespace eFMS.API.Documentation.DL.Services
                 mailFrom = @"air@itlvn.com";
             }
             emailContent.From = mailFrom; //email PIC của lô hàng
-            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.To = string.IsNullOrEmpty(toEmail) ? string.Empty : toEmail; //Email của Customer/Agent
             emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
@@ -1188,13 +1184,7 @@ namespace eFMS.API.Documentation.DL.Services
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
 
             // Email to: agent/customer + consignee
-            var mailTo = string.Empty;
-            var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerEmail))
-            {
-                partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
-            mailTo += partnerEmail;
+            var mailTo = GetToPartnerEmailOnContract(_housebill, _shipment);
             var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
             mailTo += ";" + emailConsignee;
 
