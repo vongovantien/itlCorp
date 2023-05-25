@@ -7,15 +7,16 @@ import { ToastrService } from "ngx-toastr";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
 import { Crystal } from "src/app/shared/models/report/crystal.model";
 import { TransactionTypeEnum } from "src/app/shared/enums";
-import { AccountingConstants, SystemConstants } from "@constants";
+import { AccountingConstants, ChargeConstants, RoutingConstants, SystemConstants } from "@constants";
 import { ShareBussinessPaymentMethodPopupComponent } from "../../payment-method/payment-method.popup";
-import { of } from "rxjs";
+import { of, throwError } from "rxjs";
 import { ShareBussinessAdjustDebitValuePopupComponent } from "src/app/business-modules/share-modules/components/adjust-debit-value/adjust-debit-value.popup";
 import { InjectViewContainerRefDirective } from "@directives";
 import { ICrystalReport } from "@interfaces";
 import { DetailCDNoteBase } from "../../cd-note/detail-cd-note.base";
 import { Store } from "@ngrx/store";
-import { getCurrentUserState, IAppState } from "@store";
+import { ActivatedRoute, Router, Routes } from '@angular/router';
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
     selector: 'cd-note-detail-air-popup',
@@ -49,12 +50,12 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends DetailCDNoteBas
         protected _fileMngtRepo: SystemFileManageRepo,
         protected _accountantRepo: AccountingRepo,
         protected _exportRepo: ExportRepo,
-        private _store: Store<IAppState>,
+        protected _router: Router,
     ) {
         super(_documentationRepo, _sortService, _toastService, _accountantRepo, _fileMngtRepo, _exportRepo);
         this.requestSort = this.sortChargeCdNote;
     }
-
+    
     ngOnInit() {
     }
 
@@ -441,5 +442,40 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends DetailCDNoteBas
                 console.log(url);
             }
         );   
+    }
+
+    sendMail(type: string) {
+        this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code, partnerId: this.CdNoteDetail.partnerId } });
+
+        // if (!!this.CdNoteDetail.syncStatus) {
+        //     this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code, partnerId: this.CdNoteDetail.partnerId } });
+        // }
+        // else {
+        //     this._documentationRepo.validateCheckPointContractPartner({
+        //         partnerId: this.CdNoteDetail.partnerId,
+        //         hblId: this.CdNoteDetail.listSurcharges[0].hblid,
+        //         transactionType: 'DOC',
+        //         type: 3,
+        //         salesmanId: this.CdNoteDetail.salemanId
+        //     }, 'false')
+        //         .pipe(
+        //             catchError((err: HttpErrorResponse) => {
+        //                 if (!!err.error.message) {
+        //                     this._toastService.error("Can not Send mail. " + err.error.message + " Please recheck Email.");
+        //                 }
+        //                 return throwError(err.error.message);
+        //             })
+        //         ).subscribe(
+        //             (res: any) => {
+        //                 if (res.status) {
+        //                     switch (type) {
+        //                         case 'DebitNote/Invoice':
+        //                             this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code, partnerId: this.CdNoteDetail.partnerId } });
+        //                             break;
+        //                     }
+        //                 }
+        //             },
+        //         );
+        // }
     }
 }
