@@ -4900,7 +4900,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var beneficiaryInfo = catPartnerRepo.Get(x => x.Id == criteria.Beneficiary)?.FirstOrDefault();
                 commissionData.BeneficiaryName = beneficiaryInfo?.PartnerNameVn;
                 commissionData.BankAccountNo = beneficiaryInfo?.BankAccountNo;
-                commissionData.BankName = beneficiaryInfo?.BankAccountName;
+                commissionData.BankName = beneficiaryInfo?.BankName;
                 commissionData.TaxCode = beneficiaryInfo?.TaxCode;
             }
             // get current user
