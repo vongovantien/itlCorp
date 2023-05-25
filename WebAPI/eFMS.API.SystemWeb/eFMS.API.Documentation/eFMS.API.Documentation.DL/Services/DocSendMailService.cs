@@ -774,7 +774,7 @@ namespace eFMS.API.Documentation.DL.Services
             // body part
             var _body = template.Body;
             _body = _body.Replace("{{MAWB}}", shipmentInfo.Mawb);
-            var transportMode = shipmentInfo.TransactionType[0].ToString() == "S" ? "Vessel" : "Flight";
+            var transportMode = shipmentInfo.TransactionType[0].ToString() == "S" ? "Vessel: " : "Flight: ";
             _body = _body.Replace("{{transportMode}}", transportMode);
             _body = _body.Replace("{{FlightVesNo}}", shipmentInfo.FlightVesselName);
             _body = _body.Replace("{{ETD}}", (shipmentInfo.Etd != null) ? shipmentInfo.Etd.Value.ToString("dd MMM, yyyy") : string.Empty);
