@@ -28,6 +28,7 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
     
     @Output() onSynceCombine: EventEmitter<any> = new EventEmitter<any>();
     @Input() isUpdate: boolean = false;
+    isBalance: boolean = false;
 
     partnerId: AbstractControl;
     paymentDate: AbstractControl;

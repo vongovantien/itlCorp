@@ -52,38 +52,42 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
         (res: any) => {
           if (!!res) {
             if (res.id === SystemConstants.EMPTY_GUID) {
-              return;
-            }
-            this.updateDetailForm(res[0]);
-            this.CreateReceiptCombineComponent.isAllDone = res.every(x => x.status === 'Done' && x?.syncStatus !== 'Synced');
-            this.updateGeneralReceipt(res);
-            this.updateCreditDebitCombineReceipt(res);
-          }
-        },
-      );
-  }
-
-  getDetailReceiptCombine(arcbno: string) {
-    this._accountingRepo.getByReceiptCombine(arcbno)
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe(
-        (res: any) => {
-          if (!!res) {
-            if (res.id === SystemConstants.EMPTY_GUID) {
               this.gotoList();
               return;
             }
             this.updateDetailForm(res[0]);
             this.CreateReceiptCombineComponent.isAllDone = res.every(x => x.status === 'Done' && x?.syncStatus !== 'Synced');
+            this.CreateReceiptCombineComponent.isBalance = res.every(x => x.status === 'Done' && !!x.isBalanceReceipt);
             this.updateGeneralReceipt(res);
             this.updateCreditDebitCombineReceipt(res);
           } else {
             this.gotoList();
           }
         },
-        (err) => this.gotoList()
       );
   }
+
+  // getDetailReceiptCombine(arcbno: string) {
+  //   this._accountingRepo.getByReceiptCombine(arcbno)
+  //     .pipe(takeUntil(this.ngUnsubscribe))
+  //     .subscribe(
+  //       (res: any) => {
+  //         if (!!res) {
+  //           if (res.id === SystemConstants.EMPTY_GUID) {
+  //             this.gotoList();
+  //             return;
+  //           }
+  //           this.updateDetailForm(res[0]);
+  //           this.CreateReceiptCombineComponent.isAllDone = res.every(x => x.status === 'Done' && x?.syncStatus !== 'Synced');
+  //           this.updateGeneralReceipt(res);
+  //           this.updateCreditDebitCombineReceipt(res);
+  //         } else {
+  //           this.gotoList();
+  //         }
+  //       },
+  //       (err) => this.gotoList()
+  //     );
+  // }
 
   subscriptActionValueChange() {
     this._actionStoreSubject
@@ -312,7 +316,8 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
           this._toastService.success("Send Data to Accountant System Successful");
           this._store.dispatch(ResetInvoiceList());
           this._store.dispatch(ResetCombineInvoiceList());
-          this.getDetailReceiptCombine(this.CreateReceiptCombineComponent.combineNo.value);
+          // this.getDetailReceiptCombine(this.CreateReceiptCombineComponent.combineNo.value);
+          this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${this.CreateReceiptCombineComponent.combineNo.value}`]);
         } else {
           this._toastService.error("Send Data Fail");
         }
@@ -338,7 +343,8 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
         this._toastService.success(res.message);
         this._store.dispatch(ResetCombineInvoiceList());
         this._store.dispatch(ResetInvoiceList());
-        this.getDetailReceiptCombine(selectedCPs.subArcbno);
+        // this.getDetailReceiptCombine(selectedCPs.subArcbno);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${selectedCPs.subArcbno}`]);
       });
   }
 
