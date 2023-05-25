@@ -118,7 +118,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut]
         [Route("Update")]
         [Authorize]
-        public IActionResult UpdateSOA(AcctSoaModel model)
+        public async Task<IActionResult> UpdateSOA(AcctSoaModel model)
         {
             currentUser.Action = "UpdateSoaPayment";
 
@@ -154,7 +154,7 @@ namespace eFMS.API.Accounting.Controllers
                     }
                 });
                 Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
-                var edocModel = _edocService.MapSOACharge(model.Soano);
+                var edocModel = await _edocService.MapSOACharge(model.Soano);
                 if (edocModel.ListDel.Count > 0 || edocModel.ListAdd.Count > 0)
                 {
                     var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);

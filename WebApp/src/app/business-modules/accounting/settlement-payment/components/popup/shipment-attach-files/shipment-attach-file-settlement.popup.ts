@@ -54,8 +54,8 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
                         .pipe(takeUntil(this.ngUnsubscribe))
                         .subscribe((res) => {
                             if (res) {
-                                this.settlementId = res?.settlement.id;
-                                this.settlementNo = res?.settlement.settlementNo;
+                                this.settlementId = res.settlement?.id;
+                                this.settlementNo = res.settlement?.settlementNo;
                             }
                         })
                 }

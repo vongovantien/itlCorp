@@ -39,18 +39,4 @@ export class SettlePaymentEffect {
                     )
             )
         ));
-
-
-    // getDetailSettlePaymentEffect$: Observable<Action> = createEffect(() => this.actions$
-    //     .pipe(
-    //         ofType(SettlementPaymentActionTypes.GET_DETAIL),
-    //         switchMap(
-    //             (p: { id: string }) => this._accountingRepo.getDetailSettlementPayment(p.id)
-    //                 .pipe(
-    //                     catchError(() => EMPTY),
-    //                     map((data) => LoadDetailSettlePaymentSuccess(data))
-    //                 )
-    //         )
-    //     )
-    // );
 }

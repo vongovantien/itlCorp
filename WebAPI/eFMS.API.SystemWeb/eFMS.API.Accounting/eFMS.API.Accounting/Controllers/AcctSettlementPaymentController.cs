@@ -484,7 +484,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut]
         [Route("Update")]
         [Authorize]
-        public IActionResult Update(CreateUpdateSettlementModel model)
+        public async Task<IActionResult> Update(CreateUpdateSettlementModel model)
         {
             currentUser.Action = "UpdateAcctSettlementPayment";
             if (!ModelState.IsValid) return BadRequest();
@@ -542,7 +542,7 @@ namespace eFMS.API.Accounting.Controllers
                     }
                 });
                 Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
-                var edocModel = _edocService.MapSettleCharge(model.Settlement.SettlementNo);
+                var edocModel = await _edocService.MapSettleCharge(model.Settlement.SettlementNo);
                 if (edocModel.ListDel.Count > 0 || edocModel.ListAdd.Count > 0)
                 {
                     var updateEdoc = HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);

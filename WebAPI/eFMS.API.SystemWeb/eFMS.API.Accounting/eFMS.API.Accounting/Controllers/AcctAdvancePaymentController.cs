@@ -407,7 +407,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut]
         [Route("Update")]
         [Authorize]
-        public IActionResult Update(AcctAdvancePaymentModel model)
+        public async Task<IActionResult> Update(AcctAdvancePaymentModel model)
         {
             currentUser.Action = "UpdateAdvancePayment";
 
@@ -424,30 +424,6 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(_result);
             }
-            #region
-            //if (model.AdvanceRequests.Count > 0)
-            //{
-            //    if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
-            //    {
-            //        var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
-            //        if (totalAmount > 100000000)
-            //        {
-            //            ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
-            //            return BadRequest(_result);
-            //        }
-            //    }
-            //}
-            //if (!string.IsNullOrEmpty(model.AdvanceFor))
-            //{
-            //    //Check Duplicate phí
-            //    var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
-            //    if (!string.IsNullOrEmpty(messDuplicateCharge))
-            //    {
-            //        ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
-            //        return BadRequest(_result);
-            //    }
-            //}
-            #endregion
 
             var hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
             if (hs.Code == 403)
@@ -464,7 +440,7 @@ namespace eFMS.API.Accounting.Controllers
             else
             {
                 Uri urlEdoc = new Uri(apiServiceUrl.Value.Url);
-                var edocModel = _edocSevice.MapAdvanceRequest(model.AdvanceNo);
+                var edocModel = await _edocSevice.MapAdvanceRequest(model.AdvanceNo);
                 if (edocModel.ListAdd.Count > 0 || edocModel.ListDel.Count > 0)
                 {
                     HttpClientService.PutAPI(urlEdoc + "File/api/v1/vi/EDoc/UpdateEdocByAcc", edocModel, null);
@@ -506,31 +482,6 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(resultCheckValid);
             }
-            #region
-            //if (model.AdvanceRequests.Count > 0)
-            //{
-            //    //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
-            //    if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
-            //    {
-            //        var totalAmount = model.AdvanceRequests.Select(s => s.Amount).Sum();
-            //        if (totalAmount > 100000000)
-            //        {
-            //            ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
-            //            return BadRequest(_result);
-            //        }
-            //    }
-            //    if (!string.IsNullOrEmpty(model.AdvanceFor))
-            //    {
-            //        //Check Duplicate phí
-            //        var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
-            //        if (!string.IsNullOrEmpty(messDuplicateCharge))
-            //        {
-            //            ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
-            //            return BadRequest(_result);
-            //        }
-            //    }
-            //}
-            #endregion
 
             #region -- Check Validate Email Requester --
             var isValidEmail = acctAdvancePaymentService.CheckValidateMailByUserId(model.Requester);
