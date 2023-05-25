@@ -3,7 +3,6 @@ using eFMS.API.Common.Globals;
 using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
-using eFMS.API.SystemFileManagement.DL.Services;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
@@ -67,7 +66,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
         [HttpGet("GetEDocByAccountant")]
         public async Task<IActionResult> GetEDocByAccountant(Guid billingId, string transactionType)
         {
-            var result = _edocService.GetEDocByAccountant(billingId, transactionType);
+            var result = await _edocService.GetEDocByAccountant(billingId, transactionType);
             if (result == null)
             {
                 return BadRequest(result);
@@ -78,7 +77,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
         [HttpDelete("DeleteEDoc/{edocId}/{jobId}")]
         public async Task<IActionResult> DeleteEDoc(Guid edocId, Guid jobId)
         {
-            HandleState hs = await _edocService.DeleteEdoc(edocId,jobId);
+            HandleState hs = await _edocService.DeleteEdoc(edocId, jobId);
             if (hs.Success)
                 return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
             return BadRequest(hs);
@@ -191,7 +190,7 @@ namespace eFMS.API.SystemFileManagement.Controllers
         [HttpGet("CheckAllowSettleEdocSendRequest")]
         public async Task<IActionResult> CheckAllowSettleEdocSendRequest(Guid billingId)
         {
-            var result = _edocService.CheckAllowSettleEdocSendRequest(billingId);
+            var result = await _edocService.CheckAllowSettleEdocSendRequest(billingId);
             return Ok(result);
         }
 

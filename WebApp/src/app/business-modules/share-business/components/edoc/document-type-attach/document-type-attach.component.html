@@ -75,7 +75,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <ng-template #attachPODFile>
+                                            <ng-template #attachPODFile *ngIf="isAttachFilePOD">
                                                 <td class="form-group">
                                                     <input type="text" class="form-control" value="POD" disabled>
                                                 </td>
@@ -154,7 +154,8 @@
                                                     </ng-template>
                                                 </td>
                                             </ng-container>
-                                            <td class="disabled" *ngIf="(typeFrom==='Shipment'||jobOnSettle) && !isAttachFilePOD">
+                                            <td class="disabled"
+                                                *ngIf="(typeFrom==='Shipment'||jobOnSettle) && !isAttachFilePOD">
                                                 <div class="form-group ">
                                                     <input type="text" class="form-control " [ngModel]="jobNo" disabled>
                                                 </div>
