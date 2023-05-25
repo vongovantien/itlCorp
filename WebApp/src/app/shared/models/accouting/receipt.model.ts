@@ -128,7 +128,8 @@ export class Receipt {
     arcbno: string = null;
     subArcbno: string = null;
     receiptMode: string = null;
-
+    isBalanceReceipt: boolean = false;
+    
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
