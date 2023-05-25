@@ -305,6 +305,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                     this.documentTypes = res;
                     this.configDocType.dataSource = res;
                     if (this.isAttachFilePOD) {
+                        console.log(res);
                         this.PODTypeId = res.filter(x => x.code === 'POD')[0].id;
                     }
                 },
