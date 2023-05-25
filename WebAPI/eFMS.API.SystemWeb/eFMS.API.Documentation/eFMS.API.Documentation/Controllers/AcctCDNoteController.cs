@@ -384,7 +384,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             var result = cdNoteServices.GetDataAcctMngtAgencyExport(criteria);
             if (result == null || result.Count() == 0) {
-                return Ok(new { resMsg = "No data was found for export." });
+                return NotFound();
             };
             return Ok(result);
         }
