@@ -329,7 +329,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
                     if (response != null && response.body != null) {
                         this.downLoadFile(response.body, SystemConstants.FILE_EXCEL, response.headers.get(SystemConstants.EFMS_FILE_NAME));
                     } else {
-                        this._toastService.error('There is no data to export!');
+                        this._toastService.warning('There is no data to export!');
                     }
                 },
             );
