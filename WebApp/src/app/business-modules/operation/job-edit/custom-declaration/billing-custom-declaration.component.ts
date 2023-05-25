@@ -68,9 +68,11 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
             }
         });
     }
+
     sortLocal(sort: string): void {
         this.customClearances = this._sortService.sort(this.customClearances, sort, this.order);
     }
+
     getShipmentDetails(id: any) {
         this._progressRef.start();
         this._documentRepo.getDetailShipment(id)
@@ -150,7 +152,7 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
             this._operationRepo.updateJobToClearances(dataToUpdate)
                 .subscribe(
                     (responses: any) => {
-                        if (responses.success === true) {
+                        if (responses.status === true) {
                             this._operationRepo.getListImportedInJob(this.currentJob.jobNo).pipe(
                                 takeUntil(this.ngUnsubscribe),
                                 catchError(this.catchError),
@@ -160,13 +162,13 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
                             ).subscribe(
                                 () => {
                                     this.page = 1;
+                                    this._toastService.success(responses.message);
                                     this.getCustomClearancesOfJob();
                                 }
                             );
                         }
                     }
                 );
-
         }
     }
 

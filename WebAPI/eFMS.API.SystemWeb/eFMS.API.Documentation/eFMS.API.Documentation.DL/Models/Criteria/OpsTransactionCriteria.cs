@@ -23,5 +23,6 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public DateTime? CreatedDateTo { get; set; }
         public string LinkJobSearch { get; set; }
         public string LinkFeeSearch { get; set; }
+        public string TransactionType { get; set; }
     }
 }

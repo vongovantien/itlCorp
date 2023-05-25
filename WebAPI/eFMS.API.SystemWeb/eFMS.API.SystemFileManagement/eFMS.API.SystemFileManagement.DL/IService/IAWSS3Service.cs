@@ -12,6 +12,7 @@ namespace eFMS.API.SystemFileManagement.DL.IService
         Task<HandleState> PostObjectAsync(FileUploadModel model);
         Task<string> PostFileReportAsync(FileUploadModel model);
         Task<HandleState> DeleteFile(string moduleName, string folder, Guid id);
+        Task<HandleState> DeleteFileFolder(string moduleName, string folder, Guid objectId);
         Task<HandleState> DeleteFileS3(string moduleName, string folder, Guid id, Guid objId);
         Task<List<SysImage>> GetFileSysImage(string moduleName, string folder, Guid id, string child = null);
         Task<HandleState> OpenFile(string moduleName, string folder, Guid objId, string fileName);

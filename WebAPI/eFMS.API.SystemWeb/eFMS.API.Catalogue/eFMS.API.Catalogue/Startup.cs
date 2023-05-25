@@ -29,7 +29,7 @@ namespace eFMS.API.Catalogue
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
-            
+
 
             Configuration = builder.Build();
         }
@@ -48,8 +48,10 @@ namespace eFMS.API.Catalogue
             ServiceRegister.Register(services, Configuration);
             services.AddCustomSwagger();
 
-            services.Configure<ApiServiceUrl>(option => {
+            services.Configure<ApiServiceUrl>(option =>
+            {
                 option.ApiUrlAccounting = Configuration.GetSection("ApiUrlAccounting").Value;
+                option.ApiUrlFileSystem = Configuration.GetSection("ApiUrlFileSystem").Value;
             });
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
@@ -102,7 +104,7 @@ namespace eFMS.API.Catalogue
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseSession();
             app.UseMvc();
-            
+
         }
     }
 }

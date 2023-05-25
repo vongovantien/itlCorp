@@ -49,7 +49,6 @@ namespace eFMS.API.Catalogue.DL.Services
             catUnitService = unitService;
             sysOfficeRepository = sysOfficeRepo;
             catChargeGroupService = catChargeGroup;
-
             SetChildren<CsShipmentSurcharge>("Id", "ChargeId");
             SetChildren<CatPartnerCharge>("Id", "ChargeId");
         }

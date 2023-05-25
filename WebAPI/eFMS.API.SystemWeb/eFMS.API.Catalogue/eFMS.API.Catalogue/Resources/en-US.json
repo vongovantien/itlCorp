@@ -10,9 +10,9 @@
   "MSG_CODE_EXISTED": "Code has existed",
   "MSG_DELETE_FAIL_INCLUDED_CHILD": "Data has been used. Delete denied",
   "EF_ANNOTATIONS_REQUIRED": "The [{0}] field is required",
-  "EF_ANNOTATIONS_STRING_LENGTH": "The [{0}] field must be charater trom {2}-{1} characters",
+  "EF_ANNOTATIONS_STRING_LENGTH": "The [{0}] field must be character from {2}-{1} characters",
   "FILE_NOT_FOUND": "File not found!",
-  "NOT_FOUND_DATA_EXCEL": "File exel not found data!",
+  "NOT_FOUND_DATA_EXCEL": "File excel not found data!",
   "MSG_NAME_EN_EXISTED": "Name EN has been existed",
   "MSG_NAME_LOCAL_EXISTED": "Name VN has been existed",
 
@@ -71,12 +71,12 @@
   "MSG_CONTRACT_SALESMAN_NOT_FOUND": "Salesman {0} is not found!",
   "MSG_CONTRACT_ACTIVE_NOT_FOUND": "Status {0} is not found!",
   "MSG_CONTRACT_EFFECTIVE_DATE_EMPTY": "Effective Date is not allow empty with agreement type Trial or Official!",
-  "MSG_CONTRACT_EXPERIED_DATE_EMPTY": "Experied Date is not allow empty with agreement type Trial or Official!",
+  "MSG_CONTRACT_EXPIRED_DATE_EMPTY": "Expired Date is not allow empty with agreement type Trial or Official!",
   "MSG_CONTRACT_CREDIT_LIMIT_EMPTY": "Credit Limit is not allow empty with agreement type Trial or Official!",
   "MSG_CONTRACT_PAYMENT_TERM_EMPTY": "Payment term is not allow empty with agreement type Trial or Official!",
   "MSG_CONTRACT_CONTRACT_NO_DUPLICATE": "Contract No {0} has been duplicate!|wrong",
   "MSG_CONTRACT_CONTRACT_NO_EXISTED": "Contract No {0} has been existed!",
-  "MSG_CONTRACT_EXPERIED_DATE_NOT_VALID": "Experied Date must be after or equal Effective Date!",
+  "MSG_CONTRACT_EXPIRED_DATE_NOT_VALID": "Expired Date must be after or equal Effective Date!",
   "MSG_CONTRACT_CONTRACTNO_LENGTH": "Contract No include 3 - 50 characters!",
   "MSG_CONTRACT_SALESMAN_EMPTY": "Salesman is not allow empty!",
   "MSG_CONTRACT_DUPLICATE_SERVICE": "Duplicate service, office, salesman!",
@@ -174,7 +174,14 @@
 
   "MSG_BANK_CODE_EMPTY": "Bank Code is not allow empty!|wrong",
   "MSG_BANK_CODE_EXISTED": "Bank Code {0} has been existed!|wrong",
-  "MSG_BANK_CODE_DUPLICATED": "Bank Code {0} has been duplicated!|wrong"
+  "MSG_BANK_CODE_DUPLICATED": "Bank Code {0} has been duplicated!|wrong",
   //------------end  : Charge
 
+
+  //------------start: Sync To Bravo,
+  "MSG_SYNC_SUCCESS": "Sync data success",
+  "MSG_SYNC_FAIL": "Sync data failed",
+  //------------end  : Sync To Bravo
+
+  "MSG_PARTNER_BANK_EXISTED": "Bank information already exists"
 }

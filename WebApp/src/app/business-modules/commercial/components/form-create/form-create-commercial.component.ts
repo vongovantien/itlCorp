@@ -212,7 +212,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 this.getShippingProvinces(data.id, !!this.provinceShippingId.value ? this.provinceShippingId.value : null);
                 break;
             case 'shippping-city':
-                this.provinceShippingIdName = data.name_EN;
+                this.provinceShippingIdName = data.nameEn;
                 this.provinceShippingId.setValue(data.id);
                 break;
             case 'billing-country':
@@ -224,7 +224,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                 this.getBillingProvinces(data.id, !!this.provinceId.value ? this.provinceId.value : null);
                 break;
             case 'billing-city':
-                this.provinceIdName = data.name_EN;
+                this.provinceIdName = data.nameEn;
                 this.provinceId.setValue(data.id);
                 break;
             default:

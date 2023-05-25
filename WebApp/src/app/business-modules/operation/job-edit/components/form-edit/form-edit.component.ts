@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OperationRepo } from '@repositories';
 import { takeUntil } from 'rxjs/operators';
@@ -28,7 +28,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
     @ViewChild(InjectViewContainerRefDirective) confirmContainerRef: InjectViewContainerRefDirective;
-
+    @Input() transactionType: string = '';
     opsTransaction: OpsTransaction = null;
 
     formEdit: FormGroup;
@@ -202,17 +202,19 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.salesmanName = this.opsTransaction.salesmanName;
 
         if (this.opsTransaction.isAllowChangeSaleman) {
-            this._catalogueRepo.GetListSalemanByShipmentType(this.opsTransaction.customerId, ChargeConstants.CL_CODE, this.shipmentType.value)
+            console.log(this.transactionType);
+            this._catalogueRepo.GetListSalemanByShipmentType(this.opsTransaction.customerId, this.transactionType === 'TK' ? ChargeConstants.TK_CODE : ChargeConstants.CL_CODE, this.shipmentType.value)
                 .subscribe((salesmans: any) => {
                     this.salesmans = salesmans;
                 })
         }
+        console.log(this.transactionType);
 
     }
 
     initForm() {
         this.formEdit = this._fb.group({
-            jobNo: [{value: null, disabled: true}],
+            jobNo: [{ value: null, disabled: true }],
             hwbno: [null, Validators.compose([
                 FormValidators.validateSpecialChar,
             ])],
@@ -250,7 +252,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             sumContainers: [null, Validators.max(5000000)],
             sumPackages: [null, Validators.max(5000000)],
             sumCbm: [null],
-            containerDescription: [{value: null, disabled: true}],
+            containerDescription: [{ value: null, disabled: true }],
             packageTypeId: [null],
             note: [null],
             noProfit: [false],
@@ -300,7 +302,16 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.deliveryDate = this.formEdit.controls['deliveryDate'];
         this.suspendTime = this.formEdit.controls['suspendTime'];
         this.clearanceDate = this.formEdit.controls['clearanceDate'];
+        if (this.transactionType === 'TK') {
+            this.initTruckingData();
+        }
     }
+
+    initTruckingData() {
+        this.productService.setValue('Trucking');
+        this.shipmentModes = JobConstants.COMMON_DATA.SHIPMENTMODESTKI;
+    }
+
 
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
@@ -332,7 +343,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                     return;
                 }
 
-                this._catalogueRepo.GetListSalemanByShipmentType(data.id, ChargeConstants.CL_CODE, this.shipmentType.value)
+                this._catalogueRepo.GetListSalemanByShipmentType(data.id, this.transactionType === 'TK' ? 'TK' : ChargeConstants.CL_CODE, this.shipmentType.value)
                     .subscribe(
                         (res: any) => {
                             if (!!res) {
@@ -433,7 +444,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     getSalesmanList(data: any) {
         this.shipmentType.setValue(data);
-        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, ChargeConstants.CL_CODE, this.shipmentType.value, this.opsTransaction.officeId)
+        this._catalogueRepo.GetListSalemanByShipmentType(this.customerId.value, this.transactionType === 'TK' ? 'TK' : ChargeConstants.CL_CODE, this.shipmentType.value, this.opsTransaction.officeId)
             .subscribe(
                 (res: any) => {
                     if (!!res) {

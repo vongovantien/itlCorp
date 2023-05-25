@@ -8,7 +8,7 @@ import { Partner, Office } from '@models';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 
-import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState, ReceiptClassState, ReceiptPaymentMethodState, ReceiptAgreementState } from '../../store/reducers';
+import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState, ReceiptClassState, ReceiptPaymentMethodState, ReceiptAgreementState, IsReceiptCombineState, ReceiptCombinePartnerState, ReceiptCombineState } from '../../store/reducers';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { IReceiptState } from '../../store/reducers/customer-payment.reducer';
 
@@ -40,7 +40,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     dateTypeList: string[] = ['Invoice Date', 'Service Date', 'Billing Date'];
     services: CommonInterface.INg2Select[] = [
         { text: 'All', id: 'All' },
-        { text: ChargeConstants.IT_DES, id: ChargeConstants.IT_CODE },
+        { text: ChargeConstants.TK_DES, id: ChargeConstants.TK_CODE },
         { text: ChargeConstants.AI_DES, id: ChargeConstants.AI_CODE },
         { text: ChargeConstants.AE_DES, id: ChargeConstants.AE_CODE },
         { text: ChargeConstants.SFE_DES, id: ChargeConstants.SFE_CODE },
@@ -59,6 +59,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     partnerTypeState: string;
     offices: Office[];
     isRequireAgreement: boolean = true;
+    isCombineReceipt: boolean = false;
     contractList: any[] = [];
 
     selectedDefaultOffice = { id: 'All', shortName: "All" };
@@ -100,7 +101,6 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
             .subscribe((offices: Office[]) => {
                 this.offices = offices;
             });
-
         this.customers = this._catalogueRepo.getPartnerGroupsWithCriteria({
             partnerGroups: [CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]
             , partnerType: this.partnerTypeState.toUpperCase() === 'CUSTOMER' ? 'Customer' : 'Agent'
@@ -128,55 +128,99 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
 
 
         // * Listen partner current state.
-        this._store.select(ReceiptPartnerCurrentState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (partnerId) => {
-                    if (!!partnerId) {
-                        this.partnerId.setValue(partnerId);
-                        this.customerFromReceipt = partnerId;
+        this._store.select(ReceiptCombineState)
+            .subscribe((data: any) => {
+                if (data.isCombineReceipt) {
+                    this.isRequireAgreement = false;
+                    this.isCombineReceipt = true;
+                    if (!!data.officeId) {
+                        this.office.setValue([data?.officeId]);
+                        this.formSearch.controls['office'].disable();
+                    } else {
+                        this._store.select(getCurrentUserState)
+                            .pipe(
+                                filter(c => !!c.userName),
+                                takeUntil(this.ngUnsubscribe)
+                            )
+                            .subscribe((c) => {
+                                this.office.setValue([c.officeId]);
+                            })
                     }
-                }
-            )
-        this._store.select(ReceiptAgreementState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (contract) => {
-                    this.contractList = [];
-                    if (!!contract) {
-                        this.contractList.push(contract);
-                    }
-                }
-            )
-        // * Listen Receipt Date
-        this._store.select(ReceiptDateState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (date) => {
-                    if (!!date) {
-                        this.date.setValue(date);
-                    }
-                }
-            )
+                    this.partnerTypeState = 'AGENT';
 
-        this._store.select(ReceiptTypeState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (partnerGroup) => {
-                    if (!!partnerGroup) {
-                        this.partnerTypeState = partnerGroup;
-                    }
-                }
-            )
+                    this.dateTypeList = ['Accounting Date', 'Service Date', 'Issued Date'];
 
-        this._store.select(getCurrentUserState)
-            .pipe(
-                filter(c => !!c.userName),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe((c) => {
-                this.office.setValue([c.officeId]);
-            })
+                    this._store.select(ReceiptCombinePartnerState)
+                        .pipe(takeUntil(this.ngUnsubscribe))
+                        .subscribe(
+                            (partnerId) => {
+                                if (!!partnerId) {
+                                    this.partnerId.setValue(partnerId);
+                                    this.customerFromReceipt = partnerId;
+                                }
+                            }
+                        )
+                } else {
+                    this._store.select(ReceiptPartnerCurrentState)
+                        .pipe(takeUntil(this.ngUnsubscribe))
+                        .subscribe(
+                            (partnerId) => {
+                                if (!!partnerId) {
+                                    this.partnerId.setValue(partnerId);
+                                    this.customerFromReceipt = partnerId;
+                                }
+                            }
+                        )
+                    this._store.select(ReceiptAgreementState)
+                        .pipe(takeUntil(this.ngUnsubscribe))
+                        .subscribe(
+                            (contract) => {
+                                this.contractList = [];
+                                if (!!contract) {
+                                    this.contractList.push(contract);
+                                }
+                            }
+                        )
+                    // * Listen Receipt Date
+                    this._store.select(ReceiptDateState)
+                        .pipe(takeUntil(this.ngUnsubscribe))
+                        .subscribe(
+                            (date) => {
+                                if (!!date) {
+                                    this.date.setValue(date);
+                                }
+                            }
+                        )
+
+                    this._store.select(ReceiptTypeState)
+                        .pipe(takeUntil(this.ngUnsubscribe))
+                        .subscribe(
+                            (partnerGroup) => {
+                                if (!!partnerGroup) {
+                                    this.partnerTypeState = partnerGroup;
+                                }
+                            }
+                        )
+
+                    this._store.select(getCurrentUserState)
+                        .pipe(
+                            filter(c => !!c.userName),
+                            takeUntil(this.ngUnsubscribe)
+                        )
+                        .subscribe((c) => {
+                            this.office.setValue([c.officeId]);
+                        })
+                    this._store.select(getCurrentUserState)
+                        .pipe(
+                            filter(c => !!c.userName),
+                            takeUntil(this.ngUnsubscribe)
+                        )
+                        .subscribe((c) => {
+                            this.office.setValue([c.officeId]);
+                        })
+                }
+            });
+
     }
 
     onSelectDataFormInfo(data: any) {
@@ -220,6 +264,10 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
             return;
         }
         let result: boolean = false;
+        if(this.isCombineReceipt === true){
+            this.isRequireAgreement = result;
+            return;
+        }
         combineLatest([
             this._store.select(ReceiptClassState),
             this._store.select(ReceiptPaymentMethodState)
@@ -269,6 +317,9 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
 
     searchData() {
         this.isSubmitted = true;
+        if(!this.partnerId.value){
+            return;
+        }
         this.isRequireAgreementAgent();
         if (this.formSearch.valid && (this.contractList.length || !this.isRequireAgreement)) {
             const body: IAcctCustomerDebitCredit = {
@@ -284,17 +335,22 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                 fromDate: !!this.date.value?.startDate ? formatDate(this.date.value.startDate, 'yyyy-MM-dd', 'en') : null,
                 toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,
                 dateType: this.dateType.value,
-                service: this.service.value[0] === 'All' ? this.mapMultipleValueId(this.services) : this.service.value,
-                office: this.office.value[0] === 'All' ? this.mapMultipleValueId(this.offices) : this.office.value,
+                service: this.service.value[0] === 'All' || !this.service.value.length ? this.mapMultipleValueId(this.services) : this.service.value,
+                office: this.office.value[0] === 'All' || !this.office.value?.length ? this.mapMultipleValueId(this.offices) : this.office.value,
             };
             this.poupParentComponent.onApply(body);
         }
     }
 
     reset() {
+        const partner = this.partnerId.value;
         this.formSearch.reset();
         this.initForm();
         this.date.setValue(null);
+        if(this.isCombineReceipt){
+            this.partnerId.setValue(partner);
+            this.customerFromReceipt = partner;
+        }
         this.isSubmitted = false;
     }
 }

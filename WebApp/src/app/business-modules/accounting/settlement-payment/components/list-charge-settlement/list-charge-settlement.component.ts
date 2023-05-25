@@ -258,6 +258,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     onRequestSurcharge(surcharge: Surcharge[], isCopy?: boolean) {
+
         if (surcharge[0].isFromShipment) {
             this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
             this.surcharges = [...this.surcharges, ...surcharge];

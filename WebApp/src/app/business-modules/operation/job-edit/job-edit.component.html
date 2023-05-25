@@ -106,7 +106,8 @@
                                     <h3 class="alert-block__title">Job Information</h3>
                                 </div>
                                 <div class="m-portlet__body" id="edit-ops-job-form">
-                                    <job-mangement-form-edit></job-mangement-form-edit>
+                                    <job-mangement-form-edit
+                                        [transactionType]="transactionType"></job-mangement-form-edit>
                                 </div>
                             </div>
                         </div>
@@ -119,6 +120,7 @@
                                         <ng-container
                                             *ngIf="!!opsTransaction && opsTransaction.hblid; else placeholder">
                                             <buying-charge service="logistic" [allowSaving]="!isDuplicate"
+                                                [transactionType]="transactionType"
                                                 *ngIf="selectedTabSurcharge === 'BUY'">
                                             </buying-charge>
                                         </ng-container>
@@ -200,7 +202,7 @@
 <app-dropdown #dropdownMenuDuplicate>
     <a class="dropdown-item pointer" (click)="confirmDuplicate()" title="Duplicate with current job">Current Job</a>
     <ng-container
-        *ngIf="(currentUser$ | async)?.officeType === 'Head' || (currentUser$ | async)?.officeType === 'Branch'">
+        *ngIf="((currentUser$ | async)?.officeType === 'Head' || (currentUser$ | async)?.officeType === 'Branch')&&transactionType!=='TK'">
         <a class="dropdown-item pointer" (click)="confirmDuplicate(true)" title="Duplicate with job replicate">With Job
             Replicate</a>
     </ng-container>

@@ -1,6 +1,6 @@
 import { formatDate } from "@angular/common";
 import { Component, ViewChild } from "@angular/core";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { InfoPopupComponent } from "@common";
 import { ToastrService } from "ngx-toastr";
 
@@ -28,6 +28,7 @@ export class JobManagementCreateJobComponent extends AppForm {
 
     isSaveLink: boolean = false;
     listContainer: any[];
+    transactionType: string = '';
 
     constructor(
         private _toaster: ToastrService,
@@ -35,14 +36,28 @@ export class JobManagementCreateJobComponent extends AppForm {
         private _router: Router,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _actionStoreSubject: ActionsSubject,
+        private route: ActivatedRoute,
     ) {
         super();
         this.requestCancel = this.gotoList;
     }
 
     ngOnInit() {
+        this.subscriptionJobOpsType();
         this.subscriptionSaveContainerChange();
     }
+
+    subscriptionJobOpsType() {
+        this.subscription =
+            this.route.data
+                .pipe(
+                    takeUntil(this.ngUnsubscribe)
+                ).subscribe((res: any) => {
+                    console.log(res);
+                    this.transactionType = res.transactionType;
+                });
+    }
+
 
     onSubmitData() {
         const form: any = this.formCreateComponent.formCreate.getRawValue();
@@ -54,6 +69,7 @@ export class JobManagementCreateJobComponent extends AppForm {
             commodityGroupId: form.commodity,
         };
         const opsTransaction: OpsTransaction = new OpsTransaction(Object.assign(_merge(form, formData)));
+        opsTransaction.transactionType = this.transactionType;
         opsTransaction.salemanId = form.salemansId;
         opsTransaction.csMawbcontainers = this.listContainer;
         if (!!this.formCreateComponent.jobLinkAirSeaNo
@@ -67,6 +83,10 @@ export class JobManagementCreateJobComponent extends AppForm {
             opsTransaction.csMawbcontainers = this.formCreateComponent.jobLinkAirSeaInfo?.containers || [];
             opsTransaction.containerDescription = this.formCreateComponent.jobLinkAirSeaInfo?.packageContainer
         }
+        if (this.transactionType === 'TK') {
+            opsTransaction.productService = 'Trucking';
+        }
+
         return opsTransaction;
     }
 
@@ -95,13 +115,14 @@ export class JobManagementCreateJobComponent extends AppForm {
 
     saveJob(model: OpsTransaction) {
         let objUpdateData = null;
+        console.log(this.transactionType);
 
         if (this.isSaveLink) {
             objUpdateData = this._documentRepo.validateCheckPointContractPartner({
                 partnerId: model.customerId,
                 salesmanId: model.salemanId,
                 hblId: SystemConstants.EMPTY_GUID,
-                transactionType: 'CL',
+                transactionType: this.transactionType === 'TK' ? 'TK' : 'CL',
                 type: 1
             }).pipe(
                 switchMap(
@@ -112,6 +133,7 @@ export class JobManagementCreateJobComponent extends AppForm {
                                     mergeMap((res: LinkAirSeaModel) => {
                                         model.serviceNo = res?.jobNo;
                                         model.serviceHblId = res?.hblId;
+                                        model.transactionType = this.transactionType === 'TK' ? 'TK' : null;
                                         return this._documentRepo.addOPSJob(model);
                                     }),
                                 )
@@ -126,7 +148,7 @@ export class JobManagementCreateJobComponent extends AppForm {
                 partnerId: model.customerId,
                 salesmanId: model.salemanId,
                 hblId: SystemConstants.EMPTY_GUID,
-                transactionType: 'CL',
+                transactionType: this.transactionType === 'TK' ? 'TK' : null,
                 type: 1
             }).pipe(
                 switchMap(
@@ -152,7 +174,13 @@ export class JobManagementCreateJobComponent extends AppForm {
                             this._toaster.error(res.message);
                         } else {
                             this._toaster.success(res.message);
-                            this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
+                            //this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
+                            if (this.transactionType === 'TK') {
+                                this._router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND_DETAIL}/${res.data}`]);
+                            } else {
+                                this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/${res.data}`]);
+                            }
+
                         }
                     }
                 );
@@ -160,7 +188,12 @@ export class JobManagementCreateJobComponent extends AppForm {
     }
 
     gotoList() {
-        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
+        if (this.transactionType === 'TK') {
+            this._router.navigate([RoutingConstants.LOGISTICS.TRUCKING_INLAND]);
+        }
+        else {
+            this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
+        }
     }
 
     subscriptionSaveContainerChange() {

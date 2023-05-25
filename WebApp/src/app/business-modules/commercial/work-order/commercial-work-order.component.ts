@@ -34,6 +34,7 @@ export class CommercialWorkOrderComponent extends AppList implements OnInit {
         { title: 'Sea LCL Export', value: 'SLE', icon: 'ship' },
         { title: 'Sea LCL Import', value: 'SLI', icon: 'ship' },
         { title: 'Custom Logistics', value: 'CL', icon: 'truck' },
+        { title: 'Trucking Inland', value: 'TK', icon: 'truck' },
     ];
 
 

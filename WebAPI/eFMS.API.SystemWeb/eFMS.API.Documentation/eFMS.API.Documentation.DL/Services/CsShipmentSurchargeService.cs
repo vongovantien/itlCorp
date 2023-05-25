@@ -20,6 +20,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using static eFMS.API.Documentation.DL.Common.Templates;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -638,13 +639,13 @@ namespace eFMS.API.Documentation.DL.Services
                     item.TransactionType = GetTransactionType(item.JobNo);
                     if (item.Hblid != Guid.Empty)
                     {
-                        if (item.TransactionType != "CL")
+                        if (item.TransactionType != "CL"&& item.TransactionType != "TK")
                         {
                             CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
                             item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                             item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
                             // lưu cứng HBL Tránh bug.
-                            item.Hblno = hbl?.Hwbno;
+                            item.Hblno = hbl?.Hwbno;    
                             if (hbl != null)
                             {
                                 var masterBill = csTransactionRepository.Get(x => x.Id == hbl.JobId).FirstOrDefault();
@@ -663,7 +664,16 @@ namespace eFMS.API.Documentation.DL.Services
                             item.Mblno = hbl.Mblno;
                             item.Hblno = hbl.Hwbno;
                             //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
-                            item.ClearanceNo = !string.IsNullOrEmpty(item.ClearanceNo) && !string.IsNullOrEmpty(item.SettlementCode) ? item.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo);
+                            var existCle = DataContext.Where(x => x.JobNo == item.JobNo).FirstOrDefault() != null ? DataContext.Where(x => x.JobNo == item.JobNo).FirstOrDefault().ClearanceNo : null;
+                            if (existCle != null)
+                            {
+                                item.ClearanceNo = existCle;
+                            }
+                            else
+                            {
+                                item.ClearanceNo = !string.IsNullOrEmpty(item.ClearanceNo) && (!string.IsNullOrEmpty(item.SyncedFrom) || !string.IsNullOrEmpty(item.PaySyncedFrom)
+                                || item.AcctManagementId != null || item.PayerAcctManagementId != null || !string.IsNullOrEmpty(item.SettlementCode)) ? item.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo);
+                            }
                         }
                     }
 
@@ -674,7 +684,7 @@ namespace eFMS.API.Documentation.DL.Services
                     string _jobNo = string.Empty;
                     string _mblNo = string.Empty;
                     string _hblNo = string.Empty;
-                    if (item.TransactionType != "CL")
+                    if (item.TransactionType != "CL" && item.TransactionType != "TK")
                     {
                         var houseBill = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
                         _hblNo = houseBill?.Hwbno;
@@ -758,10 +768,13 @@ namespace eFMS.API.Documentation.DL.Services
                         surcharge.Hblno = _hblNo;
                         surcharge.DatetimeModified = DateTime.Now;
                         surcharge.UserModified = currentUser.UserID;
-                        if (surcharge.TransactionType == "CL")
+                        if (surcharge.TransactionType == "CL"|| surcharge.TransactionType == "TK")
                         {
-                            //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
-                            surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) && !string.IsNullOrEmpty(surcharge.SettlementCode) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
+                            //Cập nhật Clearance No cũ nhất cho phí(nếu có), nếu phí đã có Clearance No &Settlement thì không cập nhật[15563 - 29 / 03 / 2021]
+                            //surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) && (!string.IsNullOrEmpty(surcharge.SyncedFrom) || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
+                            //|| surcharge.AcctManagementId != null || surcharge.PayerAcctManagementId != null) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
+                            surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) || (!string.IsNullOrEmpty(surcharge.SyncedFrom) || !string.IsNullOrEmpty(surcharge.PaySyncedFrom)
+                           || surcharge.AcctManagementId != null || surcharge.PayerAcctManagementId != null || !string.IsNullOrEmpty(surcharge.SettlementCode)) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
                         }
 
                         surcharge.IsRefundFee = item.IsRefundFee;
@@ -1017,16 +1030,18 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public List<sp_GetSurchargeRecently> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria)
         {
-            var parameters = new[]{
-                new SqlParameter(){ ParameterName = "@Type", Value = criteria.ChargeType },
-                new SqlParameter(){ ParameterName = "@SupplierID", Value = criteria.ColoaderId },
-                new SqlParameter(){ ParameterName = "@CustomerID", Value = criteria.CustomerId },
-                new SqlParameter(){ ParameterName = "@OfficeID", Value = currentUser.OfficeID },
-                new SqlParameter(){ ParameterName = "@ID", Value = criteria.JobId },
-                new SqlParameter(){ ParameterName = "@SalemanID", Value = criteria.SalesmanId },
-            };
+            var parameters = new[] {
+                    new SqlParameter() { ParameterName = "@Type", Value = criteria.ChargeType },
+                    new SqlParameter() { ParameterName = "@SupplierID", Value = criteria.ColoaderId },
+                    new SqlParameter() { ParameterName = "@CustomerID", Value = criteria.CustomerId },
+                    new SqlParameter() { ParameterName = "@OfficeID", Value = currentUser.OfficeID },
+                    new SqlParameter() { ParameterName = "@ID", Value = criteria.JobId },
+                    new SqlParameter() { ParameterName = "@SalemanID", Value = criteria.SalesmanId },
+                    new SqlParameter() { ParameterName = "@TransactionType", Value = null },
+                };
+
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetSurchargeRecently>(parameters);
-            if(data.Count == 0)
+            if (data.Count == 0)
             {
                 return null;
             }
@@ -1476,14 +1491,42 @@ namespace eFMS.API.Documentation.DL.Services
             return users;
         }
 
-        public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list)
+        private bool checkTranTypeImport(string No, string TranType,bool isMBL)
         {
-            var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
+            if (isMBL)
+            {
+                if (TranType == "CL")
+                {
+                    return opsTransRepository.Any(x => x.Mblno == No && x.TransactionType == null);
+                }
+                else
+                {
+                    return opsTransRepository.Any(x => x.Mblno == No && x.TransactionType == "TK");
+                }
+            }
+            else
+            {
+                if (TranType == "CL")
+                {
+                    return opsTransRepository.Any(x => x.Hwbno == No && x.TransactionType == null);
+                }
+                else
+                {
+                    return opsTransRepository.Any(x => x.Hwbno == No && x.TransactionType == "TK");
+                }
+            }
+          
+        }
+
+        public List<CsShipmentSurchargeImportModel> CheckValidImport(List<CsShipmentSurchargeImportModel> list, string transactionType)
+        {
+            var listChargeOps = DataContext.Get(x => x.TransactionType == transactionType);
             var listPartner = partnerRepository.Get(x => x.Active == true);
             var chargeData = catChargeRepository.Get(x => x.Active == true).ToLookup(x => x.Code);
             var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
             var customsDeclaration = customsDeclarationRepository.Get().ToLookup(x => x.ClearanceNo);
             string TypeCompare = string.Empty;
+            string tranName=transactionType=="TK"?"TruckingInland":"CustomLogistic";
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.Hblno))
@@ -1499,11 +1542,25 @@ namespace eFMS.API.Documentation.DL.Services
                     //    item.IsValid = false;
 
                     //}
-                    if(!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno.Trim()) && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
+                    if (!opsTransaction.Any(x => x.Hwbno == item.Hblno))
                     {
-                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST_OFFICE], item.Hblno, currentUser.OfficeCode);
+                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
                         item.IsValid = false;
-                    }    
+                    }
+                    else
+                    {
+                        if (!checkTranTypeImport(item.Hblno, transactionType, false))
+                        {
+                            item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE], item.Hblno, tranName);
+                            //item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE], item.Hblno, transactionType);
+                            item.IsValid = false;
+                        }
+                        else if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno.Trim()) && x.Hwbno == item.Hblno.Trim() && x.OfficeId == currentUser.OfficeID))
+                        {
+                            item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST_OFFICE], item.Hblno, currentUser.OfficeCode);
+                            item.IsValid = false;
+                        }
+                    }
                 }
                 if (string.IsNullOrEmpty(item.Mblno))
                 {
@@ -1517,17 +1574,23 @@ namespace eFMS.API.Documentation.DL.Services
                     //    item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
                     //    item.IsValid = false;
                     //}
-                    if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno.Trim()) && x.OfficeId == currentUser.OfficeID))
+                    if (!opsTransaction.Any(x => x.Mblno == item.Mblno))
                     {
-                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST_OFFICE], item.Mblno, currentUser.OfficeCode);
+                        //item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
+                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
                         item.IsValid = false;
                     }
-                    else if (!string.IsNullOrEmpty(item.Hblno) && !string.IsNullOrEmpty(item.Mblno))
+                    else
                     {
-                        if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno))
+                        if (!checkTranTypeImport(item.Mblno, transactionType, true))
                         {
-                            item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
-                            item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                            item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBL_NOT_VALID_TRANSACTIONTYPE], item.Mblno, tranName);
+                            //item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBL_NOT_VALID_TRANSACTIONTYPE], item.Hblno, transactionType);
+                            item.IsValid = false;
+                        }
+                        else if(!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno.Trim()) && x.OfficeId == currentUser.OfficeID))
+                        {
+                            item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST_OFFICE], item.Mblno, currentUser.OfficeCode);
                             item.IsValid = false;
                         }
                     }
@@ -1544,7 +1607,7 @@ namespace eFMS.API.Documentation.DL.Services
                             item.IsValid = false;
                         }
                     }
-                }    
+                }
                 if (string.IsNullOrEmpty(item.PartnerCode))
                 {
                     item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTNER_CODE_EMPTY]);
@@ -1607,7 +1670,7 @@ namespace eFMS.API.Documentation.DL.Services
                             item.ObhPartnerError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_OBH_PARTNER_CODE_EMPTY], item.ChargeCode);
                             item.IsValid = false;
                         }
-                        if (!lookupcharges.Any(x => x.ServiceTypeId.Contains("CL")))
+                        if (!lookupcharges.Any(x => x.ServiceTypeId.Contains(transactionType)))
                         {
                             item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_WRONG_SERVICE], item.ChargeCode);
                             item.IsValid = false;
@@ -1760,7 +1823,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         item.Hblid = currentOpsJob.Hblid;
                         item.JobNo = currentOpsJob.JobNo;
-                        item.TransactionType = "CL";
+                        item.TransactionType = transactionType == "TK" ? "TK" : "CL";
                         string jobNo = currentOpsJob.JobNo;
                         if (item.Type.ToLower() == "obh")
                         {
@@ -1978,7 +2041,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         .Select(x => x.Id)
                                         .FirstOrDefault();
                     decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-
+                    //item.TypeOfFee = catChargeGroupRepository.Get(x => x.Name == item.TypeOfFee).FirstOrDefault().Id.ToString();
                     #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                     var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                     item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
@@ -2118,7 +2181,14 @@ namespace eFMS.API.Documentation.DL.Services
                     IQueryable<OpsTransaction> opsTransaction = opsTransRepository.Get().ToLookup(x => x.JobNo)[jobNo].AsQueryable();
                     if (opsTransaction != null && opsTransaction.Count() > 0)
                     {
-                        transactionType = "CL";
+                        if (jobNo.Contains("LOG"))
+                        {
+                            transactionType = "CL";
+                        }
+                        else
+                        {
+                            transactionType = "TK";
+                        }
                     }
                     else
                     {
@@ -2138,8 +2208,25 @@ namespace eFMS.API.Documentation.DL.Services
         /// <returns></returns>
         private string GetCustomNoOldOfShipment(string jobNo)
         {
-            var LookupCustomDeclaration = customsDeclarationRepository.Get().ToLookup(x => x.JobNo);
-            var customNos = LookupCustomDeclaration[jobNo].OrderBy(o => o.DatetimeModified).FirstOrDefault()?.ClearanceNo;
+            var customNos = "";
+            var mainClaranceNo = customsDeclarationRepository.Get(x => x.JobNo == jobNo && x.ConvertTime != null).FirstOrDefault();
+            if (mainClaranceNo != null)
+            {
+                customNos = mainClaranceNo.ClearanceNo;
+            }
+            else
+            {
+                var customLastGrp = customsDeclarationRepository.Get(x => x.JobNo == jobNo).ToList();
+                if (customLastGrp.Count() > 0)
+                {
+                    var CustomLastOrder = customLastGrp.OrderBy(o => o.ClearanceDate).GroupBy(x => x.ClearanceDate).FirstOrDefault();
+                    if (CustomLastOrder.Count() > 1)
+                    {
+                        CustomLastOrder.OrderBy(x => x.DatetimeModified);
+                    }
+                    customNos = CustomLastOrder.FirstOrDefault().ClearanceNo;
+                }
+            }
             return customNos;
         }
 

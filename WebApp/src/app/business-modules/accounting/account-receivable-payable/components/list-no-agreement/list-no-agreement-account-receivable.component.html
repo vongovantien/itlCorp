@@ -29,7 +29,7 @@
                                 <ng-container>
                                     <ng-container *ngFor="let item of otherList; let i = index; trackBy: trackByFn">
                                         <tr [contextMenu]="viewContextMenu" (onTouch)="onSelectPartner(item)"
-                                            [class.touch-row]="(selectedPartner?.taxCode === item.taxCode 
+                                            [class.touch-row]="(selectedPartner?.taxCode === item.taxCode
                                             && selectedPartner.arSalesmanId === item.arSalesmanId)">
                                             <td class="table-actions-col">
                                                 <div class="table-actions" style="width: 70px">
@@ -127,6 +127,9 @@
         </div>
         <div class="menu-context__item" (click)="showDebitDetail(selectedPartner, null, 'Over30')">
             <span><i class="la la-eye align-middle text-primary"></i><span>Over 30 days</span></span>
+        </div>
+        <div class="menu-context__item" (click)="exportDebitAmount()">
+            <span><i class="la la-download text-primary"></i><span> Export Debit Amount Detail </span></span>
         </div>
     </ng-container>
 </app-context-menu>

@@ -671,5 +671,17 @@ namespace eFMS.API.Catalogue.Controllers
             }
             return Ok(hs);
         }
+        
+        /// Get AC ref partner with same saleman
+        /// </summary>
+        /// <param name="salemanId"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetParentPartnerSameSaleman")]
+        public IActionResult GetParentPartnerSameSaleman(CatPartnerCriteria criteria)
+        {
+            var data = catPartnerService.GetParentPartnerSameSaleman(criteria);
+            return Ok(data);
+        }
     }
 }

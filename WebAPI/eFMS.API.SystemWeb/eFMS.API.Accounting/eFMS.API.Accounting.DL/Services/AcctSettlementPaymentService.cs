@@ -4649,6 +4649,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             dataExport.InfoSettlement = GetInfoSettlementExport(settlementPayment);
             dataExport.ShipmentsSettlement = GetListShipmentSettlementExport(settlementPayment);
+            dataExport.UserCreated = currentUser.UserName;
             return dataExport;
         }
 
@@ -5140,7 +5141,7 @@ namespace eFMS.API.Accounting.DL.Services
                 Note = settlementPayment.Note,
                 IsDisplayLogo = isCommonOffice,
                 OfficeName = officeName,
-                ContactOffice = _contactOffice
+                ContactOffice = _contactOffice,
             };
             return infoSettlement;
         }
@@ -5224,7 +5225,7 @@ namespace eFMS.API.Accounting.DL.Services
             var ops = opsTransactionRepo.Get(x => x.Hblid == hblId).FirstOrDefault();
             if (ops != null)
             {
-                transactionType = "CL";
+                transactionType = ops?.TransactionType;
             }
             else
             {

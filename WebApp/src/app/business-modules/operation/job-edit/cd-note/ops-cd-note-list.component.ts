@@ -1,26 +1,29 @@
 import { Component, Input, ViewChild } from '@angular/core';
-import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { catchError, concatMap, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
-import { DocumentationRepo, ExportRepo, SystemFileManageRepo } from 'src/app/shared/repositories';
-import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { SortService } from 'src/app/shared/services';
 import { ActivatedRoute } from '@angular/router';
+import { ConfirmPopupComponent, InfoPopupComponent, ReportPreviewComponent } from '@common';
+import { SystemConstants } from '@constants';
+import { delayTime } from '@decorators';
+import { InjectViewContainerRefDirective } from '@directives';
+import { Crystal } from '@models';
+import { Store } from '@ngrx/store';
+import { SystemFileManageRepo } from '@repositories';
+import _uniq from 'lodash-es/uniq';
+import { ToastrService } from 'ngx-toastr';
+import { combineLatest, of } from 'rxjs';
+import { catchError, concatMap, filter, finalize, map, mergeMap, switchMap, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
 import { TransactionTypeEnum } from 'src/app/shared/enums/transaction-type.enum';
-import { OpsCdNoteDetailPopupComponent } from '../components/popup/ops-cd-note-detail/ops-cd-note-detail.popup';
-import { ToastrService } from 'ngx-toastr';
-import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/ops-cd-note-add.popup';
 import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
-import _uniq from 'lodash-es/uniq';
-import { ReportPreviewComponent } from '@common';
-import { Crystal } from '@models';
-import { InjectViewContainerRefDirective } from '@directives';
-import { delayTime } from '@decorators';
-import { combineLatest, of } from 'rxjs';
-import { HttpResponse } from '@angular/common/http';
-import { SystemConstants } from '@constants';
-import { IOPSTransactionState } from '../../store/reducers/operation.reducer';
+import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
+import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
+import { SortService } from 'src/app/shared/services';
 import { ICustomDeclarationState } from '../../store/reducers/custom-clearance.reducer';
+import { IOPSTransactionState } from '../../store/reducers/operation.reducer';
+import { OpsCdNoteAddPopupComponent } from '../components/popup/ops-cd-note-add/ops-cd-note-add.popup';
+import { OpsCdNoteDetailPopupComponent } from '../components/popup/ops-cd-note-detail/ops-cd-note-detail.popup';
+import { getCurrentUserState, IAppState } from '@store';
+import { HttpResponse } from '@angular/common/http';
+import { getOperationTransationDetail } from '../../store';
 
 @Component({
     selector: 'ops-cd-note-list',
@@ -39,7 +42,7 @@ export class OpsCDNoteComponent extends AppList {
     initGroup: any[] = [];
     deleteMessage: string = '';
     selectedCdNoteId: string = '';
-    transactionType: TransactionTypeEnum = 0;
+    transactionType: TransactionTypeEnum;
     cdNotePrint: AcctCDNote[] = [];
     selectedCdNote: AcctCDNote = null;
 
@@ -52,7 +55,8 @@ export class OpsCDNoteComponent extends AppList {
         private _sortService: SortService,
         private _activedRouter: ActivatedRoute,
         private _toastService: ToastrService,
-        private _fileMngtRepo: SystemFileManageRepo
+        private _fileMngtRepo: SystemFileManageRepo,
+        private _store: Store<IAppState>,
     ) {
         super();
     }
@@ -90,7 +94,7 @@ export class OpsCDNoteComponent extends AppList {
             { title: 'Sync Status', field: 'syncStatus', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
         ];
-
+        this.getTransactionType();
     }
 
     getListCdNote(id: string) {
@@ -113,6 +117,25 @@ export class OpsCDNoteComponent extends AppList {
                 },
             );
     }
+
+    getTransactionType() {
+        this._store.select(getOperationTransationDetail)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        console.log(res);
+
+                        if (res.transactionType === 'TK') {
+                            this.transactionType = TransactionTypeEnum.TruckingInland;
+                        } else {
+                            this.transactionType = TransactionTypeEnum.CustomLogistic;
+                        }
+                    }
+                }
+            );
+    }
+
 
     getListCdNoteWithPreview(id: string, cdNo: string, currency: string) {
         this.isLoading = true;
@@ -304,7 +327,7 @@ export class OpsCDNoteComponent extends AppList {
                             objectId: jobId,
                             hblId: hblid,
                             templateCode: templateCode,
-                            transactionType: 'CL'
+                            transactionType: this.transactionType === TransactionTypeEnum.TruckingInland ? 'TK' : 'CL'
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
                     }
@@ -378,7 +401,7 @@ export class OpsCDNoteComponent extends AppList {
             sourcePreview$ = this._documentRepo.validateCheckPointContractPartner({
                 partnerId: this.selectedCdNote.partnerId,
                 hblId: hblidCdNote,
-                transactionType: 'CL',
+                transactionType: this.transactionType === TransactionTypeEnum.TruckingInland ? 'TK' : 'CL',
                 type: 3
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {
@@ -431,7 +454,7 @@ export class OpsCDNoteComponent extends AppList {
             sourcePreview$ = this._documentRepo.validateCheckPointContractPartner({
                 partnerId: this.selectedCdNote.partnerId,
                 hblId: this.selectedCdNote.hblid,
-                transactionType: 'CL',
+                transactionType: this.transactionType === TransactionTypeEnum.TruckingInland ? 'TK' : 'CL',
                 type: 3
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {

@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.API.SystemFileManagement.DL.IService;
 using eFMS.API.SystemFileManagement.DL.Models;
 using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
@@ -28,12 +29,14 @@ namespace eFMS.API.SystemFileManagement.Controllers
         private IEDocService _edocService;
         private IContextBase<SysImage> _sysImageRepo;
         private readonly IStringLocalizer stringLocalizer;
+        private readonly IRabbitBus _busControl;
 
-        public EDocController(IEDocService edocService, IContextBase<SysImage> SysImageRepo, IStringLocalizer<LanguageSub> localizer)
+        public EDocController(IEDocService edocService, IContextBase<SysImage> SysImageRepo, IStringLocalizer<LanguageSub> localizer, IRabbitBus busControl)
         {
             _edocService = edocService;
             _sysImageRepo = SysImageRepo;
             stringLocalizer = localizer;
+            _busControl= busControl;
         }
 
 
@@ -115,25 +118,27 @@ namespace eFMS.API.SystemFileManagement.Controllers
         [HttpPut("PostAttachFileTemplateToEDoc/{moduleName}/{folder}/{id}")]
         public async Task<IActionResult> UploadAttachedFileEdoc(FileReportUpload files, string moduleName, string folder, Guid id, string child = null)
         {
-            var stream = new MemoryStream(files.FileContent);
-            var fFile = new FormFile(stream, 0, stream.Length, null, files.FileName);
-            var fFiles = new List<IFormFile>() { fFile };
-            FileUploadModel model = new FileUploadModel
+            FileUploadAttachTemplateModel model = new FileUploadAttachTemplateModel
             {
-                Files = fFiles,
+                File = files,
                 FolderName = folder,
                 Id = id,
                 Child = child,
                 ModuleName = moduleName
             };
 
-            string fileUrl = await _edocService.PostAttachFileTemplateToEDoc(model);
-            if (!string.IsNullOrEmpty(fileUrl))
-            {
-                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true, Data = fileUrl });
-            };
-            return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = fileUrl });
+            await _busControl.SendAsync(RabbitExchange.EFMS_FileManagement, RabbitConstants.PostAttachFileTemplateToEDocQueue, model);
+            ResultHandle result = new ResultHandle { Status = true, Message = stringLocalizer[LanguageSub.MSG_UPDATE_SUCCESS].Value };
+            return Ok(result);
+
+            //string fileUrl = await _edocService.PostAttachFileTemplateToEDoc(model);
+            //if (!string.IsNullOrEmpty(fileUrl))
+            //{
+            //    return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true, Data = fileUrl });
+            //};
+            //return BadRequest(new ResultHandle { Message = "Upload File fail", Status = false, Data = fileUrl });
         }
+
 
         [HttpPost("UploadPreviewTemplateToEDoc")]
         [Authorize]

@@ -1,15 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { forkJoin } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { AppPage } from 'src/app/app.base';
+import { InfoPopupComponent } from 'src/app/shared/common/popup';
+import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
+import { DocumentationRepo } from 'src/app/shared/repositories';
 import { PagingService } from 'src/app/shared/services/paging-service';
 import { SortService } from 'src/app/shared/services/sort.service';
-import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
 import { SystemConstants } from 'src/constants/system.const';
-import { InfoPopupComponent } from 'src/app/shared/common/popup';
-import { AppPage } from 'src/app/app.base';
-import { DocumentationRepo } from 'src/app/shared/repositories';
-import { ToastrService } from 'ngx-toastr';
-import { catchError } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'app-job-charge-import',
@@ -26,25 +27,39 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
     pager: PagerSetting = PAGINGSETTING;
     isDesc = true;
     sortKey: string = 'code';
+    transactionType: string = '';
 
     constructor(
         private _documentRepo: DocumentationRepo,
         private pagingService: PagingService,
         private sortService: SortService,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private route: ActivatedRoute
     ) {
         super();
     }
 
     ngOnInit() {
         this.pager.totalItems = 0;
+        this.subscriptionJobOpsType();
+    }
+
+    subscriptionJobOpsType() {
+        this.subscription =
+            this.route.data
+                .pipe(
+                    takeUntil(this.ngUnsubscribe)
+                ).subscribe((res: any) => {
+                    this.transactionType = res.transactionType;
+                    console.log(this.transactionType);
+                });
     }
 
 
     chooseFile(file: Event) {
         this.pager.totalItems = 0;
         if (file.target['files'] == null) { return; }
-        this._documentRepo.upLoadChargeFile(file.target['files'])
+        this._documentRepo.upLoadChargeFile(file.target['files'], this.transactionType === null ? 'CL' : 'TK')
             .subscribe((response: any) => {
                 this.data = response.data;
                 this.pager.currentPage = 1;
@@ -133,7 +148,7 @@ export class JobManagementChargeImportComponent extends AppPage implements OnIni
                 const criteriaCheckpointsObs = finalResult.map(x => ({
                     partnerId: x.paymentObjectId,
                     hblId: x.hblid,
-                    transactionType: 'CL',
+                    transactionType: this.transactionType === null ? 'CL' : 'TK',
                     type: x.type || 5
                 })).map(y => this._documentRepo.validateCheckPointContractPartner(y));
 

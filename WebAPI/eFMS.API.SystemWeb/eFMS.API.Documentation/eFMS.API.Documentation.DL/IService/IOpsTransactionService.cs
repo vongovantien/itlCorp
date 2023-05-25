@@ -42,5 +42,6 @@ namespace eFMS.API.Documentation.DL.IService
         List<ExportOutsourcingRegcognisingModel> GetOutsourcingRegcognising(OpsTransactionCriteria criteria);
         HandleState CheckLinkedInteralShipment(OpsTransactionModel model);
         Task<HandleState> SyncGoodInforToReplicateJob(Guid jobId);
+
     }
 }

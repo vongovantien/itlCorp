@@ -25,7 +25,7 @@ export class CommercialFormSearchWorkOrderComponent extends AppForm implements O
     active: AbstractControl;
 
     services: CommonInterface.INg2Select[] = [
-        { text: ChargeConstants.IT_DES, id: ChargeConstants.IT_CODE },
+        { text: ChargeConstants.TK_DES, id: ChargeConstants.TK_CODE },
         { text: ChargeConstants.AI_DES, id: ChargeConstants.AI_CODE },
         { text: ChargeConstants.AE_DES, id: ChargeConstants.AE_CODE },
         { text: ChargeConstants.SFE_DES, id: ChargeConstants.SFE_CODE },

@@ -16,6 +16,9 @@ namespace eFMS.API.Accounting.DL.Models
         public string ReceiptInternalOfficeCode { get; set; }
         public string ObhPartnerName { get; set; }
         public string ContractNo { get; set; }
+        public string OfficeName { get; set; }
+        public string SalemanId { get; set; }
+        public string SalemanName { get; set; }
     }
 
     public enum SaveAction

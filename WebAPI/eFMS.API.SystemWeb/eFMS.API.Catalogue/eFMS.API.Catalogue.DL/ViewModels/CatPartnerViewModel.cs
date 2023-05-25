@@ -69,5 +69,9 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public bool? Active { get; set; }
         public string PartnerType { get; set; }
         public string TaxCodeAbbrName { get; set; }
+        public string ContractId { get; set; }
+        public string SalemanId { get; set; }
+        public string SalemanName { get; set; }
+        public string ContractType { get; set; }
     }
 }

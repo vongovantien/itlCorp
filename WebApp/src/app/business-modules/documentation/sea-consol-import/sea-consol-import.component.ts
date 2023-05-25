@@ -9,7 +9,7 @@ import { SortService } from '@services';
 import { AppList } from '@app';
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from '@common';
 import { CsTransaction, CsTransactionDetail } from '@models';
-import { CommonEnum } from '@enums';
+import { CommonEnum, TransactionTypeEnum } from '@enums';
 import { JobConstants, RoutingConstants } from '@constants';
 
 import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
@@ -122,8 +122,14 @@ export class SeaConsolImportComponent extends AppList {
             )
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
-                    this.masterbills = res.data || [];
-                    this.totalItems = res.totalItems;
+                    if (res.data?.length > 0 && this.dataSearch.transactionType === TransactionTypeEnum.SeaConsolImport) {
+                        this.masterbills = res.data || [];
+                        this.totalItems = res.totalItems;
+                    } else {
+                        this.masterbills = [];
+                        this.totalItems = 0;
+                    }
+
                 }
             );
     }

@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewChildren, QueryList } from "@angular/core";
+import { Component, ViewChild, ViewChildren, QueryList, Input } from "@angular/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
@@ -9,11 +9,11 @@ import { ReceiptModel } from "@models";
 import { SortService } from "@services";
 import { RoutingConstants, AccountingConstants, SystemConstants } from "@constants";
 
-import { catchError, map, takeUntil, withLatestFrom } from "rxjs/operators";
+import { catchError, map, take, takeUntil, withLatestFrom } from "rxjs/operators";
 import { formatDate } from "@angular/common";
-import { IAppState } from "@store";
+import { IAppState, getMenuUserSpecialPermissionState } from "@store";
 import { Store } from "@ngrx/store";
-import { LoadListCustomerPayment, ResetInvoiceList, RegistTypeReceipt } from "./store/actions";
+import { LoadListCustomerPayment, ResetInvoiceList, RegistTypeReceipt, ResetCombineInvoiceList, SearchListCustomerPayment } from "./store/actions";
 import { InjectViewContainerRefDirective, ContextMenuDirective } from "@directives";
 import { customerPaymentReceipListState, customerPaymentReceipPagingState, customerPaymentReceipSearchState, customerPaymentReceipLoadingState } from "./store/reducers";
 import { ARCustomerPaymentFormQuickUpdateReceiptPopupComponent, IModelQuickUpdateReceipt } from "./components/popup/form-quick-update-receipt-popup/form-quick-update-receipt.popup";
@@ -38,6 +38,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     @ViewChild(ARCustomerPaymentFormQuickUpdateReceiptPopupComponent) quickUpdatePopup: ARCustomerPaymentFormQuickUpdateReceiptPopupComponent;
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
     CPs: ReceiptModel[] = [];
+    _receiptType: string = 'Customer';
 
     selectedCPs: ReceiptModel = null;
     messageDelete: string = "";
@@ -45,12 +46,51 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
     dataSearch: any = {
         dateFrom: formatDate(new Date(new Date().setDate(new Date().getDate() - 29)), 'yyyy-MM-dd', 'en'),
-        dateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en')
+        dateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        typeReceipt: this._receiptType
     }
+    totalItemsCustomer: number = 0;
+    totalItemsAgent: number = 0;
 
     selectedReceipt: ReceiptModel;
     selectedUpdateKey: string;
+    isSelectedTab: boolean = false;
+    headersCustomer = [
+        { title: 'Receipt No', field: 'paymentRefNo', sortable: true },
+        { title: 'Paid Date', field: 'paymentDate', sortable: true },
+        { title: 'Customer Name', field: 'customerName', sortable: true },
+        { title: 'Collect Amount', field: '', sortable: true },
+        { title: 'Description', field: 'description', sortable: true },
+        { title: 'Receipt Type', field: '', sortable: true },
+        { title: 'Payment Method', field: 'paymentMethod', sortable: true },
+        { title: 'Payment Amount', field: 'paidAmount', sortable: true },
+        { title: 'Currency', field: 'currencyId', sortable: true },
+        { title: 'Type', field: 'type', sortable: true },
+        { title: 'Billing Date', field: 'billingDate', sortable: true },
+        { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
+        { title: 'Creator', field: 'userNameCreated', sortable: true },
+        { title: 'Create Date', field: 'datetimeCreated', sortable: true },
+        { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
+    ];
 
+    headersAgent = [
+        { title: 'Receipt No', field: 'paymentRefNo', sortable: true },
+        { title: 'Paid Date', field: 'paymentDate', sortable: true },
+        { title: 'Customer Name', field: 'customerName', sortable: true },
+        { title: 'Collect Amount', field: '', sortable: true },
+        { title: 'AR Combine No', field: 'subArcbno', sortable: true },
+        { title: 'Description', field: 'description', sortable: true },
+        { title: 'Receipt Type', field: '', sortable: true },
+        { title: 'Payment Method', field: 'paymentMethod', sortable: true },
+        { title: 'Payment Amount', field: 'paidAmount', sortable: true },
+        { title: 'Currency', field: 'currencyId', sortable: true },
+        { title: 'Type', field: 'type', sortable: true },
+        { title: 'Billing Date', field: 'billingDate', sortable: true },
+        { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
+        { title: 'Creator', field: 'userNameCreated', sortable: true },
+        { title: 'Create Date', field: 'datetimeCreated', sortable: true },
+        { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
+    ];
     constructor(
         private readonly _sortService: SortService,
         private readonly _toastService: ToastrService,
@@ -66,25 +106,17 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     ngOnInit() {
-
-        this.headers = [
-            { title: 'Receipt No', field: 'paymentRefNo', sortable: true },
-            { title: 'Paid Date', field: 'paymentDate', sortable: true },
-            { title: 'Customer Name', field: 'customerName', sortable: true },
-            { title: 'Collect Amount', field: '', sortable: true },
-            { title: 'Description', field: 'description', sortable: true },
-            { title: 'Receipt Type', field: '', sortable: true },
-            { title: 'Payment Method', field: 'paymentMethod', sortable: true },
-            { title: 'Payment Amount', field: 'paidAmount', sortable: true },
-            { title: 'Currency', field: 'currencyId', sortable: true },
-            { title: 'Type', field: 'type', sortable: true },
-            { title: 'Billing Date', field: 'billingDate', sortable: true },
-            { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
-            { title: 'Creator', field: 'userNameCreated', sortable: true },
-            { title: 'Create Date', field: 'datetimeCreated', sortable: true },
-            { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
-
-        ];
+        this.headers = this.headersCustomer;
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this._store.select(customerPaymentReceipSearchState)
+        .pipe(take(1))
+        .subscribe(
+            (data: any) => {
+                if(!!data){
+                    this._receiptType = data.typeReceipt;
+                }
+            }
+        );
         this.isLoading = this._store.select(customerPaymentReceipLoadingState)
         this.getCPs();
 
@@ -186,7 +218,11 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             .subscribe(
                 (res: any) => {
                     this.CPs = res.data || [];
-                    this.totalItems = res.totalItems || 0;
+                    if (this._receiptType === 'Customer') {
+                        this.totalItemsCustomer = res.totalItems || 0;
+                    } else {
+                        this.totalItemsAgent = res.totalItems || 0;
+                    }
                 },
             );
     }
@@ -226,8 +262,14 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     gotoCreateReceipt(type: string) {
-        this._store.dispatch(ResetInvoiceList());
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${type.toLowerCase()}/new`]);
+        if (type === 'COMBINE') {
+            this._store.dispatch(ResetCombineInvoiceList());
+            this._store.dispatch(ResetInvoiceList());
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/new-combine`]);
+        } else {
+            this._store.dispatch(ResetInvoiceList());
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${type.toLowerCase()}/new`]);
+        }
     }
 
     requestLoadListCustomerPayment() {
@@ -291,20 +333,20 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
         this._accountingRepo.syncReceiptToAccountant(receiptSyncIds)
             .pipe(
-            ).subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (((res as CommonInterface.IResult).status)) {
-                        this._toastService.success(`Send ${receipt.paymentRefNo} to Accountant System Successful`);
-                        this.requestLoadListCustomerPayment();
+        ).subscribe(
+            (res: CommonInterface.IResult) => {
+                if (((res as CommonInterface.IResult).status)) {
+                    this._toastService.success(`Send ${receipt.paymentRefNo} to Accountant System Successful`);
+                    this.requestLoadListCustomerPayment();
 
-                    } else {
-                        this._toastService.error("Send Data Fail");
-                    }
-                },
-                (error) => {
-                    console.log(error);
+                } else {
+                    this._toastService.error("Send Data Fail");
                 }
-            );
+            },
+            (error) => {
+                console.log(error);
+            }
+        );
     }
 
     exportAdvanceReceipt() {
@@ -377,5 +419,34 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         });
     }
 
+    goToARCBDetail(_arcbNo: string) {
+        if (!_arcbNo) {
+            return;
+        }
+        this._store.dispatch(ResetCombineInvoiceList());
+        this._store.dispatch(ResetInvoiceList());
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${_arcbNo}`]);
+    }
+
+    goToExistingARCB(_arcbNo: string) {
+        this._store.dispatch(ResetCombineInvoiceList());
+        this._store.dispatch(ResetInvoiceList());
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/existing`], { queryParams: { arcbno: _arcbNo } });
+    }
+
+    getReceiptData(value: string) {
+        this._receiptType = value;
+        this.headers = this._receiptType === 'Customer' ? this.headersCustomer : this.headersAgent;
+        this._store.select(customerPaymentReceipSearchState)
+        .pipe(take(1))
+        .subscribe(
+            (data: any) => {
+                console.log('datasearch', data);
+                this.dataSearch = data;
+                data.typeReceipt = this._receiptType;
+                this._store.dispatch(SearchListCustomerPayment(this.dataSearch));
+            }
+        );
+    }
 }
 

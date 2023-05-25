@@ -23,20 +23,26 @@ namespace eFMS.API.Catalogue.DL.Services
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysUser> sysUserRepository;
+        private readonly IContextBase<SysImage> sysImageRepository;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IMapper mapper;
+        private readonly IContextBase<CatPartner> catPartnerRepository;
 
         public CatBankService(IContextBase<CatBank> repository,
             ICacheServiceBase<CatBank> cacheService,
             IMapper imapper,
             IContextBase<SysUser> sysUserRepo,
             IStringLocalizer<LanguageSub> localizer,
+            IContextBase<CatPartner> catPartnerRepo,
+            IContextBase<SysImage> sysImageRepo,
         ICurrentUser currUser) : base(repository, cacheService, imapper)
         {
             currentUser = currUser;
             sysUserRepository = sysUserRepo;
             stringLocalizer = localizer;
             mapper = imapper;
+            catPartnerRepository = catPartnerRepo;
+            sysImageRepository = sysImageRepo;
         }
 
         #region CRUD
@@ -305,27 +311,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 return Enumerable.Empty<CatBankModel>().AsQueryable();
             }
 
-            var result = data.Select(x => new CatBankModel
-            {
-                Id = x.Id,
-                Code = x.Code,
-                BankNameEn = x.BankNameEn,
-                BankNameVn = x.BankNameVn,
-                UserCreated = x.UserCreated,
-                DatetimeCreated = x.DatetimeCreated,
-                UserModified = x.UserModified,
-                DatetimeModified = x.DatetimeModified,
-                Active = x.Active,
-                BankId = x.BankId,
-                PartnerId = x.PartnerId,
-                InactiveOn = x.InactiveOn,
-                BankAccountNo = x.BankAccountNo,
-                BankAddress = x.BankAddress,
-                BankAccountName = x.BankAccountName,
-                Note = x.Note,
-                Source = x.Source,
-                SwiftCode = x.SwiftCode
-            });
+            var result = _mapper.Map<List<CatBankModel>>(data);
 
             return result.AsQueryable();
         }

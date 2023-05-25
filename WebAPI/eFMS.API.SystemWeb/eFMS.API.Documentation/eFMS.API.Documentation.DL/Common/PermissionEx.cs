@@ -363,10 +363,13 @@ namespace eFMS.API.Documentation.DL.Common
         public static ICurrentUser GetUserMenuPermissionTransaction(string transactionType, ICurrentUser currentUser)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docSeaFCLImport);//Set default
-
-            if (transactionType == TermData.InlandTrucking)
+            if (transactionType == null)
             {
-                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.docInlandTrucking);
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsJobManagement);
+            }
+            if (transactionType == TermData.TruckingInland)
+            {
+                _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsTruckingInland);
             }
             else if (transactionType == TermData.AirExport)
             {

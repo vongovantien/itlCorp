@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿ using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -35,6 +37,7 @@ namespace eFMS.API.Documentation.Service.Models
         public virtual DbSet<CatDepartment> CatDepartment { get; set; }
         public virtual DbSet<CatIncoterm> CatIncoterm { get; set; }
         public virtual DbSet<CatPartner> CatPartner { get; set; }
+        public virtual DbSet<CatPartnerEmail> CatPartnerEmail { get; set; }
         public virtual DbSet<CatPlace> CatPlace { get; set; }
         public virtual DbSet<CatStage> CatStage { get; set; }
         public virtual DbSet<CatUnit> CatUnit { get; set; }
@@ -1177,7 +1180,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
-                entity.Property(e => e.Offices).HasMaxLength(250);
+                entity.Property(e => e.Offices).HasMaxLength(500);
 
                 entity.Property(e => e.ProductDept)
                     .HasMaxLength(50)
@@ -1852,6 +1855,41 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
             });
 
+            modelBuilder.Entity<CatPartnerEmail>(entity =>
+            {
+                entity.ToTable("catPartnerEmail");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.PartnerId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Type)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
             modelBuilder.Entity<CatPlace>(entity =>
             {
                 entity.ToTable("catPlace");
@@ -2204,7 +2242,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("ShipperID")
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
 
                 entity.Property(e => e.Taxcll)
                     .HasColumnName("TAXCLL")
@@ -3896,11 +3933,7 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.PartnerId).HasColumnName("PartnerID");
 
-                entity.Property(e => e.QuantityFromRange).HasColumnType("decimal(18, 4)");
-
                 entity.Property(e => e.QuantityFromValue).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.QuantityToRange).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.QuantityToValue).HasColumnType("decimal(18, 4)");
 
@@ -4357,6 +4390,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.SuspendTime).HasMaxLength(150);
 
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -4754,9 +4791,7 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.SyncStatus)
-                    .HasMaxLength(10)
-                    .IsUnicode(false);
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
 
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 

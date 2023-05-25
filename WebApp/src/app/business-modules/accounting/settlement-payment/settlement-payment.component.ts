@@ -459,24 +459,24 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         let sub = this.selectAttachPopup.onSelect
             .pipe(
                 takeUntil(this.ngUnsubscribe),
-                concatMap((value: any) => {
-                    if (!!value) {
-                        const smSyncIds: string[] = settlementSyncList.map(x => x.id);
-                        const mapV: { key: any, id: string }[] = Array(settlementSyncList.length).fill(value).map((value, i) => {
-                            return { key: value, id: smSyncIds[i] }
-                        })
-                        const source = mapV.map(x => this.getPreviewSource(x.id, x.key))
-                        return forkJoin(source);
-                    }
-                    return of(false);
-                }),
-                concatMap((data: CommonInterface.IResult[]) => {
-                    if (!!data.length) {
+                // concatMap((value: any) => {
+                //     if (!!value) {
+                //         const smSyncIds: string[] = settlementSyncList.map(x => x.id);
+                //         const mapV: { key: any, id: string }[] = Array(settlementSyncList.length).fill(value).map((value, i) => {
+                //             return { key: value, id: smSyncIds[i] }
+                //         })
+                //         const source = mapV.map(x => this.getPreviewSource(x.id, x.key))
+                //         return forkJoin(source);
+                //     }
+                //     return of(false);
+                // }),
+                concatMap((data: any) => {
+                    if (!!data) {
                         const advSyncModel = settlementSyncList.map((x: SettlementPayment) => {
                             return <AccountingInterface.IRequestFileType>{
                                 Id: x.id,
                                 action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
-                                fileName: this.getFileName(data, x.id)
+                                //fileName: this.getFileName(data, x.id)
                             };
                         });
                         return this._accoutingRepo.syncSettleToAccountant(advSyncModel);
@@ -665,23 +665,23 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
         let sub = this.selectAttachPopup.onSelect
             .pipe(
                 takeUntil(this.ngUnsubscribe),
-                concatMap((value: any) => {
-                    if (!!value) {
-                        const previewSource = this.getPreviewSource(settle.id, value);
-                        return previewSource;
-                    }
-                    return of(false);
-                }),
-                map((exportData: any) => {
-                    if (!exportData) throw new Error("error: ");
-                    return exportData?.data // url preview
-                }),
+                // concatMap((value: any) => {
+                //     if (!!value) {
+                //         const previewSource = this.getPreviewSource(settle.id, value);
+                //         return previewSource;
+                //     }
+                //     return of(false);
+                // }),
+                // map((exportData: any) => {
+                //     if (!exportData) throw new Error("error: ");
+                //     return exportData?.data // url preview
+                // }),
                 concatMap((url: any) => {
                     const syncModel = [settle].map((x: SettlementPayment) => {
                         return <AccountingInterface.IRequestFileType>{
                             Id: x.id,
                             action: x.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
-                            fileName: url
+                            //fileName: url
                         };
                     });
                     return this._accoutingRepo.syncSettleToAccountant(syncModel)

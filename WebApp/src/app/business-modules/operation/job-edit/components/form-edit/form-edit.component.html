@@ -9,7 +9,8 @@
                     <label class="form-control-label" for="">
                         Job ID
                     </label>
-                    <input type="text" class="form-control m-input m-input--square" placeholder="Job ID" name="jobNo" formControlName="jobNo">
+                    <input type="text" class="form-control m-input m-input--square" placeholder="Job ID" name="jobNo"
+                        formControlName="jobNo">
                 </div>
             </div>
             <div class="col-lg-4">
@@ -109,9 +110,17 @@
                     <label class="form-control-label" required>
                         Product Service
                     </label>
-                    <ng-select class="custom" [items]="productServices" placeholder="Please select"
+                    <!-- <ng-select class="custom" [items]="productServices" placeholder="Please select"
                         formControlName="productService" [clearable]="false">
+                    </ng-select> -->
+                    <ng-select *ngIf="transactionType!=='TK',else truckingService" class="custom" disabled
+                        [items]="productServices" placeholder="Please select" [clearable]="false"
+                        formControlName="productService">
                     </ng-select>
+                    <ng-template #truckingService>
+                        <input disabled type="text" class="form-control m-input m-input--square" value="Trucking">
+                    </ng-template>
+
                     <div class="form-control-feedback"
                         *ngIf="(productService.dirty && !productService.valid) || (isSubmitted && !productService.valid)">
                         Product Service is required!
@@ -318,12 +327,13 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !salemansId.value}">
+                <div class="form-group"
+                    [ngClass]="{'m-form__group has-danger':isSubmitted && (!salemansId.value || (salesmans?.length===0&&isJobCopy))}">
                     <label class="form-control-label" for="" required>
                         Salesman
                     </label>
                     <app-combo-grid-virtual-scroll
-                        [currentActiveItemId]="{field:'id',value: salemansId.value, hardValue: salesmanName}"
+                        [currentActiveItemId]="salesmans?.length===0&&isJobCopy? {hardValue:null }:{field:'id',value: salemansId.value, hardValue: salesmanName}"
                         (itemSelected)="onSelectDataFormInfo($event, 'salesman')"
                         [selectedDisplayFields]="['employeeNameEn']" [dataSources]="salesmans" size="15"
                         [displayFields]="displayFieldSalesman" placeholder="Select salesman" [clearable]="false"
@@ -422,7 +432,8 @@
                         </div>
                     </div>
                     <div class="col-lg-4 app-switch-custom">
-                        <div class="form-group" *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
+                        <div class="form-group"
+                            *ngIf="menuSpecialPermission | async | specialPermission:'AllowNoProfit'">
                             <label class="form-control-label">
                                 No Profit
                             </label>
@@ -464,7 +475,7 @@
                         <span> Get From Declaration </span>
                     </span>
                 </button>
-                <ng-container *ngIf="opsTransaction?.linkSource !== 'Replicate'">
+                <ng-container *ngIf="opsTransaction?.linkSource !== 'Replicate' && transactionType!=='TK'">
                     <button type="button" class="btn btn-brand m-btn--icon m-btn--uppercase m--margin-right-10"
                         (click)="syncGoodInforToReplicateJob()">
                         <span>

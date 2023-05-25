@@ -68,7 +68,8 @@
                     <tbody>
                         <ng-container *ngIf="!!customers.length">
                             <ng-container *ngFor="let customer of customers; let i = index; trackBy: trackByFn">
-                                <tr class="collapse-toggle-row">
+                                <tr class="collapse-toggle-row"
+                                [contextMenu]="AddressContextMenu" (onTouch)="onSelectPartner(customer)">
                                     <td class="table-actions-col">
                                         <div class="table-actions">
                                             <button type="button" (click)="showSaleman(customer.id)"
@@ -163,8 +164,9 @@
                                 </tr>
                             </ng-container>
                         </ng-container>
-                        <tr *ngIf="(!isLoading|async) && !customers.length" app-table-none-record></tr>
+                        <!-- <tr *ngIf="(!isLoading|async) && !customers.length" app-table-none-record></tr> -->
                         <tr *ngIf="isLoading | async" app-table-row-loading></tr>
+                        <tr *ngIf="!(isLoading | async) &&!customers.length" app-table-none-record></tr>
                     </tbody>
                 </table>
             </div>
@@ -173,11 +175,19 @@
         </div>
     </div>
 </div>
-
+<app-context-menu #AddressContextMenu (clickOutside)="sltCustomer = null">
+    <div class="menu-context__item" position="rightTop" trigger="hover" >
+        <div class="d-flex justify-content-between ">
+            <div>
+                <span (click)="showManagementAddress(sltCustomer)">Address Management </span>
+            </div>
+        </div>
+    </div>  
+</app-context-menu>
 <confirm-popup body="You want to delete this customer ?" (onSubmit)="onDelete()"></confirm-popup>
 
 <permission-403-popup></permission-403-popup>
 <popup-form-contract-commercial-catalogue (onRequest)="onRequestContract($event)">
 </popup-form-contract-commercial-catalogue>
-
+<management-address-commercial></management-address-commercial>
 <form-search-export-popup></form-search-export-popup>

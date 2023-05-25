@@ -15,6 +15,7 @@ import { getTransactionDetailCsTransactionState } from '../../../store';
 import { IEDocFile, IEDocUploadFile, ShareDocumentTypeAttachComponent } from '../document-type-attach/document-type-attach.component';
 import { AppShareEDocBase } from '../edoc.base';
 import { ShareListFilesAttachComponent } from '../list-file-attach/list-file-attach.component';
+import { log } from 'console';
 @Component({
     selector: 'files-attach-v2',
     templateUrl: './files-attach-v2.component.html',
@@ -134,7 +135,10 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
                     .pipe(takeUntil(this.ngUnsubscribe))
                     .subscribe(
                         (res: any) => {
-                            this.transactionType = 'CL';
+                            console.log(res);
+                            console.log(this.transactionType);
+                            //his.transactionType = res.transactionType;
+                            this.transactionType = res.opstransaction.jobNo.includes('LOG') ? 'CL' : 'TK';
                             this.getDocumentType('CL');
                             this.getEDoc('CL');
                             this.jobNo = res.opstransaction?.jobNo;
@@ -158,6 +162,7 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             { title: 'Attach Time', field: 'datetimeCreated', sortable: true },
             { title: 'Attach Person', field: 'userCreated', sortable: true },
         ];
+
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -266,7 +271,6 @@ export class ShareBussinessAttachFileV2Component extends AppShareEDocBase implem
             this.documentAttach.headers = this.headerAccAttach;
         }
         else {
-
             this.documentAttach.headers = this.headerAttach;
         }
         this.documentAttach.isUpdate = false;

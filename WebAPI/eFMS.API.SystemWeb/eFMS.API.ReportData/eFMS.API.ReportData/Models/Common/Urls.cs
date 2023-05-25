@@ -6,6 +6,9 @@
         {
             public const string CountryUrl = "/api/v1/en-US/CatCountry/query";
             public const string CatplaceUrl = "/api/v1/en-US/CatPlace/QueryExport";
+            public const string ProvinceUrl = "/api/v1/en-US/CatCity/query";
+            public const string DistrictUrl = "/api/v1/en-US/CatDistrict/query";
+            public const string WardUrl = "/api/v1/en-US/CatWard/query";
             public const string CatPartnerUrl = "/api/v1/en-US/CatPartner/QueryExport";
             public const string CatAgreementUrl = "/api/v1/en-US/CatPartner/QueryExportAgreement";
             public const string CatCommodityUrl = "/api/v1/en-US/CatCommonity/query";

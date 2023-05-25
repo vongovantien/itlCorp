@@ -118,7 +118,10 @@ export class AppComponent {
             .subscribe((event) => {
                 console.log(`current`, event.current, `available `, event.available);
                 if (confirm(`version ${environment.eFMSVersion} available for eFMS, Reload to update`)) {
-                    this._SwUpdates.activateUpdate().then(() => location.reload());
+                    this._SwUpdates.activateUpdate()
+                        .then(() => location.reload())
+                        .catch((err) => console.log(err))
+                        .finally(() => console.log('finally'));
                 }
             });
         this._SwUpdates.activated

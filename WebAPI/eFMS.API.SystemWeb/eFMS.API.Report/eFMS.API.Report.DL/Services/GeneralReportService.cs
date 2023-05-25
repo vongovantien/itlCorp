@@ -6,6 +6,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Remotion.Linq.Clauses.ResultOperators;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -35,7 +36,9 @@ namespace eFMS.API.Report.DL.Services
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<CatIncoterm> catIncotermRepository;
         private readonly IContextBase<SysImageDetail> imageDetailRepository;
-        private readonly IContextBase<SysAttachFileTemplate> sysattachRepository; 
+        private readonly IContextBase<SysAttachFileTemplate> sysattachRepository;
+        private readonly IContextBase<CatDepartment> deptRepository;
+        private readonly IContextBase<SysGroup> groupRepository;
 
         private eFMSDataContextDefault DC => (eFMSDataContextDefault)opsRepository.DC;
 
@@ -64,6 +67,8 @@ namespace eFMS.API.Report.DL.Services
             IContextBase<SysImageDetail> imageDetailRepo,
             IContextBase<CsTransaction> tranRepo,
             IContextBase<SysAttachFileTemplate> sysattachRepo,
+            IContextBase<CatDepartment> deptRepo,
+            IContextBase<SysGroup> groupRepo,
         IContextBase<SysUserLevel> UserLevel)
         {
                 opsRepository = ops;
@@ -86,6 +91,8 @@ namespace eFMS.API.Report.DL.Services
                 imageDetailRepository = imageDetailRepo;
                 tranRepository = tranRepo;
                 sysattachRepository = sysattachRepo;
+            deptRepository = deptRepo;
+            groupRepository= groupRepo;
         }
 
         public List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria, int page, int size, out int rowsCount)
@@ -253,7 +260,7 @@ namespace eFMS.API.Report.DL.Services
                 new SqlParameter(){ ParameterName = "@carrierId", Value = criteria.CarrierId },
                 new SqlParameter(){ ParameterName = "@agentId", Value = criteria.AgentId },
                 new SqlParameter(){ ParameterName = "@pol", Value = criteria.Pol },
-                new SqlParameter(){ ParameterName = "@pod", Value = criteria.Pod }
+                new SqlParameter(){ ParameterName = "@pod", Value = criteria.Pod },
             };
             //var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDataGeneralReport>(parameters);
             var list = DC.ExecuteProcedure<sp_GetDataGeneralReport>(parameters);
@@ -272,10 +279,43 @@ namespace eFMS.API.Report.DL.Services
             return dataShipment;
         }
 
+        private Dictionary<int, string> getDicSalePICInfo(List<int> ids, string type)
+        {
+            var result = new Dictionary<int, string>();
+            if (type == "group")
+            {
+                ids.ForEach(x =>
+                {
+                    var groupItem = groupRepository.Get(z => z.Id == x).FirstOrDefault();
+                    if (groupItem != null)
+                    {
+                        result.Add(x, groupItem.ShortName);
+                    }
+                });
+            }
+            else
+            {
+                ids.ForEach(x =>
+                {
+                    var deptItem = deptRepository.Get(z => z.Id == x).FirstOrDefault();
+                    if (deptItem != null)
+                    {
+                        result.Add(x, deptItem.DeptNameAbbr);
+                    }
+                });
+            }
+            return result;
+        }
+
         public IQueryable<GeneralExportShipmentOverviewResult> GeneralExportShipmentOverview(GeneralReportCriteria criteria)
         {
             List<GeneralExportShipmentOverviewResult> lstShipment = new List<GeneralExportShipmentOverviewResult>();
             var dataShipment = GetDataGeneralReport(criteria);
+            var groupIds=dataShipment.GroupBy(x=>x.GroupId).Select(x => x.FirstOrDefault().GroupId).ToList();
+            var deptIds=dataShipment.GroupBy(x=>x.DepartmentId).Select(x => x.FirstOrDefault().DepartmentId).ToList();
+            var groupDic = getDicSalePICInfo(groupIds,"group");
+            var deptDic= getDicSalePICInfo(deptIds, "dept");
+
             if (!dataShipment.Any()) return lstShipment.AsQueryable();
             //var lstSurchage = surCharge.Get();
             //var detailLookupSur = lstSurchage.ToLookup(q => q.Hblid);
@@ -364,7 +404,51 @@ namespace eFMS.API.Report.DL.Services
                 data.GW = item.GrossWeight;
                 data.CW = item.ChargeWeight;
                 data.CBM = item.Cbm;
-
+                if (data.JobNo.Contains("LOG"))
+                {
+                    //var jobOPS = opsRepository.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
+                    //var saleFirstGroupOPS = jobOPS.SalesGroupId.Split(';').FirstOrDefault();
+                    //var saleGroupId = short.Parse(saleFirstGroupOPS);
+                    //var saleDeptId = short.Parse(jobOPS.SalesDepartmentId);
+                    //data.SaleInfo.GroupSaleMan = groupRepository.Get(x => x.Id == saleGroupId).FirstOrDefault().ShortName;
+                    //data.SaleInfo.DeptSaleMan = deptRepository.Get(x => x.Id == saleDeptId).FirstOrDefault().DeptNameAbbr;
+                    var grouSale=groupDic.Where(x=>x.Key == item.GroupId).FirstOrDefault();
+                    var deptSale=deptDic.Where(x=>x.Key== item.DepartmentId).FirstOrDefault();
+                    data.SaleInfo = new SaleManInfo() {
+                    DeptSaleMan=deptSale.Value,
+                    GroupSaleMan=grouSale.Value
+                    };
+                }
+                else
+                {
+                    var jobCS = tranRepository.Get(x => x.JobNo == item.JobNo).FirstOrDefault();
+                    var jobCSDeatil = detailRepository.Get(x => x.JobId == jobCS.Id && x.Hwbno == item.HwbNo).FirstOrDefault();
+                    var saleFristGroupId = jobCSDeatil.SalesGroupId.Split(';').FirstOrDefault();
+                    //if (jobCSDeatil.SalesGroupId != null && jobCSDeatil.SalesDepartmentId != null)
+                    //{
+                    //    var saleFristGroupId = jobCSDeatil.SalesGroupId.Split(';').FirstOrDefault();
+                    //    var saleGroup = groupRepository.Get(x => x.Id == int.Parse(saleFristGroupId)).FirstOrDefault();
+                    //    var saleDept = deptRepository.Get(x => x.Id == short.Parse(jobCSDeatil.SalesDepartmentId)).FirstOrDefault();
+                    //    data.SaleInfo.GroupSaleMan = saleGroup.ShortName;
+                    //    data.SaleInfo.DeptSaleMan = saleDept.DeptNameAbbr;
+                    //}
+                    //data.PICInfo.GroupPIC = groupRepository.Get(x => x.Id == jobCS.GroupId).FirstOrDefault().ShortName;
+                    //data.SaleInfo.DeptSaleMan = deptRepository.Get(x => x.Id == jobCS.DepartmentId).FirstOrDefault().DeptNameAbbr;
+                    //var saleGroupId = int.Parse(saleFristGroupId);
+                    //var saleDeptId = short.Parse(jobCSDeatil.SalesDepartmentId);
+                    var grouSale = groupDic.Where(x => x.Key == int.Parse(saleFristGroupId)).FirstOrDefault();
+                    var deptSale = deptDic.Where(x => x.Key == short.Parse(jobCSDeatil.SalesDepartmentId)).FirstOrDefault();
+                    var groupPIC = groupDic.Where(x => x.Key == item.GroupId).FirstOrDefault();
+                    var deptPIC = deptDic.Where(x => x.Key == item.DepartmentId).FirstOrDefault();
+                    var saleInfo = new SaleManInfo() {
+                    DeptSaleMan=deptSale.Value,
+                    GroupSaleMan=grouSale.Value,
+                    };
+                    var picInfo = new PICInfo() {
+                    DeptPIC=deptPIC.Value,
+                    GroupPIC=groupPIC.Value
+                    };
+                }
                 data.Cont20 = item.Cont20 ?? 0;
                 data.Cont40 = item.Cont40 ?? 0;
                 data.Cont40HC = item.Cont40HC ?? 0;

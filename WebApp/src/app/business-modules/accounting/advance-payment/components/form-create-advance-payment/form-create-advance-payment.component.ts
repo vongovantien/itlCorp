@@ -239,35 +239,39 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         }
     }
 
-    getBankAccountPayee(isSetBank: Boolean) {
+    getBankAccountPayee(isSetFormBank: Boolean) {
         if (!!this.payee.value && this.paymentMethod.value !== 'Cash') {
-            this._catalogueRepo.getListBankByPartnerById(this.payee.value)
+            this._catalogueRepo.getApprovedBanksByPartner(this.payee.value)
                 .pipe(catchError(this.catchError), finalize(() => {
                     this.isLoading = false;
                 })).subscribe(
                     (res: any[]) => {
-                        if (!!res && res.length > 0) {
-                            this.bankAccount = res;
-                            if (isSetBank === true) {
-                                this.bankAccountNo.setValue(res[0].bankAccountNo);
-                                this.bankAccountName.setValue(res[0].bankAccountName);
-                                this.bankName.setValue(res[0].bankNameEn);
-                                this.mapBankCode(res[0].code);
+                        this.bankAccount = res || [];
+                        if (res && res.length > 0) {
+                            if (isSetFormBank) {
+                                this.setFormBankInfo(res[0]);
                             }
                         }
                         else {
-                            this.bankAccount = [];
-                            this.setBankInfoForPayee(this.selectedPayee);
+                            this.resetFormBankInfo();
                         }
                     })
         }
     }
 
-    setBankInfoForPayee(payee: Partner) {
-        this.bankAccountNo.setValue(payee.bankAccountNo);
-        this.bankAccountName.setValue(payee.bankAccountName);
-        this.bankName.setValue(payee.bankName);
-        this.mapBankCode(payee.bankCode);
+    setFormBankInfo(data: any) {
+        console.log(data)
+        this.bankAccountNo.setValue(data.bankAccountNo);
+        this.bankAccountName.setValue(data.bankAccountName);
+        this.bankName.setValue(data.bankName);
+        this.mapBankCode(data.bankCode);
+    }
+
+    resetFormBankInfo() {
+        this.bankAccountNo.setValue(null);
+        this.bankAccountName.setValue(null);
+        this.bankName.setValue(null);
+        this.mapBankCode(null);
     }
 
     onSelectDataBankInfo(data: any, type: string) {
@@ -280,8 +284,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 case "bankAccountNo":
                     this.bankAccountName.setValue(data.bankAccountName)
                     this.bankAccountNo.setValue(data.bankAccountNo)
-                    this.bankName.setValue(data.bankNameEn);
-                    this.mapBankCode(data.code);
+                    this.bankName.setValue(data.bankName);
+                    this.mapBankCode(data.bankCode);
                     break;
                 default:
                     break;

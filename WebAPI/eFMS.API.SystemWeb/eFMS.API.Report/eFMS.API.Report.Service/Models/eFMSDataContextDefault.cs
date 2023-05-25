@@ -250,6 +250,7 @@ namespace eFMS.API.Report.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
+
                 entity.Property(e => e.ProductDept)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -675,6 +676,7 @@ namespace eFMS.API.Report.Service.Models
                     .HasMaxLength(150)
                     .IsUnicode(false);
 
+
                 entity.Property(e => e.TaxCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -796,6 +798,7 @@ namespace eFMS.API.Report.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
 
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
@@ -2048,6 +2051,10 @@ namespace eFMS.API.Report.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.SuspendTime).HasMaxLength(150);
+
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

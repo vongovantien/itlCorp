@@ -1,17 +1,17 @@
 import { Component, OnInit, ViewChild, QueryList, ViewChildren } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 
-import { Shipment, CustomDeclaration } from '@models';
+import { Shipment, CustomDeclaration, Office } from '@models';
 import { SortService } from '@services';
-import { DocumentationRepo, ExportRepo, OperationRepo } from '@repositories';
+import { DocumentationRepo, ExportRepo, OperationRepo, SystemRepo } from '@repositories';
 import { ConfirmPopupComponent, LoadingPopupComponent, Permission403PopupComponent, ReportPreviewComponent } from '@common';
 
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
-import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom, tap } from 'rxjs/operators';
 import { JobConstants, RoutingConstants, SystemConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
@@ -38,7 +38,7 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     shipments: Shipment[] = [];
     selectedShipment: Shipment = null;
-
+    transactionType: string = '';
     customClearances: any[] = [];
     deleteMessage: string = '';
 
@@ -52,6 +52,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
     isSearchLinkFeea: boolean = false;
 
+
     constructor(
         private sortService: SortService,
         private _documentRepo: DocumentationRepo,
@@ -61,7 +62,8 @@ export class JobManagementComponent extends AppList implements OnInit {
         private _router: Router,
         private _store: Store<fromOperationStore.IOperationState>,
         private _exportRepo: ExportRepo,
-        private _spinner: NgxSpinnerService
+        private _spinner: NgxSpinnerService,
+        private route: ActivatedRoute,
     ) {
         super();
         this.requestSort = this.sortShipment;
@@ -72,6 +74,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
+        this.subscriptionJobOpsType();
         this.headers = [
             { title: 'Job ID', field: 'jobNo', sortable: true },
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
@@ -104,8 +107,13 @@ export class JobManagementComponent extends AppList implements OnInit {
             { title: 'Note', field: 'note', sortable: true },
         ];
 
-        this.getShipments();
+        // this.getShipments();
+        this.selectListJob();
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this.currentUser$ = this._store.select(getCurrentUserState);
+    }
 
+    selectListJob() {
         this._store.select(fromOperationStore.getOperationTransationDataSearch)
             .pipe(
                 withLatestFrom(this._store.select(fromOperationStore.getOperationTransationPagingState)),
@@ -119,14 +127,24 @@ export class JobManagementComponent extends AppList implements OnInit {
                     } else {
                         this.dataSearch = this.defaultDataSearch;
                     }
+                    this.dataSearch.transactionType = this.transactionType;
                     this.page = criteria.page;
                     this.pageSize = criteria.pageSize;
                     this.requestSearchShipment();
                 }
             );
+    }
 
-        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
-        this.currentUser$ = this._store.select(getCurrentUserState);
+    subscriptionJobOpsType() {
+        this.subscription =
+            this.route.data
+                .pipe(
+                    takeUntil(this.ngUnsubscribe)
+                ).subscribe((res: any) => {
+                    this.transactionType = res.transactionType;
+                    console.log(this.transactionType);
+                    this.getShipments();
+                });
     }
 
     requestSearchShipment() {
@@ -199,7 +217,13 @@ export class JobManagementComponent extends AppList implements OnInit {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, id]);
+                        //this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, id]);
+                        if (this.transactionType === 'TK') {
+                            this._router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND_DETAIL}/`, id]);
+                        } else {
+                            this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, id]);
+                        }
+
                     } else {
                         this.canNotAllowActionPopup.show();
                     }
@@ -242,8 +266,15 @@ export class JobManagementComponent extends AppList implements OnInit {
             .subscribe(
                 (res: CommonInterface.IResponsePaging | any) => {
                     if (!!res.data) {
-                        this.shipments = res.data.opsTransactions || [];
-                        this.totalItems = res.totalItems;
+                        let jobFirst = res.data.opsTransactions[0];
+                        if (jobFirst && jobFirst.transactionType === this.transactionType) {
+                            this.shipments = res.data.opsTransactions || [];
+                            this.totalItems = res.totalItems;
+                        } else {
+                            this.shipments = [];
+                            this.totalItems = 0;
+                        }
+
                     } else {
                         this.shipments = [];
                         this.totalItems = 0;
@@ -264,7 +295,13 @@ export class JobManagementComponent extends AppList implements OnInit {
     }
 
     gotoCreateJob() {
-        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}/new`]);
+        //this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}/new`]);
+        if (this.transactionType === 'TK') {
+            this._router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND}/new-trucking-inland`]);
+        } else {
+            this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}/new`]);
+        }
+
     }
 
     printPLSheet(currency: string) {

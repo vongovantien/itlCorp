@@ -1106,7 +1106,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             #endregion -- Search by Services --
 
-            var hasCLService = criteria.StrServices.Contains("CL");
+            var hasCLService = criteria.StrServices.Contains("CL")|| criteria.StrServices.Contains("TK");
             var hasAirSeaService = criteria.StrServices.Contains("I") || criteria.StrServices.Contains("E");
             #region -- Search by Created Date or Service Date and Office--
             //Created Date of Job
@@ -1189,7 +1189,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.CustomNo != null)
             {
                 //Custom only for OPS
-                if (criteria.StrServices.Contains("CL"))
+                if (criteria.StrServices.Contains("CL")|| criteria.StrServices.Contains("TK"))
                 {
                     var customNos = criteria.CustomNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
                     if (customNos.Count > 0)
@@ -1445,7 +1445,7 @@ namespace eFMS.API.Accounting.DL.Services
                 string _pic = string.Empty;
                 DateTime? _serviceDate = null;
                 string _customNo = string.Empty;
-                if (surcharge.TransactionType == "CL")
+                if (surcharge.TransactionType == "CL"|| surcharge.TransactionType == "TK")
                 {
                     var ops = operations.Where(x => x.JobNo == surcharge.JobNo).FirstOrDefault();
                     if (ops != null)
@@ -1523,7 +1523,7 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<CsTransaction> transactions = null;
 
             string typeCharge = AccountingConstants.TYPE_CHARGE_SELL; //Default is SELL
-            var hasCLService = criteria.StrServices.Contains("CL");
+            var hasCLService = criteria.StrServices.Contains("CL")|| criteria.StrServices.Contains("TK");
             var hasAirSeaService = criteria.StrServices.Contains("I") || criteria.StrServices.Contains("E");
 
             Expression<Func<CsShipmentSurcharge, bool>> surchargesQuery = q => true;
@@ -2695,12 +2695,12 @@ namespace eFMS.API.Accounting.DL.Services
                 Guid? _aol, _aod;
                 int? _packageQty;
                 decimal? _grossWeight, _chargeWeight, _cbm;
-                if (sur.TransactionType == "CL")
+                if (sur.TransactionType == "CL"|| sur.TransactionType == "TK")
                 {
                     var opst = opsTransactionRepo.Get().Where(x => x.Hblid == sur.Hblid).FirstOrDefault();
                     _serviceDate = opst?.ServiceDate;
                     _createdDate = opst?.DatetimeCreated;
-                    _service = "CL";
+                    _service = opst?.TransactionType;
                     _userCreated = opst?.UserCreated;
                     _commodity = string.Empty;
                     _flightNo = string.Empty;
@@ -3665,7 +3665,7 @@ namespace eFMS.API.Accounting.DL.Services
                     c.GetType().GetProperty(i.Name).SetValue(c, i.GetValue(item, null), null);
 
                 var pic = "";
-                if (c.TransactionType == "CL")
+                if (c.TransactionType == "CL"|| c.TransactionType == "TK")
                 {
                     var ops = opsTransactionRepo.Get(x => x.Hblid == c.Hblid).FirstOrDefault();
                     if (ops!= null)

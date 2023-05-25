@@ -1,5 +1,5 @@
 import { PopupBase } from "src/app/popup.base";
-import { Component, ViewChild, EventEmitter, Output } from "@angular/core";
+import { Component, ViewChild, EventEmitter, Output, Input } from "@angular/core";
 import { DocumentationRepo } from "src/app/shared/repositories";
 import { catchError, map } from "rxjs/operators";
 import { ConfirmPopupComponent, InfoPopupComponent } from "src/app/shared/common/popup";
@@ -20,7 +20,7 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(OpsCdNoteAddRemainingChargePopupComponent) addRemainChargePopup: OpsCdNoteAddRemainingChargePopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
-
+    @Input() transactionType: TransactionTypeEnum;
 
     formCreate: FormGroup;
     headers: CommonInterface.IHeaderTable[];
@@ -290,9 +290,10 @@ export class OpsCdNoteAddPopupComponent extends PopupBase {
             this.CDNote.jobId = this.currentMBLId;
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
-            this.CDNote.salemanId = this.listChargePartner.filter((x: ChargeCdNote) => x.listCharges.length > 0).map(x=>x.salemanId)[0];
+            this.CDNote.salemanId = this.listChargePartner.filter((x: ChargeCdNote) => x.listCharges.length > 0).map(x => x.salemanId)[0];
             // this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
-            this.CDNote.transactionTypeEnum = TransactionTypeEnum.CustomLogistic;
+            //this.CDNote.transactionTypeEnum = TransactionTypeEnum.CustomLogistic;
+            this.CDNote.transactionTypeEnum = this.transactionType;
             this.CDNote.note = this.note.value;
             this.CDNote.excRateUsdToLocal = this.excRateUsdToLocal.value;
             const charges = this.listChargePartner.filter(x => x.listCharges.length > 0);

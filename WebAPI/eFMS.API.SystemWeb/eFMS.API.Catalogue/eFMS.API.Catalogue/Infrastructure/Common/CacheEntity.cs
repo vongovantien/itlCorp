@@ -20,6 +20,10 @@
         CatContract,
         catChartOfAccounts,
         CatBank,
-        CatStandardCharge
+        CatStandardCharge,
+        CatCity,
+        CatDistrict,
+        CatWard,
+        CatAddressPartner
     }
 }

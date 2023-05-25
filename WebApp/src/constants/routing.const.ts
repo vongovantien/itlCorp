@@ -27,6 +27,9 @@ export class RoutingConstants {
         ASSIGNMENT: `${RoutingConstants.ROOT_LOGISTICS}/assigment`,
         TRUCKING_ASSIGNMENT: `${RoutingConstants.ROOT_LOGISTICS}/trucking-assigment`,
         CUSTOM_CLEARANCE: `${RoutingConstants.ROOT_LOGISTICS}/custom-clearance`,
+        TRUCKING_INLAND: `${RoutingConstants.ROOT_LOGISTICS}/trucking-inland`,
+        TRUCKING_INLAND_DETAIL: `${RoutingConstants.ROOT_LOGISTICS}/trucking-inland/trucking-inland-edit`,
+
     };
 
     public static readonly DOCUMENTATION = {
@@ -108,6 +111,7 @@ export class RoutingConstants {
             ['SLE', this.DOCUMENTATION.SEA_LCL_EXPORT],
             ['SLI', this.DOCUMENTATION.SEA_LCL_IMPORT],
             ['CL', this.LOGISTICS.JOB_MANAGEMENT],
+            ['TK', this.LOGISTICS.TRUCKING_INLAND],
         ]).get(transactionType);
     }
 

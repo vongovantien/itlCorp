@@ -3,15 +3,15 @@ import { environment } from "src/environments/environment";
 
 export const language = {
     /**
-     * Use to configure menu display in page-sidebar component 
-     * @param parent_name : name of module 
-     * @param icon : css class name of module icon 
-     * @param route_parent : route of module 
-     * @param display_child : Page-sidbar component use this variable to open-close sub-menu 
-     * @param childs : list components under each module 
-     * @param name: name of component 
-     * @param route_child : route of component , example  : 'http://test.efms.itlvn.com/vi/#/home/catalogue/ware-house' 
-     * @param display : If true, component will display on menu in page-sidebar, none display if false  
+     * Use to configure menu display in page-sidebar component
+     * @param parent_name : name of module
+     * @param icon : css class name of module icon
+     * @param route_parent : route of module
+     * @param display_child : Page-sidbar component use this variable to open-close sub-menu
+     * @param childs : list components under each module
+     * @param name: name of component
+     * @param route_child : route of component , example  : 'http://test.efms.itlvn.com/vi/#/home/catalogue/ware-house'
+     * @param display : If true, component will display on menu in page-sidebar, none display if false
     */
     Menu: [
         {
@@ -54,7 +54,7 @@ export const language = {
             "display_child": false,
             "display": true,
             "childs": [
-                // { name: "Inland Trucking", route_child: "inland-trucking", display: true },
+                // { name: "Trucking Inland", route_child: "inland-trucking", display: true },
                 { name: "Air Export", route_child: "air-export", display: true },
                 { name: "Air Import", route_child: "air-import", display: true },
                 // { name: "Sea Consol Export", route_child: "sea-consol-export", display: true },

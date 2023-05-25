@@ -561,6 +561,8 @@ namespace eFMS.API.System.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.SyncStatus).HasMaxLength(50);
+
                 entity.Property(e => e.UserCreated).HasMaxLength(50);
 
                 entity.Property(e => e.UserModified).HasMaxLength(50);
@@ -1001,6 +1003,12 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.OverPaymentTermObh).HasColumnName("OverPaymentTermOBH");
+
+                entity.Property(e => e.ReplicateAutorateVat)
+                    .HasColumnName("ReplicateAutorateVAT")
+                    .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.ReplicatePrefix)
                     .HasMaxLength(50)

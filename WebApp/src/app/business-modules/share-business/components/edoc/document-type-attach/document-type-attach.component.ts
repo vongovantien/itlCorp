@@ -171,7 +171,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             }
                             );
 
-                            _uniqBy(data, 'payer').forEach(element => {
+                            _uniqBy(listJob, 'payer').forEach(element => {
                                 let item = ({
                                     payer: element.payer,
                                 })
@@ -179,7 +179,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                             }
                             );
                             this.configPayee.dataSource = this.payeeDataSource;
-                            _uniqBy(data, 'invoiceNo').forEach(element => {
+                            _uniqBy(listJob, 'invoiceNo').forEach(element => {
                                 if (element.invoiceNo !== '') {
                                     let item = ({
                                         invoiceNo: element.invoiceNo,
@@ -210,7 +210,6 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                                     customNo: element.customNo,
                                     hbl: element.hbl,
                                     mbl: element.mbl
-
                                 })
                                 this.jobDataSource.push(item);
                             }
@@ -266,6 +265,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
             }
             else if (!!docType) {
                 files[i].DocumentId = docType.id;
+                files[i].AccountingType = docType.accountingType;
                 files[i].docType = docType;
                 files[i].aliasName = docType.code + '_' + files[i].name.substring(0, files[i].name.lastIndexOf('.'));
             }
@@ -318,6 +318,7 @@ export class ShareDocumentTypeAttachComponent extends PopupBase implements OnIni
                 this.enablePayeeINV[index] = false;
                 this.listFile[index].Code = event.code;
                 this.listFile[index].DocumentId = event.id;
+                this.listFile[index].AccountingType = event.accountingType;
                 this.listFile[index].aliasName = this.isUpdate ? event.code + '_' + this.listFile[index].name : event.code + '_' + this.listFile[index].name.substring(0, this.listFile[index].name.lastIndexOf('.'))
                 this.listFile[index].docType = event.code;
                 if (event.code === 'INV' || event.code === 'OBH_INV') {

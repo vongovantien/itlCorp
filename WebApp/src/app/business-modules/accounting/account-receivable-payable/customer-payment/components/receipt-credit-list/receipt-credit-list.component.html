@@ -31,9 +31,24 @@
                                         </app-permission-button>
                                     </ng-container>
                                 </td>
+                                <td class="text-info" *ngIf="(receiptType$ | async) !=='CUSTOMER'">{{item.taxCode}} - {{item.partnerName}}</td>
                                 <td class="text-primary">{{item.refNo}}</td>
                                 <td>
                                     {{item.invoiceNo}}
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                        <ng-container [ngSwitch]="item.paymentStatus">
+                                            <span class="m-badge m-badge--success m-badge--wide" *ngSwitchCase="'Paid'">
+                                                {{item.paymentStatus}}
+                                            </span>
+                                            <span class="m-badge m-badge--warning m-badge--wide text-white"
+                                                *ngSwitchCase="'Paid A Part'">
+                                                {{item.paymentStatus}}
+                                            </span>
+                                            <span class="m-badge m-badge--danger m-badge--wide" *ngSwitchDefault>
+                                                {{item.paymentStatus}}
+                                            </span>
+                                        </ng-container>
+                                    </ng-container>
                                 </td>
                                 <td>
                                     {{!!item.voucherId ? item.voucherId : (!!item.voucherIdre ? item.voucherIdre: '')}}
@@ -108,7 +123,7 @@
                     <ng-container *ngIf="!!(creditList | async)?.length">
                         <tfoot>
                             <tr class="font-weight-bold font-15 bg-locked">
-                                <td colspan="4" rowspan="4" ALIGN="center">Total</td>
+                                <td colspan="5" rowspan="5" ALIGN="center">Total</td>
                                 <td class="text-right">{{creditList | async | sumAmount:'unpaidAmountUsd' |
                                     number:'1.2-2'}}
                                 </td>

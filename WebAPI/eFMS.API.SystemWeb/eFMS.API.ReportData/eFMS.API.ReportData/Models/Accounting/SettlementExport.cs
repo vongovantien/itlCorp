@@ -6,5 +6,6 @@ namespace eFMS.API.ReportData.Models.Accounting
     {
         public InfoSettlementExport InfoSettlement { get; set; }
         public List<InfoShipmentSettlementExport> ShipmentsSettlement { get; set; }
+        public string UserCreated { get; set; }
     }
 }

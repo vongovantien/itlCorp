@@ -73,5 +73,6 @@ namespace eFMS.API.Report.Service.Models
         public string SuspendTime { get; set; }
         public DateTime? DeliveryDate { get; set; }
         public DateTime? ClearanceDate { get; set; }
+        public string TransactionType { get; set; }
     }
 }

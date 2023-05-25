@@ -234,11 +234,22 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.listUnits = this._store.select(getCatalogueUnitState);
     }
 
+    getServicetype(serviceTypeId: string) {
+        if (serviceTypeId === 'CL') {
+            if (this.selectedShipment.jobId.includes('TKI')) {
+                return 'TK';
+            }
+            return 'CL';
+        }
+        return serviceTypeId;
+    }
+
     getMasterCharges(officeId: string = null, serviceTypeId: string = null, isChangeService: boolean = false) {
+
         forkJoin([
-            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: serviceTypeId, officeId: officeId }),
-            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OBH, serviceTypeId: serviceTypeId, officeId: officeId }),
-            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OTHER, serviceTypeId: serviceTypeId, officeId: officeId }),
+            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: this.getServicetype(serviceTypeId), officeId: officeId }),
+            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OBH, serviceTypeId: this.getServicetype(serviceTypeId), officeId: officeId }),
+            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OTHER, serviceTypeId: this.getServicetype(serviceTypeId), officeId: officeId }),
         ]).pipe(
             map(([chargeCredit, chargeOBH, chargeOther]) => {
                 return [...chargeCredit, ...chargeOBH, ...chargeOther];
@@ -286,6 +297,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         if (!!selectedCharges.length) {
             if (this.utility.getServiceType(selectedCharges[0].jobId) !== data.service) {
                 this.getMasterCharges(this.selectedShipment.officeId, this.serviceTypeId, true);
+
             }
             if (selectedCharges[0].hblid !== data.hblid) {
                 selectedCharges.forEach((charge: Surcharge) => {

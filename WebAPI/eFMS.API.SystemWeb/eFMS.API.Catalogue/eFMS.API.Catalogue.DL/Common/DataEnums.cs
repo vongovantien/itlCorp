@@ -5,6 +5,15 @@ namespace eFMS.API.Catalogue.DL.Common
 {
     public static class DataEnums
     {
+
+        // Bank Status
+        public static readonly string BANK_NEW = "New";
+        public static readonly string BANK_PROCESSING = "Processing";
+        public static readonly string BANK_APPROVED = "Approved";
+        public static readonly string BANK_REJECTED = "Rejected";
+        public static readonly string BANK_REVISE = "Revise";
+
+
         public static readonly string EnActive = "Active";
         public static readonly string EnInActive = "In Active";
         public static readonly string VnActive = "Hoạt động";
@@ -58,7 +67,8 @@ namespace eFMS.API.Catalogue.DL.Common
             new UnitType { Value = "Package", DisplayName = "Package" },
             new UnitType { Value = "WeightMeasurement", DisplayName = "Weight Measurement" },
             new UnitType { Value = "LengthMeasurement", DisplayName = "Length Measurement" },
-            new UnitType { Value = "VolumnMeasurement", DisplayName = "Volumn Measurement" }
+            new UnitType { Value = "VolumnMeasurement", DisplayName = "Volumn Measurement" },
+            new UnitType { Value = "Vehicle", DisplayName = "Vehicle" }
         };
 
         public static readonly string CONTRACT_TRIAL = "Trial";

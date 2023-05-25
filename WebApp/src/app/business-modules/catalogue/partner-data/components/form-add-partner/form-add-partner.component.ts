@@ -307,7 +307,7 @@ export class FormAddPartnerComponent extends AppForm {
                 Validators.maxLength(14),
                 Validators.minLength(8),
                 Validators.pattern(SystemConstants.CPATTERN.TAX_CODE),
-                Validators.required
+                FormValidators.required
             ])],
             partnerGroup: [null, Validators.compose([
                 Validators.required
@@ -442,7 +442,7 @@ export class FormAddPartnerComponent extends AppForm {
                 this.getShippingProvinces(data.id, !!this.provinceShippingId.value ? this.provinceShippingId.value : null);
                 break;
             case 'shippping-city':
-                this.shippingProvinceName = data.name_EN;
+                this.shippingProvinceName = data.nameEn;
                 this.provinceShippingId.setValue(data.id);
                 break;
             case 'billing-country':

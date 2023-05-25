@@ -23,6 +23,7 @@ export class JobManagementFormSearchComponent extends AppForm {
     @Output() onSearch: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
     @Output() onReset: EventEmitter<ISearchDataShipment> = new EventEmitter<ISearchDataShipment>();
     @Input() isSearchLinkFee: boolean = false;
+    @Input() transactionType: string = '';
 
     filterTypes: CommonInterface.ICommonTitleValue[];
 
@@ -69,14 +70,24 @@ export class JobManagementFormSearchComponent extends AppForm {
         this.users = this._sysRepo.getListSystemUser();
 
         this.initFormSearch();
-
-        this.filterTypes = [
-            { title: 'Custom No', value: 'clearanceNo' },
-            { title: 'Job Id', value: 'jobNo' },
-            { title: 'HBL', value: 'hwbno' },
-            { title: 'MBL', value: 'mblno' },
-            { title: 'Credit\/Debit\/Invoice\ No', value: 'creditDebitInvoice' },
-        ];
+        console.log(this.transactionType);
+        if (this.transactionType === 'TK') {
+            this.filterTypes = [
+                { title: 'Job Id', value: 'jobNo' },
+                { title: 'Custom No', value: 'clearanceNo' },
+                { title: 'HBL', value: 'hwbno' },
+                { title: 'MBL', value: 'mblno' },
+                { title: 'Credit\/Debit\/Invoice\ No', value: 'creditDebitInvoice' },
+            ];
+        } else {
+            this.filterTypes = [
+                { title: 'Custom No', value: 'clearanceNo' },
+                { title: 'Job Id', value: 'jobNo' },
+                { title: 'HBL', value: 'hwbno' },
+                { title: 'MBL', value: 'mblno' },
+                { title: 'Credit\/Debit\/Invoice\ No', value: 'creditDebitInvoice' },
+            ];
+        }
         this.filterType.setValue(this.filterTypes[0]);
 
         this._store.select(fromOpsStore.getOperationTransationDataSearch)
@@ -158,7 +169,8 @@ export class JobManagementFormSearchComponent extends AppForm {
             createdDateFrom: (!!this.createdDate.value && !!this.createdDate.value.startDate) ? formatDate(this.createdDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: (!!this.createdDate.value && !!this.createdDate.value.endDate) ? formatDate(this.createdDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             linkJobSearch: !!this.linkJobSearch.value ? this.linkJobSearch.value : null,
-            linkFeeSearch: !!this.linkFeeSearch.value ? this.linkFeeSearch.value : null
+            linkFeeSearch: !!this.linkFeeSearch.value ? this.linkFeeSearch.value : null,
+            transactionType: this.transactionType
         };
         this.onSearch.emit(body);
         console.log(body);
@@ -209,7 +221,8 @@ export class JobManagementFormSearchComponent extends AppForm {
                     endDate: new Date(this.dataSearch.createdDateTo)
                 } : null,
                 linkFeeSearch: this.linkFeeSearchs.find(s => s === this.dataSearch.linkFeeSearch) || null,
-                linkJobSearch: this.linkFeeSearchs.find(s => s === this.dataSearch.linkJobSearch) || null
+                linkJobSearch: this.linkFeeSearchs.find(s => s === this.dataSearch.linkJobSearch) || null,
+                transactionType: this.dataSearch.transactionType
             };
 
             this.formSearch.patchValue(advanceSearchForm);
@@ -246,5 +259,6 @@ interface ISearchDataShipment {
     createdDateTo: string;
     linkJobSearch: string;
     linkFeeSearch: string;
+    transactionType: string;
 }
 

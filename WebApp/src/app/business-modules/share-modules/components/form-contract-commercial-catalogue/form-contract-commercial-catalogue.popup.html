@@ -531,33 +531,37 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Contract File</label>
-                                    <input style="display:none" type="file" #file (change)="handleFileInput($event)">
                                     <div class="form-group ">
-                                        <button (click)="file.click()" type="button"
-                                            class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10">
-                                            <span>
-                                                <i class="la la-paperclip"></i>
+                                        <input style="display:none" type="file" #file
+                                            (change)="handleFileInput($event)">
+                                        <div class=" d-flex align-items-center text-truncate pb-3">
+                                            <button (click)="file.click()" type="button"
+                                                class=" btn btn-success  m-btn--icon m-btn--uppercase margin-right-10">
                                                 <span>
-                                                    Attach Files
+                                                    <i class="la la-paperclip"></i>
+                                                    <span>
+                                                        Attach Files
+                                                    </span>
                                                 </span>
-                                            </span>
-                                        </button>
-                                        <ng-container
-                                            *ngIf=" (!!fileList && !isUpdate) || (!!fileList && isCreateNewCommercial)">
-                                            <span class="text-underline text-primary">
-                                                {{ !!fileList ? fileList[0].name : null}}
-                                            </span>
-                                        </ng-container>
+                                            </button>
+                                            &nbsp;
+                                            <ng-container
+                                                *ngIf=" (!!fileList && !isUpdate) || (!!fileList && isCreateNewCommercial)">
+                                                <span class="text-underline text-primary text-truncate">
+                                                    {{ !!fileList ? fileList[0].name : null}}
+                                                </span>
+                                            </ng-container>
+                                        </div>
                                         <ng-container *ngIf="!isLoading && !!files && isUpdate">
-                                            <li *ngFor="let file of files">
-                                                <a [href]="file.url" target="_blank" [title]="file.name"
-                                                    download>{{file.name}}</a>
+                                            <p *ngFor="let file of files" class="d-flex justify-content-start">
+                                                <a class='text-truncate' [href]="file.url" target="_blank"
+                                                    [title]="file.name" download>{{file.name}}</a>
                                                 <span class="pointer text-center">
                                                     <a title="Delete" (click)="deleteFile(file)">
                                                         <i class="la la-times fa-lg text-danger"></i>
                                                     </a>
                                                 </span>
-                                            </li>
+                                            </p>
                                         </ng-container>
                                     </div>
                                 </div>

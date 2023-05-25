@@ -1,8 +1,8 @@
-import { formatDate } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { AbstractControl } from '@angular/forms';
-import { ActivatedRoute, ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
-import { ActionsSubject, Store } from '@ngrx/store';
+import { Store, ActionsSubject } from '@ngrx/store';
+import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 import { getCurrentUserState, getMenuUserSpecialPermissionState } from './../../../store/reducers/index';
 
@@ -13,6 +13,8 @@ import { InjectViewContainerRefDirective } from '@directives';
 import { RoutingConstants, JobConstants, SystemConstants } from '@constants';
 import { ICanComponentDeactivate } from '@core';
 import { AppForm } from '@app';
+
+
 import { Container, Crystal, CsTransaction, CsTransactionDetail, OpsTransaction } from '@models';
 import { ShareBussinessContainerListPopupComponent, ShareBussinessSellingChargeComponent } from '@share-bussiness';
 import { OPSTransactionGetDetailSuccessAction } from '../store';
@@ -59,6 +61,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     selectedTabSurcharge: string = 'BUY';
     allowLinkFeeSell: boolean = true;
     isReplicate: boolean = false;
+    transactionType: string = '';
 
     constructor(
         private route: ActivatedRoute,
@@ -77,11 +80,23 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     ngOnInit() {
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this.subscriptionJobOpsType();
         this.subscriptionParamURLChange();
         this.subscriptionSaveContainerChange();
 
         this.currentUser$ = this._store.select(getCurrentUserState);
     }
+
+    subscriptionJobOpsType() {
+        this.subscription =
+            this.route.data
+                .pipe(
+                    takeUntil(this.ngUnsubscribe)
+                ).subscribe((res: any) => {
+                    this.transactionType = res.transactionType;
+                });
+    }
+
 
     subscriptionParamURLChange() {
         this.subscription = combineLatest([
@@ -236,6 +251,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     saveShipment() {
+        console.log(this.transactionType);
+
         this.lstMasterContainers.forEach((c: Container) => {
             c.mblid = this.jobId;
             c.hblid = this.hblid;
@@ -258,7 +275,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             const checkPoint = {
                 partnerId: this.opsTransaction.customerId,
                 salesmanId: this.opsTransaction.salemanId,
-                transactionType: 'CL',
+                transactionType: this.transactionType === 'TK' ? 'TK' : 'CL',
                 type: 8,
                 hblId: this.opsTransaction.hblid
             };
@@ -432,7 +449,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                         this.headerComponent.resetBreadcrumb("Detail Job");
                         this.editForm.isSubmitted = false;
 
-                        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId]);
+                        if (this.transactionType === 'TK') {
+                            this._router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND_DETAIL}/`, this.jobId]);
+                        } else {
+                            this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_DETAIL}/`, this.jobId]);
+                        }
                     } else {
                         this._toastService.warning(res.message);
                     }
@@ -589,7 +610,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     gotoList() {
-        this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
+        if (this.transactionType === 'TK') {
+            this._router.navigate([`${RoutingConstants.LOGISTICS.TRUCKING_INLAND}`]);
+        } else {
+            this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}`]);
+        }
     }
 
     handleCancelForm() {
@@ -607,7 +632,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
 
     confirmCancel() {
         this.isCancelFormPopupSuccess = true;
-
         if (this.nextState) {
             this._router.navigate([this.nextState.url.toString()]);
         } else {
@@ -649,14 +673,14 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     onSubmitDuplicateConfirm() {
-        this._documentRepo.getPartnerForCheckPointInShipment(this.opsTransaction.hblid, 'CL')
+        this._documentRepo.getPartnerForCheckPointInShipment(this.opsTransaction.hblid, this.transactionType === 'TK' ? 'TK' : 'CL')
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 switchMap((partnerIds: string[]) => {
                     if (!!partnerIds.length) {
                         const criteria: DocumentationInterface.ICheckPointCriteria = {
                             data: partnerIds,
-                            transactionType: 'CL',
+                            transactionType: this.transactionType === 'TK' ? 'TK' : 'CL',
                             settlementCode: null,
                         };
                         return this._documentRepo.validateCheckPointMultiplePartner(criteria)
@@ -757,7 +781,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             objectId: this.opsTransaction.id,
                             hblId: this.opsTransaction.hblid,
                             templateCode: 'PLSheet',
-                            transactionType: 'CL'
+                            transactionType: this.transactionType === 'TK' ? 'TK' : 'CL'
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
                     }

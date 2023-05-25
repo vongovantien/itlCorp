@@ -4,6 +4,8 @@
     {
         public static string CalculatingReceivableDataPartnerQueue { get; } = "Accounting.CalculatingReceivableDataPartnerQueue";
         public static string CalculatingReceivableOverDuePaymentQueue { get; } = "Accounting.CalculatingOverDuePaymentQueue";
+        public static string PostAttachFileTemplateToEDocQueue { get; } = "FileManagement.PostAttachFileTemplateToEDocQueue";
+        public static string GenFileSyncQueue { get; } = "ReportData.GenFileSyncQueue";
     }
 
     public class RabbitExchange
@@ -17,6 +19,7 @@
         public static string EFMS_Report { get; } = "eFMS_ReportExchange";
         public static string EFMS_Mail { get; } = "eFMS_MailExchange";
         public static string EFMS_Notify { get; } = "eFMS_NotifyExchange";
-
+        public static string EFMS_FileManagement { get; } = "eFMS_FileManagementExchange";
+        public static string EFMS_ReportData { get; } = "eFMS_ReportDataExchange";
     }
 }

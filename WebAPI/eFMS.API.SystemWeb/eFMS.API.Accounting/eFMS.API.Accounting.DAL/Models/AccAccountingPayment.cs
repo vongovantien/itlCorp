@@ -51,5 +51,6 @@ namespace eFMS.API.Accounting.Service.Models
         public bool? NetOff { get; set; }
         public decimal? NetOffVnd { get; set; }
         public decimal? NetOffUsd { get; set; }
+        public string VoucherNo { get; set; }
     }
 }

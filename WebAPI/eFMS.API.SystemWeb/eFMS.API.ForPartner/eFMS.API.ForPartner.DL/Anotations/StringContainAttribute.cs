@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace eFMS.API.ForPartner.DL.Anotations
 {
-    public class StringContainAttribute: ValidationAttribute
+    public class StringContainAttribute : ValidationAttribute
     {
         public string[] AllowableValues { get; set; }
 
@@ -25,7 +22,7 @@ namespace eFMS.API.ForPartner.DL.Anotations
             {
                 return ValidationResult.Success;
             }
-            var msg = $"Please enter value contain: {string.Join(", ", (AllowableValues ?? new string[] { "Not allowable values found" }))}.";
+            var msg = $"Vui lòng nhập giá trị chứa: {string.Join(", ", (AllowableValues ?? new string[] { "Không tìm thấy giá trị cho phép" }))}.";
 
             return new ValidationResult(msg); ;
         }

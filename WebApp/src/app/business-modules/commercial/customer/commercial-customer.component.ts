@@ -22,6 +22,8 @@ import { FormContractCommercialPopupComponent } from '../../share-modules/compon
 import { FormSearchExportComponent } from '../components/popup/form-search-export/form-search-export.popup';
 import { getCustomerListState, getCustomerLoadingState, getCustomerSearchParamsState, ICustomerState } from './store';
 import { LoadListCustomer, SearchList } from './store/actions/customer.action';
+import { ManagementAddressComponent } from '../components/management-address/management-commercial-address.component';
+
 
 
 @Component({
@@ -35,6 +37,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
     @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
     @ViewChild(FormSearchExportComponent) formSearchExportPopup: FormSearchExportComponent;
+    @ViewChild(ManagementAddressComponent) formManagementAddress: ManagementAddressComponent;
 
     menuSpecialPermission: Observable<any[]>;
 
@@ -46,6 +49,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     isSearching: boolean = false;
 
     selectedCustomer: Customer;
+    sltCustomer: Customer;
 
     headerSalemans: CommonInterface.IHeaderTable[];
 
@@ -388,6 +392,14 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
                     this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'efms_customer_agreement.xlsx')
                 }
             )
+    }
+    onSelectPartner(cus: Customer) {
+        this.sltCustomer = cus;
+    }
+
+    showManagementAddress(partner: any) {
+        this.formManagementAddress.setDefaultValue(partner);
+        this.formManagementAddress.show();
     }
 }
 interface ISearchGroup {

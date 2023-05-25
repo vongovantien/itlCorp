@@ -22,6 +22,9 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public decimal? UnpaidAmount { get; set; }
         public decimal? UnpaidAmountVnd { get; set; }
         public decimal? UnpaidAmountUsd { get; set; }
+        public decimal? RemainAmount { get; set; }
+        public decimal? RemainAmountVnd { get; set; }
+        public decimal? RemainAmountUsd { get; set; }
         public decimal? PaymentTerm { get; set; }
         public DateTime? DueDate { get; set; }
         public string PaymentStatus { get; set; }

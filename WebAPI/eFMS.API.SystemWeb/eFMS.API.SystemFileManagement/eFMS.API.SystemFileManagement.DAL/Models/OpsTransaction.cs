@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.SystemFileManagement.Service.Models
 {
@@ -68,5 +69,6 @@ namespace eFMS.API.SystemFileManagement.Service.Models
         public DateTime? DateCreatedLinkJob { get; set; }
         public bool? IsReplicate { get; set; }
         public bool? NoProfit { get; set; }
+        public string TransactionType { get; set; }
     }
 }

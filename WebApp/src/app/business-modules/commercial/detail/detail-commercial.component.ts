@@ -20,6 +20,7 @@ import { CommercialBranchSubListComponent } from '../components/branch-sub/comme
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
 import { CommercialBankListComponent } from '../components/bank/commercial-bank-list.component';
 import { formatDate } from '@angular/common';
+import { CommercialAddressListComponent } from '../components/address/commercial-address-list.component';
 
 @Component({
     selector: 'app-detail-commercial',
@@ -32,6 +33,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     @ViewChild(CommercialBranchSubListComponent) formBranchSubList: CommercialBranchSubListComponent;
     @ViewChild(CommercialBankListComponent) formBankList: CommercialBankListComponent
     @ViewChild(PayableComponent) payableComponent: PayableComponent;
+    @ViewChild(CommercialAddressListComponent) addressPartnerList: CommercialAddressListComponent;
 
     partnerId: string;
     partner: Partner;
@@ -92,7 +94,12 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                         this.partnerList.getSubListPartner(this.partnerId);
                     }
                     this.formBankList.partnerId = res.partnerId;
-                    this.formBankList.getListBank(res.partnerId);
+                    this.formBankList.getPartnerBank(res.partnerId);
+
+                    this.addressPartnerList.partnerId = res.partnerId;
+                    this.addressPartnerList.getAddressPartner(res.partnerId);
+                    this.addressPartnerList.partner = res;
+
                     this.payableComponent.partnerId = res.partnerId;
                     this.payableComponent.getFileContract(res.partnerId);
                 } else {
@@ -117,6 +124,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     if (!!res) {
                         this.partner = res;
                         this.formBankList.partner = this.partner;
+                        this.addressPartnerList.partner = this.partner;
                         this.formCommercialComponent.active = this.partner.active;
                         this.formCreate.isBranchSub = this.isAddSubPartner;
                         this.setDataForm(this.partner);
@@ -337,7 +345,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                 map((value: Partner) => {
                     if (!!value) {
                         if (!!body.internalReferenceNo) {
-                            this.invalidTaxCode = `This Parnter is existed, please you check again!`;
+                            this.invalidTaxCode = `This Partner is existed, please you check again!`;
                             this.infoPopupTaxCode.show();
                         } else {
                             this.invalidTaxCode = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${value.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
@@ -371,7 +379,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                 (res: any) => {
                     console.log(res);
                     if (res === false) {
-                        //this.infoPopupTaxCode.show();
                         this.formCreate.isExistedTaxcode = true;
                         return;
                     }

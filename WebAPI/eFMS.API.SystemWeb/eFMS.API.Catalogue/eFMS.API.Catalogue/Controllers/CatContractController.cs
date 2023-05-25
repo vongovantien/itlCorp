@@ -217,6 +217,7 @@ namespace eFMS.API.Catalogue.Controllers
             var hs = catContractService.Update(model);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
             if (!hs.Success)
             {
                 return BadRequest(result);

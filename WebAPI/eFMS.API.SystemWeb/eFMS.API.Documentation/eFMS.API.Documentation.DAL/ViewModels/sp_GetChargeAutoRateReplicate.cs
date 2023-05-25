@@ -83,6 +83,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string UserNameLinkFee { get; set; }
         public string LinkChargeId { get; set; }
         public DateTime? ServiceDate { get; set; }
-
+        public decimal? ReplicateAutorateVAT { get; set; }
     }
 }

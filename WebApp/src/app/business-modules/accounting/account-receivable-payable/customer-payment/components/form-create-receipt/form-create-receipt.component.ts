@@ -3,9 +3,9 @@ import { AbstractControl, FormBuilder, FormGroup, Validators, FormControl } from
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { JobConstants, AccountingConstants } from '@constants';
+import { JobConstants, AccountingConstants, RoutingConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { Partner, } from '@models';
+import { Partner, ReceiptModel, } from '@models';
 import { CatalogueRepo } from '@repositories';
 import { IAppState } from '@store';
 import { AppForm } from '@app';
@@ -16,6 +16,7 @@ import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-a
 import { ResetInvoiceList, SelectPartnerReceipt, SelectReceiptDate, SelectReceiptAgreement, SelectReceiptClass } from '../../store/actions';
 import { ReceiptPaymentMethodState, ReceiptTypeState } from '../../store/reducers';
 import { takeUntil } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'customer-payment-form-create-receipt',
@@ -39,6 +40,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     customers: Partner[] = [];
 
     agreements: IAgreementReceipt[];
+    receipt: ReceiptModel;
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldAgreement: CommonInterface.IComboGridDisplayField[] = [
@@ -67,28 +69,31 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         private readonly _store: Store<IAppState>,
         private readonly _catalogueRepo: CatalogueRepo,
         private readonly _toastService: ToastrService,
-
+        private readonly _router: Router,
     ) {
         super();
     }
     ngOnInit() {
         this.initForm();
 
-        this._store.select(ReceiptTypeState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (partnerGroup) => {
-                    if (!!partnerGroup) {
-                        this.partnerTypeState = partnerGroup;
-                        if (this.partnerTypeState.toUpperCase() === 'CUSTOMER') {
-                            this.isRequireAgreement = true;
-                        }else{
-                            this.getRequireAgreementAgent();
+        if (!this.receipt || (this.receipt?.status !== AccountingConstants.RECEIPT_STATUS.DRAFT || this.receipt?.status !== AccountingConstants.RECEIPT_STATUS.CANCEL)
+            || !this.receipt?.arcbno) {
+            this._store.select(ReceiptTypeState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (partnerGroup) => {
+                        if (!!partnerGroup) {
+                            this.partnerTypeState = partnerGroup;
+                            if (this.partnerTypeState.toUpperCase() === 'CUSTOMER') {
+                                this.isRequireAgreement = true;
+                            } else {
+                                this.getRequireAgreementAgent();
+                            }
                         }
+                        this.getCustomerAgent();
                     }
-                    this.getCustomerAgent();
-                }
-            )
+                )
+        }
     }
 
     getCustomerAgent() {
@@ -256,6 +261,13 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         this.isShowGetDebit = false;
     }
 
+    goToReceiptCombine(arcbNo: string) {
+        if (!this.receipt.arcbno) {
+            return;
+        }
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/combine/${arcbNo}`]);
+
+    }
 }
 
 export interface IAgreementReceipt {
@@ -269,7 +281,7 @@ export interface IAgreementReceipt {
     creditCurrency: string;
 }
 
-interface IQueryAgreementCriteria {
+export interface IQueryAgreementCriteria {
     partnerId: string;
     status: boolean;
 }

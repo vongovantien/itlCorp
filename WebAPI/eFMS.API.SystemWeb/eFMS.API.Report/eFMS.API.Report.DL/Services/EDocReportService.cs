@@ -57,7 +57,7 @@ namespace eFMS.API.Report.DL.Services
         {
             var dataShipment = GetDataGeneralReport(criteria);
             var listjob = dataShipment.GroupBy(x => x.JobNo).Select(x => x.FirstOrDefault().JobNo);
-            var lstOPS = listjob.Where(x => x.Contains("LOG") && !x.Contains("RLOG")).ToList();
+            var lstOPS = listjob.Where(x => (x.Contains("LOG")||x.Contains("TKI")) && !x.Contains("RLOG")).ToList();
             var lstCS = listjob.Where(x => !x.Contains("LOG")).ToList();
             var jobOps = opsRepository.Get(x => lstOPS.Contains(x.JobNo));
             var jobCs = tranRepository.Get(x => lstCS.Contains(x.JobNo));

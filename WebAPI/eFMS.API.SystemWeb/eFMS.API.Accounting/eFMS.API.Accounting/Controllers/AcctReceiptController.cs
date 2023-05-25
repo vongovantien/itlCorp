@@ -85,7 +85,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult GenerateReceiptNo(AcctReceiptModel receipt)
         {
-            string receiptNo = acctReceiptService.GenerateReceiptNoV2(receipt);
+            string receiptNo = acctReceiptService.GenerateReceiptNoV2(receipt, currentUser.OfficeCode);
 
             return Ok(new { receiptNo });
         }
@@ -108,6 +108,19 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetById(Guid id)
         {
             var detail = acctReceiptService.GetById(id);
+            return Ok(detail);
+        }
+
+        /// <summary>
+        /// Get detail receipt combine
+        /// </summary>
+        /// <param name="arcbNo"></param>
+        /// <returns></returns>
+        [HttpGet("GetByReceiptCombine")]
+        [Authorize]
+        public IActionResult GetByReceiptCombine(string arcbNo, string getType)
+        {
+            var detail = acctReceiptService.GetByReceiptCombine(arcbNo, getType);
             return Ok(detail);
         }
 
@@ -198,57 +211,69 @@ namespace eFMS.API.Accounting.Controllers
             }
             else
             {
-                string receiptNo = acctReceiptService.GenerateReceiptNoV2(receiptModel);
+                string receiptNo = acctReceiptService.GenerateReceiptNoV2(receiptModel, currentUser.OfficeCode);
                 receiptModel.PaymentRefNo = receiptNo;
+            }
+            var hsDuplicate = acctReceiptService.CheckExitedCombineReceipt(new List<AcctReceiptModel>() { receiptModel });
+            if (!hsDuplicate.Success)
+            {
+                return Ok(new ResultHandle { Status = false, Message = hsDuplicate.Message?.ToString() });
             }
             if (saveAction == SaveAction.SAVEDONE)
             {
-                if (receiptModel.Id == Guid.Empty && receiptModel.ReferenceId != null)
+                var hsCheckDone = CheckValidReciptSaveDone(new List<AcctReceiptModel>() { receiptModel });
+                if (hsCheckDone != null)
                 {
-                    bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId
-                    && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL
-                    && x.PaymentMethod == AccountingConstants.PAYMENT_METHOD_MANAGEMENT_FEE);
-                    if (isExisted == true)
-                    {
-                        string receiptNo = acctReceiptService.First(x => x.ReferenceId == receiptModel.ReferenceId).ReferenceNo;
-                        string mess = String.Format("This Receipt already had Bank Fee/ Other fee Receipt {0}", receiptNo);
-                        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
-                        return BadRequest(_result);
-                    }
+                    return BadRequest(hsCheckDone);
                 }
+                #region delete old
+                //if (receiptModel.Id == Guid.Empty && receiptModel.ReferenceId != null)
+                //{
+                //    bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId
+                //    && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL
+                //    && x.PaymentMethod == AccountingConstants.PAYMENT_METHOD_MANAGEMENT_FEE);
+                //    if (isExisted == true)
+                //    {
+                //        string receiptNo = acctReceiptService.First(x => x.ReferenceId == receiptModel.ReferenceId).ReferenceNo;
+                //        string mess = String.Format("This Receipt already had Bank Fee/ Other fee Receipt {0}", receiptNo);
+                //        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
+                //        return BadRequest(_result);
+                //    }
+                //}
 
-                if (receiptModel.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL)
-                {
-                    bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.PaidAmountVnd ?? 0, receiptModel.PaidAmountUsd ?? 0);
-                    if (!isValidCusAgreement)
-                    {
-                        string mess = String.Format("Your Clear Amount > The Current advance of Partner, Pls check it again!");
-                        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 407 };
-                        return BadRequest(_result);
-                    }
-                }
-                if ((receiptModel.CusAdvanceAmountVnd ?? 0) > 0 || (receiptModel.CusAdvanceAmountUsd ?? 0) > 0)
-                {
-                    bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.CusAdvanceAmountVnd ?? 0, receiptModel.CusAdvanceAmountUsd ?? 0);
-                    if (!isValidCusAgreement)
-                    {
-                        string mess = String.Format("Cus Advance Amount in Receipt > The current Advance of Partner , Please check it again!");
-                        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 408 };
-                        return BadRequest(_result);
-                    }
-                }
-                string ListPaymentMessageInvalid = ValidatePaymentList(receiptModel, receiptModel.Payments);
-                if (!string.IsNullOrWhiteSpace(ListPaymentMessageInvalid))
-                {
-                    ResultHandle _result = new ResultHandle { Status = false, Message = ListPaymentMessageInvalid, Data = receiptModel };
-                    return BadRequest(_result);
-                }
+                //if (receiptModel.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL)
+                //{
+                //    bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.PaidAmountVnd ?? 0, receiptModel.PaidAmountUsd ?? 0);
+                //    if (!isValidCusAgreement)
+                //    {
+                //        string mess = String.Format("Your Clear Amount > The Current advance of Partner, Pls check it again!");
+                //        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 407 };
+                //        return BadRequest(_result);
+                //    }
+                //}
+                //if ((receiptModel.CusAdvanceAmountVnd ?? 0) > 0 || (receiptModel.CusAdvanceAmountUsd ?? 0) > 0)
+                //{
+                //    bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.CusAdvanceAmountVnd ?? 0, receiptModel.CusAdvanceAmountUsd ?? 0);
+                //    if (!isValidCusAgreement)
+                //    {
+                //        string mess = String.Format("Cus Advance Amount in Receipt > The current Advance of Partner , Please check it again!");
+                //        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 408 };
+                //        return BadRequest(_result);
+                //    }
+                //}
+                //string ListPaymentMessageInvalid = ValidatePaymentList(receiptModel, receiptModel.Payments);
+                //if (!string.IsNullOrWhiteSpace(ListPaymentMessageInvalid))
+                //{
+                //    ResultHandle _result = new ResultHandle { Status = false, Message = ListPaymentMessageInvalid, Data = receiptModel };
+                //    return BadRequest(_result);
+                //}
 
-                string msgCheckPaidPayment = CheckInvoicePaid(receiptModel);
-                if (msgCheckPaidPayment.Length > 0)
-                {
-                    return BadRequest(new ResultHandle { Status = false, Message = msgCheckPaidPayment });
-                }
+                //string msgCheckPaidPayment = CheckInvoicePaid(receiptModel);
+                //if (msgCheckPaidPayment.Length > 0)
+                //{
+                //    return BadRequest(new ResultHandle { Status = false, Message = msgCheckPaidPayment });
+                //}
+                #endregion
             }
 
             HandleState hs = acctReceiptService.SaveReceipt(receiptModel, saveAction);
@@ -256,7 +281,7 @@ namespace eFMS.API.Accounting.Controllers
             ResultHandle result = new ResultHandle();
             string message = string.Empty;
             switch (saveAction)
-            {   
+            {
                 case SaveAction.SAVEDRAFT_ADD:
                 case SaveAction.SAVEBANK_ADD:
                     message = HandleError.GetMessage(hs, Crud.Insert);
@@ -286,7 +311,7 @@ namespace eFMS.API.Accounting.Controllers
                 Response.OnCompleted(async () =>
                 {
                     var modelReceivableList = acctReceiptService.GetListReceivableReceipt(receiptModel.Id);
-                    if(modelReceivableList.Count > 0)
+                    if (modelReceivableList.Count > 0)
                     {
                         await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
                     }
@@ -297,13 +322,38 @@ namespace eFMS.API.Accounting.Controllers
                     }
                     await CalculateOverDueAsync(new List<string>() { receiptModel.CustomerId });
                 });
+
+                if (receiptModel.PaymentMethod.ToLower().Contains("credit") && saveAction == SaveAction.SAVEDONE)
+                {
+                    var hsCredit = acctReceiptService.UpdateCreditARCombine(new List<AcctReceiptModel>() { receiptModel }, saveAction);
+                    if (!hsCredit.Success)
+                    {
+                        new LogHelper("eFMS_SaveReceipt_UpdateCreditARCombine_LOG", hsCredit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
+                    }
+                    hsCredit = acctReceiptService.AddPaymentsCreditCombine(new List<AcctReceiptModel>() { receiptModel }, saveAction);
+                    if (!hsCredit.Success)
+                    {
+                        new LogHelper("eFMS_SaveReceipt_AddPaymentsCreditCombine_LOG", hsCredit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
+                    }
+                }
             }
             if (saveAction == SaveAction.SAVEDRAFT_ADD || saveAction == SaveAction.SAVEDRAFT_UPDATE || saveAction == SaveAction.SAVEDONE)
             {
-                // Cập nhật cấn trừ debit
-                if (receiptModel.Type == "Agent")
+                // cập nhật bảng debit ar
+                bool isCalDebit = false;
+                if (!string.IsNullOrEmpty(receiptModel.Arcbno))
                 {
-                    var hsDebit = acctReceiptService.UpdateAccountingDebitAR(receiptModel.Payments, saveAction);
+                    isCalDebit = receiptModel.PaymentMethod.ToLower().Contains("debit");
+                }
+                else
+                {
+                    isCalDebit = true;
+                }
+
+                // Cập nhật cấn trừ debit
+                if (receiptModel.Type == "Agent" && isCalDebit)
+                {
+                    var hsDebit = acctReceiptService.UpdateAccountingDebitAR(receiptModel.Payments, receiptModel.Id, saveAction);
                     if (!hsDebit.Success)
                     {
                         new LogHelper("eFMS_SaveReceipt_UpdateDebitAR_LOG", hsDebit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
@@ -311,6 +361,199 @@ namespace eFMS.API.Accounting.Controllers
                 }
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// check receipt is valid when save done receipt
+        /// </summary>
+        /// <param name="receiptModels"></param>
+        /// <returns></returns>
+        private object CheckValidReciptSaveDone(List<AcctReceiptModel> receiptModels)
+        {
+            foreach (var receiptModel in receiptModels)
+            {
+                if (receiptModel.Id == Guid.Empty && receiptModel.ReferenceId != null)
+                {
+                    bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId
+                    && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL
+                    && x.PaymentMethod == AccountingConstants.PAYMENT_METHOD_MANAGEMENT_FEE);
+                    if (isExisted == true)
+                    {
+                        string receiptNo = acctReceiptService.First(x => x.ReferenceId == receiptModel.ReferenceId).ReferenceNo;
+                        string mess = String.Format("This Receipt already had Bank Fee/ Other fee Receipt {0}", receiptNo);
+                        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
+                        return (_result);
+                    }
+                }
+
+                if (receiptModel.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL)
+                {
+                    bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.PaidAmountVnd ?? 0, receiptModel.PaidAmountUsd ?? 0);
+                    if (!isValidCusAgreement)
+                    {
+                        string mess = String.Format("Your Clear Amount > The Current advance of Partner, Pls check it again!");
+                        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 407 };
+                        return (_result);
+                    }
+                }
+                if ((receiptModel.CusAdvanceAmountVnd ?? 0) > 0 || (receiptModel.CusAdvanceAmountUsd ?? 0) > 0)
+                {
+                    bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.CusAdvanceAmountVnd ?? 0, receiptModel.CusAdvanceAmountUsd ?? 0);
+                    if (!isValidCusAgreement)
+                    {
+                        string mess = String.Format("Cus Advance Amount in Receipt > The current Advance of Partner , Please check it again!");
+                        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 408 };
+                        return (_result);
+                    }
+                }
+                string ListPaymentMessageInvalid = ValidatePaymentList(receiptModel, receiptModel.Payments);
+                if (!string.IsNullOrWhiteSpace(ListPaymentMessageInvalid))
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = ListPaymentMessageInvalid, Data = receiptModel };
+                    return (_result);
+                }
+
+                string msgCheckPaidPayment = CheckInvoicePaid(receiptModel);
+                if (msgCheckPaidPayment.Length > 0)
+                {
+                    return (new ResultHandle { Status = false, Message = msgCheckPaidPayment });
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Save Combine Receipt
+        /// </summary>
+        /// <param name="receiptModels"></param>
+        /// <param name="saveAction">
+        /// 0 - Save Draft - Add
+        /// 1 - Save Draft - Update
+        /// 2 - Save Done
+        /// 3 - Save Cancel
+        /// </param>
+        /// <returns></returns>
+        [HttpPost("SaveCombineReceipt")]
+        [Authorize]
+        public IActionResult SaveCombineReceipt(List<AcctReceiptModel> receiptModels, SaveAction saveAction)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            receiptModels = receiptModels.Where(x => string.IsNullOrEmpty(x.Status) || x.Status == "Draft").ToList();
+            if (receiptModels.Count == 0)
+                return BadRequest(ModelState);
+
+            var _validReceiptNos = CheckValidReceiptNo(receiptModels.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).ToList());
+            if (_validReceiptNos != null)
+            {
+                return Ok(_validReceiptNos);
+            }
+            ResultHandle result = new ResultHandle();
+            var hsDuplicate = acctReceiptService.CheckExitedCombineReceipt(receiptModels);
+            if (!hsDuplicate.Success)
+            {
+                return Ok(new ResultHandle { Status = false, Message = hsDuplicate.Message?.ToString() });
+            }
+            if (saveAction == SaveAction.SAVEDONE)
+            {
+                var hsCheckDone = CheckValidReciptSaveDone(receiptModels);
+                if (hsCheckDone != null)
+                {
+                    return Ok(hsCheckDone);
+                }
+            }
+            var debitReceipts = receiptModels.Where(x => (string.IsNullOrEmpty(x.Status) || x.Status == "Draft") && x.PaymentMethod.ToLower().Contains("debit")).ToList();
+            var creditReceipts = receiptModels.Where(x => (string.IsNullOrEmpty(x.Status) || x.Status == "Draft") && x.PaymentMethod.ToLower().Contains("credit")).ToList();
+
+            HandleState hs = acctReceiptService.SaveCombineReceipt(receiptModels, saveAction);
+            
+            string message = string.Empty;
+            switch (saveAction)
+            {
+                case SaveAction.SAVEDRAFT_ADD:
+                case SaveAction.SAVEBANK_ADD:
+                    message = HandleError.GetMessage(hs, Crud.Insert);
+                    result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = receiptModels };
+                    break;
+                case SaveAction.SAVEDRAFT_UPDATE:
+                    message = HandleError.GetMessage(hs, Crud.Update);
+                    result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = receiptModels };
+                    break;
+                case SaveAction.SAVEDONE:
+                    result = new ResultHandle { Status = hs.Success, Message = hs.Success ? "Save Done Receipt Successful" : hs.Message.ToString(), Data = receiptModels };
+                    break;
+                case SaveAction.SAVECANCEL:
+                    result = new ResultHandle { Status = hs.Success, Message = hs.Success ? "Save Cancel Receipt Successful" : hs.Message.ToString(), Data = receiptModels };
+                    break;
+                default:
+                    result = new ResultHandle { Status = false, Message = "Save Receipt fail" };
+                    break;
+            }
+            
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            else if (saveAction == SaveAction.SAVECANCEL || saveAction == SaveAction.SAVEDONE)
+            {
+                Response.OnCompleted(async () =>
+                {
+                    foreach (var receiptModel in debitReceipts)
+                    {
+                        var modelReceivableList = acctReceiptService.GetListReceivableReceipt(receiptModel.Id);
+                        if (modelReceivableList.Count > 0)
+                        {
+                            await _busControl.SendAsync(RabbitExchange.EFMS_Accounting, RabbitConstants.CalculatingReceivableDataPartnerQueue, modelReceivableList);
+                        }
+                        await CalculateOverDueAsync(new List<string>() { receiptModel.CustomerId });
+                    }
+                });
+                if (receiptModels.Any(x => x.PaymentMethod.ToLower().Contains("credit")))
+                {
+                    var hsCredit = acctReceiptService.UpdateCreditARCombine(creditReceipts, saveAction);
+                    if (!hsCredit.Success)
+                    {
+                        new LogHelper("eFMS_SaveReceipt_UpdateCreditARCombine_LOG", hsCredit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(creditReceipts));
+                    }
+                    hsCredit = acctReceiptService.AddPaymentsCreditCombine(creditReceipts, saveAction);
+                    if (!hsCredit.Success)
+                    {
+                        new LogHelper("eFMS_SaveReceipt_AddPaymentsCreditCombine_LOG", hsCredit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(creditReceipts));
+                    }
+                }
+            }
+            if (saveAction == SaveAction.SAVEDRAFT_ADD || saveAction == SaveAction.SAVEDRAFT_UPDATE || saveAction == SaveAction.SAVEDONE)
+            {
+                // Cập nhật cấn trừ debit
+                foreach (var receiptModel in debitReceipts)
+                {
+                    var hsDebit = acctReceiptService.UpdateAccountingDebitAR(receiptModel.Payments, receiptModel.Id, saveAction);
+                    if (!hsDebit.Success)
+                    {
+                        new LogHelper("eFMS_SaveReceipt_UpdateDebitAR_LOG", hsDebit.Message?.ToString() + " - Data:" + JsonConvert.SerializeObject(receiptModel));
+                    }
+                }
+            }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="receiptNos"></param>
+        /// <returns></returns>
+        private object CheckValidReceiptNo(List<AcctReceiptModel> receiptNos)
+        {
+            foreach(var rcpNo in receiptNos)
+            {
+                if (!ValidateReceiptNo(rcpNo.Id, rcpNo.PaymentRefNo, rcpNo.PaymentDate))
+                {
+                    string mess = String.Format("Receipt {0} have existed", rcpNo.PaymentRefNo);
+                    var _result = new { Status = false, Message = mess, Data = rcpNo };
+                    return _result;
+                }
+            }
+            return null;
         }
 
         [HttpPut("SaveDoneReceipt")]
@@ -525,6 +768,18 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
         {
             var result = acctReceiptService.GetDataIssueAgencyPayment(criteria);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get Data Issued Agency Payment
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataIssueCreditAgency")]
+        public IActionResult GetDataIssueCreditAgency(CustomerDebitCreditCriteria criteria)
+        {
+            var result = acctReceiptService.GetDataIssueCreditAgency(criteria);
             return Ok(result);
         }
 

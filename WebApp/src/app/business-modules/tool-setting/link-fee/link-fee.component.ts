@@ -127,8 +127,8 @@ export class LinkFeeComponent extends AppList implements OnInit {
                 return 'Sea LCL Export';
             case 'SLI':
                 return 'Sea LCL Import';
-            case 'IT':
-                return 'Inland Trucking';
+            case 'TK':
+                return 'Trucking Inland';
             case 'SCE':
                 return 'Sea Consol Export';
             case 'SCI':

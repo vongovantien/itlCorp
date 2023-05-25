@@ -2,6 +2,7 @@
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +21,10 @@ namespace eFMS.API.Infrastructure.RabbitMQ
         {
             await Task.Run(() =>
             {
-                _channel.QueueDeclare(queue, true, false, false);
+                 _channel.QueueDeclare(queue, true, false, false,
+                    arguments: new Dictionary<string, object>{
+                        { "x-message-deduplication", true }       
+                });
 
                 var properties = _channel.CreateBasicProperties();
                 properties.Persistent = true;
@@ -35,7 +39,10 @@ namespace eFMS.API.Infrastructure.RabbitMQ
             await Task.Run(() =>
             {
                 _channel.ExchangeDeclare(exchange, "direct", true, false);
-                _channel.QueueDeclare(queue, true, false, false);
+                _channel.QueueDeclare(queue, true, false, false,
+                    arguments: new Dictionary<string, object>{
+                        { "x-message-deduplication", true }       
+                });
 
                 var properties = _channel.CreateBasicProperties();
                 properties.Persistent = true;

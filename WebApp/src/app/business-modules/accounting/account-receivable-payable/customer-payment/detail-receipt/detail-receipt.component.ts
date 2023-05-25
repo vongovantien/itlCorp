@@ -104,6 +104,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         };
 
         this.formCreate.formSearchInvoice.patchValue(this.utility.mergeObject({ ...res }, formMapping));
+        this.formCreate.receipt = res;
         this.formCreate.customerName = res.customerName;
         this.formCreate.receiptReference = res.referenceNo;
         // this.formCreate.contractNo = res.contractNo;
@@ -130,7 +131,11 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         (this.listInvoice.partnerId as any) = { id: res.customerId };
         this.listInvoice.obhPartnerName = res.obhPartnerName;
 
-        if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
+        if(!!res.arcbno){
+            this.listInvoice.isCombineReceipt = true;
+        }
+
+        if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL || !!res.arcbno) {
             this.listInvoice.isReadonly = true;
             this.formCreate.isReadonly = true;
         }

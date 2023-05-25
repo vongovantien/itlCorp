@@ -86,6 +86,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     selectedCs: CsShipmentSurcharge;
     messageConfirmRevertLinkFee: string = "Do you want to Revert these Fees?";
     noProfit: boolean | any = false;
+    transactionType: string;
 
     constructor(
         protected _catalogueRepo: CatalogueRepo,
@@ -107,11 +108,14 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         this.getSurcharge();
 
+
         this._activedRoute.data
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (dataParam: CommonInterface.IDataParam) => {
-                    this.serviceTypeId = dataParam.serviceId;
+                    this.serviceTypeId = dataParam.serviceId === 'CL' ? dataParam?.transactionType === 'TK' ? 'TK' : 'CL' : dataParam.serviceId;
+                    console.log(dataParam);
+                    this.transactionType = dataParam.transactionType;
                 }
             );
 
@@ -240,7 +244,6 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (partners: Partner[]) => {
                     this.listPartner = partners;
                     this._cd.markForCheck();
-
                 }
             );
 
@@ -264,6 +267,17 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     this.containers = containers;
                 }
             );
+    }
+
+    getTranType() {
+        if (this.service === 'logistic') {
+            if (this.transactionType === 'TK') {
+                return 'TK';
+            }
+            return 'CL';
+        } else {
+            return 'DOC';
+        }
     }
 
     getShipmentDetail() {
@@ -676,49 +690,49 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.chargeWeight;
                 } else {
-                    data = this.serviceTypeId === 'CL' ? this.shipment.chargeWeight : (this.hbl.chargeWeight || this.hbl.cw);
+                    data = this.serviceTypeId === 'CL' || this.serviceTypeId === 'TK' ? this.shipment.chargeWeight : (this.hbl.chargeWeight || this.hbl.cw);
                 }
                 break;
             case 'gw':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.grossWeight;
                 } else {
-                    data = this.serviceTypeId === 'CL' ? this.shipment.grossWeight : (this.hbl.grossWeight || this.hbl.gw);
+                    data = this.serviceTypeId === 'CL' || this.serviceTypeId === 'TK' ? this.shipment.grossWeight : (this.hbl.grossWeight || this.hbl.gw);
                 }
                 break;
             case 'nw':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.netWeight;
                 } else {
-                    data = this.serviceTypeId === 'CL' ? this.shipment.netWeight : this.hbl.netWeight;
+                    data = this.serviceTypeId === 'CL' || this.serviceTypeId === 'TK' ? this.shipment.netWeight : this.hbl.netWeight;
                 }
                 break;
             case 'cbm':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.cbm;
                 } else {
-                    data = this.serviceTypeId === 'CL' ? this.shipment.cbm : this.hbl.cbm;
+                    data = this.serviceTypeId === 'CL' || this.serviceTypeId === 'TK' ? this.shipment.cbm : this.hbl.cbm;
                 }
                 break;
             case 'packageQuantity':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.packageQty;
                 } else {
-                    data = this.serviceTypeId === 'CL' ? this.shipment.packageQty : this.hbl.packageQty;
+                    data = this.serviceTypeId === 'CL' || this.serviceTypeId === 'TK' ? this.shipment.packageQty : this.hbl.packageQty;
                 }
                 break;
             case 'quantity':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.chargeWeight;
                 } else {
-                    data = this.serviceTypeId === 'CL' ? this.shipment.chargeWeight : this.hbl.chargeWeight;
+                    data = this.serviceTypeId === 'CL' || this.serviceTypeId === 'TK' ? this.shipment.chargeWeight : this.hbl.chargeWeight;
                 }
                 break;
             case 'gw':
                 if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                     data = this.shipment.grossWeight;
                 } else {
-                    data = this.serviceTypeId === 'CL' ? this.shipment.grossWeight : this.hbl.grossWeight;
+                    data = this.serviceTypeId === 'CL' || this.serviceTypeId === 'TK' ? this.shipment.grossWeight : this.hbl.grossWeight;
                 }
                 break;
             default:
@@ -733,7 +747,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             if (chargeItem.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
                 this._toastService.clear();
 
-                const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
+                const transactionType: string = this.service === 'logistic' ? this.transactionType === 'TK' ? 'TK' : 'CL' : 'DOC';
                 this._documentRepo.validateCheckPointContractPartner({
                     partnerId: partnerData.id,
                     transactionType: transactionType,
@@ -820,7 +834,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         switch (partnerType.value) {
             case CommonEnum.PartnerGroupEnum.CUSTOMER:
-                const transactionType: string = this.service === 'logistic' ? 'CL' : 'DOC';
+                const transactionType: string = this.service === 'logistic' ? this.transactionType === 'TK' ? 'TK' : 'CL' : 'DOC';
                 if (chargeItem.type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
                     this._documentRepo.validateCheckPointContractPartner({
                         partnerId: this.hbl.customerId,
@@ -981,8 +995,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         const criteria: IStandardChargeCriteria = {
             type: this.TYPE,
             transactionType: this.serviceTypeId,
-            service: this.serviceTypeId === 'CL' ? this.shipment.productService : null,
-            serviceType: this.serviceTypeId === 'CL' ? this.shipment.serviceMode : null,
+            service: this.serviceTypeId === 'CL' || this.serviceTypeId === 'TK' ? this.shipment.productService : null,
+            serviceType: this.serviceTypeId === 'CL' || this.serviceTypeId === 'TK' ? this.shipment.serviceMode : null,
         }
         this._catalogueRepo.getStandChargeByType(criteria)
             .pipe(catchError(this.catchError))
@@ -1065,6 +1079,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
 
         switch (serviceTypeId) {
             case ChargeConstants.CL_CODE:
+            case ChargeConstants.TK_CODE:
                 shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
                     c = this.updatePayer(c, customerPayer);
                 });
@@ -1271,7 +1286,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         const body: IRecentlyCharge = {
             hblId: this.hbl.id,
             jobId: this.shipment.id,
-            transactionType: this.utility.getTransationType(this.shipment.transactionType ?? 'CL'),  // ! OpsTransaion do not have TransationType
+            transactionType: this.utility.getTransationType(this.shipment.transactionType ?? this.transactionType === 'TK' ? 'TK' : 'CL'),  // ! OpsTransaion do not have TransationType
             coloaderId: this.shipment.coloaderId,
             agentId: this.shipment.agentId,
             chargeType: this.TYPE,
@@ -1347,14 +1362,14 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getRecentlyCharge() {
-        if (!this.shipment.transactionType) {
+        if (!this.shipment.transactionType || this.shipment.transactionType === 'TK') {
             this.getRecentlyChargeOps();
         }
         else {
             const body: IRecentlyCharge = {
                 hblId: this.hbl.id,
                 jobId: this.shipment.id,
-                transactionType: this.utility.getTransationType(this.shipment.transactionType ?? 'CL'),  // ! OpsTransaion do not have TransationType
+                transactionType: this.utility.getTransationType(this.shipment.transactionType ?? this.transactionType === 'TK' ? 'TK' : 'CL'),  // ! OpsTransaion do not have TransationType
                 coloaderId: this.shipment.coloaderId,
                 agentId: this.shipment.agentId,
                 chargeType: this.TYPE,

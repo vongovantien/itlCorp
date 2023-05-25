@@ -30,15 +30,28 @@ const routing: Routes = [
             {
                 path: "new",
                 component: JobManagementCreateJobComponent,
-                data: { name: "New", }
+                data: { name: "New", transactionType: null }
             },
             {
-                path: 'import-charge', component: JobManagementChargeImportComponent, data: { name: "Import Logistics Charge" }
+                path: "new-trucking-inland",
+                component: JobManagementCreateJobComponent,
+                data: { name: "New", transationType: 'TK' }
+            },
+            {
+                path: 'import-charge', component: JobManagementChargeImportComponent, data: { name: "Import Logistics Charge", transactionType: null }
+            },
+            {
+                path: 'import-charge-trucking-inland', component: JobManagementChargeImportComponent, data: { name: "Import Trucking Inland Charge", transactionType: 'TK' }
             },
             {
                 path: "job-edit",
                 loadChildren: () => import('./../job-edit/job-edit.module').then(m => m.JobEditModule),
-                data: { name: 'Detail Job', tabSurcharge: 'BUY', allowLinkFee: true }
+                data: { name: 'Detail Job', tabSurcharge: 'BUY', allowLinkFee: true, transactionType: null }
+            },
+            {
+                path: "trucking-inland-edit",
+                loadChildren: () => import('./../job-edit/job-edit.module').then(m => m.JobEditModule),
+                data: { name: 'Detail Job', tabSurcharge: 'BUY', allowLinkFee: true, transactionType: 'TK' }
             },
             {
                 path: "job-edit-link-fee",

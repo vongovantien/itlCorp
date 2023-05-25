@@ -61,7 +61,7 @@
     <div class="menu-context__item" (click)="downloadAllEdoc()">
         <span><i class="la la-cloud align-middle text-primary"></i>Download all items</span>
     </div>
-    <div class="menu-context__item {{(selectedEdoc?.userCreated === currentUser.userName && !readonly) === false ? 'disabled':''}}"
+    <div class="menu-context__item {{(currentUser.userType==='Super Admin'||selectedEdoc?.userCreated === currentUser.userName && !readonly) === false ? 'disabled':''}}"
         (click)="confirmDelete()">
         <span><i class="la la-trash align-middle text-danger"></i>Delete</span>
     </div>

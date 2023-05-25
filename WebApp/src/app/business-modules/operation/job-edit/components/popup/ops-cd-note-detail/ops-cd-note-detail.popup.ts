@@ -18,6 +18,8 @@ import { of } from 'rxjs';
 import { HttpResponse } from '@angular/common/http';
 import { Crystal } from '@models';
 import { clearScreenDown } from 'readline';
+import { getOperationTransationDetail } from 'src/app/business-modules/operation/store';
+import { TransactionTypeEnum } from '@enums';
 @Component({
     selector: 'ops-cd-note-detail',
     templateUrl: './ops-cd-note-detail.popup.html'
@@ -39,6 +41,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     totalDebit: string = '';
     totalAdjustVND: string = '';
     balanceAmount: string = '';
+    transactionType: TransactionTypeEnum;
 
     paymentMethodSelected: string = '';
 
@@ -71,6 +74,25 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             { title: 'Exc Rate', field: 'exchangeRate', sortable: true },
             { title: 'Synced From', field: 'syncedFromBy', sortable: true }
         ];
+        this.getTransactionType();
+    }
+
+    getTransactionType() {
+        this._store.select(getOperationTransationDetail)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        console.log(res);
+
+                        if (res.transactionType === 'TK') {
+                            this.transactionType = TransactionTypeEnum.TruckingInland;
+                        } else {
+                            this.transactionType = TransactionTypeEnum.CustomLogistic;
+                        }
+                    }
+                }
+            );
     }
 
     getDetailCdNote(jobId: string, cdNote: string) {
@@ -243,7 +265,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
                             objectId: this.jobId,
                             hblId: this.CdNoteDetail.listSurcharges[0].hblid,
                             templateCode: templateCode,
-                            transactionType: 'CL'
+                            transactionType: this.transactionType === TransactionTypeEnum.TruckingInland ? 'TK' : 'CL'
                         };
                         return this._fileMngtRepo.uploadPreviewTemplateEdoc([body]);
                     }
@@ -277,7 +299,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
                 partnerId: this.CdNoteDetail.partnerId,
                 hblId: this.CdNoteDetail.listSurcharges[0].hblid,
-                transactionType: 'CL',
+                transactionType: this.transactionType === TransactionTypeEnum.TruckingInland ? 'TK' : 'CL',
                 type: 3
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {
@@ -313,7 +335,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
                 partnerId: this.CdNoteDetail.partnerId,
                 hblId: this.CdNoteDetail.listSurcharges[0].hblid,
-                transactionType: 'CL',
+                transactionType: this.transactionType === TransactionTypeEnum.TruckingInland ? 'TK' : 'CL',
                 type: 3
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {
@@ -436,7 +458,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
                 partnerId: this.CdNoteDetail.partnerId,
                 hblId: this.CdNoteDetail.listSurcharges[0].hblid,
-                transactionType: 'CL',
+                transactionType: this.transactionType === TransactionTypeEnum.TruckingInland ? 'TK' : 'CL',
                 type: 3
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {
@@ -474,7 +496,7 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
     onSaveAdjustDebit() {
         this.getDetailCdNote(this.jobId, this.cdNote)
     }
-    exportItem(jobId: string, cdNote:string, format: string) {
+    exportItem(jobId: string, cdNote: string, format: string) {
         let url: string;
         let _format = 0;
         switch (format) {
@@ -496,21 +518,21 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             sourcePreview$ = this._documentationRepo.validateCheckPointContractPartner({
                 partnerId: this.CdNoteDetail.partnerId,
                 hblId: this.CdNoteDetail.listSurcharges[0].hblid,
-                transactionType: 'CL',
+                transactionType: this.transactionType === TransactionTypeEnum.TruckingInland ? 'TK' : 'CL',
                 type: 3
             }).pipe(
                 switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
                         return this._documentationRepo.getDetailsCDNote(jobId, cdNote)
-                                .pipe(
-                                    switchMap(() => {
-                                        return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
-                                    }),
-                                    concatMap((x) => {
-                                        url = x.pathReportGenerate;
-                                        return this._exportRepo.exportCrystalReportPDF(x);
-                                    }), takeUntil(this.ngUnsubscribe)
-                                )
+                            .pipe(
+                                switchMap(() => {
+                                    return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                                }),
+                                concatMap((x) => {
+                                    url = x.pathReportGenerate;
+                                    return this._exportRepo.exportCrystalReportPDF(x);
+                                }), takeUntil(this.ngUnsubscribe)
+                            )
                     }
                     this._toastService.warning(res.message);
                     return of(false);
@@ -518,29 +540,28 @@ export class OpsCdNoteDetailPopupComponent extends PopupBase {
             )
         } else {
             sourcePreview$ = this._documentationRepo.getDetailsCDNote(jobId, cdNote)
-            .pipe(
-                switchMap(() => {
-                    return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
-                }),
-                concatMap((x) => {
-                    url = x.pathReportGenerate;
-                    return this._exportRepo.exportCrystalReportPDF(x);
-                }), takeUntil(this.ngUnsubscribe))
-                
+                .pipe(
+                    switchMap(() => {
+                        return this._documentationRepo.previewOPSCdNote({ jobId: jobId, creditDebitNo: cdNote, currency: 'VND', exportFormatType: _format });
+                    }),
+                    concatMap((x) => {
+                        url = x.pathReportGenerate;
+                        return this._exportRepo.exportCrystalReportPDF(x);
+                    }), takeUntil(this.ngUnsubscribe))
+
         }
         sourcePreview$.subscribe(
             (res: any) => {
 
             },
             (error) => {
-                if(error.status === 200)
-                {
+                if (error.status === 200) {
                     this._exportRepo.downloadExport(url);
                 }
             },
             () => {
                 console.log(url);
             }
-        );  
+        );
     }
 }

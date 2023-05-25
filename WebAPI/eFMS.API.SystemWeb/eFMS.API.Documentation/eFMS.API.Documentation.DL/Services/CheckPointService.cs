@@ -215,7 +215,7 @@ namespace eFMS.API.Documentation.DL.Services
             return valid;
         }
 
-        private bool ValidateCheckPointPrepaidContractChangePartnerOrSalesman(Guid HblId, string partnerId, string transactionType)
+        private bool ValidateCheckPointPrepaidContractChangePartnerOrSalesman(Guid HblId)
         {
             bool valid = true;
             var surcharges = csSurchargeRepository.Get(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.Hblid == HblId);
@@ -228,6 +228,26 @@ namespace eFMS.API.Documentation.DL.Services
             if (hasIssuedDebit)
             {
                 return false;
+            }
+
+            return valid;
+        }
+
+        private bool ValidateCheckPointPrepaidContractOverDueDebit(string partnerId)
+        {
+            bool valid = true;
+            var debitNeedConfirms = DC.AcctCdnote.Where(x => x.PartnerId == partnerId 
+            && (x.Type == DocumentConstants.CDNOTE_TYPE_DEBIT || x.Type == DocumentConstants.CDNOTE_TYPE_INVOICE)
+            && x.Status == DocumentConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID).ToList();
+            if (debitNeedConfirms.Count() > 0)
+            {
+                // check if debitNeedConfirms's issue date > current date within 3 days.
+                var currentDate = DateTime.Now;
+                var debitOverDue = debitNeedConfirms.Any(x => x.DatetimeCreated.Value.Date.AddDays(3) < currentDate.Date);
+                if (debitOverDue)
+                {
+                    valid = false;
+                }
             }
 
             return valid;
@@ -352,7 +372,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                 {
-                    if (criteria.TransactionType == "CL")
+                    if (criteria.TransactionType == "CL"||criteria.TransactionType=="TK")
                     {
                         var ops = opsTransactionRepository.First(x => x.Hblid == criteria.HblId);
                         currentSaleman = ops.SalemanId;
@@ -388,13 +408,12 @@ namespace eFMS.API.Documentation.DL.Services
                         if (currentPartner != criteria.PartnerId || currentSaleman != criteria.SalesmanId)
                         {
                             // không cho đổi customer nếu đang là prepaid nếu đã issue debit/ inv
-                            isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId, currentPartner, criteria.TransactionType);
+                            isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId);
                             if (!isValid)
                             {
                                 return new HandleState((object)string.Format(@"Contract of {0} is Prepaid has issued debit/invoice. Cannot change to another customer or salesman",
                                 partner?.ShortName));
-                            }
-
+                            } 
                         }
                         currentSaleman = criteria.SalesmanId;
                         currentPartner = criteria.PartnerId;
@@ -408,15 +427,19 @@ namespace eFMS.API.Documentation.DL.Services
                             currentPartner = criteria.PartnerId;
                             var contractNext = GetContractByPartnerId(currentPartner, currentSaleman);
                             partner = catPartnerRepository.First(x => x.Id == currentPartner);
-                            if (contractNext.ContractType == "Prepaid")
+                            if (contractNext.ContractType == "Prepaid") // check hợp đồng sẽ đổi
                             {
-                                isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId, currentPartner, criteria.TransactionType);
+                                isValid = ValidateCheckPointPrepaidContractChangePartnerOrSalesman(criteria.HblId);
                                 if (!isValid)
                                 {
                                     return new HandleState((object)string.Format(@"Cannot change to Prepaid Contract with HBL has issued debit/invoice",
                                     partner?.ShortName));
                                 }
-                                else
+                                else if(contractNext.IsOverDuePrepaid == true)
+                                {
+                                    return new HandleState((object)string.Format(@"Cannot change to Prepaid Contract with HBL has overdue prepaid",
+                                                                           partner?.ShortName));
+                                }
                                 {
                                     isValid = true;
                                     return result;
@@ -427,7 +450,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (criteria.TransactionType == "CL")
+                    if (criteria.TransactionType == "CL"|| criteria.TransactionType=="TK")
                     {
                         currentSaleman = opsTransactionRepository.First(x => x.Hblid == criteria.HblId)?.SalemanId;
                     }
@@ -560,7 +583,7 @@ namespace eFMS.API.Documentation.DL.Services
                             if (contract.IsExpired == true)
                             {
                                 // check shipment service date between contract effective date and expired date
-                                if (criteria.TransactionType == "CL")
+                                if (criteria.TransactionType == "CL" || criteria.TransactionType == "TK")
                                 {
                                     var shipment = opsTransactionRepository.First(x => x.Hblid == criteria.HblId);
                                     if (shipment != null)
@@ -608,15 +631,35 @@ namespace eFMS.API.Documentation.DL.Services
                     else isValid = true;
                     break;
                 case "Prepaid":
+                    if (checkPointType == CHECK_POINT_TYPE.DEBIT_NOTE)
+                    {
+                        isValid = true;
+                        break;
+                    }
+                    int errorCodePrepaid = 0;
                     if (checkPointType == CHECK_POINT_TYPE.PREVIEW_HBL || checkPointType == CHECK_POINT_TYPE.UPDATE_HBL)
                     {
                         isValid = ValidateCheckPointPrepaidContractPartner(criteria.HblId, criteria.PartnerId, criteria.TransactionType);
+                        if (!isValid)
+                        {
+                            errorCode = 5;
+                            break;
+                        }
                     }
+                    if (IsSettingFlowApplyContract(contract.ContractType, currentUser.OfficeID, partner.PartnerType, "overdue"))
+                    {
+                        if (contract.IsOverDuePrepaid == true)
+                        {
+                            isValid = false;
+                            errorCodePrepaid = 7;
+                        }
+                        else isValid = true;
+                    }                    
                     else
                     {
                         isValid = true;
                     }
-                    if (!isValid) errorCode = 5;
+                    if (!isValid) errorCode = errorCodePrepaid;
 
                     break;
                 default:
@@ -651,6 +694,10 @@ namespace eFMS.API.Documentation.DL.Services
                         break;
                     case 6:
                         messError = string.Format(@"{0} - {1} {2} agreement of {3} have Over Due OBH, please check it again!",
+                  partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
+                        break;
+                    case 7:
+                        messError = string.Format(@"{0} - {1} {2} agreement of {3} have Over Due payment Prepaid, please check it again!",
                   partner?.TaxCode, partner?.ShortName, contract.ContractType, saleman.Username);
                         break;
                     default:
@@ -724,6 +771,7 @@ namespace eFMS.API.Documentation.DL.Services
                 case "Trial":
                 case "Official":
                 case "Guarantee":
+                case "Prepaid":
                     IsApplySetting = IsApplySettingFlowContractTrialOfficial(settingFlow, partnerType, typeCheckPoint);
                     break;
                 default:
@@ -1044,7 +1092,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 error = 1;
             }
-            else if (customerContract.IsOverDue == true && IsSettingFlowApplyContract(customerContract.ContractType, currentUser.OfficeID, customer.PartnerType, "overdue"))
+            else if ((customerContract.IsOverDue == true || customerContract.IsOverDuePrepaid == true) 
+                && IsSettingFlowApplyContract(customerContract.ContractType, currentUser.OfficeID, customer.PartnerType, "overdue"))
             {
                 error = 2;
             }

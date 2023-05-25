@@ -18,7 +18,7 @@ namespace eFMS.API.SystemFileManagement.DL.IService
         Task<HandleState> MappingeDocToShipment(Guid imageId, string billingId, string billingType);
         Task<HandleState> UpdateEDoc(SysImageDetailModel edocUpdate);
         Task<HandleState> PostFileAttacheDoc(FileUploadModel model);
-        Task<string> PostAttachFileTemplateToEDoc(FileUploadModel model);
+        Task<string> PostAttachFileTemplateToEDoc(FileUploadAttachTemplateModel model);
         Task<HandleState> AttachPreviewTemplate(List<EDocAttachPreviewTemplateUploadModel> models);
         Task<HandleState> OpenFile(Guid Id);
         Task<HandleState> CreateEDocZip(FileDowloadZipModel model);

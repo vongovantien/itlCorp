@@ -1,4 +1,6 @@
-﻿namespace eFMS.API.Documentation.DL.Common
+﻿
+namespace eFMS.API.Documentation.DL.Common
+
 {
     public static class DocumentConstants
     {
@@ -18,7 +20,7 @@
         public static readonly string SEND_DO_CODE = "S_DO";
         public static readonly string SEND_AL_CODE = "S_AL";
         public static readonly string SEND_HB_CODE = "S_HB";
-
+        public static readonly string SEND_INV_CODE = "S_INV";
 
         //tracking constants
         public const string IN_TRANSIT = "IN TRANSIT";
@@ -36,6 +38,7 @@
         public const string SEND_AN = "SEND_AN";
         public const string SEND_DO = "SEND_DO";
         public const string SEND_HB = "SEND_HB";
+        public const string SEND_INV = "SEND_INV";
 
         //container constants
         public static readonly string NO_CONTAINER = "No cont";
@@ -49,11 +52,12 @@
         public static readonly string SIC_SHIPMENT = "SIC"; //Sea Consol Import
         public static readonly string AE_SHIPMENT = "AE"; //Sea Air Export
         public static readonly string AI_SHIPMENT = "AI"; //Sea Air Import
-        public static readonly string IT_SHIPMENT = "IT"; //Inland Trucking
+        public static readonly string TK_SHIPMENT = "TK"; //Inland Trucking
 
 
         public static readonly string SEF_HBL = "HBL";
         public static readonly string OPS_SHIPMENT = "LOG";
+        public static readonly string TKI_SHIPMENT = "TKI";
         public static readonly string CLEARANCE_FROM_EFMS = "eFMS";
         public static readonly string CLEARANCE_FROM_REPLICATE = "Replicate";
         public static readonly string NON_CARRIER_PARTNER_CODE = "NONCARRIER";

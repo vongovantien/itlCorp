@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using static eFMS.API.Common.Helpers.FileHelper;
 using static System.Net.Mime.MediaTypeNames;
@@ -149,7 +150,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             edocUploadMapModel.EDocFilesMap = lstDocMap;
             return edocUploadMapModel;
         }
-
         public async Task<HandleState> PostEDocAsync(EDocUploadModel model, List<IFormFile> files, string type)
         {
             HandleState result = new HandleState();
@@ -226,7 +226,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                                 Source = model.FolderName,
                                 Note = edoc.Note
                             };
-
                             listDetail.Add(sysImageDetail);
                             listRepDetail.Add(sysImageDetail);
                             var imageDetailClone = sysImageDetail;
@@ -1226,14 +1225,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         var grpJobsAdv = advRquest.GroupBy(x => x.JobId).Select(x => x.Key).ToList();
                         foreach (var item in grpJobsAdv)
                         {
-                            if (item.Contains("LOG"))
+                            if (item.Contains("LOG") || item.Contains("TKI"))
                             {
                                 var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (opsJob != null)
                                 {
-                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "AD", HBLId = opsJob.Hblid });
+                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = item.Contains("TKI")?"TK": "CL", BillingNo = bilingNo, Code = "AD", HBLId = opsJob.Hblid });
                                 }
-                            }
+                            } 
                             else
                             {
                                 var csJob = DC.CsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
@@ -1250,12 +1249,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     var grpJobsSm = DC.CsShipmentSurcharge.Where(x => x.SettlementCode == bilingNo).GroupBy(x => new { x.JobNo }).Select(x => new { x.FirstOrDefault().JobNo, x.FirstOrDefault().Hblid });
                     foreach (var item in grpJobsSm)
                     {
-                        if (item.JobNo.Contains("LOG"))
+                        if (item.JobNo.Contains("LOG")|| item.JobNo.Contains("TKI"))
                         {
                             var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item.JobNo);
                             if (opsJob != null)
                             {
-                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SM", HBLId = null });
+                                transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = item.JobNo.Contains("TKI")?"TK": "CL", BillingNo = bilingNo, Code = "SM", HBLId = null });
                             }
                         }
                         else
@@ -1287,12 +1286,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         var grpJobsSOA = surchargeSoa.GroupBy(x => x.JobNo).Select(x => x.Key);
                         foreach (var item in grpJobsSOA)
                         {
-                            if (item.Contains("LOG"))
+                            if (item.Contains("LOG") || item.Contains("TKI"))
                             {
                                 var opsJob = DC.OpsTransaction.Where(x => x.CurrentStatus != "Canceled").FirstOrDefault(x => x.JobNo == item);
                                 if (opsJob != null)
                                 {
-                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = "CL", BillingNo = bilingNo, Code = "SOA" });
+                                    transctionTypeJobModels.Add(new TransctionTypeJobModel { JobId = opsJob.Id, TransactionType = item.Contains("TKI")?"TK": "CL", BillingNo = bilingNo, Code = "SOA" });
                                 }
                             }
                             else
@@ -1346,7 +1345,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 {
                     haveADV = true;
                 }
-            }
+             }
             var models = GetTransactionTypeJobBillingModel(billingType, billingId);
             var listAccountantTypes = new List<string> {
                 SystemFileManagementConstants.ATTACH_TEMPLATE_ACCOUNTING_TYPE_ADVANCE,
@@ -1385,7 +1384,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         Hblid = billingType == "Shipment" ? Guid.Parse(billingId) : Guid.Empty,
                     };
 
-                    await _sysImageDetailRepo.AddAsync(imageDetail, false);
+                    await _sysImageDetailRepo.AddAsync(imageDetail);
                 }
 
                 result = _sysImageDetailRepo.SubmitChanges();
@@ -1394,7 +1393,8 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         }
         private IQueryable<SysAttachFileTemplate> GetDocumentTypeWithTypeAttachTemplate(string type, string transactionType, string code, string accountingType, bool haveEdoc)
         {
-            Expression<Func<SysAttachFileTemplate, bool>> queryAttachTemplate = x => x.Type == type && x.TransactionType == transactionType;
+            var tranType=transactionType=="TK"||transactionType=="CL"?"CL":transactionType;
+            Expression<Func<SysAttachFileTemplate, bool>> queryAttachTemplate = x => x.Type == type && x.TransactionType == tranType;
             if (!string.IsNullOrEmpty(code))
             {
                 queryAttachTemplate = queryAttachTemplate.And(x => x.Code == code);
@@ -1419,45 +1419,47 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         {
             var urlImage = "";
             List<SysImage> list = new List<SysImage>();
-            foreach (var file in model.Files)
-            {
-                string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
-                var key = "";
-
-                string extension = Path.GetExtension(file.FileName);
-                key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
-
-                var putRequest = new PutObjectRequest()
+            if(model.Files != null){
+                foreach (var file in model.Files)
                 {
-                    BucketName = _bucketName,
-                    Key = key,
-                    InputStream = file.OpenReadStream(),
-                };
+                    string fileName = FileHelper.RenameFileS3(Path.GetFileNameWithoutExtension(FileHelper.BeforeExtention(file.FileName)));
+                    var key = "";
 
-                PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
-                if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
-                {
-                    urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
-                    if (extension == ".doc")
+                    string extension = Path.GetExtension(file.FileName);
+                    key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+
+                    var putRequest = new PutObjectRequest()
                     {
-                        urlImage = _domainTest + "/DownloadFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
-                    }
-                    var sysImage = new SysImage
-                    {
-                        Id = Guid.NewGuid(),
-                        Url = urlImage,
-                        Name = fileName + extension,
-                        Folder = model.FolderName,
-                        ObjectId = model.Id.ToString(),
-                        UserCreated = currentUser.UserName,
-                        UserModified = currentUser.UserName,
-                        DateTimeCreated = DateTime.Now,
-                        DatetimeModified = DateTime.Now,
-                        ChildId = model.Child,
-                        KeyS3 = key,
-                        SyncStatus = isSync == true ? "Synced" : ""
+                        BucketName = _bucketName,
+                        Key = key,
+                        InputStream = file.OpenReadStream(),
                     };
-                    list.Add(sysImage);
+
+                    PutObjectResponse putObjectResponse = await _client.PutObjectAsync(putRequest);
+                    if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                        if (extension == ".doc")
+                        {
+                            urlImage = _domainTest + "/DownloadFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                        }
+                        var sysImage = new SysImage
+                        {
+                            Id = Guid.NewGuid(),
+                            Url = urlImage,
+                            Name = fileName + extension,
+                            Folder = model.FolderName,
+                            ObjectId = model.Id.ToString(),
+                            UserCreated = !string.IsNullOrEmpty(model.UserCreated) ?model.UserCreated: "",
+                            UserModified = !string.IsNullOrEmpty(model.UserCreated) ? model.UserCreated : "",
+                            DateTimeCreated = DateTime.Now,
+                            DatetimeModified = DateTime.Now,
+                            ChildId = model.Child,
+                            KeyS3 = key,
+                            SyncStatus = isSync == true ? "Synced" : ""
+                        };
+                        list.Add(sysImage);
+                    }
                 }
             }
 
@@ -1488,8 +1490,20 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return null;
             }
         }
-        public async Task<string> PostAttachFileTemplateToEDoc(FileUploadModel model)
+        public async Task<string> PostAttachFileTemplateToEDoc(FileUploadAttachTemplateModel req)
         {
+            var stream = new MemoryStream(req.File.FileContent);
+            var fFile = new FormFile(stream, 0, stream.Length, null, req.File.FileName);
+            var fFiles = new List<IFormFile>() { fFile };
+            var model = new FileUploadModel
+        {
+                Child = null,
+                Files = fFiles,
+                FolderName = req.FolderName,
+                ModuleName = req.ModuleName,
+                Id = req.Id,
+                UserCreated=req.UserCreated
+            };
             var urlImage = "";
             List<SysImage> imageList = await UpLoadS3(model, true);
             urlImage = imageList.FirstOrDefault()?.Url;
@@ -2063,7 +2077,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
         private Guid getJobId(string jobNo, string trantype)
         {
-            if (trantype == "CL")
+            if (trantype == "CL"|| trantype == "TK")
             {
                 var ops = _opsTranRepo.Get(x => x.JobNo == jobNo);
                 return ops.FirstOrDefault().Id;
@@ -2166,13 +2180,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     break;
                 default: return null;
             }
+            var result = _sysImageDetailRepo.Get(x=> images.Contains((Guid)x.SysImageId)).GroupBy(x => x.SysImageId).Select(x => x.FirstOrDefault()).ToList();
             return _sysImageDetailRepo.Get(x => images.Contains((Guid)x.SysImageId)).GroupBy(x => x.SysImageId).Select(x => x.FirstOrDefault()).ToList();
         }
 
         public async Task<HandleState> UpdateEdocByAcc(EdocAccUpdateModel model)
         {
             var hsDel = new HandleState();
-            var result = new HandleState(true, "Update EDoc Success");
+            var result=  new HandleState(true,"Update EDoc Success");
             if (hsDel.Success)
             {
                 var listEdoc = new List<SysImageDetail>();

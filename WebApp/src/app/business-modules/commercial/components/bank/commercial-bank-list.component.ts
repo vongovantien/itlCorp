@@ -3,12 +3,13 @@ import { ConfirmPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { Bank, Partner } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
-import { CatalogueRepo } from '@repositories';
+import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { SortService } from '@services';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError, finalize, switchMap } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { FormBankCommercialCatalogueComponent } from 'src/app/business-modules/share-modules/components/form-bank-commercial-catalogue/form-bank-commercial-catalogue.component';
+import { FormBankCommercialCatalogueComponent } from 'src/app/business-modules/share-modules/components';
 @Component({
     selector: 'app-commercial-bank-list',
     templateUrl: './commercial-bank-list.component.html',
@@ -31,6 +32,7 @@ export class CommercialBankListComponent extends AppList {
         private _sortService: SortService,
         private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService,
+        private _systemFileManageRepo: SystemFileManageRepo
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -45,20 +47,24 @@ export class CommercialBankListComponent extends AppList {
             { title: 'Swift Code', field: '', sortable: false },
             { title: 'Bank Name', field: '', sortable: false },
             { title: 'Bank Code', field: '', sortable: false },
+            { title: 'Approved Status', field: '', sortable: true },
             { title: 'Source', field: '', sortable: false },
             { title: 'Note', field: '', sortable: false },
         ];
     }
 
-    getListBank(partnerId: string) {
+    getPartnerBank(partnerId: string) {
         this.isLoading = true;
-        this._catalogueRepo.getListBankByPartnerById(partnerId)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this.isLoading = false;
-            })).subscribe(
+        this._catalogueRepo.getPartnerBank(partnerId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this.isLoading = false;
+                })
+            )
+            .subscribe(
                 (res: Bank[]) => {
                     this.partnerBanks = res || [];
-
                 }
             );
     }
@@ -68,27 +74,16 @@ export class CommercialBankListComponent extends AppList {
         this.formUpdateBankPopup.partnerId = this.partnerId;
         if (!this.formUpdateBankPopup.isUpdate) {
             this.formUpdateBankPopup.formGroup.reset();
+            this.formUpdateBankPopup.beneficiaryAddress.setValue(this.partner.addressShippingVn);
         }
         this.formUpdateBankPopup.show();
     }
 
-    gotoDetailBank(id: string, index: number = null) {
+    gotoDetailPartnerBank(id: string) {
         this.formUpdateBankPopup.isUpdate = true;
         this.formUpdateBankPopup.partnerId = this.partnerId;
-        !!this.formUpdateBankPopup.partnerId ? this.indexLstBank = null : this.indexLstBank = index;
-        if (!!this.formUpdateBankPopup.partnerId) {
-            this._catalogueRepo.getDetailBankById(id)
-                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                .subscribe(
-                    (res: Bank) => {
-                        if (!!res) {
-                            this.formUpdateBankPopup.updateFormValue(res);
-                            this.formUpdateBankPopup.id = res.id
-                            this.formUpdateBankPopup.show();
-                        }
-                    }
-                );
-        }
+        this.formUpdateBankPopup.getDetailPartnerBank(id);
+        this.formUpdateBankPopup.show();
     }
 
     sortLocal(sort: string): void {
@@ -96,35 +91,41 @@ export class CommercialBankListComponent extends AppList {
     }
 
 
-    onDeleteBank(id: string) {
+    onDeletePartnerBank(partnerBankId: string) {
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             title: 'Confirm',
-            body: 'Do you want to delete this bank account',
+            body: 'Do you want to delete this bank account ?',
             labelConfirm: 'Ok'
-        }, () => { this.handleDeleteBank(id) });
+        }, () => { this.handleDeletePartnerBank(partnerBankId) });
     }
 
 
-    handleDeleteBank(id: string) {
-        this._catalogueRepo.deleteBank(id)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
+    handleDeletePartnerBank(id: string) {
+        this._catalogueRepo.deletePartnerBank(id)
+            .pipe(
+                switchMap((res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.getListBank(this.partnerId);
+                        return this._systemFileManageRepo.deleteFileFolder("Catalogue", "PartnerBank", id)
+                            .pipe(
+                                catchError(this.catchError),
+                                finalize(() => this._progressRef.complete())
+                            )
                     } else {
                         this._toastService.error(res.message);
+                        return of(null);
                     }
-                }
-            );
+                }),
+                catchError(this.catchError),
+                finalize(() => this.getPartnerBank(this.partnerId))
+            )
+            .subscribe();
     }
 
     onRequestBank($event: any) {
         const data = $event;
         if (data === true) {
-            this.formUpdateBankPopup.hide();
-            this.getListBank(this.partnerId);
+            this.getPartnerBank(this.partnerId);
         }
     }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
@@ -9,7 +9,11 @@ import { SortService } from 'src/app/shared/services';
 import { AppList } from 'src/app/app.list';
 import { AddDistrictPopupComponent } from './add-district/add-district.component';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
+import { getDistrictDataSearch, getLocationDistrictLoadingState, getLocationDistrictState, ICatLocationState, LoadListDistrictLocation, SearchListDistrict } from '../store';
+import { Store } from '@ngrx/store';
+import { DistrictModel } from '@models';
+import { SearchOptionsComponent } from '@common';
 
 
 @Component({
@@ -21,7 +25,7 @@ export class AppDistrictComponent extends AppList implements OnInit {
 
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(AddDistrictPopupComponent) districtPopup: AddDistrictPopupComponent;
-
+    @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
     districts: any[] = [];
     selectedDistrict: any;
 
@@ -40,14 +44,16 @@ export class AppDistrictComponent extends AppList implements OnInit {
         private _ngProgressService: NgProgress,
         private _catalogueRepo: CatalogueRepo,
         private _sortService: SortService,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _store: Store<ICatLocationState>,
+        private _cd: ChangeDetectorRef
 
     ) {
         super();
 
         this._progressRef = this._ngProgressService.ref();
-        this.requestSearch = this.searchProvince;
-        this.requestList = this.getProvince;
+        this.requestSearch = this.searchDistrict;
+        this.requestList = this.requestListDistrict;
         this.requestSort = this.sortProvince;
     }
 
@@ -61,28 +67,65 @@ export class AppDistrictComponent extends AppList implements OnInit {
             { title: 'Country', field: 'countryName', sortable: true },
             { title: 'Status', field: 'active', sortable: true },
         ];
-
+        this._store.select(getDistrictDataSearch)
+            .pipe(
+                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe),
+                map((dataSearch) => ({ dataSearch: dataSearch }))
+            ).subscribe(
+                (res: any) => {
+                    if (!!res && !!Object.keys(res?.dataSearch).length) {
+                        this.dataSearch = res.dataSearch;
+                    }
+                },
+            );
         this.getProvince();
+        this.requestListDistrict()
     }
-
-    searchProvince(event: CommonInterface.ISearchOption) {
+    ngAfterViewInit() {
+        if (Object.keys(this.dataSearch).length > 0) {
+            this.searchOptionsComponent.searchObject.searchString = this.dataSearch.keyword;
+            this._cd.detectChanges();
+        }
+    }
+    searchDistrict(event: CommonInterface.ISearchOption) {
         this.dataSearch = { placeType: CommonEnum.PlaceTypeEnum.District };
         this.dataSearch[event.field] = event.searchString;
-        this.getProvince();
+        this.dataSearch.keyword = event.searchString;
+        this._store.dispatch(SearchListDistrict({ payload: this.dataSearch }));
+        this.requestListDistrict();
     }
-
+    requestListDistrict() {
+        this._store.dispatch(LoadListDistrictLocation({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
     getProvince() {
-        this._progressRef.start();
-        this.isLoading = true;
-        this._catalogueRepo.pagingPlace(this.page, this.pageSize, this.dataSearch)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this.isLoading = false;
-                this._progressRef.complete();
-            }))
-            .subscribe(
-                (res: CommonInterface.IResponsePaging) => {
+        // this._progressRef.start();
+        // this.isLoading = true;
+        // this._catalogueRepo.getListDistrict(this.page, this.pageSize, this.dataSearch)
+        //     .pipe(catchError(this.catchError), finalize(() => {
+        //         this.isLoading = false;
+        //         this._progressRef.complete();
+        //     }))
+        //     .subscribe(
+        //         (res: CommonInterface.IResponsePaging) => {
+        //             this.districts = res.data || [];
+        //             this.totalItems = res.totalItems;
+        //         }
+        //     );
+        this._store.select(getLocationDistrictState)
+            .pipe(
+                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe),
+                map((data: CommonInterface.IResponsePaging | any) => {
+                    return {
+                        data: data.data,
+                        totalItems: data.totalItems,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
                     this.districts = res.data || [];
-                    this.totalItems = res.totalItems;
+                    this.totalItems = res.totalItems || 0;
                 }
             );
     }
@@ -93,6 +136,8 @@ export class AppDistrictComponent extends AppList implements OnInit {
 
     resetSearch() {
         this.dataSearch = { placeType: CommonEnum.PlaceTypeEnum.District };
+        this.requestListDistrict()
+        this._store.dispatch(SearchListDistrict({ payload: {} }));
         this.getProvince();
     }
 
@@ -124,7 +169,7 @@ export class AppDistrictComponent extends AppList implements OnInit {
         this.confirmDeletePopup.hide();
 
         this._progressRef.start();
-        this._catalogueRepo.deletePlace(this.selectedDistrict.id)
+        this._catalogueRepo.deleteDistrict(this.selectedDistrict.id)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {

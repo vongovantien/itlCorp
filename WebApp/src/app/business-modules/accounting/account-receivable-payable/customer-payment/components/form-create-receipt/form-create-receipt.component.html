@@ -69,6 +69,17 @@
                 </app-combo-grid-virtual-scroll>
             </div>
         </div>
+        <div class="col-lg-3" *ngIf="!!receipt?.arcbno">
+            <div class="form-group row">
+                <div class="col-md-12">
+                    Receipt Combine No
+                </div>
+                <div class="col-md-12 m--margin-top-10">
+                    <a class="pointer" style="text-decoration: underline;" (click)="goToReceiptCombine(receipt?.subArcbno)">
+                        {{receipt?.subArcbno}}</a>&nbsp;&nbsp;
+                </div>
+            </div>
+        </div>
         <div class="col-lg-3 text-right" *ngIf="isShowGetDebit && !isReadonly">
             <div class="m--margin-top-25">
                 <app-permission-button title="Get Debit" class="outline-info" [icon]="'la la-search'"

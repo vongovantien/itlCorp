@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -345,7 +346,7 @@ namespace eFMS.API.Documentation.DL.Services
             return model;
         }
 
-        public string CreateJobNoOps()
+        public string CreateJobNoOps(string transactionType)
         {
             SysOffice office = null;
             string prefixJob = string.Empty;
@@ -355,7 +356,14 @@ namespace eFMS.API.Documentation.DL.Services
                 office = sysOfficeRepo.Get(x => x.Id == currentUserOffice).FirstOrDefault();
                 prefixJob = SetPrefixJobIdByOfficeCode(office?.Code);
             }
-            prefixJob += DocumentConstants.OPS_SHIPMENT;
+            if (transactionType == "TK")
+            {
+                prefixJob += DocumentConstants.TKI_SHIPMENT;
+            }
+            else
+            {
+                prefixJob += DocumentConstants.OPS_SHIPMENT;
+            }
             var currentShipment = GetOpsTransactionToGenerateJobNo(office);
             int countNumberJob = 0;
             if (currentShipment != null)
@@ -374,21 +382,27 @@ namespace eFMS.API.Documentation.DL.Services
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                          && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                         && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
+                                                         && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-")
+                                                         && x.TransactionType == null
+                                                         )
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: HAN -> H [15202]
                     break;
                 case "ITLDAD":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
+                                                        && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
+                                                         && x.TransactionType == null
+                                                        )
                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
                     break;
                 case "ITLCAM":
                     currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                         && x.DatetimeCreated.Value.Year == DateTime.Now.Year
-                                                        && x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-"))
+                                                        && x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-")
+                                                         && x.TransactionType == null
+                                                        )
                                                         .OrderByDescending(x => x.JobNo).FirstOrDefault();
                     break;
                 default:
@@ -397,7 +411,9 @@ namespace eFMS.API.Documentation.DL.Services
                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                      && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
                                                      && !x.JobNo.StartsWith("C") && !x.JobNo.StartsWith("CAM-")
-                                                     && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
+                                                     && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-")
+                                                      && x.TransactionType == null
+                                                     )
                                                      .OrderByDescending(x => x.JobNo).FirstOrDefault();
                     break;
             }
@@ -450,7 +466,6 @@ namespace eFMS.API.Documentation.DL.Services
                 CatPartner customer = partnerRepository.Get(x => x.Id == details.CustomerId).FirstOrDefault();
                 details.CustomerName = customer?.ShortName;
                 details.CustomerAccountNo = customer?.AccountNo;
-
                 CatPlace place = placeRepository.Get(x => x.Id == details.ClearanceLocation).FirstOrDefault();
                 details.PlaceNameCode = place?.Code;
 
@@ -465,9 +480,12 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public OpsTransactionModel GetDetails(Guid id)
         {
+            //PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
             var detail = GetBy(id);
             if (detail == null) return null;
-            List<string> authorizeUserIds = permissionService.GetAuthorizedIds("CL", currentUser);
+            var tranType = detail.TransactionType == "TK" ? "TK" : "CL";
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, detail.TransactionType == "TK" ?Menu.opsTruckingInland:Menu.opsJobManagement);
+            List<string> authorizeUserIds = permissionService.GetAuthorizedIds(tranType, currentUser);
             var permissionRangeWrite = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             var permissionRangeDelete = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Delete);
             detail.Permission = new PermissionAllowBase
@@ -475,7 +493,8 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowUpdate = GetPermissionDetail(permissionRangeWrite, authorizeUserIds, detail),
                 AllowDelete = GetPermissionDetail(permissionRangeDelete, authorizeUserIds, detail)
             };
-            var specialActions = currentUser.UserMenuPermission.SpecialActions;
+            //var specialActions = currentUser.UserMenuPermission.SpecialActions;
+            var specialActions = _user.UserMenuPermission.SpecialActions;
             detail.Permission = PermissionEx.GetSpecialActions(detail.Permission, specialActions);
             return detail;
         }
@@ -545,7 +564,12 @@ namespace eFMS.API.Documentation.DL.Services
 
         public OpsTransactionResult Paging(OpsTransactionCriteria criteria, int page, int size, out int rowsCount)
         {
-            criteria.RangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+            ICurrentUser _user = PermissionEx.GetUserMenuPermissionTransaction(criteria.TransactionType, currentUser);
+
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+
+            criteria.RangeSearch = rangeSearch;
+
             var data = Query(criteria);
             int totalProcessing = 0;
             int totalfinish = 0;
@@ -603,6 +627,64 @@ namespace eFMS.API.Documentation.DL.Services
             };
             return results;
         }
+
+        private string GetClearanceNoOfShipment(string jobNo, IQueryable<CsShipmentSurcharge> surcharge, IQueryable<CustomsDeclaration> clearances)
+        {
+            var surchargeShipment = surcharge.Where(x => x.JobNo == jobNo);
+            var clearanceNos = surchargeShipment.Select(x => x.ClearanceNo).ToList();
+            var clearanceShipments = clearances.Where(x => x.JobNo == jobNo && clearanceNos.Contains(x.ClearanceNo))?.OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).ToList();
+            var clearanceShipment = clearanceShipments.FirstOrDefault();
+            if (clearanceShipments.Any(x => x.ConvertTime != null))
+            {
+                clearanceShipment = clearanceShipments.FirstOrDefault(x => x.ConvertTime != null);
+            }
+            if (surchargeShipment.Count() > 0 && clearanceShipment != null)
+            {
+                return clearanceShipment.ClearanceNo;
+            }
+            else
+            {
+                return clearances.Where(x => x.JobNo == jobNo)?.OrderBy(x => x.ClearanceDate).ThenBy(x => x.DatetimeModified).FirstOrDefault().ClearanceNo;
+            }
+        }
+
+        private IQueryable<OpsTransactionModel> FormatDataPaging(IQueryable<OpsTransaction> dataQuery)
+        {
+            IQueryable<CatPartner> customers = partnerRepository.Get(x => x.PartnerGroup.Contains("CUSTOMER"));
+            IQueryable<CatPlace> ports = placeRepository.Get(x => x.PlaceTypeId == "Port");
+            List<OpsTransactionModel> list = new List<OpsTransactionModel>();
+
+            foreach (var x in dataQuery)
+            {
+                OpsTransactionModel item = mapper.Map<OpsTransactionModel>(x);
+                item.ClearanceNo = customDeclarationRepository.Get(cus => cus.JobNo == item.JobNo)
+                    .OrderBy(cus => cus.ClearanceDate)
+                    .ThenBy(cus => cus.ClearanceNo)
+                    .Select(cus => cus.ClearanceNo)
+                    .FirstOrDefault();
+
+                item.CustomerName = customers.FirstOrDefault(cus => cus.Id == x.CustomerId)?.ShortName;
+                item.POLName = ports.FirstOrDefault(pol => pol.Id == x.Pol)?.NameEn;
+                item.PODName = ports.FirstOrDefault(pod => pod.Id == x.Pod)?.NameEn;
+                item.GroupName = groupRepository.Get(y => y.Id == x.GroupId)?.FirstOrDefault().ShortName;
+                item.DepartmentName = departmentRepository.Get(z => z.Id == x.DepartmentId)?.FirstOrDefault().DeptNameAbbr;
+
+                IQueryable<SysUser> sysUsers = userRepository.Get(u => u.Id == x.UserCreated);
+
+                item.UserCreatedName = sysUsers?.FirstOrDefault()?.Username;
+                item.UserCreatedNameLinkJob = string.IsNullOrEmpty(x.UserCreatedLinkJob) ? "" : userRepository.Get(u => u.Id == x.UserCreatedLinkJob)?.FirstOrDefault()?.Username;
+
+                if (x.ReplicatedId != null)
+                {
+                    var replicateJob = DataContext.Get(d => d.Id == x.ReplicatedId)?.FirstOrDefault();
+                    item.ReplicateJobNo = replicateJob?.JobNo;
+                }
+
+                list.Add(item);
+            }
+            return list.AsQueryable();
+        }
+
         public bool CheckAllowDelete(Guid jobId)
         {
             var detail = DataContext.Get(x => x.Id == jobId && x.CurrentStatus != TermData.Canceled)?.FirstOrDefault();
@@ -688,6 +770,7 @@ namespace eFMS.API.Documentation.DL.Services
             return query;
         }
 
+
         /// <summary>
         /// Nếu không có điều kiện search thì load list Job 3 tháng kể từ ngày modified mới nhất trở về trước
         /// </summary>
@@ -709,7 +792,7 @@ namespace eFMS.API.Documentation.DL.Services
                 query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
             }
 
-            return query;
+            return query.And(x => x.TransactionType == criteria.TransactionType);
         }
 
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
@@ -721,7 +804,10 @@ namespace eFMS.API.Documentation.DL.Services
             var queryDefault = ExpressionQueryDefault(criteria);
             var data = DataContext.Get(queryDefault);
             var queryPermission = QueryByPermission(criteria.RangeSearch);
-            queryPermission = QuerySearchLinkJob(queryPermission, criteria);
+            if (criteria.TransactionType == null)
+            {
+                queryPermission = QuerySearchLinkJob(queryPermission, criteria);
+            }
             data = data.Where(queryPermission);
 
             if (data == null) return null;
@@ -774,6 +860,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 && (x.Mblno ?? "").IndexOf(criteria.Mblno ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ProductService ?? "").IndexOf(criteria.ProductService ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.ServiceMode ?? "").IndexOf(criteria.ServiceMode ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                //&& (x.TransactionType ?? "").IndexOf(criteria.TransactionType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                 && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
                                 && (x.FieldOpsId == criteria.FieldOps || string.IsNullOrEmpty(criteria.FieldOps))
                                 && (x.ShipmentMode == criteria.ShipmentMode || string.IsNullOrEmpty(criteria.ShipmentMode))
@@ -790,6 +877,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    || (x.Mblno ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ProductService ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.ServiceMode ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
+                                   //|| (x.TransactionType ?? "").IndexOf(criteria.TransactionType ?? "", StringComparison.OrdinalIgnoreCase) > -1
                                    || (x.CustomerId == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.FieldOpsId == criteria.All || string.IsNullOrEmpty(criteria.All))
                                    || (x.ShipmentMode == criteria.All || string.IsNullOrEmpty(criteria.All))
@@ -797,6 +885,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    || ((x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) >= (criteria.CreatedDateFrom ?? null) && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Date : x.DatetimeCreated) <= (criteria.CreatedDateTo ?? null))
                                ).OrderByDescending(x => x.DatetimeModified);
             }
+            //datajoin=datajoin.Where(x=>x.TransactionType==criteria.TransactionType);
             results = mapper.Map<List<OpsTransactionModel>>(datajoin);
             return results.AsQueryable();
         }
@@ -888,7 +977,7 @@ namespace eFMS.API.Documentation.DL.Services
                 customerContract = contract;
                
                 OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, model, customerContract);
-                opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
+                opsTransaction.JobNo = CreateJobNoOps(null); //Generate JobNo [17/12/2020]
 
                 bool existedJobNo = CheckExistJobNo(opsTransaction.Id, opsTransaction.JobNo);
                 if (existedJobNo == true)
@@ -1149,7 +1238,7 @@ namespace eFMS.API.Documentation.DL.Services
                             try
                             {
                                 OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item, customerContract);
-                                opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
+                                opsTransaction.JobNo = CreateJobNoOps(null); //Generate JobNo [17/12/2020]
 
                                 bool existedJobNo = CheckExistJobNo(opsTransaction.Id, opsTransaction.JobNo);
                                 if (existedJobNo == true)
@@ -1443,6 +1532,7 @@ namespace eFMS.API.Documentation.DL.Services
                 && x.Hwbno == model.Hwbno
                 && x.Mblno == model.Mblno
                 && x.OfficeId == currentUser.OfficeID
+                && x.TransactionType == model.TransactionType
                 ).ToList();
                 if (duplicateHBLMBL.Count > 0)
                 {
@@ -1637,6 +1727,7 @@ namespace eFMS.API.Documentation.DL.Services
             try
             {
                 var detail = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+
                 var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
                 int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = detail.SalemanId, UserCreated = detail.UserCreated, CompanyId = detail.CompanyId, OfficeId = detail.OfficeId, DepartmentId = detail.DepartmentId, GroupId = detail.GroupId }, permissionRange);
                 if (code == 403) return new HandleState(403);
@@ -1971,7 +2062,7 @@ namespace eFMS.API.Documentation.DL.Services
                     Guid? _replicateId = model.ReplicatedId;
 
                     model.Hblid = Guid.NewGuid();
-                    model.JobNo = CreateJobNoOps();
+                    model.JobNo = CreateJobNoOps(model.TransactionType);
                     model.UserModified = currentUser.UserID;
                     model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
                     model.UserCreated = currentUser.UserID;
@@ -2651,7 +2742,15 @@ namespace eFMS.API.Documentation.DL.Services
             surcharge.ChargeId = chargeBuy.DebitCharge ?? Guid.Empty;
 
             surcharge.Quantity = chargeBuy.ServiceDate.Value < datetimeCR ? 1 : chargeBuy.Quantity;
-            surcharge.Vatrate = chargeBuy.ServiceDate.Value < datetimeCR ? 8 : 10; // [CR:18726] update 8 -> 10% from 1/1/2023
+            // [CR:19414 Calculate Vatrate selling]
+            if (chargeBuy.ReplicateAutorateVAT != null && chargeBuy.ReplicateAutorateVAT != 0)
+            {
+                surcharge.Vatrate = chargeBuy.ReplicateAutorateVAT ?? 0;
+            }
+            else
+            {
+                surcharge.Vatrate = chargeBuy.ServiceDate.Value < datetimeCR ? 8 : 10; // [CR:18726] update 8 -> 10% from 1/1/2023
+            }
 
             surcharge.Soano = null;
             surcharge.PaySoano = null;

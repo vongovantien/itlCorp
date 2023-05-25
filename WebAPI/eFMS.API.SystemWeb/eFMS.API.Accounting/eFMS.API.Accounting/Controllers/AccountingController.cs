@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using eFMS.API.Accounting.DL.Common;
+﻿using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.Infrastructure.Http;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
@@ -16,6 +9,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Infrastructure.RabbitMQ;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +19,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using eFMS.API.Infrastructure.RabbitMQ;
+using Microsoft.AspNetCore.Authentication.Twitter;
+using System.Security.Policy;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -45,6 +47,7 @@ namespace eFMS.API.Accounting.Controllers
         public IBackgroundTaskQueue _queue { get; }
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IRabbitBus _busControl;
+        private readonly IOptions<ApiUrl> _apiUrl;
 
         public AccountingController(
             IStringLocalizer<LanguageSub> localizer,
@@ -53,9 +56,10 @@ namespace eFMS.API.Accounting.Controllers
             IActionFuncLogService actionFuncLog,
             ICurrentUser currUser,
             ISysImageService SysImageService,
-            IBackgroundTaskQueue queue, 
+            IBackgroundTaskQueue queue,
             IServiceScopeFactory serviceScopeFactory,
-            IRabbitBus busControl
+            IRabbitBus busControl,
+            IOptions<ApiUrl> apiUrl
             )
         {
             stringLocalizer = localizer;
@@ -63,6 +67,7 @@ namespace eFMS.API.Accounting.Controllers
             webUrl = appSettings;
             actionFuncLogService = actionFuncLog;
             currentUser = currUser;
+            _apiUrl = apiUrl;
             loginInfo = new BravoLoginModel
             {
                 UserName = "bravo",
@@ -352,8 +357,8 @@ namespace eFMS.API.Accounting.Controllers
                     List<BravoAdvanceModel> listAdd = (IdsAdd.Count > 0) ? accountingService.GetListAdvanceToSyncBravo(IdsAdd) : new List<BravoAdvanceModel>();
                     List<BravoAdvanceModel> listUpdate = (IdsUpdate.Count > 0) ? accountingService.GetListAdvanceToSyncBravo(IdsUpdate) : new List<BravoAdvanceModel>();
 
-                   
-                    
+
+
                     HttpResponseMessage resAdd = new HttpResponseMessage();
                     HttpResponseMessage resUpdate = new HttpResponseMessage();
                     BravoResponseModel responseAddModel = new BravoResponseModel();
@@ -444,7 +449,7 @@ namespace eFMS.API.Accounting.Controllers
         public async Task<IActionResult> SyncSettlementToAccountantSystem(List<RequestGuidAndFileListModel> request)
         {
             var _startDateProgress = DateTime.Now;
-            if (!ModelState.IsValid) return BadRequest();
+             if (!ModelState.IsValid) return BadRequest();
             currentUser.Action = "SyncSettlementToAccountantSystem";
 
             try
@@ -548,6 +553,22 @@ namespace eFMS.API.Accounting.Controllers
                         {
                             return BadRequest(result);
                         }
+                        var listGenFile = new List<BravoSettlementModel>();
+                        listGenFile = listAdd.Count > 0 ? listAdd : listUpdate;
+                        listGenFile.ForEach(async x =>//lístAdd==0
+                            {
+                                var modelSuccess = new
+                                {
+                                    SettlementId = x.Stt,
+                                    Lang = "EN",
+                                    Action = "eDOC",
+                                    AccessToken = Request.Headers["Authorization"].ToString()
+                                };
+                                new LogHelper("Push Rabbit SyncSettlementToAccountantSystem", JsonConvert.SerializeObject(modelSuccess));
+                                await _busControl.SendAsync(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileSyncQueue, modelSuccess);
+                                //await HttpClientService.GetApi(_apiUrl.Value.Url + "/Export/api/v1/EN/AccountingReport/ExportDetailSettlementPayment?settlementId=" + x.Stt + "&action=Add", Request.Headers["Authorization"].ToString());
+                            });
+
                         return Ok(result);
                     }
                     return BadRequest(new ResultHandle { Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg });
@@ -709,7 +730,7 @@ namespace eFMS.API.Accounting.Controllers
                     HttpResponseMessage resUpdate_NVCP = new HttpResponseMessage();
                     BravoResponseModel responseAddModel_NVCP = new BravoResponseModel();
                     BravoResponseModel responseUpdateModel_NVCP = new BravoResponseModel();
-                    
+
                     // 3. Call Bravo to SYNC.
                     if (listAdd_NVHD.Count > 0)
                     {
@@ -756,7 +777,7 @@ namespace eFMS.API.Accounting.Controllers
                     if (listAdd_NVCP_SameCurrLocal.Count > 0 || listAdd_NVCP_DiffCurrLocal.Count > 0)
                     {
                         var listAddToSynceBravo = new List<SyncCreditModel>();
-                        if(listAdd_NVCP_SameCurrLocal.Count > 0)
+                        if (listAdd_NVCP_SameCurrLocal.Count > 0)
                         {
                             listAddToSynceBravo = listAdd_NVCP_SameCurrLocal;
                         }
@@ -884,7 +905,7 @@ namespace eFMS.API.Accounting.Controllers
                     List<string> IdsUpdate_NVHD = requests.Where(x => x.Action == ACTION.UPDATE && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
                     List<RequestStringTypeListModel> IdsAdd_NVCP = requests.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
                     List<RequestStringTypeListModel> IdsUpdate_NVCP = requests.Where(x => x.Action == ACTION.UPDATE && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
-                    
+
                     List<SyncModel> listAdd_NVHD = accountingService.GetListSoaToSync(IdsAdd_NVHD);
                     List<SyncModel> listUpdate_NVHD = accountingService.GetListSoaToSync(IdsUpdate_NVHD);
                     List<SyncCreditModel> listAdd_NVCP = accountingService.GetListSoaCreditToSync(IdsAdd_NVCP);
@@ -895,7 +916,7 @@ namespace eFMS.API.Accounting.Controllers
 
                     List<SyncCreditModel> listAdd_NVCP_DiffCurrLocal = listAdd_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
                     List<SyncCreditModel> listUpdate_NVCP_DiffCurrLocal = listUpdate_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
-                    
+
                     //List<string> ids = requests.Where(w => 
                     //   !listAdd_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString()) 
                     //&& !listUpdate_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())).Select(x => x.Id).ToList();
@@ -910,7 +931,7 @@ namespace eFMS.API.Accounting.Controllers
                     HttpResponseMessage resUpdate_NVCP = new HttpResponseMessage();
                     BravoResponseModel responseAddModel_NVCP = new BravoResponseModel();
                     BravoResponseModel responseUpdateModel_NVCP = new BravoResponseModel();
-                    
+
                     // 3. Call Bravo to SYNC.
                     if (listAdd_NVHD.Count > 0)
                     {
@@ -1104,7 +1125,7 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle result = new ResultHandle { Status = false, Message = "paymentModels bắt buộc phải có data!", Data = paymentModels };
                 return BadRequest(result);
             }
-            
+
             try
             {
                 // 1. Login
@@ -1112,7 +1133,7 @@ namespace eFMS.API.Accounting.Controllers
                 BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
 
                 if (loginResponse.Success == "1")
-                {                    
+                {
                     HttpResponseMessage resAdd = new HttpResponseMessage();
                     HttpResponseMessage resUpdate = new HttpResponseMessage();
                     BravoResponseModel responseAddModel = new BravoResponseModel();
@@ -1179,7 +1200,7 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest("Sync fail");
             }
         }
-        
+
         /// <summary>
         /// Func Test (Get List Receipt)
         /// </summary>
@@ -1455,13 +1476,13 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult CheckSoaSynced(string id)
         {
             string messageError = accountingService.CheckSoaSynced(id);
-            if(messageError.Length > 0)
+            if (messageError.Length > 0)
             {
                 var _result = new ResultHandle { Status = false, Message = messageError };
                 return BadRequest(_result);
             }
 
-            return Ok(new ResultHandle { Status = true  });
+            return Ok(new ResultHandle { Status = true });
         }
 
         [HttpGet("CheckVoucherSynced/{id}")]
@@ -1486,7 +1507,7 @@ namespace eFMS.API.Accounting.Controllers
             HandleState hs = await sysFileService.UploadFiles(model);
             if (hs.Success)
             {
-                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true});
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
             }
             return BadRequest(hs);
         }
@@ -1502,8 +1523,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> DeleteAttachedFile(string folder, Guid id)
         {
-            HandleState hs = await sysFileService.DeleteFile(folder,id);
-            if(hs.Success)
+            HandleState hs = await sysFileService.DeleteFile(folder, id);
+            if (hs.Success)
             {
                 return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
             }
@@ -1524,9 +1545,9 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPost("TestSendMail")]
         public ActionResult TestSendMail(string subject, string body, [FromBody] List<string> emails)
         {
-            var listcc = new List<string> {"lynne.loc@itlvn.com","alex.phuong@itlvn.com", "paulchen.bao@itlvn.com" };
+            var listcc = new List<string> { "lynne.loc@itlvn.com", "alex.phuong@itlvn.com", "paulchen.bao@itlvn.com" };
             var sendSuccess = SendMail.Send(subject, body, emails, null, listcc, null);
-            return Ok( new { sendSuccess } );
+            return Ok(new { sendSuccess });
         }
     }
 }

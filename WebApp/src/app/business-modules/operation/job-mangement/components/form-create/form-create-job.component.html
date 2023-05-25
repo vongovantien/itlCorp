@@ -116,9 +116,18 @@
                                         <label class="form-control-label" required>
                                             Product Service
                                         </label>
-                                        <ng-select class="custom" [items]="productServices" placeholder="Please select"
+                                        <!-- <ng-select class="custom" [items]="productServices" placeholder="Please select"
+                                            [clearable]="false" formControlName="productService">
+                                        </ng-select> -->
+                                        <ng-select *ngIf="transactionType!=='TK',else truckingService" class="custom"
+                                            disabled [items]="productServices" placeholder="Please select"
                                             [clearable]="false" formControlName="productService">
                                         </ng-select>
+                                        <ng-template #truckingService>
+                                            <input disabled type="text" class="form-control m-input m-input--square"
+                                                value="Trucking">
+                                        </ng-template>
+
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -148,8 +157,10 @@
                                                 <span class="text-warning">{{jobLinkAirSeaNo}}</span>
                                             </div>
                                         </div>
-                                        <ng-select class="custom" [items]="shipmentModes" placeholder="Please select"
-                                            [clearable]="false" formControlName="shipmentMode">
+                                        <ng-select class="custom" [(ngModel)]="shipmentModes[0]" [items]="shipmentModes"
+                                            placeholder="Please select" [clearable]="false"
+                                            formControlName="shipmentMode">
+
                                         </ng-select>
 
                                     </div>
@@ -326,7 +337,7 @@
                                 <div class="col-md-4">
                                     <div class="row">
                                         <ng-container
-                                            *ngIf="userLogged?.officeType === 'Head' || userLogged?.officeType === 'Branch'">
+                                            *ngIf="(userLogged?.officeType === 'Head' || userLogged?.officeType === 'Branch')&&transactionType!=='TK'">
                                             <div class="col-lg-3">
                                                 <div class="form-group">
                                                     <label class="form-control-label">
@@ -431,8 +442,8 @@
                                         <label class="form-control-label" for="">
                                             Detail of container & Packages
                                         </label>
-                                        <textarea formControlName="containerDescription"
-                                            name="containerDescription" class="form-control"></textarea>
+                                        <textarea formControlName="containerDescription" name="containerDescription"
+                                            class="form-control"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-md-4">

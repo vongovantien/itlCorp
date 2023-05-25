@@ -77,8 +77,8 @@ export class WarehouseComponent extends AppList implements OnInit {
             .subscribe(
                 ([countries, provinces, districts]) => {
                     this.formPopup.countries = this.utility.prepareNg2SelectData(countries || [], 'id', 'name');
-                    this.formPopup.provinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'name_VN');
-                    this.formPopup.districts = this.utility.prepareNg2SelectData(districts || [], 'id', 'name_VN');
+                    this.formPopup.provinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'nameVn');
+                    this.formPopup.districts = this.utility.prepareNg2SelectData(districts || [], 'id', 'nameVn');
                 },
                 () => { },
             );

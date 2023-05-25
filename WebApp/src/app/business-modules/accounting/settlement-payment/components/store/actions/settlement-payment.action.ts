@@ -13,7 +13,7 @@ export enum SettlementPaymentActionTypes {
     GET_DETAIL_FAIL = '[SettlementPayment] Get Detail Fail',
     LOAD_LIST_NO_GROUP_SURCHARGE = '[SettlementPayment] Load list No Group List Surcharge',
     UPDATE_LIST_NO_GROUP_SURCHARGE = '[SettlementPayment] Update No Group List Surcharge',
-
+    REGET_EDOC = '[SettlementPayment] Reget EDoc',
     UPDATE_LIST_EDOC = '[SettlementPayment] Update List Edoc',
     LOAD_LIST_EDOC = '[SettlementPayment] Load List EDoc',
     LOAD_LIST_EDOC_SUCCESS = '[SettlementPayment] Load List EDoc Success',

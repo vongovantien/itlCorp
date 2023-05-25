@@ -23,6 +23,9 @@ import { SalesmanCreditLimitPopupComponent } from "../commercial/components/popu
 import { ShareBussinessAdjustDebitValuePopupComponent } from './components/adjust-debit-value/adjust-debit-value.popup';
 import { FormBankCommercialCatalogueComponent } from './components/form-bank-commercial-catalogue/form-bank-commercial-catalogue.component';
 import { FormUpdateEmailCommercialCatalogueComponent } from './components/form-update-email-commercial-catalogue/form-update-email-commercial-catalogue.popup';
+import { CommercialAddressListComponent } from '../commercial/components/address/commercial-address-list.component';
+import { FormAddressCommercialCatalogueComponent } from 'src/app/business-modules/share-modules/components/form-address-commercial-catalogue/form-address-commercial-catalogue.component';
+import { ManagementAddressComponent } from '../commercial/components/management-address/management-commercial-address.component';
 
 const COMPONENTS = [
     ShareModulesInputShipmentPopupComponent,
@@ -39,7 +42,10 @@ const COMPONENTS = [
     FormSearchExportComponent,
     ShareBussinessAdjustDebitValuePopupComponent,
     PayableComponent,
-    FormBankCommercialCatalogueComponent
+    FormBankCommercialCatalogueComponent,
+    FormAddressCommercialCatalogueComponent,
+    CommercialAddressListComponent,
+    ManagementAddressComponent
 ];
 
 @NgModule({

@@ -342,6 +342,16 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/GetCDNoteWithHbl`, { hblId: hblId, jobId: jobId });
     }
 
+    getListCDNoteWithPartnerId(body: any = {}) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/AcctCDNote/Query`, body)
+            .pipe(
+                catchError((error) => throwError(error)),
+                map((res: any) => {
+                    return res;
+                })
+            );
+    }
+
     checkCdNoteAllowToDelete(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/CheckAllowDelete/${id}`).pipe(
             catchError((error) => throwError(error)),
@@ -1141,8 +1151,8 @@ export class DocumentationRepo {
         );
     }
 
-    upLoadChargeFile(files: any) {
-        return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/uploadFile`, files, "uploadedFile");
+    upLoadChargeFile(files: any, transationType: string) {
+        return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/uploadFile/${transationType}`, files, "uploadedFile");
     }
 
     importCharge(body: any) {
@@ -1339,6 +1349,11 @@ export class DocumentationRepo {
 
     trackShipmentProgress(params: any) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/ShipmentTracking/TrackShipmentProgress`, params, { "hideSpinner": "true" }).pipe(
+            map((data: any) => data)
+        );
+    }
+    getInfoMailDebitInv(cdNo: any) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/DocSendMail/getInfoMailDebitInvoice`, {cdNo: cdNo}).pipe(
             map((data: any) => data)
         );
     }

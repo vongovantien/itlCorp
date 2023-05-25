@@ -68,12 +68,12 @@
         public static readonly string MSG_CONTRACT_PAYMENT_METHOD_NOT_FOUND = "MSG_CONTRACT_PAYMENT_METHOD_NOT_FOUND";
         public static readonly string MSG_CONTRACT_SALESMAN_NOT_FOUND = "MSG_CONTRACT_SALESMAN_NOT_FOUND";
         public static readonly string MSG_CONTRACT_ACTIVE_NOT_FOUND = "MSG_CONTRACT_ACTIVE_NOT_FOUND";
-        public static readonly string MSG_CONTRACT_EXPERIED_DATE_NOT_VALID = "MSG_CONTRACT_EXPERIED_DATE_NOT_VALID";
+        public static readonly string MSG_CONTRACT_EXPIRED_DATE_NOT_VALID = "MSG_CONTRACT_EXPIRED_DATE_NOT_VALID";
         public static readonly string MSG_CONTRACT_DUPLICATE_SERVICE = "MSG_CONTRACT_DUPLICATE_SERVICE";
         public static readonly string MSG_CONTRACT_DUPLICATE_SERVICE_IMPORT = "MSG_CONTRACT_DUPLICATE_SERVICE_IMPORT";
 
         public static readonly string MSG_CONTRACT_EFFECTIVE_DATE_EMPTY = "MSG_CONTRACT_EFFECTIVE_DATE_EMPTY";
-        public static readonly string MSG_CONTRACT_EXPERIED_DATE_EMPTY = "MSG_CONTRACT_EXPERIED_DATE_EMPTY";
+        public static readonly string MSG_CONTRACT_EXPIRED_DATE_EMPTY = "MSG_CONTRACT_EXPIRED_DATE_EMPTY";
         public static readonly string MSG_CONTRACT_SALESMAN_EMPTY = "MSG_CONTRACT_SALESMAN_EMPTY";
         public static readonly string MSG_CONTRACT_CREDIT_LIMIT_EMPTY = "MSG_CONTRACT_CREDIT_LIMIT_EMPTY";
         public static readonly string MSG_CONTRACT_PAYMENT_TERM_EMPTY = "MSG_CONTRACT_PAYMENT_TERM_EMPTY";
@@ -152,6 +152,30 @@
         public static readonly string MSG_COUNTRY_CODE_EMPTY = "MSG_COUNTRY_CODE_EMPTY";
         public static readonly string MSG_COUNTRY_EXISTED = "MSG_COUNTRY_EXISTED";
         public static readonly string MSG_COUNTRY_CODE_DUPLICATE = "MSG_COUNTRY_CODE_DUPLICATE";
+        #endregion
+
+        #region city
+        public static readonly string MSG_CITY_NAME_EN_EMPTY = "MSG_CITY_NAME_EN_EMPTY";
+        public static readonly string MSG_CITY_NAME_LOCAL_EMPTY = "MSG_CITY_NAME_LOCAL_EMPTY";
+        public static readonly string MSG_CITY_CODE_EMPTY = "MSG_CITY_CODE_EMPTY";
+        public static readonly string MSG_CITY_EXISTED = "MSG_CITY_EXISTED";
+        public static readonly string MSG_CITY_CODE_DUPLICATE = "MSG_CITY_CODE_DUPLICATE";
+        #endregion
+
+        #region district
+        public static readonly string MSG_DISTRICT_NAME_EN_EMPTY = "MSG_DISTRICT_NAME_EN_EMPTY";
+        public static readonly string MSG_DISTRICT_NAME_LOCAL_EMPTY = "MSG_DISTRICT_NAME_LOCAL_EMPTY";
+        public static readonly string MSG_DISTRICT_CODE_EMPTY = "MSG_DISTRICT_CODE_EMPTY";
+        public static readonly string MSG_DISTRICT_EXISTED = "MSG_DISTRICT_EXISTED";
+        public static readonly string MSG_DISTRICT_CODE_DUPLICATE = "MSG_DISTRICT_CODE_DUPLICATE";
+        #endregion
+
+        #region ward
+        public static readonly string MSG_WARD_NAME_EN_EMPTY = "MSG_WARD_NAME_EN_EMPTY";
+        public static readonly string MSG_WARD_NAME_LOCAL_EMPTY = "MSG_WARD_NAME_LOCAL_EMPTY";
+        public static readonly string MSG_WARD_CODE_EMPTY = "MSG_WARD_CODE_EMPTY";
+        public static readonly string MSG_WARD_EXISTED = "MSG_WARD_EXISTED";
+        public static readonly string MSG_WARD_CODE_DUPLICATE = "MSG_WARD_CODE_DUPLICATE";
         #endregion
 
         #region Stage

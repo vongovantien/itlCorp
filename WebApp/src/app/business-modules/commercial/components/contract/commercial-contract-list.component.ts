@@ -120,7 +120,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             shipmentType: null,
             emailAddress: null,
             firstShipmentDate: null,
-            paymentTermObh: null
+            paymentTermObh: null,
+            debitAmount: 0
         });
         this.formContractPopup.files = null;
         this.formContractPopup.fileList = null;

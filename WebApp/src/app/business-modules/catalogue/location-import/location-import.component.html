@@ -122,6 +122,9 @@
                                 (click)="sortData('districtName')">
                                 <span>District</span>
                             </th>
+                            <th *ngIf="type == 'city'">
+                                <span>Postal Code</span>
+                            </th>
                             <th>
                                 <span>Status</span>
                             </th>
@@ -148,9 +151,9 @@
                                         *ngIf="item.nameVnError !== null">{{ item.nameVnError }}</span>
                                 </td>
                                 <td *ngIf="type != 'country'">
-                                    <span *ngIf="item.countryNameError === null">{{ item.countryName }}</span>
+                                    <span *ngIf="item.codeCountryError === null">{{ item.countryName }}</span>
                                     <span class="m--font-danger"
-                                        *ngIf="item.countryNameError !== null">{{ item.countryNameError }}</span>
+                                        *ngIf="item.codeCountryError !== null">{{ item.countryNameError }}</span>
                                 </td>
                                 <td *ngIf="type != 'city' && type != 'country'">
                                     <span *ngIf="item.provinceNameError === null">{{ item.provinceName }}</span>
@@ -161,6 +164,9 @@
                                     <span *ngIf="item.districtNameError === null">{{ item.districtName }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.districtNameError !== null">{{ item.districtNameError }}</span>
+                                </td>
+                                <td *ngIf="type == 'city'">
+                                    <span>{{ item.postalCode }}</span>
                                 </td>
                                 <td>
                                     <span>{{ item.status }}</span>

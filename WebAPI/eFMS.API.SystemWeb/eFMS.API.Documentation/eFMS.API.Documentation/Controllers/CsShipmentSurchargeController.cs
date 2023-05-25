@@ -226,7 +226,7 @@ namespace eFMS.API.Documentation.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_ARE_DUPLICATE_INVOICE].Value });
                 }
             }
-            // validate checkpoint
+             // validate checkpoint
             var partnersNeedValidate = list.Where(x => (x.Type == DocumentConstants.CHARGE_SELL_TYPE || x.Type == DocumentConstants.CHARGE_OBH_TYPE) && x.IsRefundFee != true).ToList();
             if(partnersNeedValidate.Count() > 0)
             {
@@ -582,9 +582,9 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="uploadedFile"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("uploadFile")]
+        [Route("uploadFile/{transactionType}")]
         [Authorize]
-        public IActionResult UploadFile(IFormFile uploadedFile)
+        public IActionResult UploadFile(string transactionType, IFormFile uploadedFile)
         {
             var file = new FileHelper().UploadExcel(uploadedFile);
             if (file != null)
@@ -652,6 +652,7 @@ namespace eFMS.API.Documentation.Controllers
                         CurrencyId = worksheet.Cells[row, 10].Value?.ToString().Trim(),
                         VatPartnerId = worksheet.Cells[row,11].Value?.ToString().Trim(),
                         Vatrate = (decimal?)Vatrate,
+                        //TypeOfFee = worksheet.Cells[row, 12].Value?.ToString().Trim(),
                         //TotalAmount = (decimal?)TotalAmount,
                         ExchangeDate = !string.IsNullOrEmpty(ExchangeDate) ? dateToPase : (DateTime?)null,
                         FinalExchangeRate = (decimal?)FinalExchangeRate, 
@@ -663,7 +664,7 @@ namespace eFMS.API.Documentation.Controllers
                     };
                     list.Add(surcharge);
                 }
-                var data = csShipmentSurchargeService.CheckValidImport(list);
+                var data = csShipmentSurchargeService.CheckValidImport(list,transactionType);
                 var totalValidRows = data.Count(x => x.IsValid == true);
                 var results = new { data, totalValidRows };
                 return Ok(results);

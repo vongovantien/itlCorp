@@ -154,7 +154,7 @@ namespace eFMS.API.Accounting.DL.Services
             var result = new List<Guid?>();
             jobNos.ForEach(jobNo =>
             {
-                if (jobNo.Contains("LOG"))
+                if (jobNo.Contains("LOG")|| jobNo.Contains("TKI"))
                 {
                     var opsId =  _opsTran.Get(x => x.JobNo == jobNo);
                     result.Add(opsId.FirstOrDefault().Id);
