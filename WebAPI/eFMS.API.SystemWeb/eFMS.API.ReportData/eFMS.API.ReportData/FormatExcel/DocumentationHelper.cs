@@ -3918,7 +3918,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     _statement = string.Format("IF(J{0}-L{0}<0,0,1)", startRow);
                     listKeyFormula.Add("ComOverCap", _statement);
                     // CIT charged on overcap
-                    _statement = string.Format("O{0}*25%", startRow);
+                    _statement = string.Format("O{0}*20%", startRow);
                     listKeyFormula.Add("CITCharged", _statement);
                     // Entitled COM
                     _statement = string.Format("ROUND(N{0}-P{0},0)", startRow);
@@ -4063,7 +4063,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     _statement = string.Format("IF(I{0}-K{0}<0,0,(I{0}-K{0})*N10)", startRow);
                     listKeyFormula.Add("ComOverCap", _statement);
                     // CIT charged on overcap
-                    _statement = string.Format("N{0}*25%", startRow);
+                    _statement = string.Format("N{0}*20%", startRow);
                     listKeyFormula.Add("CITCharged", _statement);
                     // Entitled COM
                     _statement = string.Format("ROUND(M{0}-O{0},0)", startRow);
