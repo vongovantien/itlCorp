@@ -1589,7 +1589,8 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             ).subscribe(
                 (dataCdNote: any) => {
                     this.CdNoteDetail = dataCdNote;
-                    this.lstHblId = this.lstHblId.concat(this.CdNoteDetail.listSurcharges.map(x => x.hblid));
+                    this.lstHblId = [...new Set(this.lstHblId.concat(this.CdNoteDetail.listSurcharges.map(x => x.hblid)))];
+                    // this.lstHblId = this.lstHblId.concat(this.CdNoteDetail.listSurcharges.map(x => x.hblid));
                 },
             );
 
