@@ -1391,7 +1391,11 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     cancelPreAlert() {
         switch (this.serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
+                if (this.hblId === SystemConstants.EMPTY_GUID && this.isDbtInv) {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`]);
+                } else {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
+                }
                 break;
             case ChargeConstants.AE_CODE: // Air Export
                 if (this.hblId === SystemConstants.EMPTY_GUID) {
@@ -1434,13 +1438,25 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 }
                 break;
             case ChargeConstants.SFI_CODE: // Sea FCL Import
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
+                if (this.hblId === SystemConstants.EMPTY_GUID && this.isDbtInv) {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`]);
+                } else {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
+                }
                 break;
             case ChargeConstants.SLI_CODE: // Sea LCL Import
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
+                if (this.hblId === SystemConstants.EMPTY_GUID && this.isDbtInv) {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`]);
+                } else {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
+                }
                 break;
             case ChargeConstants.SCI_CODE:
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
+                if (this.hblId === SystemConstants.EMPTY_GUID && this.isDbtInv) {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`]);
+                } else {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
+                }
                 break;
             default:
                 break;
