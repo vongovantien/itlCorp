@@ -1391,7 +1391,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     cancelPreAlert() {
         switch (this.serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
-                if (this.hblId === SystemConstants.EMPTY_GUID && this.isDbtInv) {
+                if (this.hblId === SystemConstants.EMPTY_GUID || this.isDbtInv) {
                     this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`]);
                 } else {
                     this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
@@ -1438,21 +1438,21 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 }
                 break;
             case ChargeConstants.SFI_CODE: // Sea FCL Import
-                if (this.hblId === SystemConstants.EMPTY_GUID && this.isDbtInv) {
+                if (this.hblId === SystemConstants.EMPTY_GUID || this.isDbtInv) {
                     this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`]);
                 } else {
                     this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
                 }
                 break;
             case ChargeConstants.SLI_CODE: // Sea LCL Import
-                if (this.hblId === SystemConstants.EMPTY_GUID && this.isDbtInv) {
+                if (this.hblId === SystemConstants.EMPTY_GUID || this.isDbtInv) {
                     this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`]);
                 } else {
                     this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
                 }
                 break;
             case ChargeConstants.SCI_CODE:
-                if (this.hblId === SystemConstants.EMPTY_GUID && this.isDbtInv) {
+                if (this.hblId === SystemConstants.EMPTY_GUID || this.isDbtInv) {
                     this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`]);
                 } else {
                     this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
