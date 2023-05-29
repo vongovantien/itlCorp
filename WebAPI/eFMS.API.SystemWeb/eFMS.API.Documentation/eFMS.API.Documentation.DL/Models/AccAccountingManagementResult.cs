@@ -28,5 +28,9 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public DateTime? ETA { get; set; }
         public DateTime? ETD { get; set; }
         public string SoaNo { get; set; }
+        public string ShipmentType { get; set; }
+        public string AmountVND { get; set;}
+        public decimal? ExchangeRate { get; set; }
+        public string ParentAccountNo { get; internal set; }
     }
 }
