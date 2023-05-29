@@ -1392,7 +1392,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         switch (this.serviceId) {
             case ChargeConstants.AI_CODE: // Air Import
                 if (this.hblId === SystemConstants.EMPTY_GUID || this.isDbtInv) {
-                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`]);
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`]);
                 } else {
                     this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.hblId}`]);
                 }
