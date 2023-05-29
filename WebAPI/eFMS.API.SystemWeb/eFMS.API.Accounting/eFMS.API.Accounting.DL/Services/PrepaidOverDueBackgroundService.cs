@@ -21,7 +21,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                await WaitForNextSchedule("0 */2 * * *"); // At the start of every 2nd hour.
+                await WaitForNextSchedule("0 6-8/2 * * *"); // At the start of 6am and 8am.
                 new LogHelper("PrepaidOverDueBackgroundService", "RUNNING at " + DateTime.Now);
                 using (var scope = _services.CreateScope())
                 {
