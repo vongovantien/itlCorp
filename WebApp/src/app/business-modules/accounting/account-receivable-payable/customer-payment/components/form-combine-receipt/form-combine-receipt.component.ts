@@ -53,7 +53,7 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
     selectedPartner: any = {};
     isAllDone: boolean = false;
 
-    typeCombine: COMBINE_TYPE = 'NEW';
+    typeCombine: string = 'new';
 
     exsitingCombines: Observable<any>;
     constructor(
@@ -87,7 +87,7 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
             paymentDate: [{ startDate: new Date(), endDate: new Date() }],
             exchangeRate: [null],
             currency: [{ value: 'USD', disabled: true }],
-            combineNo: [null, this.typeCombine === 'EXISTING' ? Validators.required : null]
+            combineNo: [null, this.typeCombine === 'existing' ? Validators.required : null]
         });
         this.partnerId = this.form.controls['partnerId'];
         this.paymentDate = this.form.controls['paymentDate'];
