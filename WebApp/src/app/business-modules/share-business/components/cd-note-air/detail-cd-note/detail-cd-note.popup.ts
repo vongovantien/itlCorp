@@ -459,7 +459,7 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends DetailCDNoteBas
                 .pipe(
                     catchError((err: HttpErrorResponse) => {
                         if (!!err.error.message) {
-                            this._toastService.error("Can not Send mail. " + err.error.message + " Please recheck Email.");
+                            this._toastService.error("Can not Send mail. " + err.error.message);
                         }
                         return throwError(err.error.message);
                     })
