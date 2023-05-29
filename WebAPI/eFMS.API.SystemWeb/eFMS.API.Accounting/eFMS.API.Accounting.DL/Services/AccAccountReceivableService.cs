@@ -406,8 +406,9 @@ namespace eFMS.API.Accounting.DL.Services
                     IsExpired = s.FirstOrDefault().contract.IsExpired,
                     OverObh1to15Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.OverObh1to15Day : 0).Sum(),
                     OverObh16to30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.OverObh16to30Day : 0).Sum(),
-                    OverObh30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.OverObh30Day : 0).Sum(),
-                    IsOverDueOBH = s.First().contract.IsOverDueObh
+                    OverObh30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.OverObh30day : 0).Sum(),
+                    IsOverDueOBH = s.First().contract.IsOverDueObh,
+                    IsOverDuePrepaid = s.First().contract.IsOverDuePrepaid
                 });
 
             var data = from contract in groupByContract
@@ -472,6 +473,8 @@ namespace eFMS.API.Accounting.DL.Services
                            OverObh1to15Day = contract.OverObh1to15Day,
                            OverObh16to30Day = contract.OverObh16to30Day,
                            OverObh30Day = contract.OverObh30Day,
+                           IsOverDuePrepaid = contract.IsOverDuePrepaid
+                           
                        };
             return data;
         }
@@ -928,7 +931,8 @@ namespace eFMS.API.Accounting.DL.Services
                         IsOverDue = s.First().IsOverDue,
                         ArOfficeIds = s.Select(x => x.OfficeId).Distinct().ToList(),
                         ArServices = s.Select(x => x.ArServiceCode).Distinct().ToList(),
-                        IsOverDueOBH = s.First().IsOverDueOBH
+                        IsOverDueOBH = s.First().IsOverDueOBH,
+                        IsOverDuePrepaid = s.First().IsOverDuePrepaid
                     }).OrderByDescending(s => s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
@@ -1181,6 +1185,7 @@ namespace eFMS.API.Accounting.DL.Services
                 OverObh1to15Day = s.Sum(sum => sum.OverObh1to15Day),
                 OverObh16to30Day = s.Sum(sum => sum.OverObh16to30Day),
                 OverObh30Day = s.Sum(sum => sum.OverObh30Day),
+                IsOverDuePrepaid = s.FirstOrDefault().IsOverDuePrepaid,
             }).FirstOrDefault();
             detail.AccountReceivableGrpOffices = GetARGroupOffice(arPartners);
             return detail;
@@ -1216,7 +1221,7 @@ namespace eFMS.API.Accounting.DL.Services
                     ArSalesmanId = s.Key.SaleMan,
                     OverObh1to15Day = s.Select(se => se.OverObh1to15Day).Sum(),
                     OverObh16to30Day = s.Select(se => se.OverObh16to30Day).Sum(),
-                    OverObh30Day = s.Select(se => se.OverObh30Day).Sum(),
+                    OverObh30Day = s.Select(se => se.OverObh30day).Sum(),
                 });
             var users = userRepo.Get();
 
@@ -1565,7 +1570,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 foreach (var item in receivables)
                                 {
                                     item.Over30Day = 0;
-                                    item.OverObh30Day = 0;
+                                    item.OverObh30day = 0;
                                     DataContext.Update(item, x => x.Id == item.Id, false);
                                 }
                                 break;
@@ -1666,7 +1671,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         break;
                                     case 3: // 30
                                         currentReceivable.Over30Day = totalAmountUnpaid;
-                                        currentReceivable.OverObh30Day = totalAmountUnpaidOBH;
+                                        currentReceivable.OverObh30day = totalAmountUnpaidOBH;
                                         DataContext.Update(currentReceivable, x => x.Id == currentReceivable.Id, false);
                                         break;
                                     default:
@@ -1785,7 +1790,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             break;
                                         case 3:
                                             newAr.Over30Day = totalAmountUnpaid;
-                                            newAr.OverObh30Day = totalAmountUnpaidOBH;
+                                            newAr.OverObh30day = totalAmountUnpaidOBH;
                                             DataContext.Add(newAr, false);
                                             break;
                                         default:
@@ -1810,7 +1815,7 @@ namespace eFMS.API.Accounting.DL.Services
                             query = query.And(x => !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0) || !DataTypeEx.IsNullOrValue(x.OverObh16to30Day, 0));
                             break;
                         case 3: // 30
-                            query = query.And(x => !DataTypeEx.IsNullOrValue(x.Over30Day, 0) || !DataTypeEx.IsNullOrValue(x.OverObh30Day, 0));
+                            query = query.And(x => !DataTypeEx.IsNullOrValue(x.Over30Day, 0) || !DataTypeEx.IsNullOrValue(x.OverObh30day, 0));
                             break;
                         default:
                             overDueParam = null;
@@ -1843,7 +1848,7 @@ namespace eFMS.API.Accounting.DL.Services
                             foreach (var ar in receivablesNeedReset)
                             {
                                 ar.Over30Day = 0;
-                                ar.OverObh30Day = 0;
+                                ar.OverObh30day = 0;
                                 DataContext.Update(ar, x => x.Id == ar.Id, false);
                             }
                             break;
@@ -1917,7 +1922,7 @@ namespace eFMS.API.Accounting.DL.Services
                             contract.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over30Day, 0));
                             contract.IsOverDueObh = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.OverObh1to15Day, 0) 
                             || !DataTypeEx.IsNullOrValue(x.OverObh16to30Day, 0)
-                            || !DataTypeEx.IsNullOrValue(x.OverObh30Day, 0));
+                            || !DataTypeEx.IsNullOrValue(x.OverObh30day, 0));
                             if (contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_GUARANTEE)
                             {
                                 var relateGuaranteeContracts = contractPartnerRepo.Get(x => x.Active == true

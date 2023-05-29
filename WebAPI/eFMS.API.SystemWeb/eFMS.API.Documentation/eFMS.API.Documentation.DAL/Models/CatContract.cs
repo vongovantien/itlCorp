@@ -57,5 +57,6 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? FirstShipmentDate { get; set; }
         public int? PaymentTermObh { get; set; }
         public bool? IsOverDueObh { get; set; }
+        public bool? IsOverDuePrepaid { get; set; }
     }
 }
