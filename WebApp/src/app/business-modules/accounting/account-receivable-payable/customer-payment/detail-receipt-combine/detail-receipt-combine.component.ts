@@ -56,8 +56,8 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
               return;
             }
             this.updateDetailForm(res[0]);
-            this.CreateReceiptCombineComponent.isAllDone = res.every(x => x.status === 'Done' && x?.syncStatus !== 'Synced');
-            this.CreateReceiptCombineComponent.isBalance = res.filter(x => x.status === 'Done').every(x => !!x.isBalanceReceipt);
+            this.CreateReceiptCombineComponent.isAllDone = res.filter(x => x?.syncStatus !== 'Synced' && x.subArcbno === res[0].subArcbno).every(x => x.status === 'Done');
+            this.CreateReceiptCombineComponent.isBalance = res.filter(x => x.status === 'Done' && x.subArcbno === res[0].subArcbno).every(x => !!x.isBalanceReceipt);
             this.updateGeneralReceipt(res);
             this.updateCreditDebitCombineReceipt(res);
           } else {
@@ -263,7 +263,7 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
     const generalGroup = (_groupBy(this.ReceiptGeneralCombineComponent.generalReceipts, 'id') || []);
     const generalReceipts = Object.keys(generalGroup).map(key => generalGroup[key][0]);
     generalReceipts
-      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done'  && x?.syncStatus !== 'Synced')
+      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done' && x.subArcbno === this.CreateReceiptCombineComponent.combineNo.value && x?.syncStatus !== 'Synced')
       .forEach((element: any) => {
         const receiptSyncId: AccountingInterface.IRequestString = {
           id: element.id,
@@ -272,30 +272,30 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
         receiptSyncIds.push(receiptSyncId);
       });
 
-    let creditAmount = generalReceipts.filter((x: any) => !!x.status && x.status.toLowerCase() === 'done' && x?.syncStatus !== 'Synced' && x.receiptMode === 'Credit')
-      .reduce((acc, curr) => { return acc + curr.finalPaidAmount }, 0);
-    let debitAmount = generalReceipts.filter((x: any) => !!x.status && x.status.toLowerCase() === 'done' && x?.syncStatus !== 'Synced' && x.receiptMode === 'Debit')
-      .reduce((acc, curr) => { return acc + curr.finalPaidAmount }, 0);
+    // let creditAmount = generalReceipts.filter((x: any) => !!x.status && x.status.toLowerCase() === 'done' && x?.syncStatus !== 'Synced' && x.receiptMode === 'Credit')
+    //   .reduce((acc, curr) => { return acc + curr.finalPaidAmount }, 0);
+    // let debitAmount = generalReceipts.filter((x: any) => !!x.status && x.status.toLowerCase() === 'done' && x?.syncStatus !== 'Synced' && x.receiptMode === 'Debit')
+    //   .reduce((acc, curr) => { return acc + curr.finalPaidAmount }, 0);
 
     this.DebitPaymentReceiptCDCombineComponent.receiptDebitGroups
-      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done'  && x?.syncStatus !== 'Synced')
+      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done' && x.subArcbno === this.CreateReceiptCombineComponent.combineNo.value && x?.syncStatus !== 'Synced')
       .forEach((item: IReceiptCombineGroup) => {
         const receiptSyncId: AccountingInterface.IRequestString = {
           id: item.id,
           action: item.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
         };
-        debitAmount += item.finalPaidAmount;
+        // debitAmount += item.finalPaidAmount;
         receiptSyncIds.push(receiptSyncId);
       });
 
     this.CreditPaymentReceiptCDCombineComponent.receiptCreditGroups
-      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done'  && x?.syncStatus !== 'Synced')
+      .filter((x: any) => !!x.status && x.status.toLowerCase() === 'done' && x.subArcbno === this.CreateReceiptCombineComponent.combineNo.value && x?.syncStatus !== 'Synced')
       .forEach((item: IReceiptCombineGroup) => {
         const receiptSyncId: AccountingInterface.IRequestString = {
           id: item.id,
           action: item.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
         };
-        creditAmount += item.finalPaidAmount;
+        // creditAmount += item.finalPaidAmount;
         receiptSyncIds.push(receiptSyncId);
       });
     if (!receiptSyncIds.length) {
@@ -303,7 +303,7 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
       return;
     }
 
-    if(creditAmount != debitAmount){
+    if(!this.CreateReceiptCombineComponent.isBalance){
       this._toastService.error("Final Credit Amount and Final Debit Amount of combined receipts not balance, Please check it again!");
       return;
     }
