@@ -1,14 +1,15 @@
 import { Component, OnInit, Input, EventEmitter, Output, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
+import { Company, Partner } from '@models';
+import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { SortService } from '@services';
-import { Partner, Company, Office } from '@models';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { IPartnerDataState, getPartnerDataSearchParamsState, getPartnerDataListState, LoadListPartner, getPartnerDataListPagingState, getPartnerDataListLoadingState } from '../../store';
-import { Store } from '@ngrx/store';
+import { getPartnerDataLoadingState, getPartnerDataSearchParamsState, getPartnerDataListState, LoadListPartner, getPartnerDataListPagingState,  } from 'src/app/business-modules/commercial/store';
 import { ManagementAddressComponent } from 'src/app/business-modules/commercial/components/management-address/management-commercial-address.component';
+import { IPartnerDataState } from 'src/app/business-modules/commercial/store/reducers/partner.reducer';
 
 
 
@@ -51,9 +52,6 @@ export class PartnerListComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
-        //this.getService();
-        //this.getOffice();
-        //this.getCompany();
         this._store.select(getPartnerDataSearchParamsState)
             .pipe(
                 withLatestFrom(this._store.select(getPartnerDataListPagingState)),
@@ -64,7 +62,6 @@ export class PartnerListComponent extends AppList implements OnInit {
                 (data: any) => {
                     if (!!data.dataSearch) {
                         this.dataSearchs = data.dataSearch;
-                        console.log(this.dataSearchs);
                         if (Object.keys(this.dataSearchs).length > 0) {
                             this.dataSearchs.type = this.dataSearchs.type === "userCreatedName" ? "userCreated" : this.dataSearchs.type;
                             this.criteria[this.dataSearchs.type] = this.dataSearchs.keyword;
@@ -120,11 +117,9 @@ export class PartnerListComponent extends AppList implements OnInit {
         } else {
             this.isCustomer = false;
         }
-
         this.getPartners();
+        this.isLoading = this._store.select(getPartnerDataLoadingState);
 
-        this.isLoading = this._store.select(getPartnerDataListLoadingState);
-        console.log(this.isLoading);
     }
 
     replaceService() {
@@ -213,42 +208,8 @@ export class PartnerListComponent extends AppList implements OnInit {
     }
 
     getPartners() {
-        // this.isLoading = true;
-        // this._progressRef.start();
-        // this._catalogueRepo.getListPartner(this.page, this.pageSize, this.dataSearch)
-        //     .pipe(catchError(this.catchError), finalize(() => {
-        //         this._progressRef.complete();
-        //         this.isLoading = false;
-        //     })).subscribe(
-        //         (res: CommonInterface.IResponsePaging) => {
-        //             this.partners = res.data || [];
-        //             console.log(this.partners);
-        //             this.totalItems = res.totalItems;
-        //         }
-        //     );
-
         this._store.dispatch(LoadListPartner({ page: this.isSearching === true ? 1 : this.page, size: this.pageSize, dataSearch: this.dataSearch }));
         this.isSearching = false;
-        // this._store.select(getPartnerDataListState)
-        //     .pipe(
-        //         catchError(this.catchError),
-        //         finalize(() => {
-        //             map((data: any) => {
-        //                 return {
-        //                     data: !!data.data ? data.data.map((item: any) => new Partner(item)) : [],
-        //                     totalItems: data.totalItems,
-        //                 };
-        //             })
-        //             this._progressRef.complete();
-        //             this.isLoading = false;
-        //         })
-
-        //     ).subscribe(
-        //         (res: any) => {
-        //             this.partners = res.data || [];
-        //             this.totalItems = res.totalItems || 0;
-        //         },
-        //     );
     }
 
     sortPartners() {

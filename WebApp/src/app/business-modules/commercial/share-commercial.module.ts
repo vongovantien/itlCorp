@@ -17,6 +17,9 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { CommonModule } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
+import { commercialEffect, reducers } from './store';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 
 @NgModule({
     declarations: [
@@ -40,6 +43,8 @@ import { NgxDaterangepickerMd } from "ngx-daterangepicker-material";
         NgSelectModule,
         TabsModule.forRoot(),
         NgxDaterangepickerMd,
+        StoreModule.forFeature('commercial', reducers),
+        EffectsModule.forFeature(commercialEffect),
     ],
     exports: [
         CommercialCreateComponent,

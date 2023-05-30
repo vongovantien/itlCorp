@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using eFMS.API.Catalogue.DL.Common;
 using eFMS.API.Catalogue.DL.IService;
 using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Catalogue.DL.Models.CataloguePartner;
 using eFMS.API.Catalogue.DL.Models.Criteria;
 using eFMS.API.Catalogue.DL.ViewModels;
 using eFMS.API.Catalogue.Service.Contexts;
@@ -59,6 +60,9 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly ICacheServiceBase<CatPartner> cache;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
+        private readonly IContextBase<CatPartnerBank> catPartnerBankRepository;
+        private readonly IContextBase<CatBank> catBankRepository;
+        private readonly IOptions<ApiServiceUrl> _serviceUrl;
         SysUser salemanBOD;
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -82,7 +86,10 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
             IContextBase<SysEmailSetting> sysEmailSettingRepo,
-            IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
+            IOptions<ApiUrl> apiurl,
+            IContextBase<CatPartnerBank> catPartnerBankRepo,
+            IContextBase<CatBank> catBankRepo,
+            IOptions<ApiServiceUrl> serviceUrl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
             currentUser = user;
@@ -106,6 +113,9 @@ namespace eFMS.API.Catalogue.DL.Services
             cache = cacheService;
             sysEmailTemplateRepository = sysEmailTemplateRepo;
             sysEmailSettingRepository = sysEmailSettingRepo;
+            catPartnerBankRepository = catPartnerBankRepo;
+            catBankRepository = catBankRepo;
+            _serviceUrl = serviceUrl;
 
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -2831,5 +2841,74 @@ namespace eFMS.API.Catalogue.DL.Services
                        };
             return data.ToList();
         }
+
+        public async Task<List<PartnerSyncModel>> GetListPartnerToSync(List<string> Ids)
+        {
+            var dataReturn = new List<PartnerSyncModel>();
+            if (Ids == null || !Ids.Any()) return dataReturn;
+            var partners = await DataContext.GetAsync(x => Ids.Contains(x.Id));
+            foreach (var partner in partners)
+            {
+                var partnerSync = new PartnerSyncModel();
+                partnerSync.Code = partner.AccountNo;
+                partnerSync.Name = partner.PartnerNameVn;
+                partnerSync.CustomerType = partner.PartnerGroup.Trim() == "STAFF;PERSONAL" ? "1" : (partner.PartnerMode.Trim() == "External" ? "2" : "3");
+                partnerSync.Address = partner.AddressShippingVn;
+                partnerSync.BillingAddress = partner.AddressVn;
+                partnerSync.TaxRegNo = partner.TaxCode;
+                partnerSync.Tel = partner.Tel;
+                partnerSync.Email = partner.Email;
+                partnerSync.IdCardNo = partner.IdentityNo;
+                partnerSync.IdCardDate = partner.DateId;
+                partnerSync.IdCardPlace = partner.PlaceId;
+
+                var partnerBankAccounts = await catPartnerBankRepository.GetAsync(x => x.PartnerId.ToString() == partner.Id && x.ApproveStatus == "New");
+                var bankAccounts = new List<PartnerBankAccountSyncModel>();
+                var attachedBankFiles = new List<PartnerAttachDocSyncModel>();
+                foreach (var partnerBank in partnerBankAccounts)
+                {
+                    var bankDetail = await catBankRepository.Where(x => x.Id.ToString() == partnerBank.BankId).FirstOrDefaultAsync();
+                    bankAccounts.Add(new PartnerBankAccountSyncModel()
+                    {
+                        BankCode = bankDetail.Code,
+                        BankAccountNo = partnerBank.BankAccountName,
+                        BankName = bankDetail.BankNameEn,
+                        SwiftCode = partnerBank.SwiftCode,
+                        Address = partnerBank.BankAddress
+                    });
+
+                    var attachedFiles = sysImageRepository.Get(x => x.ObjectId == partnerBank.Id.ToString()).Select(x => new PartnerAttachDocSyncModel
+                    {
+                        AttachDocRowId = x.Id.ToString(),
+                        AttachDocDate = x.DateTimeCreated,
+                        AttachDocName = x.Name,
+                        AttachDocPath = _serviceUrl.Value.ApiUrlFileSystem.ToString() + "/api/v1/en-Us/AWSS3/DownloadFile/" + x.KeyS3
+                    });
+                    attachedBankFiles.AddRange(attachedFiles);
+                }
+                if (bankAccounts.Count() <= 0)
+                {
+                    bankAccounts.Add(new PartnerBankAccountSyncModel());
+                }
+                partnerSync.Details = bankAccounts;
+                partnerSync.AtchDocInfo = attachedBankFiles;
+                dataReturn.Add(partnerSync);
+            }
+
+            return dataReturn;
+        }
+
+        public async Task<HandleState> UpdatePartnerSyncStatus(List<CatPartnerModel> models)
+        {
+            var hs = new HandleState();
+            foreach (var item in models)
+            {
+                var newItem = _mapper.Map<CatPartner>(item);
+                hs = DataContext.Update(newItem, x => x.Id == item.Id);
+            }
+            hs = DataContext.SubmitChanges();
+            return hs;
+        }
+
     }
 }

@@ -10,17 +10,19 @@ import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 
 import { CommercialCreateComponent } from '../create/create-commercial.component';
 
+import { formatDate } from '@angular/common';
 import { ConfirmPopupComponent } from '@common';
 import { CommonEnum } from '@enums';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
 import { combineLatest, of } from 'rxjs';
 import { catchError, concatMap, finalize, map } from 'rxjs/operators';
+import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
+import { CommercialBankListComponent } from '../components/bank/commercial-bank-list.component';
 import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
-import { CommercialBankListComponent } from '../components/bank/commercial-bank-list.component';
-import { formatDate } from '@angular/common';
 import { CommercialAddressListComponent } from '../components/address/commercial-address-list.component';
+import { getDetailPartnerSuccess } from '../store';
 
 @Component({
     selector: 'app-detail-commercial',
@@ -35,6 +37,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     @ViewChild(PayableComponent) payableComponent: PayableComponent;
     @ViewChild(CommercialAddressListComponent) addressPartnerList: CommercialAddressListComponent;
 
+    @ViewChild(FormContractCommercialPopupComponent) formContractComponent: FormContractCommercialPopupComponent
     partnerId: string;
     partner: Partner;
     currency: string;
@@ -135,11 +138,10 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                             this.formCreate.acRefCustomers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, true, this.partner.id);
                             this.formCreate.getACRefName(this.partner.parentId);
                         }
-                        // this.formCreate.partnerLocation.setValue([<CommonInterface.INg2Select>{ id: this.partner.partnerLocation, text: this.partner.partnerLocation }]);
-
                         this.formCreate.getShippingProvinces(res.countryShippingId);
                         this.formCreate.getBillingProvinces(res.countryId);
                         this.payableComponent.getGeneralPayable(this.partner.id, this.partner.currency === null ? "VND" : this.partner.currency);
+                        this._store.dispatch(getDetailPartnerSuccess({ payload: res }))
                     }
                     else {
                         this.back();
@@ -199,11 +201,9 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         this.formCommercialComponent.isBranchSubCurrent = !!partner.parentId && partner.id != partner.parentId;
     }
 
-    getListContract(partneId: string) {
+    getListContract(partnerId: string) {
         this._cd.detectChanges();
-
-        // this.contractList.isLoading = true;
-        this._catalogueRepo.getListSaleManDetail({ partnerId: partneId })
+        this._catalogueRepo.getListSaleManDetail({ partnerId: partnerId })
             .pipe(
                 finalize(() => this.contractList.isLoading = false)
             )
@@ -262,7 +262,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         modelAdd.coLoaderCode = this.partner.coLoaderCode;
         modelAdd.website = this.partner.website;
         modelAdd.bankAccountNo = this.partner.bankAccountNo;
-        //modelAdd.bankAccountName = this.partner.bankAccountName;
         modelAdd.bankAccountAddress = this.partner.bankAccountAddress;
         modelAdd.note = this.partner.note;
         modelAdd.public = this.partner.public;
@@ -275,9 +274,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
 
         console.log(modelAdd);
         this.updatePartner(modelAdd);
-        console.log(this.partner);
-
-        //this.payableComponent.getGeneralPayable(this.partner.id, payable.currency);
     }
 
     onSaveDetail() {
@@ -302,7 +298,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         modelAdd.partnerType = this.partner.partnerType;
         modelAdd.partnerGroup = this.partner.partnerGroup;
         modelAdd.datetimeCreated = this.partner.datetimeCreated;
-        modelAdd.dateId = (modelAdd.dateId === null || modelAdd.dateId?.startDate === null) ? null : (!!modelAdd.dateId ? (!!modelAdd.dateId.startDate ? formatDate(modelAdd.dateId.startDate, 'yyyy-MM-dd', 'en'):  formatDate(new Date(modelAdd.dateId), 'yyyy-MM-dd', 'en')) : null);
+        modelAdd.dateId = (modelAdd.dateId === null || modelAdd.dateId?.startDate === null) ? null : (!!modelAdd.dateId ? (!!modelAdd.dateId.startDate ? formatDate(modelAdd.dateId.startDate, 'yyyy-MM-dd', 'en') : formatDate(new Date(modelAdd.dateId), 'yyyy-MM-dd', 'en')) : null);
 
         // * Update catalogue partner data.
         modelAdd.roundUpMethod = this.partner.roundUpMethod;
@@ -314,7 +310,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         modelAdd.coLoaderCode = this.partner.coLoaderCode;
         modelAdd.website = this.partner.website;
         modelAdd.bankAccountNo = this.partner.bankAccountNo;
-        //modelAdd.bankAccountName = this.partner.bankAccountName;
         modelAdd.bankAccountAddress = this.partner.bankAccountAddress;
         modelAdd.note = this.partner.note;
         modelAdd.public = this.partner.public;

@@ -6,11 +6,11 @@ import { RoutingConstants } from '@constants';
 import { Company } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
-import { getMenuUserPermissionState, getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { getMenuUserPermissionState, getMenuUserSpecialPermissionState } from '@store';
 import _merge from 'lodash-es/merge';
 import { ToastrService } from 'ngx-toastr';
 import { combineLatest, forkJoin, Observable } from 'rxjs';
-import { catchError, finalize, map, takeUntil } from "rxjs/operators";
+import { catchError, finalize, map, switchMap, takeUntil } from "rxjs/operators";
 import { AppList } from 'src/app/app.list';
 import { CommercialBranchSubListComponent } from 'src/app/business-modules/commercial/components/branch-sub/commercial-branch-sub-list.component';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
@@ -94,7 +94,6 @@ export class PartnerDetailComponent extends AppList {
     isAddSubPartner: boolean = false;
 
     menuSpecialPermission: Observable<any[]>;
-
     constructor(private route: ActivatedRoute,
         private router: Router,
         private _catalogueRepo: CatalogueRepo,
@@ -104,7 +103,7 @@ export class PartnerDetailComponent extends AppList {
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _cd: ChangeDetectorRef,
-        private _store: Store<IAppState>
+        private _store: Store<any>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -157,7 +156,7 @@ export class PartnerDetailComponent extends AppList {
         this._cd.detectChanges();
     }
 
-    getParnerDetails() {
+    getPartnerDetail() {
         this._progressRef.start();
         this._catalogueRepo.getDetailPartner(this.partner.id)
             .pipe(
@@ -172,7 +171,7 @@ export class PartnerDetailComponent extends AppList {
                         this.allowUpdate = this.partner.permission.allowUpdate;
                         this.formPartnerComponent.isAddBranchSub = this.isAddSubPartner;
                         this.formPartnerComponent.groups = this.partner.partnerGroup;
-                        // console.log("res: ", res);
+                        this.formContractPopup.detailPartner = this.partner;
                         this.formPartnerComponent.setFormData(this.partner);
                         if (this.isAddSubPartner) {
                             this.formPartnerComponent.getACRefName(this.partner.id);
@@ -302,14 +301,11 @@ export class PartnerDetailComponent extends AppList {
                     this.formPartnerComponent.countries = this.utility.prepareNg2SelectData(countries || [], 'id', 'name');
                     this.formPartnerComponent.billingProvinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'name_VN');
                     this.formPartnerComponent.shippingProvinces = this.utility.prepareNg2SelectData(provinces || [], 'id', 'name_VN');
-                    // this.formPartnerComponent.parentCustomers = this.utility.prepareNg2SelectData(customers || [], 'id', 'partnerNameVn');
                     this.formPartnerComponent.parentCustomers = customers;
                     this.formPartnerComponent.partnerGroups = this.utility.prepareNg2SelectData(partnerGroups || [], 'id', 'id');
                     this.getPartnerGroupActive(this.partnerType);
                     this.formPartnerComponent.workPlaces = workPlaces.map(x => ({ "text": x.code + ' - ' + x.branchNameEn, "id": x.id }));
-                    this.getParnerDetails();
-
-
+                    this.getPartnerDetail();
                     // * Update other charge.
                     this.formPartnerComponent.otherChargePopup.initCharges = partnerCharge || [];
                     this.formPartnerComponent.otherChargePopup.charges = partnerCharge || [];
@@ -483,14 +479,12 @@ export class PartnerDetailComponent extends AppList {
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.bankAccountAddress, formBody.bankAccountAddress);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.swiftCode, formBody.swiftCode);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.note, formBody.note);
-        //
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingEmail, formBody.billingEmail);
         this.formPartnerComponent.trimInputValue(this.formPartnerComponent.billingPhone, formBody.billingPhone);
     }
 
     onFocusInternalReference() {
         this.confirmTaxcode.hide();
-        //
         this.formPartnerComponent.handleFocusInternalReference();
     }
 
@@ -499,10 +493,7 @@ export class PartnerDetailComponent extends AppList {
             .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    console.log("res check: ", res);
-
                     if (!!res) {
-
                         this.formPartnerComponent.isExistedTaxcode = true;
 
                         if (!!res.internalReferenceNo) {
@@ -512,29 +503,33 @@ export class PartnerDetailComponent extends AppList {
                             this.deleteMessage = `This <b>Taxcode</b> already <b>Existed</b> in  <b>${res.shortName}</b>, If you want to Create Internal account, Please fill info to <b>Internal Reference Info</b>.`;
                             this.confirmTaxcode.show();
                         }
-
-
                     } else {
                         this.onSave(body);
                     }
                 },
             );
     }
-    onSave(body: any) {
 
-        this._progressRef.start();
+    onSave(body: any) {
+        console.log(body)
         if (!this.isAddSubPartner) {
             this._catalogueRepo.updatePartner(body.id, body)
-                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-                .subscribe(
+                .pipe(
+                    catchError(this.catchError)
+                ).subscribe(
                     (res: CommonInterface.IResult) => {
-                        if (res.status) {
+                        const { status, message } = res;
+                        if (status) {
                             this.formPartnerComponent.activePartner = this.partner.active;
                             this.formPartnerComponent.bankName.setValue(this.formPartnerComponent.bankName.value?.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
                             this.getParentCustomers();
-                            this._toastService.success(res.message);
+                            if (body.active === true) {
+                                const partnerSyncIds: any[] = [{ id: body.id, action: !!body.sysMappingId ? 'UPDATE' : 'ADD' }];
+                                this.syncPartnerToAccountantSystem(partnerSyncIds);
+                            }
+                            this._toastService.success(message);
                         } else {
-                            this._toastService.warning(res.message);
+                            this._toastService.warning(message);
                         }
                     }
                 );
@@ -549,10 +544,28 @@ export class PartnerDetailComponent extends AppList {
                         } else {
                             this._toastService.error("Opps", "Something getting error!");
                         }
-
                     }, err => {
+                        console.log(err)
                     });
         }
+    }
+
+    syncPartnerToAccountantSystem(partnerSyncIds: string[]) {
+        this._catalogueRepo.syncPartnerToAccountantSystem(partnerSyncIds).pipe(
+            catchError(this.catchError),
+            switchMap((res: CommonInterface.IResult) => {
+                const { status, message } = res;
+                if (status) {
+                    this._toastService.success(message);
+                } else {
+                    this._toastService.warning(message);
+                }
+                return this._catalogueRepo.getDetailPartner(this.partner.id);
+            }),
+        ).subscribe((res: Partner) => {
+            console.log(res);
+            this.partner.SysMappingId = res.SysMappingId;
+        });
     }
 
     sortBySaleMan(sortData: CommonInterface.ISortData): void {
@@ -576,12 +589,11 @@ export class PartnerDetailComponent extends AppList {
                         }
                     }
                 });
-
     }
 
     onDelete() {
         this._catalogueRepo.deletePartner(this.partner.id)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .pipe(catchError(this.catchError), finalize(() => { }))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -654,7 +666,6 @@ export class PartnerDetailComponent extends AppList {
 
     onSaveReject($event: string) {
         const comment = $event;
-        console.log(comment);
         this._progressRef.start();
         this._catalogueRepo.rejectComment(this.partner.id, comment)
             .pipe(
@@ -669,8 +680,6 @@ export class PartnerDetailComponent extends AppList {
                     }
                 }
             );
-
-
     }
 
     onRequestApproval() {
@@ -688,8 +697,6 @@ export class PartnerDetailComponent extends AppList {
                     }
                 }
             );
-
-
     }
 
     gotoList() {

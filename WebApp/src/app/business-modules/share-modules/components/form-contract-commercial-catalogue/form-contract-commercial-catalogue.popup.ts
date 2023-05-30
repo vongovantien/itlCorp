@@ -1,15 +1,15 @@
 import { formatDate } from '@angular/common';
-import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
 import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { Company, Customer, Office, User } from '@models';
+import { Company, Customer, Office, Partner, User } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { CatalogueRepo, SystemFileManageRepo, SystemRepo } from '@repositories';
-import { GetCatalogueCurrencyAction, getCatalogueCurrencyState, getCurrentUserState, getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { GetCatalogueCurrencyAction, IAppState, getCatalogueCurrencyState, getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
 import { catchError, distinctUntilChanged, finalize, map, takeUntil } from 'rxjs/operators';
@@ -17,7 +17,7 @@ import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/comm
 import { PopupBase } from 'src/app/popup.base';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
-import { AccountingConstants } from '@constants';
+import { getDetailPartner, getDetailPartnerDataState } from 'src/app/business-modules/commercial/store';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -28,13 +28,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     formGroup: FormGroup;
     partners: Observable<Customer[]>;
-
     isUpdate: boolean = false;
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @ViewChild(SalesmanCreditLimitPopupComponent) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
     @ViewChild(PartnerRejectPopupComponent) popupRejectPartner: PartnerRejectPopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmChangeAgreementTypePopup: ConfirmPopupComponent;
-
+    detailPartner: any;
     openOnPartner: boolean = false;
 
     isRequiredContractNo: boolean = false;
@@ -76,7 +75,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
 
     partnerId: string = null;
-
     users: any[] = [];
     companies: Company[] = [];
     contracts: Contract[] = [];
@@ -162,6 +160,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+        this._store.select(getDetailPartnerDataState).subscribe(res => this.detailPartner = res)
         this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((res) => {
             if (!!res) {
                 this.currentUser = res;
@@ -212,13 +211,11 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 .subscribe((value: any) => {
                     this.minDateExpiredTrial = this.createMoment(value); // * Update MinDate -> ExpiredDate.
                 });
-
         }
     }
 
     initForm() {
         this.formGroup = this._fb.group({
-            // salesmanId: [null, Validators.required],
             companyId: [null, Validators.required],
             partnerId: [null],
             officeId: [null, Validators.required],
@@ -519,7 +516,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         if (this.formGroup.valid) {
             const objCheckContract = !!this.contractNo.value && this.contracts.length >= 1 ? this.contracts.filter(x => x.contractNo === this.contractNo.value && x.contractType === "Official").length > 1 : null;
             if (objCheckContract) {
-                //this.contractNo.setValue(null);
                 this.isDuplicateContract = true;
                 this._toastService.error('Contract no has been existed!');
                 return;
@@ -867,7 +863,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 (res: boolean) => {
                     if (res === true) {
                         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
-                            body: 'There are Other Agreement that same service, If Agreement is actived, Those Agreement will be Inactive. Are You Sure Active this agreement ?',
+                            body: 'There are Other Agreement that same service, If Agreement is activated, Those Agreement will be Inactive. Are You Sure Active this agreement ?',
                             label: 'OK'
                         }, () => {
                             this.processActiveInActiveContract(id);
@@ -898,26 +894,44 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     processActiveInActiveContract(id: string, bodyCredit?: any) {
         this._progressRef.start();
         this._catalogueRepo.activeInactiveContract(id, this.partnerId, bodyCredit)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this._progressRef.complete();
-            }))
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this.selectedContract.active = !this.selectedContract.active;
                         this.statusContract = this.selectedContract.active;
-                        let message = '';
-                        if (!this.selectedContract.active) {
-                            message = 'Inactive success !!';
-                        } else {
-                            message = 'Active success !!';
-                            this.selectedContract.partnerStatus = true;
+                        const message = this.selectedContract.active ? 'Active success !!' : 'Inactive success !!';
+                        if (this.selectedContract.active) {
+                            const action = !!this.detailPartner.sysMappingId ? 'UPDATE' : 'ADD';
+                            this.syncPartnerToAccountantSystem([{ Id: this.partnerId, action }]);
                         }
                         this._toastService.success(message);
                         this.onRequest.emit(this.selectedContract);
                     } else {
                         this._toastService.error(res.message);
                     }
+                }
+            );
+    }
+
+    syncPartnerToAccountantSystem(partnerSyncIds: any[]) {
+        this._catalogueRepo.syncPartnerToAccountantSystem(partnerSyncIds)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    const { status, message } = res;
+                    if (status) {
+                        this._toastService.success(message);
+                    } else {
+                        this._toastService.warning(message);
+                    }
+                    this._store.dispatch(getDetailPartner({ payload: this.selectedContract.partnerId }))
                 }
             );
     }

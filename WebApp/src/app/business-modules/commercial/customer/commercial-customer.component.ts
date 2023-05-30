@@ -20,9 +20,9 @@ import { Observable } from 'rxjs';
 import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 import { FormSearchExportComponent } from '../components/popup/form-search-export/form-search-export.popup';
-import { getCustomerListState, getCustomerLoadingState, getCustomerSearchParamsState, ICustomerState } from './store';
-import { LoadListCustomer, SearchList } from './store/actions/customer.action';
 import { ManagementAddressComponent } from '../components/management-address/management-commercial-address.component';
+import { getCustomerListState, getCustomerLoadingState, getCustomerSearchParamsState, LoadListCustomer, SearchListCustomer } from '../store';
+import { ICustomerState } from '../store/reducers/customer.reducer';
 
 
 
@@ -165,7 +165,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
             keyword: !!event.searchString ? event.searchString : this.dataSearchs.keyword
         };
         //this.page = 1;
-        this._store.dispatch(SearchList({ payload: searchData }));
+        this._store.dispatch(SearchListCustomer({ payload: searchData }));
         this._store.select(getCustomerListState)
             .pipe(
                 takeUntil(this.ngUnsubscribe),
@@ -238,7 +238,6 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.formContractPopup.effectiveDate.setValue(null);
         this.formContractPopup.isCustomerRequest = true;
         this.formContractPopup.show();
-        // this.formContractPopup.show();
     }
 
     onRequestContract($event: boolean) {
@@ -249,7 +248,6 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     }
     ngAfterViewInit() {
         if (Object.keys(this.dataSearchs).length > 0) {
-            console.log(this.dataSearchs);
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
             const type = this.dataSearchs.type === "userCreated" ? "userCreatedName" : this.dataSearchs.type;
             this.searchOptionsComponent.searchObject.field = this.dataSearchs.type;
@@ -259,18 +257,6 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     }
 
     getPartners() {
-        // this.isLoading = true;
-        // this._progressRef.start();
-        // this._catalogueRepo.getListPartner(this.page, this.pageSize, Object.assign({}, this.dataSearch))
-        //     .pipe(catchError(this.catchError), finalize(() => {
-        //         this._progressRef.complete();
-        //         this.isLoading = false;
-        //     })).subscribe(
-        //         (res: CommonInterface.IResponsePaging) => {
-        //             this.customers = res.data || [];
-        //             this.totalItems = res.totalItems;
-        //         }
-        //     );
         this._store.dispatch(LoadListCustomer({ page: this.isSearching === true ? 1 : this.page, size: this.pageSize, dataSearch: this.dataSearch }));
         this.isSearching = false;
     }

@@ -55,7 +55,7 @@ export class Customer {
     userCreatedName: string = '';
     taxCodeAbbrName:string = '';
     saleManRequests: SaleManRequest[] = [];
-
+    sysMappingID: string = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

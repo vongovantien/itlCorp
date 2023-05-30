@@ -1,18 +1,13 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { CommercialAgentComponent } from './commercial-agent.component';
+import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { CommercialDetailComponent } from '../detail/detail-commercial.component';
-import { CommercialCreateComponent } from '../create/create-commercial.component';
-import { ShareCommercialModule } from '../share-commercial.module';
+import { ShareModulesModule } from '../../share-modules/share-modules.module';
 import { ContractImportComponent } from '../components/contract/import/contract-import.component';
 import { CustomerAgentImportComponent } from '../components/customer-agent-import/customer-agent-import.component';
-import { StoreModule } from '@ngrx/store';
-import { reducers } from './store/reducers';
-import { ShareModulesModule } from '../../share-modules/share-modules.module';
-import { EffectsModule } from '@ngrx/effects';
-import { agentEffect } from './store/effect';
-
+import { CommercialCreateComponent } from '../create/create-commercial.component';
+import { CommercialDetailComponent } from '../detail/detail-commercial.component';
+import { ShareCommercialModule } from '../share-commercial.module';
+import { CommercialAgentComponent } from './commercial-agent.component';
 const routing: Routes = [
     {
         path: '', data: { name: "" }, children: [
@@ -49,8 +44,6 @@ const routing: Routes = [
         SharedModule,
         ShareCommercialModule,
         ShareModulesModule,
-        StoreModule.forFeature('agent', reducers),
-        EffectsModule.forFeature(agentEffect),
     ],
     exports: [],
     providers: [],

@@ -14,6 +14,7 @@ import { FormContractCommercialPopupComponent } from 'src/app/business-modules/s
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { FormUpdateEmailContractComponent } from '../popup/form-update-email-contract/form-update-email-contract.component';
 import { IAppState } from './../../../../store/reducers/index';
+import { Partner } from '@models';
 
 @Component({
     selector: 'commercial-contract-list',
@@ -24,6 +25,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
     @ViewChild(FormUpdateEmailContractComponent) formUpdateEmailContractPopup: FormUpdateEmailContractComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @Output() onGetDetailPartner : EventEmitter<any> = new EventEmitter<any>();
     @Input() partnerId: string;
     @Input() openOnPartner: boolean = false;
     @Output() onActiveContract: EventEmitter<any> = new EventEmitter<any>();
@@ -93,6 +95,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         if (this.type === 'Agent') {
             this.formContractPopup.contractTypes = this.formContractPopup.contractTypes.filter(x => x !== 'Cash');
         }
+
     }
 
     gotoCreateContract() {
@@ -276,9 +279,9 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}/${this.partnerId}/contract/${this.selectedContract.id}`]);
     }
 
-    getListContract(partneId: string) {
+    getListContract(partnerId: string) {
         this.isLoading = true;
-        this._catalogueRepo.getListContract(partneId, false)
+        this._catalogueRepo.getListContract(partnerId, false)
             .pipe(
                 finalize(() => this.isLoading = false)
             )

@@ -1,10 +1,10 @@
-import { CustomerActionTypes, LoadListCustomerSuccess } from './../actions/customer.action';
 import { Injectable } from "@angular/core";
-import { createEffect, ofType, Actions } from "@ngrx/effects";
-import { switchMap, map, catchError } from "rxjs/operators";
-import { Observable, EMPTY } from "rxjs";
-import { CatalogueRepo } from "@repositories";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { Action } from '@ngrx/store';
+import { CatalogueRepo } from "@repositories";
+import { EMPTY, Observable } from "rxjs";
+import { catchError, map, switchMap } from "rxjs/operators";
+import { CustomerActionTypes, LoadListCustomerSuccess } from '../actions/customer.action';
 
 @Injectable()
 export class CustomerEffect {

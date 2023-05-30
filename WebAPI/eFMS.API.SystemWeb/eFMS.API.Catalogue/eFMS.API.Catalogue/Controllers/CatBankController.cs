@@ -59,6 +59,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("getAll")]
+        [AllowAnonymous]
         public IActionResult Get()
         {
             var data = catBankService.GetAll()?.OrderBy(x => x.BankNameVn);

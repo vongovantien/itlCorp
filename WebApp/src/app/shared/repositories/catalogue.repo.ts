@@ -1783,4 +1783,10 @@ export class CatalogueRepo {
     getApprovedBanksByPartner(partnerId: string){
         return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPartnerBank/GetApprovedBanksByPartner`, {partnerId: partnerId});
     }
+
+    syncPartnerToAccountantSystem(list: any[]) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/SyncPartnerToAccountantSystem`, list).pipe(
+            map((data: any) => data)
+        );
+    }
 }

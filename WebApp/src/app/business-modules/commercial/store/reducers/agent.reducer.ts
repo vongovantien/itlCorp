@@ -1,26 +1,15 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import * as Types from '../actions';
 
-
-// export interface IAgentSearchParamsState {
-//     searchParams: any;
-
-// }
-// export const initialState: IAgentSearchParamsState = {
-//     searchParams: {}
-// };
-
-export interface AgentListState {
+export interface IAgentState {
     agents: any
     isLoading: boolean;
     isLoaded: boolean;
     dataSearch: any;
     pagingData: any;
-
 }
 
-
-export const initialState: AgentListState = {
+export const initialState: IAgentState = {
     agents: { data: [], totalItems: 0, },
     isLoading: false,
     isLoaded: false,
@@ -28,27 +17,23 @@ export const initialState: AgentListState = {
     dataSearch: {}
 };
 
-
-
-const agentReducer = createReducer(
+const reducer = createReducer(
     initialState,
-    on(Types.SearchListAgent, (state: AgentListState, data: any) => ({
+    on(Types.SearchListAgent, (state: IAgentState, data: any) => ({
         ...state, dataSearch: { ...data.payload }
     })),
     on(
-        Types.LoadListAgent, (state: AgentListState, payload: CommonInterface.IParamPaging) => {
+        Types.LoadListAgent, (state: IAgentState, payload: CommonInterface.IParamPaging) => {
             return { ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size } };
         }
     ),
     on(
-        Types.LoadListAgentSuccess, (state: AgentListState, payload: CommonInterface.IResponsePaging) => {
+        Types.LoadListAgentSuccess, (state: IAgentState, payload: CommonInterface.IResponsePaging) => {
             return { ...state, agents: payload, isLoading: false, isLoaded: true };
         }
     )
-
-
 );
 
-export function reducer(state: any | undefined, action: Action) {
-    return agentReducer(state, action);
+export function agentReducer(state: any | undefined, action: Action) {
+    return reducer(state, action);
 };

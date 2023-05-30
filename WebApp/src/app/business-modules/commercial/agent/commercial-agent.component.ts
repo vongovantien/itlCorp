@@ -14,13 +14,14 @@ import { AppList } from 'src/app/app.list';
 
 import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { IAgentState, getAgentSearchParamsState, SearchListAgent, getAgentDataListState, LoadListAgent, getAgentPagingState, getAgentLoadingState } from './store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { FormSearchExportComponent } from '../components/popup/form-search-export/form-search-export.popup';
 import { HttpResponse } from '@angular/common/http';
 import { ManagementAddressComponent } from '../components/management-address/management-commercial-address.component';
+import { IAgentState } from '../store/reducers/agent.reducer';
+import { LoadListAgent, SearchListAgent, getAgentDataListState, getAgentLoadingState, getAgentPagingState, getAgentSearchParamsState } from '../store';
 
 
 @Component({
@@ -266,7 +267,6 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
     ngAfterViewInit() {
         if (Object.keys(this.dataSearchs).length > 0) {
-            console.log(this.dataSearchs);
 
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;
             const type = this.dataSearchs.type === "userCreated" ? "userCreatedName" : this.dataSearchs.type;

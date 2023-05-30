@@ -39,6 +39,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<CatPotentialModel, CatPotential>();
             CreateMap<CatStandardChargeModel, CatStandardCharge>();
             CreateMap<CatStandardChargeImportModel, CatStandardCharge>();
+            CreateMap<SysActionFuncLogModel, SysActionFuncLog>();
 
             //map to entity model
             CreateMap<CatPartnerChargeModel, CatPartnerCharge>();

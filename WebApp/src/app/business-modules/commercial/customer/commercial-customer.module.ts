@@ -1,18 +1,17 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { CommercialCustomerComponent } from './commercial-customer.component';
+import { RouterModule, Routes } from '@angular/router';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { ShareCommercialModule } from '../share-commercial.module';
+import { ShareModulesModule } from '../../share-modules/share-modules.module';
+import { ContractImportComponent } from '../components/contract/import/contract-import.component';
+import { CustomerAgentImportComponent } from '../components/customer-agent-import/customer-agent-import.component';
 import { CommercialCreateComponent } from '../create/create-commercial.component';
 import { CommercialDetailComponent } from '../detail/detail-commercial.component';
-import { CustomerAgentImportComponent } from '../components/customer-agent-import/customer-agent-import.component';
-import { ContractImportComponent } from '../components/contract/import/contract-import.component';
-import { StoreModule } from '@ngrx/store';
-import { reducers } from './store/reducers';
-import { ShareModulesModule } from '../../share-modules/share-modules.module';
-import { EffectsModule } from '@ngrx/effects';
-import { CustomerEffect } from './store/effect/customer.effect';
-import { customerEffect } from './store/effect';
+import { ShareCommercialModule } from '../share-commercial.module';
+import { CommercialCustomerComponent } from './commercial-customer.component';
+import { reducers } from '../store';
+import { commercialEffect } from '../store/effects';
 
 const routing: Routes = [
     {
@@ -50,8 +49,8 @@ const routing: Routes = [
         SharedModule,
         ShareCommercialModule,
         ShareModulesModule,
-        StoreModule.forFeature('customer', reducers),
-        EffectsModule.forFeature(customerEffect)
+        StoreModule.forFeature('commercial', reducers),
+        EffectsModule.forFeature(commercialEffect)
     ],
     exports: [],
     providers: [],
