@@ -1332,10 +1332,6 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.WardId).HasColumnName("WardID");
-
-                entity.Property(e => e.WardId).HasColumnName("WardID");
-
                 entity.Property(e => e.WarehouseId).HasColumnName("WarehouseID");
             });
 
@@ -2957,10 +2953,6 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.SuspendTime).HasMaxLength(150);
-
-                entity.Property(e => e.TransactionType)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)

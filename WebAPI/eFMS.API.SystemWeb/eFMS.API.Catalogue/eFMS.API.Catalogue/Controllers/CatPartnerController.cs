@@ -772,16 +772,16 @@ namespace eFMS.API.Catalogue.Controllers
 
                 if (responseAddModel?.Success == "1" || responseUpdateModel?.Success == "1")
                 {
-                    ResultHandle result = new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_SUCCESS"].Value, Data = ids };
+                    ResultHandle result = new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_SUCCESS"].Value, Data = listAdd.Any() ? JsonConvert.SerializeObject(listAdd) : JsonConvert.SerializeObject(listUpdate) };
                     return Ok(result);
                 }
                 else
                 {
                     if (responseAddModel?.Success == null && responseUpdateModel?.Success == null)
                     {
-                        return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = null });
+                        return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = listAdd.Any() ? JsonConvert.SerializeObject(listAdd) : JsonConvert.SerializeObject(listUpdate) });
                     }
-                    return BadRequest(new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = ids });
+                    return BadRequest(new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = listAdd.Any() ? JsonConvert.SerializeObject(listAdd) : JsonConvert.SerializeObject(listUpdate) });
                 }
             }
             catch (Exception)
