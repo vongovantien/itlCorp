@@ -55,5 +55,6 @@ namespace eFMS.API.ReportData.Consts
         public const string CombineBillingByShipmentUSD = "CombingBillingByJobUSD.xlsx";
         public const string OutsourcingRecognisingTemplate = "Outsourcing Recognising Template.xlsx";
         public const string AgencyTemplate = "FlexportnewSOAtemplate.xlsx";
+        public const string InvoiceExportTemplate = "Export-Invoice.xlsx";
     }
 }

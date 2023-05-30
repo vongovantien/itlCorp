@@ -2870,7 +2870,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var charges = surchargeRepository.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.Soano)
                 && string.IsNullOrEmpty(x.CreditNo) && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE));
-
+             
             var accMangData = accountingManagementRepository.Get();
             var transactionData = cstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
             var transactionDetailData = trandetailRepositoty.Get();
@@ -2912,7 +2912,8 @@ namespace eFMS.API.Documentation.DL.Services
                             ChargeId = chg.Id,
                             CodeType = chg.Type == "BUY" ? "CREDIT" : "DEBIT",
                             ChargeType = chg.Type,
-                            SoaNo = chg.SettlementCode
+                            SoaNo = chg.SettlementCode,
+                            ExchangeRate = chg.FinalExchangeRate
                         };
 
             if (query == null || query.Count() == 0)
@@ -2962,6 +2963,7 @@ namespace eFMS.API.Documentation.DL.Services
                 DepartmentId = se.FirstOrDefault().DepartmentId,
                 AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
                 SoaNo = se.FirstOrDefault().SoaNo,
+                ExchangeRate = se.FirstOrDefault()?.ExchangeRate,
             }).AsQueryable();
             return result;
         }
@@ -3063,7 +3065,8 @@ namespace eFMS.API.Documentation.DL.Services
                               PayerId = chg.PayerId,
                               DepartmentId = soa.DepartmentId,
                               AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
-                              SoaNo = soa.Soano
+                              SoaNo = soa.Soano,
+                              ExchangeRate = soa.ExcRateUsdToLocal
                           };
             var paySoaData = from soa in soaQuery
                              join chg in chargePSoa on soa.Soano equals chg.PaySoano
@@ -3103,7 +3106,8 @@ namespace eFMS.API.Documentation.DL.Services
                                  PayerId = chg.PayerId,
                                  DepartmentId = soa.DepartmentId,
                                  AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
-                                 SoaNo = soa.Soano
+                                 SoaNo = soa.Soano,
+                                 ExchangeRate = soa.ExcRateUsdToLocal
                              };
             var data = soaData.AsEnumerable();
             if (data == null || data.Count() == 0)
@@ -3151,6 +3155,7 @@ namespace eFMS.API.Documentation.DL.Services
                 DepartmentId = se.FirstOrDefault().DepartmentId,
                 AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
                 SoaNo = se.FirstOrDefault().SoaNo,
+                ExchangeRate = se.FirstOrDefault().ExchangeRate,
             }).AsQueryable();
             return result;
         }
@@ -3255,7 +3260,8 @@ namespace eFMS.API.Documentation.DL.Services
                                  TotalAmountUsd = chg.AmountUsd,
                                  VatAmountUsd = chg.VatAmountUsd,
                                  ChargeGroup = chg.ChargeGroup,
-                                 Balance = acc.UnpaidAmountUsd == null ? null : acc.UnpaidAmountUsd
+                                 Balance = acc.UnpaidAmountUsd == null ? null : acc.UnpaidAmountUsd,
+                                 ExchangeRate = cdNote.ExchangeRate
                              };
             var debitData = from cdNote in cdNoteData
                             join chg in charges on cdNote.Code equals chg.DebitNo
@@ -3291,6 +3297,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 ChargeType = chg.Type,
                                 PayerId = chg.PayerId,
                                 DepartmentId = cdNote.DepartmentId,
+                                ExchangeRate = cdNote.ExchangeRate,
                                 AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo
                             };
             IEnumerable<InvoiceListModel> data = creditData.AsEnumerable();
@@ -3337,7 +3344,8 @@ namespace eFMS.API.Documentation.DL.Services
                 PayerId = se.FirstOrDefault().PayerId,
                 DepartmentId = se.FirstOrDefault().DepartmentId,
                 AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
-                SoaNo = se.FirstOrDefault().SoaNo
+                SoaNo = se.FirstOrDefault().SoaNo,
+                ExchangeRate = se.FirstOrDefault().ExchangeRate,
             }).AsQueryable();
             return result;
         }
@@ -4269,7 +4277,14 @@ namespace eFMS.API.Documentation.DL.Services
             queryData = GetStatusInvoiceList(criteria.Status, queryData);
             if (chargeNotSoa?.Count() > 0)
             {
-                queryData = queryData.Union(chargeNotSoa);
+                if (queryData == null || queryData.Count() == 0)
+                {
+                    queryData = chargeNotSoa;
+                }
+                else
+                {
+                    queryData = queryData.Union(chargeNotSoa);
+                }
             }
             var _resultDatas = queryData.OrderByDescending(o => o.DatetimeModified).ToList();
 
@@ -4291,6 +4306,7 @@ namespace eFMS.API.Documentation.DL.Services
                             from creator in creatorGrp.DefaultIfEmpty()
                             join departs in departments on cd.DepartmentId equals departs.Id into departGrp
                             from departs in departGrp.DefaultIfEmpty()
+                            let parentId = payer?.ParentId
                             select new AccAccountingManagementResult
                             {
                                 JobNo = cd.JobNo,
@@ -4314,11 +4330,14 @@ namespace eFMS.API.Documentation.DL.Services
                                 AccountNo = cd.AccountNo,
                                 ETA = trans != null ? trans.Eta : null,
                                 ETD = trans != null ? trans.Etd : null,
-                                SoaNo = cd.SoaNo
+                                SoaNo = cd.SoaNo,
+                                ShipmentType = trans?.ShipmentType ?? ops?.ShipmentType,
+                                ExchangeRate = cd.ExchangeRate,
+                                ParentAccountNo = string.IsNullOrEmpty(parentId) ? string.Empty : partners.FirstOrDefault(z => z.Id == parentId)?.AccountNo
                             };
 
             var res = dataTrans.OrderByDescending(o => o.SoaNo).ToList<AccAccountingManagementResult>();
-            return res;
+           return res;
         }
 
 

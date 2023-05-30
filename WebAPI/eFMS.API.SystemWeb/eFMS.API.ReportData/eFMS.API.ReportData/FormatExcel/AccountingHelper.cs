@@ -621,22 +621,11 @@ namespace eFMS.API.ReportData.FormatExcel
 
         public Stream GenerateAccountingManagementDebCreInvExcel(List<AccountingManagementExport> acctMngts, string typeOfAcctMngt, Stream stream = null)
         {
-            try
+            if (acctMngts.Count == 0)
             {
-                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
-                {
-                    excelPackage.Workbook.Worksheets.Add("Sheet1");
-                    var workSheet = excelPackage.Workbook.Worksheets.First();
-                    BindingDataAccoutingManagementDebCreInvExcel(workSheet, acctMngts, typeOfAcctMngt);
-                    excelPackage.Save();
-                    return excelPackage.Stream;
-                }
+                return null;
             }
-            catch (Exception ex)
-            {
-
-            }
-            return null;
+            return BindingDataAccoutingManagementDebCreInvExcel(acctMngts, typeOfAcctMngt);
         }
 
         public Stream GenerateAccountingManagementInvAgncyExcel(List<AccountingManagementExport> acctMngts, string typeOfAcctMngt, Stream stream = null)
@@ -5150,91 +5139,174 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
-        private void BindingDataAccoutingManagementDebCreInvExcel(ExcelWorksheet workSheet, List<AccountingManagementExport> acctMngts, string typeOfAcctMngt)
+        private Stream BindingDataAccoutingManagementDebCreInvExcel(List<AccountingManagementExport> acctMngts, string typeOfAcctMngt)
         {
-            SetWidthColumnExcelAccoutingManagement(workSheet);
-            workSheet.Column(6).Width = 20; //Cột F
-            workSheet.Column(7).Width = 20; //Cột G
-            workSheet.Column(8).Width = 20; //Cột H
-            workSheet.Column(14).Width = 20; //Cột M
-            List<string> headers = new List<string>
+            #region Old Template Binding
+            //SetWidthColumnExcelAccoutingManagement(workSheet);
+            //workSheet.Column(6).Width = 20; //Cột F
+            //workSheet.Column(7).Width = 20; //Cột G
+            //workSheet.Column(8).Width = 20; //Cột H
+            //workSheet.Column(14).Width = 20; //Cột M
+            //List<string> headers = new List<string>
+            //{
+            //    "JobNo",//0
+            //    "InvoiceNo",//1
+            //    "MBLNo",//2
+            //    "HBLNo",//3
+            //    "VoucherID",//4
+            //    "Accounting Date",//5
+            //    "CD Note",//6
+            //    "SOA/ Settlement",//7
+            //    "Code_Type",//1+7
+            //    "ChargeType",//1+8
+            //    "PayerID",//1+9
+            //    "Payer_Name",//1+10
+            //    "PartnerType",//1+11
+            //    "Parent ID",//1+12
+            //    "Curr",//1+13
+            //    "Amount",//1+14
+            //    "Amount USD",//1+15
+            //    "Amount VND",//1+16
+            //    "Issued_by",//1+17
+            //    "BU",//1+18
+            //    "Service Date",//1+19
+            //    "Issue Date",//1+20
+            //    "Account No",//1+21
+            //    "ETD",//1+22
+            //    "ETA"//1+23
+            //};
+            //int rowStart = 1;
+            //for (int i = 0; i < headers.Count; i++)
+            //{
+            //    workSheet.Cells[rowStart, i + 1].Value = headers[i];
+            //    workSheet.Cells[rowStart, i + 1].Style.Font.Bold = true;
+            //    workSheet.Cells[rowStart, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            //}
+
+            ////Cố định dòng đầu tiên (Freeze Row 1 and no column)
+            //workSheet.View.FreezePanes(2, 1);
+
+            //rowStart += 1;
+            //foreach (var item in acctMngts)
+            //{
+            //    workSheet.Cells[rowStart, 1].Value = item.JobNo;
+            //    workSheet.Cells[rowStart, 2].Value = item.InvoiceNo;
+            //    workSheet.Cells[rowStart, 3].Value = item.Mbl;
+            //    workSheet.Cells[rowStart, 4].Value = item.Hbl;
+            //    workSheet.Cells[rowStart, 5].Value = item.VoucherId;
+            //    workSheet.Cells[rowStart, 6].Value = item.VoucherIddate;
+            //    workSheet.Cells[rowStart, 6].Style.Numberformat.Format = "dd/MM/yyyy";
+            //    workSheet.Cells[rowStart, 7].Value = item.CdNoteNo;
+            //    workSheet.Cells[rowStart, 8].Value = item.SoaNo;
+            //    workSheet.Cells[rowStart, 1 + 8].Value = item.CdNoteType;
+            //    workSheet.Cells[rowStart, 1 + 9].Value = item.ChargeType;
+            //    workSheet.Cells[rowStart, 1 + 10].Value = item.PayerId;
+            //    workSheet.Cells[rowStart, 1 + 11].Value = item.PayerName;
+            //    workSheet.Cells[rowStart, 1 + 12].Value = item.PayerType;
+            //    workSheet.Cells[rowStart, 1 + 13].Value = item.Currency;
+
+            //    workSheet.Cells[rowStart, 1 + 14].Value = item.Amount;
+            //    workSheet.Cells[rowStart, 1 + 14].Style.Numberformat.Format = item.Currency == CURRENCY_LOCAL ? numberFormat2 : numberFormat;
+
+            //    workSheet.Cells[rowStart, 1 + 15].Value = item.IssueBy;
+            //    workSheet.Cells[rowStart, 1 + 16].Value = item.Bu;
+            //    workSheet.Cells[rowStart, 1 + 17].Value = item.ServiceDate;
+            //    workSheet.Cells[rowStart, 1 + 17].Style.Numberformat.Format = "dd/MM/yyyy";
+            //    workSheet.Cells[rowStart, 1 + 18].Value = item.IssueDate;
+            //    workSheet.Cells[rowStart, 1 + 18].Style.Numberformat.Format = "dd/MM/yyyy";
+
+            //    workSheet.Cells[rowStart, 1 + 19].Value = item.AccountNo;
+            //    workSheet.Cells[rowStart, 1 + 20].Value = item.ETD;
+            //    workSheet.Cells[rowStart, 1 + 20].Style.Numberformat.Format = "dd/MM/yyyy";
+            //    workSheet.Cells[rowStart, 1 + 21].Value = item.ETA;
+            //    workSheet.Cells[rowStart, 1 + 21].Style.Numberformat.Format = "dd/MM/yyyy";
+
+            //    rowStart += 1;
+            //}
+
+            //workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            //workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            //workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            //workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            #endregion
+            try
             {
-                "JobNo",//0
-                "InvoiceNo",//1
-                "MBLNo",//2
-                "HBLNo",//3
-                "VoucherID",//4
-                "Accounting Date",//5
-                "CD Note",//6
-                "SOA/ Settlement",//7
-                "Code_Type",//1+7
-                "ChargeType",//1+8
-                "PayerID",//1+9
-                "Payer_Name",//1+10
-                "PartnerType",//1+11
-                "Curr",//1+12
-                "Amount",//1+13
-                "Issued_by",//1+14
-                "BU",//1+15
-                "Service Date",//1+16
-                "Issue Date",//1+17
-                "Account No",//1+18
-                "ETD",//1+19
-                "ETA"//1+20
-            };
-            int rowStart = 1;
-            for (int i = 0; i < headers.Count; i++)
-            {
-                workSheet.Cells[rowStart, i + 1].Value = headers[i];
-                workSheet.Cells[rowStart, i + 1].Style.Font.Bold = true;
-                workSheet.Cells[rowStart, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, ResourceConsts.InvoiceExportTemplate));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                    return null;
+                var excel = new ExcelExport(path);
+                excel.StartDetailTable = 2;
+
+                excel.StartDetailTable = 2;
+                if (acctMngts.Count == 0)
+                {
+                    acctMngts.Add(new AccountingManagementExport());
+                }
+                //Set format amount
+                var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
+                var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
+                var rowStart = 2;
+                for (int i = 0; i < acctMngts.Count; i++)
+                {
+                    var item = acctMngts[i];
+                    var listKeyData = new Dictionary<string, object>();
+                    var listKeyFormat = new List<string>();
+                    excel.SetGroupsTable();
+                    listKeyData.Add("JobNo", item.JobNo);
+                    listKeyData.Add("InvoiceNo", item.InvoiceNo);
+                    listKeyData.Add("Mbl", item.Mbl);
+                    listKeyData.Add("Hbl", item.Hbl);
+                    listKeyData.Add("VoucherId", item.VoucherId);
+                    listKeyData.Add("ShipmentType", item.ShipmentType);
+                    listKeyData.Add("VoucherIddate", item.VoucherIddate);
+                    excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = "dd/MM/yyyy";
+                    listKeyData.Add("CdNoteNo", item.CdNoteNo);
+                    listKeyData.Add("SoaNo",item.SoaNo);
+                    listKeyData.Add("CdNoteType", item.CdNoteType);
+                    listKeyData.Add("ChargeType", item.ChargeType);
+                    listKeyData.Add("PayerId", item.PayerId);
+                    listKeyData.Add("PayerName", item.PayerName);
+                    listKeyData.Add("PayerType", item.PayerType);
+                    listKeyData.Add("Currency", item.Currency);
+                    listKeyData.Add("ParentAccountNo", item.ParentAccountNo);
+                    listKeyData.Add("Amount", item.Amount);
+                    excel.Worksheet.Cells[rowStart, 16].Style.Numberformat.Format = item.Currency == CURRENCY_LOCAL ? numberFormat2 : numberFormat;
+                    if (item.Currency == CURRENCY_LOCAL)
+                    {
+                        listKeyData.Add("AmountUSD", item.Amount/item.ExchangeRate);
+                        excel.Worksheet.Cells[rowStart, 17].Style.Numberformat.Format = numberFormat;
+                        listKeyData.Add("AmountVND", item.Amount);
+                        excel.Worksheet.Cells[rowStart, 18].Style.Numberformat.Format = numberFormat2;
+                    }
+                    else
+                    {
+                        listKeyData.Add("AmountVND", item.Amount * item.ExchangeRate);
+                        excel.Worksheet.Cells[rowStart, 18].Style.Numberformat.Format = numberFormat2;
+                        listKeyData.Add("AmountUSD", item.Amount);
+                        excel.Worksheet.Cells[rowStart, 17].Style.Numberformat.Format = numberFormat;
+                    }
+                    listKeyData.Add("IssueBy", item.IssueBy);
+                    listKeyData.Add("Bu", item.Bu);
+                    listKeyData.Add("ServiceDate", item.ServiceDate);
+                    excel.Worksheet.Cells[rowStart, 21].Style.Numberformat.Format = "dd/MM/yyyy";
+                    listKeyData.Add("IssueDate", item.IssueDate);
+                    excel.Worksheet.Cells[rowStart, 22].Style.Numberformat.Format = "dd/MM/yyyy";
+                    listKeyData.Add("AccountNo", item.AccountNo);
+                    listKeyData.Add("ETD", item.ETD);
+                    excel.Worksheet.Cells[rowStart, 23].Style.Numberformat.Format = "dd/MM/yyyy";
+                    listKeyData.Add("ETA", item.ETA);
+                    excel.Worksheet.Cells[rowStart, 24].Style.Numberformat.Format = "dd/MM/yyyy";
+                    
+                    excel.SetData(listKeyData);
+                    rowStart++;
+                }
+                return excel.ExcelStream();
             }
-
-            //Cố định dòng đầu tiên (Freeze Row 1 and no column)
-            workSheet.View.FreezePanes(2, 1);
-
-            rowStart += 1;
-            foreach (var item in acctMngts)
+            catch (Exception ex)
             {
-                workSheet.Cells[rowStart, 1].Value = item.JobNo;
-                workSheet.Cells[rowStart, 2].Value = item.InvoiceNo;
-                workSheet.Cells[rowStart, 3].Value = item.Mbl;
-                workSheet.Cells[rowStart, 4].Value = item.Hbl;
-                workSheet.Cells[rowStart, 5].Value = item.VoucherId;
-                workSheet.Cells[rowStart, 6].Value = item.VoucherIddate;
-                workSheet.Cells[rowStart, 6].Style.Numberformat.Format = "dd/MM/yyyy";
-                workSheet.Cells[rowStart, 7].Value = item.CdNoteNo;
-                workSheet.Cells[rowStart, 8].Value = item.SoaNo;
-                workSheet.Cells[rowStart, 1 + 8].Value = item.CdNoteType;
-                workSheet.Cells[rowStart, 1 + 9].Value = item.ChargeType;
-                workSheet.Cells[rowStart, 1 + 10].Value = item.PayerId;
-                workSheet.Cells[rowStart, 1 + 11].Value = item.PayerName;
-                workSheet.Cells[rowStart, 1 + 12].Value = item.PayerType;
-                workSheet.Cells[rowStart, 1 + 13].Value = item.Currency;
-
-                workSheet.Cells[rowStart, 1 + 14].Value = item.Amount;
-                workSheet.Cells[rowStart, 1 + 14].Style.Numberformat.Format = item.Currency == CURRENCY_LOCAL ? numberFormat2 : numberFormat;
-
-                workSheet.Cells[rowStart, 1 + 15].Value = item.IssueBy;
-                workSheet.Cells[rowStart, 1 + 16].Value = item.Bu;
-                workSheet.Cells[rowStart, 1 + 17].Value = item.ServiceDate;
-                workSheet.Cells[rowStart, 1 + 17].Style.Numberformat.Format = "dd/MM/yyyy";
-                workSheet.Cells[rowStart, 1 + 18].Value = item.IssueDate;
-                workSheet.Cells[rowStart, 1 + 18].Style.Numberformat.Format = "dd/MM/yyyy";
-
-                workSheet.Cells[rowStart, 1 + 19].Value = item.AccountNo;
-                workSheet.Cells[rowStart, 1 + 20].Value = item.ETD;
-                workSheet.Cells[rowStart, 1 + 20].Style.Numberformat.Format = "dd/MM/yyyy";
-                workSheet.Cells[rowStart, 1 + 21].Value = item.ETA;
-                workSheet.Cells[rowStart, 1 + 21].Style.Numberformat.Format = "dd/MM/yyyy";
-
-                rowStart += 1;
+                return null;
             }
-
-            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:V" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
         private Stream BindingDataAccoutingManagementAgencyInvExcel(List<AccountingManagementExport> acctMngts)
