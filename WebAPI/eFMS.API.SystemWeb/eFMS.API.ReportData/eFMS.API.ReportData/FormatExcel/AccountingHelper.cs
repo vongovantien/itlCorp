@@ -5258,6 +5258,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Mbl", item.Mbl);
                     listKeyData.Add("Hbl", item.Hbl);
                     listKeyData.Add("VoucherId", item.VoucherId);
+                    listKeyData.Add("ShipmentType", item.ShipmentType);
                     listKeyData.Add("VoucherIddate", item.VoucherIddate);
                     excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = "dd/MM/yyyy";
                     listKeyData.Add("CdNoteNo", item.CdNoteNo);
@@ -5274,12 +5275,16 @@ namespace eFMS.API.ReportData.FormatExcel
                     if (item.Currency == CURRENCY_LOCAL)
                     {
                         listKeyData.Add("AmountUSD", item.Amount/item.ExchangeRate);
+                        excel.Worksheet.Cells[rowStart, 17].Style.Numberformat.Format = numberFormat;
                         listKeyData.Add("AmountVND", item.Amount);
+                        excel.Worksheet.Cells[rowStart, 18].Style.Numberformat.Format = numberFormat2;
                     }
                     else
                     {
                         listKeyData.Add("AmountVND", item.Amount * item.ExchangeRate);
+                        excel.Worksheet.Cells[rowStart, 18].Style.Numberformat.Format = numberFormat2;
                         listKeyData.Add("AmountUSD", item.Amount);
+                        excel.Worksheet.Cells[rowStart, 17].Style.Numberformat.Format = numberFormat;
                     }
                     listKeyData.Add("IssueBy", item.IssueBy);
                     listKeyData.Add("Bu", item.Bu);

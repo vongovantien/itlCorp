@@ -26,6 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -2870,7 +2871,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var charges = surchargeRepository.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.Soano)
                 && string.IsNullOrEmpty(x.CreditNo) && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE));
-
+             
             var accMangData = accountingManagementRepository.Get();
             var transactionData = cstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
             var transactionDetailData = trandetailRepositoty.Get();
@@ -4261,7 +4262,7 @@ namespace eFMS.API.Documentation.DL.Services
             queryData = GetStatusInvoiceList(criteria.Status, queryData);
             if (chargeNotSoa?.Count() > 0)
             {
-                if (queryData == null || queryData.Count() > 0)
+                if (queryData == null || queryData.Count() == 0)
                 {
                     queryData = chargeNotSoa;
                 }
@@ -4290,6 +4291,7 @@ namespace eFMS.API.Documentation.DL.Services
                             from creator in creatorGrp.DefaultIfEmpty()
                             join departs in departments on cd.DepartmentId equals departs.Id into departGrp
                             from departs in departGrp.DefaultIfEmpty()
+                            let parentId = payer?.ParentId
                             select new AccAccountingManagementResult
                             {
                                 JobNo = cd.JobNo,
@@ -4314,13 +4316,13 @@ namespace eFMS.API.Documentation.DL.Services
                                 ETA = trans != null ? trans.Eta : null,
                                 ETD = trans != null ? trans.Etd : null,
                                 SoaNo = cd.SoaNo,
-                                ShipmentType = trans.ShipmentType ?? ops.ShipmentType,
+                                ShipmentType = trans?.ShipmentType ?? ops?.ShipmentType,
                                 ExchangeRate = cd.ExchangeRate,
-                                ParentAccountNo = partners.FirstOrDefault(z => z.Id == partners.FirstOrDefault(x => x.Id == payer.Id).ParentId)?.AccountNo
+                                ParentAccountNo = string.IsNullOrEmpty(parentId) ? string.Empty : partners.FirstOrDefault(z => z.Id == parentId)?.AccountNo
                             };
 
             var res = dataTrans.OrderByDescending(o => o.SoaNo).ToList<AccAccountingManagementResult>();
-            return res;
+           return res;
         }
 
 
