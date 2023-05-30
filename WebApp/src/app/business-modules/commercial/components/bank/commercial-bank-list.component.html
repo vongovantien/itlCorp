@@ -50,6 +50,18 @@
                                 <td>{{bank.swiftCode}}</td>
                                 <td>{{bank.bankName}}</td>
                                 <td>{{bank.bankCode}}</td>
+                                <td [ngSwitch]="bank.approveStatus">
+                                    <div *ngSwitchCase="'New'" class="text-danger">
+                                        {{bank.approveStatus}}</div>
+                                    <div *ngSwitchCase="'Reject'" class="text-danger">
+                                        {{bank.approveStatus}}</div>
+                                    <div *ngSwitchCase="'Processing'" class="text-info">
+                                        {{bank.approveStatus}}</div>
+                                    <div *ngSwitchCase="'Revise'" class="text-info">
+                                        {{bank.approveStatus}}</div>
+                                    <div *ngSwitchCase="'Approved'" class="text-success">
+                                        {{bank.approveStatus}}</div>
+                                </td>
                                 <td>{{bank.source}}</td>
                                 <td class="d-inline-block text-truncate" style="max-width: 150px;">{{bank.note}}</td>
                             </tr>

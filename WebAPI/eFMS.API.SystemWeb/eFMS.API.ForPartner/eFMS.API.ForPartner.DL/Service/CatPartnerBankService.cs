@@ -11,7 +11,6 @@ using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,32 +37,31 @@ namespace eFMS.API.ForPartner.DL.Service
 
         public async Task<HandleState> UpdatePartnerBankInfoSyncStatus(BankStatusUpdateModel model)
         {
+            var hs = new HandleState();
             var partner = await catPartnerRepository.Get(x => x.AccountNo == model.PartnerCode).FirstOrDefaultAsync();
             if (partner == null)
             {
                 return new HandleState(false, (object)"Thông tin partner không tồn tại");
             }
-            var hs = new HandleState();
-            var errorsMessage = new List<string>();
-            var listBank = await DataContext.WhereAsync(x => x.PartnerId.ToString() == partner.Id);
-            foreach (var item in model.BankInfo)
-            {
-                var bank = listBank.FirstOrDefault(x => x.BankAccountNo == item.BankAccountno);
-                if (bank == null)
-                {
-                    errorsMessage.Add(item.BankAccountno);
-                }
-                else
-                {
-                    bank.ApproveDescription = item.Description;
-                    bank.ApproveStatus = item.ApproveStatus;
-                    hs = await DataContext.UpdateAsync(bank, x => x.Id == bank.Id);
-                }
-            }
+
+            var listBank = await DataContext.GetAsync(x => x.PartnerId == partner.Id);
+            var errorsMessage = model.BankInfo
+                .Where(item => !listBank.Any(bank => bank.BankAccountNo == item.BankAccountno))
+                .Select(item => item.BankAccountno);
+
             if (errorsMessage.Any())
             {
                 return new HandleState(false, (object)$"{string.Join(", ", errorsMessage)} không tồn tại trong hệ thống");
             }
+
+            foreach (var item in model.BankInfo)
+            {
+                var bank = listBank.FirstOrDefault(x => x.BankAccountNo == item.BankAccountno);
+                bank.ApproveDescription = item.Description;
+                bank.ApproveStatus = item.ApproveStatus;
+                hs = DataContext.Update(bank, x => x.Id == bank.Id, false);
+            }
+            hs = DataContext.SubmitChanges();
             return hs;
         }
 
