@@ -1472,7 +1472,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     // } else {
                     //     this.hawbDetails = res.filter(x => x.id === this.hblId).map(v => ({ ...v, isCheckedHawb: true }));
                     // }      
-                    if (res.length > 0) {
+                    if (res.length > 0 && !this.isDbtInv) {
                         var invalidHawb = res.filter(x => !!x.errorMessage && !!x.errorMessage.length);
                         if (this.hblId === SystemConstants.EMPTY_GUID && res.length === invalidHawb.length) {
                             this._toastService.warning(invalidHawb[0].errorMessage);
