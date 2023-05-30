@@ -37,6 +37,6 @@ namespace eFMS.API.Accounting.Service.Models
         public Guid? CompanyId { get; set; }
         public decimal? OverObh1to15Day { get; set; }
         public decimal? OverObh16to30Day { get; set; }
-        public decimal? OverObh30Day { get; set; }
+        public decimal? OverObh30day { get; set; }
     }
 }

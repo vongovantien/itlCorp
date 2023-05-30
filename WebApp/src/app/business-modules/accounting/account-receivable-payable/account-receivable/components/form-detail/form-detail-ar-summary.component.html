@@ -249,6 +249,9 @@
                             <span *ngIf="accReceivableDetail.debitAmount">
                                 {{ accReceivableDetail.arCurrency }}
                             </span>
+                            <span *ngIf="!!accReceivableDetail.isOverDuePrepaid" title="Contract have overdued prepaid">
+                                <i class="la la-exclamation-triangle la-lg text-warning m-animate-blink"></i>
+                            </span>
                         </div>
                     </div>
                 </div>

@@ -31,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+  <PackageReference Include="Cronos" Version="0.7.1" />
   <PackageReference Include="ExcelDataReader" Version="3.6.0" />
   <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
   <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />

@@ -10,5 +10,6 @@ namespace eFMS.API.Accounting.DL.IService
     public interface IAccAccountReceivableHostedService
     { 
         Task<HandleState> CalculatorReceivableDebitAmountAsync(List<ObjectReceivableModel> models);
+        void CalculatetorReceivableOverDuePrepaidAsync();
     }
 }

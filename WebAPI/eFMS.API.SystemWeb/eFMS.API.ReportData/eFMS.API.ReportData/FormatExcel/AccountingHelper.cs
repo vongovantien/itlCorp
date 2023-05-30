@@ -5373,7 +5373,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             catch (Exception ex)
             {
-                return null;
+                throw new Exception("An error occurred while exporting data to Excel. Please try again or contact support for assistance.", ex);
             }
         }
 

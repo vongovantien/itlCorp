@@ -38,6 +38,8 @@ export class TrialOfficialOtherModel {
     isExpired: boolean = false;
     isOverLimit: boolean = false;
     isOverDue: boolean = false;
+    isOverDueOBH: boolean = false;
+    isOverDuePrepaid: boolean = false;
 
     arOfficeIds: string[] = [];
     arServices: string[] = null;
@@ -128,6 +130,7 @@ export class AccReceivableDetailModel {
     isOverDue: boolean = false;
     arSalesmanName: string = null;
     isOverDueOBH: boolean = false;
+    isOverDuePrepaid: boolean = false;
 
     constructor(data?: any) {
         const self = this;

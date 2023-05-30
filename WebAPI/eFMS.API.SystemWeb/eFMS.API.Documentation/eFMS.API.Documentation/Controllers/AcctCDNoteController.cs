@@ -383,7 +383,9 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult GetDataAcctMngtAgencyExport(CDNoteCriteria criteria)
         {
             var result = cdNoteServices.GetDataAcctMngtAgencyExport(criteria);
-            if (result == null || result.Count() == 0) { return BadRequest(); };
+            if (result == null || result.Count() == 0) {
+                return NotFound();
+            };
             return Ok(result);
         }
     }

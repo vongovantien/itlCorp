@@ -58,5 +58,7 @@ namespace eFMS.API.Documentation.DL.Models
         public Guid? PodId { get; set; }
         public string SettleNo { get; set; }
         public decimal? ExchangeRate { get; set; }
+        public string scType { get; set; }
+        public string VoucherIdre { get; set; }
     }
 }

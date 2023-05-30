@@ -445,37 +445,35 @@ export class ShareBussinessCdNoteDetailAirPopupComponent extends DetailCDNoteBas
     }
 
     sendMail(type: string) {
-        this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code, partnerId: this.CdNoteDetail.partnerId } });
-
-        // if (!!this.CdNoteDetail.syncStatus) {
-        //     this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code, partnerId: this.CdNoteDetail.partnerId } });
-        // }
-        // else {
-        //     this._documentationRepo.validateCheckPointContractPartner({
-        //         partnerId: this.CdNoteDetail.partnerId,
-        //         hblId: this.CdNoteDetail.listSurcharges[0].hblid,
-        //         transactionType: 'DOC',
-        //         type: 3,
-        //         salesmanId: this.CdNoteDetail.salemanId
-        //     }, 'false')
-        //         .pipe(
-        //             catchError((err: HttpErrorResponse) => {
-        //                 if (!!err.error.message) {
-        //                     this._toastService.error("Can not Send mail. " + err.error.message + " Please recheck Email.");
-        //                 }
-        //                 return throwError(err.error.message);
-        //             })
-        //         ).subscribe(
-        //             (res: any) => {
-        //                 if (res.status) {
-        //                     switch (type) {
-        //                         case 'DebitNote/Invoice':
-        //                             this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code, partnerId: this.CdNoteDetail.partnerId } });
-        //                             break;
-        //                     }
-        //                 }
-        //             },
-        //         );
-        // }
+        if(!!this.CdNoteDetail.syncStatus){
+            this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code, partnerId: this.CdNoteDetail.partnerId } });
+        }
+        else{
+            this._documentationRepo.validateCheckPointContractPartner({
+                partnerId: this.CdNoteDetail.partnerId,
+                hblId: this.CdNoteDetail.listSurcharges[0].hblid,
+                transactionType: 'DOC',
+                type: 3,
+                salesmanId: this.CdNoteDetail.salemanId
+            }, 'false')
+                .pipe(
+                    catchError((err: HttpErrorResponse) => {
+                        if (!!err.error.message) {
+                            this._toastService.error("Can not Send mail. " + err.error.message);
+                        }
+                        return throwError(err.error.message);
+                    })
+                ).subscribe(
+                    (res: any) => {
+                        if (res.status) {
+                            switch (type) {
+                                case 'DebitNote/Invoice':
+                                    this._router.navigate([`${RoutingConstants.mappingRouteDocumentWithTransactionType(this.CdNoteDetail.listSurcharges[0].transactionType)}/${this.CdNoteDetail.jobId}/prealert`], { queryParams: { name: 'Send_Debit_Invoice', cdNoteNo: this.CdNoteDetail.cdNote.code, partnerId: this.CdNoteDetail.partnerId } });
+                                    break;
+                            }
+                        }
+                    },
+                );
+        }
     }
 }

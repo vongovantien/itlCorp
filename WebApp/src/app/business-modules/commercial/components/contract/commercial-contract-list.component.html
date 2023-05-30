@@ -60,7 +60,8 @@
                                     <span *ngIf="!!item.isOverLimit" title="Contract is over credit limit">
                                         <i class="la la-exclamation la-lg text-danger"></i>
                                     </span>
-                                    <span *ngIf="!!item.isOverDue" title="Contract have overdued">
+                                    <span *ngIf="!!item.isOverDue || !!item.isOverDuePrepaid"
+                                        title="Contract have overdued">
                                         <i class="la la-exclamation-triangle la-lg text-warning"></i>
                                     </span>
                                     <span *ngIf="!!item.isOverDueObh" title="Contract have overdued OBH">
