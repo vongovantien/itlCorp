@@ -6,11 +6,11 @@ import { RoutingConstants } from '@constants';
 import { Company } from '@models';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
-import { getMenuUserPermissionState, getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { getMenuUserPermissionState, getMenuUserSpecialPermissionState } from '@store';
 import _merge from 'lodash-es/merge';
 import { ToastrService } from 'ngx-toastr';
 import { combineLatest, forkJoin, Observable } from 'rxjs';
-import { catchError, concatMap, finalize, map, switchMap, take, takeUntil, tap } from "rxjs/operators";
+import { catchError, finalize, map, switchMap, takeUntil } from "rxjs/operators";
 import { AppList } from 'src/app/app.list';
 import { CommercialBranchSubListComponent } from 'src/app/business-modules/commercial/components/branch-sub/commercial-branch-sub-list.component';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
@@ -28,7 +28,6 @@ import { FormAddPartnerComponent } from '../components/form-add-partner/form-add
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
 import { UserCreatePopupComponent } from '../components/user-create-popup/user-create-popup.component';
 import { formatDate } from '@angular/common';
-import { getDetailPartner, getDetailPartnerDataState, getDetailPartnerSuccess, getSysMappingPartnerDataState } from 'src/app/business-modules/commercial/store';
 
 
 @Component({
@@ -93,7 +92,6 @@ export class PartnerDetailComponent extends AppList {
     isAddSubPartner: boolean = false;
 
     menuSpecialPermission: Observable<any[]>;
-    sysMappingId: string = '';
     constructor(private route: ActivatedRoute,
         private router: Router,
         private _catalogueRepo: CatalogueRepo,

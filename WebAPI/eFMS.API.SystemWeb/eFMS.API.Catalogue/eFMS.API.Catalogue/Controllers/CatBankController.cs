@@ -62,8 +62,7 @@ namespace eFMS.API.Catalogue.Controllers
         [AllowAnonymous]
         public IActionResult Get()
         {
-            //var data = catBankService.GetAll()?.OrderBy(x => x.BankNameVn);
-            var data = stringLocalizer["MSG_DATA_NOT_FOUND"];
+            var data = catBankService.GetAll()?.OrderBy(x => x.BankNameVn);
             return Ok(data);
         }
 
