@@ -1026,10 +1026,6 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("SysMappingID")
                     .HasMaxLength(200);
 
-                entity.Property(e => e.SysMappingId)
-                    .HasColumnName("SysMappingID")
-                    .HasMaxLength(200);
-
                 entity.Property(e => e.TaxCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);

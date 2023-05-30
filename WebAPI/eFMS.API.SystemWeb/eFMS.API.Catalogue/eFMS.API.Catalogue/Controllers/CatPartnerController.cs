@@ -770,12 +770,12 @@ namespace eFMS.API.Catalogue.Controllers
                     {
                         item.SysMappingId = item.AccountNo;
                         var hs = catPartnerService.Update(item);
-                        hs = catPartnerService.SubmitChanges();
+                        var hsSubmit = catPartnerService.SubmitChanges();
+
                     }
                 }
-                // 4. Update STATUS
-                if (responseAddModel?.Success == "1"
-                    || responseUpdateModel?.Success == "1")
+
+                if (responseAddModel?.Success == "1" || responseUpdateModel?.Success == "1")
                 {
                     ResultHandle result = new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_SUCCESS"].Value, Data = ids };
                     return Ok(result);
@@ -788,7 +788,6 @@ namespace eFMS.API.Catalogue.Controllers
                     }
                     return BadRequest(new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = ids });
                 }
-
             }
             catch (Exception)
             {

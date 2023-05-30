@@ -1,5 +1,6 @@
 import { Action, createReducer, on } from '@ngrx/store';
 import * as Types from '../actions';
+import { Partner } from '@models';
 
 
 export interface IPartnerDataState {
@@ -29,6 +30,7 @@ const reducer = createReducer(
     ),
     on(
         Types.getDetailPartnerSuccess, (state: IPartnerDataState, data: any) => {
+            console.log(state)
             return { ...state, partner: data.payload, isLoading: false, isLoaded: true };
         }
     ),

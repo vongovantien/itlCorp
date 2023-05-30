@@ -18,11 +18,12 @@ export class PartnerEffect {
         .pipe(
             ofType(PartnerDataActionTypes.GET_DETAIL),
             switchMap(
-                (param: any) => this._catalogueRepo.getDetailPartner(param)
+                (param: any) => this._catalogueRepo.getDetailPartner(param.payload)
                     .pipe(
                         catchError(() => EMPTY),
-                        map((res: CommonInterface.IResult) => getDetailPartnerSuccess(res.data)),
-
+                        map((res: any) => {
+                            return getDetailPartnerSuccess({ payload: res });
+                        })
                     )
             )
         ));

@@ -50,7 +50,7 @@ export class FormBankCommercialCatalogueComponent extends PopupBase implements O
 
     displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Bank Code' },
-        { field: 'bankNameEn', label: 'Bank Name EN' },
+        { field: 'bankNameEn', label: 'Bank Name EN', },
     ];
 
     constructor(

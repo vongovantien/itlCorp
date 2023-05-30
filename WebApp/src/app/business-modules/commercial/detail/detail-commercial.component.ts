@@ -10,17 +10,17 @@ import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 
 import { CommercialCreateComponent } from '../create/create-commercial.component';
 
+import { formatDate } from '@angular/common';
 import { ConfirmPopupComponent } from '@common';
 import { CommonEnum } from '@enums';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
 import { combineLatest, of } from 'rxjs';
 import { catchError, concatMap, finalize, map } from 'rxjs/operators';
+import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
+import { CommercialBankListComponent } from '../components/bank/commercial-bank-list.component';
 import { CommercialBranchSubListComponent } from '../components/branch-sub/commercial-branch-sub-list.component';
 import { CommercialFormCreateComponent } from '../components/form-create/form-create-commercial.component';
-import { CommercialBankListComponent } from '../components/bank/commercial-bank-list.component';
-import { formatDate } from '@angular/common';
-import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { getDetailPartnerSuccess } from '../store';
 
 @Component({

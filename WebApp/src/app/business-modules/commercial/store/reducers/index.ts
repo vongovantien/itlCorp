@@ -27,6 +27,7 @@ export const getCustomerLoadingState = createSelector(customerState, (state: ICu
 export const getPartnerDataSearchParamsState = createSelector(partnerState, (state: IPartnerDataState) => state && state.dataSearch);
 export const getPartnerDataListState = createSelector(partnerState, (state: IPartnerDataState) => state?.partners);
 export const getDetailPartnerDataState = createSelector(partnerState, (state: IPartnerDataState) => state?.partner);
+export const getSysMappingPartnerDataState = createSelector(partnerState, (state: IPartnerDataState) => state?.partner?.sysMappingId);
 export const getPartnerDataLoadingState = createSelector(partnerState, (state: IPartnerDataState) => state?.isLoading);
 export const getPartnerDataListPagingState = createSelector(partnerState, (state: IPartnerDataState) => state.pagingData);
 

@@ -22,10 +22,10 @@
                     </h3>
                     <div>
                         <div class="c-button-actions">
-                            <app-default-button *ngIf="!isAddSubPartner && !!partner && partner.permission.allowUpdate"
+                            <app-default-button *ngIf="!isAddSubPartner && !!partner && partner.permission?.allowUpdate"
                                 [buttonSetting]="saveButtonSetting" (onClick)="onSaveDetail()">
                             </app-default-button>
-                            <app-default-button *ngIf="isAddSubPartner && !!partner && partner.permission.allowUpdate"
+                            <app-default-button *ngIf="isAddSubPartner && !!partner && partner.permission?.allowUpdate"
                                 [buttonSetting]="saveButtonSetting" (onClick)="onSave()">
                             </app-default-button>
                             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()">
@@ -61,7 +61,7 @@
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
             <tab heading="Agreement">
-                <commercial-contract-list [detailPartner]="partner" (onActiveContract)="updateStatusPartner($event)" ></commercial-contract-list>
+                <commercial-contract-list (onActiveContract)="updateStatusPartner($event)" ></commercial-contract-list>
             </tab>
             <tab heading="Branch/Sub">
                 <app-commercial-branch-sub-list></app-commercial-branch-sub-list>

@@ -25,7 +25,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
     @ViewChild(FormUpdateEmailContractComponent) formUpdateEmailContractPopup: FormUpdateEmailContractComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
-    @Input() detailPartner: Partner = null;
     @Output() onGetDetailPartner : EventEmitter<any> = new EventEmitter<any>();
     @Input() partnerId: string;
     @Input() openOnPartner: boolean = false;
@@ -97,10 +96,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             this.formContractPopup.contractTypes = this.formContractPopup.contractTypes.filter(x => x !== 'Cash');
         }
 
-    }
-
-    ongetDetailPartner($event){
-        this.onGetDetailPartner.emit(this.detailPartner);
     }
 
     gotoCreateContract() {

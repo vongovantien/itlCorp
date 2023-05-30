@@ -17,7 +17,7 @@ import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/comm
 import { PopupBase } from 'src/app/popup.base';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
-import { getDetailPartnerDataState } from 'src/app/business-modules/commercial/store';
+import { getDetailPartner, getDetailPartnerDataState } from 'src/app/business-modules/commercial/store';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -902,8 +902,6 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                         this.statusContract = this.selectedContract.active;
                         const message = this.selectedContract.active ? 'Active success !!' : 'Inactive success !!';
                         if (this.selectedContract.active) {
-                            console.log(this.detailPartner)
-                            this.selectedContract.partnerStatus = true;
                             const action = !!this.detailPartner.sysMappingId ? 'UPDATE' : 'ADD';
                             this.syncPartnerToAccountantSystem([{ Id: this.partnerId, action }]);
                         }
@@ -924,8 +922,13 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    const messageType = res.status ? 'success' : 'warning';
-                    this._toastService[messageType](res.message);
+                    const { status, message } = res;
+                    if (status) {
+                        this._toastService.success(message);
+                    } else {
+                        this._toastService.warning(message);
+                    }
+                    this._store.dispatch(getDetailPartner({ payload: this.selectedContract.partnerId }))
                 }
             );
     }
