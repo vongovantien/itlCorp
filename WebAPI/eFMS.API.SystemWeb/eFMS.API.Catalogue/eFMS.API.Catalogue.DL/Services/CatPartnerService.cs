@@ -2822,5 +2822,18 @@ namespace eFMS.API.Catalogue.DL.Services
 
             return dataReturn;
         }
+
+        public async Task<HandleState> UpdatePartnerSyncStatus(List<CatPartnerModel> models)
+        {
+            var hs = new HandleState();
+            foreach (var item in models)
+            {
+                var newItem = _mapper.Map<CatPartner>(item);
+                hs = DataContext.Update(newItem, x => x.Id == item.Id);
+            }
+            hs = DataContext.SubmitChanges();
+            return hs;
+        }
+
     }
 }

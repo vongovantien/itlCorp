@@ -766,13 +766,8 @@ namespace eFMS.API.Catalogue.Controllers
                     var idsItemAdd = request.Where(x => x.Action == ACTION.ADD).Select(x => x.Id).ToList();
                     var listUpdated = await catPartnerService.GetAsync(x => idsItemAdd.Contains(x.Id));
 
-                    foreach (var item in listUpdated)
-                    {
-                        item.SysMappingId = item.AccountNo;
-                        var hs = catPartnerService.Update(item);
-                        var hsSubmit = catPartnerService.SubmitChanges();
-
-                    }
+                    listUpdated.ForEach(x => x.SysMappingId = x.AccountNo);
+                    var hs = await catPartnerService.UpdatePartnerSyncStatus(listUpdated);
                 }
 
                 if (responseAddModel?.Success == "1" || responseUpdateModel?.Success == "1")

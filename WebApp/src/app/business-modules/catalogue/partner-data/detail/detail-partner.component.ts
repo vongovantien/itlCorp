@@ -10,7 +10,7 @@ import { getMenuUserPermissionState, getMenuUserSpecialPermissionState, IAppStat
 import _merge from 'lodash-es/merge';
 import { ToastrService } from 'ngx-toastr';
 import { combineLatest, forkJoin, Observable } from 'rxjs';
-import { catchError, concatMap, finalize, map, take, takeUntil, tap } from "rxjs/operators";
+import { catchError, concatMap, finalize, map, switchMap, take, takeUntil, tap } from "rxjs/operators";
 import { AppList } from 'src/app/app.list';
 import { CommercialBranchSubListComponent } from 'src/app/business-modules/commercial/components/branch-sub/commercial-branch-sub-list.component';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
@@ -518,7 +518,7 @@ export class PartnerDetailComponent extends AppList {
                             this.formPartnerComponent.bankName.setValue(this.formPartnerComponent.bankName.value?.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
                             this.getParentCustomers();
                             if (body.active === true) {
-                                const partnerSyncIds: any[] = [{ id: this.partner.id, action: !!this.partner.sysMappingId ? 'UPDATE' : 'ADD' }];
+                                const partnerSyncIds: any[] = [{ id: body.id, action: !!body.sysMappingId ? 'UPDATE' : 'ADD' }];
                                 this.syncPartnerToAccountantSystem(partnerSyncIds);
                             }
                             this._toastService.success(message);
@@ -538,7 +538,6 @@ export class PartnerDetailComponent extends AppList {
                         } else {
                             this._toastService.error("Opps", "Something getting error!");
                         }
-
                     }, err => {
                         console.log(err)
                     });
@@ -548,7 +547,7 @@ export class PartnerDetailComponent extends AppList {
     syncPartnerToAccountantSystem(partnerSyncIds: string[]) {
         this._catalogueRepo.syncPartnerToAccountantSystem(partnerSyncIds).pipe(
             catchError(this.catchError),
-            concatMap((res: CommonInterface.IResult) => {
+            switchMap((res: CommonInterface.IResult) => {
                 const { status, message } = res;
                 if (status) {
                     this._toastService.success(message);
@@ -556,9 +555,10 @@ export class PartnerDetailComponent extends AppList {
                     this._toastService.warning(message);
                 }
                 return this._catalogueRepo.getDetailPartner(this.partner.id);
-            })
-        ).subscribe(updatedPartner => {
-            this.partner = updatedPartner;
+            }),
+        ).subscribe((res: Partner) => {
+            console.log(res);
+            this.partner.SysMappingId = res.SysMappingId;
         });
     }
 

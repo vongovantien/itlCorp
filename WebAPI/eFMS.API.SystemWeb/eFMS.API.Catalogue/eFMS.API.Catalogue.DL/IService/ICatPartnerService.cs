@@ -7,10 +7,8 @@ using eFMS.API.Common.Globals;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Catalogue.DL.IService
@@ -26,7 +24,7 @@ namespace eFMS.API.Catalogue.DL.IService
         List<CatPartnerImportModel> CheckValidImport(List<CatPartnerImportModel> list);
         List<CatPartnerImportModel> CheckValidCustomerAgentImport(List<CatPartnerImportModel> list);
         HandleState Import(List<CatPartnerImportModel> data);
-        HandleState ImportCustomerAgent(List<CatPartnerImportModel> data,string type);
+        HandleState ImportCustomerAgent(List<CatPartnerImportModel> data, string type);
         HandleState Delete(string id);
         HandleState Update(CatPartnerModel model);
         object Add(CatPartnerModel model);
@@ -41,9 +39,10 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<QueryExportAgreementInfo> QueryExportAgreement(CatPartnerCriteria criteria);
         List<SysUserViewModel> GetListSaleman(string partnerId, string transactionType, string shipmentType, string office);
         IQueryable<CatPartnerForKeyinCharge> GetPartnerForKeyinCharge(PartnerMultiCriteria criteria);
-        Task<CatPartnerModel> GetPartnerByTaxCode (string taxCode);
+        Task<CatPartnerModel> GetPartnerByTaxCode(string taxCode);
         Task<HandleState> AddPartnerFromUserData(Guid userId);
         Task<List<PartnerSyncModel>> GetListPartnerToSync(List<string> Ids);
+        Task<HandleState> UpdatePartnerSyncStatus(List<CatPartnerModel> models);
 
     }
 }
