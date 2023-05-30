@@ -31,6 +31,6 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string ShipmentType { get; set; }
         public string AmountVND { get; set;}
         public decimal? ExchangeRate { get; set; }
-        public string ParentAccountNo { get; internal set; }
+        public string ParentAccountNo { get; set; }
     }
 }
