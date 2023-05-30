@@ -21,11 +21,13 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CsTransaction> csTransRepository;
         private readonly IContextBase<CsTransactionDetail> csTransDetailRepository;
         private readonly IStageService stageService;
+        private readonly IContextBase<CatStage> catStageRepo;
 
         public CsStageAssignedService(
             ICurrentUser user,
             IContextBase<CsTransaction> csTransRepo,
             IContextBase<CsTransactionDetail> csTransDetailRepo,
+            IContextBase<CatStage> catStageRepository,
             IContextBase<OpsStageAssigned> repository,
             IMapper mapper,
             IStageService catstageService
@@ -35,6 +37,7 @@ namespace eFMS.API.Documentation.DL.Services
             csTransRepository = csTransRepo;
             csTransDetailRepository = csTransDetailRepo;
             stageService = catstageService;
+            catStageRepo = catStageRepository;
         }
 
         public async Task<HandleState> AddNewStageAssigned(CsStageAssignedModel model)
@@ -53,7 +56,7 @@ namespace eFMS.API.Documentation.DL.Services
             var currentJob = await csTransRepository.Get(x => x.Id == criteria.JobId).FirstOrDefaultAsync();
             var hbl = await csTransDetailRepository.Get(x => x.Id == criteria.HblId).FirstOrDefaultAsync();
             var stage = await stageService.GetStageByType(criteria.StageType);
-            var orderNumber = DataContext.Where(x => x.JobId == criteria.JobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
+            var orderNumber = await DataContext.Where(x => x.JobId == criteria.JobId).Select(x => x.OrderNumberProcessed).MaxAsync() ?? 0;
 
             CsStageAssignedModel newItem = new CsStageAssignedModel();
 
@@ -76,7 +79,7 @@ namespace eFMS.API.Documentation.DL.Services
         public async Task<HandleState> AddMultipleStageAssigned(Guid jobId, List<CsStageAssignedModel> listStageAssigned)
         {
             var result = new HandleState();
-            var orderNumber = DataContext.Where(x => x.JobId == jobId).Select(x => x.OrderNumberProcessed).Max() ?? 0;
+            var orderNumber = await DataContext.Where(x => x.JobId == jobId).Select(x => x.OrderNumberProcessed).MaxAsync() ?? 0;
 
             foreach (var stage in listStageAssigned)
             {
@@ -85,6 +88,14 @@ namespace eFMS.API.Documentation.DL.Services
                 var assignedItem = mapper.Map<OpsStageAssigned>(stage);
                 assignedItem.Id = Guid.NewGuid();
                 assignedItem.Hblno = hbl;
+                if (!string.IsNullOrEmpty(stage.Code) && stage.Code.ToString() == DocumentConstants.SEND_INV_CODE && stage.Type!="User")
+                {
+                    assignedItem.Status = TermData.Done;
+                    assignedItem.StageId = catStageRepo.Get(x=>x.Code==stage.Code).FirstOrDefault().Id;
+                    assignedItem.MainPersonInCharge = stage.RealPersonInCharge = currentUser.UserID;
+                    assignedItem.Deadline = DateTime.Now;
+                    assignedItem.Type = DocumentConstants.FROM_SYSTEM;
+                }
                 assignedItem.DatetimeModified = assignedItem.DatetimeCreated = DateTime.Now;
                 assignedItem.OrderNumberProcessed = orderNumber;
 
