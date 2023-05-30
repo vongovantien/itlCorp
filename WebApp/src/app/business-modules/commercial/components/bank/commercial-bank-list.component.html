@@ -53,7 +53,7 @@
                                 <td [ngSwitch]="bank.approveStatus">
                                     <div *ngSwitchCase="'New'" class="text-danger">
                                         {{bank.approveStatus}}</div>
-                                    <div *ngSwitchCase="'Reject'" class="text-danger">
+                                    <div *ngSwitchCase="'Rejected'" class="text-danger">
                                         {{bank.approveStatus}}</div>
                                     <div *ngSwitchCase="'Processing'" class="text-info">
                                         {{bank.approveStatus}}</div>

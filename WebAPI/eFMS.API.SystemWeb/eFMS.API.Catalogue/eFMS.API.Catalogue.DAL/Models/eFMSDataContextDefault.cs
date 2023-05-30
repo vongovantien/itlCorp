@@ -3146,10 +3146,6 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.SuspendTime).HasMaxLength(150);
 
-                entity.Property(e => e.TransactionType)
-                    .HasMaxLength(50)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
