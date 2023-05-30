@@ -65,6 +65,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? OverObh1to15Day { get; set; }
         public decimal? OverObh16to30Day { get; set; }
         public decimal? OverObh30Day { get; set; }
+        public bool? IsOverDuePrepaid { get; set; }
 
     }
 }

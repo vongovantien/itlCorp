@@ -49,6 +49,7 @@ namespace eFMS.API.Accounting
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
             services.AddHostedService<ReceivableCalculatingBackgroundService>();
+            services.AddHostedService<PrepaidOverDueBackgroundService>();
             services.AddScoped<IAccAccountReceivableHostedService, AccAccountReceivableHostedService>();
             services.SetUpRabbitMq(Configuration);
         }
