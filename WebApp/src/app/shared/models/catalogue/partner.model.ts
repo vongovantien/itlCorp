@@ -91,7 +91,7 @@ export class Partner {
     currency: string = 'VND';
 
     permission: PermissionPartner = new PermissionPartner();
-    SysMappingId: string = '';
+    sysMappingId: string = '';
     countryShippingName: string = null;
     countryName: string = null;
     officeId: string = null;
