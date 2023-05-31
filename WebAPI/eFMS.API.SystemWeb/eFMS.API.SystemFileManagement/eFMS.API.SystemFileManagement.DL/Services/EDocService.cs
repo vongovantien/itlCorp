@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver.Linq;
 using Newtonsoft.Json;
 using System;
@@ -202,8 +203,18 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         list.Add(sysImage);
                         if (type == "Shipment")
                         {
-                            var attachTemplateSrc = await _attachFileTemplateRepo.GetAsync(x => x.Id == edoc.DocumentId);
+                            var attachTemplateSrc = new List<SysAttachFileTemplate>();
+                            if (edoc.DocumentId == 0)
+                            {
+                                attachTemplateSrc = await _attachFileTemplateRepo.GetAsync(x => x.Code == edoc.Code && x.TransactionType == edoc.TransactionType);
+                            }
+                            else
+                            {
+                                attachTemplateSrc = await _attachFileTemplateRepo.GetAsync(x => x.Id == edoc.DocumentId);
+                            }
+
                             var attachTemplate = attachTemplateSrc.FirstOrDefault();
+
                             var sysImageDetail = new SysImageDetail
                             {
                                 Id = Guid.NewGuid(),
