@@ -204,7 +204,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             {
                                 attachTemplate = _attachFileTemplateRepo.Get(x => x.Code == "POD" && x.TransactionType==edoc.TransactionType).FirstOrDefault();
                             }
-                            attachTemplate = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault();
+                            else
+                            {
+                                attachTemplate = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault();
+                            }
 
                             var sysImageDetail = new SysImageDetail
                             {
