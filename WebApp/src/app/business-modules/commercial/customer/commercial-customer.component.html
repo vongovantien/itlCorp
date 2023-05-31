@@ -163,7 +163,7 @@
                                 </tr>
                             </ng-container>
                         </ng-container>
-                        <tr *ngIf="(!isLoading|async) && !customers.length" app-table-none-record></tr>
+                        <tr *ngIf="!(isLoading|async) && !customers.length" app-table-none-record></tr>
                         <tr *ngIf="isLoading | async" app-table-row-loading></tr>
                     </tbody>
                 </table>
