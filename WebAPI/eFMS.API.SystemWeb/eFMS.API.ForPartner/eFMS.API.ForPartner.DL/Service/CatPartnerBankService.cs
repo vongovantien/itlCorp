@@ -5,12 +5,14 @@ using eFMS.API.Common.Helpers;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
 using eFMS.API.ForPartner.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -96,6 +98,19 @@ namespace eFMS.API.ForPartner.DL.Service
             }
 
             return valid;
+        }
+
+        public async Task<ICurrentUser> SetCurrentUserPartner(ICurrentUser currentUser, string apiKey)
+        {
+            SysPartnerApi partnerApi = await sysPartnerApiRepository.Where(x => x.ApiKey == apiKey).FirstOrDefaultAsync();
+
+            currentUser.UserID = (partnerApi != null) ? partnerApi.UserId.ToString() : Guid.Empty.ToString();
+            currentUser.GroupId = 0;
+            currentUser.DepartmentId = 0;
+            currentUser.OfficeID = Guid.Empty;
+            currentUser.CompanyID = partnerApi?.CompanyId ?? Guid.Empty;
+
+            return currentUser;
         }
     }
 }

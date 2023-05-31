@@ -7,6 +7,7 @@ using eFMS.API.ForPartner.Infrastructure.Extensions;
 using eFMS.API.ForPartner.Infrastructure.Filters;
 using eFMS.API.ForPartner.Infrastructure.Middlewares;
 using eFMS.API.ForPartner.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -31,12 +32,14 @@ namespace eFMS.API.ForPartner.Controllers
         private readonly IStringLocalizer _stringLocalizer;
         private readonly IActionFuncLogService actionFuncLogService;
         private readonly IContextBase<CatPartner> catPartnerRepository;
-        public CatalogueController(ICatPartnerBankService catPartnerBankService, IStringLocalizer<LanguageSub> stringLocalizer, IActionFuncLogService actionFuncLog, IContextBase<CatPartner> catPartnerRepo)
+        private readonly ICurrentUser _currentUser;
+        public CatalogueController(ICatPartnerBankService catPartnerBankService, IStringLocalizer<LanguageSub> stringLocalizer, IActionFuncLogService actionFuncLog, IContextBase<CatPartner> catPartnerRepo, ICurrentUser currentUser)
         {
             _catPartnerBankService = catPartnerBankService;
             _stringLocalizer = stringLocalizer;
             actionFuncLogService = actionFuncLog;
             catPartnerRepository = catPartnerRepo;
+            _currentUser = currentUser;
         }
 
         /// <summary>
@@ -61,6 +64,14 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
+
+            ICurrentUser currentUser = await _catPartnerBankService.SetCurrentUserPartner(_currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.OfficeID = _currentUser.OfficeID;
+            currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "UpdateBankInfoSyncStatus";
 
             var hs = await _catPartnerBankService.UpdatePartnerBankInfoSyncStatus(model);
             string _message = hs.Success ? "Cập nhật thông tin ngân hàng thành công." : string.Format("{0}. Cập nhật thông tin ngân hàng thất bại.", hs.Message.ToString());
