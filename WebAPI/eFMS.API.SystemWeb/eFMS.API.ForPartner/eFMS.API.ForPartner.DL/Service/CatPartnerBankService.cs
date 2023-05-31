@@ -5,12 +5,14 @@ using eFMS.API.Common.Helpers;
 using eFMS.API.ForPartner.DL.IService;
 using eFMS.API.ForPartner.DL.Models;
 using eFMS.API.ForPartner.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,22 +24,39 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<SysPartnerApi> sysPartnerApiRepository;
         private readonly IOptions<AuthenticationSetting> configSetting;
         private readonly IStringLocalizer<LanguageSub> _stringLocalizer;
+        private readonly ICurrentUser _currentUser;
+        private readonly IActionFuncLogService _actionFuncLogService;
+        
         public CatPartnerBankService(IContextBase<CatPartnerBank> repository,
             IContextBase<CatPartner> catParnerRepo,
             IContextBase<SysPartnerApi> sysPartnerApiRepo,
             IOptions<AuthenticationSetting> config,
             IMapper mapper,
-            IStringLocalizer<LanguageSub> stringLocalizer) : base(repository, mapper)
+            ICurrentUser currentUser,
+            IStringLocalizer<LanguageSub> stringLocalizer,
+            IActionFuncLogService actionFuncLogService) : base(repository, mapper)
         {
             catPartnerRepository = catParnerRepo;
             sysPartnerApiRepository = sysPartnerApiRepo;
             configSetting = config;
             _stringLocalizer = stringLocalizer;
+            _currentUser = currentUser;
+            _actionFuncLogService = actionFuncLogService;
         }
 
-        public async Task<HandleState> UpdatePartnerBankInfoSyncStatus(BankStatusUpdateModel model)
+        public async Task<HandleState> UpdatePartnerBankInfoSyncStatus(BankStatusUpdateModel model, string apiKey)
         {
+
             var hs = new HandleState();
+
+            ICurrentUser currentUser = await SetCurrentUserPartner(_currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.OfficeID = _currentUser.OfficeID;
+            currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "UpdateBankInfoSyncStatus";
+
             var partner = await catPartnerRepository.Get(x => x.AccountNo == model.PartnerCode).FirstOrDefaultAsync();
             if (partner == null)
             {
@@ -96,6 +115,19 @@ namespace eFMS.API.ForPartner.DL.Service
             }
 
             return valid;
+        }
+
+        private async Task<ICurrentUser> SetCurrentUserPartner(ICurrentUser currentUser, string apiKey)
+        {
+            SysPartnerApi partnerApi = await sysPartnerApiRepository.Where(x => x.ApiKey == apiKey).FirstOrDefaultAsync();
+
+            currentUser.UserID = (partnerApi != null) ? partnerApi.UserId.ToString() : Guid.Empty.ToString();
+            currentUser.GroupId = 0;
+            currentUser.DepartmentId = 0;
+            currentUser.OfficeID = Guid.Empty;
+            currentUser.CompanyID = partnerApi?.CompanyId ?? Guid.Empty;
+
+            return currentUser;
         }
     }
 }

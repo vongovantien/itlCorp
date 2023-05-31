@@ -8,6 +8,6 @@ namespace eFMS.API.ForPartner.DL.IService
 {
     public interface ICatPartnerBankService : IRepositoryBase<CatPartnerBank, CatPartnerBankModel>, IForPartnerApiService
     {
-        Task<HandleState> UpdatePartnerBankInfoSyncStatus(BankStatusUpdateModel model);
+        Task<HandleState> UpdatePartnerBankInfoSyncStatus(BankStatusUpdateModel model, string apiKey);
     }
 }

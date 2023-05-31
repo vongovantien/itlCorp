@@ -7,6 +7,7 @@ using eFMS.API.ForPartner.Infrastructure.Extensions;
 using eFMS.API.ForPartner.Infrastructure.Filters;
 using eFMS.API.ForPartner.Infrastructure.Middlewares;
 using eFMS.API.ForPartner.Service.Models;
+using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Connection.EF;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -31,7 +32,8 @@ namespace eFMS.API.ForPartner.Controllers
         private readonly IStringLocalizer _stringLocalizer;
         private readonly IActionFuncLogService actionFuncLogService;
         private readonly IContextBase<CatPartner> catPartnerRepository;
-        public CatalogueController(ICatPartnerBankService catPartnerBankService, IStringLocalizer<LanguageSub> stringLocalizer, IActionFuncLogService actionFuncLog, IContextBase<CatPartner> catPartnerRepo)
+
+        public CatalogueController(ICatPartnerBankService catPartnerBankService, IStringLocalizer<LanguageSub> stringLocalizer, IActionFuncLogService actionFuncLog, IContextBase<CatPartner> catPartnerRepo, ICurrentUser currentUser)
         {
             _catPartnerBankService = catPartnerBankService;
             _stringLocalizer = stringLocalizer;
@@ -61,8 +63,7 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
-
-            var hs = await _catPartnerBankService.UpdatePartnerBankInfoSyncStatus(model);
+            var hs = await _catPartnerBankService.UpdatePartnerBankInfoSyncStatus(model, apiKey);
             string _message = hs.Success ? "Cập nhật thông tin ngân hàng thành công." : string.Format("{0}. Cập nhật thông tin ngân hàng thất bại.", hs.Message.ToString());
             var result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
