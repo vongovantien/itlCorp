@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver.Linq;
 using Newtonsoft.Json;
 using System;
@@ -199,6 +200,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         if (type == "Shipment")
                         {
                             var attachTemplate = new SysAttachFileTemplate();
+                            if (edoc.Code == "POD" && edoc.DocumentId == 0)
+                            {
+                                attachTemplate = _attachFileTemplateRepo.Get(x => x.Code == "POD" && x.TransactionType==edoc.TransactionType).FirstOrDefault();
+                            }
                             attachTemplate = _attachFileTemplateRepo.Get(x => x.Id == edoc.DocumentId).FirstOrDefault();
 
                             var sysImageDetail = new SysImageDetail
