@@ -200,7 +200,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                         if (type == "Shipment")
                         {
                             var attachTemplate = new SysAttachFileTemplate();
-                            if (edoc.DocumentId == 0||edoc.DocumentId==null)
+                            if (edoc.DocumentId == 0)
                             {
                                 attachTemplate = _attachFileTemplateRepo.Get(x => x.Code == edoc.Code && x.TransactionType==edoc.TransactionType).FirstOrDefault();
                             }
