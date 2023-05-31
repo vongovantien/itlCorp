@@ -87,5 +87,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public string SoaSmNo { get; set; }
         public string ShipmentType { get; set; }
         public string ParentAccountNo { get; set; }
+        public decimal? TotalAmountVnd { get; set; }
+        public decimal? TotalAmountUsd { get; set; }
     }
 }

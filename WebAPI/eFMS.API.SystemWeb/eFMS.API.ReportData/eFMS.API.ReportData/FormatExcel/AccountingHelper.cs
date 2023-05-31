@@ -5271,32 +5271,22 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Currency", item.Currency);
                     listKeyData.Add("ParentAccountNo", item.ParentAccountNo);
                     listKeyData.Add("Amount", item.Amount);
-                    excel.Worksheet.Cells[rowStart, 16].Style.Numberformat.Format = item.Currency == CURRENCY_LOCAL ? numberFormat2 : numberFormat;
-                    if (item.Currency == CURRENCY_LOCAL)
-                    {
-                        listKeyData.Add("AmountUSD", item.Amount/item.ExchangeRate);
-                        excel.Worksheet.Cells[rowStart, 17].Style.Numberformat.Format = numberFormat;
-                        listKeyData.Add("AmountVND", item.Amount);
-                        excel.Worksheet.Cells[rowStart, 18].Style.Numberformat.Format = numberFormat2;
-                    }
-                    else
-                    {
-                        listKeyData.Add("AmountVND", item.Amount * item.ExchangeRate);
-                        excel.Worksheet.Cells[rowStart, 18].Style.Numberformat.Format = numberFormat2;
-                        listKeyData.Add("AmountUSD", item.Amount);
-                        excel.Worksheet.Cells[rowStart, 17].Style.Numberformat.Format = numberFormat;
-                    }
+                    excel.Worksheet.Cells[rowStart, 17].Style.Numberformat.Format = item.Currency == CURRENCY_LOCAL ? numberFormat2 : numberFormat;
+                    listKeyData.Add("AmountUSD", item.TotalAmountUsd);
+                    excel.Worksheet.Cells[rowStart, 18].Style.Numberformat.Format = numberFormat;
+                    listKeyData.Add("AmountVND", item.TotalAmountVnd);
+                    excel.Worksheet.Cells[rowStart, 19].Style.Numberformat.Format = numberFormat2;
                     listKeyData.Add("IssueBy", item.IssueBy);
                     listKeyData.Add("Bu", item.Bu);
                     listKeyData.Add("ServiceDate", item.ServiceDate);
-                    excel.Worksheet.Cells[rowStart, 21].Style.Numberformat.Format = "dd/MM/yyyy";
-                    listKeyData.Add("IssueDate", item.IssueDate);
                     excel.Worksheet.Cells[rowStart, 22].Style.Numberformat.Format = "dd/MM/yyyy";
+                    listKeyData.Add("IssueDate", item.IssueDate);
+                    excel.Worksheet.Cells[rowStart, 23].Style.Numberformat.Format = "dd/MM/yyyy";
                     listKeyData.Add("AccountNo", item.AccountNo);
                     listKeyData.Add("ETD", item.ETD);
-                    excel.Worksheet.Cells[rowStart, 23].Style.Numberformat.Format = "dd/MM/yyyy";
+                    excel.Worksheet.Cells[rowStart, 25].Style.Numberformat.Format = "dd/MM/yyyy";
                     listKeyData.Add("ETA", item.ETA);
-                    excel.Worksheet.Cells[rowStart, 24].Style.Numberformat.Format = "dd/MM/yyyy";
+                    excel.Worksheet.Cells[rowStart, 26].Style.Numberformat.Format = "dd/MM/yyyy";
                     
                     excel.SetData(listKeyData);
                     rowStart++;
