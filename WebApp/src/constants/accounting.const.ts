@@ -43,7 +43,7 @@ export class AccountingConstants {
     }
 
     public static DATE_TYPE: string[] = <string[]>['Create Date', 'Paid Date', 'Last Sync'];
-    public static PAYMENT_TYPE: string[] = <string[]>['Payment', 'Invoice'];
+    public static PAYMENT_TYPE: string[] = <string[]>['Payment', 'Invoice', 'ARCB No'];
     public static STATUS: string[] = <string[]>['Draft', 'Done', 'Cancel'];
     public static SYNC_STATUSS: string[] = <string[]>['Synced', 'Rejected'];
 
@@ -75,8 +75,8 @@ export class AccountingConstants {
         COLLECTED_AMOUNT: 'Collected Amount Agency',
         ADVANCE_AGENCY: 'Advance Agency',
         BANK_FEE_AGENCY: 'Bank Fee Agency',
-        RECEIVE_FROM_PAY_OBH: 'Receive From Pay OBH',
-        RECEIVE_FROM_COLLECT_OBH: 'Receive From Collect OBH',
+        // RECEIVE_FROM_PAY_OBH: 'Receive From Pay OBH',
+        // RECEIVE_FROM_COLLECT_OBH: 'Receive From Collect OBH',
         PAID_AMOUNT_AGENCY: 'Paid Amount Agency',
         //Credit combine
         // CLEAR_CREDIT_FROM_OBH: 'Clear Credit From OBH',
@@ -105,21 +105,14 @@ export class AccountingConstants {
     }
 
     public static GENERAL_RECEIPT_PAYMENT_METHOD: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
-        // { id: 'Collect OBH Agency', text: 'Collect OBH Agency' },
-        // { id: 'Pay OBH Agency', text: 'Pay OBH Agency' },
-        // { id: 'Collected Amount', text: 'Collected Amount' },
-        // { id: 'Advance Agency', text: 'Advance Agency' },
-        // { id: 'Bank Fee Agency', text: 'Bank Fee Agency' },
-        // { id: 'Receive From Pay OBH', text: 'Receive From Pay OBH' },
-        // { id: 'Receive From Collect OBH', text: 'Receive From Collect OBH' },
         { id: 'Paid Amount Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.PAID_AMOUNT_AGENCY },
         { id: 'Collect OBH Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.COLLECT_OBH_AGENCY },
         { id: 'Pay OBH Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.PAY_OBH_AGENCY },
         { id: 'Collected Amount Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.COLLECTED_AMOUNT },
         { id: 'Advance Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.ADVANCE_AGENCY },
         { id: 'Bank Fee Agency', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.BANK_FEE_AGENCY },
-        { id: 'Receive From Pay OBH', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_PAY_OBH },
-        { id: 'Receive From Collect OBH', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_COLLECT_OBH },
+        // { id: 'Receive From Pay OBH', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_PAY_OBH },
+        // { id: 'Receive From Collect OBH', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_COLLECT_OBH },
     ];
     public static CREDIT_COMBINE_RECEIPT_PAYMENT_METHOD: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
         // { id: 'Clear Credit From OBH', text: AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_CREDIT_FROM_OBH },

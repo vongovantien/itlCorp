@@ -2004,7 +2004,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             SaleManId = x.contract.SaleManId,
                             SaleManName = x.employee.EmployeeNameEn,
                             ContractNo = x.contract.ContractNo,
-                            ExpiredDate = x.contract.ExpiredDate,
+                            ExpiredDate = x.contract.ExpiredDate == null ? null : x.contract.ExpiredDate.Value.ToString("dd/MM/yyyy"),
                             ContractType = x.contract.ContractType,
                             CustomerAdvanceAmountVnd = x.contract.CustomerAdvanceAmountVnd ?? 0,
                             CreditCurrency = x.contract.CreditCurrency,

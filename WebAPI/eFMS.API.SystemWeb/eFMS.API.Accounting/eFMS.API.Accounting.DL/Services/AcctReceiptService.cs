@@ -173,7 +173,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             // Tìm theo số phiếu thu/số invoice
-            if (string.IsNullOrEmpty(criteria.PaymentType))
+            if (string.IsNullOrEmpty(criteria.PaymentType) || (!string.IsNullOrEmpty(criteria.PaymentType) && criteria.PaymentType == "Payment"))
             {
                 query = query.And(x => (x.PaymentRefNo ?? "").IndexOf(criteria.RefNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             }
@@ -209,6 +209,10 @@ namespace eFMS.API.Accounting.DL.Services
                         query = query.And(x => receiptIds.Contains(x.Id));
                     }
                 }
+            }
+            if(!string.IsNullOrEmpty(criteria.PaymentType) && criteria.PaymentType == "ARCB No")
+            {
+                query = query.And(x => (x.Arcbno ?? "").IndexOf(criteria.RefNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0 || (x.SubArcbno ?? "").IndexOf(criteria.RefNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             }
 
             IQueryable<AcctReceipt> dataQuery = DataContext.Get(query);
@@ -2702,7 +2706,10 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         hs = DataContext.Update(receiptCurrent, x => x.Id == receiptCurrent.Id);
 
-                       
+                        if (hs.Success)
+                        {
+                            var hsUpd = UpdateBalanceReceipt(receiptCurrent.SubArcbno);
+                        }
                         trans.Commit();
 
                         

@@ -104,7 +104,8 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
         this.customers = this._catalogueRepo.getPartnerGroupsWithCriteria({
             partnerGroups: [CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]
             , partnerType: this.partnerTypeState.toUpperCase() === 'CUSTOMER' ? 'Customer' : 'Agent'
-        });
+            , isExpired: true
+        });// Lấy thêm các hđ hết hạn
     }
 
     initForm() {

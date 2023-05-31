@@ -14,5 +14,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string ContractType { get; set; }
         public string PartnerType { get; set; }
         public bool? IsShowSaleman { get; set; }
+        public bool? IsExpired { get; set; } // If true => get contract without filter contract expired
     }
 }
