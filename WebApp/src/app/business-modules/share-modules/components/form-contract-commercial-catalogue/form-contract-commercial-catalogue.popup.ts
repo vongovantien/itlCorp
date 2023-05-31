@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
@@ -12,12 +12,12 @@ import { CatalogueRepo, SystemFileManageRepo, SystemRepo } from '@repositories';
 import { GetCatalogueCurrencyAction, IAppState, getCatalogueCurrencyState, getCurrentUserState, getMenuUserSpecialPermissionState } from '@store';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import { catchError, distinctUntilChanged, finalize, map, takeUntil } from 'rxjs/operators';
+import { catchError, concatMap, distinctUntilChanged, finalize, map, takeUntil} from 'rxjs/operators';
 import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/commercial/components/popup/salesman-credit-limit.popup';
 import { PopupBase } from 'src/app/popup.base';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
-import { getDetailPartner, getDetailPartnerDataState } from 'src/app/business-modules/commercial/store';
+import { getDetailPartnerDataState } from 'src/app/business-modules/commercial/store';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -916,24 +916,26 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 }
             );
     }
-
-    syncPartnerToAccountantSystem(partnerSyncIds: any[]) {
-        this._catalogueRepo.syncPartnerToAccountantSystem(partnerSyncIds)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    const { status, message } = res;
-                    if (status) {
-                        this._toastService.success(message);
-                    } else {
-                        this._toastService.warning(message);
-                    }
-                    this._store.dispatch(getDetailPartner({ payload: this.selectedContract.partnerId }))
+    syncPartnerToAccountantSystem(partnerRequest: any[]) {
+        this._catalogueRepo.syncPartnerToAccountantSystem(partnerRequest).pipe(
+            catchError(this.catchError),
+            concatMap((res: CommonInterface.IResult) => {
+                const { status, message } = res;
+                if (status) {
+                    this._toastService.success(message);
+                } else {
+                    this._toastService.error(message);
                 }
-            );
+                return this._catalogueRepo.getDetailPartner(this.detailPartner.id);
+            })
+        ).subscribe(
+            (res: Partner) => {
+                this.detailPartner.sysMappingId = res.sysMappingId;
+            },
+            (error) => {
+                console.log(error);
+            }
+        );
     }
 
     onChageTrialCreditDays() {

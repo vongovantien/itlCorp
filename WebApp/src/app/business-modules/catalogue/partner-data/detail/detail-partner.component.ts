@@ -10,7 +10,7 @@ import { getMenuUserPermissionState, getMenuUserSpecialPermissionState } from '@
 import _merge from 'lodash-es/merge';
 import { ToastrService } from 'ngx-toastr';
 import { combineLatest, forkJoin, Observable } from 'rxjs';
-import { catchError, finalize, map, switchMap, takeUntil } from "rxjs/operators";
+import { catchError, concatMap, finalize, map, takeUntil } from "rxjs/operators";
 import { AppList } from 'src/app/app.list';
 import { CommercialBranchSubListComponent } from 'src/app/business-modules/commercial/components/branch-sub/commercial-branch-sub-list.component';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
@@ -550,22 +550,26 @@ export class PartnerDetailComponent extends AppList {
         }
     }
 
-    syncPartnerToAccountantSystem(partnerSyncIds: string[]) {
-        this._catalogueRepo.syncPartnerToAccountantSystem(partnerSyncIds).pipe(
+    syncPartnerToAccountantSystem(partnerRequest: any[]) {
+        this._catalogueRepo.syncPartnerToAccountantSystem(partnerRequest).pipe(
             catchError(this.catchError),
-            switchMap((res: CommonInterface.IResult) => {
+            concatMap((res: CommonInterface.IResult) => {
                 const { status, message } = res;
                 if (status) {
                     this._toastService.success(message);
                 } else {
-                    this._toastService.warning(message);
+                    this._toastService.error(message);
                 }
                 return this._catalogueRepo.getDetailPartner(this.partner.id);
-            }),
-        ).subscribe((res: Partner) => {
-            console.log(res);
-            this.partner.SysMappingId = res.SysMappingId;
-        });
+            })
+        ).subscribe(
+            (res: Partner) => {
+                this.partner.sysMappingId = res.sysMappingId;
+            },
+            (error) => {
+                console.log(error);
+            }
+        );
     }
 
     sortBySaleMan(sortData: CommonInterface.ISortData): void {

@@ -729,10 +729,11 @@ namespace eFMS.API.Catalogue.Controllers
                 HttpResponseMessage resUpdate = new HttpResponseMessage();
                 BravoResponseModel responseAddModel = new BravoResponseModel();
                 BravoResponseModel responseUpdateModel = new BravoResponseModel();
-
+                var listRequestReturn = new List<PartnerSyncModel>();
                 // 3. Call Bravo to SYNC.
                 if (listAdd.Count > 0)
                 {
+                    listRequestReturn = mapper.Map<List<PartnerSyncModel>>(listAdd);
                     resAdd = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSCustomerSyncAdd", listAdd, loginResponse.TokenKey);
                     responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -754,6 +755,7 @@ namespace eFMS.API.Catalogue.Controllers
 
                 if (listUpdate.Count > 0)
                 {
+                    listRequestReturn = mapper.Map<List<PartnerSyncModel>>(listUpdate);
                     resUpdate = await HttpClientService.PostAPI(_webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSCustomerSyncUpdate", listUpdate, loginResponse.TokenKey);
                     responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
 
@@ -784,17 +786,17 @@ namespace eFMS.API.Catalogue.Controllers
 
                 if (responseAddModel?.Success == "1" || responseUpdateModel?.Success == "1")
                 {
-                    ResultHandle result = new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_SUCCESS"].Value, Data = listAdd.Any() ? JsonConvert.SerializeObject(listAdd) : JsonConvert.SerializeObject(listUpdate) };
+                    ResultHandle result = new ResultHandle { Status = true, Message = stringLocalizer["MSG_SYNC_SUCCESS"].Value, Data = listRequestReturn };
                     return Ok(result);
                 }
                 else
                 {
                     if (responseAddModel?.Success == null && responseUpdateModel?.Success == null)
                     {
-                        return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = listAdd.Any() ? JsonConvert.SerializeObject(listAdd) : JsonConvert.SerializeObject(listUpdate) });
+                        return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = listRequestReturn });
                     }
-                    return BadRequest(new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = listAdd.Any() ? JsonConvert.SerializeObject(listAdd) : JsonConvert.SerializeObject(listUpdate) });
                 }
+                return Ok(new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = listRequestReturn });
             }
             catch (Exception)
             {
