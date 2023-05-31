@@ -4324,7 +4324,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 Amount = cd.Total,
                                 IssueBy = creator != null ? creator.Username : "",
                                 Bu = departs != null ? departs.DeptNameEn : "",
-                                ServiceDate = trans != null ? trans.ServiceDate : ops.ServiceDate,
+                                ServiceDate = trans != null ? trans?.ServiceDate : ops?.ServiceDate,
                                 VoucherIddate = cd.VoucherIddate,
                                 IssueDate = cd.IssuedDate,
                                 AccountNo = cd.AccountNo,
@@ -4337,7 +4337,7 @@ namespace eFMS.API.Documentation.DL.Services
                             };
 
             var res = dataTrans.OrderByDescending(o => o.SoaNo).ToList<AccAccountingManagementResult>();
-           return res;
+            return res;
         }
 
 
