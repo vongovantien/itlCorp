@@ -2868,6 +2868,15 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 settlePayments = settlePayments.Where(x => x.Payee == criteria.PartnerId);
             }
+            if (criteria.FromExportDate != null && criteria.ToExportDate != null)
+            {
+                settlePayments = settlePayments.Where(x => x.RequestDate.Value.Date >= criteria.FromExportDate.Value.Date && x.RequestDate.Value.Date <= criteria.ToExportDate.Value.Date);
+            }else
+            {
+                var maxDate = DateTime.Now;
+                var minDate = maxDate.AddDays(-90); //Bắt đầu từ ngày MaxDate trở về trước 90 ngày
+                settlePayments = settlePayments.Where(x => x.RequestDate.Value.Date >= minDate.Date && x.RequestDate.Value.Date <= maxDate.Date);
+            }
             var charges = surchargeRepository.Where(x => !string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.Soano)
                 && string.IsNullOrEmpty(x.CreditNo) && (x.Type == DocumentConstants.CHARGE_OBH_TYPE || x.Type == DocumentConstants.CHARGE_BUY_TYPE));
              
@@ -2913,7 +2922,8 @@ namespace eFMS.API.Documentation.DL.Services
                             CodeType = chg.Type == "BUY" ? "CREDIT" : "DEBIT",
                             ChargeType = chg.Type,
                             SoaNo = chg.SettlementCode,
-                            ExchangeRate = chg.FinalExchangeRate
+                            TotalAmountUsd = chg.AmountUsd + chg.VatAmountUsd,
+                            TotalAmountVnd = chg.AmountVnd+ chg.VatAmountVnd
                         };
 
             if (query == null || query.Count() == 0)
@@ -2945,6 +2955,8 @@ namespace eFMS.API.Documentation.DL.Services
                 MBLNo = se.FirstOrDefault().MBLNo,
                 HBLNo = se.FirstOrDefault().HBLNo,
                 Total = se.GroupBy(x => x.ChargeId).Sum(z => z.FirstOrDefault().Total),
+                TotalAmountUsd = se.GroupBy(x => x.ChargeId).Sum(z=>z.FirstOrDefault().TotalAmountUsd),
+                TotalAmountVnd = se.GroupBy(x => x.ChargeId).Sum(z => z.FirstOrDefault().TotalAmountVnd),
                 Currency = se.FirstOrDefault().Currency,
                 IssuedDate = se.FirstOrDefault().IssuedDate,
                 Creator = se.FirstOrDefault().Creator,
@@ -2962,8 +2974,7 @@ namespace eFMS.API.Documentation.DL.Services
                 ChargeType = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.ChargeType)).Select(x => x.ChargeType).Distinct()),
                 DepartmentId = se.FirstOrDefault().DepartmentId,
                 AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
-                SoaNo = se.FirstOrDefault().SoaNo,
-                ExchangeRate = se.FirstOrDefault()?.ExchangeRate,
+                SoaNo = se.FirstOrDefault().SoaNo
             }).AsQueryable();
             return result;
         }
@@ -3066,7 +3077,8 @@ namespace eFMS.API.Documentation.DL.Services
                               DepartmentId = soa.DepartmentId,
                               AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
                               SoaNo = soa.Soano,
-                              ExchangeRate = soa.ExcRateUsdToLocal
+                              TotalAmountVnd = chg.AmountVnd + chg.VatAmountVnd,
+                              TotalAmountUsd = chg.AmountUsd + chg.VatAmountUsd
                           };
             var paySoaData = from soa in soaQuery
                              join chg in chargePSoa on soa.Soano equals chg.PaySoano
@@ -3107,7 +3119,8 @@ namespace eFMS.API.Documentation.DL.Services
                                  DepartmentId = soa.DepartmentId,
                                  AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
                                  SoaNo = soa.Soano,
-                                 ExchangeRate = soa.ExcRateUsdToLocal
+                                 TotalAmountVnd = chg.AmountVnd + chg.VatAmountVnd,
+                                 TotalAmountUsd = chg.AmountUsd + chg.VatAmountUsd
                              };
             var data = soaData.AsEnumerable();
             if (data == null || data.Count() == 0)
@@ -3136,6 +3149,8 @@ namespace eFMS.API.Documentation.DL.Services
                 MBLNo = se.FirstOrDefault().MBLNo,
                 HBLNo = se.FirstOrDefault().HBLNo,
                 Total = se.GroupBy(x => x.ChargeId).Sum(z => z.FirstOrDefault().Total),
+                TotalAmountUsd = se.GroupBy(x => x.ChargeId).Sum(z => z.FirstOrDefault().TotalAmountUsd),
+                TotalAmountVnd = se.GroupBy(x => x.ChargeId).Sum(z => z.FirstOrDefault().TotalAmountVnd),
                 Currency = se.FirstOrDefault().Currency,
                 IssuedDate = se.FirstOrDefault().IssuedDate,
                 Creator = se.FirstOrDefault().Creator,
@@ -3154,8 +3169,7 @@ namespace eFMS.API.Documentation.DL.Services
                 PayerId = se.FirstOrDefault().PayerId,
                 DepartmentId = se.FirstOrDefault().DepartmentId,
                 AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
-                SoaNo = se.FirstOrDefault().SoaNo,
-                ExchangeRate = se.FirstOrDefault().ExchangeRate,
+                SoaNo = se.FirstOrDefault().SoaNo
             }).AsQueryable();
             return result;
         }
@@ -3257,11 +3271,11 @@ namespace eFMS.API.Documentation.DL.Services
                                  DepartmentId = cdNote.DepartmentId,
                                  AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo,
                                  SoaNo = chg.Soano,
-                                 TotalAmountUsd = chg.AmountUsd,
                                  VatAmountUsd = chg.VatAmountUsd,
                                  ChargeGroup = chg.ChargeGroup,
                                  Balance = acc.UnpaidAmountUsd == null ? null : acc.UnpaidAmountUsd,
-                                 ExchangeRate = cdNote.ExchangeRate
+                                 TotalAmountVnd = chg.AmountVnd + chg.VatAmountVnd,
+                                 TotalAmountUsd = chg.AmountUsd + chg.VatAmountUsd
                              };
             var debitData = from cdNote in cdNoteData
                             join chg in charges on cdNote.Code equals chg.DebitNo
@@ -3297,7 +3311,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 ChargeType = chg.Type,
                                 PayerId = chg.PayerId,
                                 DepartmentId = cdNote.DepartmentId,
-                                ExchangeRate = cdNote.ExchangeRate,
+                                TotalAmountVnd = chg.AmountVnd + chg.VatAmountVnd,
+                                TotalAmountUsd = chg.AmountUsd + chg.VatAmountUsd,
                                 AccountNo = (chg.Type == DocumentConstants.CHARGE_OBH_TYPE ? chg.PayerAcctManagementId : chg.AcctManagementId) == null ? string.Empty : acc.AccountNo
                             };
             IEnumerable<InvoiceListModel> data = creditData.AsEnumerable();
@@ -3326,6 +3341,8 @@ namespace eFMS.API.Documentation.DL.Services
                 MBLNo = string.Join(";", se.Select(x => x.MBLNo).Distinct()),
                 HBLNo = string.Join(";", se.Select(x => x.HBLNo).Distinct()),
                 Total = se.GroupBy(x => x.ChargeId).Sum(z => z.FirstOrDefault().Total),
+                TotalAmountUsd = se.GroupBy(x => x.ChargeId).Sum(z => z.FirstOrDefault().TotalAmountUsd),
+                TotalAmountVnd = se.GroupBy(x => x.ChargeId).Sum(z => z.FirstOrDefault().TotalAmountVnd),
                 Currency = se.FirstOrDefault().Currency,
                 IssuedDate = se.FirstOrDefault().IssuedDate,
                 Creator = se.FirstOrDefault().Creator,
@@ -3345,7 +3362,6 @@ namespace eFMS.API.Documentation.DL.Services
                 DepartmentId = se.FirstOrDefault().DepartmentId,
                 AccountNo = string.Join(";", se.Where(x => !string.IsNullOrEmpty(x.AccountNo)).Select(x => x.AccountNo)?.Distinct()),
                 SoaNo = se.FirstOrDefault().SoaNo,
-                ExchangeRate = se.FirstOrDefault().ExchangeRate,
             }).AsQueryable();
             return result;
         }
@@ -4332,7 +4348,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 ETD = trans != null ? trans.Etd : null,
                                 SoaNo = cd.SoaNo,
                                 ShipmentType = trans?.ShipmentType ?? ops?.ShipmentType,
-                                ExchangeRate = cd.ExchangeRate,
+                                TotalAmountUsd  = cd.TotalAmountUsd,
+                                TotalAmountVnd = cd.TotalAmountVnd,
                                 ParentAccountNo = string.IsNullOrEmpty(parentId) ? string.Empty : partners.FirstOrDefault(z => z.Id == parentId)?.AccountNo
                             };
 

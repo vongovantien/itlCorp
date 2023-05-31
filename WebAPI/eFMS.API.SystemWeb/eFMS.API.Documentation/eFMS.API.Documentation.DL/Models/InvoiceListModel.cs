@@ -60,5 +60,7 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? ExchangeRate { get; set; }
         public string scType { get; set; }
         public string VoucherIdre { get; set; }
+        public decimal? TotalAmountVnd { get; set; }
+        public decimal? VatAmountVnd { get; set; }
     }
 }

@@ -32,5 +32,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string AmountVND { get; set;}
         public decimal? ExchangeRate { get; set; }
         public string ParentAccountNo { get; set; }
+        public decimal? TotalAmountVnd { get; set; }
+        public decimal? TotalAmountUsd { get; set; }
     }
 }
