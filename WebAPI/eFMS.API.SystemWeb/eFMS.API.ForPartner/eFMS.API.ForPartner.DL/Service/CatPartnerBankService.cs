@@ -24,22 +24,39 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<SysPartnerApi> sysPartnerApiRepository;
         private readonly IOptions<AuthenticationSetting> configSetting;
         private readonly IStringLocalizer<LanguageSub> _stringLocalizer;
+        private readonly ICurrentUser _currentUser;
+        private readonly IActionFuncLogService _actionFuncLogService;
+        
         public CatPartnerBankService(IContextBase<CatPartnerBank> repository,
             IContextBase<CatPartner> catParnerRepo,
             IContextBase<SysPartnerApi> sysPartnerApiRepo,
             IOptions<AuthenticationSetting> config,
             IMapper mapper,
-            IStringLocalizer<LanguageSub> stringLocalizer) : base(repository, mapper)
+            ICurrentUser currentUser,
+            IStringLocalizer<LanguageSub> stringLocalizer,
+            IActionFuncLogService actionFuncLogService) : base(repository, mapper)
         {
             catPartnerRepository = catParnerRepo;
             sysPartnerApiRepository = sysPartnerApiRepo;
             configSetting = config;
             _stringLocalizer = stringLocalizer;
+            _currentUser = currentUser;
+            _actionFuncLogService = actionFuncLogService;
         }
 
-        public async Task<HandleState> UpdatePartnerBankInfoSyncStatus(BankStatusUpdateModel model)
+        public async Task<HandleState> UpdatePartnerBankInfoSyncStatus(BankStatusUpdateModel model, string apiKey)
         {
+
             var hs = new HandleState();
+
+            ICurrentUser currentUser = await SetCurrentUserPartner(_currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.OfficeID = _currentUser.OfficeID;
+            currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "UpdateBankInfoSyncStatus";
+
             var partner = await catPartnerRepository.Get(x => x.AccountNo == model.PartnerCode).FirstOrDefaultAsync();
             if (partner == null)
             {
@@ -100,7 +117,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return valid;
         }
 
-        public async Task<ICurrentUser> SetCurrentUserPartner(ICurrentUser currentUser, string apiKey)
+        private async Task<ICurrentUser> SetCurrentUserPartner(ICurrentUser currentUser, string apiKey)
         {
             SysPartnerApi partnerApi = await sysPartnerApiRepository.Where(x => x.ApiKey == apiKey).FirstOrDefaultAsync();
 
