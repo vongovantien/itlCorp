@@ -69,7 +69,8 @@ export class ARCustomerPaymentFormCreateReceiptCombineComponent extends AppForm 
     }
 
     ngOnInit(): void {
-        this.partners = this.isUpdate ? null : this._catalogueRepo.getPartnerGroupsWithCriteria({ partnerGroups: [CommonEnum.PartnerGroupEnum.AGENT], partnerType : 'Agent', isShowSaleman: true});
+        // Lấy thêm các hđ hết hạn
+        this.partners = this.isUpdate ? null : this._catalogueRepo.getPartnerGroupsWithCriteria({ partnerGroups: [CommonEnum.PartnerGroupEnum.AGENT], partnerType : 'Agent', isShowSaleman: true, isExpired: true});
         this._activedRouter.data
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(

@@ -2306,7 +2306,7 @@ namespace eFMS.API.Catalogue.DL.Services
             .Where(x => (x.Active == criteria.Active || criteria.Active == null) && (string.IsNullOrEmpty(criteria.PartnerType) || x.PartnerType == criteria.PartnerType));
 
             CriteriaBuilder<CatContract> criteriaContract = new CriteriaBuilder<CatContract>()
-                .Where(x => x.Active == true && (x.IsExpired == null || x.IsExpired == false));
+                .Where(x => x.Active == true && (criteria.IsExpired == true ? true : (x.IsExpired == null || x.IsExpired == false)));
             if (criteria.PartnerGroups != null)
             {
                 criteriaPartner = criteriaPartner.Where(x => grpCodes.Count == 0 || grpCodes.Any(z => x.PartnerGroup.Contains(z)))

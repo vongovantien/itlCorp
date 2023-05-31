@@ -46,6 +46,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     displayFieldAgreement: CommonInterface.IComboGridDisplayField[] = [
         { field: 'contractType', label: 'Agreement Type' },
         { field: 'contractNo', label: 'Agreement No' },
+        { field: 'saleManName', label: 'Salesman' },
         { field: 'expiredDate', label: 'Expired Date' },
     ];
 
@@ -106,7 +107,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         this._catalogueRepo.getPartnerGroupsWithCriteria({
             partnerGroups: [CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]
             , partnerType: this.partnerTypeState.toUpperCase() === 'CUSTOMER' ? 'Customer' : 'Agent'
-        })
+            , isExpired: true
+        })// Lấy thêm các hđ hết hạn
             .subscribe(
                 (data) => {
                     this.customers = data;

@@ -74,8 +74,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         AccountingConstants.RECEIPT_PAYMENT_METHOD.COLLECTED_AMOUNT,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.ADVANCE_AGENCY,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.BANK_FEE_AGENCY,
-        AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_PAY_OBH,
-        AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_COLLECT_OBH
+        // AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_PAY_OBH,
+        // AccountingConstants.RECEIPT_PAYMENT_METHOD.RECEIVE_FROM_COLLECT_OBH
     ];
     
     constructor(
