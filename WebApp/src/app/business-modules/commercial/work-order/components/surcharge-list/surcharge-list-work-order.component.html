@@ -58,7 +58,6 @@
                                         </td>
                                         <td>
                                             <div class="form-group" [ngClass]="{'m-form__group has-danger': submitted 
-                                            && surcharge.partnerType === 'Other' 
                                             && !surcharge.partnerId }">
                                                 <ng-container
                                                     *ngIf="!(isReadonly | async) && surcharge.partnerType === 'Other'; else partner">
@@ -71,12 +70,13 @@
                                                             [displayFields]="[{'field':'shortName','label':'Name'},{'field':'taxCode','label':'Code'}]"
                                                             [size]="15" placeholder="Please Select"
                                                             (remove)="surcharge.partnerId = null" [clearable]="false"
-                                                            placeholder="Please select">
+                                                            placeholder="Please select" textColor="text-primary">
                                                         </app-combo-grid-virtual-scroll>
                                                     </div>
                                                 </ng-container>
                                                 <ng-template #partner>
-                                                    <input type="text" class="form-control form-control--custom"
+                                                    <input type="text"
+                                                        class="form-control form-control--custom text-primary"
                                                         [tooltip]="surcharge.partnerName"
                                                         [value]="surcharge.partnerName" readonly placeholder="-">
                                                 </ng-template>
@@ -142,14 +142,44 @@
                                                 </ng-template>
                                             </div>
                                         </td>
-                                        <ng-container *ngIf="surcharge.type === 'BUY'">
-                                            <td align="center">
-                                                <app-switch [(ngModel)]="surcharge.kickBack"
+                                        <td>
+                                            <div class="form-group">
+                                                <ng-container *ngIf="!(isReadonly | async); else charge">
+                                                    <div class="list-master-unit">
+                                                        <app-combo-grid-virtual-scroll (onClick)="loadUnit()"
+                                                            #comboGridCharge
+                                                            [currentActiveItemId]="{field:'id', value: surcharge.unitId, hardValue: surcharge.unitCode}"
+                                                            (itemSelected)="onSelectDataTableInfo($event, surcharge, 'unitId')"
+                                                            [selectedDisplayFields]="['code']" [dataSources]="units"
+                                                            [displayFields]="[{'field':'unitNameEn','label':'Name En'},{'field':'code','label':'Code'}]"
+                                                            [height]="150" placeholder="Please Select"
+                                                            (remove)="surcharge.unitId = null" [clearable]="false">
+                                                        </app-combo-grid-virtual-scroll>
+                                                    </div>
+                                                </ng-container>
+                                                <ng-template #charge>
+                                                    <input type="text" class="form-control form-control--custom"
+                                                        [tooltip]="surcharge.unitCode" [value]="surcharge.unitCode"
+                                                        readonly>
+                                                </ng-template>
+                                            </div>
+                                        </td>
+                                        <td [attr.align]="'center'">
+                                            <div class="form-group">
+                                                <app-switch [(ngModel)]="surcharge.isPrimary" size="sm"
                                                     [disabled]="(isReadonly | async) ? 'disabled': null">
                                                 </app-switch>
+                                            </div>
+                                        </td>
+                                        <ng-container *ngIf="surcharge.type === 'BUY'">
+                                            <td [attr.align]="'center'">
+                                                <div class="form-group">
+                                                    <app-switch [(ngModel)]="surcharge.kickBack" size="sm"
+                                                        [disabled]="(isReadonly | async) ? 'disabled': null">
+                                                    </app-switch>
+                                                </div>
                                             </td>
                                         </ng-container>
-
                                     </tr>
                                 </ng-container>
                             </ng-container>

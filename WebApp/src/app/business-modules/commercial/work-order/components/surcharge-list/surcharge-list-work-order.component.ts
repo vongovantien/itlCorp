@@ -1,15 +1,17 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { Charge, Partner, WorkOrderSurchargeModel } from '@models';
-import { Store } from '@ngrx/store';
+import { Charge, Partner, Unit, WorkOrderModel, WorkOrderPriceModel, WorkOrderSurchargeModel, WorkOrderViewUpdateModel } from '@models';
+import { ActionsSubject, Store } from '@ngrx/store';
 import { CatalogueRepo } from '@repositories';
 import cloneDeep from 'lodash-es/cloneDeep';
 import { Observable } from 'rxjs';
-import { finalize, shareReplay, takeUntil } from 'rxjs/operators';
+import { filter, finalize, map, shareReplay, take, takeUntil } from 'rxjs/operators';
 import { AppList } from 'src/app/app.list';
-import { workOrderDetailIsReadOnlyState } from '../../store';
+import { WorkOrderActionTypes, WorkOrderPriceItemUpdateModeState, workOrderDetailIsReadOnlyState, workOrderDetailState } from '../../store';
 import { IWorkOrderDetailState } from '../../store/reducers/work-order-detail.reducer';
+import { ToastrService } from 'ngx-toastr';
+import { GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
 
 @Component({
     selector: 'surcharge-list-work-order',
@@ -45,14 +47,25 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
         { field: 'chargeNameEn', label: 'Name En' },
         { field: 'code', label: 'Code' },
     ];
+
     displayFieldsPartner = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
 
     cachedSurcharge: WorkOrderSurchargeModel[] = [];
+    workOrderPriceItem: WorkOrderPriceModel;
+    workOrderPricePartnerId: string;
+    workOrderPricePartnerName: string;
+    workOrderDetail: WorkOrderViewUpdateModel;
+
+    units: Unit[] = [];
+    isValidPrimary: boolean = true;
 
     constructor(
         private readonly _catalogueRepo: CatalogueRepo,
         private readonly _store: Store<IWorkOrderDetailState>,
+        private readonly _toast: ToastrService,
+        private readonly _cd: ChangeDetectorRef,
+        private readonly _actionStoreSubject: ActionsSubject,
     ) {
         super();
     }
@@ -61,15 +74,17 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
         this.isCollapsed = !!this.surcharges.length;
         this.headers = [
             { title: 'Partner Type', field: '', required: true },
-            { title: 'Partner Name', field: '' },
-            { title: 'Charge Name', field: '', required: true },
+            { title: 'Partner', field: 'partnerName', required: true },
+            { title: 'Charge', field: 'chargeName', required: true },
             { title: 'Unit Price', field: 'unitPrice', sortable: true, required: true },
-            { title: 'Currency', field: 'currencyId', sortable: true, required: true },
+            { title: 'Currency', field: 'currencyId', sortable: true, required: true, width: 50 },
             { title: 'VAT', field: 'vatrate', sortable: true },
+            { title: 'Unit', field: 'unitId', sortable: true },
+            { title: 'Primary', field: 'isPrimary', sortable: true, align: 'center', width: 50 },
         ];
 
         if (this.type === 'BUY') {
-            this.headers.push({ title: 'KB', field: 'kickBack', sortable: true, align: 'center' })
+            this.headers.push({ title: 'KB', field: 'kickBack', sortable: true, align: 'center', width: 50 })
         }
 
         this.isReadonly = this._store.select(workOrderDetailIsReadOnlyState);
@@ -80,6 +95,72 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
                 shareReplay(),
                 finalize(() => this.isLoadingPartner = false)
             );
+        
+        // * listen WorkOrderPriceItemUpdateModeState from store.
+        this._store.select(WorkOrderPriceItemUpdateModeState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                filter(x => !!x)
+            )
+            .subscribe(
+                (priceItem: WorkOrderPriceModel) => {
+                    this.workOrderPriceItem = priceItem;
+                    this.workOrderPricePartnerId = priceItem.partnerId;
+                    this.workOrderPricePartnerName = priceItem.partnerName;
+                }
+            )
+
+        // * listen workOrderDetailState from store.
+        this._store.select(workOrderDetailState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe),
+                filter(x => !!x.id)
+            )
+            .subscribe(
+                (woDetail: any) => {
+                    this.workOrderDetail = woDetail;
+                }
+            )
+
+        // * listen SelectPartnerPriceItemWorkOrder dispatch event from store.
+        this._actionStoreSubject
+            .pipe(
+                filter((x: { type: WorkOrderActionTypes, data: Partner }) => x.type === WorkOrderActionTypes.SELECT_PARTNER_PRICE_ITEM),
+                map(d => d.data),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: Partner) => {
+                    console.log("select partner price item", data);
+                    this.workOrderPricePartnerId = data.id;
+                    this.workOrderPricePartnerName = data.shortName;
+
+                    if (!!this.surcharges.length) {
+                        const surchargeCarriers = this.surcharges.filter(x => x.partnerType === 'Carrier');
+                        if (surchargeCarriers.length) {
+                            surchargeCarriers.forEach((x: WorkOrderSurchargeModel) => {
+                                x.partnerId = data.id;
+                                x.partnerName = data.shortName;
+                            })
+                        }
+                    }
+                }
+            )
+
+        // * listen ResetUpdatePriceItemWorkOrder dispatch event from store.
+        this._actionStoreSubject
+            .pipe(
+                filter((x: { type: WorkOrderActionTypes }) => x.type === WorkOrderActionTypes.RESET_UPDATE_PRICE_ITEM),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                () => {
+                    console.log("reset update price item");
+                    this.workOrderPricePartnerId = null;
+                    this.workOrderPricePartnerName = null;
+                }
+            )
+
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -97,10 +178,28 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
         }
     }
 
+    loadUnit() {
+        if (!!this.units.length) return;
+
+        this._store.dispatch(new GetCatalogueUnitAction());
+        this._store.select(getCatalogueUnitState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (units: Unit[]) => {
+                    this.units = units || [];
+                    console.log(this.units);
+                    this._cd.markForCheck();
+                }
+            )
+    }
+
     duplicateCharge(index: number) {
         // this.isSubmitted = false;
         var newsurcharge = new WorkOrderSurchargeModel(this.surcharges[index]);
         newsurcharge.id = SystemConstants.EMPTY_GUID;
+        newsurcharge.partnerName = this.surcharges[index].partnerName;
+        newsurcharge.unitCode = this.surcharges[index].unitCode;
+
         this.surcharges.push(cloneDeep(newsurcharge));
     }
 
@@ -114,20 +213,23 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
     }
 
     addCharge() {
+        const partnerType: string = this.type === 'SELL' ? 'Customer' : 'Carrier';
+
         const newSurchargeItem: WorkOrderSurchargeModel = new WorkOrderSurchargeModel({
             chargeId: null,
             unitPrice: null,
             currencyId: this.transactionType.includes('A') ? 'USD' : 'VND',
             vatrate: null,
-            partnerType: this.type === 'SELL' ? 'Customer' : 'Carrier',
+            partnerType: partnerType,
             type: this.type,
             kickBack: null,
             id: SystemConstants.EMPTY_GUID,
-            partnerId: null,
+            partnerId: this.generatePartner(this.type, partnerType, 'id'),
             workOrderId: SystemConstants.EMPTY_GUID,
             workOrderPriceId: SystemConstants.EMPTY_GUID,
-            partnerName: null
         });
+
+        newSurchargeItem.partnerName = this.generatePartner(this.type, partnerType, 'name');
 
         if (!!this.cachedSurcharge.length) {
             // * replace id of new item with id of cached item.
@@ -142,7 +244,6 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
         }
 
         this.surcharges.push(newSurchargeItem);
-
     }
 
     onSelectDataTableInfo(data: any, surcharge: WorkOrderSurchargeModel, type: string) {
@@ -159,14 +260,55 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
                 }
                 break;
             case 'partnerType':
-                if (data !== 'Other') {
-                    surcharge.partnerId = null;
-                    surcharge.partnerName = null;
+                surcharge.partnerId = this.generatePartner(this.type, data, 'id');
+                surcharge.partnerName = this.generatePartner(this.type, data, 'name');
+                if (!surcharge.partnerId || !surcharge.partnerName) {
+                    this._toast.warning('No partner information found. Please try again.');
                 }
+                break;
+            case 'unitId':
+                surcharge.unitId = data.id || null;
+                surcharge.unitCode = data.unitCode || null;
                 break;
             default:
                 break;
         }
+    }
+
+    generatePartner(chargeType: string, partnerType: string, key: string) {
+        let partner = null;
+        switch (partnerType) {
+            case 'Customer':
+                if (key === 'id') {
+                    partner = this.workOrderDetail?.partnerId || null;
+                } else {
+                    partner = this.workOrderDetail?.partnerName || null;
+                }
+
+                break;
+            case 'Agent':
+                if (key === 'id') {
+                    partner = this.workOrderDetail?.agentId || null;
+                } else {
+                    partner = this.workOrderDetail?.agentName || null;
+                }
+                break;
+            case 'Carrier':
+                if (key === 'id') {
+                    partner = this.workOrderPricePartnerId || null;
+                } else {
+                    partner = this.workOrderPricePartnerName || null;
+                }
+                break
+            default:
+                break;
+        }
+        return partner;
+
+    }
+
+    handleChangePartnerCarrier() {
+
     }
 }
 

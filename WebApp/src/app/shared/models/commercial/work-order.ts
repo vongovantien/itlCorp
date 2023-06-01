@@ -73,7 +73,7 @@ export class WorkOrderPrice {
     // quantityToRange: number = null;
     quantityFromValue: number = null;
     quantityToValue: number = null;
-    unitId: string = null;
+    unitId: number = null;
     chargeIdBuying: string = null;
     chargeIdSelling: string = null;
     surcharges: WorkOrderSurcharge[] = [];
@@ -116,6 +116,8 @@ export class WorkOrderSurcharge {
     datetimeModified: Date = null;
     userCreated: string = null;
     userModified: string = null;
+    isPrimary: boolean = null;
+    unitId: number = null;
 
     constructor(object?: Object) {
         const self = this;
@@ -130,9 +132,10 @@ export class WorkOrderSurcharge {
 export class WorkOrderSurchargeModel extends WorkOrderSurcharge {
     partnerName: string = null;
     chargeName: string = null;
+    unitCode: string = null;
 }
 
-export class WorkOrderViewUpdateModel extends WorkOrderModel {
+export class  WorkOrderViewUpdateModel extends WorkOrderModel {
     polName: string;
     podName: string;
     salesmanName: string;

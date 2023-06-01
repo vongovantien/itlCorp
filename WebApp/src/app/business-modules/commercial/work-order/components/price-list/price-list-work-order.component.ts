@@ -36,11 +36,9 @@ export class CommercialPriceListWorkOrderComponent extends AppList implements On
     prices: Observable<WorkOrderPriceModel[]>;
     selectedIndexPriceItem: number;
 
-    actionDispatchType: WorkOrderActionTypes;
 
     constructor(
         private readonly _store: Store<IWorkOrderMngtState>,
-        private readonly _actionStoreSubject: ActionsSubject,
         private readonly _toastService: ToastrService
     ) {
         super();
@@ -49,7 +47,8 @@ export class CommercialPriceListWorkOrderComponent extends AppList implements On
     ngOnInit(): void {
         this.headers = [
             { title: 'Co-Loader', field: 'partnerName' },
-            { title: 'Quantity Range', field: '' },
+            { title: 'Quantity Type', field: 'quantityType' },
+            { title: 'Fee Type', field: 'type' },
             { title: 'Unit', field: 'unitCode' },
             { title: 'Unit Price Buying', field: 'unitPriceBuying' },
             { title: 'Unit Price Selling', field: 'unitPriceSelling' },
@@ -60,56 +59,7 @@ export class CommercialPriceListWorkOrderComponent extends AppList implements On
         this.isLoading = this._store.select(workOrderDetailLoadingState);
         this.isReadonly = this._store.select(workOrderDetailIsReadOnlyState);
 
-        // * Listen event dispatch data and check duplicate
-        this._actionStoreSubject
-            .pipe(
-                filter(
-                    (x: { type: WorkOrderActionTypes, data: WorkOrderPriceModel }) =>
-                        x.type === WorkOrderActionTypes.ADD_PRICE_ITEM || x.type === WorkOrderActionTypes.UPDATE_PRICE_ITEM
-                ),
-                tap((x: { type: WorkOrderActionTypes, data: WorkOrderPriceModel }) => {
-                    this.actionDispatchType = x.type;
-                }),
-                map(d => d.data),
-                withLatestFrom(this._store.select(WorkOrderListPricestate)),
-                takeUntil(this.ngUnsubscribe)
-            )
-            .subscribe(
-                ([priceUpdate, currentPrices]) => {
-                    switch (this.actionDispatchType) {
-                        case WorkOrderActionTypes.ADD_PRICE_ITEM:
-                            if (currentPrices.length === 0) {
-                                this._store.dispatch(AddPriceItemWorkOrderSuccess({ data: priceUpdate }));
-                                return;
-                            }
-                            const isDuplicate = currentPrices.some((price) => price.partnerId === priceUpdate.partnerId
-                                && price.quantityFromValue == priceUpdate.quantityFromValue
-                                && price.quantityToValue == priceUpdate.quantityToValue
-                            );
-                            if (!isDuplicate) {
-                                this._store.dispatch(AddPriceItemWorkOrderSuccess({ data: priceUpdate }));
-                                return;
-                            }
-                            this._toastService.warning('This price item is already existed');
-                            break;
-                        case WorkOrderActionTypes.UPDATE_PRICE_ITEM:
-                            const isDuplicateUpdate = currentPrices.some((price) => price.id !== priceUpdate.id
-                                && price.partnerId === priceUpdate.partnerId
-                                && price.quantityFromValue == priceUpdate.quantityFromValue
-                                && price.quantityToValue == priceUpdate.quantityToValue
-                            );
-                            if (!isDuplicateUpdate) {
-                                this._store.dispatch(UpdatePriceItemWorkOrderSuccess({ data: priceUpdate }));
-                                return;
-                            }
-                            this._toastService.warning('This price item is already existed');
-                            break;
-                        default:
-                            break;
-                    }
 
-                }
-            )
     }
 
     openAddNewPrice() {

@@ -285,12 +285,16 @@ namespace eFMS.API.Documentation.DL.Services
                         var surchargeChargeIds = surcharges.Select(x => x.ChargeId);
                         var surchargeCharges = catChargeRepo.Get(x => surchargeChargeIds.Contains(x.Id));
 
+                        var surchargeUnitIds = surcharges.Where(x => x.UnitId != null).Select(x => x.UnitId).ToList();
+                        var surchargeUnits = catUnitrepo.Get(x => surchargeUnitIds.Contains(x.Id));
+
                         List<CsWorkOrderSurchargeModel> listModelSurcharges = new List<CsWorkOrderSurchargeModel>();
                         foreach (var surcharge in surcharges)
                         {
                             CsWorkOrderSurchargeModel surchargeModel = mapper.Map<CsWorkOrderSurchargeModel>(surcharge);
                             surchargeModel.PartnerName = surchargesPartners.Where(x => x.Id == surcharge.PartnerId)?.FirstOrDefault()?.ShortName;
                             surchargeModel.ChargeName = surchargeCharges.Where(x => x.Id == surcharge.ChargeId)?.FirstOrDefault()?.ChargeNameVn;
+                            surchargeModel.UnitCode = surchargeUnits.Where(x => x.Id == surcharge.UnitId)?.FirstOrDefault()?.Code;
 
                             listModelSurcharges.Add(surchargeModel);
                         }
@@ -464,7 +468,7 @@ namespace eFMS.API.Documentation.DL.Services
                .WhereIf(criteria.Active != null,
                     x => x.Active == criteria.Active);
 
-            var query = criteriaBuilder.Apply(Get());
+            var query = criteriaBuilder.Apply(await GetAsync());
             return query;
         }
 

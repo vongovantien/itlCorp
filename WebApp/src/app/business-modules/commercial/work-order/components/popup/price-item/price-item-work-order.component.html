@@ -1,5 +1,5 @@
 <div class="modal fade form-contract-commercial-popup" role="dialog" bsModal #popup="bs-modal" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered c-modal-fullscreen" role="document">
+    <div class="modal-dialog modal-lg modal-dialog-centered c-modal-fullscreen fullscreen_1300" role="document">
         <div class="modal-content">
             <div class="modal-header modal-header-radient">
                 <div class="d-flex align-items-center justify-content-between p-1">
@@ -17,12 +17,12 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && (!partnerId.valid) }">
                             <label required>Co-loader</label>
-                            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                            <app-combo-grid-virtual-scroll (onClick)="loadPartner()" (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                                 (remove)="partnerId.setValue(null)"
                                 [currentActiveItemId]="{field:'id', value: partnerId.value, hardValue: selectedPartnerName}"
-                                [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
+                                [selectedDisplayFields]="['shortName']" [dataSources]="partners"
                                 [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
-                                [disabled]="(isReadonly | async)">
+                                [disabled]="(isReadonly | async)" [loading]="isLoading" textColor="text-primary">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -34,21 +34,24 @@
                                     <label required>Quantity Type</label>
                                     <ng-select [items]="quantityTypes" formControlName="quantityType" class="custom"
                                         placeholder="Please select" bindLabel="title" bindValue="value"
-                                        [clearable]="false" [readonly]="(isReadonly | async)">
+                                        (change)="onSelectDataFormInfo($event, 'quantityType')" [clearable]="false"
+                                        [readonly]="(isReadonly | async)">
                                     </ng-select>
                                 </div>
                             </div>
                             <div class="col-lg-2">
-                                <div class="form-group">
-                                    <label>From</label>
-                                    <input type="text" class="form-control" formControlName="fromValue"
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && ((!fromValue.valid && fromValue.enabled) || (fromValue.value > toValue.value)) }">
+                                    <label required>From</label>
+                                    <input type="number" class="form-control" formControlName="fromValue"
                                         placeholder="From...">
                                 </div>
                             </div>
                             <div class="col-lg-2">
-                                <div class="form-group">
-                                    <label>To</label>
-                                    <input type="text" class="form-control" formControlName="toValue"
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && ((!toValue.valid && toValue.enabled) || (toValue.value < fromValue.value)) }">
+                                    <label required>To </label>
+                                    <input type="number" class="form-control" formControlName="toValue"
                                         placeholder="To...">
                                 </div>
                             </div>
@@ -67,7 +70,7 @@
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!unitId.valid) }">
                                     <label required>Unit</label>
-                                    <ng-select [items]="units | async" formControlName="unitId" class="custom"
+                                    <ng-select [items]="units" (open)="loadUnit()" formControlName="unitId" class="custom"
                                         placeholder="Please select" bindLabel="code"
                                         (change)="onSelectDataFormInfo($event, 'unit')" bindValue="id"
                                         [clearable]="false" [readonly]="(isReadonly | async)">

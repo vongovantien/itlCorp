@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace eFMS.API.Documentation.Service.Models
 {
@@ -2205,7 +2207,6 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-
                 entity.Property(e => e.Taxcll)
                     .HasColumnName("TAXCLL")
                     .IsUnicode(false);
@@ -3965,6 +3966,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsRequired()
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.UnitId).HasColumnName("UnitID");
 
                 entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 4)");
 

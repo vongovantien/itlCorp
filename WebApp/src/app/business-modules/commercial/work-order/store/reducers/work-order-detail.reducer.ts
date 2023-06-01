@@ -1,4 +1,4 @@
-import { PermissionShipment, WorkOrderPriceModel, WorkOrderViewUpdateModel } from "@models";
+import { Partner, PermissionShipment, WorkOrderPriceModel, WorkOrderViewUpdateModel } from "@models";
 import { Action, createReducer, on } from "@ngrx/store";
 import * as WorkOrderActionTypes from '../actions';
 
@@ -12,6 +12,7 @@ export interface IWorkOrderDetailState {
     permission: Partial<PermissionShipment>;
     code: string;
     transactionTypeName: string;
+    [key: string]: any;
 
 }
 
@@ -38,13 +39,8 @@ export const reducer = createReducer(
     })),
     on(WorkOrderActionTypes.LoadDetailWorkOrderSuccess, (state: IWorkOrderDetailState, payload: WorkOrderViewUpdateModel) => ({
         ...state,
-        transactionType: payload.transactionType,
-        listPrice: payload.listPrice,
         isLoading: false,
-        active: payload.active,
-        permission: payload.permission,
-        transactionTypeName: payload.transactionTypeName,
-        code: payload.code
+        ...payload
     })),
 
     on(WorkOrderActionTypes.InitPriceListWorkOrder, (state: IWorkOrderDetailState, payload: { type: string, data: any[] }) => ({
@@ -117,6 +113,11 @@ export const reducer = createReducer(
             ]
         }
     }),
+    on(WorkOrderActionTypes.SelectPartnerPriceItemWorkOrder, (state: IWorkOrderDetailState, payload: { data: Partner }) => {
+        return {
+            ...state
+        }
+    })
 );
 
 export function workOrderDetailReducer(state: IWorkOrderDetailState | undefined, action: Action) {

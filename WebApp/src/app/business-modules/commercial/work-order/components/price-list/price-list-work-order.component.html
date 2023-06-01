@@ -47,7 +47,8 @@
                                     <span class="font-weight-bold">{{item.quantityType}}</span>
                                     {{ [item.quantityFromValue, item.quantityToValue] | quantityRange }}
                                 </td>
-                                <td>{{item.unitCode}}</td>
+                                <td class="text-info">{{item.type}}</td>
+                                <td class="text-muted">{{item.unitCode}}</td>
                                 <td>
                                     {{item?.unitPriceBuying | number: '.0-2'}}
                                     <span class="m--margin-left-10 font-weight-bold">
