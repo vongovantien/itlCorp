@@ -494,7 +494,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 if (this.isDbtInv) {
                     this.debitNos.forEach(element => {
                         if (element.isCheckedDebitNote) {
-                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'ORIGIN' }));
                         }
                     });
                 }
@@ -525,7 +525,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 if (this.isDbtInv) {
                     this.debitNos.forEach(element => {
                         if (element.isCheckedDebitNote) {
-                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'ORIGIN' }));
                         }
                     });
                 }
@@ -559,7 +559,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 if (this.isDbtInv) {
                     this.debitNos.forEach(element => {
                         if (element.isCheckedDebitNote) {
-                            streamUploadReport.push(this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                            streamUploadReport.push(this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'ORIGIN' }));
                         }
                     });
                 }
@@ -600,7 +600,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 } else if (this.isDbtInv) {
                     this.debitNos.forEach(element => {
                         if (element.isCheckedDebitNote) {
-                            streamUploadReport.push(this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                            streamUploadReport.push(this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'ORIGIN' }));
                         }
                     });
                 }
@@ -1239,7 +1239,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     previewDebitNote(debit: any) {
         if (this.serviceId === 'AI' || this.serviceId === 'AE') {
-            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: debit?.code, currency: 'VND' })
+            this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: debit?.code, currency: !!this.isDbtInv? 'ORIGIN':'VND' })
                 .pipe(
             ).subscribe(
                 (res: any) => {
@@ -1254,7 +1254,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 },
             );
         } else {
-            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: debit?.code, currency: 'VND' })
+            this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: debit?.code, currency: !!this.isDbtInv? 'ORIGIN': 'VND' })
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: any) => {

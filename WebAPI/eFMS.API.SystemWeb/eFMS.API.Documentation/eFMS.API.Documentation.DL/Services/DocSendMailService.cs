@@ -759,9 +759,9 @@ namespace eFMS.API.Documentation.DL.Services
             var shipmentAgentName = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.PartnerNameEn; // Agent on shipment
             var picUserId = sysUserRepo.Get(x => x.EmployeeId == _picId).FirstOrDefault()?.Id;
             var departmentId = sysUserLevelRepo.Get(x => x.UserId==picUserId).FirstOrDefault()?.DepartmentId;
-            var managerId = sysUserLevelRepo.Get(x => x.GroupId == 11 && x.DepartmentId== departmentId && x.Position == "Manager-Leader").FirstOrDefault()?.UserId;
-            managerId = sysUserRepo.Get(x => x.Id == managerId).FirstOrDefault()?.EmployeeId;
-            var managerMail = sysEmployeeRepo.Get(x => x.Id == managerId).FirstOrDefault()?.Email;
+            //var managerId = sysUserLevelRepo.Get(x => x.GroupId == 11 && x.DepartmentId== departmentId && x.Position == "Manager-Leader").FirstOrDefault()?.UserId;
+            //managerId = sysUserRepo.Get(x => x.Id == managerId).FirstOrDefault()?.EmployeeId;
+            //var managerMail = sysEmployeeRepo.Get(x => x.Id == managerId).FirstOrDefault()?.Email;
 
             // Get template
             // Subject part
@@ -818,7 +818,7 @@ namespace eFMS.API.Documentation.DL.Services
             var mailFrom = string.IsNullOrEmpty(picEmail) ? "Info FMS" : picEmail;
             emailContent.From = mailFrom;
             emailContent.To = toEmail;
-            emailContent.Cc = managerMail;
+            emailContent.Cc = groupUser?.Email;
             emailContent.Subject = _subject;
             emailContent.Body = _body;
             emailContent.AttachFiles = new List<string>();
