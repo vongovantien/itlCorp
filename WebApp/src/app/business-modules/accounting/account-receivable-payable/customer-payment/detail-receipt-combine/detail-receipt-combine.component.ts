@@ -56,8 +56,11 @@ export class DetailReceiptCombineComponent extends ARCustomerPaymentCreateRecipt
               return;
             }
             this.updateDetailForm(res[0]);
-            this.CreateReceiptCombineComponent.isAllDone = res.filter(x => x?.syncStatus !== 'Synced' && x.subArcbno === res[0].subArcbno).includes(x => x.status === 'Done');
-            this.CreateReceiptCombineComponent.isBalance = res.filter(x => x.status === 'Done' && x.subArcbno === res[0].subArcbno)?.includes(x => !!x.isBalanceReceipt);
+            // check isAllDone and isBalance
+            this.CreateReceiptCombineComponent.isAllDone = res.filter(x => x?.syncStatus !== 'Synced' && x.subArcbno === res[0].subArcbno).length > 0 &&
+                                                          res.filter(x => x?.syncStatus !== 'Synced' && x.subArcbno === res[0].subArcbno).every(x => x.status === 'Done');
+            this.CreateReceiptCombineComponent.isBalance = res.filter(x => x.status === 'Done' && x.subArcbno === res[0].subArcbno).length > 0 &&
+                                                          res.filter(x => x.status === 'Done' && x.subArcbno === res[0].subArcbno)?.every(x => !!x.isBalanceReceipt);
             this.updateGeneralReceipt(res);
             this.updateCreditDebitCombineReceipt(res);
           } else {
