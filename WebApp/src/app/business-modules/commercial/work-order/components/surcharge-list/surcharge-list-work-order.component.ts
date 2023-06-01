@@ -12,6 +12,7 @@ import { WorkOrderActionTypes, WorkOrderPriceItemUpdateModeState, workOrderDetai
 import { IWorkOrderDetailState } from '../../store/reducers/work-order-detail.reducer';
 import { ToastrService } from 'ngx-toastr';
 import { GetCatalogueUnitAction, getCatalogueUnitState } from '@store';
+import { SortService } from '@services';
 
 @Component({
     selector: 'surcharge-list-work-order',
@@ -52,10 +53,17 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
 
 
     cachedSurcharge: WorkOrderSurchargeModel[] = [];
+
     workOrderPriceItem: WorkOrderPriceModel;
     workOrderPricePartnerId: string;
     workOrderPricePartnerName: string;
+
     workOrderDetail: WorkOrderViewUpdateModel;
+
+    workOrderPartnerId: string;
+    workOrderPartnerName: string;
+    workOrderAgentId: string;
+    workOrderAgentName: string;
 
     units: Unit[] = [];
     isValidPrimary: boolean = true;
@@ -66,25 +74,27 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
         private readonly _toast: ToastrService,
         private readonly _cd: ChangeDetectorRef,
         private readonly _actionStoreSubject: ActionsSubject,
+        private readonly _sortService: SortService
     ) {
         super();
+        this.requestSort = this.sortSurcharge;
     }
 
     ngOnInit(): void {
         this.isCollapsed = !!this.surcharges.length;
         this.headers = [
-            { title: 'Partner Type', field: '', required: true },
-            { title: 'Partner', field: 'partnerName', required: true },
-            { title: 'Charge', field: 'chargeName', required: true },
+            { title: 'Partner Type', field: '', required: true, sortable: true },
+            { title: 'Partner', field: 'partnerName', required: true, sortable: true },
+            { title: 'Charge', field: 'chargeName', required: true, sortable: true },
             { title: 'Unit Price', field: 'unitPrice', sortable: true, required: true },
             { title: 'Currency', field: 'currencyId', sortable: true, required: true, width: 50 },
             { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Unit', field: 'unitId', sortable: true },
-            { title: 'Primary', field: 'isPrimary', sortable: true, align: 'center', width: 50 },
+            { title: 'Primary', field: 'isPrimary', align: 'center', width: 50 },
         ];
 
         if (this.type === 'BUY') {
-            this.headers.push({ title: 'KB', field: 'kickBack', sortable: true, align: 'center', width: 50 })
+            this.headers.push({ title: 'KB', field: 'kickBack', align: 'center', width: 50 })
         }
 
         this.isReadonly = this._store.select(workOrderDetailIsReadOnlyState);
@@ -95,7 +105,7 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
                 shareReplay(),
                 finalize(() => this.isLoadingPartner = false)
             );
-        
+
         // * listen WorkOrderPriceItemUpdateModeState from store.
         this._store.select(WorkOrderPriceItemUpdateModeState)
             .pipe(
@@ -107,6 +117,7 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
                     this.workOrderPriceItem = priceItem;
                     this.workOrderPricePartnerId = priceItem.partnerId;
                     this.workOrderPricePartnerName = priceItem.partnerName;
+                    
                 }
             )
 
@@ -119,8 +130,12 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
             .subscribe(
                 (woDetail: any) => {
                     this.workOrderDetail = woDetail;
-                }
-            )
+                    this.workOrderAgentId = woDetail.agentId;
+                    this.workOrderAgentName = woDetail.agentName;
+                    this.workOrderPartnerId = woDetail.partnerId;
+                    this.workOrderPartnerName = woDetail.partnerName;
+
+                });
 
         // * listen SelectPartnerPriceItemWorkOrder dispatch event from store.
         this._actionStoreSubject
@@ -131,7 +146,6 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
             )
             .subscribe(
                 (data: Partner) => {
-                    console.log("select partner price item", data);
                     this.workOrderPricePartnerId = data.id;
                     this.workOrderPricePartnerName = data.shortName;
 
@@ -144,8 +158,7 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
                             })
                         }
                     }
-                }
-            )
+                });
 
         // * listen ResetUpdatePriceItemWorkOrder dispatch event from store.
         this._actionStoreSubject
@@ -155,11 +168,39 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
             )
             .subscribe(
                 () => {
-                    console.log("reset update price item");
                     this.workOrderPricePartnerId = null;
                     this.workOrderPricePartnerName = null;
-                }
+                    
+                })
+
+        // * Listen SelectPartnerWorkOrder dispatch event from store.
+        this._actionStoreSubject
+            .pipe(
+                filter((x: { type: WorkOrderActionTypes, data: Partner }) => x.type === WorkOrderActionTypes.SELECT_PARTNER_WORK_ORDER),
+                map(d => d.data),
+                takeUntil(this.ngUnsubscribe)
             )
+            .subscribe(
+                (data: Partner) => {
+                    console.log("select partner work order", data);
+                    this.workOrderPartnerId = data.id;
+                    this.workOrderPartnerName = data.shortName;
+                });
+
+            
+        // * Listen SelectPartnerWorkOrder dispatch event from store.
+        this._actionStoreSubject
+        .pipe(
+            filter((x: { type: WorkOrderActionTypes, data: Partner }) => x.type === WorkOrderActionTypes.SELECT_AGENT_WORK_ORDER),
+            map(d => d.data),
+            takeUntil(this.ngUnsubscribe)
+        )
+        .subscribe(
+            (data: Partner) => {
+                console.log("select agent work order", data);
+                this.workOrderAgentId = data.id;
+                this.workOrderAgentName = data.shortName;
+            });
 
     }
 
@@ -262,7 +303,7 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
             case 'partnerType':
                 surcharge.partnerId = this.generatePartner(this.type, data, 'id');
                 surcharge.partnerName = this.generatePartner(this.type, data, 'name');
-                if (!surcharge.partnerId || !surcharge.partnerName) {
+                if ((!surcharge.partnerId || !surcharge.partnerName) && surcharge.partnerType !== 'Other') {
                     this._toast.warning('No partner information found. Please try again.');
                 }
                 break;
@@ -280,17 +321,17 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
         switch (partnerType) {
             case 'Customer':
                 if (key === 'id') {
-                    partner = this.workOrderDetail?.partnerId || null;
+                    partner = this.workOrderPartnerId || null;
                 } else {
-                    partner = this.workOrderDetail?.partnerName || null;
+                    partner = this.workOrderPartnerName || null;
                 }
 
                 break;
             case 'Agent':
                 if (key === 'id') {
-                    partner = this.workOrderDetail?.agentId || null;
+                    partner = this.workOrderAgentId || null;
                 } else {
-                    partner = this.workOrderDetail?.agentName || null;
+                    partner = this.workOrderAgentName || null;
                 }
                 break;
             case 'Carrier':
@@ -307,8 +348,8 @@ export class CommercialSurchargeListWorkOrderComponent extends AppList implement
 
     }
 
-    handleChangePartnerCarrier() {
-
+    sortSurcharge() {
+        this.surcharges = this._sortService.sort(this.surcharges, this.sort, this.order);
     }
 }
 

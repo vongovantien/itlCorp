@@ -117,6 +117,16 @@ export const reducer = createReducer(
         return {
             ...state
         }
+    }),
+    on(WorkOrderActionTypes.SelectAgentWorkOrder, (state: IWorkOrderDetailState, payload: { data: Partner }) => {
+        return {
+            ...state
+        }
+    }),
+    on(WorkOrderActionTypes.SelectAgentWorkOrder, (state: IWorkOrderDetailState, payload: { data: Partner }) => {
+        return {
+            ...state
+        }
     })
 );
 

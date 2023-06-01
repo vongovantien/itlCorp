@@ -12,7 +12,7 @@ import { ToastrService } from 'ngx-toastr';
 import { Observable, pipe } from 'rxjs';
 import { filter, finalize, shareReplay, takeUntil } from 'rxjs/operators';
 import { AppForm } from 'src/app/app.form';
-import { workOrderDetailIsReadOnlyState } from '../../store';
+import { SelectPartnerWorkOrder, workOrderDetailIsReadOnlyState } from '../../store';
 
 @Component({
     selector: 'form-create-work-order',
@@ -240,6 +240,7 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
                 break;
             case 'agentId':
                 this.agentName = data.shortName;
+                this._store.dispatch(SelectPartnerWorkOrder({ data: data }));
                 this.agentDescription.setValue(this.getDescription(data.partnerNameEn, data.addressEn, data.tel, data.fax));
                 break;
             case 'pol':
@@ -255,6 +256,7 @@ export class CommercialFormCreateWorkOrderComponent extends AppForm implements O
                 break;
             case 'partnerId':
                 this.isLoadingUser = true;
+                this._store.dispatch(SelectPartnerWorkOrder({ data: data }));
                 this._catalogueRepo.getListSalemanByPartner(data.id, this.transactionType)
                     .pipe(
                         finalize(() => this.isLoadingUser = false)
