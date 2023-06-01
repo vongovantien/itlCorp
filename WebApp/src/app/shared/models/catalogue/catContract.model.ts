@@ -66,7 +66,7 @@ export class Contract {
     isOverLimit: boolean = false;
     isOverDue: boolean = false;
     isOverDueObh: boolean = false;
-
+    isOverDuePrepaid: boolean = false;
 
     constructor(data?: any) {
         const self = this;

@@ -74,15 +74,16 @@ const COMPONENTS = [
 
 const customCurrencyMaskConfig = {
     align: "right",
-    allowNegative: false,
+    allowNegative: true,
     allowZero: true,
     decimal: ".",
-    precision: 0,
+    precision: 2,
     prefix: "",
     suffix: "",
     thousands: ",",
     nullable: true
 };
+
 
 @NgModule({
     imports: [

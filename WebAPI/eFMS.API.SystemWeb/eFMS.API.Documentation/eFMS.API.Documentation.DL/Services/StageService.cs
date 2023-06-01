@@ -6,6 +6,7 @@ using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -50,6 +51,9 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case DocumentConstants.SEND_HB:
                     stage = await DataContext.Get(x => x.Code == DocumentConstants.SEND_HB_CODE).FirstOrDefaultAsync();
+                    break;
+                case DocumentConstants.SEND_INV:
+                    stage = await DataContext.Get(x => x.Code == DocumentConstants.SEND_INV_CODE).FirstOrDefaultAsync();
                     break;
                 default:
                     break;

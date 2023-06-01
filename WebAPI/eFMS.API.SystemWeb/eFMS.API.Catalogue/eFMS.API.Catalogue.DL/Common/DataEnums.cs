@@ -58,7 +58,8 @@ namespace eFMS.API.Catalogue.DL.Common
             new UnitType { Value = "Package", DisplayName = "Package" },
             new UnitType { Value = "WeightMeasurement", DisplayName = "Weight Measurement" },
             new UnitType { Value = "LengthMeasurement", DisplayName = "Length Measurement" },
-            new UnitType { Value = "VolumnMeasurement", DisplayName = "Volumn Measurement" }
+            new UnitType { Value = "VolumnMeasurement", DisplayName = "Volumn Measurement" },
+            new UnitType { Value = "Vehicle", DisplayName = "Vehicle" }
         };
 
         public static readonly string CONTRACT_TRIAL = "Trial";

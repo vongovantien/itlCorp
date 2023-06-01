@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
 
@@ -336,6 +337,28 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         /// <summary>
+        /// Query CD Note by criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("Query")]
+        [Authorize]
+        public async Task<IActionResult> QueryAsync(CDNoteCriteria criteria)
+        {
+            var result = await cdNoteServices.QueryAsync(criteria);
+            if (result == null)
+            {
+                // Handle empty result set
+                return NotFound(); // or any other appropriate response indicating no data found
+            }
+            else
+            {
+                // Handle non-empty result set
+                return Ok(result);
+            }
+        }
+
+        /// <summary>
         /// get invoice - cd note
         /// </summary>
         /// <param name="criteria"></param>
@@ -360,7 +383,9 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult GetDataAcctMngtAgencyExport(CDNoteCriteria criteria)
         {
             var result = cdNoteServices.GetDataAcctMngtAgencyExport(criteria);
-            if (result == null || result.Count() == 0) { return BadRequest(); };
+            if (result == null || result.Count() == 0) {
+                return NotFound();
+            };
             return Ok(result);
         }
     }

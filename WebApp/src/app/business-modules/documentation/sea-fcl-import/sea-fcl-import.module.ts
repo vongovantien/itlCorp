@@ -18,6 +18,8 @@ import { ShareBussinessModule } from '../../share-business/share-bussines.module
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { DeactivateGuardService } from '@core';
 import { ShareSeaServiceModule } from '../share-sea/share-sea-service.module';
+import { ChargeConstants } from '@constants';
+import { ShareBusinessReAlertComponent } from '../../share-business/components/pre-alert/pre-alert.component';
 
 const routing: Routes = [
     {
@@ -45,6 +47,10 @@ const routing: Routes = [
             {
                 path: 'manifest', component: SeaFclImportManifestComponent,
                 data: { name: "Manifest", },
+            },
+            {
+                path: 'prealert', component: ShareBusinessReAlertComponent,
+                data: { name: "Pre Alert", level: 6, serviceId: ChargeConstants.SFI_CODE },
             },
         ]
     },

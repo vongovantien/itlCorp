@@ -45,7 +45,10 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctCdnote> acctCdnoteRepo;
         private readonly IContextBase<SysGroup> sysGroupRepo;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
-
+        private readonly IContextBase<SysUserLevel> sysUserLevelRepo;
+        private readonly IContextBase<CatContract> catContractRepo;
+        private readonly IContextBase<CatPartnerEmail> catPartnerEmailRepo;
+        private readonly IContextBase<CsDimensionDetail> csDimensionDetailRepo;
         public DocSendMailService(IContextBase<CsTransaction> repository,
             IMapper mapper,
             ICurrentUser user,
@@ -64,6 +67,10 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsShipmentSurcharge> sucharge,
             IContextBase<AcctCdnote> acctCdnote,
             IContextBase<SysGroup> sysGroup,
+            IContextBase<SysUserLevel> sysUserLevel,
+            IContextBase<CatContract> catContract,
+            IContextBase<CatPartnerEmail> catPartnerEmail,
+            IContextBase<CsDimensionDetail> csDimensionDetail,
             IOptions<ApiServiceUrl> serviceUrl) : base(repository, mapper)
         {
             currentUser = user;
@@ -83,6 +90,10 @@ namespace eFMS.API.Documentation.DL.Services
             suchargeRepo = sucharge;
             acctCdnoteRepo = acctCdnote;
             sysGroupRepo = sysGroup;
+            sysUserLevelRepo = sysUserLevel;
+            catContractRepo = catContract;
+            catPartnerEmailRepo = catPartnerEmail;
+            csDimensionDetailRepo = csDimensionDetail;
         }
 
         public bool SendMailDocument(EmailContentModel emailContent)
@@ -207,13 +218,8 @@ namespace eFMS.API.Documentation.DL.Services
 
             var emailContent = new EmailContentModel();
             // Email to: agent/customer
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerInfo))
-            {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
 
-            
             var mailFrom = "Info FMS";
             var signImg = string.Empty;
             emailContent.AttachFiles = new List<string>();
@@ -227,7 +233,7 @@ namespace eFMS.API.Documentation.DL.Services
                 mailFrom = @"air@itlvn.com";
             }
             emailContent.From = mailFrom; //email PIC của lô hàng
-            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.To = string.IsNullOrEmpty(toEmailOnContract) ? string.Empty : toEmailOnContract; //Email của Customer/Agent
             emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
@@ -293,12 +299,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var emailContent = new EmailContentModel();
             // Email to: agent/customer
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerInfo))
-            {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
-
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
 
             var mailFrom = "Info FMS";
             if (!string.IsNullOrEmpty(picEmail))
@@ -310,7 +311,7 @@ namespace eFMS.API.Documentation.DL.Services
                 mailFrom = @"air@itlvn.com";
             }
             emailContent.From = mailFrom; //email PIC của lô hàng
-            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.To = string.IsNullOrEmpty(toEmailOnContract) ? string.Empty : toEmailOnContract; //Email của Customer/Agent
             emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
@@ -378,11 +379,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var emailContent = new EmailContentModel();
             // Email to: agent/customer
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerInfo))
-            {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
 
             var mailFrom = "Info FMS";
             if (!string.IsNullOrEmpty(picEmail))
@@ -394,7 +391,7 @@ namespace eFMS.API.Documentation.DL.Services
                 mailFrom = @"air@itlvn.com";
             }
             emailContent.From = mailFrom; //email PIC của lô hàng
-            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.To = string.IsNullOrEmpty(toEmailOnContract) ? string.Empty : toEmailOnContract; //Email của Customer/Agent
             emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
@@ -462,11 +459,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var emailContent = new EmailContentModel();
             // Email to: agent/customer
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerInfo))
-            {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
+            var toEmail = GetToPartnerEmailOnContract(_housebill, _shipment);
 
             var mailFrom = "Info FMS";
             if (!string.IsNullOrEmpty(picEmail))
@@ -478,7 +471,7 @@ namespace eFMS.API.Documentation.DL.Services
                 mailFrom = @"air@itlvn.com";
             }
             emailContent.From = mailFrom; //email PIC của lô hàng
-            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.To = string.IsNullOrEmpty(toEmail) ? string.Empty : toEmail; //Email của Customer/Agent
             emailContent.Cc = "fin-inv.fm@itlvn.com;" + groupUser?.Email; // fin-inv.fm@itlvn.com và Group email của PIC trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
@@ -588,16 +581,13 @@ namespace eFMS.API.Documentation.DL.Services
 
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == shipmentInfo.GroupId).FirstOrDefault();
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerInfo))
-            {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.Email;
-            }
-
+            // Get email from contract
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, shipmentInfo);
+            
             var emailContent = new EmailContentModel();
             var mailFrom = string.IsNullOrEmpty(picEmail) ? "Info FMS" : picEmail;
             emailContent.From = mailFrom;
-            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo;
+            emailContent.To = string.IsNullOrEmpty(toEmailOnContract) ? string.Empty : toEmailOnContract;
             emailContent.Cc = groupUser?.Email; // @"air@itlvn.com";
             emailContent.Subject = _subject;
             emailContent.Body = _body;
@@ -717,6 +707,124 @@ namespace eFMS.API.Documentation.DL.Services
             return emailContent;
         }
 
+        public EmailContentModel GetInfoMailDebitInvoice(string cdNo)
+        {
+            if (string.IsNullOrEmpty(cdNo)){
+                throw new ArgumentException("Not able to find Cd Note");
+            }
+            var cdNoteInfo = acctCdnoteRepo.Get(x => x.Code == cdNo).FirstOrDefault();
+            var charges = new List<CsShipmentSurcharge>();
+            
+            charges = suchargeRepo.Get(x => x.CreditNo == cdNo || x.DebitNo == cdNo).ToList();
+            
+            var shipmentInfo = DataContext.First(x => x.Id == cdNoteInfo.JobId);
+            
+            var hblIds = charges.Select(x => x.Hblid).ToList();
+            var hblPackage = csDimensionDetailRepo.Get(x => hblIds.Contains((Guid)x.Hblid)).ToList();
+            var _housebills = detailRepository.Get(x => hblIds.Contains(x.Id));
+            var hwbNos = string.Join(" , ", charges.Select(x => x.Hblno).Distinct());
+            var mawb = charges.Select(x => x.Mblno).FirstOrDefault();
+
+            // Email To
+            #region Descripe
+            // Get theo thu tu: Email tren hd => Billing Email ngoai Detail Partner
+            // => Email ngoai Detail Partner => Email tab email
+            #endregion
+            var _picId = !string.IsNullOrEmpty(shipmentInfo.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == shipmentInfo.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
+            var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
+            var picName = sysUserRepo.Get(x => x.EmployeeId == _picId).FirstOrDefault()?.Username; //Email from
+            var toEmail = catContractRepo.Get(x => x.PartnerId == cdNoteInfo.PartnerId && x.SaleManId== cdNoteInfo.SalemanId && x.Active == true).FirstOrDefault()?.EmailAddress;
+            if (string.IsNullOrEmpty(toEmail))
+            {
+                toEmail = catPartnerRepo.Get(x => x.Id == cdNoteInfo.PartnerId).FirstOrDefault().BillingEmail;
+                if (string.IsNullOrEmpty(toEmail))
+                {
+                    toEmail = catPartnerRepo.Get(x => x.Id == cdNoteInfo.PartnerId).FirstOrDefault().Email;
+                }
+            }
+            // Lay mail info trong tab email
+            if (string.IsNullOrEmpty(toEmail))
+            {
+                toEmail = catPartnerEmailRepo.Get(x => x.PartnerId == cdNoteInfo.PartnerId && x.OfficeId == cdNoteInfo.OfficeId
+                                                    && x.Type == "Billing").FirstOrDefault()?.Email;
+            }
+            // case all above cannot find mail check for inactive contract
+            if (string.IsNullOrEmpty(toEmail))
+            {
+                toEmail = catContractRepo.Get(x => x.PartnerId == cdNoteInfo.PartnerId && x.SaleManId == cdNoteInfo.SalemanId && x.Active == false).FirstOrDefault()?.EmailAddress;
+
+            }
+
+            // Email cc to department manager
+            var shipmentAgentName = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.PartnerNameEn; // Agent on shipment
+            var picUserId = sysUserRepo.Get(x => x.EmployeeId == _picId).FirstOrDefault()?.Id;
+            var departmentId = sysUserLevelRepo.Get(x => x.UserId==picUserId).FirstOrDefault()?.DepartmentId;
+            var managerId = sysUserLevelRepo.Get(x => x.GroupId == 11 && x.DepartmentId== departmentId && x.Position == "Manager-Leader").FirstOrDefault()?.UserId;
+            managerId = sysUserRepo.Get(x => x.Id == managerId).FirstOrDefault()?.EmployeeId;
+            var managerMail = sysEmployeeRepo.Get(x => x.Id == managerId).FirstOrDefault()?.Email;
+
+            // Get template
+            // Subject part
+            var template = sysEmailTemplateRepo.Get(x => x.Code == "DEBIT-INVOICE-PREALERT").FirstOrDefault();
+            var _subject = template.Subject;
+            _subject = _subject.Replace("{{MAWB}}", string.IsNullOrEmpty(shipmentInfo.Mawb) ? string.Empty : shipmentInfo.Mawb);
+            _subject = _subject.Replace("{{Hwbno}}", string.IsNullOrEmpty(hwbNos) ? string.Empty : ("/ " + hwbNos));
+            _subject = _subject.Replace("{{shipmentAgentName}}", shipmentAgentName);
+            _subject = _subject.Replace("{{HAWB}}", hwbNos);
+            // body part
+            var _body = template.Body;
+            _body = _body.Replace("{{MAWB}}", shipmentInfo.Mawb);
+            var transportMode = shipmentInfo.TransactionType[0].ToString() == "S" ? "Vessel: " : "Flight: ";
+            _body = _body.Replace("{{transportMode}}", transportMode);
+            _body = _body.Replace("{{FlightVesNo}}", shipmentInfo.FlightVesselName);
+            _body = _body.Replace("{{ETD}}", (shipmentInfo.Etd != null) ? shipmentInfo.Etd.Value.ToString("dd MMM, yyyy") : string.Empty);
+            _body = _body.Replace("{{ATA}}", (shipmentInfo.Ata != null) ? shipmentInfo.Ata.Value.ToString("dd MMM, yyyy") : string.Empty);
+            
+            var contenEmail = string.Empty;
+
+            var distinctRoutes = _housebills.Select(h => h.Route).Distinct();
+            string routesString = string.Join("; ", distinctRoutes);
+            var _hblInfos = new StringBuilder();
+
+            foreach (var _hbl in _housebills)
+            {
+                var _consignee = catPartnerRepo.Get(x => x.Id == _hbl.ConsigneeId).FirstOrDefault();
+                _hblInfos.Append($"<p>- HAWB: {_hbl.Hwbno}<br>- Quantity: {Convert.ToInt32(csDimensionDetailRepo.Get(x => (Guid)x.Hblid==_hbl.Id).FirstOrDefault()?.Package)} PCS/ G.W: {string.Format("{0:n2}", _hbl.GrossWeight)} KGS<br>- Routing: {_hbl.Route}</p>");
+                _body = _body.Replace("{{FlightVesNo}}", _hbl?.FlightNo);
+                _body = _body.Replace("{{UserName}}", _consignee?.PartnerNameEn);
+            }
+
+            string _hblInfosresult = _hblInfos.ToString();
+            _subject = _subject.Replace("{{pic}}", picName);
+            _body = _body.Replace("{{HBLDetailsField}}", _hblInfos.ToString());
+            _body = _body.Replace("{{Routing}}", routesString);
+            _body = _body.Replace("{{HAWB}}", hwbNos);
+            _body = _body.Replace("{{Hwbno}}", hwbNos);
+            _body = _body.Replace("{{MAWB}}", mawb);
+            _body = _body.Replace("{{pic}}", picEmail);
+            // Get email from of person in charge
+            var groupUser = sysGroupRepo.Get(x => x.Id == shipmentInfo.GroupId).FirstOrDefault();
+
+            _body = _body.Replace("{{emailGroupOfPic}}", groupUser?.Email);
+            // Get email from of person in charge
+            var partnerInfo = catPartnerRepo.Get(x => x.Id == shipmentInfo.AgentId).FirstOrDefault()?.Email; //Email to
+            if (string.IsNullOrEmpty(partnerInfo))
+            {
+                var customers = _housebills.Select(x => x.CustomerId).Distinct().ToList();
+                partnerInfo = string.Join(";", catPartnerRepo.Get(x => customers.Any(z => z == x.Id)).Select(x => x.Email));
+            }
+
+            var emailContent = new EmailContentModel();
+            var mailFrom = string.IsNullOrEmpty(picEmail) ? "Info FMS" : picEmail;
+            emailContent.From = mailFrom;
+            emailContent.To = toEmail;
+            emailContent.Cc = managerMail;
+            emailContent.Subject = _subject;
+            emailContent.Body = _body;
+            emailContent.AttachFiles = new List<string>();
+            return emailContent;
+        }
+
         #region Mail info Sea Import - Export
         // Mail Info: Sea Import
         public EmailContentModel GetInfoMailHBLSeaImport(Guid hblId, string serviceId)
@@ -816,15 +924,9 @@ namespace eFMS.API.Documentation.DL.Services
             var _picId = !string.IsNullOrEmpty(_shipment.PersonIncharge) ? sysUserRepo.Get(x => x.Id.ToString() == _shipment.PersonIncharge).FirstOrDefault()?.EmployeeId : string.Empty;
             var picInfo = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault();
             // Email to: agent/customer + consignee
-            var mailTo = string.Empty;
-            var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerEmail))
-            {
-                partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
-            mailTo += partnerEmail;
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
             var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
-            mailTo += ";" + emailConsignee;
+            toEmailOnContract += ";" + emailConsignee;
 
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
@@ -841,7 +943,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             emailContent.From = mailFrom; //email PIC của lô hàng
-            emailContent.To = string.IsNullOrEmpty(mailTo) ? string.Empty : mailTo; //Email của Customer/Agent
+            emailContent.To = string.IsNullOrEmpty(toEmailOnContract) ? string.Empty : toEmailOnContract; //Email của Customer/Agent
             emailContent.Cc = groupUser?.Email; // Group Mail của pic trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
@@ -909,15 +1011,9 @@ namespace eFMS.API.Documentation.DL.Services
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
 
             // Email to: agent/customer + consignee
-            var mailTo = string.Empty;
-            var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerEmail))
-            {
-                partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
-            mailTo += partnerEmail;
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
             var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
-            mailTo += ";" + emailConsignee;
+            toEmailOnContract += ";" + emailConsignee;
 
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
@@ -932,7 +1028,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             emailContent.From = mailFrom; //email PIC của lô hàng
-            emailContent.To = string.IsNullOrEmpty(mailTo) ? string.Empty : mailTo; //Email của Customer/Agent
+            emailContent.To = string.IsNullOrEmpty(toEmailOnContract) ? string.Empty : toEmailOnContract; //Email của Customer/Agent
             emailContent.Cc = groupUser?.Email; // Group Mail của pic trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
@@ -1001,15 +1097,11 @@ namespace eFMS.API.Documentation.DL.Services
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
 
             // Email to: agent/customer + consignee
-            var mailTo = string.Empty;
-            var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerEmail))
-            {
-                partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
-            mailTo += partnerEmail;
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
+            
             var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
-            mailTo += ";" + emailConsignee;
+            toEmailOnContract += ";" + emailConsignee;
+            
 
             // Get email from of person in charge
             var groupUser = sysGroupRepo.Get(x => x.Id == _shipment.GroupId).FirstOrDefault();
@@ -1024,7 +1116,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             emailContent.From = mailFrom; //email PIC của lô hàng
-            emailContent.To = string.IsNullOrEmpty(mailTo) ? string.Empty : mailTo; //Email của Customer/Agent
+            emailContent.To = string.IsNullOrEmpty(toEmailOnContract) ? string.Empty: toEmailOnContract; //Email của Customer/Agent
             emailContent.Cc = groupUser?.Email; // Group Mail của pic trên Lô hàng
             emailContent.Subject = _subject;
             emailContent.Body = _body;
@@ -1092,13 +1184,7 @@ namespace eFMS.API.Documentation.DL.Services
             var picEmail = sysEmployeeRepo.Get(x => x.Id == _picId).FirstOrDefault()?.Email; //Email from
 
             // Email to: agent/customer + consignee
-            var mailTo = string.Empty;
-            var partnerEmail = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerEmail))
-            {
-                partnerEmail = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
-            mailTo += partnerEmail;
+            var mailTo = GetToPartnerEmailOnContract(_housebill, _shipment);
             var emailConsignee = catPartnerRepo.Get(x => x.Id == _housebill.ConsigneeId).FirstOrDefault()?.Email;
             mailTo += ";" + emailConsignee;
 
@@ -1334,15 +1420,10 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             // Email to: agent/customer
-            var partnerInfo = catPartnerRepo.Get(x => x.Id == _housebill.CustomerId).FirstOrDefault()?.Email; //Email to
-            if (string.IsNullOrEmpty(partnerInfo))
-            {
-                partnerInfo = catPartnerRepo.Get(x => x.Id == _shipment.AgentId).FirstOrDefault()?.Email;
-            }
-
+            var toEmailOnContract = GetToPartnerEmailOnContract(_housebill, _shipment);
             var emailContent = new EmailContentModel();
             emailContent.From = mailFrom;
-            emailContent.To = string.IsNullOrEmpty(partnerInfo) ? string.Empty : partnerInfo; //Email của Customer/Agent
+            emailContent.To = string.IsNullOrEmpty(toEmailOnContract) ? string.Empty : toEmailOnContract; //Email của Customer/Agent
             emailContent.Cc = groupUser?.Email;
             emailContent.Subject = _subject;
             emailContent.Body = _body;
@@ -1673,6 +1754,27 @@ namespace eFMS.API.Documentation.DL.Services
 
             var resquest = await HttpClientService.GetByteArrayFromFile(urlExport + "/api/v1/en-US/Documentation/ExportShipmentOutstandingDebit?salemanId=" + salemanId, null);
             return resquest;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="CsTransactionDetail _Hbl, CsTransaction _ShipmentInfo"></param>
+        /// <returns></returns>
+        private string GetToPartnerEmailOnContract(CsTransactionDetail _Hbl, CsTransaction _ShipmentInfo)
+        {
+            var toEmailOnContract = catContractRepo.Get(x => x.PartnerId == _Hbl.CustomerId && x.SaleManId == _Hbl.SaleManId && x.Active == true).FirstOrDefault()?.EmailAddress;
+            
+            if (string.IsNullOrEmpty(toEmailOnContract)) // Lay theo tt Partner
+            {
+                toEmailOnContract = catPartnerRepo.Get(x => x.Id == _Hbl.CustomerId).FirstOrDefault()?.Email; //Email to
+                if (string.IsNullOrEmpty(toEmailOnContract))
+                {
+                    toEmailOnContract = catPartnerRepo.Get(x => x.Id == _ShipmentInfo.AgentId).FirstOrDefault()?.Email;
+                }
+            }
+            return toEmailOnContract;
         }
     }
 }

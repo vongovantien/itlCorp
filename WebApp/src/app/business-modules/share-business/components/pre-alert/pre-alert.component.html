@@ -136,7 +136,7 @@
                             <ng-template #NotArrivalNotice>
                                 <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
                                     style="display: initial; margin-right: 40px;">
-                                    <input type="checkbox" disabled="true">
+                                    <input type="checkbox"disabled ="true">
                                     Arrival Notice
                                     <span></span>
                                 </label>
@@ -374,6 +374,31 @@
                         </div>
                     </div>
 
+                    <!--Send Debit Note/ Invoice-->
+                    <div class="form-group m-form__group"
+                        *ngIf="isDbtInv">
+                        <div class="m-checkbox-inline">
+                            <ng-container *ngIf="isExitsDebitNote else NotDebitNote">
+                                <ng-container *ngFor="let debitNo of debitNos">
+                                    <label class="m-checkbox m-checkbox--bold" style="display: initial;margin-left: 20px">
+                                        <input type="checkbox" [disabled]="!!debitNo.isDefaultDebitNote" [(ngModel)]="debitNo.isCheckedDebitNote" (change)="onChangeCheckBox()">
+                                        <span></span>
+                                    </label>
+                                    <span>
+                                        <a class="pointer" (click)="previewDebitNote(debitNo)">{{debitNo.code}}</a>
+                                    </span>
+                                </ng-container>
+                            </ng-container>
+                            <ng-template #NotDebitNote>
+                                <label class="m-checkbox m-checkbox--bold m-checkbox--disabled"
+                                    style="display: initial; margin-right: 40px;">
+                                    <input type="checkbox" disabled="true">
+                                    Debit Note
+                                    <span></span>
+                                </label>
+                            </ng-template>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-lg-12" *ngFor="let file of files; trackBy:trackByFn">
                     <div class="form-group m-form__group">
