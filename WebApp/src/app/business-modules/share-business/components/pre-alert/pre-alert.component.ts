@@ -494,7 +494,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 if (this.isDbtInv) {
                     this.debitNos.forEach(element => {
                         if (element.isCheckedDebitNote) {
-                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'ORIGIN' }));
                         }
                     });
                 }
@@ -525,7 +525,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 if (this.isDbtInv) {
                     this.debitNos.forEach(element => {
                         if (element.isCheckedDebitNote) {
-                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                            streamUploadReport.push(this._documentRepo.previewAirCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'ORIGIN' }));
                         }
                     });
                 }
@@ -559,7 +559,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 if (this.isDbtInv) {
                     this.debitNos.forEach(element => {
                         if (element.isCheckedDebitNote) {
-                            streamUploadReport.push(this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                            streamUploadReport.push(this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'ORIGIN' }));
                         }
                     });
                 }
@@ -600,7 +600,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                 } else if (this.isDbtInv) {
                     this.debitNos.forEach(element => {
                         if (element.isCheckedDebitNote) {
-                            streamUploadReport.push(this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'VND' }));
+                            streamUploadReport.push(this._documentRepo.previewSIFCdNote({ jobId: this.jobId, creditDebitNo: element.code, currency: 'ORIGIN' }));
                         }
                     });
                 }
