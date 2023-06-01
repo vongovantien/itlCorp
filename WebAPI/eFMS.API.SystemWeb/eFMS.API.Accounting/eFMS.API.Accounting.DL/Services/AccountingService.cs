@@ -645,7 +645,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    var _description = GetDescriptionForSyncAcct(_charge?.ChargeNameVn, surcharge.TransactionType, surcharge.ClearanceNo, surcharge.Mblno, surcharge.Hblno);
+                    var _description = GetDescriptionForSyncAcct(_charge?.ChargeNameVn, surcharge.TransactionType, surcharge.ClearanceNo, surcharge.Mblno, surcharge.Hblno, surcharge.Notes, surcharge.Hblid);
                     charge.Description = _description;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
@@ -1017,7 +1017,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Ma_SpHt = surcharge.JobNo;
                     var _charge = CatChargeRepository.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault();
                     charge.ItemCode = _charge?.Code;
-                    var _description = GetDescriptionForSyncAcct(_charge?.ChargeNameVn, surcharge.TransactionType, surcharge.ClearanceNo, surcharge.Mblno, surcharge.Hblno);
+                    var _description = GetDescriptionForSyncAcct(_charge?.ChargeNameVn, surcharge.TransactionType, surcharge.ClearanceNo, surcharge.Mblno, surcharge.Hblno, surcharge.Notes, surcharge.Hblid);
                     charge.Description = _description;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
@@ -2244,13 +2244,22 @@ namespace eFMS.API.Accounting.DL.Services
             return dueDate;
         }
 
-        private string GetDescriptionForSyncAcct(string chargeName, string transactionType, string clearanceNo, string mblNo, string hblNo)
+        private string GetDescriptionForSyncAcct(string chargeName, string transactionType, string clearanceNo, string mblNo, string hblNo, string notes, Guid hblId)
         {
             var _description = string.Empty;
             if (transactionType == "CL")
             {
-                var _customNo = !string.IsNullOrEmpty(clearanceNo) ? string.Format("TK:{0}", clearanceNo) : string.Empty;
-                _description = string.Format("{0} {1} {2}", chargeName, hblNo, _customNo); //Format: ChargeName + HBL + ClearanceNo cũ nhất [CR: 13-01-2020]
+                var productsTrucking = new List<string> { "Trucking", "Trucking Inland" };
+                var productService = opsTransactionRepository.Get(x => x.Hblid == hblId)?.FirstOrDefault()?.ProductService;
+                if(productsTrucking.Contains(productService))
+                {
+                    _description = string.Format("{0} {1}", chargeName, notes);
+                }
+                else
+                {
+                    var _customNo = !string.IsNullOrEmpty(clearanceNo) ? string.Format("TK:{0}", clearanceNo) : string.Empty;
+                    _description = string.Format("{0} {1} {2}", chargeName, hblNo, _customNo); //Format: ChargeName + HBL + ClearanceNo cũ nhất [CR: 13-01-2020]
+                }
             }
             else
             {
