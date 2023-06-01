@@ -232,8 +232,19 @@ namespace eFMS.API.Documentation.DL.Services
             workOrderViewUpdateModel.PolName = ports.Where(x => x.Id == workOrder.Pol)?.FirstOrDefault()?.NameVn;
             workOrderViewUpdateModel.PodName = ports.Where(x => x.Id == workOrder.Pod)?.FirstOrDefault()?.NameVn;
 
-            string partnerId = workOrder.PartnerId.ToString();
-            workOrderViewUpdateModel.PartnerName = catPartnerRepo.Get(x => x.Id == partnerId)?.FirstOrDefault()?.ShortName;
+            var partnerIds = new List<string> { 
+                workOrder.PartnerId?.ToString(), 
+                workOrder.AgentId?.ToString(), 
+                workOrder.ConsigneeId?.ToString(),
+                workOrder.ShipperId?.ToString()
+            }
+            .Where(x => !string.IsNullOrEmpty(x)).ToList();
+            var partners = catPartnerRepo.Get(x => partnerIds.Contains(x.Id)).ToList();
+
+            workOrderViewUpdateModel.PartnerName = partners.Where(x => x.Id == workOrder.PartnerId?.ToString())?.FirstOrDefault()?.ShortName;
+            workOrderViewUpdateModel.AgentName = partners.Where(x => x.Id == workOrder.AgentId?.ToString())?.FirstOrDefault()?.ShortName;
+            workOrderViewUpdateModel.ConsigneeName = partners.Where(x => x.Id == workOrder.ConsigneeId?.ToString())?.FirstOrDefault()?.ShortName;
+            workOrderViewUpdateModel.ShipperName = partners.Where(x => x.Id == workOrder.ShipperId?.ToString())?.FirstOrDefault()?.ShortName;
 
             var userIds = new List<string> { workOrder.UserCreated, workOrder.UserModified, workOrder.SalesmanId?.ToString() };
             var users = sysUserRepo.Get(x => userIds.Contains(x.Id)).ToList();
@@ -274,12 +285,16 @@ namespace eFMS.API.Documentation.DL.Services
                         var surchargeChargeIds = surcharges.Select(x => x.ChargeId);
                         var surchargeCharges = catChargeRepo.Get(x => surchargeChargeIds.Contains(x.Id));
 
+                        var surchargeUnitIds = surcharges.Where(x => x.UnitId != null).Select(x => x.UnitId).ToList();
+                        var surchargeUnits = catUnitrepo.Get(x => surchargeUnitIds.Contains(x.Id));
+
                         List<CsWorkOrderSurchargeModel> listModelSurcharges = new List<CsWorkOrderSurchargeModel>();
                         foreach (var surcharge in surcharges)
                         {
                             CsWorkOrderSurchargeModel surchargeModel = mapper.Map<CsWorkOrderSurchargeModel>(surcharge);
                             surchargeModel.PartnerName = surchargesPartners.Where(x => x.Id == surcharge.PartnerId)?.FirstOrDefault()?.ShortName;
                             surchargeModel.ChargeName = surchargeCharges.Where(x => x.Id == surcharge.ChargeId)?.FirstOrDefault()?.ChargeNameVn;
+                            surchargeModel.UnitCode = surchargeUnits.Where(x => x.Id == surcharge.UnitId)?.FirstOrDefault()?.Code;
 
                             listModelSurcharges.Add(surchargeModel);
                         }
@@ -453,7 +468,7 @@ namespace eFMS.API.Documentation.DL.Services
                .WhereIf(criteria.Active != null,
                     x => x.Active == criteria.Active);
 
-            var query = criteriaBuilder.Apply(Get());
+            var query = criteriaBuilder.Apply(await GetAsync());
             return query;
         }
 
@@ -957,8 +972,8 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         var worKorderPrices = workOrderPriceRepo.Where(x => workOrderIds.Contains(x.WorkOrderId)
                         && priceItem.PartnerId == x.PartnerId
-                        && priceItem.QuantityFromRange == x.QuantityFromRange
-                        && priceItem.QuantityToRange == x.QuantityToRange).ToList();
+                        && priceItem.QuantityFromValue == x.QuantityFromValue
+                        && priceItem.QuantityToValue == x.QuantityToValue).ToList();
 
                         if (worKorderPrices.Count > 0)
                         {

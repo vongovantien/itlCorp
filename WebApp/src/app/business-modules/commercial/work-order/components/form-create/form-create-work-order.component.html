@@ -19,10 +19,11 @@
                         <label class="form-control-label" required>
                             Customer
                         </label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partnerId')"
+                        <app-combo-grid-virtual-scroll (onClick)="loadPartner('partner')"
+                            (itemSelected)="onSelectDataFormInfo($event, 'partnerId')"
                             (remove)="resetFormControl(partnerId)"
                             [currentActiveItemId]="{field:'id', value: partnerId.value, hardValue: partnerName}"
-                            [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="partners"
                             [loading]="isLoadingPartner" [displayFields]="displayFieldsPartner"
                             placeholder="Select Partner" [clearable]="false" [disabled]="isReadonly"
                             textColor="text-primary">
@@ -49,11 +50,12 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label>Shipper</label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'shipperId')"
-                            [currentActiveItemId]="{ field: 'id', value: shipperId.value}"
-                            [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
+                        <app-combo-grid-virtual-scroll (onClick)="loadPartner('shipper')"
+                            (itemSelected)="onSelectDataFormInfo($event, 'shipperId')"
+                            [currentActiveItemId]="{ field: 'id', value: shipperId.value, hardValue: shipperName}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="partners"
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(shipperId)"
-                            placeholder="Select shipper" [disabled]="isReadonly">
+                            placeholder="Select shipper" [disabled]="isReadonly" [loading]="isloadingShipper">
                         </app-combo-grid-virtual-scroll>
                         <textarea autoExpand rows="7" class="form-control m-input m-input--square"
                             formControlName="shipperDescription"></textarea>
@@ -62,11 +64,12 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label>Consignee</label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'consigneeId')"
-                            [currentActiveItemId]="{ field: 'id', value: consigneeId.value}"
-                            [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
+                        <app-combo-grid-virtual-scroll (onClick)="loadPartner('consignee')"
+                            (itemSelected)="onSelectDataFormInfo($event, 'consigneeId')"
+                            [currentActiveItemId]="{ field: 'id', value: consigneeId.value, hardValue: consigneeName}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="partners"
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(consigneeId)"
-                            placeholder="Select consignee" [disabled]="isReadonly">
+                            placeholder="Select consignee" [disabled]="isReadonly" [loading]="isLoadingConsignee">
                         </app-combo-grid-virtual-scroll>
                         <textarea autoExpand rows="7" class="form-control m-input m-input--square"
                             formControlName="consigneeDescription"></textarea>
@@ -75,9 +78,10 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label>Agent Handling</label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'agentId')"
-                            [currentActiveItemId]="{ field: 'id', value: agentId.value}"
-                            [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
+                        <app-combo-grid-virtual-scroll (onClick)="loadAgent()"
+                            (itemSelected)="onSelectDataFormInfo($event, 'agentId')"
+                            [currentActiveItemId]="{ field: 'id', value: agentId.value, hardValue: agentName }"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="agents"
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(agentId)"
                             placeholder="Select agent" [disabled]="isReadonly" [loading]="isLoadingAgent">
                         </app-combo-grid-virtual-scroll>

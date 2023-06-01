@@ -366,4 +366,18 @@ export class UtilityHelper {
     deepFlatten(arr) {
         return [].concat(...arr.map(v => (Array.isArray(v) ? this.deepFlatten(v) : v)));
     }
+
+    checkRangeOverlap(range1: number[], range2: number[]): boolean {
+        const [start1, end1] = range1;
+        const [start2, end2] = range2;
+
+        if (end1 < start2 || end2 < start1) {
+            // No overlap if range1 ends before range2 starts or
+            // range2 ends before range1 starts
+            return false;
+        }
+
+        // If none of the above conditions are true, there is an overlap
+        return true;
+    }
 }

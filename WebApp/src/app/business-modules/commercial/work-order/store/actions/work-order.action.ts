@@ -1,4 +1,4 @@
-import { WorkOrderPriceModel, WorkOrderViewUpdateModel } from "@models";
+import { Partner, WorkOrderPriceModel, WorkOrderViewUpdateModel } from "@models";
 import { createAction, props } from "@ngrx/store";
 import { IWorkOrderCriteria } from "../../components/form-search/form-search-work-order.component";
 
@@ -28,6 +28,8 @@ export enum WorkOrderActionTypes {
     LOAD_DETAIL = '[WO] Load Detail',
     LOAD_DETAIL_SUCCESS = '[WO] Load Detail Success',
     LOAD_DETAIL_FAIL = '[WO] Load Detail Fail',
+
+    SELECT_PARTNER_PRICE_ITEM = '[WO] Select Partner Price Item',
 }
 
 export const SearchListWorkOrder = createAction(WorkOrderActionTypes.SEARCH, props<Partial<IWorkOrderCriteria>>());
@@ -56,3 +58,4 @@ export const DeletePriceItemWorkOrder = createAction(WorkOrderActionTypes.DELETE
 export const DeletePriceItemWorkOrderSuccess = createAction(WorkOrderActionTypes.DELETE_PRICE_ITEM_SUCCESS, props<{ index: number }>());
 export const DeletePriceItemWorkOrderFail = createAction(WorkOrderActionTypes.DELETE_PRICE_ITEM_FAIL);
 
+export const SelectPartnerPriceItemWorkOrder = createAction(WorkOrderActionTypes.SELECT_PARTNER_PRICE_ITEM, props<{ data: Partner }>());

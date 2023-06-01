@@ -48,6 +48,7 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
     @Output() itemSelected = new EventEmitter<any>();
     @Output() remove = new EventEmitter<any>();
     @Output() showedDropdown = new EventEmitter<any>();
+    @Output() onClick = new EventEmitter<any>();
 
     @ViewChild('inputSearch') inputSearch: ElementRef;
     @ViewChild('clkSearch') inputPlaceholder: ElementRef;
@@ -203,9 +204,19 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
     }
 
     setCurrentActiveItemId(data: any) {
-        // * Ưu tiên hiển thị hardValue
+        // * Ưu tiên hiển thị hardValue nhưng vẫn selecte into item
         if (data.hardValue) {
             this.displaySelectedStr = data.hardValue;
+            if (data.value !== null) {
+                this.CurrentActiveItemIdObj = data;
+                if (!!this.ConstDataSources.length) {
+                    const itemIndex = this.ConstDataSources.findIndex(i => i[data.field] === data.value);
+                    if (itemIndex !== -1) {
+                        this.indexSelected = itemIndex;
+                    }
+                }
+            }
+
         } else {
             if (data.value != null) {
                 this.CurrentActiveItemIdObj = data;
@@ -323,6 +334,11 @@ export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, After
 
     public setDisabledState?(isDisabled: boolean): void {
         this.setDisabled(isDisabled);
+    }
+
+    onClickEvent() {
+        if (this.disabled) return;
+        this.onClick.emit();
     }
 
     ngOnDestroy(): void {

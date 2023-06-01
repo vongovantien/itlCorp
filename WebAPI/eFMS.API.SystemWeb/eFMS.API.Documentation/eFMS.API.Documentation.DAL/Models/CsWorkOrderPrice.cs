@@ -18,8 +18,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string Notes { get; set; }
         public string CurrencyIdBuying { get; set; }
         public string CurrencyIdSelling { get; set; }
-        public decimal? QuantityFromRange { get; set; }
-        public decimal? QuantityToRange { get; set; }
         public decimal? QuantityFromValue { get; set; }
         public decimal? QuantityToValue { get; set; }
         public short? UnitId { get; set; }
@@ -27,5 +25,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public string QuantityType { get; set; }
     }
 }

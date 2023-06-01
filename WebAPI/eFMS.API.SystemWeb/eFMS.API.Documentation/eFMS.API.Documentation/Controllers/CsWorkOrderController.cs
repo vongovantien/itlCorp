@@ -102,11 +102,11 @@ namespace eFMS.API.Documentation.Controllers
         public async Task<IActionResult> Post(WorkOrderRequest model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            string checkExistMessage = CheckExist(model, out CsWorkOrder workOrderDuplicate);
-            if (checkExistMessage.Length > 0)
-            {
-                return Ok(new ResultHandle { Status = false, Message = string.Format(@"Work Order information was duplicated with {0}", workOrderDuplicate.Code) });
-            }
+            //string checkExistMessage = CheckExist(model, out CsWorkOrder workOrderDuplicate);
+            //if (checkExistMessage.Length > 0)
+            //{
+            //    return Ok(new ResultHandle { Status = false, Message = string.Format(@"Work Order information was duplicated with {0}", workOrderDuplicate.Code) });
+            //}
 
             var hs = await workOrderService.SaveWorkOrder(model);
             string message = HandleError.GetMessage(hs, Crud.Insert);
@@ -120,11 +120,11 @@ namespace eFMS.API.Documentation.Controllers
         public async Task<IActionResult> Put(WorkOrderRequest model)
         {
             if (!ModelState.IsValid) return BadRequest();
-            string checkExistMessage = CheckExist(model, out CsWorkOrder workOrderDuplicate);
-            if (checkExistMessage.Length > 0)
-            {
-                return Ok(new ResultHandle { Status = false, Message = string.Format(@"Work Order information was duplicated with {0}", workOrderDuplicate.Code) });
-            }
+            //string checkExistMessage = CheckExist(model, out CsWorkOrder workOrderDuplicate);
+            //if (checkExistMessage.Length > 0)
+            //{
+            //    return Ok(new ResultHandle { Status = false, Message = string.Format(@"Work Order information was duplicated with {0}", workOrderDuplicate.Code) });
+            //}
             var hs = await workOrderService.UpdateWorkOrder(model);
             string message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
