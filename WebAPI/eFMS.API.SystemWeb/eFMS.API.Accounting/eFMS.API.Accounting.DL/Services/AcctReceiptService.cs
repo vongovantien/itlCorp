@@ -6793,7 +6793,7 @@ namespace eFMS.API.Accounting.DL.Services
             switch (paymentMethod)
             {
                 case "Advance Agency":
-                case "Clear Dedit Agency":
+                case "Clear Debit Agency":
                 case "Collect OBH Agency":
                 case "Paid Amount Agency":
                     _mode = "Debit";
