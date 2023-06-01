@@ -2253,11 +2253,11 @@ namespace eFMS.API.Accounting.DL.Services
         private string GetDescriptionForSyncAcct(string chargeName, string transactionType, string clearanceNo, string mblNo, string hblNo, string notes, Guid hblId)
         {
             var _description = string.Empty;
-            if (transactionType == "CL"|| transactionType == "TK")
+            if (transactionType == "CL" || transactionType == "TK")
             {
                 var productsTrucking = new List<string> { "Trucking", "Trucking Inland" };
                 var productService = opsTransactionRepository.Get(x => x.Hblid == hblId)?.FirstOrDefault()?.ProductService;
-                if(productsTrucking.Contains(productService))
+                if(productsTrucking.Contains(productService) || transactionType == "TK")
                 {
                     _description = string.Format("{0} {1}", chargeName, notes);
                 }
