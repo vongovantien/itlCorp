@@ -740,6 +740,7 @@ namespace eFMS.API.Catalogue.Controllers
                 BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
                 if (loginResponse?.Success != "1")
                 {
+                    new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = request });
                 }
                 // 2. Get Data To Sync.
@@ -791,8 +792,8 @@ namespace eFMS.API.Catalogue.Controllers
                         Id = Guid.NewGuid(),
                         FuncLocal = "GetListPartnerToSync",
                         FuncPartner = "EFMSCustomerSyncUpdate",
-                        ObjectRequest = JsonConvert.SerializeObject(listAdd),
-                        ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
+                        ObjectRequest = JsonConvert.SerializeObject(listUpdate),
+                        ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
                         Major = "Đồng bộ đối tượng",
                         StartDateProgress = _startDateProgress,
                         EndDateProgress = DateTime.Now
@@ -818,13 +819,15 @@ namespace eFMS.API.Catalogue.Controllers
                 {
                     if (responseAddModel?.Success == null && responseUpdateModel?.Success == null)
                     {
+                        new LogHelper("eFMS_SYNC_LOG", listAdd.Any() ? responseAddModel.ToString() : responseUpdateModel.ToString());
                         return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = "Bravo Exception" });
                     }
                 }
                 return Ok(new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = listRequestReturn });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = null });
             }
         }
