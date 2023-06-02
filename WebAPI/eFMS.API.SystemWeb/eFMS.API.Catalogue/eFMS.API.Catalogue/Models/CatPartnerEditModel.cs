@@ -85,5 +85,7 @@ namespace eFMS.API.Catalogue.Models
         public string IdentityNo { get; set; }
         public DateTime? DateId { get; set; }
         public string PlaceId { get; set; }
+        public string SysMappingId { get; set; }
+        public bool IsFromPartnerData { get; set; }
     }
 }

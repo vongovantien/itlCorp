@@ -44,6 +44,7 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly IOptions<ESBUrl> _webUrl;
         private readonly BravoLoginModel loginInfo;
         private readonly IActionFuncLogService actionFuncLogService;
+        private readonly IOptions<ApiUrl> _apiUrl;
 
         /// <summary>
         /// constructor
@@ -57,7 +58,8 @@ namespace eFMS.API.Catalogue.Controllers
             IMapper iMapper,
             IHostingEnvironment hostingEnvironment,
             IOptions<ESBUrl> webUrl,
-              IActionFuncLogService actionFuncLog)
+            IActionFuncLogService actionFuncLog,
+            IOptions<ApiUrl> apiUrl)
         {
             stringLocalizer = localizer;
             catPartnerService = service;
@@ -65,6 +67,7 @@ namespace eFMS.API.Catalogue.Controllers
             _hostingEnvironment = hostingEnvironment;
             _webUrl = webUrl;
             actionFuncLogService = actionFuncLog;
+            _apiUrl = apiUrl;
             loginInfo = new BravoLoginModel
             {
                 UserName = "bravo",
@@ -310,8 +313,9 @@ namespace eFMS.API.Catalogue.Controllers
         /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize]
-        public IActionResult Put(string id, CatPartnerEditModel model)
+        public async Task<IActionResult> Put(string id, CatPartnerEditModel model)
         {
+            var hsResult = new ResultHandle { Status = true };
             if (!ModelState.IsValid) return BadRequest();
 
             if (!String.IsNullOrEmpty(model.InternalReferenceNo))
@@ -322,6 +326,15 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 model.AccountNo = model.TaxCode;
             }
+
+            var requestModel = new List<RequestStringListModel>
+                {
+                    new RequestStringListModel { Id = id, Action = ((model.SysMappingId != model.AccountNo) ? ACTION.ADD : ACTION.UPDATE) }
+                };
+            if (!string.IsNullOrEmpty(model.SysMappingId) && model.AccountNo != model.SysMappingId)
+            {
+                model.SysMappingId = null;
+            }
             var checkExistMessage = CheckExist(id, model);
             if (checkExistMessage.Length > 0)
             {
@@ -330,13 +343,28 @@ namespace eFMS.API.Catalogue.Controllers
             var partner = mapper.Map<CatPartnerModel>(model);
             partner.Id = id;
             var hs = catPartnerService.Update(partner);
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-            if (!hs.Success)
+
+            if (hs.Success && model.Active == true && model.IsFromPartnerData == true)
             {
-                return BadRequest(result);
+                Uri urlCatelogue = new Uri(_apiUrl.Value.Url);
+                string accessToken = Request.Headers["Authorization"].ToString();
+
+                HttpResponseMessage response = await HttpClientService.PutAPI("https://localhost:44341" + "/api/v1/vi/CatPartner/SyncPartnerToAccountantSystem", requestModel, accessToken);
+                hsResult = await response.Content.ReadAsAsync<ResultHandle>();
             }
-            return Ok(result);
+
+            if (!hsResult.Status)
+            {
+                return BadRequest(hsResult);
+            }
+
+            if (model.Active == false)
+            {
+                var message = HandleError.GetMessage(hs, Crud.Update);
+                hsResult = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            }
+
+            return Ok(hsResult);
         }
 
         /// <summary>
@@ -690,7 +718,7 @@ namespace eFMS.API.Catalogue.Controllers
 
         [HttpPut("SyncPartnerToAccountantSystem")]
         [Authorize]
-        public async Task<IActionResult> GetListPartnerToSync(List<RequestStringListModel> request)
+        public async Task<IActionResult> SyncPartnerToAccountantSystem(List<RequestStringListModel> request)
         {
             var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
@@ -702,7 +730,7 @@ namespace eFMS.API.Catalogue.Controllers
                 BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
                 if (loginResponse?.Success != "1")
                 {
-                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = null });
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = request });
                 }
                 // 2. Get Data To Sync.
                 List<string> ids = request.Select(x => x.Id).ToList();
@@ -762,7 +790,6 @@ namespace eFMS.API.Catalogue.Controllers
                     var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
                     #endregion
                 }
-                //update partner status
                 if (responseAddModel.Success == "1" || responseAddModel.Success == "2")
                 {
                     var idsItemAdd = request.Where(x => x.Action == ACTION.ADD).Select(x => x.Id).ToList();
@@ -781,7 +808,7 @@ namespace eFMS.API.Catalogue.Controllers
                 {
                     if (responseAddModel?.Success == null && responseUpdateModel?.Success == null)
                     {
-                        return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = listRequestReturn });
+                        return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer["MSG_SYNC_FAIL"].Value, Data = "Bravo Exception" });
                     }
                 }
                 return Ok(new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = listRequestReturn });

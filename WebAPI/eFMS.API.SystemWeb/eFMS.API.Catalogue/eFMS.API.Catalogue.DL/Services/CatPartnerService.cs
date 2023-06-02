@@ -759,11 +759,13 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.SalePersonId = model.Contracts.FirstOrDefault().SaleManId.ToString();
             }
             var hs = DataContext.Update(entity, x => x.Id == model.Id);
+
             if (hs.Success)
             {
                 ClearCache();
                 Get();
             }
+
             return hs;
         }
 
@@ -2777,7 +2779,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var partnerSync = new PartnerSyncModel();
                 partnerSync.Code = partner.AccountNo;
                 partnerSync.Name = partner.PartnerNameVn;
-                partnerSync.CustomerType = partner.PartnerGroup.Trim() == "STAFF;PERSONAL" ? "1" : (partner.PartnerMode.Trim() == "External" ? "2" : "3");
+                partnerSync.CustomerType = partner.PartnerGroup.Split(';').Any(x => x.Equals("STAFT") || x.Equals("PERSONAL")) ? "1" : (partner.PartnerMode.Trim() == "External" ? "2" : "3");
                 partnerSync.Address = partner.AddressShippingVn;
                 partnerSync.BillingAddress = partner.AddressVn;
                 partnerSync.TaxRegNo = partner.TaxCode;
@@ -2816,7 +2818,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     bankAccounts.Add(new PartnerBankAccountSyncModel());
                 }
                 partnerSync.Details = bankAccounts;
-                partnerSync.AtchDocInfo = attachedBankFiles;
+                partnerSync.AttachDocInfo = attachedBankFiles;
                 dataReturn.Add(partnerSync);
             }
 
@@ -2834,6 +2836,5 @@ namespace eFMS.API.Catalogue.DL.Services
             hs = DataContext.SubmitChanges();
             return hs;
         }
-
     }
 }
