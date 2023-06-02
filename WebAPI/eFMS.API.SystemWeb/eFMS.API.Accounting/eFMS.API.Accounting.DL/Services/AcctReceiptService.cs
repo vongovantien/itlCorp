@@ -5331,7 +5331,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             if(!string.IsNullOrEmpty(_getType) && _getType == "existing")
             {
-                receipts = new List<AcctReceipt> { receipts.FirstOrDefault() };
+                receipts = new List<AcctReceipt> { receipts.Where(x => x.SubArcbno == _arcbNo).FirstOrDefault() };
             }
 
             var resultData = new List<AcctReceiptModel>();
@@ -5750,7 +5750,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var _arcbNo = $"{Guid.NewGuid().ToString().Substring(0, 8)}";
                 foreach (var item in receiptModels)
                 {
-                    item.Arcbno = _arcbNo;
+                    item.Arcbno = item.SubArcbno = _arcbNo;
                 }
                 var generalCombines = receiptModels.Where(x => Common.CustomData.PaymentMethodGeneral.Any(c => c.Value == x.PaymentMethod)).ToList();
                 var hsGeneral = AddDraftGeneralCombine(generalCombines, _arcbNo);
@@ -6182,7 +6182,8 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 foreach (var item in receiptModels)
                 {
-                    item.Arcbno = _arcbNo;
+                    item.Arcbno =  _arcbNo;
+                    item.SubArcbno = isAddNew ? _arcbNo : item.SubArcbno;
                 }
                 var generalCombines = receiptModels.Where(x => Common.CustomData.PaymentMethodGeneral.Any(c => c.Value == x.PaymentMethod)).ToList();
                 if (generalCombines.Count > 0)
@@ -6250,11 +6251,13 @@ namespace eFMS.API.Accounting.DL.Services
             _arcbNo = GenerateCombineReceiptNo();
             foreach(var item in receiptModels)
             {
-                item.Arcbno = item.SubArcbno = _arcbNo;
+                item.Arcbno = _arcbNo;
+                item.SubArcbno = item.SubArcbno.Replace(_arcbNoRandom, _arcbNo);
             }
             foreach (var item in receiptCombineAdd)
             {
-                item.Arcbno = item.SubArcbno = _arcbNo;
+                item.Arcbno = _arcbNo;
+                item.SubArcbno = item.SubArcbno.Replace(_arcbNoRandom, _arcbNo);
                 DataContext.Update(item, x => x.Id == item.Id, false);
             }
             var hsUpdReceipt = DataContext.SubmitChanges();
@@ -6793,7 +6796,7 @@ namespace eFMS.API.Accounting.DL.Services
             switch (paymentMethod)
             {
                 case "Advance Agency":
-                case "Clear Dedit Agency":
+                case "Clear Debit Agency":
                 case "Collect OBH Agency":
                 case "Paid Amount Agency":
                     _mode = "Debit";
