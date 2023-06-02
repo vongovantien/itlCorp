@@ -9,12 +9,13 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { getMenuUserPermissionState, getMenuUserSpecialPermissionState } from '@store';
 import _merge from 'lodash-es/merge';
 import { ToastrService } from 'ngx-toastr';
-import { combineLatest, forkJoin, Observable } from 'rxjs';
-import { catchError, concatMap, finalize, map, takeUntil } from "rxjs/operators";
+import { EMPTY, Observable, combineLatest, forkJoin } from 'rxjs';
+import { catchError, concatMap, filter, finalize, map, switchMap, take, takeUntil, tap } from "rxjs/operators";
 import { AppList } from 'src/app/app.list';
 import { CommercialBranchSubListComponent } from 'src/app/business-modules/commercial/components/branch-sub/commercial-branch-sub-list.component';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 import { CommercialEmailListComponent } from 'src/app/business-modules/commercial/components/email/commercial-email-list.component';
+import { getDetailPartner, getDetailPartnerDataState } from 'src/app/business-modules/commercial/store';
 import { FormContractCommercialPopupComponent, PartnerRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
@@ -171,7 +172,6 @@ export class PartnerDetailComponent extends AppList {
                         this.allowUpdate = this.partner.permission.allowUpdate;
                         this.formPartnerComponent.isAddBranchSub = this.isAddSubPartner;
                         this.formPartnerComponent.groups = this.partner.partnerGroup;
-                        this.formContractPopup.detailPartner = this.partner;
                         this.formPartnerComponent.setFormData(this.partner);
                         if (this.isAddSubPartner) {
                             this.formPartnerComponent.getACRefName(this.partner.id);
@@ -407,9 +407,6 @@ export class PartnerDetailComponent extends AppList {
             this.formPartnerComponent.partnerMode.setErrors(null);
         }
         if (!this.formPartnerComponent.partnerForm.valid) {
-            console.log('fails');
-            console.log(this.formPartnerComponent.partnerForm);
-
             return;
         }
         this.getFormPartnerData();
@@ -446,15 +443,10 @@ export class PartnerDetailComponent extends AppList {
             creditPayment: !!formBody.creditPayment ? formBody.creditPayment.id : null,
             bankName: !!formBody.bankName ? formBody.bankName.normalize("NFD").replace(/[\u0300-\u036f]/g, "") : null
         };
-        console.log("formBody: ", formBody);
-        console.log("clone: ", cloneObject);
+
         const mergeObj = Object.assign(_merge(formBody, cloneObject));
         mergeObj.dateId = !!mergeObj.dateId ? (mergeObj.dateId.startDate !== null ? formatDate(mergeObj.dateId.startDate, 'yyyy-MM-dd', 'en') : null) : null;
-        // merge clone & this.partner.
         const mergeObjPartner = Object.assign(_merge(this.partner, mergeObj));
-
-        console.log("merge2: ", mergeObjPartner);
-        //
         this.updatePartner(mergeObjPartner);
     }
     trimInputForm(formBody: any) {
@@ -511,28 +503,33 @@ export class PartnerDetailComponent extends AppList {
     }
 
     onSave(body: any) {
-        console.log(body)
         if (!this.isAddSubPartner) {
+            body.IsFromPartnerData = true;
             this._catalogueRepo.updatePartner(body.id, body)
                 .pipe(
-                    catchError(this.catchError)
-                ).subscribe(
-                    (res: CommonInterface.IResult) => {
+                    catchError(this.catchError),
+                    tap((res: CommonInterface.IResult) => {
                         const { status, message } = res;
                         if (status) {
                             this.formPartnerComponent.activePartner = this.partner.active;
                             this.formPartnerComponent.bankName.setValue(this.formPartnerComponent.bankName.value?.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
                             this.getParentCustomers();
-                            if (body.active === true) {
-                                const partnerSyncIds: any[] = [{ id: body.id, action: !!body.sysMappingId ? 'UPDATE' : 'ADD' }];
-                                this.syncPartnerToAccountantSystem(partnerSyncIds);
-                            }
                             this._toastService.success(message);
+
                         } else {
-                            this._toastService.warning(message);
+                            this._toastService.error(message);
                         }
-                    }
-                );
+                        this._store.dispatch(getDetailPartner({ payload: this.partner.id }));
+                        if (body.active === true) {
+                            this._toastService.success("Data update success");
+                        }
+                    }),
+                    switchMap(() => this._store.select(getDetailPartnerDataState).pipe(filter((res: Partner) => Object.keys(res).length !== 0)))
+                )
+                .subscribe((partner: Partner) => {
+                    this.partner = partner;
+                    this.formPartnerComponent.setFormData(this.partner);
+                });
         } else {
             this._catalogueRepo.createPartner(body)
                 .pipe(catchError(this.catchError))
@@ -548,28 +545,6 @@ export class PartnerDetailComponent extends AppList {
                         console.log(err)
                     });
         }
-    }
-
-    syncPartnerToAccountantSystem(partnerRequest: any[]) {
-        this._catalogueRepo.syncPartnerToAccountantSystem(partnerRequest).pipe(
-            catchError(this.catchError),
-            concatMap((res: CommonInterface.IResult) => {
-                const { status, message } = res;
-                if (status) {
-                    this._toastService.success(message);
-                } else {
-                    this._toastService.error(message);
-                }
-                return this._catalogueRepo.getDetailPartner(this.partner.id);
-            })
-        ).subscribe(
-            (res: Partner) => {
-                this.partner.sysMappingId = res.sysMappingId;
-            },
-            (error) => {
-                console.log(error);
-            }
-        );
     }
 
     sortBySaleMan(sortData: CommonInterface.ISortData): void {

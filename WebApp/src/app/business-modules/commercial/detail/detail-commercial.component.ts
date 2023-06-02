@@ -389,6 +389,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                         this.payableComponent.getGeneralPayable(this.partner.id, body.currency);
                         this.isUpdated = false;
                     }
+                    this._store.dispatch(getDetailPartnerSuccess({payload: res}))
                 },
                 (error: HttpErrorResponse) => {
                     console.log(error);

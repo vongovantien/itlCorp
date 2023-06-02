@@ -109,7 +109,7 @@ export class AddPartnerDataComponent extends AppList {
         this.contractList.isActiveNewContract = false;
         this.formPartnerComponent.isUpdate = false;
         this.formPartnerComponent.creditPayment.setValue('Credit');
-        this._cd.detectChanges();
+        //this._cd.detectChanges();
     }
 
     initHeaderSalemanTable() {

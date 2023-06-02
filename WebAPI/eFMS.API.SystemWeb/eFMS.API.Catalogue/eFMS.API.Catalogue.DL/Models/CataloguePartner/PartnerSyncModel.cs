@@ -34,6 +34,6 @@ namespace eFMS.API.Catalogue.DL.Models.CataloguePartner
         public DateTime? IdCardDate { get; set; }
         public string IdCardPlace { get; set; }
         public List<PartnerBankAccountSyncModel> Details { get; set; }
-        public List<PartnerAttachDocSyncModel> AtchDocInfo { get; set; }
+        public List<PartnerAttachDocSyncModel> AttachDocInfo { get; set; }
     }
 }

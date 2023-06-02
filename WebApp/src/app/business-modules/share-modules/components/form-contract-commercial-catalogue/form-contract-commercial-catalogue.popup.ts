@@ -916,6 +916,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 }
             );
     }
+
     syncPartnerToAccountantSystem(partnerRequest: any[]) {
         this._catalogueRepo.syncPartnerToAccountantSystem(partnerRequest).pipe(
             catchError(this.catchError),
