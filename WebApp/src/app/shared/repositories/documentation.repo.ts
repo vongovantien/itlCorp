@@ -1315,6 +1315,10 @@ export class DocumentationRepo {
         }
     }
 
+    getWorkOrder(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsWorkOrder/Query`, body);
+    }
+
     getDetailWorkOrder(id: string) {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-Us/CsWorkOrder/${id}`, null, { "hideSpinner": "true" });
     }

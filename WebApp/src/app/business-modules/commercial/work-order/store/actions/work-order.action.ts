@@ -29,6 +29,8 @@ export enum WorkOrderActionTypes {
     LOAD_DETAIL_SUCCESS = '[WO] Load Detail Success',
     LOAD_DETAIL_FAIL = '[WO] Load Detail Fail',
 
+    SELECT_PARTNER_WORK_ORDER = '[WO] Select Partner',
+    SELECT_AGENT_WORK_ORDER = '[WO] Select Agent',
     SELECT_PARTNER_PRICE_ITEM = '[WO] Select Partner Price Item',
 }
 
@@ -59,3 +61,5 @@ export const DeletePriceItemWorkOrderSuccess = createAction(WorkOrderActionTypes
 export const DeletePriceItemWorkOrderFail = createAction(WorkOrderActionTypes.DELETE_PRICE_ITEM_FAIL);
 
 export const SelectPartnerPriceItemWorkOrder = createAction(WorkOrderActionTypes.SELECT_PARTNER_PRICE_ITEM, props<{ data: Partner }>());
+export const SelectPartnerWorkOrder = createAction(WorkOrderActionTypes.SELECT_PARTNER_WORK_ORDER, props<{ data: Partner }>());
+export const SelectAgentWorkOrder = createAction(WorkOrderActionTypes.SELECT_AGENT_WORK_ORDER, props<{ data: Partner }>());
