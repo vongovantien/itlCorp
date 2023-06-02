@@ -2779,7 +2779,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var partnerSync = new PartnerSyncModel();
                 partnerSync.Code = partner.AccountNo;
                 partnerSync.Name = partner.PartnerNameVn;
-                partnerSync.CustomerType = partner.PartnerGroup.Split(';').Any(x => x.Equals("STAFT") || x.Equals("PERSONAL")) ? "1" : (partner.PartnerMode.Trim() == "External" ? "2" : "3");
+                partnerSync.CustomerType = (partner.PartnerGroup.Contains("STAFF") || partner.PartnerGroup.Contains("PERSONAL")) ? "1" : (partner.PartnerMode.Trim() == "External" ? "2" : "3");
                 partnerSync.Address = partner.AddressShippingVn;
                 partnerSync.BillingAddress = partner.AddressVn;
                 partnerSync.TaxRegNo = partner.TaxCode;
