@@ -2903,7 +2903,7 @@ namespace eFMS.API.Documentation.DL.Services
                             ReferenceNo = chg.Soano,
                             HBLId = chg.Hblid,
                             JobNo = chg.JobNo,
-                            JobId = chg.TransactionType == "CL" ? ops.Id : trans.Id,
+                            JobId = string.IsNullOrEmpty(chg.TransactionType) ? ops.Id : (chg.TransactionType == "CL" ? ops.Id : trans.Id),
                             MBLNo = chg.Mblno,
                             HBLNo = chg.Hblno,
                             Total = chg.Total,
