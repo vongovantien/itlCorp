@@ -1931,6 +1931,10 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = null;
             var _currentUser = currentUser.UserName;
 
+            if (currency == "DB_INV") // currency to export case send debit_inv  mail
+            {
+                currency = data.Currency;
+            }
             var listCharge = new List<SeaDebitAgentsNewReport>();
             // var data = GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
             bool isOriginCurr = currency == DocumentConstants.CURRENCY_ORIGIN;
@@ -2207,6 +2211,10 @@ namespace eFMS.API.Documentation.DL.Services
         public Crystal PreviewAir(AcctCDNoteDetailsModel data, string currency, ExportFormatType format = ExportFormatType.PortableDocFormat)
         {
             Crystal result = null;
+            if (currency == "DB_INV") // currency to export case send debit_inv  mail
+            {
+                currency = data.Currency;
+            }
             var _currentUser = currentUser.UserName;
             var listCharge = new List<AirShipperDebitNewReport>();
             //var data = GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
