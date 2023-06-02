@@ -468,7 +468,7 @@ namespace eFMS.API.Documentation.DL.Services
                .WhereIf(criteria.Active != null,
                     x => x.Active == criteria.Active);
 
-            var query = criteriaBuilder.Apply(await GetAsync());
+            var query = criteriaBuilder.Apply(Get());
             return query;
         }
 
