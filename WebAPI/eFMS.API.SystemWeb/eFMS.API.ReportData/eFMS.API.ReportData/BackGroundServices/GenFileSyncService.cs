@@ -38,6 +38,7 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
         {
             try
             {
+                var model = new FileUploadAttachTemplateModel();
                 new LogHelper("GenFileSyncSMBackgroundService", "STARTED at " + DateTime.Now);
                 await _busControl.ReceiveAsync<ExportDetailSettleModel>(RabbitExchange.EFMS_ReportData, RabbitConstants.GenFileSyncQueue, async (models) =>
                 {
@@ -45,7 +46,7 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
                     var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
                     var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, models.Lang, "");
                     var file = new Helpers.FileHelper().ReturnFormFile(dataObjects.Result.InfoSettlement.SettlementNo, stream, "Settlement Form - eFMS");
-                    var model = new FileUploadAttachTemplateModel
+                    model = new FileUploadAttachTemplateModel
                     {
                         Child = null,
                         File = file,
@@ -56,8 +57,8 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
                     };
                 }, async (models) =>
                 {
-                    await _busControl.SendAsync(RabbitExchange.EFMS_FileManagement, RabbitConstants.PostAttachFileTemplateToEDocQueue, models);
-                }, batchSize: 3, maxMessagesInFlight: 10);
+                    await _busControl.SendAsync(RabbitExchange.EFMS_FileManagement, RabbitConstants.PostAttachFileTemplateToEDocQueue, model);
+                }, batchSize: 1, maxMessagesInFlight: 10);
             }
             catch (Exception ex)
             {

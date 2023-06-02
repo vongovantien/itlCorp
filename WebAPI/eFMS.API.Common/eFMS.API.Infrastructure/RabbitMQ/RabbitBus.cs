@@ -117,7 +117,7 @@ namespace eFMS.API.Infrastructure.RabbitMQ
             await Task.Delay(Timeout.Infinite);
         }
 
-        public async Task ReceiveAsync<T>(string exchange, string queue, Action<T> onMessage, Action<T> onMessageSend, int batchSize = 10, int maxMessagesInFlight = 100)
+        public async Task ReceiveAsync<T>(string exchange, string queue, Action<T> onMessage, Action<T> onMessageSend, int batchSize = 1, int maxMessagesInFlight = 100)
         {
             _channel.ExchangeDeclare(exchange, "direct", true, false);
             _channel.QueueDeclare(queue, true, false, false);
