@@ -1931,6 +1931,7 @@ namespace eFMS.API.Documentation.DL.Services
             Crystal result = null;
             var _currentUser = currentUser.UserName;
 
+
             var listCharge = new List<SeaDebitAgentsNewReport>();
             // var data = GetCDNoteDetails(criteria.JobId, criteria.CreditDebitNo);
             bool isOriginCurr = currency == DocumentConstants.CURRENCY_ORIGIN;
