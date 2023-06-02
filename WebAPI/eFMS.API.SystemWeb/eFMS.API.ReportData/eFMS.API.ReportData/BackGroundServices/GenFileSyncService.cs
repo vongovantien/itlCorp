@@ -54,8 +54,9 @@ namespace eFMS.API.ReportData.Service.BackGroundServices
                         Id = models.SettlementId,
                         UserCreated = dataObjects.Result.UserCreated
                     };
-                    await _busControl.SendAsync(RabbitExchange.EFMS_FileManagement, RabbitConstants.PostAttachFileTemplateToEDocQueue, model);
-
+                }, async (models) =>
+                {
+                    await _busControl.SendAsync(RabbitExchange.EFMS_FileManagement, RabbitConstants.PostAttachFileTemplateToEDocQueue, models);
                 }, batchSize: 3, maxMessagesInFlight: 10);
             }
             catch (Exception ex)

@@ -106,6 +106,50 @@ namespace eFMS.API.Infrastructure.RabbitMQ
                 {
                     _channel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
                     semaphore.Release();
+                    //
+                }
+
+
+            };
+            _channel.BasicQos(0, (ushort)batchSize, false);
+            _channel.BasicConsume(queue, false, consumer);
+
+            await Task.Delay(Timeout.Infinite);
+        }
+
+        public async Task ReceiveAsync<T>(string exchange, string queue, Action<T> onMessage, Action<T> onMessageSend, int batchSize = 10, int maxMessagesInFlight = 100)
+        {
+            _channel.ExchangeDeclare(exchange, "direct", true, false);
+            _channel.QueueDeclare(queue, true, false, false);
+            _channel.QueueBind(queue, exchange, queue);
+            var consumer = new AsyncEventingBasicConsumer(_channel);
+            var semaphore = new SemaphoreSlim(maxMessagesInFlight, maxMessagesInFlight);
+
+            consumer.Received += async (s, e) =>
+            {
+                await semaphore.WaitAsync();
+                var jsonSpecified = Encoding.UTF8.GetString(e.Body.Span);
+                var item = JsonConvert.DeserializeObject<T>(jsonSpecified);
+                try
+                {
+                    //await semaphore.WaitAsync();
+                    //var jsonSpecified = Encoding.UTF8.GetString(e.Body.Span);
+                    //var item = JsonConvert.DeserializeObject<T>(jsonSpecified);
+                    onMessage(item);
+                    await Task.Yield();
+
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+                finally
+                {
+                    _channel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
+                    semaphore.Release();
+                    onMessageSend(item);
+                    //
                 }
 
 
