@@ -117,7 +117,7 @@ namespace eFMS.API.Infrastructure.RabbitMQ
             await Task.Delay(Timeout.Infinite);
         }
 
-        public async Task ReceiveAsync<T>(string exchange, string queue, Action<T> onMessage, Action<T> onMessageSend, int batchSize = 1, int maxMessagesInFlight = 100)
+        public async Task ReceiveAsync<T>(string exchange, string queue, Action<T> onMessage, Action onMessageSend, int batchSize = 1, int maxMessagesInFlight = 100)
         {
             _channel.ExchangeDeclare(exchange, "direct", true, false);
             _channel.QueueDeclare(queue, true, false, false);
@@ -127,14 +127,11 @@ namespace eFMS.API.Infrastructure.RabbitMQ
 
             consumer.Received += async (s, e) =>
             {
-                await semaphore.WaitAsync();
-                var jsonSpecified = Encoding.UTF8.GetString(e.Body.Span);
-                var item = JsonConvert.DeserializeObject<T>(jsonSpecified);
                 try
                 {
-                    //await semaphore.WaitAsync();
-                    //var jsonSpecified = Encoding.UTF8.GetString(e.Body.Span);
-                    //var item = JsonConvert.DeserializeObject<T>(jsonSpecified);
+                    await semaphore.WaitAsync();
+                    var jsonSpecified = Encoding.UTF8.GetString(e.Body.Span);
+                    var item = JsonConvert.DeserializeObject<T>(jsonSpecified);
                     onMessage(item);
                     await Task.Yield();
 
@@ -148,7 +145,7 @@ namespace eFMS.API.Infrastructure.RabbitMQ
                 {
                     _channel.BasicAck(deliveryTag: e.DeliveryTag, multiple: false);
                     semaphore.Release();
-                    onMessageSend(item);
+                    onMessageSend();
                     //
                 }
 
