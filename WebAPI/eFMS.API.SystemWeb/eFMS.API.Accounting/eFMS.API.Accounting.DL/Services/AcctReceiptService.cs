@@ -5351,7 +5351,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var creditArs = creditMngtArRepository.Get(x => !string.IsNullOrEmpty(x.ReferenceNo));
 
                 IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH").OrderBy(x => x.DatetimeCreated);
-                var partnerInfos = partners.Where(x => x.Id == result.CustomerId || x.ParentId == result.CustomerId);
+                //var partnerInfos = partners.Where(x => x.Id == result.CustomerId || x.ParentId == result.CustomerId);
 
                 if (listOBH.Count() > 0)
                 {
@@ -5395,7 +5395,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         if (!string.IsNullOrEmpty(item.PartnerId))
                         {
-                            var agency = partnerInfos.FirstOrDefault(x => x.Id == item.PartnerId);
+                            var agency = partners.FirstOrDefault(x => x.Id == item.PartnerId);
                             item.PartnerName = agency?.ShortName;
                             item.TaxCode = agency?.AccountNo;
                         }
@@ -6227,6 +6227,7 @@ namespace eFMS.API.Accounting.DL.Services
                 if (isAddNew)
                 {
                     receiptModels = UpdateArcbNoReceipt(receiptModels, _arcbNo);
+                    _arcbNo = receiptModels.FirstOrDefault()?.Arcbno;
                 }
                 UpdateBalanceReceipt(_arcbNo);
 
