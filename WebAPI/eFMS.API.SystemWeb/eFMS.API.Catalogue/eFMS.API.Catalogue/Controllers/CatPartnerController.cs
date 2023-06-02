@@ -349,15 +349,13 @@ namespace eFMS.API.Catalogue.Controllers
                 Uri urlCatelogue = new Uri(_apiUrl.Value.Url);
                 string accessToken = Request.Headers["Authorization"].ToString();
 
-                HttpResponseMessage response = await HttpClientService.PutAPI("https://localhost:44341" + "/api/v1/vi/CatPartner/SyncPartnerToAccountantSystem", requestModel, accessToken);
+                HttpResponseMessage response = await HttpClientService.PutAPI(urlCatelogue + "/api/v1/vi/CatPartner/SyncPartnerToAccountantSystem", requestModel, accessToken);
                 hsResult = await response.Content.ReadAsAsync<ResultHandle>();
             }
-
             if (!hsResult.Status)
             {
-                return BadRequest(hsResult);
+                return Ok(hsResult);
             }
-
             if (model.Active == false)
             {
                 var message = HandleError.GetMessage(hs, Crud.Update);

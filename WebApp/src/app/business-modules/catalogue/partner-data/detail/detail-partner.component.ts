@@ -507,10 +507,11 @@ export class PartnerDetailComponent extends AppList {
                             this.formPartnerComponent.bankName.setValue(this.formPartnerComponent.bankName.value?.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
                             this.getParentCustomers();
                             this._toastService.success(message);
-                            this._store.dispatch(getDetailPartner({ payload: this.partner.id }));
+
                         } else {
-                            this._toastService.warning(message);
+                            this._toastService.error(message);
                         }
+                        this._store.dispatch(getDetailPartner({ payload: this.partner.id }));
                         if (body.active === true) {
                             this._toastService.success("Data update success");
                         }
